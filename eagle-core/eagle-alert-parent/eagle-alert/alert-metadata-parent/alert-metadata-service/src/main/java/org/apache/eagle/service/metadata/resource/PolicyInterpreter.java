@@ -23,7 +23,9 @@ import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.siddhi.core.exception.DefinitionNotExistException;
 import org.wso2.siddhi.query.api.ExecutionPlan;
+import org.wso2.siddhi.query.api.exception.DuplicateDefinitionException;
 import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.query.Query;
@@ -117,7 +119,7 @@ public class PolicyInterpreter {
                     // -----------------------
                     InputStream inputStream = ((Query) executionElement).getInputStream();
                     Selector selector = ((Query) executionElement).getSelector();
-                    Map<String,SingleInputStream> aliasToStreamMapping = new HashMap<>();
+                    Map<String, SingleInputStream> queryAliasToStreamMapping = new HashMap<>();
 
                     // Inputs stream definitions
                     for (String streamId : inputStream.getUniqueStreamIds()) {
@@ -133,8 +135,8 @@ public class PolicyInterpreter {
 
                     // Window Spec and Partition
                     if (inputStream instanceof SingleInputStream) {
-                        retrieveAlias((SingleInputStream) inputStream,aliasToStreamMapping);
-                        retrievePartition(findStreamPartition((SingleInputStream) inputStream,selector), partitions);
+                        retrieveAlias((SingleInputStream) inputStream, queryAliasToStreamMapping);
+                        retrievePartition(findStreamPartition((SingleInputStream) inputStream, selector), partitions);
                     } else {
                         if (inputStream instanceof JoinInputStream) {
                             // Only Support JOIN/INNER_JOIN Now
@@ -144,8 +146,8 @@ public class PolicyInterpreter {
 
                                 retrievePartition(findStreamPartition(leftInputStream, selector), partitions);
                                 retrievePartition(findStreamPartition(rightInputStream, selector), partitions);
-                                retrieveAlias(leftInputStream, aliasToStreamMapping);
-                                retrieveAlias(rightInputStream, aliasToStreamMapping);
+                                retrieveAlias(leftInputStream, queryAliasToStreamMapping);
+                                retrieveAlias(rightInputStream, queryAliasToStreamMapping);
 
                             } else {
                                 throw new ExecutionPlanValidationException("Not support " + ((JoinInputStream) inputStream).getType() + " yet, currently support: INNER JOIN");
@@ -153,10 +155,9 @@ public class PolicyInterpreter {
 
                             Expression joinCondition = ((JoinInputStream) inputStream).getOnCompare();
 
-                            if(joinCondition != null) {
+                            if (joinCondition != null) {
                                 if (joinCondition instanceof Compare) {
                                     if (((Compare) joinCondition).getOperator().equals(Compare.Operator.EQUAL)) {
-                                        // TODO: Handle alias reference
                                         Variable leftExpression = (Variable) ((Compare) joinCondition).getLeftExpression();
                                         Preconditions.checkNotNull(leftExpression.getStreamId());
                                         Preconditions.checkNotNull(leftExpression.getAttributeName());
@@ -164,8 +165,7 @@ public class PolicyInterpreter {
                                         StreamPartition leftPartition = new StreamPartition();
                                         leftPartition.setType(StreamPartition.Type.GROUPBY);
                                         leftPartition.setColumns(Collections.singletonList(leftExpression.getAttributeName()));
-                                        leftPartition.setStreamId(actualInputStreams.containsKey(leftExpression.getStreamId())
-                                            ? leftExpression.getStreamId() : aliasToStreamMapping.get(leftExpression.getStreamId()).getStreamId());
+                                        leftPartition.setStreamId(retrieveStreamId(leftExpression,actualInputStreams,queryAliasToStreamMapping));
                                         retrievePartition(leftPartition, partitions);
 
                                         Variable rightExpression = (Variable) ((Compare) joinCondition).getRightExpression();
@@ -173,9 +173,8 @@ public class PolicyInterpreter {
                                         Preconditions.checkNotNull(rightExpression.getAttributeName());
                                         StreamPartition rightPartition = new StreamPartition();
                                         rightPartition.setType(StreamPartition.Type.GROUPBY);
-                                        rightPartition.setColumns(Collections.singletonList(leftExpression.getAttributeName()));
-                                        rightPartition.setStreamId(actualInputStreams.containsKey(leftExpression.getStreamId())
-                                            ? leftExpression.getStreamId() : aliasToStreamMapping.get(leftExpression.getStreamId()).getStreamId());
+                                        rightPartition.setColumns(Collections.singletonList(rightExpression.getAttributeName()));
+                                        rightPartition.setStreamId(retrieveStreamId(rightExpression,actualInputStreams,queryAliasToStreamMapping));
                                         retrievePartition(leftPartition, partitions);
                                     } else {
                                         throw new ExecutionPlanValidationException("Only support \"EQUAL\" condition in INNER JOIN" + joinCondition);
@@ -247,6 +246,18 @@ public class PolicyInterpreter {
     }
 
 
+    private static String retrieveStreamId(Variable variable, Map<String, List<StreamColumn>> streamMap, Map<String, SingleInputStream> aliasMap) {
+        Preconditions.checkNotNull(variable.getStreamId(), "streamId");
+        if (streamMap.containsKey(variable.getStreamId()) && aliasMap.containsKey(variable.getStreamId())) {
+            throw new DuplicateDefinitionException("Duplicated streamId and alias: " + variable.getStreamId());
+        } else if (streamMap.containsKey(variable.getStreamId())) {
+            return variable.getStreamId();
+        } else if (aliasMap.containsKey(variable.getStreamId())) {
+            return aliasMap.get(variable.getStreamId()).getStreamId();
+        } else {
+            throw new DefinitionNotExistException(variable.getStreamId());
+        }
+    }
 
     private static StreamPartition findStreamPartition(SingleInputStream inputStream, Selector selector) {
         // Window Spec
@@ -260,14 +271,16 @@ public class PolicyInterpreter {
         // Group By Spec
         List<Variable> groupBy = selector.getGroupByList();
         if (windows.size() > 0 || groupBy.size() >= 0) {
-           return generatePartition(inputStream.getStreamId(), windows, groupBy);
+            return generatePartition(inputStream.getStreamId(), windows, groupBy);
         } else {
             return null;
         }
     }
 
-    private static void retrievePartition(StreamPartition partition, Map<String,StreamPartition> repo) {
-        if (partition == null) return;
+    private static void retrievePartition(StreamPartition partition, Map<String, StreamPartition> repo) {
+        if (partition == null) {
+            return;
+        }
 
         if (!repo.containsKey(partition.getStreamId())) {
             repo.put(partition.getStreamId(), partition);
@@ -287,12 +300,12 @@ public class PolicyInterpreter {
         }
     }
 
-    private static void retrieveAlias(SingleInputStream inputStream, Map<String,SingleInputStream> aliasStreamMapping) {
-        if(inputStream.getStreamReferenceId()!=null) {
+    private static void retrieveAlias(SingleInputStream inputStream, Map<String, SingleInputStream> aliasStreamMapping) {
+        if (inputStream.getStreamReferenceId() != null) {
             if (aliasStreamMapping.containsKey(inputStream.getStreamReferenceId())) {
-                throw new ExecutionPlanValidationException("Duplicated stream alias "+ inputStream.getStreamId()+" -> "+ inputStream);
+                throw new ExecutionPlanValidationException("Duplicated stream alias " + inputStream.getStreamId() + " -> " + inputStream);
             } else {
-                aliasStreamMapping.put(inputStream.getStreamReferenceId(),inputStream);
+                aliasStreamMapping.put(inputStream.getStreamReferenceId(), inputStream);
             }
         }
     }
@@ -322,7 +335,7 @@ public class PolicyInterpreter {
 
     private static int getExternalTimeWindowSize(Window window) {
         Expression windowSize = window.getParameters()[1];
-        if(windowSize instanceof TimeConstant) {
+        if (windowSize instanceof TimeConstant) {
             return ((TimeConstant) windowSize).getValue().intValue();
         } else if (windowSize instanceof IntConstant) {
             return ((IntConstant) windowSize).getValue();

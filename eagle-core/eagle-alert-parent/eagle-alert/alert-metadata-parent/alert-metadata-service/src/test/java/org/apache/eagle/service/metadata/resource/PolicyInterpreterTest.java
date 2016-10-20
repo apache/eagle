@@ -22,6 +22,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.junit.Assert;
 import org.junit.Test;
+import org.wso2.siddhi.core.exception.DefinitionNotExistException;
 import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
 import java.util.*;
@@ -330,6 +331,34 @@ public class PolicyInterpreterTest {
         Assert.assertEquals(1000*1000, executionPlan.getStreamPartitions().get(0).getSortSpec().getWindowPeriodMillis());
         Assert.assertEquals(StreamPartition.Type.GROUPBY, executionPlan.getStreamPartitions().get(1).getType());
         Assert.assertNull(executionPlan.getStreamPartitions().get(1).getSortSpec());
+    }
+
+    @Test
+    public void testParseTwoStreamPolicyQueryInnerJoinWithConditionHavingAlias() throws Exception {
+        PolicyExecutionPlan executionPlan = PolicyInterpreter.parseExecutionPlan(
+            "from TickEvent[symbol=='EBAY']#window.length(2000) as t unidirectional \n" +
+                "join NewsEvent#window.externalTime(timestamp, 1000 sec) as n \n" +
+                "on t.symbol == n.company \n" +
+                "insert into JoinStream "
+        );
+        Assert.assertTrue(executionPlan.getInputStreams().containsKey("TickEvent"));
+        Assert.assertTrue(executionPlan.getInputStreams().containsKey("NewsEvent"));
+        Assert.assertTrue(executionPlan.getOutputStreams().containsKey("JoinStream"));
+        Assert.assertEquals(StreamPartition.Type.SHUFFLE, executionPlan.getStreamPartitions().get(0).getType());
+        Assert.assertNotNull(executionPlan.getStreamPartitions().get(0).getSortSpec());
+        Assert.assertEquals(1000*1000, executionPlan.getStreamPartitions().get(0).getSortSpec().getWindowPeriodMillis());
+        Assert.assertEquals(StreamPartition.Type.GROUPBY, executionPlan.getStreamPartitions().get(1).getType());
+        Assert.assertNull(executionPlan.getStreamPartitions().get(1).getSortSpec());
+    }
+
+    @Test(expected = DefinitionNotExistException.class)
+    public void testParseTwoStreamPolicyQueryInnerJoinWithConditionHavingNotFoundAlias() throws Exception {
+        PolicyInterpreter.parseExecutionPlan(
+            "from TickEvent[symbol=='EBAY']#window.length(2000) as t unidirectional \n" +
+            "join NewsEvent#window.externalTime(timestamp, 1000 sec) as n \n" +
+            "on t.symbol == NOT_EXIST_ALIAS.company \n" +
+            "insert into JoinStream "
+        );
     }
 
     // --------------
