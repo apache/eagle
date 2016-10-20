@@ -25,8 +25,10 @@ import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class AlertUnitTopologyAppProviderTest extends ApplicationTestBase {
 
     @Inject
