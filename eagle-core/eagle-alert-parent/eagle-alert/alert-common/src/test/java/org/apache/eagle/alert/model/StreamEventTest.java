@@ -29,18 +29,19 @@ import java.util.List;
 public class StreamEventTest {
     @Test
     public void testStreamEventEqual() {
-        StreamEvent event1 = mockSimpleStreamEvent();
-        StreamEvent event2 = mockSimpleStreamEvent();
+        Long timestamp = System.currentTimeMillis();
+        StreamEvent event1 = mockSimpleStreamEvent(timestamp);
+        StreamEvent event2 = mockSimpleStreamEvent(timestamp);
         StreamEvent event3 = event2.copy();
         Assert.assertEquals(event1, event2);
         Assert.assertEquals(event2, event3);
     }
 
-    private static StreamEvent mockSimpleStreamEvent() {
+    private static StreamEvent mockSimpleStreamEvent(Long timestamp) {
         return StreamEvent.builder()
             .schema(mockStreamDefinition("sampleStream_1"))
             .streamId("sampleStream_1")
-            .timestamep(System.currentTimeMillis())
+            .timestamep(timestamp)
             .attributes(new HashMap<String, Object>() {{
                 put("name", "cpu");
                 put("value", 60.0);
