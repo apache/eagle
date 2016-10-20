@@ -32,10 +32,9 @@ import java.util.concurrent.TimeUnit;
 public class MetricSystem implements IMetricSystem {
     private final Config config;
     private Map<MetricSink, Config> sinks = new HashMap<>();
-    //    private Map<String,MetricSource> sources = new HashMap<>();
     private MetricRegistry registry = new MetricRegistry();
-    private volatile boolean running;
-    private volatile boolean initialized;
+    private boolean running;
+    private boolean initialized;
     private static final Logger LOG = LoggerFactory.getLogger(MetricSystem.class);
     private final Map<String, Object> metricTags = new HashMap<>();
 

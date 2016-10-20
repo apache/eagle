@@ -53,15 +53,18 @@ public class ElasticSearchSink implements MetricSink {
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
+        LOG.info("Initialized elasticsearch-sink");
     }
 
     @Override
     public void start(long period, TimeUnit unit) {
+        LOG.info("Starting elasticsearch-sink");
         reporter.start(period, TimeUnit.SECONDS);
     }
 
     @Override
     public void stop() {
+        LOG.info("Stopping elasticsearch-sink");
         reporter.stop();
         reporter.close();
     }
