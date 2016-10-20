@@ -33,6 +33,8 @@ import org.apache.eagle.app.sink.KafkaStreamSinkConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -50,34 +52,33 @@ import java.util.stream.Collectors;
  * </ul>
  */
 public class ApplicationAction implements Serializable {
-    private final Config config;
+    private final Config effectiveConfig;
     private final Application application;
     private final ExecutionRuntime runtime;
     private final ApplicationEntity metadata;
     private final IMetadataDao alertMetadataService;
-    private static final String APP_METRIC_PREFIX = "app.";
+    private static final String APP_METRIC_PREFIX = "eagle.";
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationAction.class);
 
     /**
      * @param metadata    ApplicationEntity.
      * @param application Application.
      */
-    public ApplicationAction(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService) {
+    public ApplicationAction(Application application, ApplicationEntity metadata, Config serverConfig, IMetadataDao alertMetadataService) {
         Preconditions.checkNotNull(application, "Application is null");
         Preconditions.checkNotNull(metadata, "ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(), envConfig);
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(), serverConfig);
         Map<String, Object> executionConfig = metadata.getConfiguration();
         if (executionConfig == null) {
             executionConfig = Collections.emptyMap();
         }
-
-        if (!envConfig.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
-            executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF,APP_METRIC_PREFIX);
-        } else {
-            executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF, envConfig.getString(MetricConfigs.METRIC_PREFIX_CONF) + APP_METRIC_PREFIX);
+        if(serverConfig.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
+            LOG.warn("Ignored sever config {} = {}", MetricConfigs.METRIC_PREFIX_CONF, serverConfig.getString(MetricConfigs.METRIC_PREFIX_CONF));
         }
-        this.config = ConfigFactory.parseMap(executionConfig).withFallback(envConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
+        executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF,APP_METRIC_PREFIX);
+        this.effectiveConfig = ConfigFactory.parseMap(executionConfig).withFallback(serverConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
         this.alertMetadataService = alertMetadataService;
     }
 
@@ -95,7 +96,7 @@ public class ApplicationAction implements Serializable {
                 StreamDefinition copied = streamDefinition.copy();
                 copied.setSiteId(metadata.getSite().getSiteId());
                 copied.setStreamId(generateUniqueStreamId(metadata.getSite().getSiteId(),copied.getStreamId()));
-                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(copied.getStreamId(), this.config);
+                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(copied.getStreamId(), this.effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
                 streamDesc.setSink(streamSinkConfig);
@@ -145,16 +146,16 @@ public class ApplicationAction implements Serializable {
     }
 
     public void doStart() {
-        this.runtime.start(this.application, this.config);
+        this.runtime.start(this.application, this.effectiveConfig);
     }
 
     @SuppressWarnings("unchecked")
     public void doStop() {
-        this.runtime.stop(this.application, this.config);
+        this.runtime.stop(this.application, this.effectiveConfig);
     }
 
     public ApplicationEntity.Status getStatus() {
-        return this.runtime.status(this.application, this.config);
+        return this.runtime.status(this.application, this.effectiveConfig);
     }
 
     public ApplicationEntity getMetadata() {
