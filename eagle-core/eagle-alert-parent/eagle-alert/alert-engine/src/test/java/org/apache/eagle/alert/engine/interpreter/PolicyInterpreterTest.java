@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.service.metadata.resource;
+package org.apache.eagle.alert.engine.interpreter;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.interpreter.PolicyExecutionPlan;
+import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
+import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.siddhi.core.exception.DefinitionNotExistException;
