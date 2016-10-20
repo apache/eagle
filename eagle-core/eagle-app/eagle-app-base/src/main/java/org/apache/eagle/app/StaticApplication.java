@@ -18,14 +18,14 @@ package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.StaticApplicationExecutor;
-import org.apache.eagle.app.environment.impl.WebEnvironment;
+import org.apache.eagle.app.environment.impl.StaticEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Static Application without executable process.
  */
-public class StaticApplication implements Application<WebEnvironment, StaticApplicationExecutor> {
+public class StaticApplication implements Application<StaticEnvironment, StaticApplicationExecutor> {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaticApplication.class);
     private final String name;
 
@@ -34,14 +34,14 @@ public class StaticApplication implements Application<WebEnvironment, StaticAppl
     }
 
     @Override
-    public StaticApplicationExecutor execute(Config config, WebEnvironment environment) {
+    public StaticApplicationExecutor execute(Config config, StaticEnvironment environment) {
         LOGGER.warn("Executing Static application");
         return new StaticApplicationExecutor(this);
     }
 
     @Override
-    public Class<? extends WebEnvironment> getEnvironmentType() {
-        return WebEnvironment.class;
+    public Class<? extends StaticEnvironment> getEnvironmentType() {
+        return StaticEnvironment.class;
     }
 
     @Override

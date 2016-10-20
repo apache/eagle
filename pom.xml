@@ -1154,6 +1154,10 @@
                         <maxmem>256m</maxmem>
                         <!-- aggregated reports for multi-module projects -->
                         <aggregate>true</aggregate>
+                        <check>
+                            <totalBranchRate>25</totalBranchRate>
+                            <totalLineRate>25</totalLineRate>
+                        </check>
                     </configuration>
                     <dependencies>
                         <!--Use asm-5.0 to support Java 8-->

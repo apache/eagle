@@ -20,10 +20,10 @@ import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.Environment;
 import org.apache.eagle.app.sink.StreamSinkProvider;
 
-public class WebEnvironment implements Environment {
+public class StaticEnvironment implements Environment {
     private final Config config;
 
-    public WebEnvironment(Config config) {
+    public StaticEnvironment(Config config) {
         this.config = config;
     }
 
@@ -34,6 +34,6 @@ public class WebEnvironment implements Environment {
 
     @Override
     public StreamSinkProvider streamSink() {
-        throw new IllegalStateException("streamSink() is not supported in " + WebEnvironment.class.getSimpleName());
+        throw new IllegalStateException("streamSink() is not supported in " + StaticEnvironment.class.getSimpleName());
     }
 }
