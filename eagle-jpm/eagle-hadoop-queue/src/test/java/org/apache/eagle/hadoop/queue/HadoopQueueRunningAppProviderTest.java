@@ -27,6 +27,5 @@ public class HadoopQueueRunningAppProviderTest extends ApplicationTestBase {
 
     @Test
     public void testRunAsManagedApplicationWithSimulator() {
-        simulator.start(HadoopQueueRunningAppProvider.class);
     }
 }
