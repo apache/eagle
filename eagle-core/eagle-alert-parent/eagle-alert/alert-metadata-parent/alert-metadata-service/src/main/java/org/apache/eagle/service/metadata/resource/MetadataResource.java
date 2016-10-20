@@ -23,6 +23,9 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
+import org.apache.eagle.alert.engine.interpreter.PolicyParseResult;
+import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
@@ -207,7 +210,11 @@ public class MetadataResource {
     @Path("/policies/validate")
     @POST
     public PolicyValidationResult validatePolicy(PolicyDefinition policy) {
-        return PolicyInterpreter.validate(policy,dao);
+        Map<String, StreamDefinition> allDefinitions = new HashMap<>();
+        for (StreamDefinition definition : dao.listStreams()) {
+            allDefinitions.put(definition.getStreamId(), definition);
+        }
+        return PolicyInterpreter.validate(policy, allDefinitions);
     }
 
     @Path("/policies/parse")

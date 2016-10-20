@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.service.metadata.resource;
+package org.apache.eagle.alert.engine.interpreter;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
