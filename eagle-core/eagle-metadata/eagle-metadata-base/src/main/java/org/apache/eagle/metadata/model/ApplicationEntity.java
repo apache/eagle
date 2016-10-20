@@ -35,7 +35,7 @@ public class ApplicationEntity extends PersistenceEntity {
     private ApplicationDesc descriptor;
 
     private Map<String, Object> configuration = new HashMap<>();
-    private Map<String, String> context = new HashMap<>();
+    private Map<String, Object> context = new HashMap<>();
     private List<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
     private String jarPath;
@@ -118,11 +118,11 @@ public class ApplicationEntity extends PersistenceEntity {
         }
     }
 
-    public Map<String, String> getContext() {
+    public Map<String, Object> getContext() {
         return context;
     }
 
-    public void setContext(Map<String, String> context) {
+    public void setContext(Map<String, Object> context) {
         this.context = context;
     }
 

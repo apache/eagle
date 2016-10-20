@@ -54,6 +54,10 @@ public class ApplicationEntityToRelation implements ThrowableConsumer2<PreparedS
             statement.setString(parameterIndex, JSONObject.toJSONString(entity.getConfiguration()));
             parameterIndex++;
         }
+        if (entity.getContext() != null && !entity.getContext().isEmpty()) {
+            statement.setString(parameterIndex, JSONObject.toJSONString(entity.getContext()));
+            parameterIndex++;
+        }
         if (entity.getCreatedTime() > 0) {
             statement.setLong(parameterIndex, entity.getCreatedTime());
             parameterIndex++;
