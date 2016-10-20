@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.alert.metric;
 
-import org.apache.eagle.alert.metric.sink.MetricSink;
-import org.apache.eagle.alert.metric.sink.MetricSinkRepository;
-import org.apache.eagle.alert.metric.source.MetricSource;
 import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.metric.sink.MetricSink;
+import org.apache.eagle.alert.metric.sink.MetricSinkRepository;
+import org.apache.eagle.alert.metric.source.MetricSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +33,18 @@ public class MetricSystem implements IMetricSystem {
     private final Config config;
     private Map<MetricSink, Config> sinks = new HashMap<>();
     private MetricRegistry registry = new MetricRegistry();
-    private boolean running;
-    private boolean initialized;
+    private volatile boolean running;
+    private volatile boolean initialized;
     private static final Logger LOG = LoggerFactory.getLogger(MetricSystem.class);
     private final Map<String, Object> metricTags = new HashMap<>();
+    private int scheduleDurationSeconds = 10;
 
     public MetricSystem(Config config) {
         this.config = config;
+        if (this.config.hasPath(MetricConfigs.DURATION_SECONDS_CONF)) {
+            this.scheduleDurationSeconds = this.config.getInt(MetricConfigs.DURATION_SECONDS_CONF);
+            LOG.info("Override {}: {}",MetricConfigs.DURATION_SECONDS_CONF, this.scheduleDurationSeconds);
+        }
     }
 
     public static MetricSystem load(Config config) {
@@ -48,6 +53,9 @@ public class MetricSystem implements IMetricSystem {
         return instance;
     }
 
+    /**
+     * Add additional tags.
+     */
     @Override
     public void tags(Map<String, Object> metricTags) {
         this.metricTags.putAll(metricTags);
@@ -56,9 +64,11 @@ public class MetricSystem implements IMetricSystem {
     @Override
     public void start() {
         if (initialized) {
-            throw new IllegalStateException("Attempting to initialize a MetricsSystem that is already intialized");
+            throw new IllegalStateException("Attempting to initialize a MetricsSystem that is already initialized");
         }
-        sinks.forEach((sink, conf) -> sink.prepare(conf.withValue("tags", ConfigFactory.parseMap(metricTags).root()), registry));
+        sinks.forEach((sink, conf) -> {
+            sink.prepare(conf.withValue(MetricConfigs.TAGS_FIELD_NAME, ConfigFactory.parseMap(metricTags).root()), registry);
+        });
         initialized = true;
     }
 
@@ -67,8 +77,7 @@ public class MetricSystem implements IMetricSystem {
         if (running) {
             throw new IllegalStateException("Attempting to start a MetricsSystem that is already running");
         }
-
-        sinks.keySet().forEach((sink) -> sink.start(5, TimeUnit.SECONDS));
+        sinks.keySet().forEach((sink) -> sink.start(this.scheduleDurationSeconds, TimeUnit.SECONDS));
         running = true;
     }
 
@@ -77,12 +86,12 @@ public class MetricSystem implements IMetricSystem {
     }
 
     private void loadSinksFromConfig() {
-        Config sinkCls = config.hasPath("metric.sink") ? config.getConfig("metric.sink") : null;
+        Config sinkCls = config.hasPath(MetricConfigs.METRIC_SINK_CONF) ? config.getConfig(MetricConfigs.METRIC_SINK_CONF) : null;
         if (sinkCls == null) {
             // do nothing
         } else {
             for (String sinkType : sinkCls.root().unwrapped().keySet()) {
-                register(MetricSinkRepository.createSink(sinkType), config.getConfig("metric.sink." + sinkType));
+                register(MetricSinkRepository.createSink(sinkType), config.getConfig(MetricConfigs.METRIC_SINK_CONF + "." + sinkType));
             }
         }
     }
@@ -99,8 +108,8 @@ public class MetricSystem implements IMetricSystem {
 
     @Override
     public void register(MetricSink sink, Config config) {
-        LOG.debug("Register {}", sink);
         sinks.put(sink, config);
+        LOG.info("Registered {}", sink);
     }
 
     @Override

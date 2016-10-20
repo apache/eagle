@@ -25,6 +25,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.scheme.JsonScheme;
 import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metric.MetricConfigs;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
@@ -54,6 +55,7 @@ public class ApplicationAction implements Serializable {
     private final ExecutionRuntime runtime;
     private final ApplicationEntity metadata;
     private final IMetadataDao alertMetadataService;
+    private static final String APP_METRIC_PREFIX = "app.";
 
     /**
      * @param metadata    ApplicationEntity.
@@ -70,6 +72,11 @@ public class ApplicationAction implements Serializable {
             executionConfig = Collections.emptyMap();
         }
 
+        if (!envConfig.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
+            executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF,APP_METRIC_PREFIX);
+        } else {
+            executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF, envConfig.getString(MetricConfigs.METRIC_PREFIX_CONF) + APP_METRIC_PREFIX);
+        }
         this.config = ConfigFactory.parseMap(executionConfig).withFallback(envConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
         this.alertMetadataService = alertMetadataService;
     }
