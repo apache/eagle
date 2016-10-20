@@ -70,7 +70,7 @@ public class PolicyInterpreter {
     }
 
     public static PolicyExecutionPlan parseExecutionPlan(String executionPlanQuery) throws Exception {
-        return new PolicyExecutionPlannerImpl(executionPlanQuery).getExecutionPlan();
+        return PolicyExecutionPlanner.parseExecutionPlan(executionPlanQuery);
     }
 
     public static PolicyValidationResult validate(PolicyDefinition policy, Map<String, StreamDefinition> allDefinitions) {

@@ -21,4 +21,8 @@ interface PolicyExecutionPlanner {
      * @return PolicyExecutionPlan.
      */
     PolicyExecutionPlan getExecutionPlan();
+
+    static PolicyExecutionPlan parseExecutionPlan(String executionPlan) throws Exception {
+        return new PolicyExecutionPlannerImpl(executionPlan).getExecutionPlan();
+    }
 }
