@@ -26,6 +26,8 @@ import java.io.Serializable;
 public class AggregationConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationConfig.class);
 
+    private static final String ZK_ROOT_PREFIX = "/apps/mr/aggregation";
+
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -105,7 +107,7 @@ public class AggregationConfig implements Serializable {
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
+        this.zkStateConfig.zkRoot = ZK_ROOT_PREFIX + "/" + this.stormConfig.site;
 
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");

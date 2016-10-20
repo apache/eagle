@@ -16,11 +16,19 @@
  */
 package org.apache.eagle.jpm.mr.running;
 
+import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+
+import java.util.Optional;
 
 public class MRRunningJobApplicationProvider extends AbstractApplicationProvider<MRRunningJobApplication> {
     @Override
     public MRRunningJobApplication getApplication() {
         return new MRRunningJobApplication();
+    }
+
+    @Override
+    public Optional<ApplicationListener> getApplicationListener() {
+        return Optional.of(new MRRunningJobApplicationListener());
     }
 }

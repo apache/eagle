@@ -39,15 +39,6 @@
             <description>number of tasks to parse map reduce running jobs got from resource manager</description>
             <value>5</value>
         </property>
-
-        <property>
-            <name>zookeeper.zkRoot</name>
-            <displayName>Zookeeper Root Path</displayName>
-            <description>zkRoot that used to save context for this application</description>
-            <value>/apps/mr/runningSandbox</value>
-            <required>true</required>
-        </property>
-
         <property>
             <name>endpointConfig.fetchRunningJobInterval</name>
             <displayName>Interval of Fetch Running Job From Resource Manager</displayName>
