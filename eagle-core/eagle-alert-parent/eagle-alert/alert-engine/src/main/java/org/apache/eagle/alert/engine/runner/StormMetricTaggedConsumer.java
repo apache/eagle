@@ -47,15 +47,15 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
     public void prepare(Map stormConf, Object registrationArgument, TopologyContext context, IErrorReporter errorReporter) {
         this.config = ConfigFactory.parseString((String) registrationArgument, ConfigParseOptions.defaults());
 
-        if(config.hasPath("appId")) {
+        if (config.hasPath("appId")) {
             baseTags.put("appId", config.getString("appId"));
         }
 
-        if(config.hasPath("siteId")) {
+        if (config.hasPath("siteId")) {
             baseTags.put("siteId", config.getString("siteId"));
         }
 
-        baseTags.put("appExecId",context.getStormId());
+        baseTags.put("appExecId", context.getStormId());
 
         if (config.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
             metricNamePrefix = config.getString(MetricConfigs.METRIC_PREFIX_CONF);
@@ -95,7 +95,7 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
             if (dataPoint.value instanceof Map) {
                 Map<String, Object> values = (Map<String, Object>) dataPoint.value;
                 for (Map.Entry<String, Object> entry : values.entrySet()) {
-                    String metricName = buildSimpleMetricName(metricNamePrefix,taskInfo, dataPoint.name, entry.getKey());
+                    String metricName = buildSimpleMetricName(metricNamePrefix, taskInfo, dataPoint.name, entry.getKey());
                     metricList.add(metricName);
                     Gauge gauge = metricSystem.registry().getGauges().get(metricName);
                     if (gauge == null) {
@@ -154,11 +154,11 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
     }
 
     private static String buildSimpleMetricName(String prefix, TaskInfo taskInfo, String... name) {
-        String metricName = String.join(".", StringUtils.join(name, ".").replace("/", ".")).replace("__","");
+        String metricName = String.join(".", StringUtils.join(name, ".").replace("/", ".")).replace("__", "");
         if (prefix == null) {
             return metricName;
         } else {
-            return String.format("%s%s",prefix,metricName);
+            return String.format("%s%s", prefix, metricName);
         }
     }
 
