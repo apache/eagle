@@ -18,6 +18,7 @@
 package org.apache.eagle.alert.app;
 
 import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.coordinator.resource.CoordinatorResource;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.OpResult;
@@ -33,6 +34,7 @@ class AlertUnitTopologyAppListener implements ApplicationListener {
     private static final Logger LOG = LoggerFactory.getLogger(AlertUnitTopologyAppListener.class);
 
     @Inject private IMetadataDao metadataDao;
+    @Inject private CoordinatorResource coordinatorResource;
 
     private ApplicationEntity applicationEntity;
 
@@ -72,6 +74,11 @@ class AlertUnitTopologyAppListener implements ApplicationListener {
         if (result.code == OpResult.FAILURE) {
             LOG.error(result.message);
             throw new IllegalStateException(result.message);
+        }
+        try {
+            coordinatorResource.build();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
         }
     }
 

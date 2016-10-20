@@ -13,8 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+org.apache.eagle.alert.app.AlertUnitTopologyAppProvider
+
+## DAM
 org.apache.eagle.security.hbase.HBaseAuditLogAppProvider
-org.apache.eagle.app.example.ExampleApplicationProvider
+org.apache.eagle.security.auditlog.HdfsAuditLogAppProvider
+
+## JPM
 org.apache.eagle.app.jpm.JPMWebApplicationProvider
 org.apache.eagle.jpm.mr.history.MRHistoryJobApplicationProvider
 org.apache.eagle.jpm.mr.running.MRRunningJobApplicationProvider
