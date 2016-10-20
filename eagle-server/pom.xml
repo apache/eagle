@@ -321,6 +321,13 @@
                     <artifactId>eagle-hadoop-queue</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+                
+                <!-- add topology health check-->
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-topology-app</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
