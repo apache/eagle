@@ -52,7 +52,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
     //    private final List<String> outputStreamIds;
     private final StreamContext streamContext;
     private final PartitionedEventSerializer serializer;
-    private volatile Map<StreamPartition, StreamRouterSpec> routeSpecMap;
+    private volatile Map<StreamPartition, List<StreamRouterSpec>> routeSpecMap;
     private volatile Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap;
     private final String sourceId;
 
@@ -70,8 +70,8 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         try {
             this.streamContext.counter().scope("send_count").incr();
             StreamPartition partition = event.getPartition();
-            StreamRouterSpec routerSpec = routeSpecMap.get(partition);
-            if (routerSpec == null) {
+            List<StreamRouterSpec> routerSpecs = routeSpecMap.get(partition);
+            if (routerSpecs == null || routerSpecs.size() <= 0) {
                 if (LOG.isDebugEnabled()) {
                     // Don't know how to route stream, if it's correct, it's better to filter useless stream in spout side
                     LOG.debug("Drop event {} as StreamPartition {} is not pointed to any router metadata {}", event, event.getPartition(), routeSpecMap);
@@ -80,8 +80,8 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
                 return;
             }
 
-            if (routePartitionerMap.get(routerSpec.getPartition()) == null) {
-                LOG.error("Partitioner for " + routerSpec + " is null");
+            if (routePartitionerMap.get(partition) == null) {
+                LOG.error("Partitioner for " + routerSpecs.get(0) + " is null");
                 synchronized (outputLock) {
                     this.streamContext.counter().scope("fail_count").incr();
                     this.outputCollector.fail(event.getAnchor());
@@ -101,7 +101,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
                     for (StreamRoute streamRoute : streamRoutes) {
                         String targetStreamId = StreamIdConversion.generateStreamIdBetween(sourceId, streamRoute.getTargetComponentId());
                         try {
-                            PartitionedEvent emittedEvent = new PartitionedEvent(newEvent, routerSpec.getPartition(), streamRoute.getPartitionKey());
+                            PartitionedEvent emittedEvent = new PartitionedEvent(newEvent, partition, streamRoute.getPartitionKey());
                             // Route Target Stream id instead of component id
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("Emitted to stream {} with message {}", targetStreamId, emittedEvent);
@@ -135,12 +135,13 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
                                          Collection<StreamRouterSpec> removed,
                                          Collection<StreamRouterSpec> modified,
                                          Map<String, StreamDefinition> sds) {
-        Map<StreamPartition, StreamRouterSpec> copyRouteSpecMap = new HashMap<>(routeSpecMap);
+        Map<StreamPartition, List<StreamRouterSpec>> copyRouteSpecMap = new HashMap<>(routeSpecMap);
         Map<StreamPartition, List<StreamRoutePartitioner>> copyRoutePartitionerMap = new HashMap<>(routePartitionerMap);
 
         // added StreamRouterSpec i.e. there is a new StreamPartition
         for (StreamRouterSpec spec : added) {
-            if (copyRouteSpecMap.containsKey(spec.getPartition())) {
+            if (copyRouteSpecMap.containsKey(spec.getPartition())
+                && copyRouteSpecMap.get(spec.getPartition()).contains(spec)) {
                 LOG.error("Metadata calculation error: add existing StreamRouterSpec " + spec);
             } else {
                 inplaceAdd(copyRouteSpecMap, copyRoutePartitionerMap, spec, sds);
@@ -149,7 +150,8 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
 
         // removed StreamRouterSpec i.e. there is a deleted StreamPartition
         for (StreamRouterSpec spec : removed) {
-            if (!copyRouteSpecMap.containsKey(spec.getPartition())) {
+            if (!copyRouteSpecMap.containsKey(spec.getPartition())
+                || !copyRouteSpecMap.get(spec.getPartition()).contains(spec)) {
                 LOG.error("Metadata calculation error: remove non-existing StreamRouterSpec " + spec);
             } else {
                 inplaceRemove(copyRouteSpecMap, copyRoutePartitionerMap, spec);
@@ -158,7 +160,8 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
 
         // modified StreamRouterSpec, i.e. there is modified StreamPartition, for example WorkSlotQueue assignment is changed
         for (StreamRouterSpec spec : modified) {
-            if (!copyRouteSpecMap.containsKey(spec.getPartition())) {
+            if (!copyRouteSpecMap.containsKey(spec.getPartition())
+                || !copyRouteSpecMap.get(spec.getPartition()).contains(spec)) {
                 LOG.error("Metadata calculation error: modify nonexisting StreamRouterSpec " + spec);
             } else {
                 inplaceRemove(copyRouteSpecMap, copyRoutePartitionerMap, spec);
@@ -171,19 +174,22 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         routePartitionerMap = copyRoutePartitionerMap;
     }
 
-    private void inplaceRemove(Map<StreamPartition, StreamRouterSpec> routeSpecMap,
+    private void inplaceRemove(Map<StreamPartition, List<StreamRouterSpec>> routeSpecMap,
                                Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap,
                                StreamRouterSpec toBeRemoved) {
         routeSpecMap.remove(toBeRemoved.getPartition());
         routePartitionerMap.remove(toBeRemoved.getPartition());
     }
 
-    private void inplaceAdd(Map<StreamPartition, StreamRouterSpec> routeSpecMap,
+    private void inplaceAdd(Map<StreamPartition, List<StreamRouterSpec>> routeSpecMap,
                             Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap,
                             StreamRouterSpec toBeAdded, Map<String, StreamDefinition> sds) {
-        routeSpecMap.put(toBeAdded.getPartition(), toBeAdded);
+        if (!routeSpecMap.containsKey(toBeAdded.getPartition())) {
+            routeSpecMap.put(toBeAdded.getPartition(), new ArrayList<StreamRouterSpec>());
+        }
+        routeSpecMap.get(toBeAdded.getPartition()).add(toBeAdded);
         try {
-            List<StreamRoutePartitioner> routePartitioners = calculatePartitioner(toBeAdded, sds);
+            List<StreamRoutePartitioner> routePartitioners = calculatePartitioner(toBeAdded, sds, routePartitionerMap);
             routePartitionerMap.put(toBeAdded.getPartition(), routePartitioners);
         } catch (Exception e) {
             LOG.error("ignore this failure StreamRouterSpec " + toBeAdded + ", with error" + e.getMessage(), e);
@@ -192,8 +198,13 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         }
     }
 
-    private List<StreamRoutePartitioner> calculatePartitioner(StreamRouterSpec streamRouterSpec, Map<String, StreamDefinition> sds) throws Exception {
-        List<StreamRoutePartitioner> routePartitioners = new ArrayList<>();
+    private List<StreamRoutePartitioner> calculatePartitioner(StreamRouterSpec streamRouterSpec,
+                                                              Map<String, StreamDefinition> sds,
+                                                              Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap) throws Exception {
+        List<StreamRoutePartitioner> routePartitioners = routePartitionerMap.get(streamRouterSpec.getPartition());
+        if (routePartitioners == null) {
+            routePartitioners = new ArrayList<>();
+        }
         for (PolicyWorkerQueue pwq : streamRouterSpec.getTargetQueue()) {
             routePartitioners.add(StreamRoutePartitionFactory.createRoutePartitioner(
                 Lists.transform(pwq.getWorkers(), WorkSlot::getBoltId),
