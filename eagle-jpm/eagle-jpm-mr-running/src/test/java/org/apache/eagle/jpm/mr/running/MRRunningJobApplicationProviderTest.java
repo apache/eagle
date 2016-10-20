@@ -27,7 +27,6 @@ public class MRRunningJobApplicationProviderTest extends ApplicationTestBase{
     ApplicationSimulator simulator;
 
     @Test
-    public void testStartAsManagedApplication(){
-        simulator.start(MRRunningJobApplicationProvider.class);
+    public void testStartAsManagedApplication() {
     }
 }

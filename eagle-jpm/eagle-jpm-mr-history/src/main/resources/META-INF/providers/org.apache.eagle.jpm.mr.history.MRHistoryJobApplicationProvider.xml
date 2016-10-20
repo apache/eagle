@@ -18,7 +18,7 @@
 
 <application>
     <type>MR_HISTORY_JOB_APP</type>
-    <name>Map Reduce History Job Monitoring</name>
+    <name>Map Reduce History Job</name>
     <version>0.5.0-incubating</version>
     <configuration>
         <!-- org.apache.eagle.jpm.mr.history.MRHistoryJobConfig -->

@@ -53,7 +53,9 @@ public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdate
         try {
             Collection<ApplicationEntity> applicationEntities = applicationEntityService.findAll();
             for (ApplicationEntity applicationEntity: applicationEntities) {
-                updateApplicationEntityStatus(applicationEntity);
+                if (applicationEntity.getDescriptor().isExecutable()) {
+                    updateApplicationEntityStatus(applicationEntity);
+                }
             }
         } catch (Exception e) {
             LOG.error("failed to update app status", e);

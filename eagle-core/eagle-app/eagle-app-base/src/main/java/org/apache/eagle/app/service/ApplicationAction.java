@@ -70,12 +70,7 @@ public class ApplicationAction implements Serializable {
             executionConfig = Collections.emptyMap();
         }
 
-        // TODO: Decouple hardcoded configuration key
-        executionConfig.put("siteId", metadata.getSite().getSiteId());
-        executionConfig.put("mode", metadata.getMode().name());
-        executionConfig.put("appId", metadata.getAppId());
-        executionConfig.put("jarPath", metadata.getJarPath());
-        this.config = ConfigFactory.parseMap(executionConfig).withFallback(envConfig);
+        this.config = ConfigFactory.parseMap(executionConfig).withFallback(envConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
         this.alertMetadataService = alertMetadataService;
     }
 
