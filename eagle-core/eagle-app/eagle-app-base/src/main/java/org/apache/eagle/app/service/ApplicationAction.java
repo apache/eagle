@@ -74,10 +74,10 @@ public class ApplicationAction implements Serializable {
         if (executionConfig == null) {
             executionConfig = Collections.emptyMap();
         }
-        if(serverConfig.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
+        if (serverConfig.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
             LOG.warn("Ignored sever config {} = {}", MetricConfigs.METRIC_PREFIX_CONF, serverConfig.getString(MetricConfigs.METRIC_PREFIX_CONF));
         }
-        executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF,APP_METRIC_PREFIX);
+        executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF, APP_METRIC_PREFIX);
         this.effectiveConfig = ConfigFactory.parseMap(executionConfig).withFallback(serverConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
         this.alertMetadataService = alertMetadataService;
     }
@@ -86,16 +86,16 @@ public class ApplicationAction implements Serializable {
      * Generate global unique streamId to install.
      * TODO refactor with streamId and siteId
      */
-    private static String generateUniqueStreamId(String siteId,String streamTypeId) {
-        return String.format("%s_%s",streamTypeId,siteId).toUpperCase();
-    }   
+    private static String generateUniqueStreamId(String siteId, String streamTypeId) {
+        return String.format("%s_%s", streamTypeId, siteId).toUpperCase();
+    }
 
     public void doInstall() {
         if (metadata.getDescriptor().getStreams() != null) {
             List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
                 StreamDefinition copied = streamDefinition.copy();
                 copied.setSiteId(metadata.getSite().getSiteId());
-                copied.setStreamId(generateUniqueStreamId(metadata.getSite().getSiteId(),copied.getStreamId()));
+                copied.setStreamId(generateUniqueStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
                 StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(copied.getStreamId(), this.effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
