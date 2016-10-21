@@ -78,6 +78,8 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
 
     private static final String STATUS_PATTERN = "([\\d\\.]+):\\d+\\s+\\([\\D]+(\\d+)\\)";
     private static final String QJM_PATTERN = "([\\d\\.]+):\\d+";
+    
+    private static final double TB = 1024 * 1024 * 1024 * 1024;
 
     public HdfsTopologyEntityParser(String site, TopologyCheckAppConfig.HdfsConfig hdfsConfig, TopologyRackResolver rackResolver) {
         this.namenodeUrls = hdfsConfig.namenodeUrls;
@@ -200,7 +202,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         for (int i = 0; deadNodes != null && i < deadNodes.length(); ++i) {
             final String hostname = deadNodes.getString(i);
             final JSONObject deadNode = jsonNodesObject.getJSONObject(hostname);
-            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, hostname, updateTime);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, EntityBuilderHelper.getValidHostName(hostname), updateTime);
             if (deadNode.getBoolean(DATA_NODE_DECOMMISSIONED_STATE)) {
                 ++numDeadDecommNodes;
                 entity.setStatus(TopologyConstants.DATA_NODE_DEAD_DECOMMISSIONED_STATUS);
@@ -220,11 +222,11 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             final String hostname = liveNodes.getString(i);
             final JSONObject liveNode = jsonNodesObject.getJSONObject(hostname);
 
-            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, hostname, updateTime);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, EntityBuilderHelper.getValidHostName(hostname), updateTime);
             final Number configuredCapacity = (Number) liveNode.get(DATA_NODE_CAPACITY);
-            entity.setConfiguredCapacityTB(Double.toString(configuredCapacity.doubleValue() / 1024.0 / 1024.0 / 1024.0 / 1024.0));
+            entity.setConfiguredCapacityTB(Double.toString(configuredCapacity.doubleValue() / TB));
             final Number capacityUsed = (Number) liveNode.get(DATA_NODE_USED_SPACE);
-            entity.setUsedCapacityTB(Double.toString(capacityUsed.doubleValue() / 1024.0 / 1024.0 / 1024.0 / 1024.0));
+            entity.setUsedCapacityTB(Double.toString(capacityUsed.doubleValue() / TB));
             final Number blocksTotal = (Number) liveNode.get(DATA_NODE_NUM_BLOCKS);
             entity.setNumBlocks(Double.toString(blocksTotal.doubleValue()));
             if (liveNode.has(DATA_NODE_FAILED_VOLUMN)) {

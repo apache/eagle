@@ -82,6 +82,8 @@ public class TopologyConstants {
     // field constants
     public static final String SERVICE_NAME_FIELD = "serviceName";
     public static final String TOPOLOGY_DATA_FIELD = "topologyData";
+    
+    public static final String COLON = ":";
 
     public enum HadoopVersion {
         V2
