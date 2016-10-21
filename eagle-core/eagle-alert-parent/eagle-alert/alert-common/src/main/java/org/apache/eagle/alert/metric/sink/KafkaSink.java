@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.metric.sink;
 
+import org.apache.eagle.alert.metric.MetricConfigs;
 import org.apache.eagle.alert.metric.reporter.KafkaReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
@@ -35,8 +36,8 @@ public class KafkaSink implements MetricSink {
             .topic(config.getString("topic"))
             .config(config);
 
-        if (config.hasPath("tags")) {
-            builder.addFields(config.getConfig("tags").root().unwrapped());
+        if (config.hasPath(MetricConfigs.TAGS_FIELD_NAME)) {
+            builder.addFields(config.getConfig(MetricConfigs.TAGS_FIELD_NAME).root().unwrapped());
         }
 
         reporter = builder.build();
