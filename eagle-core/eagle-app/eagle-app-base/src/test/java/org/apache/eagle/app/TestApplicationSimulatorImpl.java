@@ -19,21 +19,23 @@ package org.apache.eagle.app;
 import com.google.inject.Inject;
 import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.app.test.ApplicationTestBase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.ws.rs.WebApplicationException;
 
+@Ignore
 public class TestApplicationSimulatorImpl extends ApplicationTestBase {
     @Inject
     ApplicationSimulator simulator;
 
     @Test
-    public void testSimulatorValid(){
+    public void testSimulatorValid() {
         simulator.start(TestStormApplication.Provider.class);
     }
 
     @Test(expected = WebApplicationException.class)
-    public void testSimulatorWithStaticApp(){
+    public void testSimulatorWithStaticApp() {
         simulator.start(TestWebApplication.Provider.class);
     }
 }
