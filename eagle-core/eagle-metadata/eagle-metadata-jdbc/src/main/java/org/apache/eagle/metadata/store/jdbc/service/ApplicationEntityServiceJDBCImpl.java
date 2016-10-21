@@ -43,7 +43,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationEntityServiceJDBCImpl.class);
 
-    private static final String insertSql = "INSERT INTO applications (siteid, apptype, appmode, jarpath, appstatus, configuration, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String insertSql = "INSERT INTO applications (siteid, apptype, appmode, jarpath, appstatus, configuration, context, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String selectSql = "SELECT * FROM applications a INNER JOIN sites s on  a.siteid = s.siteid";
     private static final String selectSqlBySiteIdAndAppType = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ? and a.apptype = ?";
     private static final String selectSqlBySiteId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ?";
@@ -144,6 +144,9 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         }
         if (entity.getConfiguration() != null && !entity.getConfiguration().isEmpty()) {
             updateSql += "configuration = ?, ";
+        }
+        if (entity.getContext() != null && !entity.getContext().isEmpty()) {
+            updateSql += "context = ?, ";
         }
         if (entity.getCreatedTime() > 0) {
             updateSql += "createdtime = ?, ";

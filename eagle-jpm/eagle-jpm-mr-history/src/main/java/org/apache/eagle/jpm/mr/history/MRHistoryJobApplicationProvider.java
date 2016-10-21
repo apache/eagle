@@ -16,11 +16,19 @@
  */
 package org.apache.eagle.jpm.mr.history;
 
+import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+
+import java.util.Optional;
 
 public class MRHistoryJobApplicationProvider extends AbstractApplicationProvider<MRHistoryJobApplication> {
     @Override
     public MRHistoryJobApplication getApplication() {
         return new MRHistoryJobApplication();
+    }
+
+    @Override
+    public Optional<ApplicationListener> getApplicationListener() {
+        return Optional.of(new MRHistoryJobApplicationListener());
     }
 }

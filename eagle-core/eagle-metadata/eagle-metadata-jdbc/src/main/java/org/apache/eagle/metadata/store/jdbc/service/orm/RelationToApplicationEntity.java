@@ -43,12 +43,12 @@ public class RelationToApplicationEntity implements ThrowableFunction<ResultSet,
         applicationDesc.setType(appType);
 
         SiteEntity siteEntity = new SiteEntity();
-        siteEntity.setUuid(resultSet.getString(11));
-        siteEntity.setSiteId(resultSet.getString(12));
-        siteEntity.setSiteName(resultSet.getString(13));
-        siteEntity.setDescription(resultSet.getString(14));
-        siteEntity.setCreatedTime(resultSet.getLong(15));
-        siteEntity.setModifiedTime(resultSet.getLong(16));
+        siteEntity.setUuid(resultSet.getString(12));
+        siteEntity.setSiteId(resultSet.getString(13));
+        siteEntity.setSiteName(resultSet.getString(14));
+        siteEntity.setDescription(resultSet.getString(15));
+        siteEntity.setCreatedTime(resultSet.getLong(16));
+        siteEntity.setModifiedTime(resultSet.getLong(17));
 
 
         ApplicationEntity resultEntity = new ApplicationEntity();
@@ -59,21 +59,29 @@ public class RelationToApplicationEntity implements ThrowableFunction<ResultSet,
         resultEntity.setMode(ApplicationEntity.Mode.valueOf(resultSet.getString(5)));
         resultEntity.setJarPath(resultSet.getString(6));
         resultEntity.setStatus(ApplicationEntity.Status.valueOf(resultSet.getString(7)));
+        resultEntity.setConfiguration(parse(resultSet.getString(8)));
+        resultEntity.setContext(parse(resultSet.getString(9)));
+        resultEntity.setCreatedTime(resultSet.getLong(10));
+        resultEntity.setModifiedTime(resultSet.getLong(11));
+
+        return resultEntity;
+    }
+
+    private Map<String, Object> parse(String field) {
+        Map<String, Object> items = new java.util.HashMap<>();
         try {
-            JSONObject jsonObject = new JSONObject(resultSet.getString(8));
-            Map<String, Object> items = new java.util.HashMap<>();
+            JSONObject jsonObject = new JSONObject(field);
+
             Iterator<String> keyItemItr = jsonObject.keys();
             while (keyItemItr.hasNext()) {
                 String itemKey = keyItemItr.next();
                 items.put(itemKey, jsonObject.get(itemKey));
             }
-            resultEntity.setConfiguration(items);
+
         } catch (Exception e) {
             LOG.warn("{}", e);
         }
-        resultEntity.setCreatedTime(resultSet.getLong(9));
-        resultEntity.setModifiedTime(resultSet.getLong(10));
 
-        return resultEntity;
+        return items;
     }
 }

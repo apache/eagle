@@ -26,43 +26,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * WebExecutionRuntime.
+ * StaticExecutionRuntime.
  */
-public class WebExecutionRuntime implements ExecutionRuntime<WebEnvironment,StaticApplicationExecutor> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebExecutionRuntime.class);
+public class StaticExecutionRuntime implements ExecutionRuntime<StaticEnvironment,StaticApplicationExecutor> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaticExecutionRuntime.class);
 
-    private WebEnvironment environment;
+    private StaticEnvironment environment;
 
     @Override
-    public void prepare(WebEnvironment environment) {
+    public void prepare(StaticEnvironment environment) {
         this.environment = environment;
     }
 
     @Override
-    public WebEnvironment environment() {
+    public StaticEnvironment environment() {
         return this.environment;
     }
 
     @Override
-    public void start(Application<WebEnvironment, StaticApplicationExecutor> executor, Config config) {
+    public void start(Application<StaticEnvironment, StaticApplicationExecutor> executor, Config config) {
         LOGGER.warn("Starting {}, do nothing",executor);
     }
 
     @Override
-    public void stop(Application<WebEnvironment, StaticApplicationExecutor> executor, Config config) {
+    public void stop(Application<StaticEnvironment, StaticApplicationExecutor> executor, Config config) {
         LOGGER.warn("Stopping {}, do nothing",executor);
     }
 
     @Override
-    public ApplicationEntity.Status status(Application<WebEnvironment, StaticApplicationExecutor> executor, Config config) {
+    public ApplicationEntity.Status status(Application<StaticEnvironment, StaticApplicationExecutor> executor, Config config) {
         LOGGER.warn("Checking status {}, do nothing",executor);
         return ApplicationEntity.Status.INITIALIZED;
     }
 
-    public static class Provider implements ExecutionRuntimeProvider<WebEnvironment,StaticApplicationExecutor> {
+    public static class Provider implements ExecutionRuntimeProvider<StaticEnvironment,StaticApplicationExecutor> {
         @Override
-        public ExecutionRuntime<WebEnvironment, StaticApplicationExecutor> get() {
-            return new WebExecutionRuntime();
+        public ExecutionRuntime<StaticEnvironment, StaticApplicationExecutor> get() {
+            return new StaticExecutionRuntime();
         }
     }
 }
