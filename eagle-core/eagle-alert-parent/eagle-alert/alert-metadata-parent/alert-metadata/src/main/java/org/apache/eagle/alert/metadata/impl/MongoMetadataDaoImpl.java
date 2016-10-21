@@ -236,7 +236,13 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult removeStream(String streamId) {
-        return remove(schema, streamId);
+        BsonDocument filter = new BsonDocument();
+        filter.append("streamId", new BsonString(streamId));
+        DeleteResult dr = cluster.deleteOne(filter);
+        OpResult result = new OpResult();
+        result.code = 200;
+        result.message = String.format(" %d config item removed!", dr.getDeletedCount());
+        return result;
     }
 
     @Override
@@ -319,6 +325,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     /**
      * Due to some field name in SpoutSpec contains dot(.) which is invalid Mongo Field name, we need to transform the
      * format to store in Mongo.
+     *
      * @return opresult
      */
     private <T> OpResult addOneSpoutSpec(T t) {
@@ -328,14 +335,14 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             json = mapper.writeValueAsString(t);
             Document doc = Document.parse(json);
 
-            String [] metadataMapArrays = {"kafka2TupleMetadataMap", "tuple2StreamMetadataMap", "streamRepartitionMetadataMap"};
-            for (String metadataMapName: metadataMapArrays) {
+            String[] metadataMapArrays = {"kafka2TupleMetadataMap", "tuple2StreamMetadataMap", "streamRepartitionMetadataMap"};
+            for (String metadataMapName : metadataMapArrays) {
                 Document _metadataMapDoc = (Document) doc.get(metadataMapName);
                 doc.remove(metadataMapName);
 
                 ArrayList<Document> _metadataMapArray = new ArrayList<>();
 
-                for ( String key : _metadataMapDoc.keySet()) {
+                for (String key : _metadataMapDoc.keySet()) {
                     Document _subDoc = new Document();
                     _subDoc.put("topicName", key);
                     _subDoc.put(metadataMapName, _metadataMapDoc.get(key));
@@ -384,6 +391,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     /**
      * get the basic ScheduleState, and then based on the version to get all sub-part(spoutSpecs/alertSpecs/etc)
      * to form a completed ScheduleState.
+     *
      * @return the latest ScheduleState
      */
     @Override
@@ -470,13 +478,13 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
                     // we need to transform the format while reading from Mongo.
                     if (clz == SpoutSpec.class) {
                         Document doc = Document.parse(json);
-                        String [] metadataMapArrays = {"kafka2TupleMetadataMap", "tuple2StreamMetadataMap", "streamRepartitionMetadataMap"};
-                        for (String metadataMapName: metadataMapArrays) {
+                        String[] metadataMapArrays = {"kafka2TupleMetadataMap", "tuple2StreamMetadataMap", "streamRepartitionMetadataMap"};
+                        for (String metadataMapName : metadataMapArrays) {
                             ArrayList<Document> subDocs = (ArrayList) doc.get(metadataMapName);
                             doc.remove(metadataMapName);
 
                             Document replaceDoc = new Document();
-                            for ( Document subDoc : subDocs) {
+                            for (Document subDoc : subDocs) {
                                 replaceDoc.put((String) subDoc.get("topicName"), subDoc.get(metadataMapName));
                             }
                             doc.put(metadataMapName, replaceDoc);
@@ -580,8 +588,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             }
 
             ScheduleStateBase stateBase = new ScheduleStateBase(
-                    state.getVersion(), state.getGenerateTime(), state.getCode(),
-                    state.getMessage(), state.getScheduleTimeMillis());
+                state.getVersion(), state.getGenerateTime(), state.getCode(),
+                state.getMessage(), state.getScheduleTimeMillis());
 
             addOne(scheduleStates, stateBase);
 

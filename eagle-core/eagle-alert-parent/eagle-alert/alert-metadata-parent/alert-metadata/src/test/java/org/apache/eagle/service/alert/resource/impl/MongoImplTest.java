@@ -145,6 +145,18 @@ public class MongoImplTest {
             List<Kafka2TupleMetadata> assigns = dao.listDataSources();
             Assert.assertEquals(1, assigns.size());
         }
+        // stream
+        {
+            StreamDefinition stream = new StreamDefinition();
+            stream.setStreamId("stream");
+            OpResult result = dao.createStream(stream);
+            Assert.assertEquals(200, result.code);
+            List<StreamDefinition> assigns = dao.listStreams();
+            Assert.assertEquals(1, assigns.size());
+            dao.removeStream("stream");
+            assigns = dao.listStreams();
+            Assert.assertEquals(0, assigns.size());
+        }
         // policy
         {
             PolicyDefinition policy = new PolicyDefinition();
@@ -194,6 +206,7 @@ public class MongoImplTest {
             ScheduleState getState = dao.getScheduleState();
             Assert.assertEquals(201, getState.getCode());
         }
+
     }
 
     private void test_addstate() {
@@ -230,7 +243,7 @@ public class MongoImplTest {
         kafka2TupleMetadataMap.put("preprocess.network-sherlock.events", kafka2TupleMetadata);
         spoutSpec1.setKafka2TupleMetadataMap(kafka2TupleMetadataMap);
 
-        Map<String, List<StreamRepartitionMetadata>> streamRepartitionMetadataMap= new HashMap<>();
+        Map<String, List<StreamRepartitionMetadata>> streamRepartitionMetadataMap = new HashMap<>();
         List<StreamRepartitionMetadata> StreamRepartitionMetadataList = new ArrayList<>();
         StreamRepartitionMetadata streamRepartitionMetadata = new StreamRepartitionMetadata();
         List<StreamRepartitionStrategy> groupingStrategies = new ArrayList();
