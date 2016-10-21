@@ -23,6 +23,10 @@ public class KafkaStreamSinkConfig implements StreamSinkConfig {
     private String brokerList;
     private String serializerClass;
     private String keySerializerClass;
+    private String numBatchMessages;
+    private String maxQueueBufferMs;
+    private String producerType;
+    private String requestRequiredAcks;
 
     public String getTopicId() {
         return topicId;
@@ -54,6 +58,38 @@ public class KafkaStreamSinkConfig implements StreamSinkConfig {
 
     public void setKeySerializerClass(String keySerializerClass) {
         this.keySerializerClass = keySerializerClass;
+    }
+
+    public String getNumBatchMessages() {
+        return numBatchMessages;
+    }
+
+    public void setNumBatchMessages(String numBatchMessages) {
+        this.numBatchMessages = numBatchMessages;
+    }
+
+    public String getMaxQueueBufferMs() {
+        return maxQueueBufferMs;
+    }
+
+    public void setMaxQueueBufferMs(String maxQueueBufferMs) {
+        this.maxQueueBufferMs = maxQueueBufferMs;
+    }
+
+    public String getProducerType() {
+        return producerType;
+    }
+
+    public void setProducerType(String producerType) {
+        this.producerType = producerType;
+    }
+
+    public String getRequestRequiredAcks() {
+        return requestRequiredAcks;
+    }
+
+    public void setRequestRequiredAcks(String requestRequiredAcks) {
+        this.requestRequiredAcks = requestRequiredAcks;
     }
 
     @Override

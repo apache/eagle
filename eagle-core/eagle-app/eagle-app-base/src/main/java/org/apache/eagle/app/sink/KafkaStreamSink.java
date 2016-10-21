@@ -49,6 +49,11 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
         properties.put("metadata.broker.list", config.getBrokerList());
         properties.put("serializer.class", config.getSerializerClass());
         properties.put("key.serializer.class", config.getKeySerializerClass());
+        // new added properties for async producer
+        properties.put("producer.type", config.getProducerType());
+        properties.put("batch.num.messages", config.getNumBatchMessages());
+        properties.put("request.required.acks", config.getRequestRequiredAcks());
+        properties.put("queue.buffering.max.ms", config.getMaxQueueBufferMs());
         ProducerConfig producerConfig = new ProducerConfig(properties);
         producer = new Producer(producerConfig);
     }
@@ -97,6 +102,11 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
             desc.setBrokerList(config.getString("dataSinkConfig.brokerList"));
             desc.setSerializerClass(config.getString("dataSinkConfig.serializerClass"));
             desc.setKeySerializerClass(config.getString("dataSinkConfig.keySerializerClass"));
+            // new added properties for async producer
+            desc.setNumBatchMessages(config.getString("dataSinkConfig.numBatchMessages"));
+            desc.setProducerType(config.getString("dataSinkConfig.producerType"));
+            desc.setMaxQueueBufferMs(config.getString("dataSinkConfig.maxQueueBufferMs"));
+            desc.setRequestRequiredAcks(config.getString("dataSinkConfig.requestRequiredAcks"));
             return desc;
         }
 
