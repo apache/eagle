@@ -21,7 +21,6 @@
     <type>TOPOLOGY_HEALTH_CHECK_APP</type>
     <name>Topology Health Check</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.topology.TopologyCheckApp</appClass>
     <configuration>
         <!-- org.apache.eagle.topology.TopologyCheckApp -->
         <property>
