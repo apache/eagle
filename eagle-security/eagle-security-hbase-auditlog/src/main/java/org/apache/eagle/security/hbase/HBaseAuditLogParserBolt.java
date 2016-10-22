@@ -26,9 +26,7 @@ import backtype.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Since 6/7/16.
@@ -36,6 +34,7 @@ import java.util.TreeMap;
 public class HBaseAuditLogParserBolt extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HBaseAuditLogParserBolt.class);
     private OutputCollector collector;
+    private static final HbaseAuditLogParser parser = new HbaseAuditLogParser();
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -44,12 +43,10 @@ public class HBaseAuditLogParserBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        String logLine = new String(input.getString(0));
-
-        HbaseAuditLogParser parser = new HbaseAuditLogParser();
-        try{
+        String logLine = input.getString(0);
+        try {
             HbaseAuditLogObject entity = parser.parse(logLine);
-            Map<String, Object> map = new TreeMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put("action", entity.action);
             map.put("host", entity.host);
             map.put("status", entity.status);
@@ -57,10 +54,10 @@ public class HBaseAuditLogParserBolt extends BaseRichBolt {
             map.put("scope", entity.scope);
             map.put("user", entity.user);
             map.put("timestamp", entity.timestamp);
-            collector.emit(Arrays.asList(map));
-        }catch(Exception ex){
+            collector.emit(Collections.singletonList(map));
+        } catch (Exception ex) {
             LOG.error("Failing parse and ignore audit log {} ", logLine, ex);
-        }finally {
+        } finally {
             collector.ack(input);
         }
     }

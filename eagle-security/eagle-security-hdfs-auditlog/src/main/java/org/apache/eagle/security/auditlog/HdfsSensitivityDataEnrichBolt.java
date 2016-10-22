@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class HdfsSensitivityDataEnrichBolt extends AbstractDataEnrichBolt<HdfsSensitivityEntity, String> {
     private static Logger LOG = LoggerFactory.getLogger(HdfsSensitivityDataEnrichBolt.class);
 
-    public HdfsSensitivityDataEnrichBolt(Config config){
+    public HdfsSensitivityDataEnrichBolt(Config config) {
         super(config, new HdfsSensitivityDataEnrichLCM(config));
     }
 
@@ -68,9 +68,9 @@ public class HdfsSensitivityDataEnrichBolt extends AbstractDataEnrichBolt<HdfsSe
             }
             // LOG.info(">>>> After file sensitivity lookup: " + event);
             collector.emit(Arrays.asList(event.get("user"), event));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error joining data, ignore it", ex);
-        }finally {
+        } finally {
             collector.ack(input);
         }
     }
