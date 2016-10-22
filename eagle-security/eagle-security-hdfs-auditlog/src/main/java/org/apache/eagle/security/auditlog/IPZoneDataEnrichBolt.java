@@ -30,33 +30,35 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class IPZoneDataEnrichBolt extends AbstractDataEnrichBolt<IPZoneEntity, String> {
-	private static final Logger LOG = LoggerFactory.getLogger(IPZoneDataEnrichBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IPZoneDataEnrichBolt.class);
 
-	public IPZoneDataEnrichBolt(Config config){
-		super(config, new IPZoneDataEnrichLCM(config));
-	}
-
-	@Override
-	public void executeWithEnrich(Tuple input, Map<String, IPZoneEntity> map) {
-		try {
-			Map<String, Object> toBeCopied = (Map<String, Object>) input.getValue(1);
-			Map<String, Object> event = new TreeMap<String, Object>(toBeCopied); // shallow copy
-			IPZoneEntity e = null;
-			if (map != null) {
-				e = map.get(event.get("host"));
-			}
-			event.put("securityZone", e == null ? "NA" : e.getSecurityZone());
-			if (LOG.isDebugEnabled()) LOG.debug("After IP zone lookup: " + event);
-			collector.emit(Arrays.asList(event.get("user"), event));
-		}catch(Exception ex){
-			LOG.error("error joining data, ignore it", ex);
-		}finally {
-			collector.ack(input);
-		}
+    public IPZoneDataEnrichBolt(Config config) {
+        super(config, new IPZoneDataEnrichLCM(config));
     }
 
-	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("user", "message"));
-	}
+    @Override
+    public void executeWithEnrich(Tuple input, Map<String, IPZoneEntity> map) {
+        try {
+            Map<String, Object> toBeCopied = (Map<String, Object>) input.getValue(1);
+            Map<String, Object> event = new TreeMap<String, Object>(toBeCopied); // shallow copy
+            IPZoneEntity e = null;
+            if (map != null) {
+                e = map.get(event.get("host"));
+            }
+            event.put("securityZone", e == null ? "NA" : e.getSecurityZone());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("After IP zone lookup: " + event);
+            }
+            collector.emit(Arrays.asList(event.get("user"), event));
+        } catch (Exception ex) {
+            LOG.error("error joining data, ignore it", ex);
+        } finally {
+            collector.ack(input);
+        }
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("user", "message"));
+    }
 }

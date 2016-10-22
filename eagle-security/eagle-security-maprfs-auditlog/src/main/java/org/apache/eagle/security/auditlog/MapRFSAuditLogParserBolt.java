@@ -52,7 +52,7 @@ public class MapRFSAuditLogParserBolt extends BaseRichBolt {
 
         MAPRFSAuditLogParser parser = new MAPRFSAuditLogParser();
         MAPRFSAuditLogObject entity = null;
-        try{
+        try {
             entity = parser.parse(logLine);
             Map<String, Object> map = new TreeMap<String, Object>();
             map.put("src", entity.src);
@@ -64,7 +64,7 @@ public class MapRFSAuditLogParserBolt extends BaseRichBolt {
             map.put("cmd", entity.cmd);
             map.put("volume", entity.volume);
             collector.emit(Arrays.asList(map));
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             LOG.error("Failing parse audit log message", ex);
         }
     }

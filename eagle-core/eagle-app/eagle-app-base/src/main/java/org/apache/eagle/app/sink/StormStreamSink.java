@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.app.sink;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.topology.base.BaseRichBolt;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
@@ -28,9 +30,10 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBasicBolt implements StreamSink<K> {
+public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseRichBolt implements StreamSink<K> {
     private static final Logger LOG = LoggerFactory.getLogger(StormStreamSink.class);
     private String streamId;
+    private OutputCollector collector;
 
     @Override
     public void init(String streamId, K config) {
@@ -38,15 +41,15 @@ public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBa
     }
 
     @Override
-    public void prepare(Map stormConf, TopologyContext context) {
-        super.prepare(stormConf, context);
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
     }
 
     /**
      * Implicitly hides the Tuple protocol inside code as Tuple[Key,Map].
      */
     @Override
-    public void execute(Tuple input, BasicOutputCollector collector) {
+    public void execute(Tuple input) {
         try {
             Map event = null;
             Object key = input.getValue(0);
@@ -63,13 +66,14 @@ public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBa
                 }
             }
             execute(key, event, collector);
+            collector.ack(input);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         }
     }
 
-    protected abstract void execute(Object key, Map event, BasicOutputCollector collector);
+    protected abstract void execute(Object key, Map event, OutputCollector collector) throws Exception;
 
     private Map tupleAsMap(Tuple tuple) {
         Map values = new HashMap<>();

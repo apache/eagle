@@ -61,34 +61,50 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
 
         builder.setSpout("ingest", spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
 
+        // ---------------------
+        // ingest -> parserBolt
+        // ---------------------
 
         BaseRichBolt parserBolt = getParserBolt();
-        BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks).setNumTasks(numOfParserTasks);
+        BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks).setNumTasks(numOfParserTasks).shuffleGrouping("ingest");
+        boltDeclarer.shuffleGrouping("ingest");
 
-        Boolean useDefaultPartition = !config.hasPath("eagleProps.useDefaultPartition") || config.getBoolean("eagleProps.useDefaultPartition");
-        if(useDefaultPartition){
-            boltDeclarer.fieldsGrouping("ingest", new Fields(StringScheme.STRING_SCHEME_KEY));
-        }else{
-            boltDeclarer.customGrouping("ingest", new CustomPartitionGrouping(createStrategy(config)));
-        }
+        // Boolean useDefaultPartition = !config.hasPath("eagleProps.useDefaultPartition") || config.getBoolean("eagleProps.useDefaultPartition");
+        // if (useDefaultPartition) {
+        //    boltDeclarer.fieldsGrouping("ingest", new Fields(StringScheme.STRING_SCHEME_KEY));
+        // } else {
+        //    boltDeclarer.customGrouping("ingest", new CustomPartitionGrouping(createStrategy(config)));
+        // }
+
+        // ------------------------------
+        // parserBolt -> sensitivityJoin
+        // ------------------------------
 
         HdfsSensitivityDataEnrichBolt sensitivityDataJoinBolt = new HdfsSensitivityDataEnrichBolt(config);
         BoltDeclarer sensitivityDataJoinBoltDeclarer = builder.setBolt("sensitivityJoin", sensitivityDataJoinBolt, numOfSensitivityJoinTasks).setNumTasks(numOfSensitivityJoinTasks);
-        sensitivityDataJoinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
+        // sensitivityDataJoinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
+        sensitivityDataJoinBoltDeclarer.shuffleGrouping("parserBolt");
 
+        // ------------------------------
+        // sensitivityJoin -> ipZoneJoin
+        // ------------------------------
         IPZoneDataEnrichBolt ipZoneDataJoinBolt = new IPZoneDataEnrichBolt(config);
         BoltDeclarer ipZoneDataJoinBoltDeclarer = builder.setBolt("ipZoneJoin", ipZoneDataJoinBolt, numOfIPZoneJoinTasks).setNumTasks(numOfIPZoneJoinTasks);
-        ipZoneDataJoinBoltDeclarer.fieldsGrouping("sensitivityJoin", new Fields("user"));
+        // ipZoneDataJoinBoltDeclarer.fieldsGrouping("sensitivityJoin", new Fields("user"));
+        ipZoneDataJoinBoltDeclarer.shuffleGrouping("sensitivityJoin");
 
-        StormStreamSink sinkBolt = environment.getStreamSink("hdfs_audit_log_stream",config);
+        // ------------------------
+        // ipZoneJoin -> kafkaSink
+        // ------------------------
+
+        StormStreamSink sinkBolt = environment.getStreamSink("hdfs_audit_log_stream", config);
         BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks).setNumTasks(numOfSinkTasks);
-        kafkaBoltDeclarer.fieldsGrouping("ipZoneJoin", new Fields("user"));
+        kafkaBoltDeclarer.shuffleGrouping("ipZoneJoin");
         return builder.createTopology();
-
-
     }
 
     public abstract BaseRichBolt getParserBolt();
+
     public abstract String getSinkStreamName();
 
     public static PartitionStrategy createStrategy(Config config) {
@@ -103,10 +119,8 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         String key1 = EagleConfigConstants.EAGLE_PROPS + ".partitionRefreshIntervalInMin";
         Integer partitionRefreshIntervalInMin = config.hasPath(key1) ? config.getInt(key1) : 60;
         String key2 = EagleConfigConstants.EAGLE_PROPS + ".kafkaStatisticRangeInMin";
-        Integer kafkaStatisticRangeInMin =  config.hasPath(key2) ? config.getInt(key2) : 60;
+        Integer kafkaStatisticRangeInMin = config.hasPath(key2) ? config.getInt(key2) : 60;
         PartitionStrategy strategy = new PartitionStrategyImpl(dao, algorithm, partitionRefreshIntervalInMin * DateUtils.MILLIS_PER_MINUTE, kafkaStatisticRangeInMin * DateUtils.MILLIS_PER_MINUTE);
         return strategy;
     }
-
-
 }

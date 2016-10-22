@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.sink;
 
+import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,8 +44,8 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     @Override
-    public void prepare(Map stormConf, TopologyContext context) {
-        super.prepare(stormConf, context);
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        super.prepare(stormConf, context, collector);
         Properties properties = new Properties();
         properties.put("metadata.broker.list", config.getBrokerList());
         properties.put("serializer.class", config.getSerializerClass());
@@ -59,13 +60,13 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     @Override
-    protected void execute(Object key, Map event, BasicOutputCollector collector) {
+    protected void execute(Object key, Map event, OutputCollector collector) throws Exception {
         try {
             String output = new ObjectMapper().writeValueAsString(event);
             producer.send(new KeyedMessage(this.topicId, key, output));
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
-            collector.reportError(ex);
+            throw ex;
         }
     }
 
