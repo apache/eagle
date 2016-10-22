@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -70,13 +71,16 @@ public class ApplicationAction implements Serializable {
         this.application = application;
         this.metadata = metadata;
         this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(), serverConfig);
-        Map<String, Object> executionConfig = metadata.getConfiguration();
+        Map<String, Object> executionConfig = new HashMap<>(metadata.getConfiguration());
         if (executionConfig == null) {
             executionConfig = Collections.emptyMap();
         }
         if (serverConfig.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
             LOG.warn("Ignored sever config {} = {}", MetricConfigs.METRIC_PREFIX_CONF, serverConfig.getString(MetricConfigs.METRIC_PREFIX_CONF));
         }
+
+        executionConfig.put("jarPath", metadata.getJarPath());
+        executionConfig.put("mode", metadata.getMode().name());
         executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF, APP_METRIC_PREFIX);
         this.effectiveConfig = ConfigFactory.parseMap(executionConfig).withFallback(serverConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
         this.alertMetadataService = alertMetadataService;
