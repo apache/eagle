@@ -46,7 +46,7 @@ public class HBaseAuditLogParserBolt extends BaseRichBolt {
         String logLine = input.getString(0);
         try {
             HbaseAuditLogObject entity = parser.parse(logLine);
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new TreeMap<>();
             map.put("action", entity.action);
             map.put("host", entity.host);
             map.put("status", entity.status);
