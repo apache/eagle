@@ -101,13 +101,20 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
             KafkaStreamSinkConfig desc = new KafkaStreamSinkConfig();
             desc.setTopicId(config.getString("dataSinkConfig.topic"));
             desc.setBrokerList(config.getString("dataSinkConfig.brokerList"));
-            desc.setSerializerClass(config.getString("dataSinkConfig.serializerClass"));
-            desc.setKeySerializerClass(config.getString("dataSinkConfig.keySerializerClass"));
+            desc.setSerializerClass(config.hasPath("dataSinkConfig.serializerClass")
+                ? config.getString("dataSinkConfig.serializerClass") : "kafka.serializer.StringEncoder");
+            desc.setKeySerializerClass(config.hasPath("dataSinkConfig.keySerializerClass")
+                ? config.getString("dataSinkConfig.keySerializerClass") : "kafka.serializer.StringEncoder");
+
             // new added properties for async producer
-            desc.setNumBatchMessages(config.getString("dataSinkConfig.numBatchMessages"));
-            desc.setProducerType(config.getString("dataSinkConfig.producerType"));
-            desc.setMaxQueueBufferMs(config.getString("dataSinkConfig.maxQueueBufferMs"));
-            desc.setRequestRequiredAcks(config.getString("dataSinkConfig.requestRequiredAcks"));
+            desc.setNumBatchMessages(config.hasPath("dataSinkConfig.numBatchMessages")
+                ? config.getString("dataSinkConfig.numBatchMessages") : "1024");
+            desc.setProducerType(config.hasPath("dataSinkConfig.producerType")
+                ? config.getString("dataSinkConfig.producerType") : "async");
+            desc.setMaxQueueBufferMs(config.hasPath("dataSinkConfig.maxQueueBufferMs")
+                ? config.getString("dataSinkConfig.maxQueueBufferMs") : "3000");
+            desc.setRequestRequiredAcks(config.hasPath("dataSinkConfig.requestRequiredAcks")
+                ? config.getString("dataSinkConfig.requestRequiredAcks") : "1");
             return desc;
         }
 
