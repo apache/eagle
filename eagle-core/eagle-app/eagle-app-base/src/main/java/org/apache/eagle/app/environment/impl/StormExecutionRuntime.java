@@ -23,6 +23,7 @@ import backtype.storm.utils.NimbusClient;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.alert.engine.runner.StormMetricTaggedConsumer;
+import org.apache.eagle.alert.metric.MetricConfigs;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
@@ -61,7 +62,6 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     public static final String TOPOLOGY_MESSAGE_TIMEOUT_SECS = "topology.message.timeout.secs";
-    public static final String METRIC_CONFIG_PREFIX = "metric";
 
     private static final String STORM_NIMBUS_HOST_CONF_PATH = "application.storm.nimbusHost";
     private static final String STORM_NIMBUS_HOST_DEFAULT = "localhost";
@@ -103,7 +103,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             conf.put(TOPOLOGY_MESSAGE_TIMEOUT_SECS, config.getInt(TOPOLOGY_MESSAGE_TIMEOUT_SECS));
         }
 
-        if (config.hasPath(METRIC_CONFIG_PREFIX)) {
+        if (config.hasPath(MetricConfigs.METRIC_SINK_CONF)) {
             conf.registerMetricsConsumer(StormMetricTaggedConsumer.class, config.root().render(ConfigRenderOptions.concise()), 1);
         }
         return conf;
