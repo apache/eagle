@@ -63,6 +63,7 @@ public class UnitTopologyRunner {
     public static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
     public static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
     public static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
+    public static final String PUBLISH_EXECUTOR_NUM = "topology.numOfPublishExecutors";
     public static final String LOCAL_MODE = "topology.localMode";
     public static final String MESSAGE_TIMEOUT_SECS = "topology.messageTimeoutSecs";
     public static final int DEFAULT_MESSAGE_TIMEOUT_SECS = 3600;
@@ -88,6 +89,7 @@ public class UnitTopologyRunner {
                      int numOfSpoutTasks,
                      int numOfRouterBolts,
                      int numOfAlertBolts,
+                     int numOfPublishExecutors,
                      int numOfPublishTasks,
                      Config config,
                      boolean localMode) {
@@ -104,7 +106,7 @@ public class UnitTopologyRunner {
         }
 
         stormConfig.setNumWorkers(numOfTotalWorkers);
-        StormTopology topology = buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
+        StormTopology topology = buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishExecutors, numOfPublishTasks, config);
 
         if (localMode) {
             LOG.info("Submitting as local mode");
@@ -126,10 +128,11 @@ public class UnitTopologyRunner {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
+        int numOfPublishExecutors = config.getInt(PUBLISH_EXECUTOR_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
         boolean localMode = config.getBoolean(LOCAL_MODE);
         int numOfTotalWorkers = config.getInt(TOTAL_WORKER_NUM);
-        run(topologyId, numOfTotalWorkers, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config, localMode);
+        run(topologyId, numOfTotalWorkers, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishExecutors, numOfPublishTasks, config, localMode);
     }
 
     public IMetadataChangeNotifyService getMetadataChangeNotifyService() {
@@ -144,6 +147,7 @@ public class UnitTopologyRunner {
                                        int numOfSpoutTasks,
                                        int numOfRouterBolts,
                                        int numOfAlertBolts,
+                                       int numOfPublishExecutors,
                                        int numOfPublishTasks,
                                        Config config) {
         StreamRouterBolt[] routerBolts = new StreamRouterBolt[numOfRouterBolts];
@@ -199,7 +203,7 @@ public class UnitTopologyRunner {
         }
 
         // connect alert bolt and alert publish bolt, this is the last bolt in the pipeline
-        BoltDeclarer boltDeclarer = builder.setBolt(alertPublishBoltName, publisherBolt).setNumTasks(numOfPublishTasks);
+        BoltDeclarer boltDeclarer = builder.setBolt(alertPublishBoltName, publisherBolt, numOfPublishExecutors).setNumTasks(numOfPublishTasks);
         for (int i = 0; i < numOfAlertBolts; i++) {
             boltDeclarer.fieldsGrouping(alertBoltNamePrefix + i, new Fields(AlertConstants.FIELD_0));
         }
@@ -211,9 +215,10 @@ public class UnitTopologyRunner {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
+        int numOfPublishExecutors = config.getInt(PUBLISH_EXECUTOR_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
 
-        return buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
+        return buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishExecutors, numOfPublishTasks, config);
     }
 
     // ---------------------------
@@ -224,15 +229,17 @@ public class UnitTopologyRunner {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
+        int numOfPublishExecutors = config.getInt(PUBLISH_EXECUTOR_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
 
-        return buildTopologyMetadata(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
+        return buildTopologyMetadata(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishExecutors, numOfPublishTasks, config);
     }
 
     public static Topology buildTopologyMetadata(String topologyId,
                                                  int numOfSpoutTasks,
                                                  int numOfRouterBolts,
                                                  int numOfAlertBolts,
+                                                 int numOfPublishExecutors,
                                                  int numOfPublishTasks,
                                                  Config config) {
         Topology topology = new Topology();
