@@ -51,7 +51,7 @@ public class AlertEmailGeneratorBuilder {
         return this;
     }
 
-    public AlertEmailGeneratorBuilder withMailProps(Map<String, String> mailProps) {
+    public AlertEmailGeneratorBuilder withMailProps(Map<String, Object> mailProps) {
         generator.setProperties(mailProps);
         return this;
     }

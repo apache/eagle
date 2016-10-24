@@ -24,10 +24,8 @@ import java.util.Map;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.impl.PublishStatus;
-import com.typesafe.config.Config;
 
-import java.io.Closeable;
-import java.util.Map;
+import com.typesafe.config.Config;
 
 /**
  * Created on 2/10/16.
@@ -45,7 +43,7 @@ public interface AlertPublishPlugin extends Closeable {
     @SuppressWarnings("rawtypes")
     void init(Config config, Publishment publishment, Map configProperties) throws Exception;
 
-    void update(String dedupIntervalMin, Map<String, String> pluginProperties);
+    void update(String dedupIntervalMin, Map<String, Object> pluginProperties);
 
     void close();
 

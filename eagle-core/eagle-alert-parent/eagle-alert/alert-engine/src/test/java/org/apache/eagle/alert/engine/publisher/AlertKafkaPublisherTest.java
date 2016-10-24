@@ -37,6 +37,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -78,19 +79,25 @@ public class AlertKafkaPublisherTest {
         PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
 
         AlertKafkaPublisher publisher = new AlertKafkaPublisher();
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(PublishConstants.BROKER_LIST, "localhost:9092");
         properties.put(PublishConstants.TOPIC, TEST_TOPIC_NAME);
-        properties.put(PublishConstants.WRITE_MODE, "async");
+        
+        List<Map<String, Object>> kafkaClientConfig = new ArrayList<Map<String, Object>>();
+        kafkaClientConfig.add(ImmutableMap.of("name", "producer.type", "value", "async"));
+        kafkaClientConfig.add(ImmutableMap.of("name", "batch.num.messages", "value", 3000));
+        kafkaClientConfig.add(ImmutableMap.of("name", "queue.buffering.max.ms", "value", 5000));
+        kafkaClientConfig.add(ImmutableMap.of("name", "queue.buffering.max.messages", "value", 10000));
+        properties.put("kafka_client_config", kafkaClientConfig);
 
         Publishment publishment = new Publishment();
         publishment.setName("testAsyncPublishment");
         publishment.setType("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
         publishment.setPolicyIds(Arrays.asList(policy.getName()));
         publishment.setDedupIntervalMin("PT0M");
-        publishment.setProperties(properties);
         publishment.setSerializer("org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer");
         publishment.setProperties(properties);
+        
         Map<String, String> conf = new HashMap<String, String>();
         publisher.init(config, publishment, conf);
 
@@ -113,17 +120,19 @@ public class AlertKafkaPublisherTest {
         PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
 
         AlertKafkaPublisher publisher = new AlertKafkaPublisher();
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(PublishConstants.BROKER_LIST, "localhost:9092");
         properties.put(PublishConstants.TOPIC, TEST_TOPIC_NAME);
-        properties.put(PublishConstants.WRITE_MODE, "sync");
 
+        List<Map<String, Object>> kafkaClientConfig = new ArrayList<Map<String, Object>>();
+        kafkaClientConfig.add(ImmutableMap.of("name", "producer.type", "value", "sync"));
+        properties.put("kafka_client_config", kafkaClientConfig);
+        
         Publishment publishment = new Publishment();
         publishment.setName("testAsyncPublishment");
         publishment.setType("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
         publishment.setPolicyIds(Arrays.asList(policy.getName()));
         publishment.setDedupIntervalMin("PT0M");
-        publishment.setProperties(properties);
         publishment.setSerializer("org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer");
         publishment.setProperties(properties);
         Map<String, String> conf = new HashMap<String, String>();
@@ -165,7 +174,6 @@ public class AlertKafkaPublisherTest {
                     for (MessageAndMetadata<byte[], byte[]> mm : cstrm) {
                         String message = new String(mm.message());
                         outputMessages.add(message);
-                        System.err.println(message);
 
                         try {
                             Thread.sleep(5000);

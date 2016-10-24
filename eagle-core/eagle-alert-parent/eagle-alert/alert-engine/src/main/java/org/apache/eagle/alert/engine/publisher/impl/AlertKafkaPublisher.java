@@ -54,14 +54,11 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
         super.init(config, publishment, conf);
 
         if (publishment.getProperties() != null) {
-            Map<String, String> kafkaConfig = new HashMap<>(publishment.getProperties());
-            brokerList = kafkaConfig.get(PublishConstants.BROKER_LIST).trim();
-            producer = KafkaProducerManager.INSTANCE.getProducer(brokerList, kafkaConfig);
-            topic = kafkaConfig.get(PublishConstants.TOPIC).trim();
-            String writeMode = kafkaConfig.get(PublishConstants.WRITE_MODE);
-            if (writeMode != null) {
-                mode = KafkaWriteMode.fromString(writeMode);
-            }
+            Map<String, Object> publishConfig = new HashMap<>(publishment.getProperties());
+            brokerList = ((String) publishConfig.get(PublishConstants.BROKER_LIST)).trim();
+            producer = KafkaProducerManager.INSTANCE.getProducer(brokerList, publishConfig);
+            topic = ((String) publishConfig.get(PublishConstants.TOPIC)).trim();
+            mode = KafkaProducerManager.INSTANCE.getKafkaWriteMode(publishConfig);
         }
     }
 
@@ -77,10 +74,10 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void update(String dedupIntervalMin, Map<String, String> pluginProperties) {
+    public void update(String dedupIntervalMin, Map<String, Object> pluginProperties) {
         deduplicator.setDedupIntervalMin(dedupIntervalMin);
-        String newBrokerList = pluginProperties.get(PublishConstants.BROKER_LIST).trim();
-        String newTopic = pluginProperties.get(PublishConstants.TOPIC).trim();
+        String newBrokerList = ((String) pluginProperties.get(PublishConstants.BROKER_LIST)).trim();
+        String newTopic = ((String) pluginProperties.get(PublishConstants.TOPIC)).trim();
         if (!newBrokerList.equals(this.brokerList)) {
             if (producer != null) {
                 producer.close();

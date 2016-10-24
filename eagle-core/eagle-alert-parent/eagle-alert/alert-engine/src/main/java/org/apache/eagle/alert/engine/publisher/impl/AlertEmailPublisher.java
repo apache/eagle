@@ -43,7 +43,7 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     private static final long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
 
     private AlertEmailGenerator emailGenerator;
-    private Map<String, String> emailConfig;
+    private Map<String, Object> emailConfig;
 
     private transient ThreadPoolExecutor executorPool;
 
@@ -88,7 +88,7 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     }
 
     @Override
-    public void update(String dedupIntervalMin, Map<String, String> pluginProperties) {
+    public void update(String dedupIntervalMin, Map<String, Object> pluginProperties) {
         super.update(dedupIntervalMin, pluginProperties);
 
         if (pluginProperties != null && !emailConfig.equals(pluginProperties)) {
@@ -102,17 +102,17 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
         this.executorPool.shutdown();
     }
 
-    private AlertEmailGenerator createEmailGenerator(Map<String, String> notificationConfig) {
-        String tplFileName = notificationConfig.get(PublishConstants.TEMPLATE);
+    private AlertEmailGenerator createEmailGenerator(Map<String, Object> notificationConfig) {
+        String tplFileName = (String) notificationConfig.get(PublishConstants.TEMPLATE);
         if (tplFileName == null || tplFileName.equals("")) {
             tplFileName = "ALERT_DEFAULT.vm";
         }
-        String subject = notificationConfig.get(PublishConstants.SUBJECT);
+        String subject = (String) notificationConfig.get(PublishConstants.SUBJECT);
         if (subject == null) {
             subject = "No subject";
         }
-        String sender = notificationConfig.get(PublishConstants.SENDER);
-        String recipients = notificationConfig.get(PublishConstants.RECIPIENTS);
+        String sender = (String) notificationConfig.get(PublishConstants.SENDER);
+        String recipients = (String) notificationConfig.get(PublishConstants.RECIPIENTS);
         if (sender == null || recipients == null) {
             LOG.warn("email sender or recipients is null");
             return null;

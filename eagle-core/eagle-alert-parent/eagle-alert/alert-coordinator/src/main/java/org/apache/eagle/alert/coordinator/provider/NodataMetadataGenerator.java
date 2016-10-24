@@ -268,7 +268,7 @@ public class NodataMetadataGenerator {
         publishment.setType(KAFKA_PUBLISHMENT_TYPE);
         publishment.setPolicyIds(Arrays.asList(policyName));
         publishment.setDedupIntervalMin(PUBLISHMENT_DEDUP_DURATION);
-        Map<String, String> publishmentProperties = new HashMap<String, String>();
+        Map<String, Object> publishmentProperties = new HashMap<>();
         publishmentProperties.put("kafka_broker", kafkaBroker);
         publishmentProperties.put("topic", topic);
         publishment.setProperties(publishmentProperties);
@@ -283,7 +283,7 @@ public class NodataMetadataGenerator {
         publishment.setType(EMAIL_PUBLISHMENT_TYPE);
         publishment.setPolicyIds(Arrays.asList(policyName));
         publishment.setDedupIntervalMin(PUBLISHMENT_DEDUP_DURATION);
-        Map<String, String> publishmentProperties = new HashMap<String, String>();
+        Map<String, Object> publishmentProperties = new HashMap<>();
         publishmentProperties.put("subject", String.format("Eagle Alert - %s", topic));
         publishmentProperties.put("template", "");
         publishmentProperties.put("sender", config.getString("email.sender"));
