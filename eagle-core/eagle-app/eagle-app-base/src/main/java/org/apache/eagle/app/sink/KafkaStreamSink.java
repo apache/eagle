@@ -109,7 +109,7 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
             KafkaStreamSinkConfig desc = new KafkaStreamSinkConfig();
             String streamSpecificTopicConfigKey = getStreamSpecificTopicConfigKey(streamId);
             if (config.hasPath(streamSpecificTopicConfigKey)) {
-                desc.setTopicId(streamSpecificTopicConfigKey);
+                desc.setTopicId(config.getString(streamSpecificTopicConfigKey));
             } else if (config.hasPath(DEAULT_SHARED_TOPIC_CONF_KEY)) {
                 desc.setTopicId(config.getString(DEAULT_SHARED_TOPIC_CONF_KEY));
                 LOG.warn("Using default shared topic {}: {}", DEAULT_SHARED_TOPIC_CONF_KEY, desc.getTopicId());
