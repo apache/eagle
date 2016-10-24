@@ -18,7 +18,8 @@
 
 <application>
     <type>AlertUnitTopologyApp</type>
-    <name>Alert Unit Topology Application</name>
+    <name>Alert Engine</name>
+    <description>Real-time Alert Engine</description>
     <version>0.5.0-incubating</version>
     <configuration>
        <!-- alert topology sizing parameters -->

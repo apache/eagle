@@ -328,6 +328,13 @@
                     <artifactId>eagle-topology-app</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+
+                <!--- App: HadoopMetricMonitorApp -->
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hadoop-metric</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>

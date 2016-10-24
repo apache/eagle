@@ -14,26 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment;
+package org.apache.eagle.metadata.utils;
 
-import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.app.environment.impl.StaticEnvironment;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class StaticEnvironmentTest {
-    private StaticEnvironment environment;
-
-    @Before
-    public void setUp(){
-        environment = new StaticEnvironment(ConfigFactory.load());
+public class StreamIdConversionsTest {
+    @Test
+    public void testGenerateUniqueStreamId() {
+        Assert.assertEquals("MOCK_STREAM_TEST", StreamIdConversions.formatSiteStreamId("test","mock_stream"));
     }
 
-    /**
-     * StaticEnvironment stream sink will be usefully for collection only app
-     */
     @Test
-    public void testStreamSinkSupport(){
-        environment.streamSink();
+    public void testFormatStreamId() {
+        Assert.assertEquals("MOCK_STREAM", StreamIdConversions.formStreamTypeId("mock_stream"));
+    }
+
+    @Test
+    public void testParseStreamTypeId() {
+        Assert.assertEquals("MOCK_STREAM", StreamIdConversions.parseStreamTypeId("test","MOCK_STREAM_TEST"));
     }
 }

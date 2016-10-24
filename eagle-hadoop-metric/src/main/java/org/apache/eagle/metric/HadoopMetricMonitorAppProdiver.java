@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.impl;
+package org.apache.eagle.metric;
 
-import com.typesafe.config.Config;
-import org.apache.eagle.app.environment.AbstractEnvironment;
+import org.apache.eagle.app.StaticApplicationProvider;
 
-public class StaticEnvironment extends AbstractEnvironment {
-    public StaticEnvironment(Config config) {
-        super(config);
-    }
+public class HadoopMetricMonitorAppProdiver extends StaticApplicationProvider {
+    // Metadata: META-INF/providers/org.apache.eagle.metric.HadoopMetricMonitorAppProdiver.xml
 }

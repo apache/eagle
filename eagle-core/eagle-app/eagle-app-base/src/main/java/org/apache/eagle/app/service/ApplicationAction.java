@@ -31,6 +31,7 @@ import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.sink.KafkaStreamSinkConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.utils.StreamIdConversions;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 import org.slf4j.Logger;
@@ -86,21 +87,14 @@ public class ApplicationAction implements Serializable {
         this.alertMetadataService = alertMetadataService;
     }
 
-    /**
-     * Generate global unique streamId to install.
-     * TODO refactor with streamId and siteId
-     */
-    private static String generateUniqueStreamId(String siteId, String streamTypeId) {
-        return String.format("%s_%s", streamTypeId, siteId).toUpperCase();
-    }
-
     public void doInstall() {
         if (metadata.getDescriptor().getStreams() != null) {
             List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
                 StreamDefinition copied = streamDefinition.copy();
                 copied.setSiteId(metadata.getSite().getSiteId());
-                copied.setStreamId(generateUniqueStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
-                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(copied.getStreamId(), this.effectiveConfig);
+                copied.setStreamId(StreamIdConversions.formatSiteStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
+                StreamSinkConfig streamSinkConfig = this.runtime.environment()
+                    .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
                 streamDesc.setSink(streamSinkConfig);
