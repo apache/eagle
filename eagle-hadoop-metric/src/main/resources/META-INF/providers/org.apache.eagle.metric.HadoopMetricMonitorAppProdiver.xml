@@ -25,7 +25,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>Kafka Topic Name</displayName>
-            <value>hdfs_jmx_metric</value>
+            <value>hadoop_jmx_metric_{SITE_ID}</value>
             <description>Topic for kafka data sink</description>
             <required>true</required>
         </property>
@@ -72,4 +72,23 @@
             </columns>
         </stream>
     </streams>
+    <docs>
+        <install>
+            <b>How to Install?</b>
+            <ol>
+                <li>Create a kafka topic named <code>hadoop_jmx_metric_{SITE_ID}</code></li>
+                <li>Setup metric collector for monitored Hadoop/HBase using <a target="_blank" href="https://github.com/apache/incubator-eagle/tree/master/eagle-external/hadoop_jmx_collector">hadoop_jmx_collector</a></li>
+                <li>Setup <code>Kafka Topic Name</code> and <code>Kafka Broker List </code> in <code>Settings</code> tab</li>
+                <li>Click "Install" button then you will see the <code>HADOOP_JMX_METRIC_STREAM_{SITE_ID}</code> in <a href="/#/alert/streamList">Streams</a></li>
+            </ol>
+        </install>
+        <uninstall>
+            <b>How to Uninstall?</b>
+            <ol>
+                <li>Stop and remove installed <code>hadoop_jmx_collector</code></li>
+                <li>Remove kafka topic <code>hadoop_jmx_metric_{SITE_ID}</code></li>
+                <li>Click "Uninstall" button which will remove stream <code>HADOOP_JMX_METRIC_STREAM_{SITE_ID}</code></li>
+            </ol>
+        </uninstall>
+    </docs>
 </application>
