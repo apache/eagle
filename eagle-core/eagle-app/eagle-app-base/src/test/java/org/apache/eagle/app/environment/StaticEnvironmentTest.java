@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.environment;
 
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.environment.impl.StaticEnvironment;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class StaticEnvironmentTest {
 
     @Before
     public void setUp(){
-        environment = new StaticEnvironment(null);
+        environment = new StaticEnvironment(ConfigFactory.load());
     }
 
     /**
