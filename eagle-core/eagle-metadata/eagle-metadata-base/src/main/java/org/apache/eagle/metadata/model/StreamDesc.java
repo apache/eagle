@@ -17,6 +17,7 @@
 package org.apache.eagle.metadata.model;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.metadata.utils.StreamIdConversions;
 
 public class StreamDesc {
     private String streamId;
@@ -28,7 +29,7 @@ public class StreamDesc {
     }
 
     public void setStreamId(String streamId) {
-        this.streamId = streamId;
+        this.streamId = StreamIdConversions.formStreamTypeId(streamId);
     }
 
     public StreamDefinition getSchema() {

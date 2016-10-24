@@ -23,24 +23,24 @@
     <configuration>
         <!-- data source configurations -->
         <property>
-            <name>dataSinkConfig.topic</name>
-            <displayName>Kafka Topic Name</displayName>
+            <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
+            <displayName>JMX Metric Kafka Topic</displayName>
             <value>hadoop_jmx_metric_{SITE_ID}</value>
-            <description>Topic for kafka data sink</description>
+            <description>Hadoop JMX metric kafka topic name for stream: HADOOP_JMX_METRIC_STREAM</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.brokerList</name>
-            <displayName>Kafka Broker List</displayName>
+            <displayName>Kafka Brokers</displayName>
             <value>localhost:6667</value>
-            <description>Kafka broker list</description>
+            <description>Sourced Kafka Brokers like broker1,broker2,...</description>
             <required>true</required>
         </property>
     </configuration>
     <streams>
         <stream>
             <streamId>HADOOP_JMX_METRIC_STREAM</streamId>
-            <description>Hadoop Name Node JMX Metric Stream</description>
+            <description>Hadoop JMX Metric Stream including name node, resource manager, etc.</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
@@ -74,7 +74,7 @@
     </streams>
     <docs>
         <install>
-            <b>How to Install?</b>
+            <b>How to Install</b>
             <ol>
                 <li>Create a kafka topic named <code>hadoop_jmx_metric_{SITE_ID}</code></li>
                 <li>Setup metric collector for monitored Hadoop/HBase using <a target="_blank" href="https://github.com/apache/incubator-eagle/tree/master/eagle-external/hadoop_jmx_collector">hadoop_jmx_collector</a></li>
@@ -83,7 +83,7 @@
             </ol>
         </install>
         <uninstall>
-            <b>How to Uninstall?</b>
+            <b>How to Uninstall</b>
             <ol>
                 <li>Stop and remove installed <code>hadoop_jmx_collector</code></li>
                 <li>Remove kafka topic <code>hadoop_jmx_metric_{SITE_ID}</code></li>

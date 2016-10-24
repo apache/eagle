@@ -22,7 +22,7 @@
 
 <application>
     <type>HdfsAuditLogApplication</type>
-    <name>Hdfs Audit Log Monitoring Application</name>
+    <name>Hdfs Audit Log Monitor</name>
     <version>0.5.0-incubating</version>
     <configuration>
         <!-- topology related configurations -->

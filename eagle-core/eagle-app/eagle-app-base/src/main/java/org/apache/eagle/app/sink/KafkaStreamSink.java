@@ -24,6 +24,7 @@ import com.typesafe.config.Config;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
+import org.apache.eagle.metadata.utils.StreamIdConversions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,10 +97,26 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     public static class Provider implements StreamSinkProvider<KafkaStreamSink, KafkaStreamSinkConfig> {
+        private static final Logger LOG = LoggerFactory.getLogger(Provider.class);
+        private static final String DEAULT_SHARED_TOPIC_CONF_KEY = "dataSinkConfig.topic";
+
+        private String getStreamSpecificTopicConfigKey(String streamId) {
+            return String.format("dataSinkConfig.%s.topic",streamId);
+        }
+
         @Override
         public KafkaStreamSinkConfig getSinkConfig(String streamId, Config config) {
             KafkaStreamSinkConfig desc = new KafkaStreamSinkConfig();
-            desc.setTopicId(config.getString("dataSinkConfig.topic"));
+            String streamSpecificTopicConfigKey = getStreamSpecificTopicConfigKey(streamId);
+            if (config.hasPath(streamSpecificTopicConfigKey)) {
+                desc.setTopicId(streamSpecificTopicConfigKey);
+            } else if (config.hasPath(DEAULT_SHARED_TOPIC_CONF_KEY)) {
+                desc.setTopicId(config.getString(DEAULT_SHARED_TOPIC_CONF_KEY));
+                LOG.warn("Using default shared topic {}: {}", DEAULT_SHARED_TOPIC_CONF_KEY, desc.getTopicId());
+            } else {
+                LOG.error("Neither stream specific topic: {} nor default shared topic: {} found in config", streamSpecificTopicConfigKey, DEAULT_SHARED_TOPIC_CONF_KEY);
+                throw new IllegalArgumentException("Neither stream specific topic: " + streamSpecificTopicConfigKey + " nor default shared topic: " + DEAULT_SHARED_TOPIC_CONF_KEY + " found in config");
+            }
             desc.setBrokerList(config.getString("dataSinkConfig.brokerList"));
             desc.setSerializerClass(config.hasPath("dataSinkConfig.serializerClass")
                 ? config.getString("dataSinkConfig.serializerClass") : "kafka.serializer.StringEncoder");
