@@ -205,7 +205,8 @@ public class UnitTopologyRunner {
         // connect alert bolt and alert publish bolt, this is the last bolt in the pipeline
         BoltDeclarer boltDeclarer = builder.setBolt(alertPublishBoltName, publisherBolt, numOfPublishExecutors).setNumTasks(numOfPublishTasks);
         for (int i = 0; i < numOfAlertBolts; i++) {
-            boltDeclarer.fieldsGrouping(alertBoltNamePrefix + i, new Fields(AlertConstants.FIELD_0));
+            //boltDeclarer.fieldsGrouping(alertBoltNamePrefix + i, new Fields(AlertConstants.FIELD_0));
+            boltDeclarer.shuffleGrouping(alertBoltNamePrefix + i);
         }
 
         return builder.createTopology();
