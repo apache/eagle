@@ -51,6 +51,13 @@
             <required>false</required>
         </property>
         <property>
+            <name>topology.numOfPublishExecutors</name>
+            <displayName>Publisher Executor Number</displayName>
+            <value>1</value>
+            <description>Number of publish executors</description>
+            <required>false</required>
+        </property>
+        <property>
             <name>topology.numOfPublishTasks</name>
             <displayName>Publisher Tasks Number</displayName>
             <value>1</value>
