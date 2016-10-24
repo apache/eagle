@@ -23,7 +23,6 @@
 				<span class="fa fa-rocket"></span>
 				<h3 class="box-title">
 					Source Stream
-					<span ng-if="policy.inputStreams.length > 0">({{policy.inputStreams.length}})</span>
 				</h3>
 				<div class="box-tools pull-right">
 					<div class="btn-group" data-toggle="btn-toggle">
@@ -48,9 +47,8 @@
 						</a>
 						<ul data-id="SP_{{app}}" class="collapse in list-unstyled">
 							<li ng-repeat="stream in streams track by stream.streamId">
-								<input type="checkbox" ng-checked="isInputStreamSelected(stream.streamId)"
-									   ng-click="checkInputStream(stream.streamId)" />
 								<a data-toggle="collapse" href="[data-id='SP_{{app}}_{{stream.streamId}}']">
+									<span class="fa fa-{{isInputStreamSelected(stream.streamId) ? 'check-square' : 'square'}}"></span>
 									{{stream.streamId}}
 								</a>
 								<ul data-id="SP_{{app}}_{{stream.streamId}}" class="collapse in">
@@ -87,42 +85,99 @@
 				<h3 class="box-title">Policy</h3>
 			</div>
 			<div class="box-body">
-				<p ng-show="policy.inputStreams.length === 0" class="text-muted">No stream selected yet.</p>
-				<div ng-show="policy.inputStreams.length > 0">
-					<div class="form-group">
-						<label>Definition</label>
-						<textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()"></textarea>
+				<div class="row">
+					<div class="col-md-8">
+						<div class="form-group">
+							<label>* Name</label>
+							<input type="text" class="form-control" ng-model="policy.name" ng-disabled="policyLock" />
+						</div>
 					</div>
-
-					<label>
-						Stream Partition
-					</label>
-					<div>
-						<ul class="sm-padding">
-							<li ng-repeat="partition in policy.partitionSpec track by $index">
-								[<a class="fa fa-times" ng-click="removePartition(partition)"></a>]
-								[<span class="text-primary">{{partition.type}}</span>]
-								{{partition.streamId}}:
-								<strong class="text-success">{{partition.columns.join(", ")}}</strong>
-							</li>
-							<li>
-								<a ng-click="newPartition()">+ New Partition</a>
-							</li>
-						</ul>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label>* Parallelism Hint</label>
+							<input type="text" class="form-control" ng-model="policy.parallelismHint" ng-disabled="policyLock" />
+						</div>
 					</div>
-
-					<label>
-						Alert Stream
-					</label>
-					<div></div>
-
-					<label>
-						Publisher
-					</label>
 				</div>
+
+
+				<div class="form-group">
+					<label>Description</label>
+					<textarea class="form-control" ng-model="policy.description" rows="2" ng-disabled="policyLock"></textarea>
+				</div>
+
+				<div class="form-group" ng-class="{'has-error': !!definitionMessage}">
+					<label>* Definition</label>
+					<textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()" ng-disabled="policyLock"></textarea>
+					<p class="text-danger">{{definitionMessage}}</p>
+				</div>
+
+				<!--label>
+					Input Stream Partition
+				</label>
+				<ul class="sm-padding">
+					<li ng-repeat="partition in policy.partitionSpec track by $index">
+						<[<a class="fa fa-times" ng-click="removePartition(partition)"></a>]>
+						<strong class="text-primary">{{partition.streamId}}:</strong>
+						<p>
+							<strong>{{partition.type}}</strong> on
+							<strong class="text-success">[{{partition.columns.join(", ")}}]</strong>
+							<span ng-if="partition.sortSpec.windowPeriod">
+								sort in window:
+								<strong class="text-info">[{{partition.sortSpec.windowPeriod}}]</strong>
+							</span>
+						</p>
+					</li>
+					<li class="text-warning" ng-if="policy.partitionSpec.length === 0">No partition yet.</li>
+					<li>
+						<a ng-click="addPartition()">+ Add Partition</a>
+					</li>
+				</ul-->
+
+				<label>
+					Alert Stream
+				</label>
+				<ul class="sm-padding">
+					<li ng-repeat="stream in outputStreams track by $index">
+						<label>
+							<input type="checkbox" ng-checked="isOutputStreamSelected(stream)" ng-click="checkOutputStream(stream)" ng-disabled="policyLock" />
+							{{stream}}
+						</label>
+					</li>
+					<li class="text-warning" ng-if="policy.outputStreams.length === 0">No alert stream yet.</li>
+				</ul>
+
+				<label>
+					Publisher
+				</label>
+				<ul class="sm-padding">
+					<li ng-repeat="publisher in policyPublisherList track by $index">
+						<span>
+							[<a class="fa fa-times" ng-click="removePublisher(publisher)"></a>]
+							<strong>
+								<span>({{publisherTypes[publisher.type].name}})</span>
+								{{publisher.name}}
+							</strong>
+						</span>
+						<p class="offset" ng-repeat="field in publisherTypes[publisher.type].displayFields track by $index">
+							<span>{{field}}:</span>
+							<span>{{publisher.properties[field]}}</span>
+						</p>
+					</li>
+					<li>
+						<a ng-click="addPublisher()">+ Add Publisher</a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="text-right">
+	<button class="btn btn-primary" ng-disabled="!saveCheck()" ng-click="saveConfirm()">
+		<span class="fa fa-floppy-o"></span>
+		Save
+	</button>
 </div>
 
 <!------------------------- Modal: Partition ------------------------->
@@ -168,6 +223,71 @@
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				<button type="button" class="btn btn-primary" data-dismiss="modal"
 						ng-disabled="partition.columns.length === 0" ng-click="addPartitionConfirm()">Add</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!------------------------- Modal: Publisher ------------------------->
+<div class="modal fade" tabindex="-1" data-id="publisherMDL">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Add Publisher</h4>
+			</div>
+			<div class="modal-body">
+				<div class="radio" ng-show="publisherList.length > 0">
+					<label class="radio-inline">
+						<input type="radio" value="exist" ng-model="addPublisherType">
+						From exist publisher
+					</label>
+					<label class="radio-inline">
+						<input type="radio" value="new" ng-model="addPublisherType">
+						Create new publisher
+					</label>
+				</div>
+
+				<!-- Publisher: Exist -->
+				<div ng-if="addPublisherType === 'exist'">
+					<div class="form-group">
+						<label>Publisher</label>
+						<select class="form-control" ng-model="publisher.existPublisher"
+								ng-options="publisher as publisher.name for publisher in publisherList track by publisher.name"></select>
+					</div>
+				</div>
+
+				<div ng-if="addPublisherType === 'new'">
+					<div class="form-group" ng-class="{'has-error': checkPublisherName()}">
+						<label>
+							Name
+							<small ng-if="checkPublisherName()">({{checkPublisherName()}})</small>
+						</label>
+						<input class="form-control" ng-model="publisher.name" />
+					</div>
+					<div class="form-group">
+						<label>Dedup-Interval Minutes</label>
+						<input class="form-control" ng-model="publisher.dedupIntervalMin" />
+					</div>
+					<div class="form-group">
+						<label>Type</label>
+						<select class="form-control" ng-model="publisher.type">
+							<option ng-repeat="(type, fields) in publisherTypes track by type">{{type}}</option>
+						</select>
+					</div>
+					<div class="form-group" ng-repeat="field in publisherTypes[publisher.type].fields track by $index">
+						<label>{{field}}</label>
+						<input class="form-control" ng-model="publisher.properties[field]" />
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal"
+						ng-disabled="addPublisherType === 'new' && !publisher.name" ng-click="addPublisherConfirm()">Add</button>
 			</div>
 		</div>
 	</div>

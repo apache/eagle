@@ -318,11 +318,14 @@ ul.sm-padding > li {
 
 ul > li > label {
 	font-weight: normal;
-	padding-left: 10px;
 }
 ul > li > label > input[type='checkbox'] {
 	margin: 0;
 	vertical-align: middle;
+}
+
+ul > li > p.offset {
+	padding-left: 25px;
 }
 
 /* ========================================================================
