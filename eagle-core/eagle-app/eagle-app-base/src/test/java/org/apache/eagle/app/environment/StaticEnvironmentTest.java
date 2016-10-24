@@ -28,8 +28,11 @@ public class StaticEnvironmentTest {
         environment = new StaticEnvironment(null);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testNotSupport(){
+    /**
+     * StaticEnvironment stream sink will be usefully for collection only app
+     */
+    @Test
+    public void testStreamSinkSupport(){
         environment.streamSink();
     }
 }
