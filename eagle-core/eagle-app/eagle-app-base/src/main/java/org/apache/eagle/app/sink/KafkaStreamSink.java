@@ -115,7 +115,8 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
                 LOG.warn("Using default shared topic {}: {}", DEAULT_SHARED_TOPIC_CONF_KEY, desc.getTopicId());
             } else {
                 LOG.error("Neither stream specific topic: {} nor default shared topic: {} found in config", streamSpecificTopicConfigKey, DEAULT_SHARED_TOPIC_CONF_KEY);
-                throw new IllegalArgumentException("Neither stream specific topic: " + streamSpecificTopicConfigKey + " nor default shared topic: " + DEAULT_SHARED_TOPIC_CONF_KEY + " found in config");
+                throw new IllegalArgumentException("Neither stream specific topic: "
+                    + streamSpecificTopicConfigKey + " nor default shared topic: " + DEAULT_SHARED_TOPIC_CONF_KEY + " found in config");
             }
             desc.setBrokerList(config.getString("dataSinkConfig.brokerList"));
             desc.setSerializerClass(config.hasPath("dataSinkConfig.serializerClass")

@@ -93,7 +93,8 @@ public class ApplicationAction implements Serializable {
                 StreamDefinition copied = streamDefinition.copy();
                 copied.setSiteId(metadata.getSite().getSiteId());
                 copied.setStreamId(StreamIdConversions.formatSiteStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
-                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
+                StreamSinkConfig streamSinkConfig = this.runtime.environment()
+                    .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
                 streamDesc.setSink(streamSinkConfig);
