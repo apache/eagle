@@ -27,11 +27,8 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublishPluginsFactory;
 import org.apache.eagle.alert.engine.router.TestAlertPublisherBolt;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,22 +37,9 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 public class ExtendedDeduplicatorTest {
 
-	private DedupEventsStore store;
-	
-	@Before
-	public void setUp() {
-		store = Mockito.mock(DedupEventsStore.class);
-    	DedupEventsStoreFactory.customizeStore(store);
-	}
-	
-	@After
-	public void tearDown() {
-        Mockito.reset(store);
-	}
-	
-	@Test
-	public void testNormal() throws Exception {
-		List<Publishment> pubs = loadEntities("/router/publishments-extended-deduplicator.json", Publishment.class);
+    @Test
+    public void testNormal() throws Exception {
+        List<Publishment> pubs = loadEntities("/router/publishments-extended-deduplicator.json", Publishment.class);
 
         AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(pubs.get(0), null, null);
         AlertStreamEvent event1 = createWithStreamDef("extended_dedup_host1", "extended_dedup_testapp1", "OPEN");
@@ -65,11 +49,10 @@ public class ExtendedDeduplicatorTest {
         Assert.assertNotNull(plugin.dedup(event1));
         Assert.assertNull(plugin.dedup(event2));
         Assert.assertNotNull(plugin.dedup(event3));
-        
-        Mockito.verify(store, Mockito.atLeastOnce()).add(Mockito.anyObject(), Mockito.anyObject());
-	}
-	
-	private <T> List<T> loadEntities(String path, Class<T> tClz) throws Exception {
+
+    }
+
+    private <T> List<T> loadEntities(String path, Class<T> tClz) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         JavaType type = CollectionType.construct(List.class, SimpleType.construct(tClz));
         List<T> l = objectMapper.readValue(TestAlertPublisherBolt.class.getResourceAsStream(path), type);
@@ -95,7 +78,7 @@ public class ExtendedDeduplicatorTest {
         StreamColumn hostColumn = new StreamColumn();
         hostColumn.setName("hostname");
         hostColumn.setType(StreamColumn.Type.STRING);
-        
+
         StreamColumn stateColumn = new StreamColumn();
         stateColumn.setName("state");
         stateColumn.setType(StreamColumn.Type.STRING);
@@ -105,5 +88,5 @@ public class ExtendedDeduplicatorTest {
         alert.setSchema(sd);
         return alert;
     }
-	
+
 }
