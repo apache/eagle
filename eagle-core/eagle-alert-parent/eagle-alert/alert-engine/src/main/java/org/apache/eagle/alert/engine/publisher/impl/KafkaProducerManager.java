@@ -29,6 +29,7 @@ import java.util.Properties;
  * having multiple instances.
  */
 public class KafkaProducerManager {
+
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProducerManager.class);
 
     private static final String STRING_SERIALIZER = "org.apache.kafka.common.serialization.StringSerializer";
@@ -45,6 +46,11 @@ public class KafkaProducerManager {
 
     private static final String KEY_SERIALIZER = "key.serializer";
     private static final String KEY_SERIALIZER_UNDERSCORE = "key_serializer";
+
+    private static final String REQUEST_REQUIRED_ACKS = "request.required.acks";
+    private static final String REQUEST_REQUIRED_ACKS_UNDERSCORE = "request_required_acks";
+    // the producer gets an acknowledgement after the leader replica has received the data
+    private static final String REQUEST_REQUIRED_ACKS_DEFAULT = "1";
 
     public static final KafkaProducerManager INSTANCE = new KafkaProducerManager();
 
@@ -72,7 +78,11 @@ public class KafkaProducerManager {
         } else {
             configMap.put(VALUE_SERIALIZER, STRING_SERIALIZER);
         }
-        configMap.put("request.required.acks", "1");
+        String requestRequiredAcks = REQUEST_REQUIRED_ACKS_DEFAULT;
+        if (kafkaConfig.containsKey(REQUEST_REQUIRED_ACKS_UNDERSCORE)) {
+            requestRequiredAcks = kafkaConfig.get(REQUEST_REQUIRED_ACKS_UNDERSCORE);
+        }
+        configMap.put(REQUEST_REQUIRED_ACKS, requestRequiredAcks);
 
         // value deserializer
         if (kafkaConfig.containsKey(VALUE_DESERIALIZER_UNDERSCORE)) {

@@ -33,6 +33,7 @@ public class PublishConstants {
     // kafka specific constants
     public static final String TOPIC = "topic";
     public static final String BROKER_LIST = "kafka_broker";
+    public static final String WRITE_MODE = "kafka_write_mode";
 
     // slack specific constants
     public static final String TOKEN = "token";
@@ -50,5 +51,5 @@ public class PublishConstants {
     public static final String ALERT_EMAIL_TIMESTAMP = "alertTime";
     public static final String ALERT_EMAIL_POLICY = "policyId";
     public static final String ALERT_EMAIL_CREATOR = "creator";
-    
+
 }

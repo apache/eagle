@@ -28,8 +28,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
     private KafkaProducer producer;
     private String brokerList;
     private String topic;
+    private KafkaWriteMode mode = KafkaWriteMode.async;
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -55,6 +58,10 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             brokerList = kafkaConfig.get(PublishConstants.BROKER_LIST).trim();
             producer = KafkaProducerManager.INSTANCE.getProducer(brokerList, kafkaConfig);
             topic = kafkaConfig.get(PublishConstants.TOPIC).trim();
+            String writeMode = kafkaConfig.get(PublishConstants.WRITE_MODE);
+            if (writeMode != null) {
+                mode = KafkaWriteMode.fromString(writeMode);
+            }
         }
     }
 
@@ -96,17 +103,17 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
     }
 
     @SuppressWarnings( {"rawtypes", "unchecked"})
-    protected PublishStatus emit(String topic, List<AlertStreamEvent> outputEvents) {
+    protected void emit(String topic, List<AlertStreamEvent> outputEvents) {
         // we need to check producer here since the producer is invisable to extended kafka publisher
         if (producer == null) {
             LOG.warn("KafkaProducer is null due to the incorrect configurations");
-            return null;
+            return;
         }
         if (outputEvents == null) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Alert stream events list in publishment is empty");
             }
-            return null;
+            return;
         }
         this.status = new PublishStatus();
         try {
@@ -114,26 +121,45 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
                 ProducerRecord record = createRecord(outputEvent, topic);
                 if (record == null) {
                     LOG.error("Alert serialize return null, ignored message! ");
-                    return null;
+                    return;
                 }
-                Future<?> future = producer.send(record);
-                future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            }
-            status.successful = true;
-            status.errorMessage = "";
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Successfully send message to Kafka: " + brokerList);
+                if (mode == KafkaWriteMode.sync) {
+                    Future<?> future = producer.send(record);
+                    future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                    succeed(mode, "");
+                } else {
+                    producer.send(record, new Callback() {
+                        @Override
+                        public void onCompletion(RecordMetadata metadata, Exception exception) {
+                            if (exception != null) {
+                                failOnException(String.format("Failed to send message to %s, due to:%s",
+                                    brokerList, exception), exception);
+                                return;
+                            }
+                            succeed(mode, "");
+                        }
+                    });
+                }
             }
         } catch (InterruptedException | ExecutionException e) {
-            status.successful = false;
-            status.errorMessage = String.format("Failed to send message to %s, due to:%s", brokerList, e);
-            LOG.error(status.errorMessage, e);
+            failOnException(String.format("Failed to send message to %s, due to:%s", brokerList, e), e);
         } catch (Exception ex) {
-            LOG.error("fail writing alert to Kafka bus", ex);
-            status.successful = false;
-            status.errorMessage = ex.getMessage();
+            failOnException(String.format("Failed to send message to %s, due to:%s", brokerList, ex), ex);
         }
-        return status;
+    }
+
+    private void failOnException(String message, Exception e) {
+        status.successful = false;
+        status.errorMessage = message;
+        LOG.error(status.errorMessage, e);
+    }
+
+    private void succeed(KafkaWriteMode mode, String message) {
+        status.successful = true;
+        status.errorMessage = "";
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully send message to Kafka: {} in mode {}", brokerList, mode);
+        }
     }
 
     protected String getTopic() {
