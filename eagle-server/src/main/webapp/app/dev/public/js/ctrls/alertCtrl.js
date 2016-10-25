@@ -21,25 +21,6 @@
 
 	var eagleControllers = angular.module('eagleControllers');
 
-	// TODO: Mock data
-	var publishmentTypes = [
-		{
-			"type": "email",
-			"className": "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
-			"description": "send alert to email",
-			"enabled":true,
-			"fields": [{"name":"sender"},{"name":"recipients"},{"name":"subject"},{"name":"smtp.server", "value":"host1"},{"name":"connection", "value":"plaintext"},{"name":"smtp.port", "value": "25"}]
-		},
-		{
-			"type": "kafka",
-			"className": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
-			"description": "send alert to kafka bus",
-			"enabled":true,
-			"fields": [{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]
-		}
-	];
-
-
 	// ======================================================================================
 	// =                                        Main                                        =
 	// ======================================================================================

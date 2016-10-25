@@ -77,6 +77,11 @@
 	function policyEditController(policy, $scope, $q, $wrapState, $timeout, PageConfig, Entity) {
 		$scope.publisherTypes = publisherTypes;
 
+		PageConfig.navPath = [
+			{title: "Policy List", path: "/alert/policyList"},
+			{title: "Policy"}
+		];
+
 		$scope.policy = policy;
 		$scope.policy = common.merge({
 			name: "",
@@ -96,6 +101,7 @@
 		var searchApplications;
 		$scope.searchSourceKey = "";
 		$scope.applications = {};
+		$scope.newPolicy = !!$scope.policy.name;
 
 		// ==============================================================
 		// =                             UI                             =
