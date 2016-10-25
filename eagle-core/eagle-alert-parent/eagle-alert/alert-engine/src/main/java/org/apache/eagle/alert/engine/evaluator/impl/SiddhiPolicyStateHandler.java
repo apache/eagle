@@ -40,7 +40,8 @@ public class SiddhiPolicyStateHandler extends SiddhiPolicyHandler {
     protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamNotDefinedException {
         StringBuilder builder = new StringBuilder();
         PolicyDefinition.Definition stateDefiniton = policyDefinition.getStateDefinition();
-        for (String inputStream : stateDefiniton.getInputStreams()) { // the state stream follow the output stream of the policy definition
+        List<String> inputStreams = stateDefiniton.getInputStreams();
+        for (String inputStream : inputStreams) { // the state stream follow the output stream of the policy definition
             builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(sds.get(inputStream)));
             builder.append("\n");
         }

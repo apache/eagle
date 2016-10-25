@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
@@ -84,14 +84,12 @@ public class SiddhiDefinitionAdapter {
         StringBuilder builder = new StringBuilder();
         PolicyDefinition.Definition coreDefinition = policyDefinition.getDefinition();
         // init if not present
-        if (coreDefinition.getInputStreams() == null || coreDefinition.getInputStreams().isEmpty()) {
-            coreDefinition.setInputStreams(policyDefinition.getInputStreams());
-        }
-        if (coreDefinition.getOutputStreams() == null || coreDefinition.getOutputStreams().isEmpty()) {
-            coreDefinition.setOutputStreams(policyDefinition.getOutputStreams());
+        List<String> inputStreams = coreDefinition.getInputStreams();
+        if (inputStreams == null || inputStreams.isEmpty()) {
+            inputStreams = policyDefinition.getInputStreams();
         }
 
-        for (String inputStream : coreDefinition.getInputStreams()) {
+        for (String inputStream : inputStreams) {
             builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(sds.get(inputStream)));
             builder.append("\n");
         }
