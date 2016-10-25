@@ -1150,7 +1150,6 @@
                     <artifactId>cobertura-maven-plugin</artifactId>
                     <version>${cobertura-maven.version}</version>
                     <configuration>
-                        <format>xml</format>
                         <maxmem>256m</maxmem>
                         <!-- aggregated reports for multi-module projects -->
                         <aggregate>true</aggregate>
