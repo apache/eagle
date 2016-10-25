@@ -17,6 +17,7 @@
 package org.apache.eagle.alert.engine.sorter;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * By default, we could keep the current time clock in memory,
@@ -37,4 +38,8 @@ public interface StreamTimeClockManager extends StreamTimeClockTrigger, Serializ
     StreamTimeClock getStreamTimeClock(String streamId);
 
     void removeStreamTimeClock(String streamId);
+
+    Map<String, StreamTimeClock> getAllStreamTimeClock();
+
+    Map<StreamTimeClockListener, String> getAllListenerStreamIdMap();
 }

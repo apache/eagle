@@ -19,6 +19,8 @@ package org.apache.eagle.alert.coordination.model;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +31,7 @@ import java.util.Objects;
  *
  * <p>Key is StreamPartition.
  */
-public class StreamRouterSpec {
+public class StreamRouterSpec implements Serializable {
     private String streamId;
     private StreamPartition partition; // The meta-data to build
     // StreamPartitioner

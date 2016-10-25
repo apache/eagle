@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -34,7 +35,7 @@ import java.util.Set;
  *
  * @since 4/25/16
  */
-public class Tuple2StreamMetadata {
+public class Tuple2StreamMetadata implements Serializable {
     /**
      * only messages belonging to activeStreamNames will be kept while
      * transforming tuple into stream.
