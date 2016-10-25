@@ -34,10 +34,7 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.ws.rs.*;
 
@@ -258,6 +255,9 @@ public class MetadataResource {
             for (String publishmentId : publishmentIds) {
                 if (publishmentMap.containsKey(publishmentId)) {
                     Publishment publishment = publishmentMap.get(publishmentId);
+                    if (publishment.getPolicyIds() == null) {
+                        publishment.setPolicyIds(new ArrayList<>());
+                    }
                     if (publishment.getPolicyIds().contains(policyId)) {
                         LOG.warn("Policy {} was already bound with publisher {}",policyId, publishmentId);
                     } else {
