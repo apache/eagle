@@ -51,6 +51,19 @@ public class AlertPublisherImpl implements AlertPublisher {
         this.name = name;
     }
 
+    public AlertPublisherImpl(String name, List<Publishment> publishments) {
+        this.name = name;
+        for (Publishment publishment : publishments) {
+            AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
+            if (plugin != null) {
+                publishPluginMapping.put(publishment.getName(), plugin);
+                addPublishmentPolicies(policyPublishPluginMapping, publishment.getPolicyIds(), publishment.getName());
+            } else {
+                LOG.error("Initialized alertPublisher {} failed due to invalid format", publishment);
+            }
+        }
+    }
+
     @Override
     public void init(Config config, Map conf) {
         this.config = config;

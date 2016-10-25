@@ -19,6 +19,7 @@ package org.apache.eagle.alert.engine.coordinator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Set;
  * @since Apr 11, 2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Publishment {
+public class Publishment implements Serializable {
 
     public static final String STREAM_NAME_DEFAULT = "_default";
 

@@ -19,6 +19,8 @@ package org.apache.eagle.alert.coordination.model;
 import com.google.common.base.Objects;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +28,8 @@ import java.util.Map;
  * This metadata model controls how to convert kafka topic into tuple stream.
  * @since Apr 5, 2016
  */
-public class Kafka2TupleMetadata {
+public class Kafka2TupleMetadata  implements Serializable {
+    private static final long serialVersionUID = 5248377553126073015L;
     private String type;
     private String name; // data source name
     private Map<String, String> properties = new HashMap<>();

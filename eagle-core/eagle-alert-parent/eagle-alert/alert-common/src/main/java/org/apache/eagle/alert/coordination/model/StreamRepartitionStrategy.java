@@ -19,10 +19,12 @@ package org.apache.eagle.alert.coordination.model;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
 import org.apache.commons.collections.CollectionUtils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StreamRepartitionStrategy {
+public class StreamRepartitionStrategy implements Serializable {
     public StreamPartition partition;
 
     public int numTotalParticipatingRouterBolts = 0;      // how many group-by bolts participate policy evaluation
@@ -44,7 +46,7 @@ public class StreamRepartitionStrategy {
         }
         StreamRepartitionStrategy o = (StreamRepartitionStrategy) obj;
         return partition.equals(o.partition)
-            && CollectionUtils.isEqualCollection(totalTargetBoltIds, o.totalTargetBoltIds);
+                && CollectionUtils.isEqualCollection(totalTargetBoltIds, o.totalTargetBoltIds);
     }
 
     public StreamPartition getPartition() {
