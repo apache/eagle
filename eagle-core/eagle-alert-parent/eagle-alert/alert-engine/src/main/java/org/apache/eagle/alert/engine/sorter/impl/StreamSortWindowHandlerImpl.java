@@ -30,20 +30,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.Serializable;
 
-public class StreamSortWindowHandlerImpl implements StreamSortHandler {
+public class StreamSortWindowHandlerImpl implements StreamSortHandler, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
     private StreamWindowManager windowManager;
     private StreamSortSpec streamSortSpecSpec;
-    private PartitionedEventCollector outputCollector;
+    private transient PartitionedEventCollector outputCollector;
     private String streamId;
 
     public void prepare(String streamId, StreamSortSpec streamSortSpecSpec, PartitionedEventCollector outputCollector) {
         this.windowManager = new StreamWindowManagerImpl(
-            Period.parse(streamSortSpecSpec.getWindowPeriod()),
-            streamSortSpecSpec.getWindowMargin(),
-            PartitionedEventTimeOrderingComparator.INSTANCE,
-            outputCollector);
+                Period.parse(streamSortSpecSpec.getWindowPeriod()),
+                streamSortSpecSpec.getWindowMargin(),
+                PartitionedEventTimeOrderingComparator.INSTANCE,
+                outputCollector);
         this.streamSortSpecSpec = streamSortSpecSpec;
         this.streamId = streamId;
         this.outputCollector = outputCollector;
@@ -109,6 +110,14 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
             throw new NullPointerException("streamSortSpec is null");
         } else {
             return streamSortSpecSpec.hashCode();
+        }
+    }
+
+    public void updateOutputCollector(PartitionedEventCollector outputCollector) {
+        this.outputCollector = outputCollector;
+        if (this.windowManager != null) {
+            StreamWindowManagerImpl windowImpl = (StreamWindowManagerImpl) this.windowManager;
+            windowImpl.updateOutputCollector(outputCollector);
         }
     }
 }

@@ -18,7 +18,8 @@ package org.apache.eagle.alert.coordination.model;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +30,11 @@ import java.util.Map;
  *
  * @since Apr 29, 2016
  */
-public class AlertBoltSpec {
+public class AlertBoltSpec implements Serializable {
     private String version;
     private String topologyName;
 
     // mapping from boltId to list of PolicyDefinitions
-    @JsonIgnore
     private Map<String, List<PolicyDefinition>> boltPoliciesMap = new HashMap<String, List<PolicyDefinition>>();
 
     // mapping from boltId to list of PolicyDefinition's Ids
@@ -87,12 +87,10 @@ public class AlertBoltSpec {
         }
     }
 
-    @JsonIgnore
     public Map<String, List<PolicyDefinition>> getBoltPoliciesMap() {
         return boltPoliciesMap;
     }
 
-    @JsonIgnore
     public void setBoltPoliciesMap(Map<String, List<PolicyDefinition>> boltPoliciesMap) {
         this.boltPoliciesMap = boltPoliciesMap;
     }
