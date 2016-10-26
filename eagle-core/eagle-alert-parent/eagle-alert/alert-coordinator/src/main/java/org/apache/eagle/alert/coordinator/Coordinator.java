@@ -280,10 +280,12 @@ public class Coordinator {
                 });
                 scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
 
-                //
+                // disable periodically schedule by default due for the sake of Metadata store performance
+                /***
                 scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_DELAY,
                     CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_INTERVAL, TimeUnit.MILLISECONDS);
-
+                ***/
+                
                 Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
                 LOG.info("Eagle Coordinator started ...");
 
