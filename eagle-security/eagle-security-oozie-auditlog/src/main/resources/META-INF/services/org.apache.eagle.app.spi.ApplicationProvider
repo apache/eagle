@@ -13,20 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-org.apache.eagle.alert.app.AlertUnitTopologyAppProvider
-
-## DAM
-org.apache.eagle.security.hbase.HBaseAuditLogAppProvider
-org.apache.eagle.security.auditlog.HdfsAuditLogAppProvider
-
-## JPM
-org.apache.eagle.app.jpm.JPMWebApplicationProvider
-org.apache.eagle.jpm.mr.history.MRHistoryJobApplicationProvider
-org.apache.eagle.jpm.mr.running.MRRunningJobApplicationProvider
-org.apache.eagle.jpm.aggregation.AggregationApplicationProvider
-org.apache.eagle.hadoop.queue.HadoopQueueRunningAppProvider
-org.apache.eagle.topology.TopologyCheckAppProvider
-org.apache.eagle.metric.HadoopMetricMonitorAppProdiver
-
-## OOZIE
 org.apache.eagle.security.oozie.parse.OozieAuditLogAppProvider
