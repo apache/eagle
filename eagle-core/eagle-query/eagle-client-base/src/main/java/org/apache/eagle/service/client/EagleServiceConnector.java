@@ -22,8 +22,6 @@ import org.apache.eagle.common.config.EagleConfigConstants;
 
 import java.io.Serializable;
 
-import static org.apache.eagle.common.config.EagleConfigConstants.SERVICE_ENV;
-
 /**
  * Some common codes to enable DAO through eagle service including service host/post, credential population etc.
  */
@@ -61,20 +59,11 @@ public class EagleServiceConnector implements Serializable{
     }
 
     public EagleServiceConnector(Config config){
-        if (config.hasPath(EagleConfigConstants.SERVICE)) {
-            this.eagleServiceHost = config.getString(EagleConfigConstants.SERVICE_HOST);
-            this.eagleServicePort = config.getInt(EagleConfigConstants.SERVICE_PORT);
-            if (config.hasPath(EagleConfigConstants.SERVICE_USERNAME) && config.hasPath(EagleConfigConstants.SERVICE_PASSWORD)) {
-                this.username = config.getString(EagleConfigConstants.SERVICE_USERNAME);
-                this.password = config.getString(EagleConfigConstants.SERVICE_PASSWORD);
-            }
-        } else {
-            this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-            this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-            if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) && config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
-                this.username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
-                this.password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
-            }
+        this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
+        this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
+        if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) && config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
+            this.username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
+            this.password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
         }
     }
 }
