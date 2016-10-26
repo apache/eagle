@@ -37,9 +37,7 @@ public class HadoopQueueRunningAppConfig implements Serializable {
     }
 
     public static class Topology implements Serializable {
-        public boolean localMode;
         public int numOfParserTasks;
-        public String name;
     }
 
     public static class DataSourceConfig implements Serializable {
@@ -82,17 +80,15 @@ public class HadoopQueueRunningAppConfig implements Serializable {
     private void init(Config config) {
         this.config = config;
 
-        this.topology.localMode = config.getBoolean("topology.localMode");
         this.topology.numOfParserTasks = config.getInt("topology.numOfParserTasks");
-        this.topology.name = config.getString("topology.name");
 
         this.dataSourceConfig.rMEndPoints = config.getString("dataSourceConfig.rMEndPoints");
         this.dataSourceConfig.fetchIntervalSec = config.getString("dataSourceConfig.fetchIntervalSec");
 
-        this.eagleProps.site = config.getString("eagleProps.site");
-        this.eagleProps.eagleService.host = config.getString("eagleProps.eagleService.host");
-        this.eagleProps.eagleService.port = config.getInt("eagleProps.eagleService.port");
-        this.eagleProps.eagleService.username = config.getString("eagleProps.eagleService.username");
-        this.eagleProps.eagleService.password = config.getString("eagleProps.eagleService.password");
+        this.eagleProps.site = config.getString("siteId");
+        this.eagleProps.eagleService.host = config.getString("service.host");
+        this.eagleProps.eagleService.port = config.getInt("service.port");
+        this.eagleProps.eagleService.username = config.getString("service.username");
+        this.eagleProps.eagleService.password = config.getString("service.password");
     }
 }
