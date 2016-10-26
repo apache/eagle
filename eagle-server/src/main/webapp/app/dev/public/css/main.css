@@ -90,6 +90,10 @@ a {
 	.row.flex > [class*='col-'] > * {
 		flex: auto;
 	}
+
+	.row.flex > [class*='col-md-4'] {
+		width: 33.2%;
+	}
 }
 
 .row.border-split > div {
