@@ -264,6 +264,36 @@ var app = {};
 				}
 			});
 
+			var modules = {};
+			$.each(register.moduleList, function (i, module) {
+				modules[module.application] = module;
+			});
+
+			$scope.$on('$stateChangeSuccess', function (event, next, nextParam, current, currentParam) {
+				// Application check
+				//console.log("!!!!!", JSON.stringify(Site.list, null, "\t"));
+				var siteId = nextParam.siteId;
+				if (siteId) {
+					var name = next.name;
+					var match = false;
+					$.each(common.getValueByPath(Site.find(siteId), ["applicationList"]), function (i, app) {
+						var appType = app.descriptor.type;
+						var module = modules[appType];
+						if(!module) return;
+
+						if(common.array.find(name, module.routeList, ["state"])) {
+							match = true;
+							return false;
+						}
+					});
+
+					if(!match) {
+						console.log("[Application] No route match:", name);
+						$wrapState.go("site", {siteId: siteId});
+					}
+				}
+			});
+
 			// ================================ Function ================================
 			// Get side bar navigation item class
 			$scope.getNavClass = function (portal) {

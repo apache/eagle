@@ -311,18 +311,24 @@
 			});
 
 			common.deferred.all(promiseList).then(function (moduleList) {
+				// Filter module list
+				moduleList = $.map(moduleList, function (module) {
+					return module;
+				});
+
 				var routeList = $.map(moduleList, function (module) {
-					return module && module.routeList;
+					return module.routeList;
 				});
 				var portalList = $.map(moduleList, function (module) {
-					return module && module.portalList;
+					return module.portalList;
 				});
 				var widgetList = $.map(moduleList, function (module) {
-					return module && module.widgetList;
+					return module.widgetList;
 				});
 
 				$(document).trigger("APPLICATION_READY", {
 					appList: _registerAppList,
+					moduleList: moduleList,
 					routeList: routeList,
 					portalList: portalList,
 					widgetList: widgetList

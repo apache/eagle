@@ -80,9 +80,6 @@
 		};
 
 		Site.switchSite = function (site) {
-			/*$wrapState.current;
-			$wrapState.go($wrapState.current, );
-			console.log(">>>", site);*/
 			var param = $wrapState.param;
 			if(!site) {
 				$wrapState.go("home");
