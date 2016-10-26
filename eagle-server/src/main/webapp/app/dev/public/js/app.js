@@ -109,15 +109,15 @@ var app = {};
 					controller: "alertStreamListCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyCreate', {
-					url: "policyCreate",
-					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
+				.state('policyCreate', {
+					url: "/alert/policyCreate",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyCreateCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyEdit', {
-					url: "policyEdit/{name}",
-					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
+				.state('policyEdit', {
+					url: "/alert/policyEdit/{name}",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyEditCtrl",
 					resolve: routeResolve()
 				})
@@ -185,7 +185,7 @@ var app = {};
 				$stateProvider.state(route.state, config);
 			});
 
-			$httpProvider.interceptors.push(function($q) {
+			/* $httpProvider.interceptors.push(function($q) {
 				function eagleRequestHandle(res) {
 					var data = res.data || {
 						exception: "",
@@ -218,7 +218,7 @@ var app = {};
 						return $q.reject(eagleRequestHandle(res));
 					}
 				};
-			});
+			}); */
 		});
 
 		// ======================================================================================
@@ -235,6 +235,8 @@ var app = {};
 			window._UI = $scope.UI = UI;
 			window._Time = $scope.Time = Time;
 			$scope.common = common;
+
+			$scope._TRS = window._TRS();
 
 			Object.defineProperty(window, "scope", {
 				get: function () {

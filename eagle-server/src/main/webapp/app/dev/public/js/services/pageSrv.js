@@ -53,7 +53,7 @@
 		var defaultPortalList = [
 			{name: "Home", icon: "home", path: "#/"},
 			{name: "Alert", icon: "bell", showFunc: checkApplication, list: [
-				{name: "Explore Alerts", path: "#/alert/"},
+				// {name: "Explore Alerts", path: "#/alert/"},
 				{name: "Policies", path: "#/alert/policyList"},
 				{name: "Streams", path: "#/alert/streamList"},
 				{name: "Define Policy", path: "#/alert/policyCreate"}
