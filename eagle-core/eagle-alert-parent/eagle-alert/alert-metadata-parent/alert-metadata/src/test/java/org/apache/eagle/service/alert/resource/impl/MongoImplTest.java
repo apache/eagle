@@ -203,9 +203,6 @@ public class MongoImplTest {
             Assert.assertEquals(200, result.code);
             List<StreamDefinition> assigns = dao.listStreams();
             Assert.assertEquals(1, assigns.size());
-            dao.removeStream("stream");
-            assigns = dao.listStreams();
-            Assert.assertEquals(0, assigns.size());
         }
         // alert
         {
