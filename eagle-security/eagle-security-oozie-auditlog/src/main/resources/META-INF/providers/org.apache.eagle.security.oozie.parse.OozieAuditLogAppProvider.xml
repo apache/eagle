@@ -176,14 +176,6 @@
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
         </property>
-
-        <!-- web app related configurations -->
-        <property>
-            <name>fs.defaultFS</name>
-            <displayName>fs.defaultFS</displayName>
-            <value>hdfs://localhost:8020</value>
-            <description>hdfs endpoint</description>
-        </property>
     </configuration>
     <streams>
         <stream>
