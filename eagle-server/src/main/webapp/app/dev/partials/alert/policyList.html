@@ -35,7 +35,7 @@
 							<span class="fa fa-square" ng-class="item.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
 						</td>
 						<td>
-							<a ui-sref="policyDetail({name: item.name})" target="_blank">{{item.name}}</a>
+							<a ui-sref="policyDetail({name: item.name})">{{item.name}}</a>
 						</td>
 						<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
 						<td>{{item.description}}</td>
@@ -47,7 +47,7 @@
 								<button class="btn btn-default opt" ng-if="item.policyStatus === 'ENABLED'" ng-click="stopPolicy(item)">
 									<span class="fa fa-stop"></span>
 								</button>
-								<a ui-sref="policyEdit({name: item.name})" target="_blank" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
+								<a ui-sref="policyEdit({name: item.name})" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
 								<button class="btn btn-danger opt" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
 							</div>
 						</td>

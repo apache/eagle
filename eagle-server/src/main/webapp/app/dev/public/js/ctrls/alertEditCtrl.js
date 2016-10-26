@@ -150,8 +150,6 @@
 				list.push(stream);
 				$scope.streams[stream.streamId] = stream;
 			});
-
-			console.log($scope.applications);
 		});
 
 		$scope.isInputStreamSelected = function (streamId) {
@@ -205,7 +203,7 @@
 		// ==============================================================
 		// =                        Output Stream                       =
 		// ==============================================================
-		$scope.outputStreams = [];
+		$scope.outputStreams = ($scope.policy.outputStreams || []).concat();
 
 		$scope.isOutputStreamSelected = function (streamId) {
 			return $.inArray(streamId, $scope.policy.outputStreams) >= 0;
@@ -260,6 +258,14 @@
 		$scope.addPublisherType = "";
 		$scope.policyPublisherList = [];
 		$scope.publisher = {};
+
+		Entity.queryMetadata("policies/" + $scope.policy.name + "/publishments/")._then(function (res) {
+			$scope.policyPublisherList = $.map(res.data, function (publisher) {
+				return $.extend({
+					_exist: true
+				}, publisher);
+			});
+		});
 
 		$scope.addPublisher = function () {
 			$scope.publisher = {
@@ -384,6 +390,6 @@
 			}, function () {
 				$scope.saveLock = false;
 			});
-		}
+		};
 	}
 })();
