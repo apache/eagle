@@ -97,7 +97,7 @@ public class AlertPublishEvent {
         alertEvent.setAlertId(UUID.randomUUID().toString());
         alertEvent.setPolicyId(event.getPolicyId());
         alertEvent.setAlertTimestamp(event.getCreatedTime());
-        if (event.getExtraData() != null) {
+        if (event.getExtraData() != null && !event.getExtraData().isEmpty()) {
             alertEvent.setSiteId(event.getExtraData().get(SITE_ID_KEY).toString());
             alertEvent.setPolicyValue(event.getExtraData().get(POLICY_VALUE_KEY).toString());
             alertEvent.setAppIds((List<String>) event.getExtraData().get(APP_IDS_KEY));

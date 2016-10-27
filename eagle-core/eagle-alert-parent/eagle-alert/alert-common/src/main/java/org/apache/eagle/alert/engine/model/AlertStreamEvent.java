@@ -126,6 +126,4 @@ public class AlertStreamEvent extends StreamEvent {
         this.extraData = extraData;
     }
 
-
 }
-

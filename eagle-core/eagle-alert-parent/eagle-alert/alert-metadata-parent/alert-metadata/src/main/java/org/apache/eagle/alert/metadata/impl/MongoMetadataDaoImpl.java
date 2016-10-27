@@ -125,6 +125,15 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             publishmentType.createIndex(doc1, io1);
         }
 
+        alerts = db.getCollection("alerts");
+        {
+            IndexOptions io1 = new IndexOptions().background(true).unique(true).name("alertIndex");
+            BsonDocument doc1 = new BsonDocument();
+            doc1.append("alertId", new BsonInt32(1));
+            alerts.createIndex(doc1, io1);
+        }
+
+
         // below is for schedule_specs and its splitted collections
         BsonDocument doc1 = new BsonDocument();
         IndexOptions io1 = new IndexOptions().background(true).name("versionIndex");
@@ -179,6 +188,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             filter.append("streamId", new BsonString(MetadataUtils.getKey(t)));
         } else if (t instanceof PublishmentType) {
             filter.append("type", new BsonString(MetadataUtils.getKey(t)));
+        } else if (t instanceof AlertPublishEvent) {
+            filter.append("alertId", new BsonString(MetadataUtils.getKey(t)));
         } else {
             filter.append("name", new BsonString(MetadataUtils.getKey(t)));
         }
@@ -307,12 +318,22 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
+        return list(alerts, AlertPublishEvent.class);
+    }
+
+    @Override
+    public AlertPublishEvent getAlertPublishEvent(String alertId) {
+        List<AlertPublishEvent> results = list(alerts, AlertPublishEvent.class);
+        Optional<AlertPublishEvent> op = results.stream().filter(alert -> alert.getAlertId().equals(alertId)).findAny();
+        if (op.isPresent()) {
+            return op.get();
+        }
         return null;
     }
 
     @Override
     public OpResult addAlertPublishEvent(AlertPublishEvent event) {
-        return null;
+        return addOrReplace(alerts, event);
     }
 
     private <T> OpResult addOne(MongoCollection<Document> collection, T t) {

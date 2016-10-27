@@ -42,8 +42,11 @@ public class JdbcDatabaseHandler {
     private static final String DELETE_STATEMENT = "DELETE FROM %s WHERE id=?";
     private static final String UPDATE_STATEMENT = "UPDATE %s set value=? WHERE id=?";
     private static final String QUERY_ALL_STATEMENT = "SELECT value FROM %s";
-    private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
+    private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=%s";
     private static final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
+    private static final String QUERY_ALL_STATEMENT_WITH_SIZE = "SELECT value FROM %s limit %s";
+
+    public enum SortType { DESC, ASC }
 
     private Map<String, String> tblNameMap = new HashMap<>();
 
@@ -151,10 +154,44 @@ public class JdbcDatabaseHandler {
 
     public <T> List<T> list(Class<T> clz) {
         String tb = getTableName(clz.getSimpleName());
+        String query = String.format(QUERY_ALL_STATEMENT, tb);
+        return executeSelectStatement(clz, query);
+    }
+
+    public <T> List<T> listSubset(Class<T> clz, int size) {
+        String tb = getTableName(clz.getSimpleName());
+        String query = String.format(QUERY_ALL_STATEMENT_WITH_SIZE, tb, size);
+        return executeSelectStatement(clz, query);
+    }
+
+    public <T> T listWithFilter(String key, Class<T> clz) {
+        String tb = getTableName(clz.getSimpleName());
+        String query = String.format(QUERY_CONDITION_STATEMENT, tb, key);
+        List<T> result = executeSelectStatement(clz, query);
+        if (result.isEmpty()) {
+            return null;
+        } else {
+            return result.get(0);
+        }
+    }
+
+    public <T> T listTop(Class<T> clz, String sortType) {
+        String tb = getTableName(clz.getSimpleName());
+        String query = String.format(QUERY_ORDERBY_STATEMENT, tb, sortType);
+        List<T> result = executeSelectStatement(clz, query);
+        if (result.isEmpty()) {
+            return null;
+        } else {
+            return result.get(0);
+        }
+    }
+
+    public <T> List<T> executeSelectStatement(Class<T> clz, String query) {
+        String tb = getTableName(clz.getSimpleName());
         List<T> result = new LinkedList<>();
         try {
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(String.format(QUERY_ALL_STATEMENT, tb));
+            ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 //String key = rs.getString(1);
                 String json = rs.getString(1);
@@ -171,79 +208,6 @@ public class JdbcDatabaseHandler {
             e.printStackTrace();
         }
         return result;
-    }
-
-    public <T> T listWithFilter(String key, Class<T> clz) {
-        String tb = getTableName(clz.getSimpleName());
-        List<T> result = new LinkedList<>();
-        PreparedStatement statement = null;
-        try {
-            statement = connection.prepareStatement(String.format(QUERY_CONDITION_STATEMENT, tb));
-            statement.setString(1, key);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-                //String key = rs.getString(1);
-                String json = rs.getString(1);
-                try {
-                    T obj = mapper.readValue(json, clz);
-                    result.add(obj);
-                } catch (IOException e) {
-                    LOG.error("deserialize config item failed!", e);
-                }
-            }
-            rs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    LOG.warn("Close statement failed");
-                }
-            }
-        }
-        if (result.isEmpty()) {
-            return null;
-        } else {
-            return result.get(0);
-        }
-    }
-
-    public <T> T listTop(Class<T> clz, String sortType) {
-        String tb = getTableName(clz.getSimpleName());
-        List<T> result = new LinkedList<>();
-        PreparedStatement statement = null;
-        try {
-            statement = connection.prepareStatement(String.format(QUERY_ORDERBY_STATEMENT, tb, sortType));
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-                //String key = rs.getString(1);
-                String json = rs.getString(1);
-                try {
-                    T obj = mapper.readValue(json, clz);
-                    result.add(obj);
-                } catch (IOException e) {
-                    LOG.error("deserialize config item failed!", e);
-                }
-            }
-            rs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    LOG.warn("Close statement failed");
-                }
-            }
-        }
-        if (result.isEmpty()) {
-            return null;
-        } else {
-            return result.get(0);
-        }
     }
 
     public <T> OpResult remove(String clzName, String key) {
