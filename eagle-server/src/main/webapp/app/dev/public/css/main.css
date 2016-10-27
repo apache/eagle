@@ -70,7 +70,7 @@ a {
  * ======================================================================== */
 
 @media (min-width: 1200px) {
-	.row.flex {
+	body:not(.safari) .row.flex {
 		display: -webkit-box;
 		display: -webkit-flex;
 		display: -ms-flexbox;
@@ -78,7 +78,7 @@ a {
 		flex-wrap: wrap;
 	}
 
-	.row.flex > [class*='col-'] {
+	body:not(.safari) .row.flex > [class*='col-'] {
 		display: -webkit-box;
 		display: -webkit-flex;
 		display: -ms-flexbox;
@@ -87,12 +87,8 @@ a {
 		flex-wrap: nowrap;
 	}
 
-	.row.flex > [class*='col-'] > * {
+	body:not(.safari) .row.flex > [class*='col-'] > * {
 		flex: auto;
-	}
-
-	.row.flex > [class*='col-md-4'] {
-		width: 33.2%;
 	}
 }
 
