@@ -18,13 +18,14 @@ package org.apache.eagle.alert.engine.sorter.impl;
 
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 
 /**
  * TODO: Stable sorting algorithm for better performance to avoid event resorting with same timestamp?.
  */
-public class PartitionedEventTimeOrderingComparator implements Comparator<PartitionedEvent> {
+public class PartitionedEventTimeOrderingComparator implements Comparator<PartitionedEvent>, Serializable {
     public static final PartitionedEventTimeOrderingComparator INSTANCE = new PartitionedEventTimeOrderingComparator();
 
     @Override

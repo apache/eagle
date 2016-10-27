@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -29,17 +30,20 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.util.snapshot.ByteSerializer;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SiddhiPolicyHandler implements PolicyStreamHandler {
+public class SiddhiPolicyHandler implements PolicyStreamHandler, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SiddhiPolicyHandler.class);
-    private ExecutionPlanRuntime executionRuntime;
-    private SiddhiManager siddhiManager;
+    private transient ExecutionPlanRuntime executionRuntime;
+    private transient SiddhiManager siddhiManager;
     private Map<String, StreamDefinition> sds;
     private PolicyDefinition policy;
-    private PolicyHandlerContext context;
+    private transient PolicyHandlerContext context;
 
     private int currentIndex = 0; // the index of current definition statement inside the policy definition
 
@@ -49,7 +53,7 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
     }
 
     protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamNotDefinedException {
-        return SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition,sds);
+        return SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition, sds);
     }
 
     @Override
@@ -71,9 +75,9 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         for (final String outputStream : outputStreams) {
             if (executionRuntime.getStreamDefinitionMap().containsKey(outputStream)) {
                 this.executionRuntime.addCallback(outputStream,
-                    new AlertStreamCallback(
-                        outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream)),
-                        collector, context, currentIndex));
+                        new AlertStreamCallback(
+                                outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream)),
+                                collector, context, currentIndex));
             } else {
                 throw new IllegalStateException("Undefined output stream " + outputStream);
             }
@@ -111,6 +115,32 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         this.siddhiManager.shutdown();
         LOG.info("Shutdown siddhi manager {}", this.siddhiManager);
         LOG.info("Closed handler for policy {}", this.policy.getName());
+    }
+
+    public void restoreSiddhiSnapshot(byte[] siddhiSnapshot) {
+        HashMap<String, Object[]> snapshots = (HashMap<String, Object[]>) ByteSerializer.BToO(siddhiSnapshot);
+        HashMap<String, Object[]> modifiedSnapshots = new HashMap<>(snapshots.size());
+        snapshots.forEach((oldElementId, snapshot) -> {
+            String[] splitedId = StringUtils.split(oldElementId, "-");
+            String newElementId = executionRuntime.getName() + "-" + splitedId[splitedId.length - 1];
+            modifiedSnapshots.put(newElementId, snapshot);
+        });
+        siddhiSnapshot = ByteSerializer.OToB(modifiedSnapshots);
+        LOG.info("Restoring SiddhiSnapshot Start");
+        this.executionRuntime.restore(siddhiSnapshot);
+        LOG.info("Restoring SiddhiSnapshot End");
+    }
+
+    public byte[] closeAndSnapShot() {
+        byte[] snapshot = snapShot();
+        this.executionRuntime.shutdown();
+        this.siddhiManager.shutdown();
+        return snapshot;
+    }
+
+    public byte[] snapShot() {
+        byte[] snapshot = this.executionRuntime.snapshot();
+        return snapshot;
     }
 
     @Override

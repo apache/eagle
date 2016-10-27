@@ -1,0 +1,53 @@
+{
+  "version": null,
+  "topologyId": "testTopology",
+  "kafka2TupleMetadataMap": {
+    "oozie": {
+      "type": null,
+      "name": "oozie",
+      "properties": null,
+      "topic": "oozie",
+      "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+      "codec": null
+    }
+  },
+  "tuple2StreamMetadataMap": {
+    "oozie": {
+      "activeStreamNames": [
+        "oozieStream"
+      ],
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "oozieStream"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.PlainStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": null
+    }
+  },
+  "streamRepartitionMetadataMap": {
+    "oozie": [
+      {
+        "topicName": "oozie",
+        "streamId": "defaultStringStream",
+        "groupingStrategies": [
+          {
+            "partition": {
+              "streamId": "oozieStream",
+              "type": "GROUPBY",
+              "columns": [
+                "operation"
+              ],
+              "sortSpec": {
+                "windowPeriod": "PT4S",
+                "windowMargin": 1000
+              }
+            },
+            "numTotalParticipatingRouterBolts": 4,
+            "startSequence": 0,
+            "totalTargetBoltIds": []
+          }
+        ]
+      }
+    ]
+  }
+}
