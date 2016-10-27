@@ -79,6 +79,17 @@
 			return Site.find($wrapState.param.siteId);
 		};
 
+		Site.switchSite = function (site) {
+			var param = $wrapState.param;
+			if(!site) {
+				$wrapState.go("home");
+			} else if(param.siteId) {
+				$wrapState.go($wrapState.current.name, $.extend({}, param, {siteId: site.siteId}));
+			} else {
+				$wrapState.go("site", {siteId: site.siteId});
+			}
+		};
+
 		Site.getPromise = function (config) {
 			var siteList = Site.list;
 
