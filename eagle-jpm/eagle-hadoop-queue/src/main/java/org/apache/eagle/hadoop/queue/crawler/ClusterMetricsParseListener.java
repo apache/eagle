@@ -83,7 +83,7 @@ public class ClusterMetricsParseListener {
         createMetric(MetricName.HADOOP_CLUSTER_TOTAL_MEMORY, currentTimestamp, metrics.getTotalMB(), AggregateFunc.MAX);
         createMetric(MetricName.HADOOP_CLUSTER_AVAILABLE_MEMORY, currentTimestamp, metrics.getAvailableMB(), AggregateFunc.AVG);
         createMetric(MetricName.HADOOP_CLUSTER_RESERVED_MEMORY, currentTimestamp, metrics.getReservedMB(), AggregateFunc.AVG);
-        createMetric(MetricName.HADOOP_CLUSTER_TOTAL_VIRTUAL_CORES, currentTimestamp, metrics.getTotalVirtualCores(), AggregateFunc.MAX);
+        createMetric(MetricName.HADOOP_CLUSTER_TOTAL_VIRTUAL_CORES, currentTimestamp, metrics.getAllocatedVirtualCores(), AggregateFunc.MAX);
     }
 
     public void flush() {

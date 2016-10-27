@@ -33,9 +33,11 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
 
 
     private JobHistoryContentFilter filter;
+    private EagleOutputCollector collector;
 
     public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, EagleOutputCollector eagleCollector) {
         this.filter = filter;
+        this.collector = eagleCollector;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
             jobFileInputStream.close();
         } else {
             //get parser and parse, do not need to emit data now
-            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter);
+            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter, this.collector);
             parser.parse(jobFileInputStream);
             jobFileInputStream.close();
         }

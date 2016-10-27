@@ -101,9 +101,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setConfiguration(appConfig);
 
         applicationEntity.getContext().put("siteId", siteEntity.getSiteId());
-        applicationEntity.getContext().put("mode", applicationEntity.getMode().name());
         applicationEntity.getContext().put("appId", applicationEntity.getAppId());
-        applicationEntity.getContext().put("jarPath", applicationEntity.getJarPath());
 
         // Validate Dependency
         validateDependingApplicationInstalled(applicationEntity);

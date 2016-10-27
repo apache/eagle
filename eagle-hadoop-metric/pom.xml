@@ -26,6 +26,10 @@
 
     <artifactId>eagle-hadoop-metric</artifactId>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-app-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
-
 </project>

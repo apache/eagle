@@ -313,7 +313,9 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" ng-disabled="installLock" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" ng-disabled="installLock || !checkFields()" ng-click="installAppConfirm()">Install</button>
+				<button type="button" class="btn btn-primary" ng-disabled="installLock || !checkFields()" ng-click="installAppConfirm()">
+					{{tmpApp.uuid ? 'Update' : 'Install'}}
+				</button>
 			</div>
 		</div>
 	</div>

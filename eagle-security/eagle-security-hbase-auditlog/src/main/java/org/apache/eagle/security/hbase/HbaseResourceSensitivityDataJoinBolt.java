@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-public class HbaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<HBaseSensitivityEntity, String>  {
+public class HbaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<HBaseSensitivityEntity, String> {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseResourceSensitivityDataJoinBolt.class);
 
-    public HbaseResourceSensitivityDataJoinBolt(Config config){
+    public HbaseResourceSensitivityDataJoinBolt(Config config) {
         super(config, new HBaseSensitivityDataEnrichLCM(config));
     }
 
@@ -57,8 +57,8 @@ public class HbaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt
                 }
             }
             Map<String, Object> newEvent = new TreeMap<String, Object>(event);
-            newEvent.put("sensitivityType", sensitivityEntity == null ?
-                    "NA" : sensitivityEntity.getSensitivityType());
+            newEvent.put("sensitivityType", sensitivityEntity == null
+                ? "NA" : sensitivityEntity.getSensitivityType());
             newEvent.put("scope", resource);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("After hbase resource sensitivity lookup: " + newEvent);
@@ -66,9 +66,9 @@ public class HbaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt
             LOG.info("After hbase resource sensitivity lookup: " + newEvent);
             // push to Kafka sink
             collector.emit(Arrays.asList(newEvent.get("user"), newEvent));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error joining data, ignore it", ex);
-        }finally {
+        } finally {
             collector.ack(input);
         }
     }

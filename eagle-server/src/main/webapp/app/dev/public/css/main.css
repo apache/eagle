@@ -70,7 +70,7 @@ a {
  * ======================================================================== */
 
 @media (min-width: 1200px) {
-	.row.flex {
+	body:not(.safari) .row.flex {
 		display: -webkit-box;
 		display: -webkit-flex;
 		display: -ms-flexbox;
@@ -78,7 +78,7 @@ a {
 		flex-wrap: wrap;
 	}
 
-	.row.flex > [class*='col-'] {
+	body:not(.safari) .row.flex > [class*='col-'] {
 		display: -webkit-box;
 		display: -webkit-flex;
 		display: -ms-flexbox;
@@ -87,7 +87,7 @@ a {
 		flex-wrap: nowrap;
 	}
 
-	.row.flex > [class*='col-'] > * {
+	body:not(.safari) .row.flex > [class*='col-'] > * {
 		flex: auto;
 	}
 }
@@ -99,6 +99,13 @@ a {
 .no-padding > .row.border-split {
 	margin-left: 0;
 	margin-right: 0;
+}
+
+/* ========================================================================
+ * =                              Drop Down                               =
+ * ======================================================================== */
+.hover-dropdown:hover .dropdown-menu {
+	display: block;
 }
 
 /* ========================================================================
@@ -181,6 +188,44 @@ ul.stepGuide li > .icon {
 
 ul.stepGuide li > .title {
 	display: block;
+}
+
+/* ========================================================================
+ * =                                Input                                 =
+ * ======================================================================== */
+.input-with-icon {
+	position: relative;
+	margin-bottom: 10px;
+}
+
+.input-with-icon .fa {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	pointer-events: none;
+	opacity: 0.6;
+}
+
+.input-with-icon input {
+	padding-left: 28px;
+}
+
+/* ========================================================================
+ * =                                Policy                                =
+ * ======================================================================== */
+.policy-app-list > a {
+	display: block;
+	font-size: 18px;
+}
+
+.policy-app-list > ul {
+	margin: 0;
+	padding: 0 0 0 5px;
+}
+
+.policy-app-list > ul > li input[type='checkbox'] {
+	vertical-align: middle;
+	margin: 0;
 }
 
 /* ========================================================================
@@ -268,6 +313,26 @@ ul.stepGuide li > .title {
 .list-inline > li > .label {
 	margin-bottom: 2px;
 	display: inline-block;
+}
+
+ul.sm-padding {
+	padding: 0 0 0 25px;
+}
+
+ul.sm-padding > li {
+	list-style: circle;
+}
+
+ul > li > label {
+	font-weight: normal;
+}
+ul > li > label > input[type='checkbox'] {
+	margin: 0;
+	vertical-align: middle;
+}
+
+ul > li > p.offset {
+	padding-left: 25px;
 }
 
 /* ========================================================================

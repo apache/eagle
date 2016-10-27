@@ -77,6 +77,27 @@
 									<li><a ng-click="customizeTimeRange()"><i class="fa fa-clock-o"></i>Customize</a></li>
 								</ul>
 							</li>
+							<li class="hover-dropdown">
+								<a>
+									<span ng-if="!Site.current()">
+										<span class="fa fa-home"></span>
+										Overview
+									</span>
+									<span ng-if="Site.current()">
+										<span class="fa fa-server"></span>
+										{{Site.current().siteName || Site.current().siteId}}
+									</span>
+								</a>
+
+								<ul class="dropdown-menu">
+									<li><a ng-click="Site.switchSite()"><span class="fa fa-home"></span> Overview</a></li>
+									<li ng-repeat="site in Site.list track by $index">
+										<a ng-click="Site.switchSite(site)">
+											<span class="fa fa-server"></span> {{site.siteName || site.siteId}}
+										</a>
+									</li>
+								</ul>
+							</li>
 							<li>
 								<a data-toggle="dropdown" aria-expanded="false">
 									<i class="glyphicon glyphicon-question-sign"></i>
@@ -242,6 +263,7 @@
 		<script src="public/js/components/sortTable.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/chart.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/widget.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/staticInclude.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Controllers -->
 		<script src="public/js/ctrls/main.js" type="text/javascript" charset="utf-8"></script>

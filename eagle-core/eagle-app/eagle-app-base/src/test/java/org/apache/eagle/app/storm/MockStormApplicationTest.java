@@ -18,15 +18,18 @@ package org.apache.eagle.app.storm;
 
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MockStormApplicationTest {
+    @Ignore
     @Test
     public void testGetConfigClass(){
         MockStormApplication mockStormApplication = new MockStormApplication();
         Assert.assertEquals(StormEnvironment.class,mockStormApplication.getEnvironmentType());
     }
 
+    @Ignore
     @Test
     public void testRunApplicationWithSysConfig(){
         new MockStormApplication().run();

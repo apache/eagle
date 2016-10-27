@@ -30,7 +30,7 @@ import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -40,6 +40,7 @@ import java.util.TreeMap;
 public class HdfsAuditLogParserBolt extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogParserBolt.class);
     private OutputCollector collector;
+    private static final HDFSAuditLogParser parser = new HDFSAuditLogParser();
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -49,12 +50,10 @@ public class HdfsAuditLogParserBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         String logLine = input.getString(0);
-
-        HDFSAuditLogParser parser = new HDFSAuditLogParser();
         HDFSAuditLogObject entity = null;
         try {
             entity = parser.parse(logLine);
-            Map<String, Object> map = new TreeMap<String, Object>();
+            Map<String, Object> map = new TreeMap<>();
             map.put("src", entity.src);
             map.put("dst", entity.dst);
             map.put("host", entity.host);
@@ -62,7 +61,7 @@ public class HdfsAuditLogParserBolt extends BaseRichBolt {
             map.put("allowed", entity.allowed);
             map.put("user", entity.user);
             map.put("cmd", entity.cmd);
-            collector.emit(Arrays.asList(map));
+            collector.emit(Collections.singletonList(map));
         } catch (Exception ex) {
             LOG.error("Failing parse audit log message {}", logLine, ex);
         } finally {

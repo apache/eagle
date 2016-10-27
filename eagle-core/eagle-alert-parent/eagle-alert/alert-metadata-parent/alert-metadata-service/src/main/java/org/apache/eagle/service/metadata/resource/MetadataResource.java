@@ -34,10 +34,7 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.ws.rs.*;
 
@@ -258,6 +255,9 @@ public class MetadataResource {
             for (String publishmentId : publishmentIds) {
                 if (publishmentMap.containsKey(publishmentId)) {
                     Publishment publishment = publishmentMap.get(publishmentId);
+                    if (publishment.getPolicyIds() == null) {
+                        publishment.setPolicyIds(new ArrayList<>());
+                    }
                     if (publishment.getPolicyIds().contains(policyId)) {
                         LOG.warn("Policy {} was already bound with publisher {}",policyId, publishmentId);
                     } else {
@@ -274,6 +274,22 @@ public class MetadataResource {
                     }
                 } else {
                     throw new IllegalArgumentException("Publishsment (name: " + publishmentId + ") not found");
+                }
+            }
+
+            //for other publishments, remove policyId from them, work around, we should refactor
+            for (String publishmentId : publishmentMap.keySet()) {
+                if (publishmentIds.contains(publishmentId)) {
+                    continue;
+                }
+                Publishment publishment = publishmentMap.get(publishmentId);
+                if (publishment.getPolicyIds() != null && publishment.getPolicyIds().contains(policyId)) {
+                    publishment.getPolicyIds().remove(policyId);
+                    OpResult opResult = addPublishment(publishment);
+                    if (opResult.code == OpResult.FAILURE) {
+                        LOG.error("Failed to delete policy {}, from publisher {}, {} ", policyId, publishmentId, opResult.message);
+                        return opResult;
+                    }
                 }
             }
             result.code = OpResult.SUCCESS;

@@ -96,6 +96,7 @@ public class ApplicationResource {
     public RESTResponse<ApplicationEntity> updateApplicationEntity(@PathParam("appUuid") String appUuid, ApplicationOperations.UpdateOperation updateOperation) {
         return RESTResponse.async(() -> {
             ApplicationEntity applicationEntity = new ApplicationEntity();
+            applicationEntity.setStatus(entityService.getByUUID(appUuid).getStatus());
             applicationEntity.setUuid(appUuid);
             applicationEntity.setJarPath(updateOperation.getJarPath());
             applicationEntity.setMode(updateOperation.getMode());

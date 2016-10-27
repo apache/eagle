@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.app.sink;
 
-import backtype.storm.topology.BasicOutputCollector;
+import backtype.storm.task.OutputCollector;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> 
     }
 
     @Override
-    protected void execute(Object key, Map event, BasicOutputCollector collector) {
+    protected void execute(Object key, Map event, OutputCollector collector) throws Exception {
         LOGGER.info("Receiving {}", event);
     }
 

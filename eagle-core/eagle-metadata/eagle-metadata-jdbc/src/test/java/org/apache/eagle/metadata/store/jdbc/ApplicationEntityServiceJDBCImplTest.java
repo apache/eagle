@@ -63,6 +63,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Map<String, Object> configure = new HashedMap();
         configure.put("a", "b");
         applicationEntity.setConfiguration(configure);
+        applicationEntity.setContext(configure);
         applicationEntityService.create(applicationEntity);
         String appuuid = applicationEntity.getUuid();
         String appId = applicationEntity.getAppId();
@@ -117,6 +118,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Map<String, Object> configure = new HashedMap();
         configure.put("a", "b");
         applicationEntity.setConfiguration(configure);
+        applicationEntity.setContext(configure);
         applicationEntityService.create(applicationEntity);
         applicationEntityService.create(applicationEntity);
     }
@@ -148,6 +150,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Map<String, Object> configure = new HashedMap();
         configure.put("a", "b");
         applicationEntity.setConfiguration(configure);
+        applicationEntity.setContext(configure);
         applicationEntityService.create(applicationEntity);
         Collection<ApplicationEntity> results = applicationEntityService.findAll();
         Assert.assertEquals(1, results.size());

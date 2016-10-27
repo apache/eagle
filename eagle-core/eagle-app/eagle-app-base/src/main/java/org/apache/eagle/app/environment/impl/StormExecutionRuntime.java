@@ -21,6 +21,9 @@ import backtype.storm.LocalCluster;
 import backtype.storm.generated.*;
 import backtype.storm.utils.NimbusClient;
 import com.google.common.base.Preconditions;
+import com.typesafe.config.ConfigRenderOptions;
+import org.apache.eagle.alert.engine.runner.StormMetricTaggedConsumer;
+import org.apache.eagle.alert.metric.MetricConfigs;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
@@ -98,6 +101,10 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
 
         if (config.hasPath(TOPOLOGY_MESSAGE_TIMEOUT_SECS)) {
             conf.put(TOPOLOGY_MESSAGE_TIMEOUT_SECS, config.getInt(TOPOLOGY_MESSAGE_TIMEOUT_SECS));
+        }
+
+        if (config.hasPath(MetricConfigs.METRIC_SINK_CONF)) {
+            conf.registerMetricsConsumer(StormMetricTaggedConsumer.class, config.root().render(ConfigRenderOptions.concise()), 1);
         }
         return conf;
     }

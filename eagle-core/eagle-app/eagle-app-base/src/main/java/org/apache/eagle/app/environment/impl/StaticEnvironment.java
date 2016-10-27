@@ -17,23 +17,10 @@
 package org.apache.eagle.app.environment.impl;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.app.environment.Environment;
-import org.apache.eagle.app.sink.StreamSinkProvider;
+import org.apache.eagle.app.environment.AbstractEnvironment;
 
-public class WebEnvironment implements Environment {
-    private final Config config;
-
-    public WebEnvironment(Config config) {
-        this.config = config;
-    }
-
-    @Override
-    public Config config() {
-        return this.config;
-    }
-
-    @Override
-    public StreamSinkProvider streamSink() {
-        throw new IllegalStateException("streamSink() is not supported in " + WebEnvironment.class.getSimpleName());
+public class StaticEnvironment extends AbstractEnvironment {
+    public StaticEnvironment(Config config) {
+        super(config);
     }
 }

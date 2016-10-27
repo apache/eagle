@@ -16,16 +16,6 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
-import org.apache.eagle.alert.coordination.model.*;
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
-import org.apache.eagle.alert.coordination.model.internal.Topology;
-import org.apache.eagle.alert.engine.coordinator.*;
-import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.resource.Models;
-import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -40,6 +30,16 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.coordination.model.*;
+import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
+import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
+import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
+import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
+import org.apache.eagle.alert.metadata.resource.Models;
+import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
 import org.bson.BsonString;
@@ -205,8 +205,12 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     }
 
     private <T> OpResult remove(MongoCollection<Document> collection, String name) {
+        return removeObject(collection, "name", name);
+    }
+
+    private <T> OpResult removeObject(MongoCollection<Document> collection, String nameField, String name) {
         BsonDocument filter = new BsonDocument();
-        filter.append("name", new BsonString(name));
+        filter.append(nameField, new BsonString(name));
         DeleteResult dr = collection.deleteOne(filter);
         OpResult result = new OpResult();
         result.code = 200;
@@ -236,7 +240,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult removeStream(String streamId) {
-        return remove(schema, streamId);
+        return removeObject(schema, "streamId", streamId);
     }
 
     @Override

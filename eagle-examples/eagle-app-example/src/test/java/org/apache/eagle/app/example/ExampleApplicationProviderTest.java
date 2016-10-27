@@ -109,6 +109,10 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase {
         conf.put("dataSinkConfig.brokerList", "broker");
         conf.put("dataSinkConfig.serializerClass", "serializerClass");
         conf.put("dataSinkConfig.keySerializerClass", "keySerializerClass");
+        conf.put("dataSinkConfig.producerType", "async");
+        conf.put("dataSinkConfig.numBatchMessages", 4096);
+        conf.put("dataSinkConfig.maxQueueBufferMs", 5000);
+        conf.put("dataSinkConfig.requestRequiredAcks", 0);
         conf.put("spoutNum", 2);
         conf.put("mode", "LOCAL");
         return conf;

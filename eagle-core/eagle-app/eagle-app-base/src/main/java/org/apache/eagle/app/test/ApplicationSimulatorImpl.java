@@ -16,16 +16,15 @@
  */
 package org.apache.eagle.app.test;
 
-import org.apache.eagle.app.config.ApplicationProviderConfig;
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.app.utils.DynamicJarPathFinder;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
-import com.google.inject.Inject;
-import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.junit.Assert;
 
 import java.util.HashMap;
@@ -36,6 +35,9 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
     private final Config config;
     private final SiteResource siteResource;
     private final ApplicationResource applicationResource;
+
+    @Inject
+    ApplicationStatusUpdateService statusUpdateService;
 
     @Inject
     public ApplicationSimulatorImpl(Config config, SiteResource siteResource, ApplicationResource applicationResource) {
@@ -68,10 +70,13 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation(siteEntity.getSiteId(), appType, ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(appConfig);
         // Install application
-        ApplicationEntity applicationEntity =
-            applicationResource.installApplication(installOperation).getData();
+        ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
+        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
+        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
     }
 
     @Override

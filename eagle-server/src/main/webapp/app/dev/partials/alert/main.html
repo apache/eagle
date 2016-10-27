@@ -18,14 +18,9 @@
 
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
-		<li ng-class="{active: getState() === 'alert.list'}"><a href="#/alert/">Alerts</a></li>
+		<!--li ng-class="{active: getState() === 'alert.list'}"><a href="#/alert/">Alerts</a></li-->
 		<li ng-class="{active: getState() === 'alert.policyList'}"><a href="#/alert/policyList">Policies</a></li>
 		<li ng-class="{active: getState() === 'alert.streamList'}"><a href="#/alert/streamList">Streams</a></li>
-
-		<li
-			ng-class="{active: ['alert.policyCreate', 'alert.policyEdit'].indexOf(getState()) >= 0}"
-			ng-if="['alert.policyCreate', 'alert.policyEdit'].indexOf(getState()) >= 0"
-		><a href="#/alert/policyCreate">Define Alert Policy</a></li>
 	</ul>
 	<div class="tab-content no-padding">
 		<div ui-view></div>

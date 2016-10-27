@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,29 +16,39 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
-import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.coordinator.MetadataType;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.router.StreamRouter;
 import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterBoltOutputCollector;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.utils.AlertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
 
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
-import com.typesafe.config.Config;
-import org.apache.commons.collections.CollectionUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouterBoltSpecListener, SerializationMetadataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterBolt.class);
@@ -48,7 +58,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
     // mapping from StreamPartition to StreamSortSpec
     private volatile Map<StreamPartition, StreamSortSpec> cachedSSS = new HashMap<>();
     // mapping from StreamPartition(streamId, groupbyspec) to StreamRouterSpec
-    private volatile Map<StreamPartition, StreamRouterSpec> cachedSRS = new HashMap<>();
+    private volatile Map<StreamPartition, List<StreamRouterSpec>> cachedSRS = new HashMap<>();
 
     public StreamRouterBolt(String boltId, Config config, IMetadataChangeNotifyService changeNotifyService) {
         super(boltId, changeNotifyService, config);
@@ -127,8 +137,13 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         cachedSSS = newSSS;
 
         // figure out added, removed, modified StreamRouterSpec
-        Map<StreamPartition, StreamRouterSpec> newSRS = new HashMap<>();
-        spec.getRouterSpecs().forEach(t -> newSRS.put(t.getPartition(), t));
+        Map<StreamPartition, List<StreamRouterSpec>> newSRS = new HashMap<>();
+        spec.getRouterSpecs().forEach(t -> {
+            if (!newSRS.containsKey(t.getPartition())) {
+                newSRS.put(t.getPartition(), new ArrayList<StreamRouterSpec>());
+            }
+            newSRS.get(t.getPartition()).add(t);
+        });
 
         Set<StreamPartition> newStreamPartitions = newSRS.keySet();
         Set<StreamPartition> cachedStreamPartitions = cachedSRS.keySet();
@@ -140,11 +155,11 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         Collection<StreamRouterSpec> addedRouterSpecs = new ArrayList<>();
         Collection<StreamRouterSpec> removedRouterSpecs = new ArrayList<>();
         Collection<StreamRouterSpec> modifiedRouterSpecs = new ArrayList<>();
-        addedStreamPartitions.forEach(s -> addedRouterSpecs.add(newSRS.get(s)));
-        removedStreamPartitions.forEach(s -> removedRouterSpecs.add(cachedSRS.get(s)));
+        addedStreamPartitions.forEach(s -> addedRouterSpecs.addAll(newSRS.get(s)));
+        removedStreamPartitions.forEach(s -> removedRouterSpecs.addAll(cachedSRS.get(s)));
         modifiedStreamPartitions.forEach(s -> {
-            if (!newSRS.get(s).equals(cachedSRS.get(s))) { // this means StreamRouterSpec is changed for one specific StreamPartition
-                modifiedRouterSpecs.add(newSRS.get(s));
+            if (!CollectionUtils.isEqualCollection(newSRS.get(s), cachedSRS.get(s))) { // this means StreamRouterSpec is changed for one specific StreamPartition
+                modifiedRouterSpecs.addAll(newSRS.get(s));
             }
         });
 

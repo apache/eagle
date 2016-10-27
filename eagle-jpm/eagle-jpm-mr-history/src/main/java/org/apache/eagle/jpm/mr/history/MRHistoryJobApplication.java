@@ -16,8 +16,10 @@
  */
 package org.apache.eagle.jpm.mr.history;
 
+import backtype.storm.topology.BoltDeclarer;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
@@ -66,6 +68,12 @@ public class MRHistoryJobApplication extends StormApplication {
                 new JobHistorySpout(filter, config),
                 tasks
         ).setNumTasks(tasks);
+
+        StormStreamSink sinkBolt = environment.getStreamSink("mr_failed_job_stream", config);
+        BoltDeclarer kafkaBoltDeclarer = topologyBuilder.setBolt("HistoryKafkaSink", sinkBolt, jhfAppConf.getInt("stormConfig.historyKafkaSinkTasks"))
+                .setNumTasks(jhfAppConf.getInt("stormConfig.historyKafkaSinkTasks"));
+        kafkaBoltDeclarer.shuffleGrouping(spoutName);
+
         return topologyBuilder.createTopology();
     }
 }

@@ -18,7 +18,8 @@
 
 <application>
     <type>AlertUnitTopologyApp</type>
-    <name>Alert Unit Topology Application</name>
+    <name>Alert Engine</name>
+    <description>Real-time Alert Engine</description>
     <version>0.5.0-incubating</version>
     <configuration>
        <!-- alert topology sizing parameters -->
@@ -48,6 +49,13 @@
             <displayName>Evaluator Tasks Number</displayName>
             <value>10</value>
             <description>Number of alert tasks</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>topology.numOfPublishExecutors</name>
+            <displayName>Publisher Executor Number</displayName>
+            <value>1</value>
+            <description>Number of publish executors</description>
             <required>false</required>
         </property>
         <property>

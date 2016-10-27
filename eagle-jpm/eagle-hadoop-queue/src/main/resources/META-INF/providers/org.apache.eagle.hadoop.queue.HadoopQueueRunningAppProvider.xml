@@ -18,54 +18,34 @@
 
 <application>
   <type>HADOOP_QUEUE_RUNNING_APP</type>
-  <name>Hadoop Queue Running Monitoring</name>
+  <name>Hadoop Queue Monitor</name>
   <version>0.5.0-incubating</version>
   <configuration>
     <!-- org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig -->
     <property>
-      <name>workers</name>
-      <displayName>storm worker number</displayName>
-      <value>4</value>
+      <name>dataSourceConfig.rMEndPoints</name>
+      <displayName>Resource Manager End Point</displayName>
+      <description>end point of resource manager, e.g. http://sandbox.hortonworks.com:8088/</description>
+      <value>http://sandbox.hortonworks.com:8088/</value>
+      <required>true</required>
     </property>
     <property>
-      <name>topology.localMode</name>
-      <value>true</value>
+      <name>workers</name>
+      <displayName>Storm Worker Number</displayName>
+      <description>the number of storm worker</description>
+      <value>1</value>
     </property>
     <property>
       <name>topology.numOfParserTasks</name>
+      <displayName>Parallel Tasks Per Bolt</displayName>
+      <description>the number of tasks that should be assigned to execute a bolt</description>
       <value>2</value>
     </property>
     <property>
-      <name>topology.name</name>
-      <value>sandbox-running-queue-topology</value>
-    </property>
-    <property>
-      <name>dataSourceConfig.rMEndPoints</name>
-      <value>http://sandbox.hortonworks.com:8088/</value>
-    </property>
-    <property>
       <name>dataSourceConfig.fetchIntervalSec</name>
+      <displayName>Fetch Interval in Seconds</displayName>
+      <description>fetching interval in seconds</description>
       <value>10</value>
-    </property>
-    <property>
-      <name>eagleProps.site</name>
-      <value>sandbox</value>
-    </property>
-    <property>
-      <name>eagleProps.eagleService.host</name>
-      <value>localhost</value>
-    </property>
-    <property>
-      <name>eagleProps.eagleService.port</name>
-      <value>9099</value>
-    </property>
-    <property>
-      <name>eagleProps.eagleService.username</name>
-      <value>admin</value>
-    </property>
-    <property>
-      <name>eagleProps.eagleService.password</name>
-      <value>secret</value>
     </property>
   </configuration>
   <docs>

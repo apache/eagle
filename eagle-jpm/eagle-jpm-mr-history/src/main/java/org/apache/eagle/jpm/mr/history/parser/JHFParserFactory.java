@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
@@ -29,9 +30,12 @@ public class JHFParserFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(JHFParserFactory.class);
 
-    public static JHFParserBase getParser(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
+    public static JHFParserBase getParser(Map<String, String> baseTags,
+                                          Configuration configuration,
+                                          JobHistoryContentFilter filter,
+                                          EagleOutputCollector outputCollector) {
         JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter);
-        reader2.addListener(new JobEntityCreationEagleServiceListener());
+        reader2.addListener(new JobEntityCreationEagleServiceListener(outputCollector));
         reader2.addListener(new TaskFailureListener());
         reader2.addListener(new TaskAttemptCounterListener());
         reader2.addListener(new JobConfigurationCreationServiceListener());

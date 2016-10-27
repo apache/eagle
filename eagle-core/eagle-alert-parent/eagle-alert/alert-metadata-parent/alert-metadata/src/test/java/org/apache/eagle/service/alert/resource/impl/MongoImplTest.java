@@ -194,6 +194,18 @@ public class MongoImplTest {
             ScheduleState getState = dao.getScheduleState();
             Assert.assertEquals(201, getState.getCode());
         }
+        // stream
+        {
+            StreamDefinition stream = new StreamDefinition();
+            stream.setStreamId("stream");
+            OpResult result = dao.createStream(stream);
+            Assert.assertEquals(200, result.code);
+            List<StreamDefinition> assigns = dao.listStreams();
+            Assert.assertEquals(1, assigns.size());
+            dao.removeStream("stream");
+            assigns = dao.listStreams();
+            Assert.assertEquals(0, assigns.size());
+        }
     }
 
     private void test_addstate() {

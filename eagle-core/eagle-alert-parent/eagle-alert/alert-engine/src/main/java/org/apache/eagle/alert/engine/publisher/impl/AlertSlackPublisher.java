@@ -51,10 +51,10 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
         super.init(config, publishment, conf);
 
         if (publishment.getProperties() != null) {
-            Map<String, String> slackConfig = new HashMap<>(publishment.getProperties());
-            final String token = slackConfig.get(PublishConstants.TOKEN).trim();
-            slackChannels = slackConfig.get(PublishConstants.CHANNELS).trim();
-            severitys = slackConfig.get(PublishConstants.SEVERITYS).trim();
+            Map<String, Object> slackConfig = new HashMap<>(publishment.getProperties());
+            final String token = ((String) slackConfig.get(PublishConstants.TOKEN)).trim();
+            slackChannels = ((String) slackConfig.get(PublishConstants.CHANNELS)).trim();
+            severitys = ((String) slackConfig.get(PublishConstants.SEVERITYS)).trim();
 
             if (StringUtils.isNotEmpty(token)) {
                 LOG.debug(" Creating Slack Session... ");

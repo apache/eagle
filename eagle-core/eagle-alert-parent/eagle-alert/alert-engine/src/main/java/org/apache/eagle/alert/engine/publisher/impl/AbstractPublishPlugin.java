@@ -92,7 +92,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     }
 
     @Override
-    public void update(String dedupIntervalMin, Map<String, String> pluginProperties) {
+    public void update(String dedupIntervalMin, Map<String, Object> pluginProperties) {
         deduplicator.setDedupIntervalMin(dedupIntervalMin);
     }
 

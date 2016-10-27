@@ -78,6 +78,7 @@ public class MRJobParser implements Runnable {
     private List<String> configKeys;
     private static final int TOP_BOTTOM_TASKS_BY_ELAPSED_TIME = 10;
     private static final int FLUSH_TASKS_EVERY_TIME = 5;
+    private static final int MAX_TASKS_PERMIT = 5000;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -428,6 +429,16 @@ public class MRJobParser implements Runnable {
     }
 
     private Function<String, Boolean> fetchTasks = jobId -> {
+        try {
+            JobExecutionAPIEntity entity = this.mrJobEntityMap.get(jobId);
+            int taskNumber = entity.getNumTotalMaps() + entity.getNumTotalReduces();
+            if (taskNumber > MAX_TASKS_PERMIT) {
+                LOG.info("too many tasks {}, ignore tasks", taskNumber);
+                return true;
+            }
+        } catch (Exception e) {
+            return true;
+        }
         String taskURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         List<MRTask> tasks = null;

@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS applications (
   jarpath varchar(255) DEFAULT NULL,
   appstatus  varchar(20) DEFAULT NULL,
   configuration mediumtext DEFAULT NULL,
+  context mediumtext DEFAULT NULL,
   createdtime bigint(20) DEFAULT NULL,
   modifiedtime  bigint(20) DEFAULT NULL
 );

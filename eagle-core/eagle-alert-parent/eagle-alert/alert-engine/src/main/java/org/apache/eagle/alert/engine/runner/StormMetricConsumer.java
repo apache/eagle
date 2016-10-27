@@ -44,13 +44,13 @@ public class StormMetricConsumer implements IMetricsConsumer {
     @Override
     public void prepare(Map stormConf, Object registrationArgument, TopologyContext context, IErrorReporter errorReporter) {
         Config config = ConfigFactory.parseString((String) registrationArgument, ConfigParseOptions.defaults());
-        topologyName = config.getString("topology.name");
+        topologyName = config.getString("appId");
         topologyId = context.getStormId();
         metricSystem = MetricSystem.load(config);
         metricSystem.tags(new HashMap<String, Object>() {
             {
-                put("topologyName", topologyName);
-                put("topologyId", topologyId);
+                put("appId", topologyName);
+                put("stormId", topologyId);
             }
         });
         metricSystem.start();

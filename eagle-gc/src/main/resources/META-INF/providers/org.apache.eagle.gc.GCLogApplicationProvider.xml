@@ -21,10 +21,9 @@
   -->
 
 <application>
-    <type>GCLogApplication</type>
-    <name>GC Log Monitoring Application</name>
+    <type>GC_LOG_MONITOR</type>
+    <name>GC Log Monitor</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.gc.GCLogApplication</appClass>
     <configuration>
         <!-- topology level configurations -->
         <property>

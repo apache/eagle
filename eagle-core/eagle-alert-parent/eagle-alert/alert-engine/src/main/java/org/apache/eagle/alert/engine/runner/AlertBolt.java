@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
+import backtype.storm.metric.api.IMetric;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.engine.AlertStreamCollector;
@@ -31,8 +32,6 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.engine.utils.SingletonExecutor;
-import org.apache.eagle.alert.metric.MetricSystem;
-import org.apache.eagle.alert.metric.source.MetricSource;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.eagle.alert.utils.AlertConstants;
@@ -43,8 +42,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,28 +76,6 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // TODO next stage evaluator
     }
 
-    private class MetaConflictMetricSource implements MetricSource {
-        private MetricRegistry registry = new MetricRegistry();
-
-        public MetaConflictMetricSource() {
-            registry.register("meta.conflict", (Gauge<String>) () -> "meta conflict happening!");
-        }
-
-        public MetaConflictMetricSource(String message) {
-            registry.register("meta.conflict", (Gauge<String>) () -> message);
-        }
-
-        @Override
-        public String name() {
-            return "metaConflict";
-        }
-
-        @Override
-        public MetricRegistry registry() {
-            return registry;
-        }
-    }
-
     @Override
     public void execute(Tuple input) {
         this.streamContext.counter().scope("execute_count").incr();
@@ -129,11 +104,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 LOG.warn(message);
 
                 // send out metrics for meta conflict
-                MetricSystem system = MetricSystem.load(this.getConfig());
-                system.register(new MetaConflictMetricSource(message));
-                system.start();
-                system.report();
-                system.stop();
+                this.streamContext.counter().scope("meta_conflict").incr();
 
                 ExecutorService executors = SingletonExecutor.getExecutorService();
                 executors.submit(() -> {

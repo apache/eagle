@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -26,6 +26,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigParseOptions;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.alert.metric.MetricConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,18 +37,29 @@ import java.util.*;
  */
 public class StormMetricTaggedConsumer implements IMetricsConsumer {
     public static final Logger LOG = LoggerFactory.getLogger(StormMetricTaggedConsumer.class);
-    private String topologyName;
-    private Map<String, MetricSystem> metricSystems;
-    private String stormId;
+    private final Map<String, MetricSystem> metricSystems = new HashMap<>();
     private Config config;
+    private String metricNamePrefix;
+    private Map<String, Object> baseTags = new HashMap<>();
 
     @SuppressWarnings("rawtypes")
     @Override
     public void prepare(Map stormConf, Object registrationArgument, TopologyContext context, IErrorReporter errorReporter) {
         this.config = ConfigFactory.parseString((String) registrationArgument, ConfigParseOptions.defaults());
-        topologyName = config.getString("topology.name");
-        stormId = context.getStormId();
-        metricSystems = new HashMap<>();
+
+        if (config.hasPath("appId")) {
+            baseTags.put("appId", config.getString("appId"));
+        }
+
+        if (config.hasPath("siteId")) {
+            baseTags.put("siteId", config.getString("siteId"));
+        }
+
+        baseTags.put("appExecId", context.getStormId());
+
+        if (config.hasPath(MetricConfigs.METRIC_PREFIX_CONF)) {
+            metricNamePrefix = config.getString(MetricConfigs.METRIC_PREFIX_CONF);
+        }
     }
 
     @SuppressWarnings("serial")
@@ -59,12 +71,11 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
             if (metricSystem == null) {
                 metricSystem = MetricSystem.load(config);
                 metricSystems.put(uniqueTaskKey, metricSystem);
+                metricSystem.tags(baseTags);
                 metricSystem.tags(new HashMap<String, Object>() {
                     {
-                        put("topology", topologyName);
-                        put("stormId", stormId);
-                        put("component", taskInfo.srcComponentId);
-                        put("task", taskInfo.srcTaskId);
+                        put("componentId", taskInfo.srcComponentId);
+                        put("taskId", taskInfo.srcTaskId);
                     }
                 });
                 metricSystem.start();
@@ -84,7 +95,7 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
             if (dataPoint.value instanceof Map) {
                 Map<String, Object> values = (Map<String, Object>) dataPoint.value;
                 for (Map.Entry<String, Object> entry : values.entrySet()) {
-                    String metricName = buildSimpleMetricName(taskInfo, dataPoint.name, entry.getKey());
+                    String metricName = buildSimpleMetricName(metricNamePrefix, taskInfo, dataPoint.name, entry.getKey());
                     metricList.add(metricName);
                     Gauge gauge = metricSystem.registry().getGauges().get(metricName);
                     if (gauge == null) {
@@ -96,7 +107,7 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
                     }
                 }
             } else {
-                String metricName = buildSimpleMetricName(taskInfo, dataPoint.name);
+                String metricName = buildSimpleMetricName(metricNamePrefix, taskInfo, dataPoint.name);
                 metricList.add(metricName);
                 Gauge gauge = metricSystem.registry().getGauges().get(metricName);
                 if (gauge == null) {
@@ -142,12 +153,18 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
         return String.format("%s[%s]", taskInfo.srcComponentId, taskInfo.srcTaskId);
     }
 
-    private static String buildSimpleMetricName(TaskInfo taskInfo, String... name) {
-        return String.join(".", StringUtils.join(name, ".").replace("/", "."));
+    private static String buildSimpleMetricName(String prefix, TaskInfo taskInfo, String... name) {
+        String metricName = String.join(".", StringUtils.join(name, ".").replace("/", ".")).replace("__", "");
+        if (prefix == null) {
+            return metricName;
+        } else {
+            return String.format("%s%s", prefix, metricName);
+        }
     }
 
     @Override
     public void cleanup() {
         metricSystems.values().forEach(IMetricSystem::stop);
+        metricSystems.clear();
     }
 }

@@ -21,7 +21,7 @@ package org.apache.eagle.security.auditlog.kafka;
 import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import storm.kafka.StringScheme;
 

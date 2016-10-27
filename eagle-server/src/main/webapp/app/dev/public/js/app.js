@@ -30,6 +30,11 @@ var app = {};
 		var param_next;
 		var param_current;
 
+		var modules = {};
+		$.each(register.moduleList, function (i, module) {
+			modules[module.application] = module;
+		});
+
 		// ======================================================================================
 		// =                                   Initialization                                   =
 		// ======================================================================================
@@ -58,6 +63,34 @@ var app = {};
 
 			resolve.Application = function (Application) {
 				return Application.getPromise();
+			};
+
+			resolve._router = function (Site, $wrapState, $q) {
+				var name = state_next.name;
+				var siteId = param_next.siteId;
+				if (siteId && name !== "site") {
+					return Site.getPromise(config).then(function () {
+						var match =  false;
+						$.each(common.getValueByPath(Site.find(siteId), ["applicationList"]), function (i, app) {
+							var appType = app.descriptor.type;
+							var module = modules[appType];
+							if(!module) return;
+
+							if(common.array.find(name, module.routeList, ["state"])) {
+								match = true;
+								return false;
+							}
+						});
+
+						if(!match) {
+							console.log("[Application] No route match:", name);
+							$wrapState.go("site", {siteId: siteId});
+							return $q.reject(false);
+						}
+					});
+				} else {
+					return true;
+				}
 			};
 
 			resolve.Time = function (Time) {
@@ -109,15 +142,15 @@ var app = {};
 					controller: "alertStreamListCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyCreate', {
-					url: "policyCreate",
-					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
+				.state('policyCreate', {
+					url: "/alert/policyCreate",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyCreateCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyEdit', {
-					url: "policyEdit/{name}",
-					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
+				.state('policyEdit', {
+					url: "/alert/policyEdit/{name}",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyEditCtrl",
 					resolve: routeResolve()
 				})
@@ -185,7 +218,7 @@ var app = {};
 				$stateProvider.state(route.state, config);
 			});
 
-			$httpProvider.interceptors.push(function($q) {
+			/* $httpProvider.interceptors.push(function($q) {
 				function eagleRequestHandle(res) {
 					var data = res.data || {
 						exception: "",
@@ -218,7 +251,7 @@ var app = {};
 						return $q.reject(eagleRequestHandle(res));
 					}
 				};
-			});
+			}); */
 		});
 
 		// ======================================================================================
@@ -235,6 +268,8 @@ var app = {};
 			window._UI = $scope.UI = UI;
 			window._Time = $scope.Time = Time;
 			$scope.common = common;
+
+			$scope._TRS = window._TRS();
 
 			Object.defineProperty(window, "scope", {
 				get: function () {
