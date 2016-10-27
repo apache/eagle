@@ -20,13 +20,18 @@ package org.apache.eagle.alert.engine.publisher.impl;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class AlertEagleStorePlugin extends AbstractPublishPlugin {
@@ -49,9 +54,23 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void update(String dedupIntervalMin, Map<String, Object> pluginProperties) {
+        deduplicator.setDedupIntervalMin(dedupIntervalMin);
+    }
+
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
-        //client.addAlertPublishEvent(event.getAlertPublishEvent());
+        List<AlertStreamEvent> eventList = this.dedup(event);
+        if (eventList == null || eventList.isEmpty()) {
+            return;
+        }
+        List<AlertPublishEvent> alertEvents = new ArrayList<>();
+        for (AlertStreamEvent e : eventList) {
+            alertEvents.add(AlertPublishEvent.createAlertPublishEvent(e));
+        }
+        client.addAlertPublishEvents(alertEvents);
     }
 
     @Override

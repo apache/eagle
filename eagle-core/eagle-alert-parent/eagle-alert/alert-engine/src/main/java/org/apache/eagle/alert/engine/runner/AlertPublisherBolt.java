@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.*;
@@ -47,6 +48,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private final AlertPublisher alertPublisher;
     private volatile Map<String, Publishment> cachedPublishments = new HashMap<>();
     private volatile Map<String, PolicyDefinition> policyDefinitionMap;
+    private volatile Map<String, StreamDefinition> streamDefinitionMap;
 
     public AlertPublisherBolt(String alertPublisherName, Config config, IMetadataChangeNotifyService coordinatorService) {
         super(alertPublisherName, coordinatorService, config);
@@ -65,7 +67,9 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     public void execute(Tuple input) {
         try {
             streamContext.counter().scope("receive_count");
-            alertPublisher.nextEvent((AlertStreamEvent) input.getValueByField(AlertConstants.FIELD_1));
+            AlertStreamEvent event = (AlertStreamEvent) input.getValueByField(AlertConstants.FIELD_1);
+            wrapAlertPublishEvent(event);
+            alertPublisher.nextEvent(event);
             this.collector.ack(input);
             streamContext.counter().scope("ack_count");
         } catch (Exception ex) {
@@ -91,6 +95,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         if (pubSpec == null) {
             return;
         }
+        this.streamDefinitionMap = sds;
 
         List<Publishment> newPublishments = pubSpec.getPublishments();
         if (newPublishments == null) {
@@ -117,13 +122,21 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         this.policyDefinitionMap = pds;
     }
 
-    public AlertPublishEvent getAlertPublishEvent(AlertStreamEvent event) {
-        AlertPublishEvent alertEvent = new AlertPublishEvent();
-        alertEvent.getAlertData().putAll(event.getDataMap());
-        alertEvent.setPolicyId(event.getPolicyId());
-        alertEvent.setStreamId(event.getStreamId());
-        alertEvent.setAlertTimestamp(event.getCreatedTime());
-        String inputStream = null;
-        return alertEvent;
+    private void wrapAlertPublishEvent(AlertStreamEvent event) {
+        Map<String, Object> extraData = new HashedMap();
+        List<String> appIds = new ArrayList<>();
+        if (this.policyDefinitionMap != null) {
+            PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
+            for ( String inputStreamId : policyDefinition.getInputStreams()) {
+                StreamDefinition sd = this.streamDefinitionMap.get(inputStreamId);
+                if (sd != null) {
+                    extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());
+                    appIds.add(sd.getDataSource());
+                }
+            }
+            extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);
+            extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, policyDefinition.getDefinition().getValue());
+        }
+        event.setExtraData(extraData);
     }
 }

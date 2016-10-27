@@ -200,7 +200,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
-        if (size > 0) {
+        if (size > 0 && size <= alerts.size()) {
             return alerts.subList(0, size);
         }
         return alerts;

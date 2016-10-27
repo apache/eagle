@@ -17,6 +17,7 @@
 package org.apache.eagle.service.metadata.resource;
 
 import com.google.common.base.Preconditions;
+import javafx.scene.control.Alert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
@@ -466,6 +467,16 @@ public class MetadataResource {
     @POST
     public OpResult addAlertPublishEvent(AlertPublishEvent event) {
         return dao.addAlertPublishEvent(event);
+    }
+
+    @Path("/alerts/batch")
+    @POST
+    public List<OpResult> addAlertPublishEvents(List<AlertPublishEvent> events) {
+        List<OpResult> results = new LinkedList<>();
+        for (AlertPublishEvent e : events) {
+            results.add(dao.addAlertPublishEvent(e));
+        }
+        return results;
     }
 
     @Path("/alerts")

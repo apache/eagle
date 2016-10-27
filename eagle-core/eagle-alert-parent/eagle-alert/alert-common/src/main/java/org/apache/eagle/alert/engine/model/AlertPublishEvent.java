@@ -18,20 +18,45 @@
 
 package org.apache.eagle.alert.engine.model;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class AlertPublishEvent {
+    private String alertId;
     private String siteId;
-    private String appId;
-    private String streamId;
+    private List<String> appIds;
     private String policyId;
-    private String policyContent;
+    private String policyValue;
     private long alertTimestamp;
     private Map<String, String> alertData;
 
-    public AlertPublishEvent() {
-        alertData = new HashMap<>();
+    public static final String SITE_ID_KEY = "siteId";
+    public static final String APP_IDS_KEY = "appIds";
+    public static final String POLICY_VALUE_KEY = "policyValue";
+
+    public String getAlertId() {
+        return alertId;
+    }
+
+    public void setAlertId(String alertId) {
+        this.alertId = alertId;
+    }
+
+    public List<String> getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(List<String> appIds) {
+        this.appIds = appIds;
+    }
+
+    public String getPolicyValue() {
+        return policyValue;
+    }
+
+    public void setPolicyValue(String policyValue) {
+        this.policyValue = policyValue;
     }
 
     public long getAlertTimestamp() {
@@ -50,21 +75,6 @@ public class AlertPublishEvent {
         this.siteId = siteId;
     }
 
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    public String getStreamId() {
-        return streamId;
-    }
-
-    public void setStreamId(String streamId) {
-        this.streamId = streamId;
-    }
 
     public String getPolicyId() {
         return policyId;
@@ -80,5 +90,18 @@ public class AlertPublishEvent {
 
     public void setAlertData(Map<String, String> alertData) {
         this.alertData = alertData;
+    }
+
+    public static AlertPublishEvent createAlertPublishEvent(AlertStreamEvent event) {
+        AlertPublishEvent alertEvent = new AlertPublishEvent();
+        alertEvent.setAlertId(UUID.randomUUID().toString());
+        alertEvent.setPolicyId(event.getPolicyId());
+        if (event.getExtraData() != null) {
+            alertEvent.setSiteId(event.getExtraData().get(SITE_ID_KEY).toString());
+            alertEvent.setPolicyValue(event.getExtraData().get(POLICY_VALUE_KEY).toString());
+            alertEvent.setAppIds((List<String>) event.getExtraData().get(APP_IDS_KEY));
+        }
+        alertEvent.setAlertData(event.getDataMap());
+        return alertEvent;
     }
 }

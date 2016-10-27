@@ -35,6 +35,8 @@ public class AlertStreamEvent extends StreamEvent {
     private StreamDefinition schema;
     private String createdBy;
     private long createdTime;
+    // app related fields
+    private Map<String, Object> extraData;
 
     public AlertStreamEvent() {
     }
@@ -102,6 +104,10 @@ public class AlertStreamEvent extends StreamEvent {
         Map<String, String> event = new HashMap<>();
         for (StreamColumn column : schema.getColumns()) {
             Object obj = this.getData()[schema.getColumnIndex(column.getName())];
+            if (obj == null) {
+                event.put(column.getName(), null);
+                continue;
+            }
             if (column.getName().equalsIgnoreCase("timestamp") && obj instanceof Long) {
                 String eventTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(((Long) obj).longValue());
                 event.put(column.getName(), eventTime);
@@ -110,6 +116,14 @@ public class AlertStreamEvent extends StreamEvent {
             }
         }
         return event;
+    }
+
+    public Map<String, Object> getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(Map<String, Object> extraData) {
+        this.extraData = extraData;
     }
 
 }
