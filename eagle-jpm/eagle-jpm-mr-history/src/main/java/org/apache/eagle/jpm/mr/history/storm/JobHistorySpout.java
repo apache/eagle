@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.storm;
 
+import backtype.storm.tuple.Fields;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.*;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
@@ -180,6 +181,7 @@ public class JobHistorySpout extends BaseRichSpout {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("jobId", "message"));
     }
 
     /**
