@@ -95,7 +95,6 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         if (pubSpec == null) {
             return;
         }
-        this.streamDefinitionMap = sds;
 
         List<Publishment> newPublishments = pubSpec.getPublishments();
         if (newPublishments == null) {
@@ -118,8 +117,9 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     }
 
     @Override
-    public void onAlertPolicyChange(Map<String, PolicyDefinition> pds) {
+    public void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
         this.policyDefinitionMap = pds;
+        this.streamDefinitionMap = sds;
     }
 
     private void wrapAlertPublishEvent(AlertStreamEvent event) {

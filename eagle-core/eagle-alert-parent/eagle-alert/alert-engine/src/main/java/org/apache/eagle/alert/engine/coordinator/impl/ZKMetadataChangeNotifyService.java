@@ -123,7 +123,7 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
                     prePopulate(alertSpec, state.getPolicySnapshots());
                     notifyAlertBolt(alertSpec, sds);
                     if (state.getPublishSpecs().get(topologyId) != null) {
-                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()));
+                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()), sds);
                     }
                 }
                 break;
@@ -134,7 +134,7 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
                 } else {
                     notifyAlertPublishBolt(pubSpec, sds);
                     if (state.getAlertSpecs().get(topologyId) != null) {
-                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()));
+                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()), sds);
                     }
                 }
                 break;
