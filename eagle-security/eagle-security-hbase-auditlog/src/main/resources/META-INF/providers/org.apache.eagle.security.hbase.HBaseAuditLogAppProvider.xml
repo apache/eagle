@@ -17,8 +17,8 @@
   -->
 
 <application>
-    <type>HBaseAuditLogApplication</type>
-    <name>Hbase Audit Log Monitoring Application</name>
+    <type>HBASE_AUDIT_LOG_MONITOR</type>
+    <name>Hbase Audit Log Monitor</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.security.hbase.HBaseAuditLogApplication</appClass>
     <configuration>
@@ -31,8 +31,14 @@
         <property>
             <name>dataSourceConfig.zkConnection</name>
             <displayName>dataSourceConfig.zkConnection</displayName>
-            <value>server.eagle.apache.org</value>
+            <value>server.eagle.apache.org:2181</value>
             <description>zk connection</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.txZkServers</name>
+            <displayName>dataSourceConfig.txZkServers</displayName>
+            <value>server.eagle.apache.org:2181</value>
+            <description>txZkServers</description>
         </property>
         <property>
             <name>dataSourceConfig.zkConnectionTimeoutMS</name>
@@ -47,18 +53,6 @@
             <description>kafka fetch size</description>
         </property>
         <property>
-            <name>dataSourceConfig.transactionZKServers</name>
-            <displayName>dataSourceConfig.transactionZKServers</displayName>
-            <value>server.eagle.apache.org</value>
-            <description>zookeeper server for offset transaction</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.transactionZKPort</name>
-            <displayName>dataSourceConfig.transactionZKPort</displayName>
-            <value>2181</value>
-            <description>zookeeper server port for offset transaction</description>
-        </property>
-        <property>
             <name>dataSourceConfig.transactionZKRoot</name>
             <displayName>dataSourceConfig.transactionZKRoot</displayName>
             <value>/consumers</value>
@@ -67,7 +61,7 @@
         <property>
             <name>dataSourceConfig.consumerGroupId</name>
             <displayName>dataSourceConfig.consumerGroupId</displayName>
-            <value>eagle.hbaseaudit.consumer</value>
+            <value>eagleConsumer</value>
             <description>kafka consumer group Id</description>
         </property>
         <property>
@@ -81,18 +75,6 @@
             <displayName>dataSourceConfig.schemeCls</displayName>
             <value>storm.kafka.StringScheme</value>
             <description>scheme class</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.transactionZKPort</name>
-            <displayName>dataSourceConfig.transactionZKPort</displayName>
-            <value>2181</value>
-            <description>zookeeper server port for offset transaction</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.transactionZKPort</name>
-            <displayName>dataSourceConfig.transactionZKPort</displayName>
-            <value>2181</value>
-            <description>zookeeper server port for offset transaction</description>
         </property>
         <property>
             <name>topology.numOfSpoutTasks</name>
@@ -119,32 +101,26 @@
             <description>number of sink tasks</description>
         </property>
         <property>
-            <name>eagleProps.dataJoinPollIntervalSec</name>
-            <displayName>eagleProps.dataJoinPollIntervalSec</displayName>
-            <value>30</value>
-            <description>interval in seconds for polling</description>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.host</name>
-            <displayName>eagleProps.eagleService.host</displayName>
+            <name>eagleService.host</name>
+            <displayName>eagleService.host</displayName>
             <value>localhost</value>
             <description>eagle service host</description>
         </property>
         <property>
-            <name>eagleProps.eagleService.port</name>
-            <displayName>eagleProps.eagleService.port</displayName>
+            <name>eagleService.port</name>
+            <displayName>eagleService.port</displayName>
             <value>8080</value>
             <description>eagle service port</description>
         </property>
         <property>
-            <name>eagleProps.eagleService.username</name>
-            <displayName>eagleProps.eagleService.username</displayName>
+            <name>eagleService.username</name>
+            <displayName>eagleService.username</displayName>
             <value>admin</value>
             <description>eagle service username</description>
         </property>
         <property>
-            <name>eagleProps.eagleService.password</name>
-            <displayName>eagleProps.eagleService.password</displayName>
+            <name>eagleService.password</name>
+            <displayName>eagleService.password</displayName>
             <value>secret</value>
             <description>eagle service password</description>
         </property>
@@ -209,12 +185,20 @@
                     <type>string</type>
                 </column>
                 <column>
+                    <name>scope</name>
+                    <type>string</type>
+                </column>
+                <column>
                     <name>status</name>
                     <type>string</type>
                 </column>
                 <column>
                     <name>timestamp</name>
                     <type>long</type>
+                </column>
+                <column>
+                    <name>user</name>
+                    <type>string</type>
                 </column>
             </columns>
         </stream>
