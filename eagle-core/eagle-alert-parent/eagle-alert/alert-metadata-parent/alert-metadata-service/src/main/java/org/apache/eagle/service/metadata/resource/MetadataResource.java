@@ -276,6 +276,22 @@ public class MetadataResource {
                     throw new IllegalArgumentException("Publishsment (name: " + publishmentId + ") not found");
                 }
             }
+
+            //for other publishments, remove policyId from them, work around, we should refactor
+            for (String publishmentId : publishmentMap.keySet()) {
+                if (publishmentIds.contains(publishmentId)) {
+                    continue;
+                }
+                Publishment publishment = publishmentMap.get(publishmentId);
+                if (publishment.getPolicyIds() != null && publishment.getPolicyIds().contains(policyId)) {
+                    publishment.getPolicyIds().remove(policyId);
+                    OpResult opResult = addPublishment(publishment);
+                    if (opResult.code == OpResult.FAILURE) {
+                        LOG.error("Failed to delete policy {}, from publisher {}, {} ", policyId, publishmentId, opResult.message);
+                        return opResult;
+                    }
+                }
+            }
             result.code = OpResult.SUCCESS;
             result.message = "Successfully add " + publishmentIds.size() + " publishments: [" + StringUtils.join(publishmentIds,",") + "] to policy: " + policyId;
             LOG.info(result.message);
