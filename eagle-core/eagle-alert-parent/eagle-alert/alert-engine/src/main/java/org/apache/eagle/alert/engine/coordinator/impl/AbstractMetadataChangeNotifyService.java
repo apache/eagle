@@ -22,6 +22,7 @@ import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.MetadataType;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
@@ -100,6 +101,10 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
 
     protected void notifyAlertPublishBolt(PublishSpec alertPublishSpec, Map<String, StreamDefinition> sds) {
         alertPublishSpecListeners.forEach(s -> s.onAlertPublishSpecChange(alertPublishSpec, sds));
+    }
+
+    protected void notifyAlertPublishBolt(Map<String, PolicyDefinition> pds) {
+        alertPublishSpecListeners.forEach(s -> s.onAlertPolicyChange(pds));
     }
 
     public void close() throws IOException {

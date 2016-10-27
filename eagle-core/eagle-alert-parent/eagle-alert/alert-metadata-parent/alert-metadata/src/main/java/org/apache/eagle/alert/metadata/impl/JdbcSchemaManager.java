@@ -23,6 +23,7 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import com.typesafe.config.Config;
 import org.apache.ddlutils.Platform;
@@ -67,6 +68,7 @@ public class JdbcSchemaManager {
         registerTableName(ScheduleState.class.getSimpleName(), "schedule_state");
         registerTableName(PolicyAssignment.class.getSimpleName(), "assignment");
         registerTableName(Topology.class.getSimpleName(), "topology");
+        registerTableName(AlertPublishEvent.class.getSimpleName(), "alert_event");
     }
 
     public static JdbcSchemaManager getInstance() {

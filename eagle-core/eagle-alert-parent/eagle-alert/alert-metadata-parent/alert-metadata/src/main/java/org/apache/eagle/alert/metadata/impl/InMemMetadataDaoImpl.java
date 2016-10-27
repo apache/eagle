@@ -21,6 +21,7 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
@@ -54,6 +55,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     private SortedMap<String, ScheduleState> scheduleStates = new TreeMap<String, ScheduleState>();
     private List<PolicyAssignment> assignments = new ArrayList<PolicyAssignment>();
     private List<Topology> topologies = new ArrayList<Topology>();
+    private List<AlertPublishEvent> alerts = new ArrayList<>();
 
     @Inject
     public InMemMetadataDaoImpl(Config config) {
@@ -194,6 +196,22 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult removePublishmentType(String pubType) {
         return remove(publishmentTypes, pubType);
+    }
+
+    @Override
+    public List<AlertPublishEvent> listAlertPublishEvent(int size) {
+        if (size > 0 && size <= alerts.size()) {
+            return alerts.subList(0, size);
+        }
+        return alerts;
+    }
+
+    @Override
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        alerts.add(event);
+        OpResult result = new OpResult();
+        result.code = 200;
+        return result;
     }
 
 

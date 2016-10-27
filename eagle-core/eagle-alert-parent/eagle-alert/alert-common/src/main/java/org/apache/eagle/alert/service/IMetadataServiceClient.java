@@ -27,6 +27,8 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
+
 import java.io.Closeable;
 import java.io.Serializable;
 import java.util.List;
@@ -85,4 +87,12 @@ public interface IMetadataServiceClient extends Closeable, Serializable {
     void clear();
 
     // for topology mgmt
+
+    // for alert event
+    List<AlertPublishEvent> listAlertPublishEvent();
+
+    void addAlertPublishEvent(AlertPublishEvent event);
+
+    void addAlertPublishEvents(List<AlertPublishEvent> events);
+
 }

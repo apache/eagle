@@ -37,6 +37,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,7 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final String METADATA_POLICIES_PATH = "/metadata/policies";
     private static final String METADATA_CLUSTERS_PATH = "/metadata/clusters";
     private static final String METADATA_TOPOLOGY_PATH = "/metadata/topologies";
+    private static final String METADATA_ALERTS_PATH = "/metadata/alerts";
 
     private static final String METADATA_PUBLISHMENTS_BATCH_PATH = "/metadata/publishments/batch";
     private static final String METADATA_DATASOURCES_BATCH_PATH = "/metadata/datasources/batch";
@@ -64,6 +66,7 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final String METADATA_POLICIES_BATCH_PATH = "/metadata/policies/batch";
     private static final String METADATA_CLUSTERS_BATCH_PATH = "/metadata/clusters/batch";
     private static final String METADATA_TOPOLOGY_BATCH_PATH = "/metadata/topologies/batch";
+    private static final String METADATA_ALERTS_BATCH_PATH = "/metadata/alerts/batch";
 
     private static final String METADATA_CLEAR_PATH = "/metadata/clear";
 
@@ -273,6 +276,23 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     public void clear() {
         WebResource r = client.resource(basePath + METADATA_CLEAR_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post();
+    }
+
+    @Override
+    public List<AlertPublishEvent> listAlertPublishEvent() {
+        return list(METADATA_ALERTS_PATH, new GenericType<List<AlertPublishEvent>>(){});
+    }
+
+    @Override
+    public void addAlertPublishEvent(AlertPublishEvent event) {
+        WebResource r = client.resource(basePath + METADATA_ALERTS_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(event);
+    }
+
+    @Override
+    public void addAlertPublishEvents(List<AlertPublishEvent> events) {
+        WebResource r = client.resource(basePath + METADATA_ALERTS_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(events);
     }
 
 }

@@ -21,6 +21,7 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
@@ -72,6 +73,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
+    public List<AlertPublishEvent> listAlertPublishEvent(int size) {
+        return null;
+    }
+
+    @Override
     public ScheduleState getScheduleState(String versionId) {
         return handler.listWithFilter(versionId, ScheduleState.class);
         //return null;
@@ -100,6 +106,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult addCluster(StreamingCluster cluster) {
         return handler.addOrReplace(StreamingCluster.class.getSimpleName(), cluster);
+    }
+
+    @Override
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        return null;
     }
 
     @Override

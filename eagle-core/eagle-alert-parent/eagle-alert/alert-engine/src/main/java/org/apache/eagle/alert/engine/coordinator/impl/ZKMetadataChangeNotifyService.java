@@ -122,6 +122,9 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
                 } else {
                     prePopulate(alertSpec, state.getPolicySnapshots());
                     notifyAlertBolt(alertSpec, sds);
+                    if (state.getPublishSpecs().get(topologyId) != null) {
+                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()));
+                    }
                 }
                 break;
             case ALERT_PUBLISH_BOLT:
@@ -130,6 +133,9 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
                     LOG.error(" alert spec for version {} not found for topology {} !", version, topologyId);
                 } else {
                     notifyAlertPublishBolt(pubSpec, sds);
+                    if (state.getAlertSpecs().get(topologyId) != null) {
+                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()));
+                    }
                 }
                 break;
             case SPOUT:
