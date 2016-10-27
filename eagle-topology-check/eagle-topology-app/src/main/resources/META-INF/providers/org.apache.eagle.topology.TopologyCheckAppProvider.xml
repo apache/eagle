@@ -52,7 +52,7 @@
             <displayName>numEntityPersistBolt</displayName>
             <description>Bolt Task Number</description>
             <value>1</value>
-        </property>
+        </property>    
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>zkQuorum</displayName>
@@ -142,7 +142,12 @@
             <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
             <value>2</value>
         </property>
-
+        <property>
+            <name>topology.numOfSinkTasks</name>
+            <displayName>topology.numOfSinkTasks</displayName>
+            <value>2</value>
+            <description>number of sink tasks</description>
+        </property>
     </configuration>
     <streams>
         <stream>
