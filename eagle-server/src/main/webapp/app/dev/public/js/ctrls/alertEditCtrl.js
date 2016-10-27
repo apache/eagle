@@ -36,7 +36,12 @@
 			name: "Slack",
 			displayFields: ["channels"],
 			fields: ["token", "channels", "severitys", "urltemplate"]
-		}
+		},
+		'org.apache.eagle.alert.engine.publisher.impl.AlertEagleStorePlugin': {
+			name: "Storage",
+			displayFields: [],
+			fields: []
+		},
 	};
 
 	// ======================================================================================
