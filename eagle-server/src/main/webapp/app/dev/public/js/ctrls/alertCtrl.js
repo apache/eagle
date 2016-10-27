@@ -100,7 +100,7 @@
 			UI.deleteConfirm(item.name)(function (entity, closeFunc) {
 				Entity.deleteMetadata("policies/" + item.name)._promise.finally(function () {
 					closeFunc();
-					$scope.policyList._refresh();
+					updateList();
 				});
 			});
 		};
