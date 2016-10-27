@@ -84,10 +84,6 @@ public class TopologyConstants {
     public static final String TOPOLOGY_DATA_FIELD = "topologyData";
     
     public static final String COLON = ":";
-    
-    public static final String COMMA = ","; 
-    
-    public static final String KAFKA_DATA_FIELD = "kafkaData"; 
 
     public enum HadoopVersion {
         V2

@@ -58,7 +58,7 @@ public class HealthCheckParseBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
     	HealthCheckParseAPIEntity result = null;
         try{
-        	result = (HealthCheckParseAPIEntity) tuple.getValueByField(TopologyConstants.KAFKA_DATA_FIELD);
+        	result = (HealthCheckParseAPIEntity) tuple.getValueByField("kafkaData");
             Map<String, Object> map = new TreeMap<>();
             map.put("status", result.getStatus());
             map.put("timestamp", result.getTimeStamp());

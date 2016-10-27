@@ -115,7 +115,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    	declarer.declare(new Fields(TopologyConstants.KAFKA_DATA_FIELD));
+    	declarer.declare(new Fields("kafkaData"));
     }
 
     private void deleteEntities(List<TopologyBaseAPIEntity> entities, String serviceName) {
