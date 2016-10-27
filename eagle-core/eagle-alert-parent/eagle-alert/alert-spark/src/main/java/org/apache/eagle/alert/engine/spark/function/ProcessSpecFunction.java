@@ -25,6 +25,9 @@ import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.spark.model.*;
+import org.apache.eagle.alert.engine.utils.SpecUtils;
+import org.apache.eagle.alert.service.IMetadataServiceClient;
+import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -44,7 +47,7 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessSpecFunction.class);
 
-    private SpecMetadataServiceClientImpl client;
+    private IMetadataServiceClient client;
     private AtomicReference<OffsetRange[]> offsetRanges;
     private AtomicReference<SpoutSpec> spoutSpecRef;
     private AtomicReference<PublishSpec> publishSpecRef;
@@ -60,11 +63,14 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
     private PublishState publishState;
     private SiddhiState siddhiState;
 
+    private int numOfAlertBolts;
+
     public ProcessSpecFunction(AtomicReference<OffsetRange[]> offsetRanges, AtomicReference<SpoutSpec> spoutSpecRef,
                                AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef,
                                AtomicReference<HashSet<String>> topicsRef, AtomicReference<RouterSpec> routerSpecRef,
                                Config config, WindowState windowState, RouteState routeState, PolicyState policyState,
-                               PublishState publishState, SiddhiState siddhiState, AtomicReference<PublishSpec> publishSpecRef
+                               PublishState publishState, SiddhiState siddhiState, AtomicReference<PublishSpec> publishSpecRef,
+                               int numOfAlertBolts
     ) {
         this.offsetRanges = offsetRanges;
         this.spoutSpecRef = spoutSpecRef;
@@ -72,21 +78,22 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
         this.routerSpecRef = routerSpecRef;
         this.publishSpecRef = publishSpecRef;
         this.topicsRef = topicsRef;
-        this.client = new SpecMetadataServiceClientImpl(config);
+        this.client = new MetadataServiceClientImpl(config);
         this.sdsRef = sdsRef;
         this.winstate = windowState;
         this.routeState = routeState;
         this.policyState = policyState;
         this.publishState = publishState;
         this.siddhiState = siddhiState;
+        this.numOfAlertBolts = numOfAlertBolts;
     }
 
     @Override
     public JavaRDD<MessageAndMetadata<String, String>> call(JavaRDD<MessageAndMetadata<String, String>> rdd) throws Exception {
 
-        SpoutSpec spoutSpec = client.getSpoutSpec();
+        SpoutSpec spoutSpec = SpecUtils.generateSpout(client, numOfAlertBolts);
         spoutSpecRef.set(spoutSpec);
-        AlertBoltSpec alertBoltSpec = client.getAlertBoltSpec();
+        AlertBoltSpec alertBoltSpec = SpecUtils.generateAlertBoltSpec(client, numOfAlertBolts);
         alertBoltSpecRef.set(alertBoltSpec);
         //Fix always get getModified policy
         alertBoltSpec.getBoltPoliciesMap().values().forEach((policyDefinitions) -> policyDefinitions.forEach(policy -> {
@@ -96,9 +103,9 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
 
                 )
         );
-        sdsRef.set(client.getSds());
-        publishSpecRef.set(client.getPublishSpec());
-        routerSpecRef.set(client.getRouterSpec());
+        sdsRef.set(SpecUtils.generateSds(client));
+        publishSpecRef.set(SpecUtils.generatePublishSpec(client));
+        routerSpecRef.set(SpecUtils.generateRouterSpec(client, numOfAlertBolts));
 
         loadTopics(spoutSpec);
         updateOffsetRanges(rdd);
