@@ -144,6 +144,28 @@
         </property>
 
     </configuration>
+    <streams>
+        <stream>
+            <streamId>topology_health_check_stream</streamId>
+            <description>topology health check Stream</description>
+            <validate>true</validate>
+            <timeseries>true</timeseries>    
+            <columns>
+                <column>
+                    <name>status</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>tag</name>
+                    <type>string</type>
+                </column>             
+            </columns>
+        </stream>
+    </streams>
     <docs>
         <install>
         </install>

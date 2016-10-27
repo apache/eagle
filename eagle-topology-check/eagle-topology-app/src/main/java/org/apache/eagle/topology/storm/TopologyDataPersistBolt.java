@@ -22,7 +22,12 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+
+
+
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
@@ -32,16 +37,25 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
+import org.apache.eagle.topology.entity.HBaseServiceTopologyAPIEntity;
+import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
+import org.apache.eagle.topology.entity.HealthCheckParseAPIEntity;
+import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
 import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
+import org.apache.eagle.topology.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.*;
 
 public class TopologyDataPersistBolt extends BaseRichBolt {
 
-    private TopologyCheckAppConfig config;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private TopologyCheckAppConfig config;
     private IEagleServiceClient client;
     private OutputCollector collector;
 
@@ -84,6 +98,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             deleteEntities(entitiesForDeletion, serviceName);
             writeEntities(entitiesToWrite, serviceName);
             writeEntities(result.getMetrics(), serviceName);
+            emitToKafkaBolt(result);
             this.collector.ack(input);
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,7 +115,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-
+    	declarer.declare(new Fields(TopologyConstants.KAFKA_DATA_FIELD));
     }
 
     private void deleteEntities(List<TopologyBaseAPIEntity> entities, String serviceName) {
@@ -138,5 +153,48 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
                 entity.getTags().get(TopologyConstants.RACK_TAG), entity.getTags().get(TopologyConstants.HOSTNAME_TAG),
                 entity.getTags().get(TopologyConstants.ROLE_TAG));
     }
-
+    
+    private void emitToKafkaBolt(TopologyEntityParserResult result){    	
+    	
+    	List<HealthCheckParseAPIEntity> healthCheckParseAPIList = new ArrayList<HealthCheckParseAPIEntity>();    	
+   
+    	setNodeInfo(result.getMasterNodes(),healthCheckParseAPIList);      	
+    	
+    	setNodeInfo(result.getSlaveNodes(),healthCheckParseAPIList);    
+    	
+    	for(HealthCheckParseAPIEntity healthCheckAPIEntity : healthCheckParseAPIList){
+    		this.collector.emit(new Values(healthCheckAPIEntity));
+    	}
+        
+    }
+    
+    private void setNodeInfo(List<TopologyBaseAPIEntity> TopologyBaseAPIList, List<HealthCheckParseAPIEntity> healthCheckParseAPIList){
+    	
+    	HealthCheckParseAPIEntity healthCheckAPIEntity = null;
+    	
+    	for(Iterator<TopologyBaseAPIEntity> iterator = TopologyBaseAPIList.iterator(); iterator.hasNext();){   	
+    		
+    		 healthCheckAPIEntity = new HealthCheckParseAPIEntity();
+	   		 TopologyBaseAPIEntity topologyBaseAPIEntity = iterator.next();
+	   		 
+	   		 if(topologyBaseAPIEntity instanceof HBaseServiceTopologyAPIEntity){   			 
+	   		
+	   			healthCheckAPIEntity.setStatus(((HBaseServiceTopologyAPIEntity)topologyBaseAPIEntity).getStatus());	   			
+	   		
+	   		 }
+	   		 if(topologyBaseAPIEntity instanceof HdfsServiceTopologyAPIEntity){   			 
+	   			
+	   			healthCheckAPIEntity.setStatus(((HdfsServiceTopologyAPIEntity)topologyBaseAPIEntity).getStatus());
+	   		 }
+	   		
+	   		 if(topologyBaseAPIEntity instanceof MRServiceTopologyAPIEntity){	   			 
+	   		
+	   			healthCheckAPIEntity.setStatus(((MRServiceTopologyAPIEntity)topologyBaseAPIEntity).getStatus());
+	   		 }	  
+	   		 
+	   		healthCheckAPIEntity.setTimeStamp(topologyBaseAPIEntity.getTimestamp());
+	   		healthCheckAPIEntity.setTag(StringUtils.convertMapToString(topologyBaseAPIEntity.getTags()));
+	   		healthCheckParseAPIList.add(healthCheckAPIEntity);
+    	}
+    }
 }
