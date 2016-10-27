@@ -21,4 +21,5 @@ public class Constants {
     public static final int UNKNOW_PARTITION = -1;
     public static final String UNKNOW_STREAMID = "xx";
     public static final String ALERTBOLTNAME_PREFIX = "alertBolt";
+    public static final String TOPOLOGY_ID = "topologyId";
 }
