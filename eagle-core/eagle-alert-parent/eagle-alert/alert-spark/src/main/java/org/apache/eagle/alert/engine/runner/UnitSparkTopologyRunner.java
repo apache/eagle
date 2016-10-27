@@ -157,7 +157,8 @@ public class UnitSparkTopologyRunner implements Serializable {
                         policyState,
                         publishState,
                         siddhiState,
-                        publishSpecRef))
+                        publishSpecRef,
+                        numOfAlertBolts))
                 .mapToPair(km -> new Tuple2<>(km.topic(), km.message()));
 
         pairDStream
