@@ -105,4 +105,6 @@ public class AlertPublishEvent {
         alertEvent.setAlertData(event.getDataMap());
         return alertEvent;
     }
+
 }
+

@@ -95,6 +95,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         if (pubSpec == null) {
             return;
         }
+        this.streamDefinitionMap = sds;
 
         List<Publishment> newPublishments = pubSpec.getPublishments();
         if (newPublishments == null) {
