@@ -16,14 +16,35 @@
   limitations under the License.
   -->
 
-<div class="nav-tabs-custom">
-	<ul class="nav nav-tabs">
-		<li ng-class="{active: getState() === 'alert.list'}"><a href="#/alert/">Alerts</a></li>
-		<li ng-class="{active: getState() === 'alert.policyList'}"><a href="#/alert/policyList">Policies</a></li>
-		<li ng-class="{active: getState() === 'alert.streamList'}"><a href="#/alert/streamList">Streams</a></li>
-	</ul>
-	<div class="tab-content no-padding">
-		<div ui-view></div>
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<span class="fa fa-bell"></span>
+		<h3 class="box-title">
+			ID: {{alert.alertId}}
+		</h3>
+	</div>
+	<div class="box-body">
+		<table class="table">
+			<tbody>
+				<tr>
+					<th>Id</th>
+					<td>{{alert.alertId}}</td>
+					<th>Time</th>
+					<td>{{Time.format(alert.alertTimestamp)}}</td>
+				</tr>
+				<tr>
+					<th>Policy</th>
+					<td>{{alert.policyId}}</td>
+					<th>Stream</th>
+					<td>{{alert.streamId}}</td>
+				</tr>
+				<tr>
+					<th>Alert Content</th>
+					<td colspan="3">
+						<pre>{{alert.alertData | json}}</pre>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
-

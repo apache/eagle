@@ -17,5 +17,30 @@
   -->
 
 <div class="box-body">
-	Good!
+	<div sort-table="alertList">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th sortpath="alertTimestamp" width="135">Alert Time</th>
+					<th sortpath="policyId">Policy</th>
+					<th sortpath="streamId">Stream</th>
+					<th>Alert Data</th>
+					<th width="10"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{Time.format(item.alertTimestamp)}}</td>
+					<td>
+						<a ui-sref="policyDetail({name: item.policyId})">{{item.policyId}}</a>
+					</td>
+					<td>{{item.streamId}}</td>
+					<td>{{item.alertData}}</td>
+					<td>
+						<a ui-sref="alertDetail({alertId: item.alertId})">Detail</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>
