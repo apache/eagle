@@ -18,10 +18,8 @@ package org.apache.eagle.alert.engine.runner;
 
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
-import org.apache.eagle.alert.engine.coordinator.Publishment;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
@@ -48,6 +46,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherBolt.class);
     private final AlertPublisher alertPublisher;
     private volatile Map<String, Publishment> cachedPublishments = new HashMap<>();
+    private volatile Map<String, PolicyDefinition> policyDefinitionMap;
 
     public AlertPublisherBolt(String alertPublisherName, Config config, IMetadataChangeNotifyService coordinatorService) {
         super(alertPublisherName, coordinatorService, config);
@@ -111,5 +110,20 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         // switch
         cachedPublishments = newPublishmentsMap;
         specVersion = pubSpec.getVersion();
+    }
+
+    @Override
+    public void onAlertPolicyChange(Map<String, PolicyDefinition> pds) {
+        this.policyDefinitionMap = pds;
+    }
+
+    public AlertPublishEvent getAlertPublishEvent(AlertStreamEvent event) {
+        AlertPublishEvent alertEvent = new AlertPublishEvent();
+        alertEvent.getAlertData().putAll(event.getDataMap());
+        alertEvent.setPolicyId(event.getPolicyId());
+        alertEvent.setStreamId(event.getStreamId());
+        alertEvent.setAlertTimestamp(event.getCreatedTime());
+        String inputStream = null;
+        return alertEvent;
     }
 }

@@ -26,11 +26,13 @@ import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
 import org.apache.eagle.alert.engine.interpreter.PolicyParseResult;
 import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.google.inject.Inject;
+import org.apache.storm.zookeeper.Op;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -458,6 +460,18 @@ public class MetadataResource {
             results.add(dao.addTopology(t));
         }
         return results;
+    }
+
+    @Path("/alerts")
+    @POST
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        return dao.addAlertPublishEvent(event);
+    }
+
+    @Path("/alerts")
+    @GET
+    public List<AlertPublishEvent> listAlertPublishEvents(@QueryParam("size") int size) {
+        return dao.listAlertPublishEvent(size);
     }
 
     @Path("/topologies/{topologyName}")

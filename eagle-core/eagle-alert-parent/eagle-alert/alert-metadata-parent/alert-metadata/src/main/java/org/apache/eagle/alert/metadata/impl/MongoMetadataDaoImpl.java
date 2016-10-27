@@ -36,6 +36,7 @@ import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
@@ -74,6 +75,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     private MongoCollection<Document> publishment;
     private MongoCollection<Document> publishmentType;
     private MongoCollection<Document> topologies;
+    private MongoCollection<Document> alerts;
 
     // scheduleStates splits to several collections
     private MongoCollection<Document> scheduleStates;
@@ -301,6 +303,16 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult removePublishmentType(String pubType) {
         return remove(publishmentType, pubType);
+    }
+
+    @Override
+    public List<AlertPublishEvent> listAlertPublishEvent(int size) {
+        return null;
+    }
+
+    @Override
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        return null;
     }
 
     private <T> OpResult addOne(MongoCollection<Document> collection, T t) {
