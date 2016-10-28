@@ -355,8 +355,12 @@ var app = {};
 		//noinspection JSCheckFunctionSignatures
 		angular.element(document).ready(function() {
 			console.info("[Eagle] UI start...");
+
 			//noinspection JSCheckFunctionSignatures
 			angular.bootstrap(document, ['eagleApp']);
+
+			$("body").removeClass("ng-init-lock");
+			$("#appLoadTip").remove();
 		});
 	});
 })();
