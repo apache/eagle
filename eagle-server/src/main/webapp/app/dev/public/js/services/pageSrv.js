@@ -53,10 +53,10 @@
 		var defaultPortalList = [
 			{name: "Home", icon: "home", path: "#/"},
 			{name: "Alert", icon: "bell", showFunc: checkApplication, list: [
-				{name: "Alerts", path: "#/alert/"},
-				{name: "Policies", path: "#/alert/policyList"},
-				{name: "Streams", path: "#/alert/streamList"},
-				{name: "Define Policy", path: "#/alert/policyCreate"}
+				{name: "Alerts", path: "#/alerts"},
+				{name: "Policies", path: "#/policies"},
+				{name: "Streams", path: "#/streams"},
+				{name: "Define Policy", path: "#/policy/create"}
 			]}
 		];
 		var adminPortalList = [

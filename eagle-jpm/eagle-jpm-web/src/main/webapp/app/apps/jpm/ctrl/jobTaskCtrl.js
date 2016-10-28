@@ -101,7 +101,7 @@
 			var startTime = Number($wrapState.param.startTime);
 			var endTime = Number($wrapState.param.endTime);
 
-			PageConfig.title = "Task";
+			PageConfig.title = "(beta) Task Statistic";
 			PageConfig.subTitle = $scope.jobId;
 
 			var timeDiff = endTime - startTime;

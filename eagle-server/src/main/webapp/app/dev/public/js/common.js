@@ -360,6 +360,7 @@
 		var sign = number < 0 ? -1 : 1;
 		var unit = '';
 		number = Math.abs(number);
+		if(isNaN(number)) return "-";
 
 		for(var i = abbrev.length - 1; i >= 0; i--) {
 			var size = Math.pow(base, i + 1);

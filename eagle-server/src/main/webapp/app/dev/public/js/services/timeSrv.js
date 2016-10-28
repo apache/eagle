@@ -235,41 +235,44 @@
 
 		var promiseLock = false;
 		$Time.getPromise = function (config, state, param) {
+			var deferred = $q.defer();
+
 			if(keepTime) {
 				keepTime = false;
-				return $q.when($Time);
-			}
+				deferred.resolve($Time);
+			} else {
+				if (config.time === true) {
+					$Time.pickerType = $Time.TIME_RANGE_PICKER;
 
-			if(config.time === true) {
-				$Time.pickerType = $Time.TIME_RANGE_PICKER;
+					if (!promiseLock) {
+						startTime = $Time.verifyTime(param.startTime);
+						endTime = $Time.verifyTime(param.endTime);
 
-				if(!promiseLock) {
-					startTime = $Time.verifyTime(param.startTime);
-					endTime = $Time.verifyTime(param.endTime);
-
-					if (!startTime || !endTime) {
-						endTime = $Time();
-						startTime = endTime.clone().subtract(2, "hour");
-
-						setTimeout(function () {
-							promiseLock = true;
-							keepTime = true;
-							$wrapState.go(state.name, $.extend({}, param, {
-								startTime: $Time.format(startTime),
-								endTime: $Time.format(endTime)
-							}), {location: "replace", notify: false});
+						if (!startTime || !endTime) {
+							endTime = $Time();
+							startTime = endTime.clone().subtract(2, "hour");
 
 							setTimeout(function () {
-								promiseLock = false;
-							}, 150);
-						}, 100);
+								promiseLock = true;
+								keepTime = true;
+								$wrapState.go(state.name, $.extend({}, param, {
+									startTime: $Time.format(startTime),
+									endTime: $Time.format(endTime)
+								}), {location: "replace", notify: false});
+
+								setTimeout(function () {
+									promiseLock = false;
+								}, 150);
+							}, 100);
+						}
 					}
+				} else {
+					$Time.pickerType = null;
 				}
-			} else {
-				$Time.pickerType = null;
+				deferred.resolve($Time);
 			}
 
-			return $q.when($Time);
+			return deferred.promise;
 		};
 
 		return $Time;
