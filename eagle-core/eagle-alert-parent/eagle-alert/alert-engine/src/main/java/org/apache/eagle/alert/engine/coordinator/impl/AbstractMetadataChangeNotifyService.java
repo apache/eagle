@@ -103,8 +103,8 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
         alertPublishSpecListeners.forEach(s -> s.onAlertPublishSpecChange(alertPublishSpec, sds));
     }
 
-    protected void notifyAlertPublishBolt(Map<String, PolicyDefinition> pds) {
-        alertPublishSpecListeners.forEach(s -> s.onAlertPolicyChange(pds));
+    protected void notifyAlertPublishBolt(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
+        alertPublishSpecListeners.forEach(s -> s.onAlertPolicyChange(pds, sds));
     }
 
     public void close() throws IOException {

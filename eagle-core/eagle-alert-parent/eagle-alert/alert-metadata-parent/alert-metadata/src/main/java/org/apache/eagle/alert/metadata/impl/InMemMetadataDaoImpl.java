@@ -207,6 +207,16 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
+    public AlertPublishEvent getAlertPublishEvent(String alertId) {
+        Optional<AlertPublishEvent> op = alerts.stream().filter(alert -> alert.getAlertId().equals(alertId)).findAny();
+        if (op.isPresent()) {
+            return op.get();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public OpResult addAlertPublishEvent(AlertPublishEvent event) {
         alerts.add(event);
         OpResult result = new OpResult();

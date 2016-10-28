@@ -25,5 +25,5 @@ import java.util.Map;
 public interface AlertPublishSpecListener {
     void onAlertPublishSpecChange(PublishSpec spec, Map<String, StreamDefinition> sds);
     
-    void onAlertPolicyChange(Map<String, PolicyDefinition> pds);
+    void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds);
 }

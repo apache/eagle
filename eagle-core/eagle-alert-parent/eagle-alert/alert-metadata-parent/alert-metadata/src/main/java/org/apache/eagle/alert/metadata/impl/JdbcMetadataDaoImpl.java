@@ -74,7 +74,12 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
-        return null;
+        return handler.listSubset(AlertPublishEvent.class, size);
+    }
+
+    @Override
+    public AlertPublishEvent getAlertPublishEvent(String alertId) {
+        return handler.listWithFilter(alertId, AlertPublishEvent.class);
     }
 
     @Override
@@ -85,7 +90,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public ScheduleState getScheduleState() {
-        return handler.listTop(ScheduleState.class, "DESC");
+        return handler.listTop(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
     }
 
     @Override
@@ -110,7 +115,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult addAlertPublishEvent(AlertPublishEvent event) {
-        return null;
+        return handler.addOrReplace(AlertPublishEvent.class.getSimpleName(), event);
     }
 
     @Override

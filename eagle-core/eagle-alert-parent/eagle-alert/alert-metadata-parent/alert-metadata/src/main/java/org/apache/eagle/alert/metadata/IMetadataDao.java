@@ -80,6 +80,8 @@ public interface IMetadataDao extends Closeable {
 
     List<AlertPublishEvent> listAlertPublishEvent(int size);
 
+    AlertPublishEvent getAlertPublishEvent(String alertId);
+
     OpResult addAlertPublishEvent(AlertPublishEvent event);
 
     ScheduleState getScheduleState(String versionId);

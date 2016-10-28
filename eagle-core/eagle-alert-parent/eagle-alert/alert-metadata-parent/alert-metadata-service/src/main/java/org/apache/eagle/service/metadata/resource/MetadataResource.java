@@ -17,7 +17,6 @@
 package org.apache.eagle.service.metadata.resource;
 
 import com.google.common.base.Preconditions;
-import javafx.scene.control.Alert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
@@ -33,7 +32,6 @@ import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.google.inject.Inject;
-import org.apache.storm.zookeeper.Op;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -499,6 +497,12 @@ public class MetadataResource {
     @GET
     public List<AlertPublishEvent> listAlertPublishEvents(@QueryParam("size") int size) {
         return dao.listAlertPublishEvent(size);
+    }
+
+    @Path("/alerts/{alertId}")
+    @GET
+    public AlertPublishEvent getAlertPublishEvent(@PathParam("alertId") String alertId) {
+        return dao.getAlertPublishEvent(alertId);
     }
 
     @Path("/topologies/{topologyName}")
