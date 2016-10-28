@@ -51,8 +51,15 @@
 	eagleControllers.controller('alertDetailCtrl', function ($scope, $wrapState, PageConfig, Entity) {
 		PageConfig.title = "Alert Detail";
 
-		Entity.query("metadata/alerts")._then(function (res) {
-			$scope.alert = res.data[0];
+		$scope.alertList = Entity.queryMetadata("alerts/" + encodeURIComponent($wrapState.param.alertId));
+		$scope.alertList._then(function () {
+			$scope.alert = $scope.alertList[0];
+			if(!$scope.alert) {
+				$.dialog({
+					title: "OPS",
+					content: "Alert '" + $wrapState.param.alertId + "' not found!"
+				});
+			}
 		});
 	});
 
