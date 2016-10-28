@@ -23,6 +23,7 @@ import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,9 @@ public class MetadataUtils {
         }
         if (t instanceof ScheduleState) {
             return ((ScheduleState) t).getVersion();
+        }
+        if (t instanceof AlertPublishEvent) {
+            return ((AlertPublishEvent) t).getAlertId();
         }
 
         try {
