@@ -224,9 +224,8 @@ public class ScheduleContextBuilder {
             } else {
                 StreamWorkSlotQueue queue = queueMap.get(assignment.getQueueId());
                 if (queue == null
-                    || policies.get(assignment.getPolicyName()).getParallelismHint() > queue.getQueueSize()
-                        || policies.get(assignment.getPolicyName()).getParallelismHint() < queue.getQueueSize()) {
-                    // queue not found or policy has hint bigger than queue (possible a poilcy update)
+                    || policies.get(assignment.getPolicyName()).getParallelismHint() != queue.getQueueSize()) {
+                    // queue not found or policy has hint not equal to queue (possible a poilcy update)
                     LOG.info("Policy assignment {} 's policy doesnt match queue: {}!", assignment, queue);
                     paIt.remove();
                 }
