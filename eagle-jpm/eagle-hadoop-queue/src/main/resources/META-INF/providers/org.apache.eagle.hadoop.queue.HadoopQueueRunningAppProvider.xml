@@ -43,8 +43,8 @@
     </property>
     <property>
       <name>dataSourceConfig.fetchIntervalSec</name>
-      <displayName>Fetch Interval in Seconds</displayName>
-      <description>fetching interval in seconds</description>
+      <displayName>Fetching Metric Interval in Seconds</displayName>
+      <description>interval seconds of fetching metric from resource manager</description>
       <value>10</value>
     </property>
   </configuration>
