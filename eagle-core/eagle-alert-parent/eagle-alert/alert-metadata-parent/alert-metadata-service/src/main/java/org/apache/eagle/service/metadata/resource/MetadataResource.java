@@ -305,12 +305,9 @@ public class MetadataResource {
 
     @Path("/policies/{policyId}")
     @GET
-    public PolicyDefinition getPolicyByID(@PathParam("policyId") String policyId) {
-        Preconditions.checkNotNull(policyId,"policyId");
-        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).findAny().orElseGet(() -> {
-            LOG.error("Policy (policyId " + policyId + ") not found");
-            throw new IllegalArgumentException("Policy (policyId " + policyId + ") not found");
-        });
+    public List<PolicyDefinition> getPolicyByID(@PathParam("policyId") String policyId) {
+        Preconditions.checkNotNull(policyId, "policyId");
+        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).collect(Collectors.toList());
     }
 
     @Path("/policies/{policyId}/status/{status}")
@@ -318,7 +315,7 @@ public class MetadataResource {
     public OpResult updatePolicyStatusByID(@PathParam("policyId") String policyId, @PathParam("status") PolicyDefinition.PolicyStatus status) {
         OpResult result = new OpResult();
         try {
-            PolicyDefinition policyDefinition = getPolicyByID(policyId);
+            PolicyDefinition policyDefinition = getPolicyByID(policyId).get(0);
             policyDefinition.setPolicyStatus(status);
             OpResult updateResult  = addPolicy(policyDefinition);
             result.code = updateResult.code;
