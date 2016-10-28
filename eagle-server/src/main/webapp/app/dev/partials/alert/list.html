@@ -17,16 +17,18 @@
   -->
 
 <div class="box-body">
-	<div sort-table="alertList">
+	<div sort-table="alertList" is-sorting="isSorting">
 		<table class="table table-bordered">
 			<thead>
 				<tr>
 					<th sortpath="alertTimestamp" width="135">
 						Alert Time
-						<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done"></span>
+						<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done || isSorting"></span>
 					</th>
+					<th sortpath="siteId" width="75">Site</th>
 					<th sortpath="policyId" width="75">Policy</th>
-					<th sortpath="streamId" width="75">Stream</th>
+					<!--th sortpath="streamId" width="75">Stream</th-->
+					<th width="100">Application</th>
 					<th>Alert Data</th>
 					<th width="10"></th>
 				</tr>
@@ -34,10 +36,18 @@
 			<tbody>
 				<tr>
 					<td>{{Time.format(item.alertTimestamp)}}</td>
+					<td>{{item.siteId}}</td>
 					<td>
 						<a ui-sref="policyDetail({name: item.policyId})">{{item.policyId}}</a>
 					</td>
-					<td>{{item.streamId}}</td>
+					<!--td>{{item.streamId}}</td-->
+					<td>
+						<ul class="list-unstyled">
+							<li ng-repeat="app in item.appIds track by $index" class="label label-sm label-primary">
+								{{Application.findProvider(app).type || app}}
+							</li>
+						</ul>
+					</td>
 					<td class="text-break">{{item.alertData}}</td>
 					<td>
 						<a ui-sref="alertDetail({alertId: item.alertId})">Detail</a>

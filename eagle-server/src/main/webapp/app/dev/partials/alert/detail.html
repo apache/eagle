@@ -28,16 +28,28 @@
 		<table class="table">
 			<tbody>
 				<tr>
-					<th>Id</th>
-					<td>{{alert.alertId}}</td>
+					<th width="15%">Policy</th>
+					<td width="35%"><a ui-sref="policyDetail({name: item.policyId})">{{alert.policyId}}</a></td>
+					<th width="15%">Id</th>
+					<td width="35%">{{alert.alertId}}</td>
+				</tr>
+				<tr>
+					<th>Site</th>
+					<td>{{alert.siteId}}</td>
 					<th>Time</th>
 					<td>{{Time.format(alert.alertTimestamp)}}</td>
 				</tr>
 				<tr>
-					<th>Policy</th>
-					<td><a ui-sref="policyDetail({name: item.policyId})">{{alert.policyId}}</a></td>
 					<th>Stream</th>
 					<td>{{alert.streamId}}</td>
+					<th>Applications</th>
+					<td>
+						<ul class="list-unstyled">
+							<li ng-repeat="app in alert.appIds track by $index" class="label label-sm label-primary">
+								{{Application.findProvider(app).type || app}}
+							</li>
+						</ul>
+					</td>
 				</tr>
 				<tr>
 					<th>Alert Content</th>
