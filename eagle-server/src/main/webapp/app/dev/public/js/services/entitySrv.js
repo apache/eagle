@@ -59,10 +59,12 @@
 			return _host;
 		};
 
-		Entity.query = function (url) {
+		Entity.query = function (url, param) {
 			var list = [];
 			list._refresh = function () {
-				return wrapList(list, $http.get(_host + "/rest/" + url));
+				var config = {};
+				if(param) config.params = param;
+				return wrapList(list, $http.get(_host + "/rest/" + url, config));
 			};
 
 			return list._refresh();
@@ -118,17 +120,28 @@
 		};
 
 		// TODO: metadata will be removed
-		Entity.queryMetadata = function (url) {
-			var metaList = Entity.query('metadata/' +  url);
-			metaList._then(function (res) {
-				var data = res.data;
-				if(!$.isArray(data)) {
-					data = [data];
-				}
+		Entity.queryMetadata = function (url, param) {
+			var metaList = Entity.query('metadata/' +  url, param);
+			var _refresh = metaList._refresh;
 
-				metaList.splice(0);
-				Array.prototype.push.apply(metaList, data);
-			});
+			function process() {
+				metaList._then(function (res) {
+					var data = res.data;
+					if(!$.isArray(data)) {
+						data = [data];
+					}
+
+					metaList.splice(0);
+					Array.prototype.push.apply(metaList, data);
+				});
+			}
+
+			metaList._refresh = function () {
+				_refresh();
+				process();
+			};
+
+			process();
 
 			return metaList;
 		};
