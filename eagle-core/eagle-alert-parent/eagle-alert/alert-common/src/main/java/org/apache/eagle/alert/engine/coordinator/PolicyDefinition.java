@@ -153,7 +153,7 @@ public class PolicyDefinition implements Serializable {
             && (another.definition != null && another.definition.equals(this.definition))
             && Objects.equals(this.definition, another.definition)
             && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
-            // && another.parallelismHint == this.parallelismHint
+             && another.parallelismHint == this.parallelismHint
             ) {
             return true;
         }
