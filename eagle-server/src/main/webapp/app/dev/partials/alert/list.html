@@ -21,9 +21,12 @@
 		<table class="table table-bordered">
 			<thead>
 				<tr>
-					<th sortpath="alertTimestamp" width="135">Alert Time</th>
-					<th sortpath="policyId">Policy</th>
-					<th sortpath="streamId">Stream</th>
+					<th sortpath="alertTimestamp" width="135">
+						Alert Time
+						<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done"></span>
+					</th>
+					<th sortpath="policyId" width="75">Policy</th>
+					<th sortpath="streamId" width="75">Stream</th>
 					<th>Alert Data</th>
 					<th width="10"></th>
 				</tr>
@@ -35,7 +38,7 @@
 						<a ui-sref="policyDetail({name: item.policyId})">{{item.policyId}}</a>
 					</td>
 					<td>{{item.streamId}}</td>
-					<td>{{item.alertData}}</td>
+					<td class="text-break">{{item.alertData}}</td>
 					<td>
 						<a ui-sref="alertDetail({alertId: item.alertId})">Detail</a>
 					</td>

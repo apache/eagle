@@ -34,31 +34,26 @@
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig) {
+	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity) {
 		PageConfig.subTitle = "Explore Alerts";
 
-		// TODO: real api required
-		$scope.alertList = [];
-		for(var i = 0 ; i < 1000 ; i += 1) {
-			$scope.alertList.push({
-				streamId: "HBASE_AUDIT_LOG_STREAM_APOLLO",
-				policyId: "Mock",
-				alertTimestamp: +new Date() - i * 1000,
-				alertData: {key1: "value1", key2: "value2", key3: "value3"}
-			});
-		}
+		$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
+
+		// ================================================================
+		// =                             Sync                             =
+		// ================================================================
+		var refreshInterval = $interval($scope.alertList._refresh, 1000 * 10);
+		$scope.$on('$destroy', function() {
+			$interval.cancel(refreshInterval);
+		});
 	});
 
-	eagleControllers.controller('alertDetailCtrl', function ($scope, $wrapState, PageConfig) {
+	eagleControllers.controller('alertDetailCtrl', function ($scope, $wrapState, PageConfig, Entity) {
 		PageConfig.title = "Alert Detail";
 
-		$scope.alert = {
-			alertId: "TODO: this is a mock",
-			streamId: "HBASE_AUDIT_LOG_STREAM_APOLLO",
-			policyId: "Mock",
-			alertTimestamp: +new Date(),
-			alertData: {key1: "value1", key2: "value2", key3: "value3"}
-		};
+		Entity.query("metadata/alerts")._then(function (res) {
+			$scope.alert = res.data[0];
+		});
 	});
 
 	// ======================================================================================
