@@ -17,7 +17,7 @@
   -->
 
 <application>
-    <type>AlertUnitTopologyApp</type>
+    <type>ALERT_UNIT_TOPOLOGY_APP</type>
     <name>Alert Engine</name>
     <description>Real-time Alert Engine</description>
     <version>0.5.0-incubating</version>

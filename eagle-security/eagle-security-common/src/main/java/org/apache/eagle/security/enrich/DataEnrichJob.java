@@ -49,7 +49,7 @@ public class DataEnrichJob implements Job {
                 );
             ExternalDataCache.getInstance().setJobResult(lcm.getClass(), map);
         } catch(Exception ex) {
-            LOG.error("Fail to load hbase resource sensitivity data", ex);
+            LOG.error("Fail to load sensitivity data", ex);
         }
     }
 }

@@ -371,9 +371,9 @@ public class MetadataResource {
         return results;
     }
 
-    @Path("/publishments/{pubId}")
+    @Path("/publishments/{name}")
     @DELETE
-    public OpResult removePublishment(@PathParam("pubId") String pubId) {
+    public OpResult removePublishment(@PathParam("name") String pubId) {
         return dao.removePublishment(pubId);
     }
 

@@ -37,8 +37,8 @@ public abstract class AbstractDataEnrichLCM<T, K> implements DataEnrichLCM<T, K>
 
     @Override
     public Collection<T> loadExternal() {
-        String eagleServiceHost = config.getString("eagleService.host");
-        Integer eagleServicePort = config.getInt("eagleService.port");
+        String eagleServiceHost = config.getString("service.host");
+        Integer eagleServicePort = config.getInt("service.port");
 
         // load from eagle database
         LOG.info("Load sensitivity information from eagle service " + eagleServiceHost + ":" + eagleServicePort);
