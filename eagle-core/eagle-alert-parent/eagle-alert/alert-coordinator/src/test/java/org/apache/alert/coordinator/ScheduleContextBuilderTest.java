@@ -157,14 +157,15 @@ public class ScheduleContextBuilderTest {
         StreamWorkSlotQueue queue = SchedulerTest.getQueue(context, assignment1.getQueueId()).getRight();
 
         PolicyDefinition pd1 = client.listPolicies().get(0);
-        pd1.setParallelismHint(4); // default queue is 5 , change to smaller, has no effect
+        pd1.setParallelismHint(4); // default queue is 5 , change to smaller, same like change bigger
 
         context = builder.buildContext();
-        PolicyAssignment assignmentNew = context.getPolicyAssignments().values().iterator().next();
-        StreamWorkSlotQueue queueNew = SchedulerTest.getQueue(context, assignmentNew.getQueueId()).getRight();
-        Assert.assertNotNull(queueNew);
+        Assert.assertFalse(context.getPolicyAssignments().values().iterator().hasNext());
+        //PolicyAssignment assignmentNew = context.getPolicyAssignments().values().iterator().next();
+        //StreamWorkSlotQueue queueNew = SchedulerTest.getQueue(context, assignmentNew.getQueueId()).getRight();
+        //Assert.assertNotNull(queueNew);
         // just to make sure queueNew is present
-        Assert.assertEquals(queue.getQueueId(), queueNew.getQueueId());
+        //Assert.assertEquals(queue.getQueueId(), queueNew.getQueueId());
 
         // default queue is 5 , change to bigger 6, policy assignment removed
         pd1.setParallelismHint(queue.getQueueSize() + 1);
@@ -333,7 +334,7 @@ public class ScheduleContextBuilderTest {
         slots.add(slot2);
         slots.add(slot3);
         slots.add(slot4);
-        slots.add(slot5);
+        //slots.add(slot5);
 
         StreamWorkSlotQueue q = new StreamWorkSlotQueue(streamGroup, false, new HashMap<>(), slots);
         ms.addQueues(q);
