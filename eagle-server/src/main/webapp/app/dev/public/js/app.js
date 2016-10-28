@@ -117,52 +117,45 @@ var app = {};
 					resolve: routeResolve({ site: false, application: false })
 				})
 				// ================================= Alerts =================================
-				.state('alert', {
-					abstract: true,
-					url: "/alert/",
-					templateUrl: "partials/alert/main.html?_=" + window._TRS(),
-					controller: "alertCtrl",
-					resolve: routeResolve(false)
-				})
-				.state('alert.list', {
-					url: "",
+				.state('alertList', {
+					url: "/alerts",
 					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
 					controller: "alertListCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyList', {
-					url: "policyList",
+				.state('policyList', {
+					url: "/policies",
 					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
 					controller: "policyListCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.streamList', {
-					url: "streamList",
+				.state('streamList', {
+					url: "/streams",
 					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
 					controller: "alertStreamListCtrl",
 					resolve: routeResolve()
 				})
 				.state('policyCreate', {
-					url: "/alert/policyCreate",
+					url: "/policy/create",
 					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyCreateCtrl",
 					resolve: routeResolve()
 				})
 				.state('policyEdit', {
-					url: "/alert/policyEdit/{name}",
+					url: "/policy/edit/{name}",
 					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyEditCtrl",
 					resolve: routeResolve()
 				})
 
 				.state('alertDetail', {
-					url: "/alertDetail/{alertId}",
+					url: "/alert/detail/{alertId}",
 					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
 					controller: "alertDetailCtrl",
 					resolve: routeResolve()
 				})
 				.state('policyDetail', {
-					url: "/policyDetail/{name}",
+					url: "/policy/detail/{name}",
 					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
 					controller: "policyDetailCtrl",
 					resolve: routeResolve()
@@ -303,6 +296,10 @@ var app = {};
 				}
 			});
 
+			$scope.$on('$stateChangeSuccess ', function (event) {
+				console.log("[Switch] done ->", event);
+			});
+
 			// ================================ Function ================================
 			// Get side bar navigation item class
 			$scope.getNavClass = function (portal) {
@@ -355,8 +352,12 @@ var app = {};
 		//noinspection JSCheckFunctionSignatures
 		angular.element(document).ready(function() {
 			console.info("[Eagle] UI start...");
+
 			//noinspection JSCheckFunctionSignatures
 			angular.bootstrap(document, ['eagleApp']);
+
+			$("body").removeClass("ng-init-lock");
+			$("#appLoadTip").remove();
 		});
 	});
 })();

@@ -17,6 +17,12 @@
  * limitations under the License.
  */
 
+body.ng-init-lock .main-sidebar .sidebar-menu,
+body.ng-init-lock .content-wrapper .content-header,
+body.ng-init-lock .main-header .navbar-custom-menu {
+	display: none;
+}
+
 a {
 	cursor: pointer;
 }

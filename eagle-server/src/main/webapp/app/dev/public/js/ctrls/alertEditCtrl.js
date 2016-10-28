@@ -73,7 +73,7 @@
 					title: "OPS",
 					content: "Policy '" + $wrapState.param.name + "' not found!"
 				}, function () {
-					$wrapState.go("alert.policyList");
+					$wrapState.go("policyList");
 				});
 			}
 		});
@@ -81,11 +81,6 @@
 
 	function policyEditController(policy, $scope, $q, $wrapState, $timeout, PageConfig, Entity) {
 		$scope.publisherTypes = publisherTypes;
-
-		PageConfig.navPath = [
-			{title: "Policy List", path: "/alert/policyList"},
-			{title: "Policy"}
-		];
 
 		$scope.policy = policy;
 		$scope.policy = common.merge({
@@ -107,6 +102,11 @@
 		$scope.searchSourceKey = "";
 		$scope.applications = {};
 		$scope.newPolicy = !$scope.policy.name;
+
+		PageConfig.navPath = [
+			{title: "Policy List", path: "/policies"},
+			{title: ($scope.newPolicy ? "Define" : "Update") + " Policy"}
+		];
 
 		// ==============================================================
 		// =                             UI                             =

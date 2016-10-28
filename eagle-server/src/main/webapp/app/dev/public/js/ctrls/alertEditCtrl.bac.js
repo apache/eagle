@@ -58,7 +58,7 @@
 					title: "OPS",
 					content: "Policy '" + $wrapState.param.name + "' not found!"
 				}, function () {
-					$wrapState.go("alert.policyList");
+					$wrapState.go("policyList");
 				});
 			}
 		});

@@ -44,7 +44,7 @@
 		<link href="public/css/main.css" rel="stylesheet" type="text/css" media="screen">
 		<!-- endref -->
 	</head>
-	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : PageConfig.hideSidebar}">
+	<body class="skin-blue sidebar-mini ng-init-lock" ng-class="{'no-sidebar' : PageConfig.hideSidebar}">
 		<!-- Site wrapper -->
 		<div class="wrapper">
 			<header class="main-header">
@@ -169,6 +169,11 @@
 
 				<!-- Main content -->
 				<section class="content">
+					<h1 id="appLoadTip">
+						<span class="fa fa-refresh fa-spin"></span>
+						Loading...
+					</h1>
+
 					<div id="content">
 						<div ui-view></div>
 					</div>
