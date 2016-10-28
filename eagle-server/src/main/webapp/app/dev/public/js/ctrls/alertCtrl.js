@@ -34,8 +34,33 @@
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig) {
+	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity) {
 		PageConfig.subTitle = "Explore Alerts";
+
+		$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
+
+		// ================================================================
+		// =                             Sync                             =
+		// ================================================================
+		var refreshInterval = $interval($scope.alertList._refresh, 1000 * 10);
+		$scope.$on('$destroy', function() {
+			$interval.cancel(refreshInterval);
+		});
+	});
+
+	eagleControllers.controller('alertDetailCtrl', function ($scope, $wrapState, PageConfig, Entity) {
+		PageConfig.title = "Alert Detail";
+
+		$scope.alertList = Entity.queryMetadata("alerts/" + encodeURIComponent($wrapState.param.alertId));
+		$scope.alertList._then(function () {
+			$scope.alert = $scope.alertList[0];
+			if(!$scope.alert) {
+				$.dialog({
+					title: "OPS",
+					content: "Alert '" + $wrapState.param.alertId + "' not found!"
+				});
+			}
+		});
 	});
 
 	// ======================================================================================
@@ -77,7 +102,7 @@
 			UI.deleteConfirm(item.name)(function (entity, closeFunc) {
 				Entity.deleteMetadata("policies/" + item.name)._promise.finally(function () {
 					closeFunc();
-					$scope.policyList._refresh();
+					updateList();
 				});
 			});
 		};

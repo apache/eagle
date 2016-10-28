@@ -58,7 +58,13 @@
 		});
 
 		Application.findProvider = function (type) {
-			return common.array.find(type, Application.providerList, ["type"]);
+			var provider = common.array.find(type, Application.providerList, ["type"]);
+			if(provider) return provider;
+
+			var app = common.array.find(type, Application.list, ["appId"]);
+			if(!app || !app.descriptor) return null;
+
+			return common.array.find(app.descriptor.type, Application.providerList, ["type"]);
 		};
 
 		Application.getPromise = function () {

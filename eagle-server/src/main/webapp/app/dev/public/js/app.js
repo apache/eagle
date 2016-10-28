@@ -155,6 +155,12 @@ var app = {};
 					resolve: routeResolve()
 				})
 
+				.state('alertDetail', {
+					url: "/alertDetail/{alertId}",
+					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
+					controller: "alertDetailCtrl",
+					resolve: routeResolve()
+				})
 				.state('policyDetail', {
 					url: "/policyDetail/{name}",
 					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
