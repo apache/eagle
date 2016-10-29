@@ -96,8 +96,8 @@
             <description>number of sink tasks</description>
         </property>
         <property>
-            <name>eagleProps.dataJoinPollIntervalSec</name>
-            <displayName>eagleProps.dataJoinPollIntervalSec</displayName>
+            <name>dataEnrich.dataJoinPollIntervalSec</name>
+            <displayName>Data Join Poll Interval Sec</displayName>
             <value>30</value>
             <description>interval in seconds for polling</description>
         </property>
@@ -155,6 +155,22 @@
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
+                <column>
+                    <name>sensitivityType</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>scope</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>user</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>request</name>
+                    <type>string</type>
+                </column>
                 <column>
                     <name>action</name>
                     <type>string</type>
