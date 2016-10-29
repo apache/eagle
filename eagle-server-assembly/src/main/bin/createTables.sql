@@ -39,3 +39,23 @@ CREATE TABLE IF NOT EXISTS sites (
   modifiedtime  bigint(20) DEFAULT NULL,
   UNIQUE (siteid)
 );
+
+CREATE TABLE IF NOT EXISTS hdfs_sensitivity_entity (
+  site varchar(20) DEFAULT NULL,
+  filedir varchar(100) DEFAULT NULL,
+  sensitivity_type varchar(20) DEFAULT NULL,
+  primary key (site, filedir)
+);
+
+CREATE TABLE IF NOT EXISTS ip_securityzone (
+  iphost varchar(100) DEFAULT NULL,
+  security_zone varchar(100) DEFAULT NULL,
+  primary key (iphost)
+);
+
+CREATE TABLE IF NOT EXISTS hbase_sensitivity_entity (
+  site varchar(20) DEFAULT NULL,
+  hbase_resource varchar(100) DEFAULT NULL,
+  sensitivity_type varchar(20) DEFAULT NULL,
+  primary key (site, hbase_resource)
+);

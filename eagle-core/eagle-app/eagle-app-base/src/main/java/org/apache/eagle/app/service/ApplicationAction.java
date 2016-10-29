@@ -88,45 +88,51 @@ public class ApplicationAction implements Serializable {
     }
 
     public void doInstall() {
-        if (metadata.getDescriptor().getStreams() != null) {
-            List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
-                StreamDefinition copied = streamDefinition.copy();
-                copied.setSiteId(metadata.getSite().getSiteId());
-                copied.setStreamId(StreamIdConversions.formatSiteStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
-                StreamSinkConfig streamSinkConfig = this.runtime.environment()
+        processStreams();
+    }
+
+    private void processStreams() {
+        if (metadata.getDescriptor().getStreams() == null) {
+            return;
+        }
+
+        List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
+            StreamDefinition copied = streamDefinition.copy();
+            copied.setSiteId(metadata.getSite().getSiteId());
+            copied.setStreamId(StreamIdConversions.formatSiteStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
+            StreamSinkConfig streamSinkConfig = this.runtime.environment()
                     .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
-                StreamDesc streamDesc = new StreamDesc();
-                streamDesc.setSchema(copied);
-                streamDesc.setSink(streamSinkConfig);
-                streamDesc.setStreamId(copied.getStreamId());
-                return streamDesc;
-            })).collect(Collectors.toList());
-            metadata.setStreams(streamDescToInstall);
+            StreamDesc streamDesc = new StreamDesc();
+            streamDesc.setSchema(copied);
+            streamDesc.setSink(streamSinkConfig);
+            streamDesc.setStreamId(copied.getStreamId());
+            return streamDesc;
+        })).collect(Collectors.toList());
+        metadata.setStreams(streamDescToInstall);
 
-            // TODO: Decouple converting from StreamSink to Alert DataSource
-            // iterate each stream descriptor and create alert datasource for each
-            for (StreamDesc streamDesc : streamDescToInstall) {
-                // only take care of Kafka sink
-                if (streamDesc.getSink() instanceof KafkaStreamSinkConfig) {
-                    KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSink();
-                    Kafka2TupleMetadata datasource = new Kafka2TupleMetadata();
-                    datasource.setType("KAFKA");
-                    datasource.setName(metadata.getAppId());
-                    datasource.setTopic(kafkaCfg.getTopicId());
-                    datasource.setSchemeCls(JsonScheme.class.getCanonicalName());
-                    Tuple2StreamMetadata tuple2Stream = new Tuple2StreamMetadata();
-                    Properties prop = new Properties();
-                    prop.put(JsonStringStreamNameSelector.USER_PROVIDED_STREAM_NAME_PROPERTY, streamDesc.getStreamId());
-                    tuple2Stream.setStreamNameSelectorProp(prop);
-                    tuple2Stream.setTimestampColumn("timestamp");
-                    tuple2Stream.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getCanonicalName());
-                    datasource.setCodec(tuple2Stream);
-                    alertMetadataService.addDataSource(datasource);
+        // TODO: Decouple converting from StreamSink to Alert DataSource
+        // iterate each stream descriptor and create alert datasource for each
+        for (StreamDesc streamDesc : streamDescToInstall) {
+            // only take care of Kafka sink
+            if (streamDesc.getSink() instanceof KafkaStreamSinkConfig) {
+                KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSink();
+                Kafka2TupleMetadata datasource = new Kafka2TupleMetadata();
+                datasource.setType("KAFKA");
+                datasource.setName(metadata.getAppId());
+                datasource.setTopic(kafkaCfg.getTopicId());
+                datasource.setSchemeCls(JsonScheme.class.getCanonicalName());
+                Tuple2StreamMetadata tuple2Stream = new Tuple2StreamMetadata();
+                Properties prop = new Properties();
+                prop.put(JsonStringStreamNameSelector.USER_PROVIDED_STREAM_NAME_PROPERTY, streamDesc.getStreamId());
+                tuple2Stream.setStreamNameSelectorProp(prop);
+                tuple2Stream.setTimestampColumn("timestamp");
+                tuple2Stream.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getCanonicalName());
+                datasource.setCodec(tuple2Stream);
+                alertMetadataService.addDataSource(datasource);
 
-                    StreamDefinition sd = streamDesc.getSchema();
-                    sd.setDataSource(metadata.getAppId());
-                    alertMetadataService.createStream(streamDesc.getSchema());
-                }
+                StreamDefinition sd = streamDesc.getSchema();
+                sd.setDataSource(metadata.getAppId());
+                alertMetadataService.createStream(streamDesc.getSchema());
             }
         }
     }
@@ -144,6 +150,9 @@ public class ApplicationAction implements Serializable {
     }
 
     public void doStart() {
+        if (metadata.getStreams() == null) {
+            processStreams();
+        }
         this.runtime.start(this.application, this.effectiveConfig);
     }
 
