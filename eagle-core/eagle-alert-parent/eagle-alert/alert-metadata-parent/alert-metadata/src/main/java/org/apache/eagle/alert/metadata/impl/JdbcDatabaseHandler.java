@@ -42,7 +42,7 @@ public class JdbcDatabaseHandler {
     private static final String DELETE_STATEMENT = "DELETE FROM %s WHERE id=?";
     private static final String UPDATE_STATEMENT = "UPDATE %s set value=? WHERE id=?";
     private static final String QUERY_ALL_STATEMENT = "SELECT value FROM %s";
-    private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=%s";
+    private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id='%s'";
     private static final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
     private static final String QUERY_ALL_STATEMENT_WITH_SIZE = "SELECT value FROM %s limit %s";
 
