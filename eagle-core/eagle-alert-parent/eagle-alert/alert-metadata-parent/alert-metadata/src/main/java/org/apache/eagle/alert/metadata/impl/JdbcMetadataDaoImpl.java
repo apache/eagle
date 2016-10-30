@@ -74,7 +74,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
-        return handler.listSubset(AlertPublishEvent.class, size);
+        if (size <= 0) {
+            return handler.list(AlertPublishEvent.class);
+        } else {
+            return handler.listSubset(AlertPublishEvent.class, size);
+        }
     }
 
     @Override

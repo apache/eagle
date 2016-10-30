@@ -95,34 +95,10 @@
             <description>number of sink tasks</description>
         </property>
         <property>
-            <name>eagleProps.dataJoinPollIntervalSec</name>
-            <displayName>eagleProps.dataJoinPollIntervalSec</displayName>
+            <name>dataEnrich.dataJoinPollIntervalSec</name>
+            <displayName>Data Join Poll Interval Sec</displayName>
             <value>30</value>
             <description>interval in seconds for polling</description>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.host</name>
-            <displayName>eagleProps.eagleService.host</displayName>
-            <value>localhost</value>
-            <description>eagle service host</description>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.port</name>
-            <displayName>eagleProps.eagleService.port</displayName>
-            <value>8080</value>
-            <description>eagle service port</description>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.username</name>
-            <displayName>eagleProps.eagleService.username</displayName>
-            <value>admin</value>
-            <description>eagle service username</description>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.password</name>
-            <displayName>eagleProps.eagleService.password</displayName>
-            <value>secret</value>
-            <description>eagle service password</description>
         </property>
         <property>
             <name>dataSinkConfig.topic</name>
