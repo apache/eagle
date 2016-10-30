@@ -38,7 +38,7 @@ public class ExternalDataJoiner {
 	private String taskId;
 	private Config config;
 
-	private static final String DATA_JOIN_POLL_INTERVALSEC = "dataJoinPollIntervalSec";
+	private static final String DATA_JOIN_POLL_INTERVALSEC = "dataEnrich.dataJoinPollIntervalSec";
 	private static final String QUARTZ_GROUP_NAME = "dataJoiner";
 
 	private final int defaultIntervalSeconds = 60;
@@ -77,8 +77,10 @@ public class ExternalDataJoiner {
 		     .build();
 
 		// for trigger
-		Object interval = jobDataMap.get(DATA_JOIN_POLL_INTERVALSEC);
-        int dataJoinPollIntervalSec = (interval == null ? defaultIntervalSeconds : Integer.parseInt(interval.toString()));
+        int dataJoinPollIntervalSec = defaultIntervalSeconds;
+        if (this.config.hasPath(DATA_JOIN_POLL_INTERVALSEC)) {
+            dataJoinPollIntervalSec = this.config.getInt(DATA_JOIN_POLL_INTERVALSEC);
+        }
 		Trigger trigger = TriggerBuilder.newTrigger()
 			  .withIdentity(jobId + ".trigger", group)
 		      .startNow()
