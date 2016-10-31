@@ -318,7 +318,10 @@
 
 			$.each(fields, function (i, field) {
 				// Fill default value
-				$scope.tmpApp.configuration[field.name] = field.value;
+				$scope.tmpApp.configuration[field.name] = common.template(field.value || "", {
+					siteId: $scope.site.siteId,
+					appType: application.type
+				});
 
 				// Reassign the fields
 				if(field.required) {
@@ -365,15 +368,29 @@
 		// ================================================================
 		// Start application
 		$scope.startApp = function (application) {
-			Entity.post("apps/start", { uuid: application.uuid })._then(function () {
-				refreshApplications();
+			$.dialog({
+				title: "Confirm",
+				content: "Do you want to start '" + application.descriptor.name + "'?",
+				confirm: true
+			}, function (ret) {
+				if(!ret) return;
+				Entity.post("apps/start", { uuid: application.uuid })._then(function () {
+					refreshApplications();
+				});
 			});
 		};
 
 		// Stop application
 		$scope.stopApp = function (application) {
-			Entity.post("apps/stop", { uuid: application.uuid })._then(function () {
-				refreshApplications();
+			$.dialog({
+				title: "Confirm",
+				content: "Do you want to stop '" + application.descriptor.name + "'?",
+				confirm: true
+			}, function (ret) {
+				if(!ret) return;
+				Entity.post("apps/stop", { uuid: application.uuid })._then(function () {
+					refreshApplications();
+				});
 			});
 		};
 
