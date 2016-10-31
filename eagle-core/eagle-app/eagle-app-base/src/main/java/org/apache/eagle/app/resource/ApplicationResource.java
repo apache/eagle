@@ -17,16 +17,29 @@
 package org.apache.eagle.app.resource;
 
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.app.Application;
+import org.apache.eagle.app.environment.Environment;
+import org.apache.eagle.app.environment.ExecutionRuntime;
+import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.StreamDesc;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 import org.apache.eagle.metadata.resource.RESTResponse;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import com.google.inject.Inject;
+import org.apache.eagle.metadata.utils.StreamIdConversions;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -35,15 +48,18 @@ public class ApplicationResource {
     private final ApplicationProviderService providerService;
     private final ApplicationManagementService applicationManagementService;
     private final ApplicationEntityService entityService;
+    private final Config config;
 
     @Inject
     public ApplicationResource(
         ApplicationProviderService providerService,
         ApplicationManagementService applicationManagementService,
-        ApplicationEntityService entityService) {
+        ApplicationEntityService entityService,
+        Config config) {
         this.providerService = providerService;
         this.applicationManagementService = applicationManagementService;
         this.entityService = entityService;
+        this.config = config;
     }
 
     @GET
@@ -75,11 +91,33 @@ public class ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Collection<ApplicationEntity>> getApplicationEntities(@QueryParam("siteId") String siteId) {
         return RESTResponse.async(() -> {
+            Collection<ApplicationEntity> entities;
             if (siteId == null) {
-                return entityService.findAll();
+                entities = entityService.findAll();
             } else {
-                return entityService.findBySiteId(siteId);
+                entities = entityService.findBySiteId(siteId);
             }
+            for (ApplicationEntity entity : entities) {
+                List<StreamDesc> streamDescToInstall = entity.getDescriptor().getStreams().stream().map((streamDefinition -> {
+                    StreamDefinition copied = streamDefinition.copy();
+                    copied.setSiteId(entity.getSite().getSiteId());
+                    copied.setStreamId(StreamIdConversions.formatSiteStreamId(entity.getSite().getSiteId(), copied.getStreamId()));
+                    Config effectiveConfig = ConfigFactory.parseMap(new HashMap<>(entity.getConfiguration()))
+                            .withFallback(config).withFallback(ConfigFactory.parseMap(entity.getContext()));
+
+                    ExecutionRuntime runtime = ExecutionRuntimeManager.getInstance().getRuntime(
+                            providerService.getApplicationProviderByType(entity.getDescriptor().getType()).getApplication().getEnvironmentType(), config);
+                    StreamSinkConfig streamSinkConfig = runtime.environment()
+                            .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
+                    StreamDesc streamDesc = new StreamDesc();
+                    streamDesc.setSchema(copied);
+                    streamDesc.setSink(streamSinkConfig);
+                    streamDesc.setStreamId(copied.getStreamId());
+                    return streamDesc;
+                })).collect(Collectors.toList());
+                entity.setStreams(streamDescToInstall);
+            }
+            return entities;
         }).get();
     }
 
