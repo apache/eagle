@@ -113,6 +113,7 @@ public class ApplicationResource {
                     streamDesc.setSchema(copied);
                     streamDesc.setSink(streamSinkConfig);
                     streamDesc.setStreamId(copied.getStreamId());
+                    streamDesc.getSchema().setDataSource(entity.getAppId());
                     return streamDesc;
                 })).collect(Collectors.toList());
                 entity.setStreams(streamDescToInstall);
