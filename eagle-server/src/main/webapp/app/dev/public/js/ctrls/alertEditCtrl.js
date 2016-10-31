@@ -172,20 +172,6 @@
 		// ==============================================================
 		// =                         Definition                         =
 		// ==============================================================
-		console.log(">>>", $element.find("#advPolicyDefinition"));
-		$timeout(function() {
-			var editor = ace.edit("advPolicyDefinition");
-			var session = editor.getSession();
-			editor.container.style.lineHeight = 1.5;
-			editor.setOptions({
-				fontSize: "14px"
-			});
-			editor.setTheme("ace/theme/tomorrow");
-			session.setUseWorker(false);
-			session.setUseWrapMode(true);
-			session.setMode("ace/mode/sql");
-		}, 100);
-
 		var checkPromise;
 		$scope.definitionMessage = "";
 		$scope.checkDefinition = function () {
