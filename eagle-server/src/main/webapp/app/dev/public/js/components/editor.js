@@ -29,6 +29,15 @@
 			link: function($scope, $element, $attrs, $ctrl) {
 				$element.innerHeight(21 * Number($attrs.rows || 10));
 
+				var updateId;
+				function updateScope(value) {
+					clearTimeout(updateId);
+
+					updateId = setTimeout(function () {
+						$ctrl.$setViewValue(value);
+					}, 0);
+				}
+
 				var editLock = false;
 
 				var editor = ace.edit($element[0]);
@@ -42,10 +51,9 @@
 				editor.getSession().on('change', function(event) {
 					editLock = true;
 
-					if(event.action === "remove") return;
-
 					var value = session.getValue();
-					$ctrl.$setViewValue(value);
+					updateScope(value);
+
 				});
 				session.setUseWorker(false);
 				session.setUseWrapMode(true);
