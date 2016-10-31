@@ -266,9 +266,9 @@ ul.stepGuide li > .title {
 	color: #666;
 }
 
-	/* ========================================================================
-     * =                                 Tab                                  =
-     * ======================================================================== */
+/* ========================================================================
+ * =                                 Tab                                  =
+ * ======================================================================== */
 .tab-content.keepContent > .tab-pane {
 	display: block;
 }
@@ -276,6 +276,15 @@ ul.stepGuide li > .title {
 .tab-content.keepContent > .tab-pane:not(.active) {
 	max-height: 0;
 	overflow: hidden;
+}
+
+.nav-tabs-custom .nav-tabs .tab-sm a {
+	padding-left: 8px;
+	padding-right: 8px;
+}
+.nav-tabs-custom .nav-tabs .tab-xs a {
+	padding-left: 0;
+	padding-right: 0;
 }
 
 /* ========================================================================

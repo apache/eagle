@@ -54,11 +54,11 @@
 		policyEditController.apply(this, newArgs);
 	}
 
-	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity) {
+	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
 		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
 	});
-	eagleControllers.controller('policyEditCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity) {
+	eagleControllers.controller('policyEditCtrl', function ($scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
 		PageConfig.title = "Edit Policy";
 		var args = arguments;
 
@@ -79,7 +79,7 @@
 		});
 	});
 
-	function policyEditController(policy, $scope, $q, $wrapState, $timeout, PageConfig, Entity) {
+	function policyEditController(policy, $scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
 		$scope.publisherTypes = publisherTypes;
 
 		$scope.policy = policy;
