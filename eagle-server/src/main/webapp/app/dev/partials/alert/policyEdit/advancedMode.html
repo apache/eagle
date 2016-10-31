@@ -108,7 +108,8 @@
 
 				<div class="form-group" ng-class="{'has-error': !!definitionMessage}">
 					<label>* Definition</label>
-					<textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()" ng-disabled="policyLock"></textarea>
+					<div editor ng-model="policy.definition.value" ng-change="checkDefinition()"></div>
+					<!--textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()" ng-disabled="policyLock"></textarea-->
 					<p class="text-danger">{{definitionMessage}}</p>
 				</div>
 
