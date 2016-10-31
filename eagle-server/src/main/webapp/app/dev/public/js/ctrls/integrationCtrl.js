@@ -318,7 +318,10 @@
 
 			$.each(fields, function (i, field) {
 				// Fill default value
-				$scope.tmpApp.configuration[field.name] = field.value;
+				$scope.tmpApp.configuration[field.name] = common.template(field.value || "", {
+					siteId: $scope.site.siteId,
+					appType: application.type
+				});
 
 				// Reassign the fields
 				if(field.required) {
