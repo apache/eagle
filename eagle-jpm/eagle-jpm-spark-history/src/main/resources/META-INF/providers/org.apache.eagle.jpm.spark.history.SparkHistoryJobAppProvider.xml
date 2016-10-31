@@ -18,179 +18,127 @@
 
 <application>
     <type>SPARK_HISTORY_JOB_APP</type>
-    <name>Spark History Job Monitoring</name>
+    <name>Spark History Job Monitor</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.jpm.spark.history.SparkHistoryJobApp</appClass>
     <configuration>
-        <!-- org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig -->
+        <!-- topology config -->
         <property>
-            <name>basic.cluster</name>
-            <displayName>cluster</displayName>
-            <description>Cluster Name</description>
-            <value>sandbox</value>
+            <name>workers</name>
+            <displayName>topology workers</displayName>
+            <description>topology workers</description>
+            <value>1</value>
         </property>
         <property>
-            <name>basic.dataCenter</name>
-            <displayName>dataCenter</displayName>
-            <description>Data Center</description>
-            <value>sandbox</value>
-        </property>
-        <property>
-            <name>basic.jobConf.additional.info</name>
-            <displayName>jobConf.additional.info</displayName>
-            <description>Additional info in Job Configs</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.zkQuorum</name>
-            <displayName>zkQuorum</displayName>
-            <description>Zookeeper Quorum</description>
-            <value>sandbox.hortonworks.com:2181</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.zkRoot</name>
-            <displayName>zkRoot</displayName>
-            <description>Zookeeper Root</description>
-            <value>/sparkHistoryJob</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.zkPort</name>
-            <displayName>zkPort</displayName>
-            <description>Zookeeper Port</description>
-            <value>2181</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.zkSessionTimeoutMs</name>
-            <displayName>zkSessionTimeoutMs</displayName>
-            <description>Zookeeper session timeoutMs</description>
-            <value>15000</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryTimes</name>
-            <displayName>zkRetryTimes</displayName>
-            <description>zookeeperConfig.zkRetryTimes</description>
-            <value>3</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryInterval</name>
-            <displayName>zkRetryInterval</displayName>
-            <description>zookeeperConfig.zkRetryInterval</description>
-            <value>20000</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.url</name>
-            <displayName>spark.history.server.url</displayName>
-            <description>Spark History Server URL</description>
-            <value>http://sandbox.hortonworks.com:18080</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.username</name>
-            <displayName>spark.history.server.username</displayName>
-            <description>Spark History Server Auth Username</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.password</name>
-            <displayName>spark.history.server.password</displayName>
-            <description>Spark History Server Auth Password</description>
-            <value></value>
-        </property>
-        <property>
-            <name>eagleProps.eagle.service.host</name>
-            <description>eagleProps.eagle.service.host</description>
-            <value>sandbox.hortonworks.com</value>
-        </property>
-        <property>
-            <name>eagleProps.eagle.service.port</name>
-            <description>eagleProps.eagle.service.port</description>
-            <value>9099</value>
-        </property>
-        <property>
-            <name>eagleProps.eagle.service.username</name>
-            <description>eagleProps.eagle.service.username</description>
-            <value>admin</value>
-        </property>
-        <property>
-            <name>eagleProps.eagle.service.password</name>
-            <description>eagleProps.eagle.service.password</description>
-            <value>secret</value>
-        </property>
-        <property>
-            <name>eagleProps.eagle.service.basePath</name>
-            <description>eagleProps.eagle.service.basePath</description>
-            <value>/rest</value>
-        </property>
-        <property>
-            <name>eagleProps.eagle.service.read.timeout</name>
-            <displayName>eagleProps.eagle.service.read.timeout</displayName>
-            <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
-            <value>2</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.maxFlushNum</name>
-            <displayName>eagleProps.eagleService.maxFlushNum</displayName>
-            <value>500</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.eventLog</name>
-            <displayName>dataSourceConfig.hdfs.eventLog</displayName>
-            <value>/spark-history</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.endpoint</name>
-            <displayName>dataSourceConfig.hdfs.endpoint</displayName>
-            <value>hdfs://sandbox.hortonworks.com:8020</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.keytab</name>
-            <displayName>dataSourceConfig.hdfs.keytab</displayName>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.principal</name>
-            <displayName>dataSourceConfig.hdfs.principal</displayName>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.rmUrl</name>
-            <displayName>dataSourceConfig.rmUrl</displayName>
-            <value>http://sandbox.hortonworks.com:8088</value>
-        </property>
-        <property>
-            <name>storm.pendingSpout</name>
-            <displayName>pendingSpout</displayName>
-            <value>1000</value>
-        </property>
-        <property>
-            <name>storm.spoutCrawlInterval</name>
-            <displayName>spoutCrawlInterval</displayName>
-            <description>Spout crawl interval (in milliseconds)</description>
-            <value>10000</value>
-        </property>
-        <property>
-            <name>storm.parallelismConfig.sparkHistoryJobFetchSpout</name>
-            <displayName>parallelismConfig.sparkHistoryJobFetchSpout</displayName>
+            <name>topology.numOfSpoutExecutors</name>
+            <displayName>spout executors</displayName>
             <description>Parallelism of sparkHistoryJobFetchSpout </description>
             <value>1</value>
         </property>
         <property>
-            <name>storm.tasks.sparkHistoryJobFetchSpout</name>
-            <displayName>tasks.sparkHistoryJobFetchSpout</displayName>
+            <name>topology.numOfSpoutTasks</name>
+            <displayName>spout tasks</displayName>
             <description>Tasks Num of sparkHistoryJobFetchSpout </description>
             <value>4</value>
         </property>
         <property>
-            <name>storm.parallelismConfig.sparkHistoryJobParseBolt</name>
-            <displayName>parallelismConfig.sparkHistoryJobParseBolt</displayName>
+            <name>topology.numOfParseBoltExecutors</name>
+            <displayName>parser bolt parallelism hint</displayName>
             <description>Parallelism of sparkHistoryJobParseBolt </description>
             <value>1</value>
         </property>
         <property>
-            <name>storm.tasks.sparkHistoryJobParseBolt</name>
-            <displayName>parallelismConfig.sparkHistoryJobParseBolt</displayName>
+            <name>topology.numOfParserBoltTasks</name>
+            <displayName>parser bolt tasks</displayName>
             <description>Tasks Num of sparkHistoryJobParseBolt</description>
             <value>4</value>
         </property>
+        <property>
+            <name>topology.spoutCrawlInterval</name>
+            <displayName>spout crawl interval</displayName>
+            <description>Spout crawl interval (in milliseconds)</description>
+            <value>10000</value>
+        </property>
+        <property>
+            <name>topology.message.timeout.secs</name>
+            <displayName>topology message timeout (secs)</displayName>
+            <description>default timeout is 30s</description>
+            <value>300</value>
+        </property>
+        <!-- zookeeper config -->
+        <property>
+            <name>zkStateConfig.zkQuorum</name>
+            <displayName>zookeeper quorum list</displayName>
+            <description>zookeeper to store topology metadata</description>
+            <value>sandbox.hortonworks.com:2181</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkRoot</name>
+            <displayName>zookeeper root for topology metadata</displayName>
+            <description>Zookeeper Root</description>
+            <value>/sparkHistoryJob</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkSessionTimeoutMs</name>
+            <displayName>zookeeper session timeout (ms)</displayName>
+            <description>Zookeeper session timeoutMs</description>
+            <value>15000</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkRetryTimes</name>
+            <displayName>zookeeper connection retry times</displayName>
+            <description>retry times for zookeeper connection</description>
+            <value>3</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkRetryInterval</name>
+            <displayName>zookeeper connection retry interval</displayName>
+            <description>retry interval for zookeeper connection</description>
+            <value>20000</value>
+        </property>
+
+        <!-- datasource config -->
+        <property>
+            <name>dataSourceConfig.spark.history.server.url</name>
+            <displayName>spark.history.server.url</displayName>
+            <description>spark history server URL</description>
+            <value>http://sandbox.hortonworks.com:18080</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.spark.history.server.username</name>
+            <displayName>user name for spark history server</displayName>
+            <description>spark history server auth username</description>
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.spark.history.server.password</name>
+            <displayName>user password for spark history server</displayName>
+            <description>spark history server auth password</description>
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.rm.url</name>
+            <displayName>resource manager url</displayName>
+            <description>url to fetch finished spark job list</description>
+            <value>http://sandbox.hortonworks.com:8088</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.hdfs.fs.defaultFS</name>
+            <displayName>hdfs url</displayName>
+            <description>target hdfs to crawl log data</description>
+            <value>hdfs://sandbox.hortonworks.com:8020</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.baseDir</name>
+            <displayName>hdfs base path for spark job data</displayName>
+            <description>hdfs base path for spark job data</description>
+            <value>/spark-history</value>
+            <required>true</required>
+        </property>
+
         <property>
             <name>spark.defaultVal.spark.executor.memory</name>
             <displayName>spark.executor.memory</displayName>

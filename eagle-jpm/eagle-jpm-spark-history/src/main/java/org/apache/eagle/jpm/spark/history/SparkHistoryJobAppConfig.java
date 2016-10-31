@@ -33,7 +33,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
 
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
-    public BasicInfo info;
     public EagleInfo eagleInfo;
     public StormConfig stormConfig;
 
@@ -49,7 +48,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryConfig = new JobHistoryEndpointConfig();
         this.jobHistoryConfig.hdfs = new HashMap<>();
-        this.info = new BasicInfo();
         this.eagleInfo = new EagleInfo();
         this.stormConfig = new StormConfig();
     }
@@ -77,21 +75,25 @@ public class SparkHistoryJobAppConfig implements Serializable {
             this.jobHistoryConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
         }
 
-        info.site = config.getString("basic.cluster") + "-" + config.getString("basic.dataCenter");
-        info.jobConf = config.getString("basic.jobConf.additional.info").split(",\\s*");
-
-        this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
-        this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
-        this.eagleInfo.username = config.getString("eagleProps.eagle.service.username");
-        this.eagleInfo.password = config.getString("eagleProps.eagle.service.password");
-        this.eagleInfo.timeout = config.getInt("eagleProps.eagle.service.read.timeout");
+        this.eagleInfo.host = config.getString("service.host");
+        this.eagleInfo.port = config.getInt("service.port");
+        this.eagleInfo.username = config.getString("service.username");
+        this.eagleInfo.password = config.getString("service.password");
+        this.eagleInfo.timeout = 2;
+        if (config.hasPath("service.read.timeout")) {
+            this.eagleInfo.timeout = config.getInt("service.read.timeout");
+        }
         this.eagleInfo.basePath = EagleServiceBaseClient.DEFAULT_BASE_PATH;
-        if (config.hasPath("eagleProps.eagle.service.basePath")) {
-            this.eagleInfo.basePath = config.getString("eagleProps.eagle.service.basePath");
+        if (config.hasPath("service.basePath")) {
+            this.eagleInfo.basePath = config.getString("service.basePath");
         }
 
-        this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
-        this.stormConfig.spoutCrawlInterval = config.getInt("storm.spoutCrawlInterval");
+        this.stormConfig.siteId = config.getString("siteId");
+        this.stormConfig.spoutCrawlInterval = config.getInt("topology.spoutCrawlInterval");
+        this.stormConfig.numOfSpoutExecutors = config.getInt("topology.numOfSpoutExecutors");
+        this.stormConfig.numOfSpoutTasks = config.getInt("topology.numOfSpoutTasks");
+        this.stormConfig.numOfParserBoltExecutors = config.getInt("topology.numOfParseBoltExecutors");
+        this.stormConfig.numOfParserBoltTasks = config.getInt("topology.numOfParserBoltTasks");
     }
 
     public static class ZKStateConfig implements Serializable {
@@ -111,14 +113,13 @@ public class SparkHistoryJobAppConfig implements Serializable {
         public Map<String, String> hdfs;
     }
 
-    public static class BasicInfo implements Serializable {
-        public String site;
-        public String[] jobConf;
-    }
-
     public static class StormConfig implements Serializable {
-        public int spoutPending;
+        public String siteId;
         public int spoutCrawlInterval;
+        public int numOfSpoutExecutors;
+        public int numOfSpoutTasks;
+        public int numOfParserBoltExecutors;
+        public int numOfParserBoltTasks;
     }
 
     public static class EagleInfo implements Serializable {

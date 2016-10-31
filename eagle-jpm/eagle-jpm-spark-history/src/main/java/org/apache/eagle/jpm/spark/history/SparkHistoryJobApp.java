@@ -36,18 +36,17 @@ public class SparkHistoryJobApp extends StormApplication {
 
         // 2. Config topology.
         TopologyBuilder topologyBuilder = new TopologyBuilder();
-        config = sparkHistoryJobAppConfig.getConfig();
+
         topologyBuilder.setSpout(
                 jobFetchSpoutName,
-                new SparkHistoryJobSpout(sparkHistoryJobAppConfig),
-                config.getInt("storm.parallelismConfig." + jobFetchSpoutName)
-        ).setNumTasks(config.getInt("storm.tasks." + jobFetchSpoutName));
+                new SparkHistoryJobSpout(sparkHistoryJobAppConfig), sparkHistoryJobAppConfig.stormConfig.numOfSpoutExecutors
+        ).setNumTasks(sparkHistoryJobAppConfig.stormConfig.numOfSpoutTasks);
 
         topologyBuilder.setBolt(
                 jobParseBoltName,
                 new SparkHistoryJobParseBolt(sparkHistoryJobAppConfig),
-                config.getInt("storm.parallelismConfig." + jobParseBoltName)
-        ).setNumTasks(config.getInt("storm.tasks." + jobParseBoltName)).shuffleGrouping(jobFetchSpoutName);
+                sparkHistoryJobAppConfig.stormConfig.numOfParserBoltExecutors
+        ).setNumTasks(sparkHistoryJobAppConfig.stormConfig.numOfParserBoltTasks).shuffleGrouping(jobFetchSpoutName);
 
         return topologyBuilder.createTopology();
     }
