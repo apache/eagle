@@ -72,6 +72,11 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
         LOG.info("init called for client");
     }
 
+    @Override
+    public void activateFetchMetaData() throws Exception {
+        this.onNewConfig(consumer.getConfigValue());
+    }
+
     private String getMetadataTopicSuffix() {
         switch (type) {
             case ALERT_BOLT:

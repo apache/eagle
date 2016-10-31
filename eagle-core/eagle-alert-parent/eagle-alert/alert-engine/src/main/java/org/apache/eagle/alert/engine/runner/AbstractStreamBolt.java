@@ -82,6 +82,11 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
         this.collector = collector;
         this.serializer = Serializers.newPartitionedEventSerializer(this);
         internalPrepare(collector, this.changeNotifyService, this.config, context);
+        try {
+            this.changeNotifyService.activateFetchMetaData();
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+        }
     }
 
 
