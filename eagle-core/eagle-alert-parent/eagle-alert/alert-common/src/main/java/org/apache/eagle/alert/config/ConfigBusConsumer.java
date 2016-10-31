@@ -31,6 +31,7 @@ public class ConfigBusConsumer extends ConfigBusBase {
 
     private NodeCache cache;
     private String zkPath;
+    public static final ObjectMapper mapper = new ObjectMapper();
 
     public ConfigBusConsumer(ZKConfig config, String topic, ConfigChangeCallback callback) {
         super(config);
@@ -53,7 +54,6 @@ public class ConfigBusConsumer extends ConfigBusBase {
 
     public ConfigValue getConfigValue() throws Exception {
         byte[] value = curator.getData().forPath(zkPath);
-        ObjectMapper mapper = new ObjectMapper();
         ConfigValue v = mapper.readValue(value, ConfigValue.class);
         return v;
     }
