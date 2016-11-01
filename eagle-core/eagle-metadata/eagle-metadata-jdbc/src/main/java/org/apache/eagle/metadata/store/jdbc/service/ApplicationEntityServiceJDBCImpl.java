@@ -18,15 +18,23 @@
 package org.apache.eagle.metadata.store.jdbc.service;
 
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.app.environment.ExecutionRuntime;
+import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.StreamDesc;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.store.jdbc.JDBCMetadataQueryService;
 import org.apache.eagle.metadata.store.jdbc.service.orm.ApplicationEntityToRelation;
 import org.apache.eagle.metadata.store.jdbc.service.orm.RelationToApplicationEntity;
 
 import com.google.inject.Singleton;
+import org.apache.eagle.metadata.utils.StreamIdConversions;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +42,9 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -55,6 +65,8 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
     JDBCMetadataQueryService queryService;
     @Inject
     ApplicationProviderService applicationProviderService;
+    @Inject
+    Config config;
 
     @Override
     public Collection<ApplicationEntity> findBySiteId(String siteId) {
@@ -187,6 +199,28 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
     private void fillApplicationDesc(List<ApplicationEntity> entities) {
         for (ApplicationEntity entity : entities) {
             entity.setDescriptor(applicationProviderService.getApplicationDescByType(entity.getDescriptor().getType()));
+            if (entity.getDescriptor().getStreams() == null) {
+                continue;
+            }
+            List<StreamDesc> streamDescToInstall = entity.getDescriptor().getStreams().stream().map((streamDefinition -> {
+                StreamDefinition copied = streamDefinition.copy();
+                copied.setSiteId(entity.getSite().getSiteId());
+                copied.setStreamId(StreamIdConversions.formatSiteStreamId(entity.getSite().getSiteId(), copied.getStreamId()));
+                Config effectiveConfig = ConfigFactory.parseMap(new HashMap<>(entity.getConfiguration()))
+                        .withFallback(config).withFallback(ConfigFactory.parseMap(entity.getContext()));
+
+                ExecutionRuntime runtime = ExecutionRuntimeManager.getInstance().getRuntime(
+                        applicationProviderService.getApplicationProviderByType(entity.getDescriptor().getType()).getApplication().getEnvironmentType(), config);
+                StreamSinkConfig streamSinkConfig = runtime.environment()
+                        .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
+                StreamDesc streamDesc = new StreamDesc();
+                streamDesc.setSchema(copied);
+                streamDesc.setSink(streamSinkConfig);
+                streamDesc.setStreamId(copied.getStreamId());
+                streamDesc.getSchema().setDataSource(entity.getAppId());
+                return streamDesc;
+            })).collect(Collectors.toList());
+            entity.setStreams(streamDescToInstall);
         }
     }
 
