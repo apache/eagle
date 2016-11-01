@@ -51,7 +51,7 @@ public class JobHistoryZKStateManager {
     }
 
     public JobHistoryZKStateManager(SparkHistoryJobAppConfig config) {
-        this.zkRoot = config.zkStateConfig.zkRoot + "/" + config.info.site;
+        this.zkRoot = config.zkStateConfig.zkRoot + "/" + config.stormConfig.siteId;
 
         try {
             curator = newCurator(config);
