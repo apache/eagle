@@ -62,16 +62,14 @@ public class HealthCheckParseBolt extends BaseRichBolt {
             Map<String, Object> map = new TreeMap<>();
             map.put("status", result.getStatus());
             map.put("timestamp", result.getTimeStamp());
-            map.put("tag", result.getTag());
+            map.put("role", result.getRole());
+            map.put("host", result.getHost());
+            map.put("site", result.getSite());
 
             if(LOG.isDebugEnabled()){
                 LOG.debug("emitted " + map);
-            }
-
-            // push to Kafka sink
-            ObjectMapper mapper = new ObjectMapper();
-            String msg = mapper.writeValueAsString(map);
-            collector.emit(Arrays.asList(result.getTag(), msg));
+            }      
+            collector.emit(Arrays.asList(result.getHost(), map));
         }catch(Exception ex){
             LOG.error("Failing parse security log message, and ignore this message", ex);
         }finally {

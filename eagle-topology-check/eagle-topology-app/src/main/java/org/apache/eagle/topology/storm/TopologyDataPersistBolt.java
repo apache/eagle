@@ -18,6 +18,10 @@
 
 package org.apache.eagle.topology.storm;
 
+import static org.apache.eagle.topology.TopologyConstants.HOSTNAME_TAG;
+import static org.apache.eagle.topology.TopologyConstants.RACK_TAG;
+import static org.apache.eagle.topology.TopologyConstants.ROLE_TAG;
+import static org.apache.eagle.topology.TopologyConstants.SITE_TAG;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -25,6 +29,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+
 
 
 
@@ -42,9 +47,9 @@ import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
 import org.apache.eagle.topology.entity.HealthCheckParseAPIEntity;
 import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
 import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
-import org.apache.eagle.topology.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -193,8 +198,10 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 	   		 }	  
 	   		 
 	   		healthCheckAPIEntity.setTimeStamp(topologyBaseAPIEntity.getTimestamp());
-	   		healthCheckAPIEntity.setTag(StringUtils.convertMapToString(topologyBaseAPIEntity.getTags()));
-	   		healthCheckParseAPIList.add(healthCheckAPIEntity);
+	   		healthCheckAPIEntity.setHost(topologyBaseAPIEntity.getTags().get(HOSTNAME_TAG));
+	   		healthCheckAPIEntity.setRole(topologyBaseAPIEntity.getTags().get(ROLE_TAG));
+	   		healthCheckAPIEntity.setSite(topologyBaseAPIEntity.getTags().get(SITE_TAG));
+	   		healthCheckParseAPIList.add(healthCheckAPIEntity);	 
     	}
     }
 }

@@ -20,7 +20,12 @@ package org.apache.eagle.topology;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
+
+import com.microsoft.azure.storage.core.Logger;
 import com.typesafe.config.Config;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
@@ -36,6 +41,7 @@ public class TopologyCheckApp extends StormApplication {
 	
 	private static final String SINK_TASK_NUM = "topology.numOfSinkTasks";
 	private static final String TOPOLOGY_HEALTH_CHECK_STREAM = "topology_health_check_stream";
+	Log logger = LogFactory.getLog(TopologyCheckApp.class);
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
@@ -64,9 +70,10 @@ public class TopologyCheckApp extends StormApplication {
     		new HealthCheckParseBolt(),
     		topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(persistBoltName);      
         
+        logger.info("start to sink messsage to kafka");
         StormStreamSink<?> sinkBolt = environment.getStreamSink(TOPOLOGY_HEALTH_CHECK_STREAM,config);
-        topologyBuilder.setBolt(kafkaSinkBoltName, sinkBolt, numOfSinkTasks).setNumTasks(numOfSinkTasks);
-        
+        topologyBuilder.setBolt(kafkaSinkBoltName, sinkBolt, numOfSinkTasks).setNumTasks(numOfSinkTasks).shuffleGrouping(parseBoltName);
+
         return topologyBuilder.createTopology();
     }
 }

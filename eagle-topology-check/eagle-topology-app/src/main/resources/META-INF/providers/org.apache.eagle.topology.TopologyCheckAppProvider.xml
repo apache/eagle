@@ -22,13 +22,13 @@
     <name>Topology Health Check</name>
     <version>0.5.0-incubating</version>
     <configuration>
-        <!-- org.apache.eagle.topology.TopologyCheckApp -->
+        <!-- org.apache.eagle.topology.TopologyCheckApp -->   
         <property>
             <name>dataExtractorConfig.site</name>
             <displayName>site</displayName>
             <description>Site</description>
             <value>sandbox</value>
-        </property>
+        </property>  
         <property>
             <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
             <displayName>FetchDataIntervalInSecs</displayName>
@@ -52,7 +52,15 @@
             <displayName>numEntityPersistBolt</displayName>
             <description>Bolt Task Number</description>
             <value>1</value>
-        </property>    
+        </property> 
+        
+        <property>
+            <name>dataExtractorConfig.rackResolverCls</name>
+            <displayName>rackResolverCls</displayName>
+            <description>rack resolver class</description>
+            <value>org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver</value>
+        </property>     
+      
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>zkQuorum</displayName>
@@ -89,28 +97,36 @@
             <description>Hbase Master Principal</description>
             <value>hadoop/_HOST@EXAMPLE.COM</value>
         </property>
-
+        
+        <property>
+            <name>dataSourceConfig.hbase.kerberos.eagle.principal</name>
+            <displayName>hbaseEaglePrincipal</displayName>
+            <description>Hbase eagle Principal</description>
+            <value></value>
+        </property>
+        
         <property>
             <name>dataSourceConfig.hdfs.namenodeUrl</name>
             <displayName>hdfsNamenodeUrl</displayName>
             <description>Hdfs Namenode Web URL</description>
             <value>http://sandbox.hortonworks.com:50070</value>
+            <required>true</required>
         </property>
-
         <property>
             <name>dataSourceConfig.mr.rmUrl</name>
             <displayName>resourceManagerUrl</displayName>
             <description>Resource Manager URL</description>
             <value>http://sandbox.hortonworks.com:8088</value>
+            <required>true</required>
         </property>
 
         <property>
             <name>dataSourceConfig.mr.historyServerUrl</name>
             <displayName>historyServerUrl</displayName>
-            <description>History Server URL</description>
-            <value></value>
-        </property>
-
+            <description>History Server URL</description>            
+            <value></value>  
+        </property> 
+        
         <property>
             <name>eagleProps.eagleService.host</name>
             <description>eagleProps.eagleService.host</description>
@@ -135,19 +151,47 @@
             <name>eagleProps.eagleService.basePath</name>
             <description>eagleProps.eagleService.basePath</description>
             <value>/rest</value>
-        </property>
+        </property>               
         <property>
             <name>eagleProps.eagleService.readTimeOutSeconds</name>
             <displayName>eagleProps.eagleService.readTimeOutSeconds</displayName>
             <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
             <value>2</value>
         </property>
+        
         <property>
             <name>topology.numOfSinkTasks</name>
             <displayName>topology.numOfSinkTasks</displayName>
             <value>2</value>
             <description>number of sink tasks</description>
         </property>
+        
+        <!-- data sink configurations -->
+        <property>
+            <name>dataSinkConfig.topic</name>
+            <displayName>dataSinkConfig.topic</displayName>
+            <value>topology_health_check</value>
+            <description>topic for kafka data sink</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.brokerList</name>
+            <displayName>dataSinkConfig.brokerList</displayName>
+            <value>server.eagle.apache.org:9092</value>
+            <description>kafka broker list</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.serializerClass</name>
+            <displayName>dataSinkConfig.serializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message value</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.keySerializerClass</name>
+            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message key</description>
+        </property>
+        
     </configuration>
     <streams>
         <stream>
@@ -165,9 +209,17 @@
                     <type>long</type>
                 </column>
                 <column>
-                    <name>tag</name>
+                    <name>host</name>
                     <type>string</type>
-                </column>             
+                </column> 
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>role</name>
+                    <type>string</type>
+                </column>            
             </columns>
         </stream>
     </streams>
