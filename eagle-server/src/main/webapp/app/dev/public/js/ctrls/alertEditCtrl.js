@@ -326,6 +326,7 @@
 			if(!$scope.policy.parallelismHint) return false;
 			if(!$scope.policy.definition.value) return false;
 			if(!$scope.policy.outputStreams.length) return false;
+			if(!$scope.policyPublisherList.length) return false;
 			return true;
 		};
 
