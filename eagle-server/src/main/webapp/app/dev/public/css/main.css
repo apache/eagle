@@ -437,3 +437,7 @@ ul > li > p.offset {
 .bsc-datepicker {
 	z-index: 2000;
 }
+
+.with-padding {
+	padding: 15px;
+}
