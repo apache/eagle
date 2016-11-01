@@ -73,12 +73,6 @@
             <value>sandbox.hortonworks.com:2181</value>
         </property>
         <property>
-            <name>zkStateConfig.zkRoot</name>
-            <displayName>zookeeper root for topology metadata</displayName>
-            <description>Zookeeper Root</description>
-            <value>/sparkHistoryJob</value>
-        </property>
-        <property>
             <name>zkStateConfig.zkSessionTimeoutMs</name>
             <displayName>zookeeper session timeout (ms)</displayName>
             <description>Zookeeper session timeoutMs</description>
@@ -98,25 +92,6 @@
         </property>
 
         <!-- datasource config -->
-        <property>
-            <name>dataSourceConfig.spark.history.server.url</name>
-            <displayName>spark history server url</displayName>
-            <description>spark history server URL</description>
-            <value>http://sandbox.hortonworks.com:18080</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.username</name>
-            <displayName>user name for spark history server</displayName>
-            <description>spark history server auth username</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.password</name>
-            <displayName>user password for spark history server</displayName>
-            <description>spark history server auth password</description>
-            <value></value>
-        </property>
         <property>
             <name>dataSourceConfig.rm.url</name>
             <displayName>resource manager url</displayName>
