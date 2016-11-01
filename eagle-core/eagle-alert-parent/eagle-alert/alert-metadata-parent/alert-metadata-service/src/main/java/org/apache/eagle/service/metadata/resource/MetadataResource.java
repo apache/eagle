@@ -249,7 +249,7 @@ public class MetadataResource {
     @POST
     public OpResult addPublishmentsToPolicy(@PathParam("policyId") String policyId, List<String> publishmentIds) {
         OpResult result = new OpResult();
-        if (publishmentIds.size() == 0) {
+        if (publishmentIds == null || publishmentIds.size() == 0) {
             result.code = OpResult.FAILURE;
             result.message = "Failed to add policy, there is no publisher in it";
             return result;
