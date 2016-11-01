@@ -70,51 +70,52 @@
         </property>
         <property>
             <name>dataSinkConfig.topic</name>
-            <displayName>dataSinkConfig.topic</displayName>
-            <value>map_reduce_failed_job</value>
-            <description>topic for kafka data sink</description>
+            <displayName>Destination(Kafka Topic) Of Stream Data</displayName>
+            <value>sandbox_map_reduce_failed_job</value>
+            <description>application emits stream data to this kafka topic</description>
+            <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.brokerList</name>
-            <displayName>dataSinkConfig.brokerList</displayName>
+            <displayName>Broker(Kafka) List Of Stream Data</displayName>
             <value>localhost:6667</value>
-            <description>kafka broker list</description>
+            <description>kafka broker list for stream data</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.serializerClass</name>
-            <displayName>dataSinkConfig.serializerClass</displayName>
+            <displayName>Serializer Class For Kafka Message Value</displayName>
             <value>kafka.serializer.StringEncoder</value>
             <description>serializer class Kafka message value</description>
         </property>
         <property>
             <name>dataSinkConfig.keySerializerClass</name>
-            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <displayName>Serializer Class For Kafka Message Key</displayName>
             <value>kafka.serializer.StringEncoder</value>
             <description>serializer class Kafka message key</description>
         </property>
 
         <property>
             <name>dataSinkConfig.producerType</name>
-            <displayName>dataSinkConfig.producerType</displayName>
+            <displayName>Producer Type Of Stream Data</displayName>
             <value>async</value>
             <description>whether the messages are sent asynchronously in a background thread</description>
         </property>
         <property>
             <name>dataSinkConfig.numBatchMessages</name>
-            <displayName>dataSinkConfig.numBatchMessages</displayName>
+            <displayName>Number Of Message Sent In One Batch</displayName>
             <value>4096</value>
             <description>number of messages to send in one batch when using async mode</description>
         </property>
         <property>
             <name>dataSinkConfig.maxQueueBufferMs</name>
-            <displayName>dataSinkConfig.maxQueueBufferMs</displayName>
+            <displayName>Maximum Time To Buffer Data</displayName>
             <value>5000</value>
             <description>maximum time to buffer data when using async mode</description>
         </property>
         <property>
             <name>dataSinkConfig.requestRequiredAcks</name>
-            <displayName>dataSinkConfig.requestRequiredAcks</displayName>
+            <displayName>Requires Ack For Stream Data</displayName>
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
         </property>
