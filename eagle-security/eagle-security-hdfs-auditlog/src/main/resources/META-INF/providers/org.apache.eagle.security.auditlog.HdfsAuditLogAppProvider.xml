@@ -21,44 +21,44 @@
   -->
 
 <application>
-    <type>HdfsAuditLogApplication</type>
+    <type>HDFS_AUDIT_LOG_MONITOR_APP</type>
     <name>Hdfs Audit Log Monitor</name>
     <version>0.5.0-incubating</version>
     <configuration>
         <!-- topology related configurations -->
         <property>
             <name>workers</name>
-            <displayName>workers</displayName>
+            <displayName>storm workers</displayName>
             <value>1</value>
             <description>number of topology workers</description>
         </property>
         <property>
             <name>topology.numOfSpoutTasks</name>
-            <displayName>topology.numOfSpoutTasks</displayName>
+            <displayName>Topology Spout Tasks</displayName>
             <value>2</value>
             <description>number of spout tasks</description>
         </property>
         <property>
             <name>topology.numOfParserTasks</name>
-            <displayName>topology.numOfParserTasks</displayName>
+            <displayName>Topology Parser Tasks</displayName>
             <value>2</value>
             <description>number of parser tasks</description>
         </property>
         <property>
             <name>topology.numOfSensitivityJoinTasks</name>
-            <displayName>topology.numOfSensitivityJoinTasks</displayName>
+            <displayName>Topology Sensitivity JoinTasks</displayName>
             <value>2</value>
             <description>number of sensitivity join tasks</description>
         </property>
         <property>
             <name>topology.numOfIPZoneJoinTasks</name>
-            <displayName>topology.numOfIPZoneJoinTasks</displayName>
+            <displayName>Topology IPZone JoinTasks</displayName>
             <value>2</value>
             <description>number of ip zone join tasks</description>
         </property>
         <property>
             <name>topology.numOfSinkTasks</name>
-            <displayName>topology.numOfSinkTasks</displayName>
+            <displayName>Topology Sink Tasks</displayName>
             <value>2</value>
             <description>number of sink tasks</description>
         </property>
@@ -66,110 +66,81 @@
         <!-- data source configurations -->
         <property>
             <name>dataSourceConfig.topic</name>
-            <displayName>dataSourceConfig.topic</displayName>
+            <displayName>Kafka Topic for Data Consumption</displayName>
             <value>hdfs_audit_log</value>
-            <description>data source topic</description>
+            <description>kafka topic for data consumption</description>
         </property>
         <property>
             <name>dataSourceConfig.zkConnection</name>
-            <displayName>dataSourceConfig.zkConnection</displayName>
-            <value>localhost</value>
-            <description>zk connection</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.txZkServers</name>
-            <displayName>dataSourceConfig.txZkServers</displayName>
+            <displayName>Kafka Zookeeper Connection</displayName>
             <value>localhost:2181</value>
-            <description>zookeeper server for offset transaction</description>
+            <description>kafka broker zk connection</description>
+            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.schemeCls</name>
-            <displayName>dataSourceConfig.schemeCls</displayName>
+            <displayName>Kafka Consumer SchemeCls</displayName>
             <value>storm.kafka.StringScheme</value>
             <description>scheme class</description>
+            <required>true</required>
         </property>
 
         <!-- data enrich configurations -->
         <property>
             <name>dataEnrich.dataJoinPollIntervalSec</name>
-            <displayName>eagleProps.dataJoinPollIntervalSec</displayName>
+            <displayName>Data Join Poll Interval Sec</displayName>
             <value>30</value>
             <description>interval in seconds for polling</description>
-        </property>
-
-        <!-- eagle service configurations -->
-        <property>
-            <name>eagleService.host</name>
-            <displayName>eagleService.host</displayName>
-            <value>localhost</value>
-            <description>eagle service host</description>
-        </property>
-        <property>
-            <name>eagleService.port</name>
-            <displayName>eagleService.port</displayName>
-            <value>9090</value>
-            <description>eagle service port</description>
-        </property>
-        <property>
-            <name>eagleService.username</name>
-            <displayName>eagleService.username</displayName>
-            <value>admin</value>
-            <description>eagle service username</description>
-        </property>
-        <property>
-            <name>eagleService.password</name>
-            <displayName>eagleService.password</displayName>
-            <value>secret</value>
-            <description>eagle service password</description>
         </property>
 
         <!-- data sink configurations -->
         <property>
             <name>dataSinkConfig.topic</name>
-            <displayName>dataSinkConfig.topic</displayName>
+            <displayName>Kafka Topic for Parsed Data Sink</displayName>
             <value>hdfs_audit_log_enriched</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
             <name>dataSinkConfig.brokerList</name>
-            <displayName>dataSinkConfig.brokerList</displayName>
+            <displayName>Kafka BrokerList for Data Sink</displayName>
             <value>localhost:6667</value>
             <description>kafka broker list</description>
+            <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.serializerClass</name>
-            <displayName>dataSinkConfig.serializerClass</displayName>
+            <displayName>Kafka Producer SerializerClass</displayName>
             <value>kafka.serializer.StringEncoder</value>
             <description>serializer class Kafka message value</description>
         </property>
         <property>
             <name>dataSinkConfig.keySerializerClass</name>
-            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <displayName>Kafka Producer keySerializerClass</displayName>
             <value>kafka.serializer.StringEncoder</value>
             <description>serializer class Kafka message key</description>
         </property>
 
         <property>
             <name>dataSinkConfig.producerType</name>
-            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <displayName>Kafka Producer Type</displayName>
             <value>async</value>
             <description>whether the messages are sent asynchronously in a background thread</description>
         </property>
         <property>
             <name>dataSinkConfig.numBatchMessages</name>
-            <displayName>dataSinkConfig.numBatchMessages</displayName>
+            <displayName>Kafka Producer NumBatchMessages</displayName>
             <value>4096</value>
             <description>number of messages to send in one batch when using async mode</description>
         </property>
         <property>
             <name>dataSinkConfig.maxQueueBufferMs</name>
-            <displayName>dataSinkConfig.maxQueueBufferMs</displayName>
+            <displayName>Kafka Producer MaxQueueBufferMs</displayName>
             <value>5000</value>
             <description>maximum time to buffer data when using async mode</description>
         </property>
         <property>
             <name>dataSinkConfig.requestRequiredAcks</name>
-            <displayName>dataSinkConfig.requestRequiredAcks</displayName>
+            <displayName>Kafka Producer RequestRequiredAcks</displayName>
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
         </property>

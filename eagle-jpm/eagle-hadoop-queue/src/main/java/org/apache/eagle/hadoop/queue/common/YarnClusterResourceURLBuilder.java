@@ -18,26 +18,29 @@
 
 package org.apache.eagle.hadoop.queue.common;
 
+import org.apache.eagle.app.utils.PathResolverHelper;
+
 public class YarnClusterResourceURLBuilder {
 
-    private static final String CLUSTER_SCHEDULER_API_URL = "ws/v1/cluster/scheduler";
-    private static final String CLUSTER_METRICS_API_URL = "ws/v1/cluster/metrics";
-    private static final String CLUSTER_APPS_API_URL = "ws/v1/cluster/apps";
+    private static final String CLUSTER_SCHEDULER_API_URL = "/ws/v1/cluster/scheduler";
+    private static final String CLUSTER_METRICS_API_URL = "/ws/v1/cluster/metrics";
+    private static final String CLUSTER_APPS_API_URL = "/ws/v1/cluster/apps";
     private static final String ANONYMOUS_PARAMETER = "anonymous=true";
 
     public static String buildSchedulerInfoURL(String urlBase) {
-        return urlBase + CLUSTER_SCHEDULER_API_URL + "?" + ANONYMOUS_PARAMETER;
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_SCHEDULER_API_URL + "?" + ANONYMOUS_PARAMETER);
     }
 
     public static String buildClusterMetricsURL(String urlBase) {
-        return urlBase + CLUSTER_METRICS_API_URL + "?" + ANONYMOUS_PARAMETER;
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_METRICS_API_URL + "?" + ANONYMOUS_PARAMETER);
     }
 
     public static String buildRunningAppsURL(String urlBase) {
-        return urlBase + CLUSTER_APPS_API_URL + "?state=RUNNING" + "&" + ANONYMOUS_PARAMETER;
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "?state=RUNNING" + "&" + ANONYMOUS_PARAMETER);
     }
 
     public static String buildFinishedAppsURL(String urlBase) {
-        return urlBase + CLUSTER_APPS_API_URL + "?state=FINISHED" + "&" + ANONYMOUS_PARAMETER;
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "?state=FINISHED" + "&" + ANONYMOUS_PARAMETER);
     }
+
 }

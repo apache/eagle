@@ -26,6 +26,7 @@ import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
 import org.apache.eagle.alert.engine.interpreter.PolicyParseResult;
 import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
@@ -305,12 +306,9 @@ public class MetadataResource {
 
     @Path("/policies/{policyId}")
     @GET
-    public PolicyDefinition getPolicyByID(@PathParam("policyId") String policyId) {
-        Preconditions.checkNotNull(policyId,"policyId");
-        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).findAny().orElseGet(() -> {
-            LOG.error("Policy (policyId " + policyId + ") not found");
-            throw new IllegalArgumentException("Policy (policyId " + policyId + ") not found");
-        });
+    public List<PolicyDefinition> getPolicyByID(@PathParam("policyId") String policyId) {
+        Preconditions.checkNotNull(policyId, "policyId");
+        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).collect(Collectors.toList());
     }
 
     @Path("/policies/{policyId}/status/{status}")
@@ -318,7 +316,7 @@ public class MetadataResource {
     public OpResult updatePolicyStatusByID(@PathParam("policyId") String policyId, @PathParam("status") PolicyDefinition.PolicyStatus status) {
         OpResult result = new OpResult();
         try {
-            PolicyDefinition policyDefinition = getPolicyByID(policyId);
+            PolicyDefinition policyDefinition = getPolicyByID(policyId).get(0);
             policyDefinition.setPolicyStatus(status);
             OpResult updateResult  = addPolicy(policyDefinition);
             result.code = updateResult.code;
@@ -370,9 +368,9 @@ public class MetadataResource {
         return results;
     }
 
-    @Path("/publishments/{pubId}")
+    @Path("/publishments/{name}")
     @DELETE
-    public OpResult removePublishment(@PathParam("pubId") String pubId) {
+    public OpResult removePublishment(@PathParam("name") String pubId) {
         return dao.removePublishment(pubId);
     }
 
@@ -474,6 +472,34 @@ public class MetadataResource {
             results.add(dao.addTopology(t));
         }
         return results;
+    }
+
+    @Path("/alerts")
+    @POST
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        return dao.addAlertPublishEvent(event);
+    }
+
+    @Path("/alerts/batch")
+    @POST
+    public List<OpResult> addAlertPublishEvents(List<AlertPublishEvent> events) {
+        List<OpResult> results = new LinkedList<>();
+        for (AlertPublishEvent e : events) {
+            results.add(dao.addAlertPublishEvent(e));
+        }
+        return results;
+    }
+
+    @Path("/alerts")
+    @GET
+    public List<AlertPublishEvent> listAlertPublishEvents(@QueryParam("size") int size) {
+        return dao.listAlertPublishEvent(size);
+    }
+
+    @Path("/alerts/{alertId}")
+    @GET
+    public AlertPublishEvent getAlertPublishEvent(@PathParam("alertId") String alertId) {
+        return dao.getAlertPublishEvent(alertId);
     }
 
     @Path("/topologies/{topologyName}")

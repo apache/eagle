@@ -50,4 +50,8 @@ public interface IMetadataChangeNotifyService extends Closeable, Serializable {
     void registerListener(StreamRouterBoltSpecListener listener);
 
     void registerListener(AlertPublishSpecListener listener);
+
+    default void activateFetchMetaData() throws Exception {
+
+    }
 }

@@ -24,6 +24,7 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 
 import java.io.IOException;
@@ -149,6 +150,21 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void clear() {
+
+    }
+
+    @Override
+    public List<AlertPublishEvent> listAlertPublishEvent() {
+        return null;
+    }
+
+    @Override
+    public void addAlertPublishEvent(AlertPublishEvent event) {
+
+    }
+
+    @Override
+    public void addAlertPublishEvents(List<AlertPublishEvent> events) {
 
     }
 }

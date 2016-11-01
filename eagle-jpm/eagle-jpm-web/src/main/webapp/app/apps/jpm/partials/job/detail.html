@@ -125,19 +125,23 @@
 						</tr>
 						<tr>
 							<th>Map vCores</th>
-							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_MAPS)}}</td>
+							<td class="text-no-break">{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_MAPS)}} ms</td>
 							<th>Map CPU</th>
-							<td>{{common.number.toFixed(job.jobCounters.counters.MapTaskAttemptCounter.CPU_MILLISECONDS)}}</td>
+							<td class="text-no-break">{{common.number.toFixed(job.jobCounters.counters.MapTaskAttemptCounter.CPU_MILLISECONDS)}} ms</td>
 							<th>HDFS Read Bytes</th>
-							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}</td>
+							<td title="{{job.jobCounters.counters['org.apache.hadoop.mapreduce.FileSystemCounter'].HDFS_BYTES_READ}}">
+								{{common.number.abbr(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ, true)}}
+							</td>
 						</tr>
 						<tr>
 							<th>Reduce vCores</th>
-							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_REDUCES)}}</td>
+							<td class="text-no-break">{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_REDUCES)}} ms</td>
 							<th>Map CPU</th>
-							<td>{{common.number.toFixed(job.jobCounters.counters.ReduceTaskAttemptCounter.CPU_MILLISECONDS)}}</td>
+							<td class="text-no-break">{{common.number.toFixed(job.jobCounters.counters.ReduceTaskAttemptCounter.CPU_MILLISECONDS)}} ms</td>
 							<th>HDFS Write Bytes</th>
-							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
+							<td title="{{job.jobCounters.counters['org.apache.hadoop.mapreduce.FileSystemCounter'].HDFS_BYTES_WRITTEN}}">
+								{{common.number.abbr(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN, true)}}
+							</td>
 						</tr>
 						<tr ng-if="!isRunning">
 							<th>Last Map Duration</th>

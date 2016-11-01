@@ -21,6 +21,7 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
@@ -72,6 +73,20 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
+    public List<AlertPublishEvent> listAlertPublishEvent(int size) {
+        if (size <= 0) {
+            return handler.list(AlertPublishEvent.class);
+        } else {
+            return handler.listSubset(AlertPublishEvent.class, size);
+        }
+    }
+
+    @Override
+    public AlertPublishEvent getAlertPublishEvent(String alertId) {
+        return handler.listWithFilter(alertId, AlertPublishEvent.class);
+    }
+
+    @Override
     public ScheduleState getScheduleState(String versionId) {
         return handler.listWithFilter(versionId, ScheduleState.class);
         //return null;
@@ -79,7 +94,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public ScheduleState getScheduleState() {
-        return handler.listTop(ScheduleState.class, "DESC");
+        return handler.listTop(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
     }
 
     @Override
@@ -100,6 +115,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult addCluster(StreamingCluster cluster) {
         return handler.addOrReplace(StreamingCluster.class.getSimpleName(), cluster);
+    }
+
+    @Override
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        return handler.addOrReplace(AlertPublishEvent.class.getSimpleName(), event);
     }
 
     @Override

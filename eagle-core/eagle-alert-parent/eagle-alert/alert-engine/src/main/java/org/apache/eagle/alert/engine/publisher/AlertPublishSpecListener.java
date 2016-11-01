@@ -17,10 +17,13 @@
 package org.apache.eagle.alert.engine.publisher;
 
 import org.apache.eagle.alert.coordination.model.PublishSpec;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
 import java.util.Map;
 
 public interface AlertPublishSpecListener {
     void onAlertPublishSpecChange(PublishSpec spec, Map<String, StreamDefinition> sds);
+    
+    void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds);
 }

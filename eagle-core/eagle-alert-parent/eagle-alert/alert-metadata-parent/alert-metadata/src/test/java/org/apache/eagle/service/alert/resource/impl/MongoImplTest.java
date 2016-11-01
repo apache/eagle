@@ -32,6 +32,7 @@ import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.StreamGroup;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
@@ -202,9 +203,16 @@ public class MongoImplTest {
             Assert.assertEquals(200, result.code);
             List<StreamDefinition> assigns = dao.listStreams();
             Assert.assertEquals(1, assigns.size());
-            dao.removeStream("stream");
-            assigns = dao.listStreams();
-            Assert.assertEquals(0, assigns.size());
+        }
+        // alert
+        {
+            AlertPublishEvent alert = new AlertPublishEvent();
+            alert.setAlertTimestamp(System.currentTimeMillis());
+            alert.setAlertId(UUID.randomUUID().toString());
+            OpResult result = dao.addAlertPublishEvent(alert);
+            Assert.assertEquals(200, result.code);
+            List<AlertPublishEvent> alerts = dao.listAlertPublishEvent(2);
+            Assert.assertEquals(1, alerts.size());
         }
     }
 

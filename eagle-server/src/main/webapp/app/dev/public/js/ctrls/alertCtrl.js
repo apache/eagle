@@ -22,28 +22,42 @@
 	var eagleControllers = angular.module('eagleControllers');
 
 	// ======================================================================================
-	// =                                        Main                                        =
-	// ======================================================================================
-	eagleControllers.controller('alertCtrl', function ($scope, $wrapState, PageConfig) {
-		PageConfig.title = "Alert";
-		$scope.getState = function() {
-			return $wrapState.current.name;
-		};
-	});
-
-	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig) {
-		PageConfig.subTitle = "Explore Alerts";
+	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity) {
+		PageConfig.title = "Alerts";
+
+		$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
+
+		// ================================================================
+		// =                             Sync                             =
+		// ================================================================
+		var refreshInterval = $interval($scope.alertList._refresh, 1000 * 10);
+		$scope.$on('$destroy', function() {
+			$interval.cancel(refreshInterval);
+		});
+	});
+
+	eagleControllers.controller('alertDetailCtrl', function ($scope, $wrapState, PageConfig, Entity) {
+		PageConfig.title = "Alert Detail";
+
+		$scope.alertList = Entity.queryMetadata("alerts/" + encodeURIComponent($wrapState.param.alertId));
+		$scope.alertList._then(function () {
+			$scope.alert = $scope.alertList[0];
+			if(!$scope.alert) {
+				$.dialog({
+					title: "OPS",
+					content: "Alert '" + $wrapState.param.alertId + "' not found!"
+				});
+			}
+		});
 	});
 
 	// ======================================================================================
 	// =                                       Stream                                       =
 	// ======================================================================================
 	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
-		PageConfig.title = "Alert";
-		PageConfig.subTitle = "Streams";
+		PageConfig.title = "Streams";
 
 		$scope.streamList = $.map(Application.list, function (app) {
 			return (app.streams || []).map(function (stream) {
@@ -61,7 +75,7 @@
 	// =                                       Policy                                       =
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
-		PageConfig.subTitle = "Manage Policies";
+		PageConfig.title = "Policies";
 
 		$scope.policyList = [];
 
@@ -77,7 +91,7 @@
 			UI.deleteConfirm(item.name)(function (entity, closeFunc) {
 				Entity.deleteMetadata("policies/" + item.name)._promise.finally(function () {
 					closeFunc();
-					$scope.policyList._refresh();
+					updateList();
 				});
 			});
 		};
@@ -99,7 +113,7 @@
 		PageConfig.title = $wrapState.param.name;
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
-			{title: "Policy List", path: "/alert/policyList"},
+			{title: "Policy List", path: "/policies"},
 			{title: "Detail"}
 		];
 
@@ -113,7 +127,7 @@
 					title: "OPS",
 					content: "Policy '" + $wrapState.param.name + "' not found!"
 				}, function () {
-					$wrapState.go("alert.policyList");
+					$wrapState.go("policyList");
 				});
 			} else {
 				$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");

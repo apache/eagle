@@ -33,6 +33,7 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 
 /**
@@ -53,6 +54,7 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     private SortedMap<String, ScheduleState> scheduleStates = new TreeMap<String, ScheduleState>();
     private List<SpoutSpec> spoutSpecs = new ArrayList<SpoutSpec>();
     private List<Publishment> publishmetns = new ArrayList<Publishment>();
+    private List<AlertPublishEvent> alerts = new ArrayList<>();
 
     @Override
     public void close() throws IOException {
@@ -179,6 +181,21 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     @Override
     public void clear() {
         // do nothing
+    }
+
+    @Override
+    public List<AlertPublishEvent> listAlertPublishEvent() {
+        return this.alerts;
+    }
+
+    @Override
+    public void addAlertPublishEvent(AlertPublishEvent event) {
+        this.alerts.add(event);
+    }
+
+    @Override
+    public void addAlertPublishEvents(List<AlertPublishEvent> events) {
+        this.alerts.addAll(events);
     }
 
 }

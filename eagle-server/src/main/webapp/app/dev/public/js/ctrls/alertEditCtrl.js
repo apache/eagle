@@ -36,7 +36,12 @@
 			name: "Slack",
 			displayFields: ["channels"],
 			fields: ["token", "channels", "severitys", "urltemplate"]
-		}
+		},
+		'org.apache.eagle.alert.engine.publisher.impl.AlertEagleStorePlugin': {
+			name: "Storage",
+			displayFields: [],
+			fields: []
+		},
 	};
 
 	// ======================================================================================
@@ -49,11 +54,11 @@
 		policyEditController.apply(this, newArgs);
 	}
 
-	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity) {
+	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
 		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
 	});
-	eagleControllers.controller('policyEditCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity) {
+	eagleControllers.controller('policyEditCtrl', function ($scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
 		PageConfig.title = "Edit Policy";
 		var args = arguments;
 
@@ -68,19 +73,14 @@
 					title: "OPS",
 					content: "Policy '" + $wrapState.param.name + "' not found!"
 				}, function () {
-					$wrapState.go("alert.policyList");
+					$wrapState.go("policyList");
 				});
 			}
 		});
 	});
 
-	function policyEditController(policy, $scope, $q, $wrapState, $timeout, PageConfig, Entity) {
+	function policyEditController(policy, $scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
 		$scope.publisherTypes = publisherTypes;
-
-		PageConfig.navPath = [
-			{title: "Policy List", path: "/alert/policyList"},
-			{title: "Policy"}
-		];
 
 		$scope.policy = policy;
 		$scope.policy = common.merge({
@@ -102,6 +102,11 @@
 		$scope.searchSourceKey = "";
 		$scope.applications = {};
 		$scope.newPolicy = !$scope.policy.name;
+
+		PageConfig.navPath = [
+			{title: "Policy List", path: "/policies"},
+			{title: ($scope.newPolicy ? "Define" : "Update") + " Policy"}
+		];
 
 		// ==============================================================
 		// =                             UI                             =

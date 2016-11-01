@@ -22,6 +22,7 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.slf4j.Logger;
@@ -76,6 +77,12 @@ public interface IMetadataDao extends Closeable {
     OpResult addPublishmentType(PublishmentType publishmentType);
 
     OpResult removePublishmentType(String pubType);
+
+    List<AlertPublishEvent> listAlertPublishEvent(int size);
+
+    AlertPublishEvent getAlertPublishEvent(String alertId);
+
+    OpResult addAlertPublishEvent(AlertPublishEvent event);
 
     ScheduleState getScheduleState(String versionId);
 

@@ -30,17 +30,17 @@ public class ConfigBusConsumer extends ConfigBusBase {
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ConfigBusConsumer.class);
 
     private NodeCache cache;
+    private String zkPath;
+    public static final ObjectMapper mapper = new ObjectMapper();
 
     public ConfigBusConsumer(ZKConfig config, String topic, ConfigChangeCallback callback) {
         super(config);
-        String zkPath = zkRoot + "/" + topic;
+        this.zkPath = zkRoot + "/" + topic;
         LOG.info("monitor change for zkPath " + zkPath);
         cache = new NodeCache(curator, zkPath);
         cache.getListenable().addListener(() -> {
                 // get node value and notify callback
-                byte[] value = curator.getData().forPath(zkPath);
-                ObjectMapper mapper = new ObjectMapper();
-                ConfigValue v = mapper.readValue(value, ConfigValue.class);
+                ConfigValue v = getConfigValue();
                 callback.onNewConfig(v);
             }
         );
@@ -50,5 +50,11 @@ public class ConfigBusConsumer extends ConfigBusBase {
             LOG.error("error start NodeCache listener", ex);
             throw new RuntimeException(ex);
         }
+    }
+
+    public ConfigValue getConfigValue() throws Exception {
+        byte[] value = curator.getData().forPath(zkPath);
+        ConfigValue v = mapper.readValue(value, ConfigValue.class);
+        return v;
     }
 }

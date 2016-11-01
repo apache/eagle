@@ -25,6 +25,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
@@ -36,6 +38,7 @@ import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
@@ -58,6 +61,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     private static final String DB_NAME = "ump_alert_metadata";
     private static final Logger LOG = LoggerFactory.getLogger(MongoMetadataDaoImpl.class);
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static final int DEFAULT_CAPPED_MAX_SIZE = 500 * 1024 * 1024;
+    private static final int DEFAULT_CAPPED_MAX_DOCUMENTS = 20000;
 
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -65,6 +70,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     private final String connection;
     private final MongoClient client;
+    private final int cappedMaxSize;
+    private final int cappedMaxDocuments;
 
     private MongoDatabase db;
     private MongoCollection<Document> cluster;
@@ -74,6 +81,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     private MongoCollection<Document> publishment;
     private MongoCollection<Document> publishmentType;
     private MongoCollection<Document> topologies;
+    private MongoCollection<Document> alerts;
 
     // scheduleStates splits to several collections
     private MongoCollection<Document> scheduleStates;
@@ -89,8 +97,37 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     @Inject
     public MongoMetadataDaoImpl(Config config) {
         this.connection = config.getString("connection");
+        this.cappedMaxSize = config.hasPath("cappedMaxSize") ? config.getInt("cappedMaxSize") : DEFAULT_CAPPED_MAX_SIZE;
+        this.cappedMaxDocuments = config.hasPath("cappedMaxDocuments") ? config.getInt("cappedMaxDocuments") : DEFAULT_CAPPED_MAX_DOCUMENTS;
         this.client = new MongoClient(new MongoClientURI(this.connection));
         init();
+    }
+
+    private boolean isCollectionExists(String collectionName) {
+        boolean result = false;
+        MongoIterable<String> allCollections = db.listCollectionNames();
+        for ( String collection : allCollections ) {
+            if (collection.equals(collectionName)) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    private MongoCollection<Document> getCollection(String collectionName) {
+        // first check if collection exists, if not then create a new collection with cappedSize
+        if (!isCollectionExists(collectionName)) {
+            CreateCollectionOptions option = new CreateCollectionOptions();
+            option.capped(true);
+            option.maxDocuments(cappedMaxDocuments);
+            option.sizeInBytes(cappedMaxSize);
+            db.createCollection(collectionName, option);
+        }
+
+        return db.getCollection(collectionName);
+
     }
 
     private void init() {
@@ -123,14 +160,23 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             publishmentType.createIndex(doc1, io1);
         }
 
+        alerts = db.getCollection("alerts");
+        {
+            IndexOptions io1 = new IndexOptions().background(true).unique(true).name("alertIndex");
+            BsonDocument doc1 = new BsonDocument();
+            doc1.append("alertId", new BsonInt32(1));
+            alerts.createIndex(doc1, io1);
+        }
+
+
         // below is for schedule_specs and its splitted collections
         BsonDocument doc1 = new BsonDocument();
         IndexOptions io1 = new IndexOptions().background(true).name("versionIndex");
         doc1.append("version", new BsonInt32(1));
-        scheduleStates = db.getCollection("schedule_specs");
+        scheduleStates = getCollection("schedule_specs");
         scheduleStates.createIndex(doc1, io1);
 
-        spoutSpecs = db.getCollection("spoutSpecs");
+        spoutSpecs = getCollection("spoutSpecs");
         {
             IndexOptions ioInternal = new IndexOptions().background(true).name("topologyIdIndex");
             BsonDocument docInternal = new BsonDocument();
@@ -138,7 +184,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             spoutSpecs.createIndex(docInternal, ioInternal);
         }
 
-        alertSpecs = db.getCollection("alertSpecs");
+        alertSpecs = getCollection("alertSpecs");
         {
             IndexOptions ioInternal = new IndexOptions().background(true).name("topologyNameIndex");
             BsonDocument docInternal = new BsonDocument();
@@ -146,22 +192,22 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             alertSpecs.createIndex(docInternal, ioInternal);
         }
 
-        groupSpecs = db.getCollection("groupSpecs");
+        groupSpecs = getCollection("groupSpecs");
         groupSpecs.createIndex(doc1, io1);
 
-        publishSpecs = db.getCollection("publishSpecs");
+        publishSpecs = getCollection("publishSpecs");
         publishSpecs.createIndex(doc1, io1);
 
-        policySnapshots = db.getCollection("policySnapshots");
+        policySnapshots = getCollection("policySnapshots");
         policySnapshots.createIndex(doc1, io);
 
-        streamSnapshots = db.getCollection("streamSnapshots");
+        streamSnapshots = getCollection("streamSnapshots");
         streamSnapshots.createIndex(doc1, io);
 
-        monitoredStreams = db.getCollection("monitoredStreams");
+        monitoredStreams = getCollection("monitoredStreams");
         monitoredStreams.createIndex(doc1, io);
 
-        assignments = db.getCollection("assignments");
+        assignments = getCollection("assignments");
         assignments.createIndex(doc1, io1);
     }
 
@@ -177,6 +223,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             filter.append("streamId", new BsonString(MetadataUtils.getKey(t)));
         } else if (t instanceof PublishmentType) {
             filter.append("type", new BsonString(MetadataUtils.getKey(t)));
+        } else if (t instanceof AlertPublishEvent) {
+            filter.append("alertId", new BsonString(MetadataUtils.getKey(t)));
         } else {
             filter.append("name", new BsonString(MetadataUtils.getKey(t)));
         }
@@ -301,6 +349,26 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult removePublishmentType(String pubType) {
         return remove(publishmentType, pubType);
+    }
+
+    @Override
+    public List<AlertPublishEvent> listAlertPublishEvent(int size) {
+        return list(alerts, AlertPublishEvent.class);
+    }
+
+    @Override
+    public AlertPublishEvent getAlertPublishEvent(String alertId) {
+        List<AlertPublishEvent> results = list(alerts, AlertPublishEvent.class);
+        Optional<AlertPublishEvent> op = results.stream().filter(alert -> alert.getAlertId().equals(alertId)).findAny();
+        if (op.isPresent()) {
+            return op.get();
+        }
+        return null;
+    }
+
+    @Override
+    public OpResult addAlertPublishEvent(AlertPublishEvent event) {
+        return addOrReplace(alerts, event);
     }
 
     private <T> OpResult addOne(MongoCollection<Document> collection, T t) {
