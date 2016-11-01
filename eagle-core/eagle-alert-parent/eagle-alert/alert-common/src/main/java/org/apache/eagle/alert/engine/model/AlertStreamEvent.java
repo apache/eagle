@@ -108,12 +108,7 @@ public class AlertStreamEvent extends StreamEvent {
                 event.put(column.getName(), null);
                 continue;
             }
-            if (column.getName().equalsIgnoreCase("timestamp") && obj instanceof Long) {
-                String eventTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(((Long) obj).longValue());
-                event.put(column.getName(), eventTime);
-            } else {
-                event.put(column.getName(), obj.toString());
-            }
+            event.put(column.getName(), obj.toString());
         }
         return event;
     }

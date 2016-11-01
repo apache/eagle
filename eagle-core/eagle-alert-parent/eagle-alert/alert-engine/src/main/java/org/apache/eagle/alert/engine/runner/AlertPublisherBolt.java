@@ -91,7 +91,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     }
 
     @Override
-    public void onAlertPublishSpecChange(PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
+    public synchronized void onAlertPublishSpecChange(PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
         if (pubSpec == null) {
             return;
         }

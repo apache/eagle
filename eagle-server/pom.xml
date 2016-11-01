@@ -314,6 +314,11 @@
                     <artifactId>eagle-jpm-aggregation</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-jpm-spark-history</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
 
                 <!-- App: Hadoop Queue Running Monitoring-->
                 <dependency>

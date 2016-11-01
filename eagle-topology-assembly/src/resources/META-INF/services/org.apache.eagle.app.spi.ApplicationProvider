@@ -27,3 +27,4 @@ org.apache.eagle.jpm.aggregation.AggregationApplicationProvider
 org.apache.eagle.hadoop.queue.HadoopQueueRunningAppProvider
 org.apache.eagle.topology.TopologyCheckAppProvider
 org.apache.eagle.metric.HadoopMetricMonitorAppProdiver
+org.apache.eagle.jpm.spark.history.SparkHistoryJobAppProvider

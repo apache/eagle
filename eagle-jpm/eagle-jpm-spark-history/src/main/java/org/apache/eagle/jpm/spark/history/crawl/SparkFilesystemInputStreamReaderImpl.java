@@ -34,7 +34,7 @@ public class SparkFilesystemInputStreamReaderImpl implements JHFInputStreamReade
 
     public SparkFilesystemInputStreamReaderImpl(SparkHistoryJobAppConfig config, SparkApplicationInfo app) {
         this.config = config;
-        this.site = config.info.site;
+        this.site = config.stormConfig.siteId;
         this.app = app;
     }
 
