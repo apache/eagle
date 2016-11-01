@@ -26,4 +26,25 @@ public class OpResult {
 
     public static final int SUCCESS = 200;
     public static final int FAILURE = 500;
+
+    public static OpResult of(int code, String messsage) {
+        OpResult opResult = new OpResult();
+        opResult.code = code;
+        opResult.message = messsage;
+        return opResult;
+    }
+
+    public static OpResult success(String messsage) {
+        OpResult opResult = new OpResult();
+        opResult.code = SUCCESS;
+        opResult.message = messsage;
+        return opResult;
+    }
+
+    public static OpResult fail(String messsage) {
+        OpResult opResult = new OpResult();
+        opResult.code = FAILURE;
+        opResult.message = messsage;
+        return opResult;
+    }
 }
