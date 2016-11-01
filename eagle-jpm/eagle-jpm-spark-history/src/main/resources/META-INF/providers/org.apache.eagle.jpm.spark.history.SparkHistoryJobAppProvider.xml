@@ -100,7 +100,7 @@
         <!-- datasource config -->
         <property>
             <name>dataSourceConfig.spark.history.server.url</name>
-            <displayName>spark.history.server.url</displayName>
+            <displayName>spark history server url</displayName>
             <description>spark history server URL</description>
             <value>http://sandbox.hortonworks.com:18080</value>
             <required>true</required>
