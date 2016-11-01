@@ -132,13 +132,15 @@
 								</tr>
 								<tr>
 									<th>View Path</th>
-									<td>{{application.viewPath}}</td>
+									<td>
+										<span na-block="application.viewPath"></span>
+									</td>
 									<th>Version</th>
 									<td>{{application.version}}</td>
 								</tr>
 								<tr>
 									<th>Jar Path</th>
-									<td colspan="3">{{tmpApp.jarPath || application.jarPath}}</td>
+									<td colspan="3" class="text-break">{{tmpApp.jarPath || application.jarPath}}</td>
 								</tr>
 								<tr>
 									<th>Application Class</th>
@@ -150,17 +152,19 @@
 								</tr>
 								<tr>
 									<th>Description</th>
-									<td colspan="3">{{application.description}}</td>
+									<td colspan="3" class="text-break"><span na-block="application.description"></span></td>
 								</tr>
 								<tr>
 									<th>Dependencies</th>
 									<td colspan="3">
-										<ul>
-											<li ng-repeat="dep in application.dependencies track by $index">
-												{{Application.findProvider(dep.type).name}}
-												({{dep.type}})
-											</li>
-										</ul>
+										<div na-block="application.dependencies.length > 0">
+											<ul>
+												<li ng-repeat="dep in application.dependencies track by $index">
+													{{Application.findProvider(dep.type).name}}
+													({{dep.type}})
+												</li>
+											</ul>
+										</div>
 									</td>
 								</tr>
 								<tr ng-if="tmpApp.uuid">
@@ -241,15 +245,15 @@
 									<span class="fa fa-question-circle" uib-tooltip="Application execution mode: LOCAL/CLUSTER"></span>
 								</label>
 								<select class="form-control" ng-model="tmpApp.mode">
-									<option value="CLUSTER">Submit as Cluster Mode</option>
-									<option VALUE="LOCAL">Submit as Local Mode</option>
+									<option value="CLUSTER">Cluster Mode</option>
+									<option VALUE="LOCAL">Local Mode</option>
 								</select>
 							</div>
 							<div class="form-group">
 								<label>Execution File
 									<span class="fa fa-question-circle" uib-tooltip="Full path of Application Jar or Class file on eagle server host"></span>
 								</label>
-								<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
+								<textarea class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" rows="2"></textarea>
 							</div>
 						</div>
 
@@ -264,7 +268,7 @@
 							</a>
 						</h5>
 						<div data-id="appGeneral" class="collapse in">
-							<span class="text-muted" ng-if="generalFields.length === 0">N/A</span>
+							<span class="text-muted with-padding" ng-if="generalFields.length === 0">N/A</span>
 							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in generalFields track by $index">
 								<label>
 									{{field.displayName || field.name}}
@@ -282,7 +286,7 @@
 							</a>
 						</h5>
 						<div data-id="appAdvanced" class="collapse in">
-							<span class="text-muted" ng-if="advancedFields.length === 0">N/A</span>
+							<span class="text-muted with-padding" ng-if="advancedFields.length === 0">N/A</span>
 							<div class="form-group" ng-repeat="field in advancedFields track by $index">
 								<label>
 									{{field.displayName || field.name}}
@@ -299,6 +303,7 @@
 							</a>
 						</h5>
 						<div data-id="appCustomize" class="collapse in">
+							<span class="text-muted with-padding" ng-if="customizeFields.length === 0">N/A</span>
 							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in customizeFields track by $index">
 								<label>
 									<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
@@ -306,7 +311,9 @@
 								</label>
 								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
 							</div>
-							<a ng-click="newField()">+ Add Property</a>
+							<div>
+								<a class="with-padding" ng-click="newField()">+ Add Property</a>
+							</div>
 						</div>
 					</div>
 				</div>

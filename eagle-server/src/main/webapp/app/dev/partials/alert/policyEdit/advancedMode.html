@@ -145,7 +145,7 @@
 							{{stream}}
 						</label>
 					</li>
-					<li class="text-warning" ng-if="policy.outputStreams.length === 0">No alert stream yet.</li>
+					<li class="text-danger" ng-if="policy.outputStreams.length === 0">No alert stream yet.</li>
 				</ul>
 
 				<label>
@@ -165,6 +165,7 @@
 							<span>{{publisher.properties[field]}}</span>
 						</p>
 					</li>
+					<li class="text-danger" ng-if="policyPublisherList.length === 0">No publisher yet.</li>
 					<li>
 						<a ng-click="addPublisher()">+ Add Publisher</a>
 					</li>
