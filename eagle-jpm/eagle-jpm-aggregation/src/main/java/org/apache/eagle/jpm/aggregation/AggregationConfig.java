@@ -72,25 +72,15 @@ public class AggregationConfig implements Serializable {
         public String password;
     }
 
-    private static AggregationConfig manager = new AggregationConfig();
-
-    private AggregationConfig() {
+    private AggregationConfig(Config config) {
         this.zkStateConfig = new ZKStateConfig();
         this.stormConfig = new StormConfig();
         this.eagleServiceConfig = new EagleServiceConfig();
-        this.config = null;
+        init(config);
     }
 
-    public static AggregationConfig getInstance(Config config) {
-        if (config != null && manager.config == null) {
-            manager.init(config);
-        }
-
-        return manager;
-    }
-
-    public static AggregationConfig get() {
-        return getInstance(null);
+    public static AggregationConfig newInstance(Config config) {
+        return new AggregationConfig(config);
     }
 
     /**
@@ -98,6 +88,7 @@ public class AggregationConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
+
         //parse stormConfig
         this.stormConfig.site = config.getString("siteId");
         this.stormConfig.aggregationDuration = config.getLong("stormConfig.aggregationDuration");
