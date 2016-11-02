@@ -29,12 +29,16 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.EagleServiceConfig;
+
 public class JobConfigurationCreationServiceListener implements HistoryJobEntityLifecycleListener {
     private static final Logger logger = LoggerFactory.getLogger(JobConfigurationCreationServiceListener.class);
     private static final int MAX_RETRY_TIMES = 3;
     private JobConfigurationAPIEntity jobConfigurationEntity;
+    private EagleServiceConfig eagleServiceConfig;
 
-    public JobConfigurationCreationServiceListener() {
+    public JobConfigurationCreationServiceListener(EagleServiceConfig eagleServiceConfig) {
+        this.eagleServiceConfig = eagleServiceConfig;
     }
 
     @Override
@@ -54,12 +58,12 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
     @Override
     public void flush() throws Exception {
         IEagleServiceClient client = new EagleServiceClientImpl(
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
-            MRHistoryJobConfig.get().getEagleServiceConfig().username,
-            MRHistoryJobConfig.get().getEagleServiceConfig().password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getEagleServiceConfig().readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         List<JobConfigurationAPIEntity> list = new ArrayList<>();
         list.add(jobConfigurationEntity);
 

@@ -37,7 +37,7 @@ public class MRHistoryJobApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         //1. trigger init conf
-        MRHistoryJobConfig appConfig = MRHistoryJobConfig.getInstance(config);
+        MRHistoryJobConfig appConfig = MRHistoryJobConfig.newInstance(config);
         com.typesafe.config.Config jhfAppConf = appConfig.getConfig();
 
         //2. init JobHistoryContentFilter
@@ -65,7 +65,7 @@ public class MRHistoryJobApplication extends StormApplication {
         int tasks = jhfAppConf.getInt("stormConfig.mrHistoryJobSpoutTasks");
         topologyBuilder.setSpout(
                 spoutName,
-                new JobHistorySpout(filter, config),
+                new JobHistorySpout(filter, appConfig),
                 tasks
         ).setNumTasks(tasks);
 

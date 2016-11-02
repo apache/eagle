@@ -18,6 +18,10 @@
 
 package org.apache.eagle.jpm.mr.history.storm;
 
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.*;
@@ -26,14 +30,8 @@ import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.eagle.jpm.util.JobIdFilterByPartition;
-import org.apache.eagle.jpm.util.JobIdPartitioner;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +39,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.JobHistoryEndpointConfig;
 
 
 /**
@@ -95,20 +95,22 @@ public class JobHistorySpout extends BaseRichSpout {
     private JHFInputStreamCallback callback;
     private JobHistoryLCM jhfLCM;
     private static final int MAX_RETRY_TIMES = 3;
-    private Config config;
+    private MRHistoryJobConfig appConfig;
+    private JobHistoryEndpointConfig jobHistoryEndpointConfig;
 
-    public JobHistorySpout(JobHistoryContentFilter filter, Config config) {
-        this(filter, config, new JobHistorySpoutCollectorInterceptor());
+    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
+        this(filter, appConfig, new JobHistorySpoutCollectorInterceptor());
     }
 
     /**
      * mostly this constructor signature is for unit test purpose as you can put customized interceptor here.
      */
-    public JobHistorySpout(JobHistoryContentFilter filter, Config config, JobHistorySpoutCollectorInterceptor adaptor) {
+    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig, JobHistorySpoutCollectorInterceptor adaptor) {
         this.contentFilter = filter;
-        this.config = config;
         this.interceptor = adaptor;
-        callback = new DefaultJHFInputStreamCallback(contentFilter, interceptor);
+        this.appConfig = appConfig;
+        jobHistoryEndpointConfig = appConfig.getJobHistoryEndpointConfig();
+        callback = new DefaultJHFInputStreamCallback(contentFilter, interceptor,  appConfig);
     }
 
     private int calculatePartitionId(TopologyContext context) {
@@ -129,7 +131,6 @@ public class JobHistorySpout extends BaseRichSpout {
     @Override
     public void open(Map conf, TopologyContext context,
                      final SpoutOutputCollector collector) {
-        MRHistoryJobConfig.getInstance(config);
         partitionId = calculatePartitionId(context);
         // sanity verify 0<=partitionId<=numTotalPartitions-1
         if (partitionId < 0 || partitionId > numTotalPartitions) {
@@ -137,17 +138,18 @@ public class JobHistorySpout extends BaseRichSpout {
                 + partitionId + " and numTotalPartitions " + numTotalPartitions);
         }
         JobIdFilter jobIdFilter = new JobIdFilterByPartition(new DefaultJobIdPartitioner(), numTotalPartitions, partitionId);
-        JobHistoryZKStateManager.instance().init(MRHistoryJobConfig.get().getZkStateConfig());
+        JobHistoryZKStateManager.instance().init(appConfig.getZkStateConfig());
         JobHistoryZKStateManager.instance().ensureJobPartitions(numTotalPartitions);
         interceptor.setSpoutOutputCollector(collector);
 
         try {
-            jhfLCM = new JobHistoryDAOImpl(MRHistoryJobConfig.get().getJobHistoryEndpointConfig());
+            jhfLCM = new JobHistoryDAOImpl(jobHistoryEndpointConfig);
             driver = new JHFCrawlerDriverImpl(
                 callback,
                 jhfLCM,
                 jobIdFilter,
-                partitionId);
+                partitionId,
+                appConfig);
         } catch (Exception e) {
             LOG.error("failing creating crawler driver");
             throw new IllegalStateException(e);
@@ -227,7 +229,7 @@ public class JobHistorySpout extends BaseRichSpout {
         LOG.info("update process time stamp {}", minTimeStamp);
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", MRHistoryJobConfig.get().getJobHistoryEndpointConfig().site);
+                put("site", jobHistoryEndpointConfig.site);
             }
         };
         JobProcessTimeStampEntity entity = new JobProcessTimeStampEntity();
@@ -235,13 +237,14 @@ public class JobHistorySpout extends BaseRichSpout {
         entity.setTimestamp(minTimeStamp);
         entity.setTags(baseTags);
 
+        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
         IEagleServiceClient client = new EagleServiceClientImpl(
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
-            MRHistoryJobConfig.get().getEagleServiceConfig().username,
-            MRHistoryJobConfig.get().getEagleServiceConfig().password);
+                eagleServiceConfig.eagleServiceHost,
+                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.username,
+                eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getEagleServiceConfig().readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
 
         List<JobProcessTimeStampEntity> entities = new ArrayList<>();
         entities.add(entity);

@@ -30,12 +30,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.EagleServiceConfig;
+
 public class TaskAttemptCounterListener implements HistoryJobEntityCreationListener {
     private static final Logger logger = LoggerFactory.getLogger(TaskAttemptCounterListener.class);
     private static final int BATCH_SIZE = 1000;
     private Map<CounterKey, CounterValue> counters = new HashMap<>();
+    private EagleServiceConfig eagleServiceConfig;
 
-    public TaskAttemptCounterListener() {
+    public TaskAttemptCounterListener(EagleServiceConfig eagleServiceConfig) {
+        this.eagleServiceConfig = eagleServiceConfig;
     }
 
     private static class CounterKey {
@@ -111,12 +115,12 @@ public class TaskAttemptCounterListener implements HistoryJobEntityCreationListe
     @Override
     public void flush() throws Exception {
         IEagleServiceClient client = new EagleServiceClientImpl(
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
-            MRHistoryJobConfig.get().getEagleServiceConfig().username,
-            MRHistoryJobConfig.get().getEagleServiceConfig().password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getEagleServiceConfig().readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         List<TaskAttemptCounterAPIEntity> list = new ArrayList<>();
         logger.info("start flushing TaskAttemptCounter entities of total number " + counters.size());
         // create entity

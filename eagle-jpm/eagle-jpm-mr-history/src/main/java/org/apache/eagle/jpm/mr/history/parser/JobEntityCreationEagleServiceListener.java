@@ -49,18 +49,20 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     private JobExecutionMetricsCreationListener jobExecutionMetricsCreationListener = new JobExecutionMetricsCreationListener();
     private TimeZone timeZone;
     private EagleOutputCollector collector;
+    private MRHistoryJobConfig appConfig;
 
-    public JobEntityCreationEagleServiceListener(EagleOutputCollector collector) {
-        this(BATCH_SIZE, collector);
+    public JobEntityCreationEagleServiceListener(EagleOutputCollector collector, MRHistoryJobConfig appConfig) {
+        this(BATCH_SIZE, collector, appConfig);
     }
 
-    public JobEntityCreationEagleServiceListener(int batchSize, EagleOutputCollector collector) {
+    public JobEntityCreationEagleServiceListener(int batchSize, EagleOutputCollector collector, MRHistoryJobConfig appConfig) {
         if (batchSize <= 0) {
             throw new IllegalArgumentException("batchSize must be greater than 0 when it is provided");
         }
         this.batchSize = batchSize;
         this.collector = collector;
-        timeZone = TimeZone.getTimeZone(MRHistoryJobConfig.get().getJobHistoryEndpointConfig().timeZone);
+        this.appConfig = appConfig;
+        timeZone = TimeZone.getTimeZone(appConfig.getJobHistoryEndpointConfig().timeZone);
     }
 
     @Override
@@ -86,13 +88,14 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
      */
     @Override
     public void flush() throws Exception {
+        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
         IEagleServiceClient client = new EagleServiceClientImpl(
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
-            MRHistoryJobConfig.get().getEagleServiceConfig().username,
-            MRHistoryJobConfig.get().getEagleServiceConfig().password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getEagleServiceConfig().readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         logger.info("start flushing entities of total number " + list.size());
         List<GenericMetricEntity> metricEntities = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
