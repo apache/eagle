@@ -185,7 +185,7 @@
         <spark.core.version>1.4.0</spark.core.version>
 
         <!--  Client -->
-        <kafka-client.version>0.9.0.0</kafka-client.version>
+        <!--<kafka-client.version>0.9.0.0</kafka-client.version>-->
         <!-- Reflection -->
         <reflections.version>0.9.8</reflections.version>
 
@@ -1150,7 +1150,6 @@
                     <artifactId>cobertura-maven-plugin</artifactId>
                     <version>${cobertura-maven.version}</version>
                     <configuration>
-                        <format>xml</format>
                         <maxmem>256m</maxmem>
                         <!-- aggregated reports for multi-module projects -->
                         <aggregate>true</aggregate>

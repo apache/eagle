@@ -23,7 +23,8 @@ import org.apache.eagle.alert.engine.router.StreamSortHandler;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamWindow;
 import org.apache.eagle.alert.engine.sorter.StreamWindowManager;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

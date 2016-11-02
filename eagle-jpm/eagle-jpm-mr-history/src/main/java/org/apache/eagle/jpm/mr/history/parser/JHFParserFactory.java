@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.hadoop.conf.Configuration;
@@ -33,12 +34,15 @@ public class JHFParserFactory {
     public static JHFParserBase getParser(Map<String, String> baseTags,
                                           Configuration configuration,
                                           JobHistoryContentFilter filter,
-                                          EagleOutputCollector outputCollector) {
-        JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter);
-        reader2.addListener(new JobEntityCreationEagleServiceListener(outputCollector));
-        reader2.addListener(new TaskFailureListener());
-        reader2.addListener(new TaskAttemptCounterListener());
-        reader2.addListener(new JobConfigurationCreationServiceListener());
+                                          EagleOutputCollector outputCollector,
+                                          MRHistoryJobConfig appConfig) {
+        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
+
+        JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter, appConfig);
+        reader2.addListener(new JobEntityCreationEagleServiceListener(outputCollector, appConfig));
+        reader2.addListener(new TaskFailureListener(eagleServiceConfig));
+        reader2.addListener(new TaskAttemptCounterListener(eagleServiceConfig));
+        reader2.addListener(new JobConfigurationCreationServiceListener(eagleServiceConfig));
 
         reader2.register(new JobEntityLifecycleAggregator());
         JHFParserBase parser = new JHFMRVer2Parser(reader2);

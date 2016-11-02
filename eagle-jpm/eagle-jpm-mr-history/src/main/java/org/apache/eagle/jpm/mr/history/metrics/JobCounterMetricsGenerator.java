@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.EagleServiceConfig;
+
 public class JobCounterMetricsGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(JobCounterMetricsGenerator.class);
     private static final int BATCH_SIZE = 1000;
@@ -45,8 +47,11 @@ public class JobCounterMetricsGenerator {
     private List<GenericMetricEntity> lastEntitiesBatch;
     private Map<String, String> baseTags;
 
-    public JobCounterMetricsGenerator() {
+    private EagleServiceConfig eagleServiceConfig;
+
+    public JobCounterMetricsGenerator(EagleServiceConfig eagleServiceConfig) {
         this.lastEntitiesBatch = null;
+        this.eagleServiceConfig = eagleServiceConfig;
     }
 
     public void setBaseTags(Map<String, String> tags) {
@@ -115,10 +120,10 @@ public class JobCounterMetricsGenerator {
         }
 
         IEagleServiceClient client = new EagleServiceClientImpl(
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
-            MRHistoryJobConfig.get().getEagleServiceConfig().username,
-            MRHistoryJobConfig.get().getEagleServiceConfig().password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
 
         for (List<GenericMetricEntity> entities : metricEntities) {
             LOG.info("start flushing entities of total number " + entities.size());

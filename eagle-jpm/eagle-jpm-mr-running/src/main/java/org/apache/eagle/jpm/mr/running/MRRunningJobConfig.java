@@ -78,27 +78,25 @@ public class MRRunningJobConfig implements Serializable {
 
     private Config config;
 
-    private static MRRunningJobConfig manager = new MRRunningJobConfig();
-
-    private MRRunningJobConfig() {
+    private MRRunningJobConfig(Config config) {
         this.eagleServiceConfig = new EagleServiceConfig();
         this.endpointConfig = new EndpointConfig();
         this.zkStateConfig = new ZKStateConfig();
+        init(config);
     }
 
-    public static MRRunningJobConfig getInstance(String[] args) {
+    public static MRRunningJobConfig newInstance(String[] args) {
         try {
             LOG.info("Loading from configuration file");
-            return getInstance(new ConfigOptionParser().load(args));
+            return newInstance(new ConfigOptionParser().load(args));
         } catch (Exception e) {
             LOG.error("failed to load config");
             throw new IllegalArgumentException("Failed to load config", e);
         }
     }
 
-    public static MRRunningJobConfig getInstance(Config config) {
-        manager.init(config);
-        return manager;
+    public static MRRunningJobConfig newInstance(Config config) {
+        return new MRRunningJobConfig(config);
     }
 
     private void init(Config config) {

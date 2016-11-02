@@ -29,7 +29,8 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.sorter.impl.PartitionedEventTimeOrderingComparator;
 import org.apache.eagle.alert.engine.sorter.impl.StreamSortWindowHandlerImpl;
 import org.apache.eagle.alert.engine.sorter.impl.StreamTimeClockInLocalMemory;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;

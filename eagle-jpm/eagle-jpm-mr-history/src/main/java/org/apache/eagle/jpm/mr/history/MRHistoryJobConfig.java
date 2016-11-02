@@ -85,31 +85,21 @@ public class MRHistoryJobConfig implements Serializable {
         public int readTimeoutSeconds;
     }
 
-    private static MRHistoryJobConfig manager = new MRHistoryJobConfig();
-
     /**
      * As this is singleton object and constructed while this class is being initialized,
      * so any exception within this constructor will be wrapped with java.lang.ExceptionInInitializerError.
      * And this is unrecoverable and hard to troubleshooting.
      */
-    private MRHistoryJobConfig() {
+    private MRHistoryJobConfig(Config config) {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryEndpointConfig = new JobHistoryEndpointConfig();
         this.jobHistoryEndpointConfig.hdfs = new HashMap<>();
         this.eagleServiceConfig = new EagleServiceConfig();
-        this.config = null;
+        init(config);
     }
 
-    public static MRHistoryJobConfig getInstance(Config config) {
-        if (config != null && manager.config == null) {
-            manager.init(config);
-        }
-
-        return manager;
-    }
-
-    public static MRHistoryJobConfig get() {
-        return getInstance(null);
+    public static MRHistoryJobConfig newInstance(Config config) {
+        return new MRHistoryJobConfig(config);
     }
 
     /**

@@ -75,6 +75,11 @@ module.exports = function (grunt) {
 					{expand: true, cwd: 'dev/', src: '<%= config.copy.js.worker %>', dest: 'tmp'}
 				]
 			},
+			reference: {
+				files: [
+					{expand: true, flatten: true, src: '<%= config.copy.js.reference %>', dest: 'tmp/public/js/reference'}
+				]
+			},
 			ui: {
 				files: [
 					{expand: true, cwd: 'tmp/', src: ['**'], dest: 'ui'},
@@ -172,6 +177,7 @@ module.exports = function (grunt) {
 		// Compress JS
 		'concat:js_require',
 		'copy:worker',
+		'copy:reference',
 		'concat:js_project',
 		'regex-replace:strict',
 		'uglify',

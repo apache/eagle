@@ -17,7 +17,7 @@
 package org.apache.eagle.alert.engine.sorter.impl;
 
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
 
 import java.util.concurrent.atomic.AtomicLong;
 

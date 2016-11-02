@@ -27,7 +27,7 @@ import org.apache.eagle.hadoop.queue.storm.HadoopQueueRunningSpout;
 
 public class HadoopQueueRunningApp extends StormApplication {
     public StormTopology execute(Config config, StormEnvironment environment) {
-        HadoopQueueRunningAppConfig appConfig = HadoopQueueRunningAppConfig.getInstance(config);
+        HadoopQueueRunningAppConfig appConfig = new HadoopQueueRunningAppConfig(config);
 
         IRichSpout spout = new HadoopQueueRunningSpout(appConfig);
         HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(appConfig);

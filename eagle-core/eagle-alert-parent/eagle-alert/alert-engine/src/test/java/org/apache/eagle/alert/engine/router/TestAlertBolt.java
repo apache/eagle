@@ -40,7 +40,8 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.runner.AlertBolt;
 import org.apache.eagle.alert.engine.runner.TestStreamRouterBolt;
 import org.apache.eagle.alert.engine.serialization.impl.PartitionedEventSerializerImpl;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

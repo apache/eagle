@@ -202,7 +202,12 @@ public class MetadataResource {
     @Path("/policies")
     @POST
     public OpResult addPolicy(PolicyDefinition policy) {
-        return dao.addPolicy(policy);
+        PolicyValidationResult validationResult = this.validatePolicy(policy);
+        if (validationResult.isSuccess()) {
+            return dao.addPolicy(policy);
+        } else {
+            return OpResult.fail(validationResult.getMessage());
+        }
     }
 
     @Path("/policies/validate")
@@ -249,6 +254,11 @@ public class MetadataResource {
     @POST
     public OpResult addPublishmentsToPolicy(@PathParam("policyId") String policyId, List<String> publishmentIds) {
         OpResult result = new OpResult();
+        if (publishmentIds == null || publishmentIds.size() == 0) {
+            result.code = OpResult.FAILURE;
+            result.message = "Failed to add policy, there is no publisher in it";
+            return result;
+        }
         try {
             getPolicyByID(policyId);
             Map<String,Publishment> publishmentMap = new HashMap<>();

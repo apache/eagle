@@ -91,7 +91,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     }
 
     @Override
-    public void onAlertPublishSpecChange(PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
+    public synchronized void onAlertPublishSpecChange(PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
         if (pubSpec == null) {
             return;
         }
@@ -126,9 +126,9 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private void wrapAlertPublishEvent(AlertStreamEvent event) {
         Map<String, Object> extraData = new HashedMap();
         List<String> appIds = new ArrayList<>();
-        if (this.policyDefinitionMap != null) {
-            PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
-            for ( String inputStreamId : policyDefinition.getInputStreams()) {
+        PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
+        if (this.policyDefinitionMap != null && policyDefinition != null) {
+            for (String inputStreamId : policyDefinition.getInputStreams()) {
                 StreamDefinition sd = this.streamDefinitionMap.get(inputStreamId);
                 if (sd != null) {
                     extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());

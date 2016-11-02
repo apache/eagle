@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.alert.engine.utils;
 
-import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+import org.apache.eagle.common.DateTimeUtil;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 import org.junit.Assert;

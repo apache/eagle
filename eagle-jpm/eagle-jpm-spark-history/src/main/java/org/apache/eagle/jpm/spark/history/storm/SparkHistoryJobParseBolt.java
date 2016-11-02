@@ -24,10 +24,7 @@ import org.apache.eagle.jpm.spark.history.crawl.JHFInputStreamReader;
 import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.history.crawl.SparkFilesystemInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
-import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
 import org.apache.eagle.jpm.util.HDFSUtil;
-import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
-import org.apache.eagle.jpm.util.resourcefetch.SparkHistoryServerResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.model.SparkApplication;
 
 import backtype.storm.task.OutputCollector;
@@ -49,7 +46,6 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(SparkHistoryJobParseBolt.class);
 
     private OutputCollector collector;
-    private ResourceFetcher historyServerFetcher;
     private SparkHistoryJobAppConfig config;
     private JobHistoryZKStateManager zkState;
     private Configuration hdfsConf;
@@ -67,8 +63,6 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
             this.hdfsConf.set(entry.getKey(), entry.getValue());
             LOG.info("conf key {}, conf value {}", entry.getKey(), entry.getValue());
         }
-        this.historyServerFetcher = new SparkHistoryServerResourceFetcher(config.jobHistoryConfig.historyServerUrl,
-                config.jobHistoryConfig.historyServerUserName, config.jobHistoryConfig.historyServerUserPwd);
         this.zkState = new JobHistoryZKStateManager(config);
     }
 

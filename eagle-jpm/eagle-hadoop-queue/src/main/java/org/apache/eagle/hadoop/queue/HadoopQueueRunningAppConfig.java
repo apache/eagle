@@ -21,7 +21,6 @@ import com.typesafe.config.Config;
 import java.io.Serializable;
 
 public class HadoopQueueRunningAppConfig implements Serializable {
-    public static final HadoopQueueRunningAppConfig instance = new HadoopQueueRunningAppConfig();
 
     public Topology topology;
     public DataSourceConfig dataSourceConfig;
@@ -29,11 +28,11 @@ public class HadoopQueueRunningAppConfig implements Serializable {
 
     private Config config = null;
 
-    private HadoopQueueRunningAppConfig() {
+    public HadoopQueueRunningAppConfig(Config config) {
         this.topology = new Topology();
         this.dataSourceConfig = new DataSourceConfig();
         this.eagleProps = new EagleProps();
-        this.config = null;
+        init(config);
     }
 
     public static class Topology implements Serializable {
@@ -59,18 +58,6 @@ public class HadoopQueueRunningAppConfig implements Serializable {
             public String username;
             public String password;
         }
-    }
-
-    public static HadoopQueueRunningAppConfig getInstance(Config config) {
-        if (config != null && instance.config == null) {
-            synchronized (instance) {
-                if (instance.config == null) {
-                    instance.init(config);
-                }
-                return instance;
-            }
-        }
-        return instance;
     }
 
     public Config getConfig() {

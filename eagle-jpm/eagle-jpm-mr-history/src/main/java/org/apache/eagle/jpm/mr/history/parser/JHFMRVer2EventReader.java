@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -42,8 +43,8 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
      *
      * @throws IOException
      */
-    public JHFMRVer2EventReader(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
-        super(baseTags, configuration, filter);
+    public JHFMRVer2EventReader(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
+        super(baseTags, configuration, filter, appConfig);
     }
 
     @SuppressWarnings("deprecation")

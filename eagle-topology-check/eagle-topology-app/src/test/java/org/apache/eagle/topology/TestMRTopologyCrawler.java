@@ -32,7 +32,7 @@ public class TestMRTopologyCrawler {
     public void test() {
         Config config = ConfigFactory.load();
 
-        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
+        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
         TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
         MRTopologyCrawler crawler = new MRTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
         crawler.extract();

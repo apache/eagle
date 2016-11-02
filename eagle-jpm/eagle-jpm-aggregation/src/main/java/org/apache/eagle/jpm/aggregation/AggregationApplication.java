@@ -54,17 +54,17 @@ public class AggregationApplication extends StormApplication {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrHistoryAggregationSpout";
         String boltName = "mrHistoryAggregationBolt";
-        AggregationConfig aggregationConfig = AggregationConfig.getInstance(config);
+        AggregationConfig aggregationConfig = AggregationConfig.newInstance(config);
         int tasks = aggregationConfig.getConfig().getInt("stormConfig." + spoutName + "Tasks");
         topologyBuilder.setSpout(
             spoutName,
-            new AggregationSpout(config, new MRMetricsAggregateContainer(metrics)),
+            new AggregationSpout(aggregationConfig, new MRMetricsAggregateContainer(metrics, aggregationConfig)),
             tasks
         ).setNumTasks(tasks);
 
         tasks = aggregationConfig.getConfig().getInt("stormConfig." + boltName + "Tasks");
         topologyBuilder.setBolt(boltName,
-            new AggregationBolt(config, new MRMetricsAggregateContainer(metrics)),
+            new AggregationBolt(aggregationConfig.getStormConfig(), new MRMetricsAggregateContainer(metrics, aggregationConfig)),
             tasks).setNumTasks(tasks).shuffleGrouping(spoutName);
 
         return topologyBuilder.createTopology();

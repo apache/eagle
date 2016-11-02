@@ -79,6 +79,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
     private JobCounterMetricsGenerator jobCounterMetricsGenerator;
 
+    private MRHistoryJobConfig appConfig;
+
     /**
      * baseTags stores the basic tag name values which might be used for persisting various entities.
      * baseTags includes: site and jobName
@@ -86,7 +88,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
      *
      * @param baseTags
      */
-    public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
+    public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
         this.filter = filter;
 
         this.baseTags = baseTags;
@@ -119,7 +121,9 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         }
         this.sumMapTaskDuration = 0L;
         this.sumReduceTaskDuration = 0L;
-        this.jobCounterMetricsGenerator = new JobCounterMetricsGenerator();
+
+        this.appConfig = appConfig;
+        this.jobCounterMetricsGenerator = new JobCounterMetricsGenerator(appConfig.getEagleServiceConfig());
     }
 
     public void register(HistoryJobEntityLifecycleListener lifecycleListener) {
@@ -149,7 +153,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     }
 
     private String buildJobTrackingUrl(String jobId) {
-        String jobTrackingUrlBase = MRHistoryJobConfig.getInstance(null).getJobHistoryEndpointConfig().mrHistoryServerUrl + "/jobhistory/job/";
+        String jobTrackingUrlBase = appConfig.getJobHistoryEndpointConfig().mrHistoryServerUrl + "/jobhistory/job/";
         try {
             URI oldUri = new URI(jobTrackingUrlBase);
             URI resolved = oldUri.resolve(jobId);

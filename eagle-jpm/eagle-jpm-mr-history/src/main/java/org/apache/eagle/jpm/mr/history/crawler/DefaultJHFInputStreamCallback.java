@@ -28,16 +28,19 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.JobHistoryEndpointConfig;
+
 public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultJHFInputStreamCallback.class);
 
-
     private JobHistoryContentFilter filter;
     private EagleOutputCollector collector;
+    private MRHistoryJobConfig appConfig;
 
-    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, EagleOutputCollector eagleCollector) {
+    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, EagleOutputCollector eagleCollector, MRHistoryJobConfig appConfig) {
         this.filter = filter;
         this.collector = eagleCollector;
+        this.appConfig = appConfig;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", MRHistoryJobConfig.get().getJobHistoryEndpointConfig().site);
+                put("site", appConfig.getJobHistoryEndpointConfig().site);
             }
         };
 
@@ -54,7 +57,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
             jobFileInputStream.close();
         } else {
             //get parser and parse, do not need to emit data now
-            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter, this.collector);
+            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter, this.collector, appConfig);
             parser.parse(jobFileInputStream);
             jobFileInputStream.close();
         }

@@ -24,7 +24,8 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.alert.engine.mock.MockSampleMetadataFactory;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;

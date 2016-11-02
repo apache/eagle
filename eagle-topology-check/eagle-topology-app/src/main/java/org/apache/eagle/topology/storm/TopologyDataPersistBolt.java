@@ -69,8 +69,8 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.config.getString("service.host"),this.config.config.getInt("service.port"),
-        		this.config.config.getString("service.username"),this.config.config.getString("service.password")));
+        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.getConfig().getString("service.host"),this.config.getConfig().getInt("service.port"),
+        		this.config.getConfig().getString("service.username"),this.config.getConfig().getString("service.password")));
         this.collector = collector;
     }
 

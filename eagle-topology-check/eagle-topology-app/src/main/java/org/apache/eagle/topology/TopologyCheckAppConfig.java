@@ -48,21 +48,23 @@ public class TopologyCheckAppConfig implements Serializable {
     public MRConfig mrConfig;
     public List<TopologyConstants.TopologyType> topologyTypes;
 
-    public Config config;
+    private Config config;
 
-    private static TopologyCheckAppConfig configManager = new TopologyCheckAppConfig();
-
-    private TopologyCheckAppConfig() {
+    private TopologyCheckAppConfig(Config config) {
         hBaseConfig = null;
         hdfsConfig = null;
         mrConfig = null;
         dataExtractorConfig = new DataExtractorConfig();
         topologyTypes = new ArrayList<>();
+        init(config);
     }
 
-    public static TopologyCheckAppConfig getInstance(Config config) {
-        configManager.init(config);
-        return configManager;
+    public Config getConfig() {
+        return config;
+    }
+
+    public static TopologyCheckAppConfig newInstance(Config config) {
+        return new TopologyCheckAppConfig(config);
     }
 
     private void init(Config config) {

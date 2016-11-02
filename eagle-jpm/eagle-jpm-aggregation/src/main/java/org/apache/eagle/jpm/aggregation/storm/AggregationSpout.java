@@ -18,17 +18,16 @@
 
 package org.apache.eagle.jpm.aggregation.storm;
 
-import org.apache.eagle.jpm.aggregation.AggregationConfig;
-import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
-import org.apache.eagle.jpm.aggregation.state.AggregationTimeManager;
-import org.apache.eagle.jpm.util.Utils;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import com.typesafe.config.Config;
+import org.apache.eagle.jpm.aggregation.AggregationConfig;
+import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
+import org.apache.eagle.jpm.aggregation.state.AggregationTimeManager;
+import org.apache.eagle.jpm.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,23 +40,22 @@ public class AggregationSpout extends BaseRichSpout {
     private static final Long MAX_WAIT_TIME = 12 * 60 * 60000L;//12 hours
     private static final Long MAX_SAFE_TIME = 6 * 60 * 60000L;//6 hours
 
-    private Config config;
+    private AggregationConfig appConfig;
     MetricsAggregateContainer jobProcessTime;
 
     private SpoutOutputCollector collector;
     private Set<Long> processStartTime;
     private Long lastUpdateTime;
 
-    public AggregationSpout(Config config, MetricsAggregateContainer jobProcessTime) {
-        this.config = config;
+    public AggregationSpout(AggregationConfig appConfig, MetricsAggregateContainer jobProcessTime) {
+        this.appConfig = appConfig;
         this.jobProcessTime = jobProcessTime;
         this.processStartTime = new HashSet<>();
     }
 
     @Override
     public void open(Map conf, TopologyContext context, final SpoutOutputCollector collector) {
-        AggregationConfig.getInstance(config);
-        AggregationTimeManager.instance().init(AggregationConfig.get().getZkStateConfig());
+        AggregationTimeManager.instance().init(appConfig.getZkStateConfig());
         this.collector = collector;
     }
 
@@ -90,7 +88,7 @@ public class AggregationSpout extends BaseRichSpout {
             for (Long startTime = lastUpdateTime; startTime < lastUpdateTime + MAX_SAFE_TIME;) {
                 collector.emit(new Values(startTime), startTime);
                 this.processStartTime.add(startTime);
-                startTime += AggregationConfig.get().getStormConfig().aggregationDuration * 1000;
+                startTime += appConfig.getStormConfig().aggregationDuration * 1000;
             }
         } catch (Exception e) {
             LOG.warn("{}", e);
