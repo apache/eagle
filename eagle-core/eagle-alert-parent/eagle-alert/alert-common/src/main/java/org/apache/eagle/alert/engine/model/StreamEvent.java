@@ -19,7 +19,7 @@ package org.apache.eagle.alert.engine.model;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;

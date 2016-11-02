@@ -19,7 +19,8 @@ package org.apache.eagle.alert.engine.sorter.impl;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockManager;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

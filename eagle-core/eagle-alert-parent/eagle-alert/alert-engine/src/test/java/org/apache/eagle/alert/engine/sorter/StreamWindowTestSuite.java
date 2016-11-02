@@ -22,7 +22,8 @@ import org.apache.eagle.alert.engine.mock.MockSampleMetadataFactory;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.sorter.impl.PartitionedEventTimeOrderingComparator;
 import org.apache.eagle.alert.engine.sorter.impl.StreamTimeClockInLocalMemory;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

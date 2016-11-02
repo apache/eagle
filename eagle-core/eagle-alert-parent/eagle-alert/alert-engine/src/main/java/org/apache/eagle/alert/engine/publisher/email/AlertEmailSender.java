@@ -18,7 +18,7 @@
 package org.apache.eagle.alert.engine.publisher.email;
 
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

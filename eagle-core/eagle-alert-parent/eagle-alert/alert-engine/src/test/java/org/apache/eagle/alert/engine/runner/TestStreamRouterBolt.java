@@ -37,8 +37,9 @@ import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.coordinator.impl.AbstractMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.StreamIdConversion;
+import org.apache.eagle.common.DateTimeUtil;
+
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
