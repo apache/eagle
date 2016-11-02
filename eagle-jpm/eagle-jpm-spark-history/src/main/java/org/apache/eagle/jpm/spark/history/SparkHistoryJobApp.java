@@ -29,7 +29,7 @@ public class SparkHistoryJobApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         // 1. Init conf
-        SparkHistoryJobAppConfig sparkHistoryJobAppConfig = SparkHistoryJobAppConfig.getInstance(config);
+        SparkHistoryJobAppConfig sparkHistoryJobAppConfig = SparkHistoryJobAppConfig.newInstance(config);
 
         final String jobFetchSpoutName = SparkHistoryJobAppConfig.SPARK_HISTORY_JOB_FETCH_SPOUT_NAME;
         final String jobParseBoltName = SparkHistoryJobAppConfig.SPARK_HISTORY_JOB_PARSE_BOLT_NAME;

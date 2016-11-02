@@ -40,23 +40,21 @@ public class SparkHistoryJobAppConfig implements Serializable {
 
     private Config config;
 
-    private static SparkHistoryJobAppConfig manager = new SparkHistoryJobAppConfig();
-    
     public Config getConfig() {
         return config;
     }
 
-    public SparkHistoryJobAppConfig() {
+    private SparkHistoryJobAppConfig(Config config) {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryConfig = new JobHistoryEndpointConfig();
         this.jobHistoryConfig.hdfs = new HashMap<>();
         this.eagleInfo = new EagleInfo();
         this.stormConfig = new StormConfig();
+        init(config);
     }
 
-    public static SparkHistoryJobAppConfig getInstance(Config config) {
-        manager.init(config);
-        return manager;
+    public static SparkHistoryJobAppConfig newInstance(Config config) {
+        return new SparkHistoryJobAppConfig(config);
     }
 
     private void init(Config config) {
