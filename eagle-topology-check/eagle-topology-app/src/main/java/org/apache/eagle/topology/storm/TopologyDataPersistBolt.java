@@ -54,8 +54,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class TopologyDataPersistBolt extends BaseRichBolt {
-
-	private static final long serialVersionUID = 1L;
 	
 	private TopologyCheckAppConfig config;
     private IEagleServiceClient client;
