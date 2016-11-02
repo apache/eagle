@@ -202,7 +202,12 @@ public class MetadataResource {
     @Path("/policies")
     @POST
     public OpResult addPolicy(PolicyDefinition policy) {
-        return dao.addPolicy(policy);
+        PolicyValidationResult validationResult = this.validatePolicy(policy);
+        if (validationResult.isSuccess()) {
+            return dao.addPolicy(policy);
+        } else {
+            return OpResult.fail(validationResult.getMessage());
+        }
     }
 
     @Path("/policies/validate")

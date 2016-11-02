@@ -82,35 +82,23 @@
 		<div class="box box-primary">
 			<div class="box-header with-border">
 				<span class="fa fa-pencil"></span>
-				<h3 class="box-title">Policy</h3>
+				<h3 class="box-title">Policy Editor</h3>
 			</div>
 			<div class="box-body">
+
+
 				<div class="row">
-					<div class="col-md-8">
+					<div class="col-md-12">
 						<div class="form-group">
-							<label>* Name</label>
-							<input type="text" class="form-control" ng-model="policy.name" ng-readonly="!newPolicy" ng-disabled="policyLock" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label>* Parallelism Hint</label>
-							<input type="text" class="form-control" ng-model="policy.parallelismHint" ng-disabled="policyLock" />
+							<label>Name *</label>
+							<input type="text" style="text-transform:uppercase" class="form-control" ng-model="policy.name" ng-readonly="!newPolicy" ng-disabled="policyLock" />
 						</div>
 					</div>
 				</div>
-
 
 				<div class="form-group">
 					<label>Description</label>
 					<textarea class="form-control" ng-model="policy.description" rows="2" ng-disabled="policyLock"></textarea>
-				</div>
-
-				<div class="form-group" ng-class="{'has-error': !!definitionMessage}">
-					<label>* Definition</label>
-					<div editor ng-model="policy.definition.value" ng-change="checkDefinition()"></div>
-					<!--textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()" ng-disabled="policyLock"></textarea-->
-					<p class="text-danger">{{definitionMessage}}</p>
 				</div>
 
 				<!--label>
@@ -135,9 +123,19 @@
 					</li>
 				</ul-->
 
-				<label>
-					Alert Stream
-				</label>
+				<div class="form-group" ng-class="{'has-error': !!definitionMessage}">
+					<label>Policy Definition *</label>
+					<div editor ng-model="policy.definition.value" ng-change="checkDefinition()"></div>
+					<!--textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()" ng-disabled="policyLock"></textarea-->
+					<p class="text-danger">{{definitionMessage}}</p>
+				</div>
+
+				<!--<label>-->
+					<!--Alert Stream-->
+				<!--</label>-->
+
+				<p class="text-danger" ng-if="policy.outputStreams.length === 0"><i class="fa fa-fw fa-warning"></i> No alert stream defined</p>
+
 				<ul class="sm-padding">
 					<li ng-repeat="stream in outputStreams track by $index">
 						<label>
@@ -145,12 +143,14 @@
 							{{stream}}
 						</label>
 					</li>
-					<li class="text-danger" ng-if="policy.outputStreams.length === 0">No alert stream yet.</li>
 				</ul>
 
 				<label>
-					Publisher
+					Publish Alerts
 				</label>
+
+				<p class="text-danger" ng-if="policyPublisherList.length === 0"><i class="fa fa-fw fa-warning"></i> No alert publisher defined </p>
+
 				<ul class="sm-padding">
 					<li ng-repeat="publisher in policyPublisherList track by $index">
 						<span>
@@ -165,11 +165,19 @@
 							<span>{{publisher.properties[field]}}</span>
 						</p>
 					</li>
-					<li class="text-danger" ng-if="policyPublisherList.length === 0">No publisher yet.</li>
 					<li>
 						<a ng-click="addPublisher()">+ Add Publisher</a>
 					</li>
 				</ul>
+
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<label>Schedule Parallelism *</label>
+							<input type="text" class="form-control" ng-model="policy.parallelismHint" ng-disabled="policyLock" />
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -178,7 +186,7 @@
 <div class="text-right">
 	<button class="btn btn-primary" ng-disabled="!saveCheck()" ng-click="saveConfirm()">
 		<span class="fa fa-floppy-o"></span>
-		Save
+		Apply
 	</button>
 </div>
 
