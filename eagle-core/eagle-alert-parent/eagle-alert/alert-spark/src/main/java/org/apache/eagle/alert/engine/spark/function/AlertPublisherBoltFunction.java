@@ -69,7 +69,6 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
                 publishState.store(streamId, cachedPublishments);
             }
             AlertStreamEvent alertEvent = tuple2._2;
-            LOG.info("AlertPublisherBoltFunction " + alertEvent);
             alertPublisher.nextEvent(alertEvent);
         }
         if (alertPublisher != null) {
