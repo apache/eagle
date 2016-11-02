@@ -62,6 +62,11 @@
 			var cssList = getResList('link[href][rel="stylesheet"]', 'href');
 			var jsList = getResList('script[src]', 'src');
 
+			// Filter requirement
+			jsList.requireList = $.grep(jsList.requireList, function(src) {
+				return !/ace\.js/.test(src);
+			});
+
 			// JS Worker process
 			var workerFolderPath = 'dev/public/js/worker/';
 			var workerList = fs.readdirSync(workerFolderPath);
@@ -120,7 +125,12 @@
 				},
 				copy: {
 					js: {
-						worker: workerList.concat(workerRequireList)
+						worker: workerList.concat(workerRequireList),
+						reference: [
+							"node_modules/ace-builds/src-min-noconflict/ace.js",
+							"node_modules/ace-builds/src-min-noconflict/theme-tomorrow.js",
+							"node_modules/ace-builds/src-min-noconflict/mode-sql.js"
+						]
 					}
 				}
 			};
