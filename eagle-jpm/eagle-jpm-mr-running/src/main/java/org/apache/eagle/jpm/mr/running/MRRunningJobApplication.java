@@ -33,7 +33,7 @@ public class MRRunningJobApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         //1. trigger init conf
-        MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.getInstance(config);
+        MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
 
         String[] confKeyPatternsSplit = mrRunningJobConfig.getConfig().getString("MRConfigureKeys.jobConfigKey").split(",");
         List<String> confKeyKeys = new ArrayList<>(confKeyPatternsSplit.length);
