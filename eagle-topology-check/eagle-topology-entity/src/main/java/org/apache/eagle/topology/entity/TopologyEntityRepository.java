@@ -26,5 +26,5 @@ public class TopologyEntityRepository extends EntityRepository {
         entitySet.add(HdfsServiceTopologyAPIEntity.class);
         entitySet.add(MRServiceTopologyAPIEntity.class);
         entitySet.add(JournalNodeServiceAPIEntity.class);
-   }
+    }
 }

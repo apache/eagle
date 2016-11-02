@@ -21,7 +21,7 @@ package org.apache.eagle.topology.extractor.mr;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class YarnNodeInfo {
 
@@ -40,60 +40,79 @@ public class YarnNodeInfo {
     public String getRack() {
         return rack;
     }
+
     public void setRack(String rack) {
         this.rack = rack;
     }
+
     public String getState() {
         return state;
     }
+
     public void setState(String state) {
         this.state = state;
     }
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getNodeHostName() {
         return nodeHostName;
     }
+
     public void setNodeHostName(String nodeHostName) {
         this.nodeHostName = nodeHostName;
     }
+
     public String getNodeHTTPAddress() {
         return nodeHTTPAddress;
     }
+
     public void setNodeHTTPAddress(String nodeHTTPAddress) {
         this.nodeHTTPAddress = nodeHTTPAddress;
     }
+
     public String getLastHealthUpdate() {
         return lastHealthUpdate;
     }
+
     public void setLastHealthUpdate(String lastHealthUpdate) {
         this.lastHealthUpdate = lastHealthUpdate;
     }
+
     public String getHealthReport() {
         return healthReport;
     }
+
     public void setHealthReport(String healthReport) {
         this.healthReport = healthReport;
     }
+
     public String getNumContainers() {
         return numContainers;
     }
+
     public void setNumContainers(String numContainers) {
         this.numContainers = numContainers;
     }
+
     public String getUsedMemoryMB() {
         return usedMemoryMB;
     }
+
     public void setUsedMemoryMB(String usedMemoryMB) {
         this.usedMemoryMB = usedMemoryMB;
     }
+
     public String getAvailMemoryMB() {
         return availMemoryMB;
     }
+
     public void setAvailMemoryMB(String availMemoryMB) {
         this.availMemoryMB = availMemoryMB;
     }

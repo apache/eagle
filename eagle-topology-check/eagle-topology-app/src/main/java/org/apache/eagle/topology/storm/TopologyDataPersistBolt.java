@@ -22,6 +22,7 @@ import static org.apache.eagle.topology.TopologyConstants.HOSTNAME_TAG;
 import static org.apache.eagle.topology.TopologyConstants.RACK_TAG;
 import static org.apache.eagle.topology.TopologyConstants.ROLE_TAG;
 import static org.apache.eagle.topology.TopologyConstants.SITE_TAG;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -29,8 +30,6 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-
-
 
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -54,8 +53,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class TopologyDataPersistBolt extends BaseRichBolt {
-	
-	private TopologyCheckAppConfig config;
+
+    private TopologyCheckAppConfig config;
     private IEagleServiceClient client;
     private OutputCollector collector;
 
@@ -67,8 +66,8 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.getConfig().getString("service.host"),this.config.getConfig().getInt("service.port"),
-        		this.config.getConfig().getString("service.username"),this.config.getConfig().getString("service.password")));
+        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.getConfig().getString("service.host"), this.config.getConfig().getInt("service.port"),
+            this.config.getConfig().getString("service.username"), this.config.getConfig().getString("service.password")));
         this.collector = collector;
     }
 
@@ -102,7 +101,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             emitToKafkaBolt(result);
             this.collector.ack(input);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
             this.collector.fail(input);
         }
     }
@@ -116,7 +115,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    	declarer.declare(new Fields("f1"));
+        declarer.declare(new Fields("f1"));
     }
 
     private void deleteEntities(List<TopologyBaseAPIEntity> entities, String serviceName) {
@@ -128,9 +127,9 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
                 LOG.info("Successfully delete {} entities for {}", entities.size(), serviceName);
             }
         } catch (EagleServiceClientException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
         entities.clear();
     }
@@ -151,53 +150,51 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     private String generateKey(TopologyBaseAPIEntity entity) {
         return String.format("%s-%s-%s-%s", entity.getTags().get(TopologyConstants.SITE_TAG),
-                entity.getTags().get(TopologyConstants.RACK_TAG), entity.getTags().get(TopologyConstants.HOSTNAME_TAG),
-                entity.getTags().get(TopologyConstants.ROLE_TAG));
+            entity.getTags().get(TopologyConstants.RACK_TAG), entity.getTags().get(TopologyConstants.HOSTNAME_TAG),
+            entity.getTags().get(TopologyConstants.ROLE_TAG));
     }
-    
-    private void emitToKafkaBolt(TopologyEntityParserResult result){    	
-    	
-    	List<HealthCheckParseAPIEntity> healthCheckParseAPIList = new ArrayList<HealthCheckParseAPIEntity>();    	
-   
-    	setNodeInfo(result.getMasterNodes(),healthCheckParseAPIList);      	
-    	
-    	setNodeInfo(result.getSlaveNodes(),healthCheckParseAPIList);    
-    	
-    	for(HealthCheckParseAPIEntity healthCheckAPIEntity : healthCheckParseAPIList){
-    		this.collector.emit(new Values(healthCheckAPIEntity));
-    	}
-        
+
+    private void emitToKafkaBolt(TopologyEntityParserResult result) {
+
+        List<HealthCheckParseAPIEntity> healthCheckParseAPIList = new ArrayList<HealthCheckParseAPIEntity>();
+
+        setNodeInfo(result.getMasterNodes(), healthCheckParseAPIList);
+
+        setNodeInfo(result.getSlaveNodes(), healthCheckParseAPIList);
+
+        for (HealthCheckParseAPIEntity healthCheckAPIEntity : healthCheckParseAPIList) {
+            this.collector.emit(new Values(healthCheckAPIEntity));
+        }
+
     }
-    
-    private void setNodeInfo(List<TopologyBaseAPIEntity> TopologyBaseAPIList, List<HealthCheckParseAPIEntity> healthCheckParseAPIList){
-    	
-    	HealthCheckParseAPIEntity healthCheckAPIEntity = null;
-    	
-    	for(Iterator<TopologyBaseAPIEntity> iterator = TopologyBaseAPIList.iterator(); iterator.hasNext();){   	
-    		
-    		 healthCheckAPIEntity = new HealthCheckParseAPIEntity();
-	   		 TopologyBaseAPIEntity topologyBaseAPIEntity = iterator.next();
-	   		 
-	   		 if(topologyBaseAPIEntity instanceof HBaseServiceTopologyAPIEntity){   			 
-	   		
-	   			healthCheckAPIEntity.setStatus(((HBaseServiceTopologyAPIEntity)topologyBaseAPIEntity).getStatus());	   			
-	   		
-	   		 }
-	   		 if(topologyBaseAPIEntity instanceof HdfsServiceTopologyAPIEntity){   			 
-	   			
-	   			healthCheckAPIEntity.setStatus(((HdfsServiceTopologyAPIEntity)topologyBaseAPIEntity).getStatus());
-	   		 }
-	   		
-	   		 if(topologyBaseAPIEntity instanceof MRServiceTopologyAPIEntity){	   			 
-	   		
-	   			healthCheckAPIEntity.setStatus(((MRServiceTopologyAPIEntity)topologyBaseAPIEntity).getStatus());
-	   		 }	  
-	   		 
-	   		healthCheckAPIEntity.setTimeStamp(topologyBaseAPIEntity.getTimestamp());
-	   		healthCheckAPIEntity.setHost(topologyBaseAPIEntity.getTags().get(HOSTNAME_TAG));
-	   		healthCheckAPIEntity.setRole(topologyBaseAPIEntity.getTags().get(ROLE_TAG));
-	   		healthCheckAPIEntity.setSite(topologyBaseAPIEntity.getTags().get(SITE_TAG));
-	   		healthCheckParseAPIList.add(healthCheckAPIEntity);	 
-    	}
+
+    private void setNodeInfo(List<TopologyBaseAPIEntity> topologyBaseAPIList, List<HealthCheckParseAPIEntity> healthCheckParseAPIList) {
+        HealthCheckParseAPIEntity healthCheckAPIEntity = null;
+        for (Iterator<TopologyBaseAPIEntity> iterator = topologyBaseAPIList.iterator(); iterator.hasNext(); ) {
+
+            healthCheckAPIEntity = new HealthCheckParseAPIEntity();
+            TopologyBaseAPIEntity topologyBaseAPIEntity = iterator.next();
+
+            if (topologyBaseAPIEntity instanceof HBaseServiceTopologyAPIEntity) {
+
+                healthCheckAPIEntity.setStatus(((HBaseServiceTopologyAPIEntity) topologyBaseAPIEntity).getStatus());
+
+            }
+            if (topologyBaseAPIEntity instanceof HdfsServiceTopologyAPIEntity) {
+
+                healthCheckAPIEntity.setStatus(((HdfsServiceTopologyAPIEntity) topologyBaseAPIEntity).getStatus());
+            }
+
+            if (topologyBaseAPIEntity instanceof MRServiceTopologyAPIEntity) {
+
+                healthCheckAPIEntity.setStatus(((MRServiceTopologyAPIEntity) topologyBaseAPIEntity).getStatus());
+            }
+
+            healthCheckAPIEntity.setTimeStamp(topologyBaseAPIEntity.getTimestamp());
+            healthCheckAPIEntity.setHost(topologyBaseAPIEntity.getTags().get(HOSTNAME_TAG));
+            healthCheckAPIEntity.setRole(topologyBaseAPIEntity.getTags().get(ROLE_TAG));
+            healthCheckAPIEntity.setSite(topologyBaseAPIEntity.getTags().get(SITE_TAG));
+            healthCheckParseAPIList.add(healthCheckAPIEntity);
+        }
     }
 }

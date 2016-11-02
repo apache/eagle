@@ -57,6 +57,7 @@ public class TopologyEntityParserResult {
     public TopologyConstants.HadoopVersion getVersion() {
         return version;
     }
+
     public void setVersion(TopologyConstants.HadoopVersion version) {
         this.version = version;
     }

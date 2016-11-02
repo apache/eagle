@@ -18,45 +18,50 @@
 package org.apache.eagle.topology.entity;
 
 public class HealthCheckParseAPIEntity {
-	
-	private String status;
-	private long timeStamp;
-	private String host;
-	private String role;
-	private String site;
-	
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	public long getTimeStamp() {
-		return timeStamp;
-	}
-	public void setTimeStamp(long timeStamp) {
-		this.timeStamp = timeStamp;
-	}
-	
-	public String getHost() {
-		return host;
-	}
-	public void setHost(String host) {
-		this.host = host;
-	}
-	
-	public String getRole() {
-		return role;
-	}
-	public void setRole(String role) {
-		this.role = role;
-	}
-	
-	public String getSite() {
-		return site;
-	}
-	public void setSite(String site) {
-		this.site = site;
-	}    
+
+    private String status;
+    private long timeStamp;
+    private String host;
+    private String role;
+    private String site;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
+    }
 }

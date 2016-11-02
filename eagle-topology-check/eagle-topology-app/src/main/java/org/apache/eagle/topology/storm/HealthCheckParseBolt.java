@@ -33,9 +33,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class HealthCheckParseBolt extends BaseRichBolt { 	
-	
-	private static Logger LOG = LoggerFactory.getLogger(HealthCheckParseBolt.class);
+public class HealthCheckParseBolt extends BaseRichBolt {
+
+    private static Logger LOG = LoggerFactory.getLogger(HealthCheckParseBolt.class);
     private OutputCollector collector;
 
     @Override
@@ -45,8 +45,8 @@ public class HealthCheckParseBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-    	HealthCheckParseAPIEntity result = null;
-        try{
+        HealthCheckParseAPIEntity result = null;
+        try {
             result = (HealthCheckParseAPIEntity) tuple.getValueByField("f1");
             Map<String, Object> map = new TreeMap<>();
             map.put("status", result.getStatus());
@@ -55,13 +55,13 @@ public class HealthCheckParseBolt extends BaseRichBolt {
             map.put("host", result.getHost());
             map.put("site", result.getSite());
 
-            if(LOG.isDebugEnabled()){
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("emitted " + map);
-            }      
+            }
             collector.emit(Arrays.asList(result.getHost(), map));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("Failing parse security log message, and ignore this message", ex);
-        }finally {
+        } finally {
             collector.ack(tuple);
         }
     }
