@@ -20,12 +20,7 @@ package org.apache.eagle.topology;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
-
-import com.microsoft.azure.storage.core.Logger;
 import com.typesafe.config.Config;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
@@ -34,14 +29,11 @@ import org.apache.eagle.topology.storm.TopologyCheckAppSpout;
 import org.apache.eagle.topology.storm.TopologyDataPersistBolt;
 
 public class TopologyCheckApp extends StormApplication {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	
 	private static final String SINK_TASK_NUM = "topology.numOfSinkTasks";
-	private static final String TOPOLOGY_HEALTH_CHECK_STREAM = "topology_health_check_stream";
-	Log logger = LogFactory.getLog(TopologyCheckApp.class);
+	private static final String TOPOLOGY_HEALTH_CHECK_STREAM = "topology_health_check_stream";	
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
@@ -49,7 +41,7 @@ public class TopologyCheckApp extends StormApplication {
         String spoutName = TopologyCheckAppConfig.TOPOLOGY_DATA_FETCH_SPOUT_NAME;
         String persistBoltName = TopologyCheckAppConfig.TOPOLOGY_ENTITY_PERSIST_BOLT_NAME;
         String parseBoltName = TopologyCheckAppConfig.PARSE_BOLT_NAME;
-        String kafkaSinkBoltName = TopologyCheckAppConfig.KAFKA_SINK_BOLT_NAME;
+        String kafkaSinkBoltName = TopologyCheckAppConfig.SINK_BOLT_NAME;
         int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
         
         TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -68,9 +60,8 @@ public class TopologyCheckApp extends StormApplication {
         topologyBuilder.setBolt(
     		parseBoltName,
     		new HealthCheckParseBolt(),
-    		topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(persistBoltName);      
-        
-        logger.info("start to sink messsage to kafka");
+    		topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(persistBoltName);         
+   
         StormStreamSink<?> sinkBolt = environment.getStreamSink(TOPOLOGY_HEALTH_CHECK_STREAM,config);
         topologyBuilder.setBolt(kafkaSinkBoltName, sinkBolt, numOfSinkTasks).setNumTasks(numOfSinkTasks).shuffleGrouping(parseBoltName);
 

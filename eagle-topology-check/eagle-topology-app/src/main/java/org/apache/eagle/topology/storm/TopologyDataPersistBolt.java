@@ -72,7 +72,8 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.config));
+        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.config.getString("service.host"),this.config.config.getInt("service.port"),
+        		this.config.config.getString("service.username"),this.config.config.getString("service.password")));
         this.collector = collector;
     }
 
@@ -120,7 +121,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    	declarer.declare(new Fields("kafkaData"));
+    	declarer.declare(new Fields("f1"));
     }
 
     private void deleteEntities(List<TopologyBaseAPIEntity> entities, String serviceName) {

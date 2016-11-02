@@ -23,10 +23,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.entity.HealthCheckParseAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +33,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * Since 10/26/16.
- */
-public class HealthCheckParseBolt extends BaseRichBolt {
-    /**
-	 * 
-	 */
+public class HealthCheckParseBolt extends BaseRichBolt { 
+
 	private static final long serialVersionUID = 1L;
 	
 	private static Logger LOG = LoggerFactory.getLogger(HealthCheckParseBolt.class);
@@ -58,7 +49,7 @@ public class HealthCheckParseBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
     	HealthCheckParseAPIEntity result = null;
         try{
-        	result = (HealthCheckParseAPIEntity) tuple.getValueByField("kafkaData");
+        	result = (HealthCheckParseAPIEntity) tuple.getValueByField("f1");
             Map<String, Object> map = new TreeMap<>();
             map.put("status", result.getStatus());
             map.put("timestamp", result.getTimeStamp());

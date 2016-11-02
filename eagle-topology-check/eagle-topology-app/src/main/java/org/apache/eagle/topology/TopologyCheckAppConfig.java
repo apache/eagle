@@ -29,11 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TopologyCheckAppConfig implements Serializable {
-
-    public static final String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
+	
+	private static final long serialVersionUID = 1L;
+	
+	public static final String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
     public static final String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
     public static final String PARSE_BOLT_NAME = "parserBolt";
-    public static final String KAFKA_SINK_BOLT_NAME = "kafkaSinkBolt";
+    public static final String SINK_BOLT_NAME = "sinkBolt";
 
     private static final int MAX_NUM_THREADS = 10;
     private static final String HBASE_ZOOKEEPER_CLIENT_PORT = "2181";
