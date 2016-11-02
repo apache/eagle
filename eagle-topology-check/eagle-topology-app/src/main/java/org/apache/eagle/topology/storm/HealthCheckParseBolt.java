@@ -33,9 +33,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class HealthCheckParseBolt extends BaseRichBolt { 
-
-	private static final long serialVersionUID = 1L;
+public class HealthCheckParseBolt extends BaseRichBolt { 	
 	
 	private static Logger LOG = LoggerFactory.getLogger(HealthCheckParseBolt.class);
     private OutputCollector collector;
@@ -49,7 +47,7 @@ public class HealthCheckParseBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
     	HealthCheckParseAPIEntity result = null;
         try{
-        	result = (HealthCheckParseAPIEntity) tuple.getValueByField("f1");
+            result = (HealthCheckParseAPIEntity) tuple.getValueByField("f1");
             Map<String, Object> map = new TreeMap<>();
             map.put("status", result.getStatus());
             map.put("timestamp", result.getTimeStamp());
