@@ -16,10 +16,12 @@
  */
 package org.apache.eagle.alert.engine.model;
 
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.utils.DateTimeUtil;
+
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

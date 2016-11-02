@@ -22,8 +22,8 @@ import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamWindow;
 import org.apache.eagle.alert.engine.sorter.StreamWindowManager;
 import org.apache.eagle.alert.engine.sorter.StreamWindowRepository;
-import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+import org.apache.eagle.common.DateTimeUtil;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.joda.time.Period;
