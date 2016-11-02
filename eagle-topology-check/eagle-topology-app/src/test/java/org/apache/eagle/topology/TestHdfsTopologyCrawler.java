@@ -32,7 +32,7 @@ public class TestHdfsTopologyCrawler {
     public void test() {
         Config config = ConfigFactory.load();
 
-        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
+        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
         TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
         HdfsTopologyCrawler crawler = new HdfsTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
         crawler.extract();

@@ -32,7 +32,7 @@ public class TestHbaseTopologyCrawler {
     public void test() {
         Config config = ConfigFactory.load();
 
-        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
+        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
         TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
         HbaseTopologyCrawler crawler = new HbaseTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
         crawler.extract();
