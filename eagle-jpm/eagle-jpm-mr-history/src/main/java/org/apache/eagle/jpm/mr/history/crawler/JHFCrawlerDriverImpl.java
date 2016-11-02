@@ -61,13 +61,13 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private JobCountMetricsGenerator jobCountMetricsGenerator;
 
     public JHFCrawlerDriverImpl(JHFInputStreamCallback reader,
-                                JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
+                                JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId, MRHistoryJobConfig appConfig) throws Exception {
         this.reader = reader;
         jhfLCM = historyLCM;//new JobHistoryDAOImpl(jobHistoryConfig);
         this.partitionId = partitionId;
         this.jobFilter = jobFilter;
-        timeZone = TimeZone.getTimeZone(MRHistoryJobConfig.get().getJobHistoryEndpointConfig().timeZone);
-        jobCountMetricsGenerator = new JobCountMetricsGenerator(timeZone);
+        timeZone = TimeZone.getTimeZone(appConfig.getJobHistoryEndpointConfig().timeZone);
+        jobCountMetricsGenerator = new JobCountMetricsGenerator(timeZone, appConfig);
     }
 
     /**

@@ -29,7 +29,7 @@ import org.apache.eagle.topology.storm.TopologyDataPersistBolt;
 public class TopologyCheckApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
+        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
 
         String spoutName = TopologyCheckAppConfig.TOPOLOGY_DATA_FETCH_SPOUT_NAME;
         String persistBoltName = TopologyCheckAppConfig.TOPOLOGY_ENTITY_PERSIST_BOLT_NAME;

@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.*;
 
+import static org.apache.eagle.jpm.aggregation.AggregationConfig.EagleServiceConfig;
+
 public class MRMetricAggregator implements MetricAggregator, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRMetricAggregator.class);
 
@@ -39,25 +41,29 @@ public class MRMetricAggregator implements MetricAggregator, Serializable {
     private List<List<String>> aggregateColumns;
     //key is AggregatorColumns, value is a map(key is timeStamp, value is metric value)
     private Map<AggregatorColumns, Map<Long, Long>> aggregateValues;
+    private AggregationConfig appConfig;
+    private EagleServiceConfig eagleServiceConfig;
 
-    public MRMetricAggregator(String metric, List<List<String>> aggregateColumns) {
+    public MRMetricAggregator(String metric, List<List<String>> aggregateColumns, AggregationConfig appConfig) {
         this.metric = metric;
         this.aggregateColumns = aggregateColumns;
         this.aggregateValues = new TreeMap<>();
+        this.appConfig = appConfig;
+        eagleServiceConfig = appConfig.getEagleServiceConfig();
     }
 
     @Override
     public boolean aggregate(long startTime, long endTime) {
         LOG.info("start to aggregate {} from {} to {}", metric, startTime, endTime);
         IEagleServiceClient client = new EagleServiceClientImpl(
-            AggregationConfig.get().getEagleServiceConfig().eagleServiceHost,
-            AggregationConfig.get().getEagleServiceConfig().eagleServicePort,
-            AggregationConfig.get().getEagleServiceConfig().username,
-            AggregationConfig.get().getEagleServiceConfig().password);
+                eagleServiceConfig.eagleServiceHost,
+                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.username,
+                eagleServiceConfig.password);
 
         String query = String.format("%s[@site=\"%s\"]{*}",
             Constants.GENERIC_METRIC_SERVICE,
-            AggregationConfig.get().getStormConfig().site);
+            appConfig.getStormConfig().site);
 
         GenericServiceAPIResponseEntity response;
         try {
@@ -115,10 +121,10 @@ public class MRMetricAggregator implements MetricAggregator, Serializable {
 
     private boolean flush() {
         IEagleServiceClient client = new EagleServiceClientImpl(
-            AggregationConfig.get().getEagleServiceConfig().eagleServiceHost,
-            AggregationConfig.get().getEagleServiceConfig().eagleServicePort,
-            AggregationConfig.get().getEagleServiceConfig().username,
-            AggregationConfig.get().getEagleServiceConfig().password);
+                eagleServiceConfig.eagleServiceHost,
+                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.username,
+                eagleServiceConfig.password);
 
         List<GenericMetricEntity> entities = new ArrayList<>();
         for (AggregatorColumns aggregatorColumns : this.aggregateValues.keySet()) {

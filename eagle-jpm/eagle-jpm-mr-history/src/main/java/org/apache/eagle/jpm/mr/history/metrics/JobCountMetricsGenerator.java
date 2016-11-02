@@ -32,13 +32,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.EagleServiceConfig;
+
 public class JobCountMetricsGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(JobCountMetricsGenerator.class);
 
     private TimeZone timeZone;
 
-    public JobCountMetricsGenerator(TimeZone timeZone) {
+    private MRHistoryJobConfig appConfig;
+
+    public JobCountMetricsGenerator(TimeZone timeZone, MRHistoryJobConfig appConfig) {
         this.timeZone = timeZone;
+        this.appConfig = appConfig;
     }
 
     public void flush(String date, int year, int month, int day) throws Exception {
@@ -58,11 +63,12 @@ public class JobCountMetricsGenerator {
         }
         int failed = total - killed - succeeded;
 
+        EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
         final IEagleServiceClient client = new EagleServiceClientImpl(
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
-            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
-            MRHistoryJobConfig.get().getEagleServiceConfig().username,
-            MRHistoryJobConfig.get().getEagleServiceConfig().password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
 
 
         GregorianCalendar cal = new GregorianCalendar(year, month, day);
@@ -88,7 +94,7 @@ public class JobCountMetricsGenerator {
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", MRHistoryJobConfig.get().getJobHistoryEndpointConfig().site);
+                put("site", appConfig.getJobHistoryEndpointConfig().site);
                 put(MRJobTagName.JOB_STATUS.toString(), state);
             }
         };

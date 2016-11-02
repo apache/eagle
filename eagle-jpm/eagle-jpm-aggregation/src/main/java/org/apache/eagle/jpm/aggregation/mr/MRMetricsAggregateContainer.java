@@ -34,31 +34,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.eagle.jpm.aggregation.AggregationConfig.EagleServiceConfig;
+
 public class MRMetricsAggregateContainer implements MetricsAggregateContainer, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRMetricsAggregateContainer.class);
 
     private Map<String, MetricAggregator> metricAggregators;
+    private AggregationConfig appConfig;
 
-    public MRMetricsAggregateContainer(Map<String, List<List<String>>> metrics) {
+    public MRMetricsAggregateContainer(Map<String, List<List<String>>> metrics, AggregationConfig appConfig) {
         this.metricAggregators = new HashMap<>();
         //metric name, aggregate columns
         for (String metric : metrics.keySet()) {
-            this.metricAggregators.put(metric, new MRMetricAggregator(metric, metrics.get(metric)));
+            this.metricAggregators.put(metric, new MRMetricAggregator(metric, metrics.get(metric), appConfig));
         }
+        this.appConfig = appConfig;
     }
 
     @Override
     public long fetchLatestJobProcessTime() {
         try {
+            EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
             IEagleServiceClient client = new EagleServiceClientImpl(
-                AggregationConfig.get().getEagleServiceConfig().eagleServiceHost,
-                AggregationConfig.get().getEagleServiceConfig().eagleServicePort,
-                AggregationConfig.get().getEagleServiceConfig().username,
-                AggregationConfig.get().getEagleServiceConfig().password);
+                    eagleServiceConfig.eagleServiceHost,
+                    eagleServiceConfig.eagleServicePort,
+                    eagleServiceConfig.username,
+                    eagleServiceConfig.password);
 
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
                 Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
-                AggregationConfig.get().getStormConfig().site);
+                appConfig.getStormConfig().site);
 
             GenericServiceAPIResponseEntity response = client
                 .search(query)

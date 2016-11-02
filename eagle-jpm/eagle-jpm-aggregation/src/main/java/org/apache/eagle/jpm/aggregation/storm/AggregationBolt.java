@@ -18,33 +18,32 @@
 
 package org.apache.eagle.jpm.aggregation.storm;
 
-import org.apache.eagle.jpm.aggregation.AggregationConfig;
-import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import com.typesafe.config.Config;
+import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static org.apache.eagle.jpm.aggregation.AggregationConfig.StormConfig;
+
 public class AggregationBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationBolt.class);
-    private Config config;
+    private StormConfig stormConfig;
     private OutputCollector collector;
     private MetricsAggregateContainer metricsAggregateContainer;
 
-    public AggregationBolt(Config config, MetricsAggregateContainer metricsAggregateContainer) {
-        this.config = config;
+    public AggregationBolt(StormConfig stormConfig, MetricsAggregateContainer metricsAggregateContainer) {
+        this.stormConfig = stormConfig;
         this.metricsAggregateContainer = metricsAggregateContainer;
     }
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        AggregationConfig.getInstance(config);
         this.collector = outputCollector;
     }
 
@@ -52,7 +51,7 @@ public class AggregationBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         Long startTime = tuple.getLongByField("startTime");
         LOG.info("get startTime {}", startTime);
-        Long endTime = startTime + AggregationConfig.get().getStormConfig().aggregationDuration * 1000;
+        Long endTime = startTime + stormConfig.aggregationDuration * 1000;
 
         if (metricsAggregateContainer.aggregate(startTime, endTime)) {
             collector.ack(tuple);
