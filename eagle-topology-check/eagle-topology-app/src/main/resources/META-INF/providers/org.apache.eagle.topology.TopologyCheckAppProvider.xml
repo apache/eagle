@@ -63,8 +63,8 @@
       
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
-            <displayName>Zookeeper Quorum</displayName>
-            <description>Zookeeper Quorum</description>
+            <displayName>HBase Zookeeper Quorum</displayName>
+            <description>HBase Zookeeper Quorum</description>
             <value>sandbox.hortonworks.com:2181</value>
             <required>true</required>
         </property>
