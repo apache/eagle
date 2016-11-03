@@ -33,8 +33,8 @@ public class DateTimeUtil {
     public static final long ONEMINUTE = 1L * 60L * 1000L;
     public static final long ONEHOUR = 1L * 60L * 60L * 1000L;
     public static final long ONEDAY = 24L * 60L * 60L * 1000L;
-    //private static TimeZone CURRENT_TIME_ZONE = EagleConfigFactory.load().getTimeZone();
-    private static TimeZone CURRENT_TIME_ZONE = TimeZone.getDefault();
+    private static TimeZone CURRENT_TIME_ZONE = EagleConfigFactory.load().getTimeZone();
+    //private static TimeZone CURRENT_TIME_ZONE = TimeZone.getDefault();
 
     public static Date humanDateToDate(String date) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
