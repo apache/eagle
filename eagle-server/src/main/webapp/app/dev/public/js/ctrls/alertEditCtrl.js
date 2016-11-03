@@ -97,11 +97,15 @@
 		}, $scope.policy);
 		console.log("[Policy]", $scope.policy);
 
+		var cacheSearchType;
 		var cacheSearchSourceKey;
 		var searchApplications;
+
+		$scope.searchType = "app";
 		$scope.searchSourceKey = "";
 		$scope.applications = {};
 		$scope.newPolicy = !$scope.policy.name;
+		$scope.autoPolicyDescription = $scope.newPolicy && !$scope.policy.description;
 
 		PageConfig.navPath = [
 			{title: "Policy List", path: "/policies"},
@@ -120,26 +124,29 @@
 		// =                        Input Stream                        =
 		// ==============================================================
 		$scope.getSearchApplication = function() {
-			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase()) {
+			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSearchType !== $scope.searchType) {
+				var match = false;
 				cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
+				cacheSearchType = $scope.searchType;
 
 				searchApplications = {};
 				$.each($scope.applications, function (appName, streams) {
-					if(appName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0) {
-						searchApplications[appName] = streams;
-					} else {
-						var streamList = [];
-						$.each(streams, function (i, stream) {
-							if(stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0) {
-								streamList.push(stream);
-							}
-						});
-
-						if(streamList.length > 0) {
-							searchApplications[appName] = streamList;
+					$.each(streams, function (i, stream) {
+						var groupName = cacheSearchType === "app" ? stream.dataSource : stream.siteId;
+						if(
+							groupName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0 ||
+							stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0
+						) {
+							match = true;
+							var group = searchApplications[groupName] = searchApplications[groupName] || [];
+							group.push(stream);
 						}
-					}
+					});
 				});
+
+				if(!match) {
+					searchApplications = null;
+				}
 			}
 			return searchApplications;
 		};
@@ -172,6 +179,12 @@
 		// ==============================================================
 		// =                         Definition                         =
 		// ==============================================================
+		function autoDescription() {
+			if(!$scope.autoPolicyDescription) return;
+
+			$scope.policy.description = "Policy for " + $scope.policy.outputStreams.join(", ");
+		}
+
 		var checkPromise;
 		$scope.definitionMessage = "";
 		$scope.checkDefinition = function () {
@@ -194,6 +207,7 @@
 							});
 							$scope.policy.outputStreams = outputStreams.concat();
 							$scope.outputStreams = outputStreams;
+							autoDescription();
 
 							// Partition
 							$scope.policy.partitionSpec = data.policyExecutionPlan.streamPartitions;
@@ -220,6 +234,7 @@
 			} else {
 				$scope.policy.outputStreams.push(streamId);
 			}
+			autoDescription();
 		};
 
 		// ==============================================================
