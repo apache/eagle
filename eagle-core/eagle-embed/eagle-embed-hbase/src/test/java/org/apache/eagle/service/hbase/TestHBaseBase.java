@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.service.hbase;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.apache.hadoop.conf.Configuration;
+import org.junit.*;
+
+
 
 @Ignore
 public class TestHBaseBase {
@@ -28,6 +28,11 @@ public class TestHBaseBase {
     @BeforeClass
     public static void setUpHBase() {
         hbase = EmbeddedHbase.getInstance();
+    }
+
+    public static void setupHBaseWithConfig(Configuration config){
+        Assert.assertTrue("HBase test mini cluster should not start",null == hbase);
+        hbase = EmbeddedHbase.getInstance(config);
     }
 
     @AfterClass
