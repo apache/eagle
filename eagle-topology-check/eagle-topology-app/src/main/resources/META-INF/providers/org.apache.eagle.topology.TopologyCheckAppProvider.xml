@@ -101,6 +101,7 @@
             <description>Hbase Eagle KeyTab</description>
             <value></value>
         </property>
+
         <property>
             <name>dataSourceConfig.hdfs.namenodeUrl</name>
             <displayName>Hdfs Namenode Web URL</displayName>
@@ -175,6 +176,7 @@
                     <name>host</name>
                     <type>string</type>
                 </column>
+
                 <column>
                     <name>site</name>
                     <type>string</type>
