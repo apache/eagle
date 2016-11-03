@@ -21,6 +21,35 @@
 
 	var eagleControllers = angular.module('eagleControllers');
 
+	var serviceModule = angular.module('eagle.service');
+
+	serviceModule.service('Policy', function($q, UI, Entity) {
+		return {
+			delete: function (policy) {
+				var deferred = $q.defer();
+
+				UI.deleteConfirm(policy.name)(function (entity, closeFunc) {
+					Entity.deleteMetadata("policies/" + policy.name)._promise.finally(function () {
+						closeFunc();
+						deferred.resolve();
+					});
+				}, function () {
+					deferred.reject();
+				});
+
+				return deferred.promise;
+			},
+
+			start: function (policy) {
+				return Entity.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/ENABLED", {})._promise;
+			},
+
+			stop: function (policy) {
+				return Entity.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})._promise;
+			}
+		};
+	});
+
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
@@ -74,7 +103,7 @@
 	// ======================================================================================
 	// =                                       Policy                                       =
 	// ======================================================================================
-	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
+	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
 		PageConfig.title = "Policies";
 
 		$scope.policyList = [];
@@ -87,29 +116,20 @@
 		}
 		updateList();
 
-		$scope.deletePolicy = function (item) {
-			UI.deleteConfirm(item.name)(function (entity, closeFunc) {
-				Entity.deleteMetadata("policies/" + item.name)._promise.finally(function () {
-					closeFunc();
-					updateList();
-				});
-			});
+		$scope.deletePolicy = function(policy) {
+			Policy.delete(policy).then(updateList);
 		};
 
-		$scope.startPolicy = function (policy) {
-			Entity
-				.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/ENABLED", {})
-				._then(updateList);
+		$scope.startPolicy = function(policy) {
+			Policy.start(policy).then(updateList);
 		};
 
-		$scope.stopPolicy = function (policy) {
-			Entity
-				.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})
-				._then(updateList);
+		$scope.stopPolicy = function(policy) {
+			Policy.stop(policy).then(updateList);
 		};
 	});
 
-	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
 		PageConfig.title = $wrapState.param.name;
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
@@ -117,21 +137,38 @@
 			{title: "Detail"}
 		];
 
-		var policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
-		policyList._promise.then(function () {
-			$scope.policy = policyList[0];
-			console.log("[Policy]", $scope.policy);
+		function updatePolicy() {
+			var policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
+			policyList._promise.then(function () {
+				$scope.policy = policyList[0];
+				console.log("[Policy]", $scope.policy);
 
-			if(!$scope.policy) {
-				$.dialog({
-					title: "OPS",
-					content: "Policy '" + $wrapState.param.name + "' not found!"
-				}, function () {
-					$wrapState.go("policyList");
-				});
-			} else {
-				$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
-			}
-		});
+				if(!$scope.policy) {
+					$.dialog({
+						title: "OPS",
+						content: "Policy '" + $wrapState.param.name + "' not found!"
+					}, function () {
+						$wrapState.go("policyList");
+					});
+				} else {
+					$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
+				}
+			});
+		}
+		updatePolicy();
+
+		$scope.deletePolicy = function() {
+			Policy.delete($scope.policy).then(function () {
+				$wrapState.go("policyList");
+			});
+		};
+
+		$scope.startPolicy = function() {
+			Policy.start($scope.policy).then(updatePolicy);
+		};
+
+		$scope.stopPolicy = function() {
+			Policy.stop($scope.policy).then(updatePolicy);
+		};
 	});
 }());
