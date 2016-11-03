@@ -22,13 +22,13 @@
     <name>Topology Health Check</name>
     <version>0.5.0-incubating</version>
     <configuration>
-        <!-- org.apache.eagle.topology.TopologyCheckApp -->   
+        <!-- org.apache.eagle.topology.TopologyCheckApp -->
         <property>
             <name>dataExtractorConfig.site</name>
             <displayName>site</displayName>
             <description>Site</description>
             <value>sandbox</value>
-        </property>  
+        </property>
         <property>
             <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
             <displayName>Fetch Data Interval in Secs</displayName>
@@ -52,15 +52,15 @@
             <displayName>Bolt Task Number</displayName>
             <description>Bolt Task Number</description>
             <value>1</value>
-        </property> 
-        
+        </property>
+
         <property>
             <name>dataExtractorConfig.rackResolverCls</name>
             <displayName>Rack Resolver Class</displayName>
             <description>rack resolver class</description>
             <value>org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver</value>
-        </property>     
-      
+        </property>
+
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>HBase Zookeeper Quorum</displayName>
@@ -88,14 +88,20 @@
             <description>Hbase Master Principal</description>
             <value>hadoop/_HOST@EXAMPLE.COM</value>
         </property>
-     
+
         <property>
-            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
-            <displayName>Hbase Master Principal</displayName>
+            <name>dataSourceConfig.hbase.kerberos.eagle.principal</name>
+            <displayName>Hbase Eagle Principal</displayName>
             <description>Hbase Master Principal</description>
-            <value>hadoop/_HOST@EXAMPLE.COM</value>
-        </property>  
-        
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.kerberos.eagle.keytab</name>
+            <displayName>Hbase Eagle KeyTab</displayName>
+            <description>Hbase Eagle KeyTab</description>
+            <value></value>
+        </property>
+
         <property>
             <name>dataSourceConfig.hdfs.namenodeUrl</name>
             <displayName>Hdfs Namenode Web URL</displayName>
@@ -110,21 +116,20 @@
             <value>http://sandbox.hortonworks.com:8088</value>
             <required>true</required>
         </property>
-
         <property>
             <name>dataSourceConfig.mr.historyServerUrl</name>
             <displayName>History Server URL</displayName>
-            <description>History Server URL</description>            
-            <value></value>  
-        </property> 
-        
+            <description>History Server URL</description>
+            <value></value>
+        </property>
+
         <property>
             <name>topology.numOfSinkTasks</name>
             <displayName>topology.numOfSinkTasks</displayName>
             <value>2</value>
             <description>number of sink tasks</description>
         </property>
-        
+
         <!-- data sink configurations -->
         <property>
             <name>dataSinkConfig.topic</name>
@@ -150,14 +155,14 @@
             <value>kafka.serializer.StringEncoder</value>
             <description>Serializer Class Kafka Message Key</description>
         </property>
-        
+
     </configuration>
     <streams>
         <stream>
             <streamId>topology_health_check_stream</streamId>
             <description>topology health check Stream</description>
             <validate>true</validate>
-            <timeseries>true</timeseries>    
+            <timeseries>true</timeseries>
             <columns>
                 <column>
                     <name>status</name>
@@ -170,7 +175,8 @@
                 <column>
                     <name>host</name>
                     <type>string</type>
-                </column> 
+                </column>
+
                 <column>
                     <name>site</name>
                     <type>string</type>
@@ -178,7 +184,7 @@
                 <column>
                     <name>role</name>
                     <type>string</type>
-                </column>            
+                </column>
             </columns>
         </stream>
     </streams>
