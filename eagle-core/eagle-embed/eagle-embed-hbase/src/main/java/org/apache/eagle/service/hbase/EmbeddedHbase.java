@@ -42,26 +42,37 @@ public class EmbeddedHbase {
         this(port, DEFAULT_ZNODE);
     }
     
-    public static EmbeddedHbase getInstance() {
+    public static EmbeddedHbase getInstance(Configuration conf) {
         if (hbase == null) {
             synchronized (EmbeddedHbase.class) {
                 if (hbase == null) {
                     hbase = new EmbeddedHbase();
-                    hbase.start();                           
+                    hbase.start(conf);
                 }
             }
         }
         return hbase;
     }
-    
+
+    public static EmbeddedHbase getInstance() {
+        return  getInstance(null);
+    }
+
     private EmbeddedHbase() {
         this(DEFAULT_PORT, DEFAULT_ZNODE);
     }
 
     public void start() {
+        start(null);
+    }
+
+    public void start(Configuration confMap) {
         try {
             util = new HBaseTestingUtility();
             Configuration conf = util.getConfiguration();
+            if(confMap != null) {
+                conf.addResource(confMap);
+            }
             conf.setInt("test.hbase.zookeeper.property.clientPort", port);
             conf.set("zookeeper.znode.parent", znode);
             conf.setInt("hbase.zookeeper.property.maxClientCnxns", 200);
