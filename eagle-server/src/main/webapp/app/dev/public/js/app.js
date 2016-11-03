@@ -296,7 +296,14 @@ var app = {};
 				}
 			});
 
-			$scope.$on('$stateChangeSuccess ', function (event) {
+			$scope.$on('$stateChangeSuccess', function (event) {
+				var _innerSearch = Time._innerSearch;
+				Time._innerSearch = null;
+				if(_innerSearch) {
+					setTimeout(function () {
+						$wrapState.go(".", $.extend({}, $wrapState.param, _innerSearch), {location: "replace", notify: false});
+					}, 0);
+				}
 				console.log("[Switch] done ->", event);
 			});
 
