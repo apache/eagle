@@ -22,85 +22,85 @@ import java.util.List;
 
 public class CircularArrayListSortedSet<E> {
 
-	private final CircularArrayList<E> list;
+    private final CircularArrayList<E> list;
     private final Comparator<? super E> comparator;
 
-	public CircularArrayListSortedSet(E[] array) {
-		this.list = new CircularArrayList<E>(array);
-		this.comparator = null;
-	}
-	
-	public CircularArrayListSortedSet(E[] array, Comparator<? super E> comparator) {
-		this.list = new CircularArrayList<E>(array);
-		this.comparator = comparator;
-	}
-	
+    public CircularArrayListSortedSet(E[] array) {
+        this.list = new CircularArrayList<E>(array);
+        this.comparator = null;
+    }
+
+    public CircularArrayListSortedSet(E[] array, Comparator<? super E> comparator) {
+        this.list = new CircularArrayList<E>(array);
+        this.comparator = comparator;
+    }
+
     public int capacity() {
         return list.capacity();
     }
-    
+
     public int head() {
-    	return list.head();
+        return list.head();
     }
-    
+
     public int tail() {
-    	return list.tail();
+        return list.tail();
     }
-    
+
     public boolean isFull() {
-    	return list.isFull();
+        return list.isFull();
     }
-  
+
     public void clear() {
-    	list.clear();
+        list.clear();
     }
-    
+
     public int size() {
-    	return list.size();
+        return list.size();
     }
-  
+
     public E get(int i) {
         return list.get(i);
     }
-    
+
     @SuppressWarnings("unchecked")
-	public int binarySearch(E e) {
-    	if (comparator != null) {
-    		return Collections.binarySearch(list, e, comparator);
-    	} else {
-    		return Collections.binarySearch((List<? extends Comparable<? super E>>)list, e);
-    	}
+    public int binarySearch(E e) {
+        if (comparator != null) {
+            return Collections.binarySearch(list, e, comparator);
+        } else {
+            return Collections.binarySearch((List<? extends Comparable<? super E>>) list, e);
+        }
     }
-    
+
     public int replace(E e) {
-    	int index = binarySearch(e);
-    	if (index < 0) {
-    		return -1;
-    	}
-    	list.set(index, e);
-    	return index;
+        int index = binarySearch(e);
+        if (index < 0) {
+            return -1;
+        }
+        list.set(index, e);
+        return index;
     }
-  
+
     public int insert(E e) {
-    	int index = binarySearch(e);
-    	if (index > 0) {
-    		return -1;
-    	}
-    	index = 0 - index - 1;
-    	list.add(index, e);
-    	return index;
+        int index = binarySearch(e);
+        if (index > 0) {
+            return -1;
+        }
+        index = 0 - index - 1;
+        list.add(index, e);
+        return index;
     }
-  
+
     public E remove(int i) {
-    	return list.remove(i);
+        return list.remove(i);
     }
-    
+
     public int remove(E e) {
-    	final int index = binarySearch(e);
-    	if (index > 0) {
-        	list.remove(index);
-        	return index;
-    	}
-    	return -1;
+        final int index = binarySearch(e);
+        if (index > 0) {
+            list.remove(index);
+            return index;
+        }
+        return -1;
     }
 }

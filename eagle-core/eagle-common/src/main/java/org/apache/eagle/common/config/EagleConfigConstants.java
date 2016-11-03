@@ -44,7 +44,7 @@ public final class EagleConfigConstants {
     public static final int DEFAULT_SERVICE_PORT = 8080;
     public static final String DEFAULT_ZOOKEEPER_ZNODE_PARENT = "/hbase-unsecure";
 
-    public static final String EAGLE_PROPS="eagleProps";
+    public static final String EAGLE_PROPS = "eagleProps";
     public static final String EAGLE_SERVICE = "eagleService";
     public static final String HOST = "host";
     public static final String PORT = "port";

@@ -23,7 +23,7 @@ import java.util.Map;
 
 
 public class ConfigOptionParser extends AbstractConfigOptionParser {
-    private final static String CONFIG_OPT_FLAG = "D";
+    private static final String CONFIG_OPT_FLAG = "D";
 
     @Override
     protected Parser parser() {
@@ -38,27 +38,27 @@ public class ConfigOptionParser extends AbstractConfigOptionParser {
     }
 
     @Override
-    public Map<String,String> parseConfig(String[] arguments) throws ParseException {
+    public Map<String, String> parseConfig(String[] arguments) throws ParseException {
         CommandLine cmd = parse(arguments);
         return parseCommand(cmd);
     }
 
-    protected Map<String,String> parseCommand(CommandLine cmd) throws ParseException {
-        Map<String,String> result = new HashMap<>();
-        if(cmd.hasOption(CONFIG_OPT_FLAG)){
+    protected Map<String, String> parseCommand(CommandLine cmd) throws ParseException {
+        Map<String, String> result = new HashMap<>();
+        if (cmd.hasOption(CONFIG_OPT_FLAG)) {
             String[] values = cmd.getOptionValues(CONFIG_OPT_FLAG);
-            for(String value:values){
+            for (String value : values) {
                 int eqIndex = value.indexOf("=");
-                if(eqIndex>0 && eqIndex<value.length()){
-                    String k = value.substring(0,eqIndex);
-                    String v = value.substring(eqIndex+1,value.length());
-                    if(result.containsKey(k)){
-                        throw new ParseException("Duplicated "+CONFIG_OPT_FLAG+" "+value);
-                    }else{
-                        result.put(k,v);
+                if (eqIndex > 0 && eqIndex < value.length()) {
+                    String k = value.substring(0, eqIndex);
+                    String v = value.substring(eqIndex + 1, value.length());
+                    if (result.containsKey(k)) {
+                        throw new ParseException("Duplicated " + CONFIG_OPT_FLAG + " " + value);
+                    } else {
+                        result.put(k, v);
                     }
-                }else{
-                    throw new ParseException("Invalid format: -"+CONFIG_OPT_FLAG+" "+value+", required: -"+CONFIG_OPT_FLAG+" key=value");
+                } else {
+                    throw new ParseException("Invalid format: -" + CONFIG_OPT_FLAG + " " + value + ", required: -" + CONFIG_OPT_FLAG + " key=value");
                 }
             }
         }

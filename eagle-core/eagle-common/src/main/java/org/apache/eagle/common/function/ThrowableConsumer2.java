@@ -17,6 +17,6 @@ package org.apache.eagle.common.function;
  * limitations under the License.
  */
 @FunctionalInterface
-public interface ThrowableConsumer2<T1,T2, E extends Throwable> {
-    void accept(T1 o1,T2 o2) throws E;
+public interface ThrowableConsumer2<T1, T2, E extends Throwable> {
+    void accept(T1 o1, T2 o2) throws E;
 }

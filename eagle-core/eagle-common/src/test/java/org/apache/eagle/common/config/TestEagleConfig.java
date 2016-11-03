@@ -27,16 +27,16 @@ import java.util.TimeZone;
 public class TestEagleConfig {
 
     @Test
-    public void testLoadConfig(){
+    public void testLoadConfig() {
         System.setProperty("config.resource", "application-test.conf");
         EagleConfig config = EagleConfigFactory.load();
-        Assert.assertEquals("test",config.getEnv());
-        Assert.assertEquals("localhost-for-test",config.getZKQuorum());
-        Assert.assertEquals("1234",config.getZKPort());
-        Assert.assertEquals("hbase",config.getStorageType());
-        Assert.assertEquals(true,config.isCoprocessorEnabled());
-        Assert.assertEquals(9090,config.getServicePort());
-        Assert.assertEquals("localhost",config.getServiceHost());
-        Assert.assertEquals(TimeZone.getTimeZone("UTC"),config.getTimeZone());
+        Assert.assertEquals("test", config.getEnv());
+        Assert.assertEquals("localhost-for-test", config.getZKQuorum());
+        Assert.assertEquals("1234", config.getZKPort());
+        Assert.assertEquals("hbase", config.getStorageType());
+        Assert.assertEquals(true, config.isCoprocessorEnabled());
+        Assert.assertEquals(9090, config.getServicePort());
+        Assert.assertEquals("localhost", config.getServiceHost());
+        Assert.assertEquals(TimeZone.getTimeZone("UTC"), config.getTimeZone());
     }
 }

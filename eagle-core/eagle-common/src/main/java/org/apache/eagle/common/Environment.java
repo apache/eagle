@@ -17,7 +17,7 @@
 package org.apache.eagle.common;
 
 public enum Environment {
-	dev,
-	test,
-	prod,
+    dev,
+    test,
+    prod,
 }

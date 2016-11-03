@@ -23,27 +23,28 @@ import java.io.Serializable;
 
 public class TestSerializableUtils {
     @Test
-    public void testSerializeObject(){
+    public void testSerializeObject() {
         SerializableUtils.ensureSerializable(0.5);
         byte[] bytes = SerializableUtils.serializeToByteArray(0.5);
         Assert.assertNotNull(bytes);
-        Assert.assertEquals(0.5,SerializableUtils.deserializeFromByteArray(bytes,"0.5"));
+        Assert.assertEquals(0.5, SerializableUtils.deserializeFromByteArray(bytes, "0.5"));
     }
+
     @Test
-    public void testSerializeObjectWithCompression(){
+    public void testSerializeObjectWithCompression() {
         SerializableUtils.ensureSerializable(0.5);
         byte[] bytes = SerializableUtils.serializeToCompressedByteArray(0.5);
         Assert.assertNotNull(bytes);
-        Assert.assertEquals(0.5,SerializableUtils.deserializeFromCompressedByteArray(bytes,"0.5"));
+        Assert.assertEquals(0.5, SerializableUtils.deserializeFromCompressedByteArray(bytes, "0.5"));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testUnserializableObject(){
+    public void testUnserializableObject() {
         SerializableUtils.serializeToByteArray(new Object());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testEnsureUnserializableObject(){
+    public void testEnsureUnserializableObject() {
         SerializableUtils.ensureSerializable(new UnserializablePOJO());
     }
 
