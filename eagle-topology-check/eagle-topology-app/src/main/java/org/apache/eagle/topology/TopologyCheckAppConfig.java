@@ -32,6 +32,8 @@ public class TopologyCheckAppConfig implements Serializable {
 
     public static final String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
     public static final String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
+    public static final String PARSE_BOLT_NAME = "parserBolt";
+    public static final String SINK_BOLT_NAME = "sinkBolt";
 
     private static final int MAX_NUM_THREADS = 10;
     private static final String HBASE_ZOOKEEPER_CLIENT_PORT = "2181";
@@ -98,7 +100,7 @@ public class TopologyCheckAppConfig implements Serializable {
         if (config.hasPath("dataSourceConfig.mr")) {
             topologyTypes.add(TopologyConstants.TopologyType.MR);
             mrConfig = new MRConfig();
-            mrConfig.rmUrls =  config.getString("dataSourceConfig.mr.rmUrl").split(",\\s*");
+            mrConfig.rmUrls = config.getString("dataSourceConfig.mr.rmUrl").split(",\\s*");
             mrConfig.historyServerUrl = getOptionalConfig("dataSourceConfig.mr.historyServerUrl", null);
         }
 
@@ -129,12 +131,12 @@ public class TopologyCheckAppConfig implements Serializable {
     }
 
     public static class MRConfig implements Serializable {
-        public String [] rmUrls;
+        public String[] rmUrls;
         public String historyServerUrl;
     }
 
     public static class HdfsConfig implements Serializable {
-        public String [] namenodeUrls;
+        public String[] namenodeUrls;
     }
 
     private String getOptionalConfig(String key, String defaultValue) {

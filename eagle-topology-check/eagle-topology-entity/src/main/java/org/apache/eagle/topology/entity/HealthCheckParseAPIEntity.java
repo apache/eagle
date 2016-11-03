@@ -15,16 +15,53 @@
  *  limitations under the License.
  *
  */
-
 package org.apache.eagle.topology.entity;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
+public class HealthCheckParseAPIEntity {
 
-public class TopologyEntityRepository extends EntityRepository {
-    public TopologyEntityRepository() {
-        entitySet.add(HBaseServiceTopologyAPIEntity.class);
-        entitySet.add(HdfsServiceTopologyAPIEntity.class);
-        entitySet.add(MRServiceTopologyAPIEntity.class);
-        entitySet.add(JournalNodeServiceAPIEntity.class);
+    private String status;
+    private long timeStamp;
+    private String host;
+    private String role;
+    private String site;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
     }
 }

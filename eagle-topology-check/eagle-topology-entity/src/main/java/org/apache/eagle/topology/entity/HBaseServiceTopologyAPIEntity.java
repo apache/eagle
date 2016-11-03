@@ -22,13 +22,13 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.topology.TopologyConstants;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
 @Prefix("hbaseservicestatus")
 @Service(TopologyConstants.HBASE_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
-public class HBaseServiceTopologyAPIEntity  extends TopologyBaseAPIEntity {
+public class HBaseServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private String status;
     @Column("b")

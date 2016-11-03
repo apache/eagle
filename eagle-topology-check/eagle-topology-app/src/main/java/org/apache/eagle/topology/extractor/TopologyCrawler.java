@@ -21,7 +21,8 @@ package org.apache.eagle.topology.extractor;
 public interface TopologyCrawler {
 
     /**
-     * Fetch raw data and emit the parsed result to the next bolt
+     * Fetch raw data and emit the parsed result to the next bolt.
+     *
      * @return
      */
     void extract();

@@ -22,13 +22,13 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.topology.TopologyConstants;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
 @Prefix("journalnodestatus")
 @Service(TopologyConstants.JN_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
-@Tags({TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG,  TopologyConstants.ROLE_TAG})
+@Tags( {TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG, TopologyConstants.ROLE_TAG})
 public class JournalNodeServiceAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private long writtenTxidDiff;

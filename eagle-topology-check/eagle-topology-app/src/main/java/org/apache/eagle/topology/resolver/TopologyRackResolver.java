@@ -21,7 +21,7 @@ package org.apache.eagle.topology.resolver;
 public interface TopologyRackResolver {
 
     /**
-     *resolve rack by hostname
+     *resolve rack by hostname.
      * @return rack name
      */
     String resolve(String hostname);

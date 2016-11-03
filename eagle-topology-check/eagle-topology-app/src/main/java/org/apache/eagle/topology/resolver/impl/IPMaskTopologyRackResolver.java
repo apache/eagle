@@ -24,19 +24,19 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * resolve rack by hostname
+ * resolve rack by hostname.
  */
 public class IPMaskTopologyRackResolver implements TopologyRackResolver {
 
-    private final int DEFAULT_RACK_POS = 2;
+    private final int pos = 2;
     private int rackPos;
 
     public IPMaskTopologyRackResolver() {
-        this.rackPos = DEFAULT_RACK_POS;
+        this.rackPos = pos;
     }
 
     public IPMaskTopologyRackResolver(int rackPos) {
-        this.rackPos = (rackPos > 3 || rackPos < 0) ? DEFAULT_RACK_POS : rackPos;
+        this.rackPos = (rackPos > 3 || rackPos < 0) ? pos : rackPos;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class IPMaskTopologyRackResolver implements TopologyRackResolver {
         String result = null;
         try {
             InetAddress address = InetAddress.getByName(hostname);
-            result = "rack" + (int)(address.getAddress()[rackPos] & 0xff);
+            result = "rack" + (int) (address.getAddress()[rackPos] & 0xff);
         } catch (UnknownHostException e) {
             //e.printStackTrace();
         }

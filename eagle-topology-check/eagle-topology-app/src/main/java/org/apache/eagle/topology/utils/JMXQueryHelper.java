@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Helper class to query Hadoop JMX servlets
+ * Helper class to query Hadoop JMX servlets.
  */
 public final class JMXQueryHelper {
 
@@ -66,13 +66,13 @@ public final class JMXQueryHelper {
         final JSONArray jsonArray = jsonBeansObject.getJSONArray("beans");
         int size = jsonArray.length();
         for (int i = 0; i < size; ++i) {
-            final JSONObject obj = (JSONObject)jsonArray.get(i);
+            final JSONObject obj = (JSONObject) jsonArray.get(i);
             final JMXBean bean = new JMXBean();
             final Map<String, Object> map = new HashMap<String, Object>();
             bean.setPropertyMap(map);
             final JSONArray names = obj.names();
             int jsonSize = names.length();
-            for (int j = 0 ; j < jsonSize; ++j) {
+            for (int j = 0; j < jsonSize; ++j) {
                 final String key = names.getString(j);
                 Object value = obj.get(key);
                 map.put(key, value);

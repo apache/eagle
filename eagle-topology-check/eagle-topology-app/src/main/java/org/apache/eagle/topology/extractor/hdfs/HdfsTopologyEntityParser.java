@@ -47,7 +47,7 @@ import static org.apache.eagle.topology.TopologyConstants.RACK_TAG;
 public class HdfsTopologyEntityParser implements TopologyEntityParser {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(HdfsTopologyEntityParser.class);
-    private String [] namenodeUrls;
+    private String[] namenodeUrls;
     private String site;
     private TopologyRackResolver rackResolver;
 
@@ -78,7 +78,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
 
     private static final String STATUS_PATTERN = "([\\d\\.]+):\\d+\\s+\\([\\D]+(\\d+)\\)";
     private static final String QJM_PATTERN = "([\\d\\.]+):\\d+";
-    
+
     private static final double TB = 1024 * 1024 * 1024 * 1024;
 
     public HdfsTopologyEntityParser(String site, TopologyCheckAppConfig.HdfsConfig hdfsConfig, TopologyRackResolver rackResolver) {
@@ -118,9 +118,9 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         if (bean == null || bean.getPropertyMap() == null) {
             throw new ServiceNotResponseException("Invalid JMX format, FSNamesystem bean is null!");
         }
-        final String hostname = (String)bean.getPropertyMap().get(HA_NAME);
+        final String hostname = (String) bean.getPropertyMap().get(HA_NAME);
         HdfsServiceTopologyAPIEntity result = createHdfsServiceEntity(TopologyConstants.NAME_NODE_ROLE, hostname, updateTime);
-        final String state = (String)bean.getPropertyMap().get(HA_STATE);
+        final String state = (String) bean.getPropertyMap().get(HA_STATE);
         result.setStatus(state);
         final Double configuredCapacityGB = (Double) bean.getPropertyMap().get(CAPACITY_TOTAL_GB);
         result.setConfiguredCapacityTB(Double.toString(configuredCapacityGB / 1024));
@@ -155,9 +155,9 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         JSONObject jsonMap = (JSONObject) jsonArray.get(0);
 
         Map<String, HdfsServiceTopologyAPIEntity> journalNodesMap = new HashMap<>();
-        String QJM = jsonMap.getString("manager");
+        String manager = jsonMap.getString("manager");
         Pattern qjm = Pattern.compile(QJM_PATTERN);
-        Matcher jpmMatcher = qjm.matcher(QJM);
+        Matcher jpmMatcher = qjm.matcher(manager);
         while (jpmMatcher.find()) {
             String ip = jpmMatcher.group(1);
             String hostname = EntityBuilderHelper.resolveHostByIp(ip);
@@ -196,7 +196,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         int numDeadDecommNodes = 0;
 
         String deadNodesStrings = (String) bean.getPropertyMap().get(DEAD_NODES);
-        JSONTokener tokener  = new JSONTokener(deadNodesStrings);
+        JSONTokener tokener = new JSONTokener(deadNodesStrings);
         JSONObject jsonNodesObject = new JSONObject(tokener);
         final JSONArray deadNodes = jsonNodesObject.names();
         for (int i = 0; deadNodes != null && i < deadNodes.length(); ++i) {

@@ -22,128 +22,166 @@
     <name>Topology Health Check</name>
     <version>0.5.0-incubating</version>
     <configuration>
-        <!-- org.apache.eagle.topology.TopologyCheckApp -->
+        <!-- org.apache.eagle.topology.TopologyCheckApp -->   
         <property>
             <name>dataExtractorConfig.site</name>
             <displayName>site</displayName>
             <description>Site</description>
             <value>sandbox</value>
-        </property>
+        </property>  
         <property>
             <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
-            <displayName>FetchDataIntervalInSecs</displayName>
+            <displayName>Fetch Data Interval in Secs</displayName>
             <description>Fetch Data Interval in Secs</description>
             <value>300</value>
         </property>
         <property>
             <name>dataExtractorConfig.parseThreadPoolSize</name>
-            <displayName>parseThreadPoolSize</displayName>
+            <displayName>Parser Thread Pool Size</displayName>
             <description>Parser Thread Pool Size</description>
             <value>5</value>
         </property>
         <property>
             <name>dataExtractorConfig.numDataFetcherSpout</name>
-            <displayName>numDataFetcherSpout</displayName>
+            <displayName>Spout Task Number</displayName>
             <description>Spout Task Number</description>
             <value>1</value>
         </property>
         <property>
             <name>dataExtractorConfig.numEntityPersistBolt</name>
-            <displayName>numEntityPersistBolt</displayName>
+            <displayName>Bolt Task Number</displayName>
             <description>Bolt Task Number</description>
             <value>1</value>
-        </property>
+        </property> 
+        
+        <property>
+            <name>dataExtractorConfig.rackResolverCls</name>
+            <displayName>Rack Resolver Class</displayName>
+            <description>rack resolver class</description>
+            <value>org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver</value>
+        </property>     
+      
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
-            <displayName>zkQuorum</displayName>
-            <description>Zookeeper Quorum</description>
+            <displayName>HBase Zookeeper Quorum</displayName>
+            <description>HBase Zookeeper Quorum</description>
             <value>sandbox.hortonworks.com:2181</value>
+            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkZnodeParent</name>
-            <displayName>zkZnodeParent</displayName>
+            <displayName>Hbase Zookeeper Znode Parent Root</displayName>
             <description>Hbase Zookeeper Znode Parent Root</description>
             <value>/hbase-unsecure</value>
+            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
-            <displayName>zkPropertyClientPort</displayName>
+            <displayName>Hbase Zookeeper Client Port</displayName>
             <description>Hbase Zookeeper Client Port</description>
             <value>2181</value>
+            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.hbase.kerberos.master.principal</name>
-            <displayName>hbaseMasterPrincipal</displayName>
+            <displayName>Hbase Master Principal</displayName>
             <description>Hbase Master Principal</description>
             <value>hadoop/_HOST@EXAMPLE.COM</value>
         </property>
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.eagle.keytab</name>
-            <displayName>eagleKeytab</displayName>
-            <description>Eagle keytab</description>
-            <value></value>
-        </property>
+     
         <property>
             <name>dataSourceConfig.hbase.kerberos.master.principal</name>
-            <displayName>hbaseMasterPrincipal</displayName>
+            <displayName>Hbase Master Principal</displayName>
             <description>Hbase Master Principal</description>
             <value>hadoop/_HOST@EXAMPLE.COM</value>
-        </property>
-
+        </property>  
+        
         <property>
             <name>dataSourceConfig.hdfs.namenodeUrl</name>
-            <displayName>hdfsNamenodeUrl</displayName>
+            <displayName>Hdfs Namenode Web URL</displayName>
             <description>Hdfs Namenode Web URL</description>
             <value>http://sandbox.hortonworks.com:50070</value>
+            <required>true</required>
         </property>
-
         <property>
             <name>dataSourceConfig.mr.rmUrl</name>
-            <displayName>resourceManagerUrl</displayName>
+            <displayName>Resource Manager URL</displayName>
             <description>Resource Manager URL</description>
             <value>http://sandbox.hortonworks.com:8088</value>
+            <required>true</required>
         </property>
 
         <property>
             <name>dataSourceConfig.mr.historyServerUrl</name>
-            <displayName>historyServerUrl</displayName>
-            <description>History Server URL</description>
-            <value></value>
-        </property>
-
+            <displayName>History Server URL</displayName>
+            <description>History Server URL</description>            
+            <value></value>  
+        </property> 
+        
         <property>
-            <name>eagleProps.eagleService.host</name>
-            <description>eagleProps.eagleService.host</description>
-            <value>localhost</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.port</name>
-            <description>eagleProps.eagleService.port</description>
-            <value>9090</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.username</name>
-            <description>eagleProps.eagleService.username</description>
-            <value>admin</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.password</name>
-            <description>eagleProps.eagleService.password</description>
-            <value>secret</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.basePath</name>
-            <description>eagleProps.eagleService.basePath</description>
-            <value>/rest</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.readTimeOutSeconds</name>
-            <displayName>eagleProps.eagleService.readTimeOutSeconds</displayName>
-            <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
+            <name>topology.numOfSinkTasks</name>
+            <displayName>topology.numOfSinkTasks</displayName>
             <value>2</value>
+            <description>number of sink tasks</description>
         </property>
-
+        
+        <!-- data sink configurations -->
+        <property>
+            <name>dataSinkConfig.topic</name>
+            <displayName>Topic For Kafka Data Sink</displayName>
+            <value>topology_health_check</value>
+            <description>Topic For Kafka Data Sink</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.brokerList</name>
+            <displayName>Kafka Broker List</displayName>
+            <value>server.eagle.apache.org:9092</value>
+            <description>Kafka Broker List</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.serializerClass</name>
+            <displayName>Serializer Class Kafka Message Value</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>Serializer Class Kafka Message Value</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.keySerializerClass</name>
+            <displayName>Serializer Class Kafka Message Key</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>Serializer Class Kafka Message Key</description>
+        </property>
+        
     </configuration>
+    <streams>
+        <stream>
+            <streamId>topology_health_check_stream</streamId>
+            <description>topology health check Stream</description>
+            <validate>true</validate>
+            <timeseries>true</timeseries>    
+            <columns>
+                <column>
+                    <name>status</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column> 
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>role</name>
+                    <type>string</type>
+                </column>            
+            </columns>
+        </stream>
+    </streams>
     <docs>
         <install>
         </install>
