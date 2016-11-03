@@ -22,15 +22,13 @@
 		<li><a href="#definition" data-toggle="tab">Definition</a></li>
 		<li><a href="#publisher" data-toggle="tab">Publisher</a></li>
 
-		<li class="pull-right tab-sm">
-			<a class="fa fa-edit" ui-sref="policyEdit({name: policy.name})"></a>
-		</li>
-		<li class="pull-right tab-xs">
-			<a>
-				<span class="label" ng-class="{'label-default': policy.policyStatus !== 'ENABLED', 'label-success': policy.policyStatus === 'ENABLED'}">
-					{{policy.policyStatus}}
-				</span>
-			</a>
+		<li class="box-tools pull-right">
+			<div class="btn-group">
+				<button class="btn btn-default fa fa-play" ng-click="startPolicy()" ng-if="policy.policyStatus !== 'ENABLED'"></button>
+				<button class="btn btn-default fa fa-square" ng-click="stopPolicy()" ng-if="policy.policyStatus === 'ENABLED'"></button>
+				<a class="btn btn-default fa fa-pencil" ui-sref="policyEdit({name: policy.name})"></a>
+				<button class="btn btn-danger fa fa-trash" ng-click="deletePolicy()"></button>
+			</div>
 		</li>
 	</ul>
 	<div class="tab-content">
@@ -39,7 +37,10 @@
 				<tbody>
 					<tr>
 						<th>Name</th>
-						<td>{{policy.name}}</td>
+						<td>
+							<span class="fa fa-square" ng-class="policy.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
+							{{policy.name}}
+						</td>
 						<th>Parallelism Hint</th>
 						<td>{{policy.parallelismHint}}</td>
 					</tr>

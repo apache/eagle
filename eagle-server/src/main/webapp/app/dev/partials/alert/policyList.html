@@ -30,7 +30,6 @@
 					<tr>
 						<th sortpath="policyStatus" width="10"></th>
 						<th sortpath="name" width="20%">Name</th>
-						<th sortpath="definition.type" width="70">Type</th>
 						<th>Description</th>
 						<th width="85">Action</th>
 					</tr>
@@ -43,7 +42,6 @@
 						<td>
 							<a ui-sref="policyDetail({name: item.name})">{{item.name}}</a>
 						</td>
-						<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
 						<td>{{item.description}}</td>
 						<td class="text-center">
 							<div class="btn-group btn-group-xs">
