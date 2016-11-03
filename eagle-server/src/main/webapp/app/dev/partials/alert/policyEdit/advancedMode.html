@@ -41,11 +41,19 @@
 						<input type="text" class="form-control" placeholder="Search..." ng-model="searchSourceKey" />
 						<span class="fa fa-search"></span>
 					</div>
-					<div ng-repeat="(app, streams) in getSearchApplication() track by app" class="policy-app-list">
+					<p>
+						Group Type:
+						<a ng-class="{'text-bold': searchType === 'app'}" ng-click="searchType = 'app'">Application</a>
+						/
+						<a ng-class="{'text-bold': searchType === 'site'}" ng-click="searchType = 'site'">Site</a>
+					</p>
+
+					<p ng-hide="getSearchApplication()" class="text-warning">No stream match</p>
+					<div ng-show="getSearchApplication()" ng-repeat="(app, streams) in getSearchApplication() track by app" class="policy-app-list">
 						<a data-toggle="collapse" href="[data-id='SP_{{app}}']">
 							<strong>{{app}}</strong>
 						</a>
-						<ul data-id="SP_{{app}}" class="collapse in list-unstyled">
+						<ul data-id="SP_{{app}}" class="collapse list-unstyled">
 							<li ng-repeat="stream in streams track by stream.streamId">
 								<a data-toggle="collapse" href="[data-id='SP_{{app}}_{{stream.streamId}}']">
 									<span class="fa fa-{{isInputStreamSelected(stream.streamId) ? 'check-square' : 'square'}}"></span>
@@ -91,14 +99,14 @@
 					<div class="col-md-12">
 						<div class="form-group">
 							<label>Name *</label>
-							<input type="text" style="text-transform:uppercase" class="form-control" ng-model="policy.name" ng-readonly="!newPolicy" ng-disabled="policyLock" />
+							<input type="text" class="form-control" ng-model="policy.name" ng-readonly="!newPolicy" ng-disabled="policyLock" />
 						</div>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label>Description</label>
-					<textarea class="form-control" ng-model="policy.description" rows="2" ng-disabled="policyLock"></textarea>
+					<textarea class="form-control" ng-model="policy.description" ng-change="autoPolicyDescription = false" rows="2" ng-disabled="policyLock"></textarea>
 				</div>
 
 				<!--label>
@@ -130,13 +138,9 @@
 					<p class="text-danger">{{definitionMessage}}</p>
 				</div>
 
-				<!--<label>-->
-					<!--Alert Stream-->
-				<!--</label>-->
-
-				<p class="text-danger" ng-if="policy.outputStreams.length === 0"><i class="fa fa-fw fa-warning"></i> No alert stream defined</p>
 
 				<ul class="sm-padding">
+					<li class="text-danger" ng-if="policy.outputStreams.length === 0"><i class="fa fa-fw fa-warning"></i> No alert stream defined</li>
 					<li ng-repeat="stream in outputStreams track by $index">
 						<label>
 							<input type="checkbox" ng-checked="isOutputStreamSelected(stream)" ng-click="checkOutputStream(stream)" ng-disabled="policyLock" />
@@ -149,9 +153,8 @@
 					Publish Alerts
 				</label>
 
-				<p class="text-danger" ng-if="policyPublisherList.length === 0"><i class="fa fa-fw fa-warning"></i> No alert publisher defined </p>
-
 				<ul class="sm-padding">
+					<li class="text-danger" ng-if="policyPublisherList.length === 0"><i class="fa fa-fw fa-warning"></i> No alert publisher defined </li>
 					<li ng-repeat="publisher in policyPublisherList track by $index">
 						<span>
 							[<a class="fa fa-times" ng-click="removePublisher(publisher)"></a>]
