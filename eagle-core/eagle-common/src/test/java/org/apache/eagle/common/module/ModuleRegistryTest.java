@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class ModuleRegistryTest {
     @Test
-    public void testPutAndGet(){
+    public void testPutAndGet() {
         ModuleRegistry registry = new ModuleRegistryImpl();
         registry.register(TestModuleScope_1.class, new AbstractModule() {
             @Override
@@ -42,11 +42,14 @@ public class ModuleRegistryTest {
 
             }
         });
-        Assert.assertEquals(2,registry.getModules(TestModuleScope_1.class).size());
-        Assert.assertEquals(1,registry.getModules(TestModuleScope_2.class).size());
-        Assert.assertEquals(3,registry.getModules().size());
+        Assert.assertEquals(2, registry.getModules(TestModuleScope_1.class).size());
+        Assert.assertEquals(1, registry.getModules(TestModuleScope_2.class).size());
+        Assert.assertEquals(3, registry.getModules().size());
     }
 
-    private class TestModuleScope_1 implements ModuleScope {}
-    private class TestModuleScope_2 implements ModuleScope {}
+    private class TestModuleScope_1 implements ModuleScope {
+    }
+
+    private class TestModuleScope_2 implements ModuleScope {
+    }
 }

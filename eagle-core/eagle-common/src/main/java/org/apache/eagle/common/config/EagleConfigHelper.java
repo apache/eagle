@@ -32,12 +32,12 @@ public class EagleConfigHelper {
     }
 
     public static String getServiceUser(Config config) {
-        return config.hasPath(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ?
-               config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
+        return config.hasPath(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ? config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME)
+            : null;
     }
 
     public static String getServicePassword(Config config) {
-        return config.hasPath(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
-                config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
+        return config.hasPath(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ? config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)
+            : null;
     }
 }

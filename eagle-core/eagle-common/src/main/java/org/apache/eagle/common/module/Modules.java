@@ -17,11 +17,8 @@
 package org.apache.eagle.common.module;
 
 import com.google.inject.AbstractModule;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+
+import java.lang.annotation.*;
 
 /**
  * Defines the Guice Modules in use in the test class.

@@ -19,5 +19,5 @@ package org.apache.eagle.common.service;
 import java.util.List;
 
 public interface HadoopAccountService {
-	public List<HadoopUser> searchByUsername(List<String> username);
+    public List<HadoopUser> searchByUsername(List<String> username);
 }

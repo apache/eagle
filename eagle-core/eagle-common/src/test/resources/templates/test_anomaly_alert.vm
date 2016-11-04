@@ -18,118 +18,122 @@
  *#
 #parse("header.vm")
 <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" style="">
-  <tr>
-    <td class="head" width="800">
-      <span style="color: #091D42">Eagle Job Anomaly Host Detection <small style="color: #999999;"><br>$startTime ~ $endTime</small></span>
-    </td>
-  </tr>
-  <tr>
-    <td class="head2" width="800">
+    <tr>
+        <td class="head" width="800">
+            <span style="color: #091D42">Eagle Job Anomaly Host Detection <small style="color: #999999;"><br>$startTime ~ $endTime</small></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="head2" width="800">
       <span>
         Statistics
       </span>
-    </td>
-  </tr>
-  <tr>
-    <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
-      <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
-        <thead>
-        <tr>
-          <th class="table-border-th" style="width: 25%">Cluster</th>
-          <th class="table-border-th" style="width: 25%">Datacener</th>
-          <th class="table-border-th" style="width: 25%">Count</th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr>
-              <td class="table-border-td">$cluster</td>
-              <td class="table-border-td">$datacenter</td>
-              <td class="table-border-td">$count</td>
-          </tr>
-        </tbody>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td class="head2" width="800">
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
+            <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
+                <thead>
+                <tr>
+                    <th class="table-border-th" style="width: 25%">Cluster</th>
+                    <th class="table-border-th" style="width: 25%">Datacener</th>
+                    <th class="table-border-th" style="width: 25%">Count</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="table-border-td">$cluster</td>
+                    <td class="table-border-td">$datacenter</td>
+                    <td class="table-border-td">$count</td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="head2" width="800">
       <span>
         Anomaly detector configurations
       </span>
-    </td>
-  </tr>
-  <tr>
-    <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
-      <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
-        <thead>
-        <tr>
-          <th class="table-border-th" style="width: 25%">Parameter Name</th>
-          <th class="table-border-th" style="width: 25%">Value</th>
-          <th class="table-border-th" style="width: 25%">Description</th>
-        </tr>
-        </thead>
-        <tbody>
-        #foreach($key in $configMap.keySet())
-        <tr>
-            <td class="table-border-td">$key</td>
-            <td class="table-border-td">$configMap.get($key)</td>
-            <td class="table-border-td">$configDescMap.get($key)</td>
-        </tr>
-       	#end
-         </tbody>
-        </table>
-      </td>
-  </tr>
-  <tr>
-    <td class="head2" width="800">
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
+            <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
+                <thead>
+                <tr>
+                    <th class="table-border-th" style="width: 25%">Parameter Name</th>
+                    <th class="table-border-th" style="width: 25%">Value</th>
+                    <th class="table-border-th" style="width: 25%">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($key in $configMap.keySet())
+                    <tr>
+                        <td class="table-border-td">$key</td>
+                        <td class="table-border-td">$configMap.get($key)</td>
+                        <td class="table-border-td">$configDescMap.get($key)</td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="head2" width="800">
       <span>
         Detail Information
       </span>
-    </td>
-  </tr>
-  <tr>
-    <td class="info" width="800">
+        </td>
+    </tr>
+    <tr>
+        <td class="info" width="800">
       <span>
           These are the anomaly hosts detected by Hadoop Eagle:
       </span>
-    </td>
-  </tr>
-  <tr>
-    <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
-      <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
-        <thead>
-          <tr>
-            <th class="table-border-th">Cluster</th>
-            <th class="table-border-th">Datacenter</th>
-            <th class="table-border-th">Hostname</th>
-            <th class="table-border-th">Description</th>
-            <th class="table-border-th">Job Types</th>
-            <th class="table-border-th">Errors</th>
-          </tr>
-        </thead>
-        <tbody>
-        #foreach($key in $anomalyHostMap.keySet())
-        <tr>
-            <td class="table-border-td">$cluster</td>
-            <td class="table-border-td">$datacenter</td>
-            <td class="table-border-td"><a href="http://123.dc1.xyz.com:9090/eagle-web/ui/AnomalyDetection.html?cluster=$cluster&datacenter=$datacenter&intervalmin=1&startTime=$startTime&endTime=$endTime&top=20">$key</a></td>
-            <td class="table-border-td">$anomalyHostMap.get($key)</td>
-            <td class="table-border-td">$jobNameMap.get($key)</td>
-            <td class="table-border-td"><a href="http://hadoop-eagle.vip.dc1.xyz.com/eagle-service/rest/list?query=TaskExecutionService[@cluster=%22$cluster%22%20AND%20@datacenter=%22$datacenter%22%20AND%20@hostname=%22$key%22%20AND%20@taskStatus=%22FAILED%22]{@error,@jobID,@taskID,@normJobName}&pageSize=1000&startTime=$startTime&endTime=$endTime">$errorMap.get($key)</a></td>
-        </tr>
-       	#end
-        </tbody>
-      </table>
-    </td>
-  </tr>
-  <br>
-  <tr>
-    <td class="foot" width="800">
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
+            <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
+                <thead>
+                <tr>
+                    <th class="table-border-th">Cluster</th>
+                    <th class="table-border-th">Datacenter</th>
+                    <th class="table-border-th">Hostname</th>
+                    <th class="table-border-th">Description</th>
+                    <th class="table-border-th">Job Types</th>
+                    <th class="table-border-th">Errors</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($key in $anomalyHostMap.keySet())
+                    <tr>
+                        <td class="table-border-td">$cluster</td>
+                        <td class="table-border-td">$datacenter</td>
+                        <td class="table-border-td"><a
+                                href="http://123.dc1.xyz.com:9090/eagle-web/ui/AnomalyDetection.html?cluster=$cluster&datacenter=$datacenter&intervalmin=1&startTime=$startTime&endTime=$endTime&top=20">$key</a>
+                        </td>
+                        <td class="table-border-td">$anomalyHostMap.get($key)</td>
+                        <td class="table-border-td">$jobNameMap.get($key)</td>
+                        <td class="table-border-td"><a
+                                href="http://hadoop-eagle.vip.dc1.xyz.com/eagle-service/rest/list?query=TaskExecutionService[@cluster=%22$cluster%22%20AND%20@datacenter=%22$datacenter%22%20AND%20@hostname=%22$key%22%20AND%20@taskStatus=%22FAILED%22]{@error,@jobID,@taskID,@normJobName}&pageSize=1000&startTime=$startTime&endTime=$endTime">$errorMap.get($key)</a>
+                        </td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    <br>
+    <tr>
+        <td class="foot" width="800">
       <span class="outlook">
          Apache Eagle <a href="http://hadoop-eagle.vip.dc1.xyz.com"
-                  target ="_blank" title="Hadoop Eagle">Apache Eagle</a>
+                         target="_blank" title="Hadoop Eagle">Apache Eagle</a>
       </span>
-    </td>
-  </tr>
+        </td>
+    </tr>
 </table>
 <br>
 <br>

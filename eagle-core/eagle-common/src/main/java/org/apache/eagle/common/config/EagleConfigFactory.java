@@ -103,6 +103,7 @@ public class EagleConfigFactory implements EagleConfig {
             ? config.getString(EagleConfigConstants.SERVICE_ZOOKEEPER_ZNODE_PARENT) : EagleConfigConstants.DEFAULT_ZOOKEEPER_ZNODE_PARENT;
         String clientIPCPoolSize = getString(config, EagleConfigConstants.SERVICE_HBASE_CLIENT_IPC_POOL_SIZE, "10");
         this.hbaseConf = HBaseConfiguration.create();
+        this.hbaseConf.set("hbase.client.ipc.pool.size", clientIPCPoolSize);
 
         if (this.zkQuorum != null) {
             this.hbaseConf.set("hbase.zookeeper.quorum", this.zkQuorum);
@@ -118,18 +119,22 @@ public class EagleConfigFactory implements EagleConfig {
             this.hbaseConf.set("zookeeper.znode.parent", EagleConfigConstants.DEFAULT_ZOOKEEPER_ZNODE_PARENT);
         }
 
-        this.hbaseConf.set("hbase.client.ipc.pool.size", clientIPCPoolSize);
 
         this.eagleServiceHost = config.hasPath(EagleConfigConstants.SERVICE_HOST) ? config.getString(EagleConfigConstants.SERVICE_HOST) : EagleConfigConstants.DEFAULT_SERVICE_HOST;
         this.storageType = config.hasPath(EagleConfigConstants.SERVICE_STORAGE_TYPE) ? config.getString(EagleConfigConstants.SERVICE_STORAGE_TYPE) : EagleConfigConstants.DEFAULT_STORAGE_TYPE;
         this.isCoprocessorEnabled = config.hasPath(EagleConfigConstants.SERVICE_COPROCESSOR_ENABLED) && config.getBoolean(EagleConfigConstants.SERVICE_COPROCESSOR_ENABLED);
         this.eagleServicePort = config.hasPath(EagleConfigConstants.SERVICE_PORT) ? config.getInt(EagleConfigConstants.SERVICE_PORT) : EagleConfigConstants.DEFAULT_SERVICE_PORT;
-        this.tableNamePrefixedWithEnv = config.hasPath(EagleConfigConstants.SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT) && config.getBoolean(EagleConfigConstants.SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT);
-        this.hbaseClientScanCacheSize = config.hasPath(EagleConfigConstants.SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE) : hbaseClientScanCacheSize;
+        this.tableNamePrefixedWithEnv = config.hasPath(EagleConfigConstants.SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT) && config.getBoolean(EagleConfigConstants
+            .SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT);
+        this.hbaseClientScanCacheSize = config.hasPath(EagleConfigConstants.SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE) :
+            hbaseClientScanCacheSize;
         // initilize eagle service thread pool for parallel execution of hbase scan etc.
-        int threadPoolCoreSize = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_CORE_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_THREADPOOL_CORE_SIZE) : EagleConfigConstants.DEFAULT_THREAD_POOL_CORE_SIZE;
-        int threadPoolMaxSize = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_MAX_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_THREADPOOL_MAX_SIZE) : EagleConfigConstants.DEFAULT_THREAD_POOL_MAX_SIZE;
-        long threadPoolShrinkTime = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_SHRINK_SIZE) ? config.getLong(EagleConfigConstants.SERVICE_THREADPOOL_SHRINK_SIZE) : EagleConfigConstants.DEFAULT_THREAD_POOL_SHRINK_TIME;
+        int threadPoolCoreSize = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_CORE_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_THREADPOOL_CORE_SIZE) : EagleConfigConstants
+            .DEFAULT_THREAD_POOL_CORE_SIZE;
+        int threadPoolMaxSize = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_MAX_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_THREADPOOL_MAX_SIZE) : EagleConfigConstants
+            .DEFAULT_THREAD_POOL_MAX_SIZE;
+        long threadPoolShrinkTime = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_SHRINK_SIZE) ? config.getLong(EagleConfigConstants.SERVICE_THREADPOOL_SHRINK_SIZE) : EagleConfigConstants
+            .DEFAULT_THREAD_POOL_SHRINK_TIME;
         this.isServiceAuditingEnabled = config.hasPath(EagleConfigConstants.SERVICE_AUDITING_ENABLED) && config.getBoolean(EagleConfigConstants.SERVICE_AUDITING_ENABLED);
 
         this.executor = new ThreadPoolExecutor(threadPoolCoreSize, threadPoolMaxSize, threadPoolShrinkTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());

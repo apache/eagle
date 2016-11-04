@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 
-public class CommonGuiceModule extends AbstractModule{
+public class CommonGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Config.class).toProvider(ConfigServiceProvider.class).in(Singleton.class);

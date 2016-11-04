@@ -27,10 +27,11 @@ import java.util.List;
  * Since 8/4/16.
  */
 public class StreamAggregator {
-    public static StreamAggregatorBuilder builder(){
+    public static StreamAggregatorBuilder builder() {
         return new StreamAggregatorBuilder();
     }
-    public static class StreamAggregatorBuilder{
+
+    public static class StreamAggregatorBuilder {
         private Groupby gb = new Groupby();
         private String windowDuration;
         private long start;
@@ -39,28 +40,34 @@ public class StreamAggregator {
         private String timestampColumn;
         private StreamDefinition sd = new StreamDefinition();
         private AggregateHandler handler;
-        public StreamAggregatorBuilder groupby(String ... gbFields){
+
+        public StreamAggregatorBuilder groupby(String... gbFields) {
             gb.cols = Arrays.asList(gbFields);
             return this;
         }
-        public StreamAggregatorBuilder window(String windowDuration){
+
+        public StreamAggregatorBuilder window(String windowDuration) {
             window(windowDuration, 0);
             return this;
         }
-        public StreamAggregatorBuilder window(String windowDuration, long start){
+
+        public StreamAggregatorBuilder window(String windowDuration, long start) {
             this.windowDuration = windowDuration;
             this.start = start;
             return this;
         }
-        public StreamAggregatorBuilder timeColumn(String timestampColumn){
+
+        public StreamAggregatorBuilder timeColumn(String timestampColumn) {
             this.timestampColumn = timestampColumn;
             return this;
         }
-        public StreamAggregatorBuilder filter(String filter){
+
+        public StreamAggregatorBuilder filter(String filter) {
             this.filter = filter;
             return this;
         }
-        public StreamAggregatorBuilder agg(String function, String field, String alias){
+
+        public StreamAggregatorBuilder agg(String function, String field, String alias) {
             Agg agg = new Agg();
             agg.function = function;
             agg.field = field;
@@ -68,25 +75,29 @@ public class StreamAggregator {
             aggs.add(agg);
             return this;
         }
-        public StreamAggregatorBuilder columnDef(String colName, String colType){
+
+        public StreamAggregatorBuilder columnDef(String colName, String colType) {
             Column col = new Column();
             col.name = colName;
             col.type = colType;
-            if(sd.columns == null){
+            if (sd.columns == null) {
                 sd.columns = new ArrayList<>();
             }
             sd.columns.add(col);
             return this;
         }
-        public StreamAggregatorBuilder streamDef(StreamDefinition sd){
+
+        public StreamAggregatorBuilder streamDef(StreamDefinition sd) {
             this.sd = sd;
             return this;
         }
-        public StreamAggregatorBuilder aggregateHandler(AggregateHandler handler){
+
+        public StreamAggregatorBuilder aggregateHandler(AggregateHandler handler) {
             this.handler = handler;
             return this;
         }
-        public SiddhiAggregator build(){
+
+        public SiddhiAggregator build() {
             TimeBatchWindowSpec spec = new TimeBatchWindowSpec();
             spec.aggs = aggs;
             spec.filter = filter;

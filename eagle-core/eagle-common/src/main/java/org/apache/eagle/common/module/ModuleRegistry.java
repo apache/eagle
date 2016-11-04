@@ -21,32 +21,38 @@ import com.google.inject.Module;
 import java.util.List;
 
 /**
- * Module Registry Repository
+ * Module Registry Repository.
  */
 public interface ModuleRegistry {
-    /**
-     * @param modules
-     */
-    void register(Class<? extends ModuleScope> scope, Module ... modules);
 
     /**
-     *
+     * Get Register.
+     * @param modules
+     */
+    void register(Class<? extends ModuleScope> scope, Module... modules);
+
+    default void register(Module... modules) {
+        register(GlobalScope.class, modules);
+    }
+
+    /**
+     * Get Module With Scope.
      * @param moduleScope
      * @return
      */
     List<Module> getModules(Class<? extends ModuleScope> moduleScope);
 
     /**
-     * @return
-     */
-    List<Class<? extends ModuleScope>> getScopes();
-
-    /**
+     * Get All Modules.
      * @return all modules
      */
     List<Module> getModules();
 
-    default void register(Module ... modules){
-        register(GlobalScope.class,modules);
-    }
+    /**
+     * Get All Scopes.
+     * @return
+     */
+    List<Class<? extends ModuleScope>> getScopes();
+
+
 }

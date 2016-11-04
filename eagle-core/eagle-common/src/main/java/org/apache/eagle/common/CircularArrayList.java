@@ -20,45 +20,45 @@ import java.util.AbstractList;
 import java.util.RandomAccess;
 
 /**
- * Circular array implementation
+ * Circular array implementation.
  *
  * @param <E>
  */
 public class CircularArrayList<E> extends AbstractList<E> implements RandomAccess {
-  
+
     private final E[] buf; // a List implementing RandomAccess
     private int head = 0;
     private int tail = 0;
     private boolean full = false;
-  
+
     public CircularArrayList(E[] array) {
         buf = array;
         full = (buf.length == 0);
     }
-  
+
     public int capacity() {
         return buf.length;
     }
-    
+
     public int head() {
-    	return head;
+        return head;
     }
-    
+
     public int tail() {
-    	return tail;
+        return tail;
     }
-    
+
     public boolean isFull() {
-    	return full;
+        return full;
     }
-    
+
     @Override
     public void clear() {
         head = 0;
         tail = 0;
         full = false;
         for (int i = 0; i < buf.length; ++i) {
-        	buf[i] = null;
+            buf[i] = null;
         }
     }
 
@@ -69,7 +69,7 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         }
         return m;
     }
-  
+
     // This method is O(n) but will never be called if the
     // CircularArrayList is used in its typical/intended role.
     private void shiftBlock(int startIndex, int endIndex) {
@@ -78,25 +78,25 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
             set(i + 1, get(i));
         }
     }
-    
+
     public int find(E e) {
-    	final int size = size();
-    	for (int i = 0; i < size; ++i) {
-    		if (e.equals(get(i))) {
-    			return i;
-    		}
-    	}
-    	return -1;
+        final int size = size();
+        for (int i = 0; i < size; ++i) {
+            if (e.equals(get(i))) {
+                return i;
+            }
+        }
+        return -1;
     }
-  
+
     @Override
     public int size() {
-    	if (full) {
-    		return buf.length;
-    	}
+        if (full) {
+            return buf.length;
+        }
         return tail - head + (tail < head ? buf.length : 0);
     }
-  
+
     @Override
     public E get(int i) {
         if (i < 0 || i >= size()) {
@@ -104,21 +104,21 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         }
         return buf[wrapIndex(head + i)];
     }
-  
+
     @Override
     public E set(int i, E e) {
         if (i < 0 || i >= size()) {
             throw new IndexOutOfBoundsException();
         }
-        return buf[wrapIndex(head + i)] =  e;
+        return buf[wrapIndex(head + i)] = e;
     }
-  
+
     @Override
     public void add(int i, E e) {
         int s = size();
         if (s == buf.length) {
             throw new IllegalStateException("Cannot add element."
-                    + " CircularArrayList is filled to capacity.");
+                + " CircularArrayList is filled to capacity.");
         }
         full = (s + 1 == buf.length);
         if (i < 0 || i > s) {
@@ -130,7 +130,7 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         }
         set(i, e);
     }
-  
+
     @Override
     public E remove(int i) {
         int s = size();
@@ -141,7 +141,7 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         if (i > 0) {
             shiftBlock(0, i);
         }
-    	buf[head] = null;
+        buf[head] = null;
         head = wrapIndex(head + 1);
         full = false;
         return e;
