@@ -1158,6 +1158,11 @@
                             <totalBranchRate>25</totalBranchRate>
                             <totalLineRate>25</totalLineRate>
                         </check>
+                        <instrumentation>
+                            <excludes>
+                                <exclude>org/apache/eagle/storage/hbase/query/coprocessor/generated/*.class</exclude>
+                            </excludes>
+                        </instrumentation>
                     </configuration>
                     <dependencies>
                         <!--Use asm-5.0 to support Java 8-->
