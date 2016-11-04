@@ -102,8 +102,8 @@ public class EagleConfigFactory implements EagleConfig {
         final String zkZnodeParent = config.hasPath(EagleConfigConstants.SERVICE_ZOOKEEPER_ZNODE_PARENT)
             ? config.getString(EagleConfigConstants.SERVICE_ZOOKEEPER_ZNODE_PARENT) : EagleConfigConstants.DEFAULT_ZOOKEEPER_ZNODE_PARENT;
         String clientIPCPoolSize = getString(config, EagleConfigConstants.SERVICE_HBASE_CLIENT_IPC_POOL_SIZE, "10");
-        this.hbaseConf.set("hbase.client.ipc.pool.size", clientIPCPoolSize);
         this.hbaseConf = HBaseConfiguration.create();
+        this.hbaseConf.set("hbase.client.ipc.pool.size", clientIPCPoolSize);
 
         if (this.zkQuorum != null) {
             this.hbaseConf.set("hbase.zookeeper.quorum", this.zkQuorum);
