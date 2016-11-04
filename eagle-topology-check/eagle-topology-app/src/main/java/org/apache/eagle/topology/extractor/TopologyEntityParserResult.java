@@ -21,7 +21,6 @@ package org.apache.eagle.topology.extractor;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +57,7 @@ public class TopologyEntityParserResult {
     public TopologyConstants.HadoopVersion getVersion() {
         return version;
     }
+
     public void setVersion(TopologyConstants.HadoopVersion version) {
         this.version = version;
     }

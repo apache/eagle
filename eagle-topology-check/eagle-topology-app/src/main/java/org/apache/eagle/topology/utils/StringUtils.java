@@ -16,26 +16,30 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.topology.extractor.mr;
+package org.apache.eagle.topology.utils;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import java.util.List;
+public final class StringUtils {
 
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class YarnNodeInfos {
+    private StringUtils() {
 
-    private List<YarnNodeInfo> node;
-
-    public List<YarnNodeInfo> getNode() {
-        return node;
     }
 
-    public void setNode(List<YarnNodeInfo> node) {
-        this.node = node;
+    public static String convertMapToString(Map<String, String> tags) {
+        StringBuilder tagBuilder = new StringBuilder();
+        Iterator<Entry<String, String>> iter = tags.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) iter.next();
+            tagBuilder.append(entry.getKey() + ":" + entry.getValue());
+            if (iter.hasNext()) {
+                tagBuilder.append(",");
+            }
+        }
+        return tagBuilder.toString();
     }
-
-}
+} 

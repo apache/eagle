@@ -21,15 +21,11 @@ package org.apache.eagle.topology.utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
-import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.apache.eagle.topology.TopologyConstants.*;
 
 public class EntityBuilderHelper {
 
@@ -48,7 +44,7 @@ public class EntityBuilderHelper {
         metricEntity.setTimestamp(timestamp);
         metricEntity.setTags(tags);
         metricEntity.setPrefix(metricName);
-        metricEntity.setValue(new double[]{value});
+        metricEntity.setValue(new double[] {value});
         return metricEntity;
     }
 
@@ -59,12 +55,12 @@ public class EntityBuilderHelper {
         String metricName = String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, role);
         return EntityBuilderHelper.metricWrapper(timestamp, metricName, value, tags);
     }
-    
-    public static String getValidHostName(String key){
-    	if(StringUtils.isBlank(key)){
-    		throw new IllegalArgumentException("key can not be empty");
-    	}    	
-    	return key.indexOf(TopologyConstants.COLON) > 0 ? key.substring(0,key.indexOf(TopologyConstants.COLON)) : key;    	
+
+    public static String getValidHostName(String key) {
+        if (StringUtils.isBlank(key)) {
+            throw new IllegalArgumentException("key can not be empty");
+        }
+        return key.indexOf(TopologyConstants.COLON) > 0 ? key.substring(0, key.indexOf(TopologyConstants.COLON)) : key;
     }
 
 }

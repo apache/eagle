@@ -22,7 +22,7 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.topology.TopologyConstants;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
 @Prefix("hdfsservicestatus")
@@ -56,34 +56,43 @@ public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     public String getNumFailedVolumes() {
         return numFailedVolumes;
     }
+
     public void setNumFailedVolumes(String numFailedVolumes) {
         this.numFailedVolumes = numFailedVolumes;
         valueChanged("numFailedVolumes");
     }
+
     public String getNumBlocks() {
         return numBlocks;
     }
+
     public void setNumBlocks(String numBlocks) {
         this.numBlocks = numBlocks;
         valueChanged("numBlocks");
     }
+
     public String getStatus() {
         return status;
     }
+
     public void setStatus(String status) {
         this.status = status;
         valueChanged("status");
     }
+
     public String getConfiguredCapacityTB() {
         return configuredCapacityTB;
     }
+
     public void setConfiguredCapacityTB(String configuredCapacityTB) {
         this.configuredCapacityTB = configuredCapacityTB;
         valueChanged("configuredCapacityTB");
     }
+
     public String getUsedCapacityTB() {
         return usedCapacityTB;
     }
+
     public void setUsedCapacityTB(String usedCapacityTB) {
         this.usedCapacityTB = usedCapacityTB;
         valueChanged("usedCapacityTB");

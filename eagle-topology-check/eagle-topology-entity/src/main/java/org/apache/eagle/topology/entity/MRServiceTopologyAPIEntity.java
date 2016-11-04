@@ -22,13 +22,13 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.topology.TopologyConstants;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
 @Prefix("mrservicestatus")
 @Service(TopologyConstants.MR_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
-public class MRServiceTopologyAPIEntity  extends TopologyBaseAPIEntity {
+public class MRServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private String status;
     @Column("b")
@@ -52,27 +52,34 @@ public class MRServiceTopologyAPIEntity  extends TopologyBaseAPIEntity {
     public String getStatus() {
         return status;
     }
+
     public void setStatus(String status) {
         this.status = status;
         valueChanged("status");
     }
+
     public String getNumConfiguredMapSlots() {
         return numConfiguredMapSlots;
     }
+
     public void setNumConfiguredMapSlots(String numConfiguredMapSlots) {
         this.numConfiguredMapSlots = numConfiguredMapSlots;
         valueChanged("numConfiguredMapSlots");
     }
+
     public String getNumConfiguredReduceSlots() {
         return numConfiguredReduceSlots;
     }
+
     public void setNumConfiguredReduceSlots(String numConfiguredReduceSlots) {
         this.numConfiguredReduceSlots = numConfiguredReduceSlots;
         valueChanged("numConfiguredReduceSlots");
     }
+
     public String getHealthReport() {
         return healthReport;
     }
+
     public void setHealthReport(String healthReport) {
         this.healthReport = healthReport;
         valueChanged("healthReport");

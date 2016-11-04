@@ -25,14 +25,14 @@ public class ServiceNotResponseException extends IOException {
     private static final long serialVersionUID = -2425311876734366496L;
 
     /**
-     * Default constructor of FeederException
+     * Default constructor of FeederException.
      */
     public ServiceNotResponseException() {
         super();
     }
 
     /**
-     * Constructor of FeederException
+     * Constructor of FeederException.
      *
      * @param message error message
      */
@@ -41,18 +41,17 @@ public class ServiceNotResponseException extends IOException {
     }
 
     /**
-     * Constructor of FeederException
+     * Constructor of FeederException.
      *
      * @param message error message
-     * @param cause the cause of the exception
-     *
+     * @param cause   the cause of the exception
      */
     public ServiceNotResponseException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Constructor of FeederException
+     * Constructor of FeederException.
      *
      * @param cause the cause of the exception
      */
