@@ -58,6 +58,7 @@ public class ConfigBusConsumer extends ConfigBusBase {
         try {
             v = mapper.readValue(value, ConfigValue.class);
         } catch (JsonParseException e) {
+            LOG.warn("warn getConfigValue parse exception", e.getMessage());
             v = new ConfigValue();
         }
         return v;
