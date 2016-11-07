@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @since Apr 11, 2016.
@@ -364,6 +365,13 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             return op.get();
         }
         return null;
+    }
+
+    @Override
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId) {
+        List<AlertPublishEvent> results = list(alerts, AlertPublishEvent.class);
+        List<AlertPublishEvent> ret = results.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
+        return ret;
     }
 
     @Override
