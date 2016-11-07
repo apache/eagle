@@ -338,7 +338,7 @@
 			if($scope.saveLock) return false;
 
 			if(!$scope.policy.name) return false;
-			if(!$scope.policy.parallelismHint) return false;
+			if(common.number.parse($scope.policy.parallelismHint) <= 0) return false;
 			if(!$scope.policy.definition.value) return false;
 			if(!$scope.policy.outputStreams.length) return false;
 			if(!$scope.policyPublisherList.length) return false;
