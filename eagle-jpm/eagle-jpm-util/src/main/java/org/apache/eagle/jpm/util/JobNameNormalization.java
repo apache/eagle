@@ -31,6 +31,9 @@ public class JobNameNormalization {
     private static Logger LOG = LoggerFactory.getLogger(JobNameNormalization.class);
     private static JobNameNormalization instance = new JobNameNormalization();
     private static final String JOB_NAME_NORMALIZATION_RULES_KEY = "job.name.normalization.rules.key";
+    private static final String JOB_NAME_NORMALIZATION_RULES_KEY_DEFAULT = "^(.*)[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}$ => "
+        + "$1~ ; ^(oozie:launcher):T=(.*):W=(.*):A=(.*):ID=(?:.*)$ => $1-$2-$3-$4~ ; ^(.*)([0-9]{10})$ => $1~ ; "
+        + "^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$ => uuid~ ; ^(.*)(?:[0-9]{8}/[0-9]{2}_[0-9]{2})$ => $1~";
     private static final String PARAMETERIZED_PREFIX = "\\$";
     private static final String MULTIPLE_RULE_DILIMITER = ";";
     /**
@@ -64,7 +67,7 @@ public class JobNameNormalization {
             // load normalization rules
             Config conf = ConfigFactory.load();
             String key = JOB_NAME_NORMALIZATION_RULES_KEY.toLowerCase();
-            String value = conf.getString(key);
+            String value = conf.getString(key) != null ? conf.getString(key) : JOB_NAME_NORMALIZATION_RULES_KEY_DEFAULT;
             if (value == null) {
                 LOG.info("no job name normalization rules are loaded");
                 return;
