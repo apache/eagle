@@ -161,7 +161,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         // modified StreamRouterSpec, i.e. there is modified StreamPartition, for example WorkSlotQueue assignment is changed
         for (StreamRouterSpec spec : modified) {
             if (!copyRouteSpecMap.containsKey(spec.getPartition())
-                || !copyRouteSpecMap.get(spec.getPartition()).contains(spec)) {
+                || copyRouteSpecMap.get(spec.getPartition()).contains(spec)) {
                 LOG.error("Metadata calculation error: modify nonexisting StreamRouterSpec " + spec);
             } else {
                 inplaceRemove(copyRouteSpecMap, copyRoutePartitionerMap, spec);
