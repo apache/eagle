@@ -21,29 +21,6 @@
 
 	var eagleControllers = angular.module('eagleControllers');
 
-	var publisherTypes = {
-		'org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher': {
-			name: "Email",
-			displayFields: ["recipients"],
-			fields: ["subject", "template", "sender", "recipients", "mail.smtp.host", "connection", "mail.smtp.port"]
-		},
-		'org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher': {
-			name: "Kafka",
-			displayFields: ["topic"],
-			fields: ["topic", "kafka_broker", "rawAlertNamespaceLabel", "rawAlertNamespaceValue"]
-		},
-		'org.apache.eagle.alert.engine.publisher.impl.AlertSlackPublisher': {
-			name: "Slack",
-			displayFields: ["channels"],
-			fields: ["token", "channels", "severitys", "urltemplate"]
-		},
-		'org.apache.eagle.alert.engine.publisher.impl.AlertEagleStorePlugin': {
-			name: "Storage",
-			displayFields: [],
-			fields: []
-		},
-	};
-
 	// ======================================================================================
 	// =                                    Policy Create                                   =
 	// ======================================================================================
@@ -54,11 +31,11 @@
 		policyEditController.apply(this, newArgs);
 	}
 
-	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
+	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity, Policy) {
 		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
 	});
-	eagleControllers.controller('policyEditCtrl', function ($scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
+	eagleControllers.controller('policyEditCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity, Policy) {
 		PageConfig.title = "Edit Policy";
 		var args = arguments;
 
@@ -79,8 +56,8 @@
 		});
 	});
 
-	function policyEditController(policy, $scope, $q, $wrapState, $timeout, $element, PageConfig, Entity) {
-		$scope.publisherTypes = publisherTypes;
+	function policyEditController(policy, $scope, $q, $wrapState, $timeout, PageConfig, Entity, Policy) {
+		$scope.publisherTypes = Policy.publisherTypes;
 
 		$scope.policy = policy;
 		$scope.policy = common.merge({
@@ -324,7 +301,7 @@
 				}, $scope.publisher.existPublisher);
 			}
 			var properties = {};
-			$.each($scope.publisherTypes[$scope.publisher.type].fields, function (i, field) {
+			$.each(Policy.publisherTypes[$scope.publisher.type].fields, function (i, field) {
 				properties[field] = $scope.publisher.properties[field] || "";
 			});
 			$scope.policyPublisherList.push($.extend({}, $scope.publisher, {properties: properties}));
@@ -335,14 +312,14 @@
 		// ==============================================================
 		$scope.saveLock = false;
 		$scope.saveCheck = function () {
-			if($scope.saveLock) return false;
-
-			if(!$scope.policy.name) return false;
-			if(common.number.parse($scope.policy.parallelismHint) <= 0) return false;
-			if(!$scope.policy.definition.value) return false;
-			if(!$scope.policy.outputStreams.length) return false;
-			if(!$scope.policyPublisherList.length) return false;
-			return true;
+			return (
+				!$scope.saveLock &&
+				$scope.policy.name &&
+				common.number.parse($scope.policy.parallelismHint) > 0 &&
+				$scope.policy.definition.value &&
+				$scope.policy.outputStreams.length &&
+				$scope.policyPublisherList.length
+			);
 		};
 
 		$scope.saveConfirm = function () {

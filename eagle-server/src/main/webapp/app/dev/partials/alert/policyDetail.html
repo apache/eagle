@@ -16,37 +16,71 @@
   limitations under the License.
   -->
 
-<div class="nav-tabs-custom">
-	<ul class="nav nav-tabs">
-		<li class="active"><a href="#basic" data-toggle="tab">Basic</a></li>
-		<li><a href="#definition" data-toggle="tab">Definition</a></li>
-		<li><a href="#publisher" data-toggle="tab">Publisher</a></li>
-
-		<li class="box-tools pull-right">
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<span class="fa fa-square" ng-class="policy.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
+		<h3 class="box-title">
+			{{policy.name}}
+		</h3>
+		<div class="box-tools pull-right">
 			<div class="btn-group">
 				<button class="btn btn-default fa fa-play" ng-click="startPolicy()" ng-if="policy.policyStatus !== 'ENABLED'"></button>
 				<button class="btn btn-default fa fa-square" ng-click="stopPolicy()" ng-if="policy.policyStatus === 'ENABLED'"></button>
 				<a class="btn btn-default fa fa-pencil" ui-sref="policyEdit({name: policy.name})"></a>
 				<button class="btn btn-danger fa fa-trash" ng-click="deletePolicy()"></button>
 			</div>
-		</li>
+		</div>
+	</div>
+	<div class="box-body">
+		<table class="table">
+			<tbody>
+				<tr>
+					<th>Status</th>
+					<td>
+						<span class="label" ng-class="policy.policyStatus === 'ENABLED' ? 'label-success' : 'label-default'">
+							{{policy.policyStatus}}
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Definition</th>
+					<td><pre class="text-break">{{policy.definition.value}}</pre></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+<div class="nav-tabs-custom">
+	<ul class="nav nav-tabs">
+		<!--li><a href="#statistic" data-toggle="tab">Statistic</a></li>
+		<li><a href="#alerts" data-toggle="tab">Alerts</a></li-->
+		<li class="active"><a href="#setting" data-toggle="tab">Setting</a></li>
+		<li><a href="#assignments" data-toggle="tab">Assignments</a></li>
 	</ul>
 	<div class="tab-content">
-		<div class="tab-pane active" id="basic">
+		<div class="tab-pane active" id="setting">
 			<table class="table">
 				<tbody>
 					<tr>
-						<th>Name</th>
-						<td>
-							<span class="fa fa-square" ng-class="policy.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
-							{{policy.name}}
-						</td>
 						<th>Parallelism Hint</th>
 						<td>{{policy.parallelismHint}}</td>
 					</tr>
 					<tr>
-						<th>Description</th>
-						<td colspan="3"><pre class="inline">{{policy.description}}</pre></td>
+						<th>Partitions</th>
+						<td>
+							<ul class="no-margin">
+								<li ng-repeat="partition in policy.partitionSpec track by $index">
+									[<span class="text-primary">{{partition.type}}</span>]
+									{{partition.streamId}}:
+									<strong class="text-success">{{partition.columns.join(", ")}}</strong>
+								</li>
+								<li ng-if="policy.partitionSpec.length === 0" class="text-muted">
+									No partition
+								</li>
+							</ul>
+						</td>
 					</tr>
 					<tr>
 						<th>Input Streams</th>
@@ -57,6 +91,8 @@
 								</li>
 							</ul>
 						</td>
+					</tr>
+					<tr>
 						<th>Output Streams</th>
 						<td>
 							<ul class="no-margin">
@@ -66,50 +102,61 @@
 							</ul>
 						</td>
 					</tr>
+					<tr>
+						<th>Publishers</th>
+						<td>
+							<ul class="no-margin">
+								<li class="text-danger" ng-if="policyPublisherList.length === 0">
+									<i class="fa fa-fw fa-warning"></i> No alert publisher defined
+								</li>
+								<li ng-repeat="publisher in policyPublisherList track by $index">
+									<span>
+										<strong>
+											<span>({{Policy.publisherTypes[publisher.type].name}})</span>
+											{{publisher.name}}
+										</strong>
+									</span>
+									<p class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
+										<span>{{field}}:</span>
+										<span>{{publisher.properties[field]}}</span>
+									</p>
+								</li>
+							</ul>
+						</td>
+					</tr>
+					<tr>
+						<th class="text-no-break">Execution Plan</th>
+						<td><pre>{{executionPlan.policyExecutionPlan.executionPlanDesc}}</pre></td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
-		<div class="tab-pane" id="definition">
-			<label>Definition</label>
-			<pre>{{policy.definition.value}}</pre>
-
-			<label>Partition</label>
-			<ul class="no-margin">
-				<li ng-repeat="partition in policy.partitionSpec track by $index">
-					[<span class="text-primary">{{partition.type}}</span>]
-					{{partition.streamId}}:
-					<strong class="text-success">{{partition.columns.join(", ")}}</strong>
-				</li>
-				<li ng-if="policy.partitionSpec.length === 0" class="text-muted">
-					No partition
-				</li>
-			</ul>
+		<div class="tab-pane" id="statistic">statistic
 		</div>
-		<div class="tab-pane" id="publisher">
-			<p ng-if="publisherList.length === 0" class="text-muted">
-				<span class="fa fa-exclamation-triangle"></span> No publisher configured
-			</p>
-			<table class="table table-bordered" ng-repeat="publisher in publisherList track by publisher.name">
+		<div class="tab-pane" id="alerts">alerts
+		</div>
+		<div class="tab-pane" id="assignments">
+			<table class="table">
 				<tbody>
 					<tr>
-						<th width="100" class="text-no-break">Name</th>
-						<td>{{publisher.name}}</td>
-						<th width="150" class="text-no-break">DeDup Interval Min</th>
-						<td>{{publisher.dedupIntervalMin}}</td>
+						<th>Version</th>
+						<td>{{assignment.version}}</td>
 					</tr>
 					<tr>
-						<th>Type</th>
-						<td colspan="3">{{publisher.type}}</td>
+						<th>Queue Id</th>
+						<td>{{assignment.queueId}}</td>
 					</tr>
 					<tr>
-						<th>Properties</th>
-						<td colspan="3">
-							<ul class="no-margin">
-								<li ng-repeat="(key, value) in publisher.properties track by key">
-									<strong>{{key}}:</strong>
-									{{value}}
-								</li>
-							</ul>
+						<th class="text-no-break">working Slots</th>
+						<td>
+							<div na-block="queue.workingSlots.length > 0">
+								<ul class="no-margin">
+									<li ng-repeat="slot in queue.workingSlots track by $index">
+										<span class="text-primary">{{slot.topologyName}}</span>
+										- {{slot.boltId}}
+									</li>
+								</ul>
+							</div>
 						</td>
 					</tr>
 				</tbody>

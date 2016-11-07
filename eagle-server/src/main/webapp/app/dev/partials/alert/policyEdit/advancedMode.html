@@ -49,24 +49,26 @@
 					</p>
 
 					<p ng-hide="getSearchApplication()" class="text-warning">No stream match</p>
-					<div ng-show="getSearchApplication()" ng-repeat="(app, streams) in getSearchApplication() track by app" class="policy-app-list">
-						<a data-toggle="collapse" href="[data-id='SP_{{app}}']">
-							<strong>{{app}}</strong>
-						</a>
-						<ul data-id="SP_{{app}}" class="collapse list-unstyled">
-							<li ng-repeat="stream in streams track by stream.streamId">
-								<a data-toggle="collapse" href="[data-id='SP_{{app}}_{{stream.streamId}}']">
-									<span class="fa fa-{{isInputStreamSelected(stream.streamId) ? 'check-square' : 'square'}}"></span>
-									{{stream.streamId}}
-								</a>
-								<ul data-id="SP_{{app}}_{{stream.streamId}}" class="collapse in">
-									<li ng-repeat="column in stream.columns track by $index">
-										<span class="text-primary">[{{column.type}}]</span>
-										{{column.name}}
-									</li>
-								</ul>
-							</li>
-						</ul>
+					<div ng-show="getSearchApplication()">
+						<div ng-repeat="(app, streams) in getSearchApplication() track by app" class="policy-app-list">
+							<a data-toggle="collapse" href="[data-id='SP_{{app}}']">
+								<strong class="text-break">{{app}}</strong>
+							</a>
+							<ul data-id="SP_{{app}}" class="collapse list-unstyled">
+								<li ng-repeat="stream in streams track by stream.streamId">
+									<a data-toggle="collapse" href="[data-id='SP_{{app}}_{{stream.streamId}}']"  class="text-break">
+										<span class="fa fa-{{isInputStreamSelected(stream.streamId) ? 'check-square' : 'square'}}"></span>
+										{{stream.streamId}}
+									</a>
+									<ul data-id="SP_{{app}}_{{stream.streamId}}" class="collapse in">
+										<li ng-repeat="column in stream.columns track by $index">
+											<span class="text-primary">[{{column.type}}]</span>
+											{{column.name}}
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 				<div ng-show="sourceTab === 'selected'">
@@ -159,11 +161,11 @@
 						<span>
 							[<a class="fa fa-times" ng-click="removePublisher(publisher)"></a>]
 							<strong>
-								<span>({{publisherTypes[publisher.type].name}})</span>
+								<span>({{Policy.publisherTypes[publisher.type].name}})</span>
 								{{publisher.name}}
 							</strong>
 						</span>
-						<p class="offset" ng-repeat="field in publisherTypes[publisher.type].displayFields track by $index">
+						<p class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
 							<span>{{field}}:</span>
 							<span>{{publisher.properties[field]}}</span>
 						</p>
@@ -287,10 +289,10 @@
 					<div class="form-group">
 						<label>Type</label>
 						<select class="form-control" ng-model="publisher.type">
-							<option ng-repeat="(type, fields) in publisherTypes track by type">{{type}}</option>
+							<option ng-repeat="(type, fields) in Policy.publisherTypes track by type">{{type}}</option>
 						</select>
 					</div>
-					<div class="form-group" ng-repeat="field in publisherTypes[publisher.type].fields track by $index">
+					<div class="form-group" ng-repeat="field in Policy.publisherTypes[publisher.type].fields track by $index">
 						<label>{{field}}</label>
 						<input class="form-control" ng-model="publisher.properties[field]" />
 					</div>
