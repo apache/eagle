@@ -16,30 +16,22 @@
  */
 package org.apache.eagle.storage.hbase.spi;
 
+import org.apache.eagle.service.hbase.TestHBaseBase;
 import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.hbase.HBaseStorage;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @since 3/20/15
  */
-public class TestHBaseStorageLoader {
+public class TestHBaseStorageLoader  extends TestHBaseBase {
     @Test
-    @Ignore("TODO: Add back after refactoring hbase related unit test cases")
-    public void testHBaseStorageLoader() {
-        try {
-            assert DataStorageManager.getDataStorageByEagleConfig() instanceof HBaseStorage;
-        } catch (IllegalDataStorageTypeException e) {
-            Assert.fail(e.getMessage());
-        }
+    public void testHBaseStorageLoader() throws IllegalDataStorageTypeException {
 
-        try {
-            assert DataStorageManager.newDataStorage("hbase") instanceof HBaseStorage;
-        } catch (IllegalDataStorageTypeException e) {
-            Assert.fail(e.getMessage());
-        }
+        Assert.assertTrue(DataStorageManager.getDataStorageByEagleConfig() instanceof HBaseStorage);
+        Assert.assertTrue(DataStorageManager.newDataStorage("hbase") instanceof HBaseStorage);
+
     }
 }

@@ -67,7 +67,9 @@ public class HBaseStorage extends DataStorageBase {
         ModifyResult<String> result = new ModifyResult<>();
         try {
             GenericEntityWriter entityWriter = new GenericEntityWriter(entityDefinition);
-            result.setIdentifiers(entityWriter.write(entities));
+            List<String> keys = entityWriter.write(entities);
+            result.setIdentifiers(keys);
+            result.setSize(keys.size());
             result.setSuccess(true);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -102,7 +104,9 @@ public class HBaseStorage extends DataStorageBase {
         ModifyResult<String> result = new ModifyResult<String>();
         try {
             GenericDeleter deleter = new GenericDeleter(entityDefinition.getTable(), entityDefinition.getColumnFamily());
-            result.setIdentifiers(deleter.delete(entities));
+            List<String> keys = deleter.delete(entities);
+            result.setIdentifiers(keys);
+            result.setSize(keys.size());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             result.setSuccess(false);

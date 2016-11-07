@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.junit.Assert;
 
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateClient;
@@ -30,7 +33,8 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +53,6 @@ import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl
 /**
  * @since : 11/10/14,2014
  */
-@Ignore
 public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
 
     private final static Logger LOG = LoggerFactory.getLogger(TestGroupAggregateTimeSeriesClient.class);
@@ -61,6 +64,14 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
     AggregateClient client;
     Scan scan;
     EntityDefinition ed;
+
+    // This is Bad, It will hide TestHBaseBase.setUpHBase!!!!
+    @BeforeClass
+    public static void setUpHBase() {
+        Configuration conf = new Configuration();
+        conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY,AggregateProtocolEndPoint.class.getName());
+        TestHBaseBase.setupHBaseWithConfig(conf);
+    }
 
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException {
@@ -121,7 +132,7 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
     }
 
 
-    //@Test
+    @Test
     public void testGroupTimeSeriesAggCountClient() {
         try {
             List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.count), Arrays.asList("count"), true, startTime, System.currentTimeMillis(), 10).getKeyValues();
@@ -134,7 +145,7 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
         }
     }
 
-    //@Test
+    @Test
     public void testGroupTimeSeriesAggMaxClient() {
         try {
             List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.max), Arrays.asList("field2"), true, startTime, System.currentTimeMillis(), 10).getKeyValues();
@@ -147,7 +158,7 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
         }
     }
 
-    //@Test
+    @Test
     public void testGroupTimeSeriesAggMinClient() {
         try {
             List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.min), Arrays.asList("field2"), true, startTime, System.currentTimeMillis(), 10).getKeyValues();
@@ -160,7 +171,7 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
         }
     }
 
-    //@Test
+    @Test
     public void testGroupTimeSeriesAggAvgClient() {
         try {
             List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.min), Arrays.asList("field2"), true, startTime, System.currentTimeMillis(), 10).getKeyValues();
@@ -173,7 +184,7 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
         }
     }
 
-    //@Test
+    @Test
     public void testGroupTimeSeriesAggSumClient() {
         try {
             List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.sum), Arrays.asList("field2"), true, startTime, System.currentTimeMillis(), 10).getKeyValues();
@@ -186,7 +197,7 @@ public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
         }
     }
 
-    //@Test
+    @Test
     public void testGroupTimeSeriesAggMultipleClient() {
         try {
             List<GroupbyKeyValue> result = client.aggregate(table, ed, scan,
