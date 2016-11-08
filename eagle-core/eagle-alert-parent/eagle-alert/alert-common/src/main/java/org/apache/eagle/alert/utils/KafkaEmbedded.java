@@ -20,6 +20,7 @@ import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
 import org.apache.commons.io.FileUtils;
 import org.apache.curator.test.InstanceSpec;
+
 import java.io.File;
 import java.util.Properties;
 
@@ -71,6 +72,10 @@ public class KafkaEmbedded {
         return new KafkaConfig(p);
     }
 
+    public String getZkConnectionString() {
+        return zk.getConnectionString();
+    }
+
     public String getBrokerConnectionString() {
         return "localhost:" + port;
     }
@@ -89,4 +94,5 @@ public class KafkaEmbedded {
         }
         zk.shutdown();
     }
+
 }
