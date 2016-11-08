@@ -16,13 +16,14 @@
  */
 package org.apache.eagle.alert.engine.interpreter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.interpreter.PolicyExecutionPlan;
-import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
-import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
+import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.siddhi.core.exception.DefinitionNotExistException;
@@ -363,6 +364,38 @@ public class PolicyInterpreterTest {
             "insert into JoinStream "
         );
     }
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Test
+    public void testLeftJoin() throws  Exception {
+        PolicyDefinition def = mapper.readValue(PolicyInterpreterTest.class.getResourceAsStream("/interpreter/policy.json"), PolicyDefinition.class);
+        ArrayNode array = (ArrayNode)mapper.readTree(PolicyInterpreterTest.class.getResourceAsStream("/interpreter/streams.json"));
+        Map<String, StreamDefinition> allDefinitions = new HashMap<>();
+        for(JsonNode node : array) {
+            StreamDefinition streamDef = mapper.readValue(node.toString(), StreamDefinition.class);
+            allDefinitions.put(streamDef.getStreamId(), streamDef);
+        }
+        PolicyValidationResult result = PolicyInterpreter.validate(def, allDefinitions);
+        Assert.assertTrue(result.isSuccess());
+    }
+
+    @Test
+    public void testExtendPolicy() throws  Exception {
+        PolicyDefinition policyDefinition = new PolicyDefinition();
+        policyDefinition.setName("test-extend-policy");
+        policyDefinition.setInputStreams(Collections.singletonList("INPUT_STREAM_1"));
+        policyDefinition.setOutputStreams(Collections.singletonList("OUTPUT_STREAM_1"));
+        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
+        definition.setType(PolicyStreamHandlers.CUSTOMIZED_ENGINE);
+        policyDefinition.setDefinition(definition);
+
+        Map<String, StreamDefinition> allDefinitions = new HashMap<>();
+        allDefinitions.put("INPUT_STREAM_1", mockStreamDefinition("INPUT_STREAM_1"));
+        PolicyValidationResult result = PolicyInterpreter.validate(policyDefinition, allDefinitions);
+        Assert.assertTrue(result.isSuccess());
+    }
+
 
     // --------------
     // Helper Methods

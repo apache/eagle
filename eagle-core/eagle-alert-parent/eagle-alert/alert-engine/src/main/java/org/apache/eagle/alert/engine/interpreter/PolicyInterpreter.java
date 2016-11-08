@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
+import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,12 +89,15 @@ public class PolicyInterpreter {
                 }
             }
 
-            PolicyExecutionPlan policyExecutionPlan = parseExecutionPlan(policy.getDefinition().getValue(), inputDefinitions);
-            // Validate output
-            if (policy.getOutputStreams() != null) {
-                for (String outputStream : policy.getOutputStreams()) {
-                    if (!policyExecutionPlan.getOutputStreams().containsKey(outputStream)) {
-                        throw new StreamNotDefinedException("Output stream " + outputStream + " not defined");
+            PolicyExecutionPlan policyExecutionPlan = null;
+            if (PolicyStreamHandlers.SIDDHI_ENGINE.equalsIgnoreCase(policy.getDefinition().getType())) {
+                policyExecutionPlan = parseExecutionPlan(policy.getDefinition().getValue(), inputDefinitions);
+                // Validate output
+                if (policy.getOutputStreams() != null) {
+                    for (String outputStream : policy.getOutputStreams()) {
+                        if (!policyExecutionPlan.getOutputStreams().containsKey(outputStream)) {
+                            throw new StreamNotDefinedException("Output stream " + outputStream + " not defined");
+                        }
                     }
                 }
             }
