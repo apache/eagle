@@ -173,7 +173,10 @@ public class AlertPublisherImpl implements AlertPublisher {
                 addPublishmentPoliciesStreams(newPSPublishPluginMapping, newPolicies, newStreams, pubName);
             }
             Publishment newPub = afterModified.get(i);
-            newPublishMap.get(pubName).update(newPub.getDedupIntervalMin(), newPub.getProperties());
+
+            // for updated publishment, need to init them too
+            AlertPublishPlugin newPlugin = AlertPublishPluginsFactory.createNotificationPlugin(newPub, config, conf);
+            newPublishMap.replace(pubName, newPlugin);
         }
 
         // now do the swap
