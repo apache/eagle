@@ -56,19 +56,33 @@
 	// ======================================================================================
 	// =                                       Stream                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
+	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application, Entity) {
 		PageConfig.title = "Streams";
 
-		$scope.streamList = $.map(Application.list, function (app) {
-			return (app.streams || []).map(function (stream) {
-				return {
-					streamId: stream.streamId,
-					appType: app.descriptor.type,
-					siteId: app.site.siteId,
-					schema: stream.schema
-				};
+		$scope.streamList = [];
+		Entity.queryMetadata("streams")._then(function (res) {
+			$scope.streamList = $.map(res.data, function (stream) {
+				var application = Application.findProvider(stream.dataSource);
+				return $.extend({application: application}, stream);
 			});
 		});
+
+		$scope.dataSources = {};
+		Entity.queryMetadata("datasources")._then(function(res) {
+			$.each(res.data, function (i, dataSource) {
+				$scope.dataSources[dataSource.name] = dataSource;
+			});
+		});
+
+		$scope.showDataSource = function (stream) {
+			var dataSource = $scope.dataSources[stream.dataSource];
+			console.log(">>>", dataSource);
+			$.dialog({
+				title: dataSource.name,
+				content: $("<pre class='text-break'>").html(JSON.stringify(dataSource, null, "\t")),
+				size: "large"
+			});
+		};
 	});
 
 	// ======================================================================================
