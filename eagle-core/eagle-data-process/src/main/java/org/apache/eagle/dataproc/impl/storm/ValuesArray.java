@@ -20,18 +20,18 @@ import java.util.ArrayList;
 
 /**
  * multiple datapoints are stored within one ValuesArray object
- * sent out
+ * sent out.
  */
-public class ValuesArray extends ArrayList<Object>{
-	private static final long serialVersionUID = -8218427810421668178L;
+public class ValuesArray extends ArrayList<Object> {
+    private static final long serialVersionUID = -8218427810421668178L;
 
-	public ValuesArray() {
+    public ValuesArray() {
 
     }
 
     public ValuesArray(Object... vals) {
         super(vals.length);
-        for(Object o: vals) {
+        for (Object o : vals) {
             add(o);
         }
     }

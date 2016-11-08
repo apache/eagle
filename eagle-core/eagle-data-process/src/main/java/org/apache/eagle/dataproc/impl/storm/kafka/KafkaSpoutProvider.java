@@ -36,23 +36,26 @@ import java.util.stream.Collectors;
  * Since 6/8/16.
  */
 public class KafkaSpoutProvider implements StormSpoutProvider {
-    private final static Logger LOG = LoggerFactory.getLogger(KafkaSpoutProvider.class);
-    private final static String DEFAULT_CONFIG_PREFIX = "dataSourceConfig";
-    private final static String DEFAULT_CONSUMER_GROUP_ID = "eagleConsumer";
-    private final static String DEFAULT_TRANSACTION_ZK_ROOT = "/consumers";
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaSpoutProvider.class);
+    private static final String DEFAULT_CONFIG_PREFIX = "dataSourceConfig";
+    private static final String DEFAULT_CONSUMER_GROUP_ID = "eagleConsumer";
+    private static final String DEFAULT_TRANSACTION_ZK_ROOT = "/consumers";
 
     private String configPrefix = DEFAULT_CONFIG_PREFIX;
 
-    public KafkaSpoutProvider(){}
+    public KafkaSpoutProvider() {
+    }
 
-    public KafkaSpoutProvider(String prefix){
+    public KafkaSpoutProvider(String prefix) {
         this.configPrefix = prefix;
     }
 
     @Override
-    public BaseRichSpout getSpout(Config config){
+    public BaseRichSpout getSpout(Config config) {
         Config context = config;
-        if(this.configPrefix!=null) context = config.getConfig(configPrefix);
+        if (this.configPrefix != null) {
+            context = config.getConfig(configPrefix);
+        }
 
         // the following is for fetching data from one topic
         // Kafka topic
@@ -76,16 +79,16 @@ public class KafkaSpoutProvider implements StormSpoutProvider {
         String groupId = context.hasPath("consumerGroupId") ? context.getString("consumerGroupId") : DEFAULT_CONSUMER_GROUP_ID;
         String brokerZkPath = context.hasPath("brokerZkPath") ? context.getString("brokerZkPath") : null;
         BrokerHosts hosts;
-        if(brokerZkPath == null) {
+        if (brokerZkPath == null) {
             hosts = new ZkHosts(zkConnString);
         } else {
             hosts = new ZkHosts(zkConnString, brokerZkPath);
         }
 
         SpoutConfig spoutConfig = new SpoutConfig(hosts,
-                topic,
-                zkRoot + "/" + topic,
-                groupId);
+            topic,
+            zkRoot + "/" + topic,
+            groupId);
 
         // transaction zkServers to store kafka consumer offset. Default to use storm zookeeper
         if (context.hasPath("txZkServers")) {
@@ -112,13 +115,13 @@ public class KafkaSpoutProvider implements StormSpoutProvider {
 
         if (context.hasPath("schemeCls")) {
             try {
-                Scheme s = (Scheme)Class.forName(context.getString("schemeCls")).newInstance();
+                Scheme s = (Scheme) Class.forName(context.getString("schemeCls")).newInstance();
                 spoutConfig.scheme = new SchemeAsMultiScheme(s);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 LOG.error("error instantiating scheme object");
                 throw new IllegalStateException(ex);
             }
-        }else{
+        } else {
             String err = "schemeCls must be present";
             LOG.error(err);
             throw new IllegalStateException(err);
