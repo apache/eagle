@@ -96,6 +96,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
 
         KafkaMessageIdWrapper newMessageId = new KafkaMessageIdWrapper(messageId);
         newMessageId.topic = topic;
+        newMessageId.timestamp = System.currentTimeMillis();
         /**
          phase 1: tuple to stream converter
          if this topic multiplexes multiple streams, then retrieve the individual streams.

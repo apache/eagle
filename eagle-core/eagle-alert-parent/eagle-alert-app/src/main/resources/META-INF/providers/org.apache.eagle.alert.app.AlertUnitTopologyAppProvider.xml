@@ -66,10 +66,10 @@
             <required>false</required>
         </property>
         <property>
-            <name>topology.messageTimeoutSecs</name>
-            <displayName>Message Timeout Seconds</displayName>
-            <value>3600</value>
-            <description>Number of tuple timeout in seconds</description>
+            <name>topology.message.timeout.secs</name>
+            <displayName>topology message timeout (secs)</displayName>
+            <description>default timeout is 30s</description>
+            <value>30</value>
             <required>false</required>
         </property>
 

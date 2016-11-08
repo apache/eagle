@@ -125,12 +125,13 @@ public class PolicyDefinition implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(name)
-            .append(inputStreams)
-            .append(outputStreams)
-            .append(definition)
-            .append(partitionSpec)
-            // .append(parallelismHint)
+                .append(name)
+                .append(inputStreams)
+                .append(outputStreams)
+                .append(definition)
+                .append(partitionSpec)
+                .append(policyStatus)
+                .append(parallelismHint)
             .build();
     }
 
@@ -153,7 +154,8 @@ public class PolicyDefinition implements Serializable {
             && (another.definition != null && another.definition.equals(this.definition))
             && Objects.equals(this.definition, another.definition)
             && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
-             && another.parallelismHint == this.parallelismHint
+                && another.policyStatus.equals(this.policyStatus)
+                && another.parallelismHint == this.parallelismHint
             ) {
             return true;
         }
