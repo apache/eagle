@@ -9,9 +9,6 @@
       "policyIds": [
         "policy1"
       ],
-      "streamIds": [
-        "stream2"
-      ],
       "dedupIntervalMin": "PT2M",
       "properties": {
         "subject": "Test Alert",
