@@ -341,6 +341,12 @@
 		return typeof num === "number" && !isNaN(num);
 	};
 
+	common.number.parse = function (num) {
+		num = Number(num);
+		if(isNaN(num)) num = 0;
+		return num;
+	};
+
 	common.number.toFixed = function (num, fixed) {
 		if(!common.number.isNumber(num)) return "-";
 		num = Number(num);

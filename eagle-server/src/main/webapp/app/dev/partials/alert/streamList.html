@@ -37,11 +37,14 @@
 				<tbody>
 					<tr>
 						<td><span class="label label-primary">{{item.streamId}}</span></td>
-						<td>{{item.appType}}</td>
+						<td class="text-no-break">
+							{{item.application.type}}
+							<a class="fa fa-plug" uib-tooltip="Click to view data source" ng-click="showDataSource(item)"></a>
+						</td>
 						<td>{{item.siteId}}</td>
 						<td>
 							<ul class="no-margin">
-								<li ng-repeat="column in item.schema.columns track by $index">
+								<li ng-repeat="column in item.columns track by $index">
 									<strong>{{column.name}}</strong>:
 									{{column.type}}
 								</li>

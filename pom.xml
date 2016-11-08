@@ -1113,6 +1113,13 @@
                         <argLine>-XX:-UseGCOverheadLimit</argLine>
                         <forkMode>always</forkMode>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit47</artifactId>
+                            <version>${maven-surefire.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1158,6 +1165,11 @@
                             <totalBranchRate>25</totalBranchRate>
                             <totalLineRate>25</totalLineRate>
                         </check>
+                        <instrumentation>
+                            <excludes>
+                                <exclude>org/apache/eagle/storage/hbase/query/coprocessor/generated/*.class</exclude>
+                            </excludes>
+                        </instrumentation>
                     </configuration>
                     <dependencies>
                         <!--Use asm-5.0 to support Java 8-->

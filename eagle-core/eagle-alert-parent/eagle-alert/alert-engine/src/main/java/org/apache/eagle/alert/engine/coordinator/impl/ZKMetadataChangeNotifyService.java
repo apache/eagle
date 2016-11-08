@@ -127,9 +127,6 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
                 } else {
                     prePopulate(alertSpec, state.getPolicySnapshots());
                     notifyAlertBolt(alertSpec, sds);
-                    if (state.getPublishSpecs().get(topologyId) != null) {
-                        notifyAlertPublishBolt(listToMap(state.getPolicySnapshots()), sds);
-                    }
                 }
                 break;
             case ALERT_PUBLISH_BOLT:

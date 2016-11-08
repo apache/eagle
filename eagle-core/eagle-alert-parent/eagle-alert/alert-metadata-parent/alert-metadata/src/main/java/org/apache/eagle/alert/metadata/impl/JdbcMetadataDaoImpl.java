@@ -30,6 +30,7 @@ import com.typesafe.config.Config;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @since May 26, 2016.
@@ -84,6 +85,13 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public AlertPublishEvent getAlertPublishEvent(String alertId) {
         return handler.listWithFilter(alertId, AlertPublishEvent.class);
+    }
+
+    @Override
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId) {
+        List<AlertPublishEvent> alerts = handler.list(AlertPublishEvent.class);
+        List<AlertPublishEvent> result = alerts.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
+        return result;
     }
 
     @Override

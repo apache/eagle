@@ -41,10 +41,16 @@
 		$scope.deleteSite = function (site) {
 			UI.deleteConfirm(site.siteId)
 			(function (entity, closeFunc, unlock) {
-				Entity.delete("sites", site.uuid)._then(function () {
+				Entity.delete("sites", site.uuid)._then(function (res) {
 					Site.reload();
 					closeFunc();
-				}, unlock);
+				}, function (res) {
+					$.dialog({
+						title: "OPS",
+						content: common.getValueByPath(res, ["data", "message"])
+					});
+					unlock();
+				});
 			});
 		};
 

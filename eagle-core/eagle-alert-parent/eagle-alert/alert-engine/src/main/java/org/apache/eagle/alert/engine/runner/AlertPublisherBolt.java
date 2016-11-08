@@ -126,6 +126,10 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private void wrapAlertPublishEvent(AlertStreamEvent event) {
         Map<String, Object> extraData = new HashedMap();
         List<String> appIds = new ArrayList<>();
+        if (policyDefinitionMap == null || streamDefinitionMap == null) {
+            LOG.warn("policyDefinitions or streamDefinitions in publisher bolt have not been initialized");
+            return;
+        }
         PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
         if (this.policyDefinitionMap != null && policyDefinition != null) {
             for (String inputStreamId : policyDefinition.getInputStreams()) {

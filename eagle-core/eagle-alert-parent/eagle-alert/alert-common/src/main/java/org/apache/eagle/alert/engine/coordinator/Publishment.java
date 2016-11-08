@@ -32,6 +32,7 @@ public class Publishment {
     private String name;
     private String type;
     private List<String> policyIds;
+    private List<String> streamIds;
     private String dedupIntervalMin;
     private List<String> dedupFields;
     private String dedupStateField;
@@ -97,6 +98,14 @@ public class Publishment {
         this.policyIds = policyIds;
     }
 
+    public List<String> getStreamIds() {
+        return streamIds;
+    }
+
+    public void setStreamIds(List<String> streamIds) {
+        this.streamIds = streamIds;
+    }
+
     public String getDedupIntervalMin() {
         return dedupIntervalMin;
     }
@@ -130,7 +139,9 @@ public class Publishment {
                 && Objects.equals(dedupFields, p.getDedupFields())
                 && Objects.equals(dedupStateField, p.getDedupStateField())
                 && Objects.equals(overrideDeduplicator, p.getOverrideDeduplicator())
-                && Objects.equals(policyIds, p.getPolicyIds()) && properties.equals(p.getProperties()));
+                && Objects.equals(policyIds, p.getPolicyIds())
+                && Objects.equals(streamIds, p.getStreamIds())
+                && properties.equals(p.getProperties()));
         }
         return false;
     }
