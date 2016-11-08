@@ -38,7 +38,11 @@ public class KafkaMessageIdWrapper {
 
     public String toString() {
         try {
-            return String.format("KafkaMessageIdWrapper[topic=%s, id=%s, timestamp=%s %s]", topic, objectMapper.writeValueAsString(id), DateTimeUtil.millisecondsToHumanDateWithSeconds(timestamp), DateTimeUtil.CURRENT_TIME_ZONE.getID());
+            return String.format("KafkaMessageIdWrapper[topic=%s, id=%s, timestamp=%s %s]",
+                    topic,
+                    objectMapper.writeValueAsString(id),
+                    DateTimeUtil.millisecondsToHumanDateWithSeconds(timestamp),
+                    DateTimeUtil.CURRENT_TIME_ZONE.getID());
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
         }
