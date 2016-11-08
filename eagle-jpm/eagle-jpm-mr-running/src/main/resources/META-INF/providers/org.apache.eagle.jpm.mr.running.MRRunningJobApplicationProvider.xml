@@ -81,12 +81,6 @@
             <description>User use -Dkey=value to specify name of a job when submit. use this to extract job name from job configuration</description>
             <value>eagle.job.name</value>
         </property>
-        <property>
-            <name>job.name.normalization.rules.key</name>
-            <displayName>Job Name Normalization Rules Key</displayName>
-            <description>User use -Dkey=job name normalization rules</description>
-            <value>^(.*)[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}$ => $1~ ; ^(oozie:launcher):T=(.*):W=(.*):A=(.*):ID=(?:.*)$ => $1-$2-$3-$4~ ; ^(.*)([0-9]{10})$ => $1~ ; ^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$ => uuid~ ; ^(.*)(?:[0-9]{8}/[0-9]{2}_[0-9]{2})$ => $1~</value>
-        </property>
     </configuration>
     <docs>
         <install>
