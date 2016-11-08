@@ -16,54 +16,44 @@
  */
 package org.apache.alert.coordinator;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.config.ZKConfig;
+import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordinator.ExclusiveExecutor;
 import org.apache.eagle.alert.utils.ZookeeperEmbedded;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestGreedyScheduleCoordinator {
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-    public static class ScheduleZkState {
-        volatile boolean scheduleAcquired = false;
-        volatile boolean scheduleCompleted = false;
-    }
+public class TestGreedyScheduleCoordinator {
 
     public static class GreedyScheduleCoordinator {
 
-        public int schedule(int input) {
-            ScheduleZkState scheduleZkState = new ScheduleZkState();
-            ExclusiveExecutor.Runnable exclusiveRunnable = new ExclusiveExecutor.Runnable() {
-                @Override
-                public void run() throws Exception {
-                    scheduleZkState.scheduleAcquired = true;
-
-                    while (!scheduleZkState.scheduleCompleted) {
-                        Thread.sleep(2000);
-                    }
-                }
-            };
-            ExclusiveExecutor.execute("/alert/test", exclusiveRunnable);
-            int waitMaxTimes = 0;
-            while (waitMaxTimes < 90) { //about 3 minutes waiting
-                if (!scheduleZkState.scheduleAcquired) {
-                    waitMaxTimes++;
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                    }
-                    continue;
-                }
+        public int schedule(int input) throws TimeoutException {
+            Config config = ConfigFactory.load().getConfig("coordinator");
+            ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
+            ExclusiveExecutor executor = new ExclusiveExecutor(zkConfig);
+            final AtomicInteger r = new AtomicInteger();
+            executor.execute("/alert/test", () -> {
                 try {
-                    return input;
-                } finally {
-                    //schedule completed
-                    scheduleZkState.scheduleCompleted = true;
+                    Thread.sleep(input);
+                } catch (Exception e){
                 }
+
+                r.set(input);
+            });
+            try {
+                executor.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             throw new RuntimeException("Acquire greedy scheduler lock failed, please retry later");
         }
-
     }
 
     ZookeeperEmbedded zkEmbed;
@@ -90,7 +80,10 @@ public class TestGreedyScheduleCoordinator {
 
             @Override
             public void run() {
-                System.out.println("output: " + coordinator.schedule(1));
+                try {
+                    System.out.println("output: " + coordinator.schedule(1));
+                } catch (TimeoutException e) {
+                }
 
                 try {
                     Thread.sleep(1000);
@@ -104,7 +97,10 @@ public class TestGreedyScheduleCoordinator {
 
             @Override
             public void run() {
-                System.out.println("output: " + coordinator.schedule(2));
+                try {
+                    System.out.println("output: " + coordinator.schedule(2));
+                } catch (TimeoutException e) {
+                }
 
                 try {
                     Thread.sleep(1000);
@@ -118,7 +114,10 @@ public class TestGreedyScheduleCoordinator {
 
             @Override
             public void run() {
-                System.out.println("output: " + coordinator.schedule(3));
+                try {
+                    System.out.println("output: " + coordinator.schedule(3));
+                } catch (TimeoutException e) {
+                }
 
                 try {
                     Thread.sleep(1000);

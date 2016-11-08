@@ -68,10 +68,9 @@ public class CoordinatorTest {
         before();
         Config config = ConfigFactory.load().getConfig("coordinator");
         ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
-        ConfigBusProducer producer = new ConfigBusProducer(zkConfig);
         IMetadataServiceClient client = new MetadataServiceClientImpl(config);
 
-        Coordinator coordinator = new Coordinator(config, producer, client);
+        Coordinator coordinator = new Coordinator(config, zkConfig, client);
         ScheduleOption option = new ScheduleOption();
         ScheduleState state = coordinator.schedule(option);
         String v = state.getVersion();
@@ -96,10 +95,9 @@ public class CoordinatorTest {
         before();
         Config config = ConfigFactory.load().getConfig("coordinator");
         ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
-        ConfigBusProducer producer = new ConfigBusProducer(zkConfig);
         IMetadataServiceClient client = ScheduleContextBuilderTest.getSampleMetadataService();
 
-        Coordinator coordinator = new Coordinator(config, producer, client);
+        Coordinator coordinator = new Coordinator(config, zkConfig, client);
         ScheduleOption option = new ScheduleOption();
         ScheduleState state = coordinator.schedule(option);
         String v = state.getVersion();
@@ -120,13 +118,6 @@ public class CoordinatorTest {
 
         latch.await(3, TimeUnit.SECONDS);
         Assert.assertTrue(validated.get());
-    }
-
-    @Ignore
-    @Test
-    public void test_main() throws Exception {
-        before();
-        Coordinator.main(null);
     }
 
     @Before
