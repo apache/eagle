@@ -35,7 +35,7 @@ public class DateTimeUtil {
     public static final long ONEMINUTE = 1L * 60L * 1000L;
     public static final long ONEHOUR = 1L * 60L * 60L * 1000L;
     public static final long ONEDAY = 24L * 60L * 60L * 1000L;
-    private static TimeZone CURRENT_TIME_ZONE;
+    public static TimeZone CURRENT_TIME_ZONE;
 
     static {
         Config config = ConfigFactory.load();

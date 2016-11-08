@@ -20,23 +20,25 @@ package org.apache.eagle.alert.engine.spout;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.eagle.common.DateTimeUtil;
 
 /**
  * Created on 2/18/16.
  */
 public class KafkaMessageIdWrapper {
     public Object id;
+    public String topic;
+    public long timestamp;
 
     public KafkaMessageIdWrapper(Object o) {
         this.id = o;
     }
 
-    public String topic;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public String toString() {
         try {
-            return String.format("KafkaMessageIdWrapper[topic=%s, id=%s]", topic, objectMapper.writeValueAsString(id));
+            return String.format("KafkaMessageIdWrapper[topic=%s, id=%s, timestamp=%s %s]", topic, objectMapper.writeValueAsString(id), DateTimeUtil.millisecondsToHumanDateWithSeconds(timestamp), DateTimeUtil.CURRENT_TIME_ZONE.getID());
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
         }
