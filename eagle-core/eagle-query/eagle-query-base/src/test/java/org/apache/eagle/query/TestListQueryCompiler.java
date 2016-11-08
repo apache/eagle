@@ -17,7 +17,7 @@
 /**
  * 
  */
-package org.apache.eagle.service.generic;
+package org.apache.eagle.query;
 
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
