@@ -34,6 +34,7 @@ public class ConfigUtilsTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+    public static final String END_LINE = System.getProperty("line.separator");
 
     @Test
     public void testToProperties() throws IOException {
@@ -45,29 +46,29 @@ public class ConfigUtilsTest {
 
     private File genConfig() throws IOException {
         File file = tempFolder.newFile("application-config.conf");
-        String fileContent = "{\n" +
-                "  metric {\n" +
-                "    sink {\n" +
-                "      stdout {\n" +
-                "        // console metric sink\n" +
-                "      }\n" +
-                "      kafka {\n" +
-                "        \"topic\": \"alert_metric_test\"\n" +
-                "        \"bootstrap.servers\": \"localhost:9092\"\n" +
-                "      }\n" +
-                "      logger {\n" +
-                "        level = \"INFO\"\n" +
-                "      }\n" +
-                "      elasticsearch {\n" +
-                "        hosts = [\"localhost:9200\"]\n" +
-                "        index = \"alert_metric_test\"\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "  zkConfig {\n" +
-                "    \"zkQuorum\": \"localhost:2181\"\n" +
-                "    \"zkRoot\": \"/alert\"\n" +
-                "  }\n" +
+        String fileContent = "{" + END_LINE + "" +
+                "  metric {" + END_LINE + "" +
+                "    sink {" + END_LINE + "" +
+                "      stdout {" + END_LINE + "" +
+                "        // console metric sink" + END_LINE + "" +
+                "      }" + END_LINE + "" +
+                "      kafka {" + END_LINE + "" +
+                "        \"topic\": \"alert_metric_test\"" + END_LINE + "" +
+                "        \"bootstrap.servers\": \"localhost:9092\"" + END_LINE + "" +
+                "      }" + END_LINE + "" +
+                "      logger {" + END_LINE + "" +
+                "        level = \"INFO\"" + END_LINE + "" +
+                "      }" + END_LINE + "" +
+                "      elasticsearch {" + END_LINE + "" +
+                "        hosts = [\"localhost:9200\"]" + END_LINE + "" +
+                "        index = \"alert_metric_test\"" + END_LINE + "" +
+                "      }" + END_LINE + "" +
+                "    }" + END_LINE + "" +
+                "  }" + END_LINE + "" +
+                "  zkConfig {" + END_LINE + "" +
+                "    \"zkQuorum\": \"localhost:2181\"" + END_LINE + "" +
+                "    \"zkRoot\": \"/alert\"" + END_LINE + "" +
+                "  }" + END_LINE + "" +
                 "}";
         FileUtils.writeStringToFile(file, fileContent);
         return file;
