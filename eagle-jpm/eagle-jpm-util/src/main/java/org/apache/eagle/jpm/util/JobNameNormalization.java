@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 public class JobNameNormalization {
     private static Logger LOG = LoggerFactory.getLogger(JobNameNormalization.class);
-    private static JobNameNormalization instance = new JobNameNormalization();
     private static final String JOB_NAME_NORMALIZATION_RULES_KEY = "job.name.normalization.rules.key";
     private static final String PARAMETERIZED_PREFIX = "\\$";
     private static final String MULTIPLE_RULE_DILIMITER = ";";
@@ -59,16 +58,11 @@ public class JobNameNormalization {
         String target;
     }
 
-    private JobNameNormalization() {
+    private JobNameNormalization(Config conf) {
         try {
             // load normalization rules
-            Config conf = ConfigFactory.load();
             String key = JOB_NAME_NORMALIZATION_RULES_KEY.toLowerCase();
-            String value = conf.getString(key);
-            if (value == null) {
-                LOG.info("no job name normalization rules are loaded");
-                return;
-            }
+            String value = conf.getString(key) != null ? conf.getString(key) : Constants.JOB_NAME_NORMALIZATION_RULES_KEY_DEFAULT;
             // multiple rules are concatenated with semicolon, i.e. ;
             String[] rules = value.split(MULTIPLE_RULE_DILIMITER);
             for (String rule : rules) {
@@ -82,8 +76,8 @@ public class JobNameNormalization {
         }
     }
 
-    public static JobNameNormalization getInstance() {
-        return instance;
+    public static JobNameNormalization getInstance(Config config) {
+        return new JobNameNormalization(config);
     }
 
     private void addRule(String rule) {

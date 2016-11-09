@@ -200,7 +200,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             }
 
             if (jobDefId == null) {
-                this.jobDefId = JobNameNormalization.getInstance().normalize(jobName);
+                this.jobDefId = JobNameNormalization.getInstance(this.appConfig.getConfig()).normalize(jobName);
             } else {
                 LOG.debug("Got JobDefId from job configuration for " + id + ": " + jobDefId);
                 this.jobDefId = jobDefId;

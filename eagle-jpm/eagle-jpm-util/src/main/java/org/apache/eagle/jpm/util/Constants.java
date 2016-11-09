@@ -187,4 +187,8 @@ public class Constants {
 
     public static final String HADOOP_HISTORY_TOTAL_METRIC_FORMAT = "hadoop.%s.history.%s";
     public static final String HADOOP_HISTORY_MINUTE_METRIC_FORMAT = "hadoop.%s.history.minute.%s";
+
+    public static final String JOB_NAME_NORMALIZATION_RULES_KEY_DEFAULT = "^(.*)[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}$ => "
+        + "$1~ ; ^(oozie:launcher):T=(.*):W=(.*):A=(.*):ID=(?:.*)$ => $1-$2-$3-$4~ ; ^(.*)([0-9]{10})$ => $1~ ; "
+        + "^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$ => uuid~ ; ^(.*)(?:[0-9]{8}/[0-9]{2}_[0-9]{2})$ => $1~";
 }

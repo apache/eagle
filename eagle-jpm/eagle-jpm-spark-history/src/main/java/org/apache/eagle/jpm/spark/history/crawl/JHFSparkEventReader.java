@@ -674,7 +674,7 @@ public class JHFSparkEventReader {
         if (null != assignedName) {
             return assignedName;
         } else {
-            return JobNameNormalization.getInstance().normalize(jobName);
+            return JobNameNormalization.getInstance(this.config.getConfig()).normalize(jobName);
         }
     }
 

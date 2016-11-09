@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobConfig;
@@ -79,6 +80,7 @@ public class MRJobParser implements Runnable {
     private static final int TOP_BOTTOM_TASKS_BY_ELAPSED_TIME = 10;
     private static final int FLUSH_TASKS_EVERY_TIME = 5;
     private static final int MAX_TASKS_PERMIT = 5000;
+    private Config config;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -88,7 +90,8 @@ public class MRJobParser implements Runnable {
                        MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
-                       List<String> configKeys) {
+                       List<String> configKeys,
+                       Config config) {
         this.app = app;
         this.mrJobEntityMap = new HashMap<>();
         this.mrJobEntityMap = mrJobMap;
@@ -107,6 +110,7 @@ public class MRJobParser implements Runnable {
         this.rmResourceFetcher = rmResourceFetcher;
         this.finishedTaskIds = new HashSet<>();
         this.configKeys = configKeys;
+        this.config = config;
     }
 
     public void setAppInfo(AppInfo app) {
@@ -195,7 +199,7 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setTags(new HashMap<>(commonTags));
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), mrJob.getName());
-            String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
+            String jobDefId = JobNameNormalization.getInstance(this.config).normalize(mrJob.getName());
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), jobDefId);
             if (mrJobConfigs.get(id) != null) {
                 JobConfig jobConfig = mrJobConfigs.get(id);
