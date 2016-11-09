@@ -27,6 +27,7 @@
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity) {
 		PageConfig.title = "Alerts";
 
+		$scope.displayType = "raw";
 		$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
 
 		// ================================================================
@@ -76,7 +77,6 @@
 
 		$scope.showDataSource = function (stream) {
 			var dataSource = $scope.dataSources[stream.dataSource];
-			console.log(">>>", dataSource);
 			$.dialog({
 				title: dataSource.name,
 				content: $("<pre class='text-break'>").html(JSON.stringify(dataSource, null, "\t")),
@@ -114,13 +114,20 @@
 		};
 	});
 
-	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity, Policy) {
 		PageConfig.title = "Policy";
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
 			{title: "Policy List", path: "/policies"},
 			{title: "Detail"}
 		];
+
+		$scope.tab = "setting";
+		$scope.displayType = "raw";
+
+		$scope.setTab = function (tab) {
+			$scope.tab = tab;
+		};
 
 		function updatePolicy() {
 			var policyName = $wrapState.param.name;
@@ -159,6 +166,8 @@
 		}
 		updatePolicy();
 
+		$scope.alertList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name) + "/alerts", {size: 1000});
+
 		$scope.deletePolicy = function() {
 			Policy.delete($scope.policy).then(function () {
 				$wrapState.go("policyList");
@@ -172,5 +181,10 @@
 		$scope.stopPolicy = function() {
 			Policy.stop($scope.policy).then(updatePolicy);
 		};
+
+		var refreshInterval = $interval($scope.alertList._refresh, 1000 * 60);
+		$scope.$on('$destroy', function() {
+			$interval.cancel(refreshInterval);
+		});
 	});
 }());
