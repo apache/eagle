@@ -220,9 +220,15 @@ ul.stepGuide li > .title {
 /* ========================================================================
  * =                                Policy                                =
  * ======================================================================== */
+.policy-app-list {
+	border-bottom: 1px solid #f4f4f4;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+}
+
 .policy-app-list > a {
 	display: block;
-	font-size: 18px;
+	font-size: 16px;
 }
 
 .policy-app-list > ul {
