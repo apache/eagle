@@ -85,7 +85,7 @@ public class StreamColumn implements Serializable {
                     this.setDefaultValue(Double.valueOf((String) this.getDefaultValue()));
                     break;
                 case BOOL:
-                    this.setDefaultValue(Double.valueOf((String) this.getDefaultValue()));
+                    this.setDefaultValue(Boolean.valueOf((String) this.getDefaultValue()));
                     break;
                 case OBJECT:
                     try {
