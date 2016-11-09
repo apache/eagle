@@ -28,7 +28,7 @@ public class StreamGroupTest {
     @Test
     public void testStreamGroup() {
         StreamGroup streamGroup = new StreamGroup();
-        Assert.assertEquals("StreamGroup partitions=: [] ", streamGroup.toString());
+        Assert.assertEquals("StreamGroup dedicated=: false partitions=: [] ", streamGroup.toString());
         Assert.assertEquals("SG[]", streamGroup.getStreamId());
 
         StreamSortSpec streamSortSpec = new StreamSortSpec();
@@ -42,7 +42,8 @@ public class StreamGroupTest {
         streamPartition.setType(StreamPartition.Type.GROUPBY);
         streamGroup.addStreamPartition(streamPartition);
         Assert.assertEquals("SG[test-]", streamGroup.getStreamId());
-        Assert.assertEquals("StreamGroup partitions=: [StreamPartition[streamId=test,type=GROUPBY,columns=[jobId],sortSpec=[StreamSortSpec[windowPeriod=PT10S,windowMargin=30000]]]] ", streamGroup.toString());
+        Assert.assertEquals("StreamGroup dedicated=: false partitions=: [StreamPartition[streamId=test,type=GROUPBY,columns=[jobId],sortSpec=[StreamSortSpec[windowPeriod=PT10S,windowMargin=30000]]]] ",
+            streamGroup.toString());
 
         List<StreamPartition> streamPartitions = new ArrayList<>();
         streamPartition.setStreamId("test1");
@@ -57,7 +58,7 @@ public class StreamGroupTest {
         streamPartitions.add(streamPartition1);
         streamGroup.addStreamPartitions(streamPartitions);
         Assert.assertEquals("SG[test1-test1-test2-]", streamGroup.getStreamId());
-        Assert.assertEquals("StreamGroup partitions=: [StreamPartition[streamId=test1,type=GROUPBY,columns=[jobId],sortSpec=[StreamSortSpec[windowPeriod=PT10S,windowMargin=30000]]], StreamPartition[streamId=test1,type=GROUPBY,columns=[jobId],sortSpec=[StreamSortSpec[windowPeriod=PT10S,windowMargin=30000]]], StreamPartition[streamId=test2,type=null,columns=[],sortSpec=[null]]] ", streamGroup.toString());
+        Assert.assertEquals("StreamGroup dedicated=: false partitions=: [StreamPartition[streamId=test1,type=GROUPBY,columns=[jobId],sortSpec=[StreamSortSpec[windowPeriod=PT10S,windowMargin=30000]]], StreamPartition[streamId=test1,type=GROUPBY,columns=[jobId],sortSpec=[StreamSortSpec[windowPeriod=PT10S,windowMargin=30000]]], StreamPartition[streamId=test2,type=null,columns=[],sortSpec=[null]]] ", streamGroup.toString());
 
         StreamGroup streamGroup1 = new StreamGroup();
         streamGroup1.addStreamPartitions(streamGroup.getStreamPartitions());

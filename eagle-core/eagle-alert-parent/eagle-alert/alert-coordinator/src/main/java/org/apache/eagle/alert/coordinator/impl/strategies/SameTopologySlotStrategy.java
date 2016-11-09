@@ -17,6 +17,7 @@
 package org.apache.eagle.alert.coordinator.impl.strategies;
 
 import static org.apache.eagle.alert.coordinator.CoordinatorConstants.CONFIG_ITEM_TOPOLOGY_LOAD_UPBOUND;
+
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.coordination.model.internal.StreamGroup;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
@@ -36,11 +37,9 @@ import java.util.*;
 /**
  * A simple strategy that only find the bolts in the same topology as the
  * required work slots.
- *
- * <p>Invariant:<br/>
+ * Invariant:<br/>
  * One slot queue only on the one topology.<br/>
- * One topology doesn't contains two same partition slot queues.</p>
- *
+ * One topology doesn't contains two same partition slot queues.
  * @since Apr 27, 2016
  */
 public class SameTopologySlotStrategy implements IWorkSlotStrategy {
@@ -53,6 +52,8 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
 
     //    private final int numOfPoliciesBoundPerBolt;
     private final double topoLoadUpbound;
+    private final boolean reuseBoltInStreams;
+    private final int streamsPerBolt;
 
     public SameTopologySlotStrategy(IScheduleContext context, StreamGroup streamPartitionGroup,
                                     TopologyMgmtService mgmtService) {
@@ -63,6 +64,16 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
         Config config = ConfigFactory.load().getConfig(CoordinatorConstants.CONFIG_ITEM_COORDINATOR);
         // numOfPoliciesBoundPerBolt = config.getInt(CoordinatorConstants.POLICIES_PER_BOLT);
         topoLoadUpbound = config.getDouble(CONFIG_ITEM_TOPOLOGY_LOAD_UPBOUND);
+        if (config.hasPath(CoordinatorConstants.REUSE_BOLT_IN_STREAMS)) {
+            reuseBoltInStreams = config.getBoolean(CoordinatorConstants.REUSE_BOLT_IN_STREAMS);
+        } else {
+            reuseBoltInStreams = false;
+        }
+        if (config.hasPath(CoordinatorConstants.STREAMS_PER_BOLT)) {
+            streamsPerBolt = config.getInt(CoordinatorConstants.STREAMS_PER_BOLT);
+        } else {
+            streamsPerBolt = 1;
+        }
     }
 
     /**
@@ -145,7 +156,13 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
 
     private boolean isBoltAvailable(AlertBoltUsage alertUsage) {
         // FIXME : more detail to compare on queue exclusion check
-        if (alertUsage.getQueueSize() > 0) {
+        if (alertUsage.getPartitions().stream().filter(partition -> partition.isDedicated()).count() > 0) {
+            return false;
+        }
+        if (!reuseBoltInStreams && alertUsage.getQueueSize() > 0) {
+            return false;
+        }
+        if (reuseBoltInStreams && alertUsage.getQueueSize() >= streamsPerBolt) {
             return false;
         }
         // actually it's now 0;

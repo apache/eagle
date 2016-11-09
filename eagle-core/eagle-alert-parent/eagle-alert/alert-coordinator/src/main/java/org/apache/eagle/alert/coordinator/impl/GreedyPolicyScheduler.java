@@ -220,7 +220,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
             result.message = "policy doesn't have partition spec";
             return result;
         }
-        policyStreamPartition.addStreamPartitions(item.def.getPartitionSpec());
+        policyStreamPartition.addStreamPartitions(item.def.getPartitionSpec(), item.def.isDedicated());
 
         MonitoredStream targetdStream = context.getMonitoredStreams().get(policyStreamPartition);
         if (targetdStream == null) {
@@ -271,7 +271,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
         if (targetQueue == null) {
             WorkQueueBuilder builder = new WorkQueueBuilder(context, mgmtService);
             // TODO : get the properties from policy definiton
-            targetQueue = builder.createQueue(targetdStream, false, getQueueSize(def.getParallelismHint()),
+            targetQueue = builder.createQueue(targetdStream, def.isDedicated(), getQueueSize(def.getParallelismHint()),
                 new HashMap<String, Object>());
         }
         return targetQueue;
