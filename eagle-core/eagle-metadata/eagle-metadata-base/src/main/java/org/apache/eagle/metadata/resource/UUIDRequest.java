@@ -19,7 +19,7 @@ package org.apache.eagle.metadata.resource;
 
 import java.io.Serializable;
 
-public class UUIDRequest implements Serializable{
+public class UUIDRequest implements Serializable {
     private String uuid;
 
     public String getUuid() {

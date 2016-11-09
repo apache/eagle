@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JDBCMetadataStoreConfigProvider implements Provider<JDBCDataSourceConfig> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(JDBCMetadataStoreConfigProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCMetadataStoreConfigProvider.class);
 
     @Inject
     private Config config;
@@ -33,8 +33,8 @@ public class JDBCMetadataStoreConfigProvider implements Provider<JDBCDataSourceC
     @Override
     public JDBCDataSourceConfig get() {
         JDBCDataSourceConfig dataSourceConfig = new ObjectMapper().convertValue(
-                    config.getConfig(JDBCDataSourceConfig.CONFIG_PREFIX).root().unwrapped(),JDBCDataSourceConfig.class);
-        LOGGER.info("JDBC Configuration: {}",dataSourceConfig);
+            config.getConfig(JDBCDataSourceConfig.CONFIG_PREFIX).root().unwrapped(), JDBCDataSourceConfig.class);
+        LOGGER.info("JDBC Configuration: {}", dataSourceConfig);
         return dataSourceConfig;
     }
 }

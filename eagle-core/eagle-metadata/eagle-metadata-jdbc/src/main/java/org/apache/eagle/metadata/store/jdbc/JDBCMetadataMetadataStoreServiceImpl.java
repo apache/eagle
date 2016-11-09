@@ -17,18 +17,17 @@
 package org.apache.eagle.metadata.store.jdbc;
 
 
+import com.google.inject.Inject;
 import org.apache.eagle.common.function.ThrowableConsumer2;
 import org.apache.eagle.common.function.ThrowableFunction;
-
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import javax.sql.DataSource;
 
 
 public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQueryService {
@@ -164,7 +163,8 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
     }
 
     @Override
-    public <T, E extends Throwable> List<T> queryWithCond(String sqlQuery, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper1, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E {
+    public <T, E extends Throwable> List<T> queryWithCond(String sqlQuery, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper1, ThrowableFunction<ResultSet, T, E> mapper) throws
+        SQLException, E {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;

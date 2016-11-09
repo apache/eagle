@@ -21,12 +21,12 @@ import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import java.util.Map;
 
 /**
- * Site app management entity
+ * Site app management entity.
  */
 public class ApplicationRawEntity extends PersistenceEntity {
     private String siteUuid;
     private String appType;
-    private Map<String,Map> configuration;
+    private Map<String, Map> configuration;
     private long createdTime;
     private long modifiedTime;
 
