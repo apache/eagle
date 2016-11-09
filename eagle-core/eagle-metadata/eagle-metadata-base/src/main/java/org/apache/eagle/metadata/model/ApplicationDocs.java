@@ -30,12 +30,12 @@ public class ApplicationDocs {
         return install;
     }
 
-    @XmlAnyElement(value=InstallDocDomHandler.class)
+    @XmlAnyElement(value = InstallDocDomHandler.class)
     public void setInstall(String install) {
         this.install = install;
     }
 
-    @XmlAnyElement(value= UninstallDocDomHandler.class)
+    @XmlAnyElement(value = UninstallDocDomHandler.class)
     public String getUninstall() {
         return uninstall;
     }

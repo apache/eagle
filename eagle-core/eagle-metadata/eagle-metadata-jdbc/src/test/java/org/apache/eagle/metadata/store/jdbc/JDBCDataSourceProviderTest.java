@@ -33,19 +33,19 @@ public class JDBCDataSourceProviderTest extends JDBCMetadataTestBase {
     private JDBCDataSourceConfig dataSourceConfig;
 
     @Test
-    public void testSingletonDataSource(){
+    public void testSingletonDataSource() {
         DataSource dataSource1 = injector().getInstance(DataSource.class);
         DataSource dataSource2 = injector().getInstance(DataSource.class);
-        Assert.assertTrue("Should get datasource in singleton pattern",dataSource == dataSource1);
-        Assert.assertTrue("Should get datasource in singleton pattern",dataSource1 == dataSource2);
+        Assert.assertTrue("Should get datasource in singleton pattern", dataSource == dataSource1);
+        Assert.assertTrue("Should get datasource in singleton pattern", dataSource1 == dataSource2);
     }
 
     @Test
-    public void testDataSourceConfig(){
-        Assert.assertEquals("jdbc:h2:mem:test;INIT=RUNSCRIPT FROM './src/test/resources/init.sql'",dataSourceConfig.getUrl());
-        Assert.assertEquals(null,dataSourceConfig.getUsername());
-        Assert.assertEquals(null,dataSourceConfig.getPassword());
-        Assert.assertEquals("encoding=UTF8;timeout=60",dataSourceConfig.getConnectionProperties());
+    public void testDataSourceConfig() {
+        Assert.assertEquals("jdbc:h2:mem:test;INIT=RUNSCRIPT FROM './src/test/resources/init.sql'", dataSourceConfig.getUrl());
+        Assert.assertEquals(null, dataSourceConfig.getUsername());
+        Assert.assertEquals(null, dataSourceConfig.getPassword());
+        Assert.assertEquals("encoding=UTF8;timeout=60", dataSourceConfig.getConnectionProperties());
     }
 
     @Test
@@ -57,19 +57,22 @@ public class JDBCDataSourceProviderTest extends JDBCMetadataTestBase {
             connection = dataSource.getConnection();
             Assert.assertNotNull(connection);
             statement = connection.createStatement();
-            resultSet  = statement.executeQuery("SELECT 1");
+            resultSet = statement.executeQuery("SELECT 1");
             Assert.assertTrue(resultSet.next());
-            Assert.assertEquals(1,resultSet.getInt(1));
+            Assert.assertEquals(1, resultSet.getInt(1));
         } catch (SQLException e) {
             Assert.fail(e.getMessage());
             throw e;
         } finally {
-            if(resultSet!=null)
+            if (resultSet != null) {
                 resultSet.close();
-            if(statement != null)
+            }
+            if (statement != null) {
                 statement.close();
-            if(connection!=null)
+            }
+            if (connection != null) {
                 connection.close();
+            }
         }
     }
 }

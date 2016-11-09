@@ -22,5 +22,6 @@ import java.util.Collection;
 
 public interface ApplicationDescService {
     Collection<ApplicationDesc> getApplicationDescs();
+
     ApplicationDesc getApplicationDescByType(String appType);
 }

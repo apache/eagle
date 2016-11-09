@@ -22,7 +22,7 @@ import org.junit.Test;
 public class StreamIdConversionsTest {
     @Test
     public void testGenerateUniqueStreamId() {
-        Assert.assertEquals("MOCK_STREAM_TEST", StreamIdConversions.formatSiteStreamId("test","mock_stream"));
+        Assert.assertEquals("MOCK_STREAM_TEST", StreamIdConversions.formatSiteStreamId("test", "mock_stream"));
     }
 
     @Test
@@ -32,6 +32,6 @@ public class StreamIdConversionsTest {
 
     @Test
     public void testParseStreamTypeId() {
-        Assert.assertEquals("MOCK_STREAM", StreamIdConversions.parseStreamTypeId("test","MOCK_STREAM_TEST"));
+        Assert.assertEquals("MOCK_STREAM", StreamIdConversions.parseStreamTypeId("test", "MOCK_STREAM_TEST"));
     }
 }

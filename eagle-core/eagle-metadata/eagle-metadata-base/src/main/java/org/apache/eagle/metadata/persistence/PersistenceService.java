@@ -22,6 +22,8 @@ import java.util.Collection;
 
 public interface PersistenceService<T extends PersistenceEntity> {
     Collection<T> findAll();
+
     T getByUUID(String uuid) throws EntityNotFoundException;
+
     T create(T entity);
 }

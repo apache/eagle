@@ -19,13 +19,9 @@ package org.apache.eagle.metadata.store.jdbc;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.typesafe.config.ConfigFactory;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.eagle.app.module.ApplicationGuiceModule;
-import org.apache.eagle.app.service.ApplicationProviderService;
-import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
 import org.apache.eagle.common.module.CommonGuiceModule;
-import org.apache.eagle.metadata.store.jdbc.JDBCMetadataStore;
 import org.junit.After;
 import org.junit.Before;
 
@@ -39,19 +35,19 @@ public class JDBCMetadataTestBase {
     private DataSource dataSource;
 
     @Before
-    public void setUp(){
-        injector = Guice.createInjector(new JDBCMetadataStore(),new ApplicationGuiceModule(),new CommonGuiceModule());
+    public void setUp() {
+        injector = Guice.createInjector(new JDBCMetadataStore(), new ApplicationGuiceModule(), new CommonGuiceModule());
         injector.injectMembers(this);
     }
 
     @After
     public void after() throws SQLException {
-        if(dataSource!=null){
+        if (dataSource != null) {
             ((BasicDataSource) dataSource).close();
         }
     }
 
-    public Injector injector(){
+    public Injector injector() {
         return injector;
     }
 }

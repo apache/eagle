@@ -18,10 +18,9 @@
 package org.apache.eagle.metadata.store.jdbc.service.orm;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.common.function.ThrowableConsumer2;
 import org.apache.eagle.metadata.model.SiteEntity;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

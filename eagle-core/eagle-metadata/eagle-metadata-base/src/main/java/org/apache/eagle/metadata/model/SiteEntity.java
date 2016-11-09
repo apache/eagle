@@ -21,7 +21,7 @@ import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import java.util.Map;
 
 /**
- * Dynamically registered site
+ * Dynamically registered site.
  */
 public class SiteEntity extends PersistenceEntity {
     private String siteId;

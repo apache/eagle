@@ -24,8 +24,12 @@ import java.util.Collection;
 
 public interface ApplicationEntityService extends PersistenceService<ApplicationEntity> {
     Collection<ApplicationEntity> findBySiteId(String siteId);
-    ApplicationEntity getBySiteIdAndAppType(String siteId,String appType);
-    ApplicationEntity getByUUIDOrAppId(String uuid,String appId);
+
+    ApplicationEntity getBySiteIdAndAppType(String siteId, String appType);
+
+    ApplicationEntity getByUUIDOrAppId(String uuid, String appId);
+
     ApplicationEntity delete(ApplicationEntity applicationEntity);
+
     ApplicationEntity update(ApplicationEntity entity);
 }

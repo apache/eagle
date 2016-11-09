@@ -18,6 +18,7 @@
 package org.apache.eagle.metadata.store.jdbc.service;
 
 
+import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang.StringUtils;
@@ -32,13 +33,11 @@ import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.store.jdbc.JDBCMetadataQueryService;
 import org.apache.eagle.metadata.store.jdbc.service.orm.ApplicationEntityToRelation;
 import org.apache.eagle.metadata.store.jdbc.service.orm.RelationToApplicationEntity;
-
-import com.google.inject.Singleton;
 import org.apache.eagle.metadata.utils.StreamIdConversions;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,14 +45,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 @Singleton
 public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationEntityServiceJDBCImpl.class);
 
-    private static final String insertSql = "INSERT INTO applications (siteid, apptype, appmode, jarpath, appstatus, configuration, context, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String insertSql = "INSERT INTO applications (siteid, apptype, appmode, jarpath, appstatus, configuration, context, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, "
+        + "?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String selectSql = "SELECT * FROM applications a INNER JOIN sites s on  a.siteid = s.siteid";
     private static final String selectSqlBySiteIdAndAppType = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ? and a.apptype = ?";
     private static final String selectSqlBySiteId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ?";
@@ -207,12 +205,12 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
                 copied.setSiteId(entity.getSite().getSiteId());
                 copied.setStreamId(StreamIdConversions.formatSiteStreamId(entity.getSite().getSiteId(), copied.getStreamId()));
                 Config effectiveConfig = ConfigFactory.parseMap(new HashMap<>(entity.getConfiguration()))
-                        .withFallback(config).withFallback(ConfigFactory.parseMap(entity.getContext()));
+                    .withFallback(config).withFallback(ConfigFactory.parseMap(entity.getContext()));
 
                 ExecutionRuntime runtime = ExecutionRuntimeManager.getInstance().getRuntime(
-                        applicationProviderService.getApplicationProviderByType(entity.getDescriptor().getType()).getApplication().getEnvironmentType(), config);
+                    applicationProviderService.getApplicationProviderByType(entity.getDescriptor().getType()).getApplication().getEnvironmentType(), config);
                 StreamSinkConfig streamSinkConfig = runtime.environment()
-                        .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
+                    .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
                 streamDesc.setSink(streamSinkConfig);

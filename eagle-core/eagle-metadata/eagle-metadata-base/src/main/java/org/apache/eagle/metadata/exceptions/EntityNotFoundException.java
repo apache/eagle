@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.metadata.exceptions;
 
-public class EntityNotFoundException extends Exception{
+public class EntityNotFoundException extends Exception {
     public EntityNotFoundException(Throwable cause) {
         super(cause);
     }

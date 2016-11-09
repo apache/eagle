@@ -119,7 +119,7 @@ public class ApplicationDesc implements Serializable {
     @Override
     public String toString() {
         return String.format("ApplicationDesc [type=%s, name=%s, version=%s, appClass=%s, viewPath=%s, jarpath=%s, providerClass=%s, configuration= %s properties, description=%s",
-            getType(), getName(), getVersion(), getAppClass(), getViewPath(),getJarPath(), getProviderClass(), getConfiguration() == null ? 0 : getConfiguration().size(), getDescription());
+            getType(), getName(), getVersion(), getAppClass(), getViewPath(), getJarPath(), getProviderClass(), getConfiguration() == null ? 0 : getConfiguration().size(), getDescription());
     }
 
     public void setConfiguration(Configuration configuration) {
