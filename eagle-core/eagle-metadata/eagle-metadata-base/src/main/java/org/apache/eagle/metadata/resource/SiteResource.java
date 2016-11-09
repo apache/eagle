@@ -16,7 +16,9 @@
  */
 package org.apache.eagle.metadata.resource;
 
+import org.apache.eagle.metadata.exceptions.SiteDeleteException;
 import org.apache.eagle.metadata.model.SiteEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
 
 import javax.inject.Inject;
@@ -29,10 +31,13 @@ import java.util.Collection;
 @Singleton
 public class SiteResource {
     private final SiteEntityService siteEntityService;
+    private final ApplicationEntityService entityService;
 
     @Inject
-    public SiteResource(SiteEntityService siteEntityService){
+    public SiteResource(SiteEntityService siteEntityService,
+                        ApplicationEntityService applicationEntityService){
         this.siteEntityService = siteEntityService;
+        this.entityService = applicationEntityService;
     }
 
     @GET
@@ -63,14 +68,26 @@ public class SiteResource {
     @Path("/{siteId}")
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<SiteEntity> deleteSiteBySiteId(@PathParam("siteId") String siteId){
-        return RESTResponse.async(()->siteEntityService.deleteBySiteId(siteId)).get();
+        return RESTResponse.async(()-> {
+            int appCount = entityService.findBySiteId(siteId).size();
+            if (appCount > 0) {
+                throw new SiteDeleteException("This site has enabled applications, remove them first");
+            }
+            return siteEntityService.deleteBySiteId(siteId);
+        }).get();
     }
 
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<SiteEntity> deleteSiteByUUID(UUIDRequest uuidRequest){
-        return RESTResponse.async(()->siteEntityService.deleteByUUID(uuidRequest.getUuid())).get();
+        return RESTResponse.async(()-> {
+            int appCount = entityService.findBySiteId(siteEntityService.getByUUID(uuidRequest.getUuid()).getSiteId()).size();
+            if (appCount > 0) {
+                throw new SiteDeleteException("This site has enabled applications, remove them first");
+            }
+            return siteEntityService.deleteByUUID(uuidRequest.getUuid());
+        }).get();
     }
 
     @PUT

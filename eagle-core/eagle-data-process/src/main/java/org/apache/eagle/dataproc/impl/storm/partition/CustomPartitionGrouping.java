@@ -42,7 +42,7 @@ public class CustomPartitionGrouping implements CustomStreamGrouping {
     @Override
     public List<Integer> chooseTasks(int taskId, List<Object> values) {
         int numTasks = targetTasks.size();
-        int targetTaskIndex = strategy.balance((String)values.get(0), numTasks);
+        int targetTaskIndex = strategy.balance((String) values.get(0), numTasks);
         return Arrays.asList(targetTasks.get(targetTaskIndex));
     }
 }

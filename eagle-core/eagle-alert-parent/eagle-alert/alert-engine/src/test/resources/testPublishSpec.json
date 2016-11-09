@@ -11,6 +11,9 @@
         "policy2",
         "policy3"
       ],
+      "streamIds": [
+        "stream1"
+      ],
       "dedupIntervalMin": "PT1M",
       "properties": {
         "subject": "Test Alert",
@@ -24,7 +27,8 @@
         "mail.debug": "false",
         "mail.connection": "tls",
         "mail.smtp.port": "587"
-      }
+      },
+      "serializer": "org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer"
     }
     /*    {
           "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",

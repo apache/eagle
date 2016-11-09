@@ -25,7 +25,7 @@ public class EagleExceptionWrapper {
     }
 
     public static String wrap(Exception ex, int maxdepth) {
-        if(ex == null) {
+        if (ex == null) {
             return null;
         }
         int d = maxdepth;

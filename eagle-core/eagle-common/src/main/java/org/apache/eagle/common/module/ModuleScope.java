@@ -21,18 +21,20 @@ import com.google.inject.Module;
 import java.util.List;
 
 /**
+ * Module Scope.
  * @see ModuleRegistry
  */
 public interface ModuleScope {
     /**
+     * Get Modules.
      * @param registry ModuleRegistry
      * @return
      */
-    default List<Module> getModules(ModuleRegistry registry){
+    default List<Module> getModules(ModuleRegistry registry) {
         return registry.getModules(this.getClass());
     }
 
-    default String getName(){
+    default String getName() {
         return getClass().getName();
     }
 }

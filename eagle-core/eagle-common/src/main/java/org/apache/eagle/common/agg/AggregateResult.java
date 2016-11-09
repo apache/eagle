@@ -30,25 +30,26 @@ public class AggregateResult {
     private Object[] data;
     private Map<String, Integer> colIndices;
     private List<String> colNames;
-    public AggregateResult(Object[] data, Map<String, Integer> colIndices, List<String> colNames){
+
+    public AggregateResult(Object[] data, Map<String, Integer> colIndices, List<String> colNames) {
         this.data = data;
         this.colIndices = colIndices;
         this.colNames = colNames;
     }
 
-    public Object get(int index){
+    public Object get(int index) {
         return data[index];
     }
 
-    public Object get(String fieldName){
+    public Object get(String fieldName) {
         int index = colIndices.get(fieldName);
         return get(index);
     }
 
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        for(int i=0; i<data.length; i++){
+        for (int i = 0; i < data.length; i++) {
             sb.append(colNames.get(i));
             sb.append("=");
             sb.append(data[i]);

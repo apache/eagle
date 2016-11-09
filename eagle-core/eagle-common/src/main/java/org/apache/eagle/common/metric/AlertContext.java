@@ -24,71 +24,70 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * not thread safe
+ * not thread safe.
  */
-public class AlertContext implements Serializable{
-	private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(AlertContext.class);
+public class AlertContext implements Serializable {
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(AlertContext.class);
 
-	private Map<String, String> properties = new HashMap<String, String>();
-	
-	public AlertContext(){
-	}
-	
-	public AlertContext(AlertContext context){
-		this.properties = new HashMap<String, String>(context.properties);
-	}
-	
-	public String removeProperty(String name)
-	{
-		return properties.remove(name);
-	}
-	
-	public AlertContext addProperty(String name, String value){
-		properties.put(name, value);
-		return this;
-	}
+    private Map<String, String> properties = new HashMap<String, String>();
 
-	public AlertContext addAll(Map<String,String> propHash){
-		this.properties.putAll(propHash);
-		return this;
-	}
+    public AlertContext() {
+    }
 
-	public String toJsonString(){
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			return objectMapper.writeValueAsString(properties);
-		}catch(Exception ex){
-			LOG.error("fail converting alertcontext into string", ex);
-			return null;
-		}
-	}
+    public AlertContext(AlertContext context) {
+        this.properties = new HashMap<String, String>(context.properties);
+    }
 
-	public static AlertContext fromJsonString(String json){
-		ObjectMapper objectMapper = new ObjectMapper();
-		try{
-			Map m = objectMapper.readValue(json, Map.class);
-			AlertContext c = new AlertContext();
-			c.addAll(m);
-			return c;
-		}catch(Exception ex){
-			LOG.error("fail converting string into alertcontext", ex);
-			return null;
-		}
-	}
+    public String removeProperty(String name) {
+        return properties.remove(name);
+    }
 
-	public String getProperty(String name){
-		return properties.get(name);
-	}
-	
-	public String toString(){
-		return properties.toString();
-	}
+    public AlertContext addProperty(String name, String value) {
+        properties.put(name, value);
+        return this;
+    }
 
-	public Map<String, String> getProperties(){
-		return properties;
-	}
-	
-	public void setProperties(Map<String, String> properties){
-		this.properties = properties;
-	}
+    public AlertContext addAll(Map<String, String> propHash) {
+        this.properties.putAll(propHash);
+        return this;
+    }
+
+    public String toJsonString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(properties);
+        } catch (Exception ex) {
+            LOG.error("fail converting alertcontext into string", ex);
+            return null;
+        }
+    }
+
+    public static AlertContext fromJsonString(String json) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map m = objectMapper.readValue(json, Map.class);
+            AlertContext c = new AlertContext();
+            c.addAll(m);
+            return c;
+        } catch (Exception ex) {
+            LOG.error("fail converting string into alertcontext", ex);
+            return null;
+        }
+    }
+
+    public String getProperty(String name) {
+        return properties.get(name);
+    }
+
+    public String toString() {
+        return properties.toString();
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
 }

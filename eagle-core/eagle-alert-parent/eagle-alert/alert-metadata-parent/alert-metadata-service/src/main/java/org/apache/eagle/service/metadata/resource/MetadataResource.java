@@ -242,6 +242,12 @@ public class MetadataResource {
         return dao.removePolicy(policyId);
     }
 
+    @Path("/policies/{policyId}/alerts")
+    @GET
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(@PathParam("policyId") String policyId) {
+        return dao.getAlertPublishEventByPolicyId(policyId);
+    }
+
     @Path("/policies/{policyId}/publishments")
     @GET
     public List<Publishment> getPolicyPublishments(@PathParam("policyId") String policyId) {

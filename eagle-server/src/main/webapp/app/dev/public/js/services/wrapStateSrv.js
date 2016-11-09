@@ -106,13 +106,16 @@
 				}
 			},
 
-			// Parameter
+			// State
 			state: {
 				get: function() {
 					return $state;
 				}
 			}
 		});
+
+		$wrapState.search = $location.search.bind($location);
+		$wrapState.$location = $location;
 
 		return $wrapState;
 	});

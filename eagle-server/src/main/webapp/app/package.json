@@ -20,7 +20,7 @@
     "angular-resource": "1.5.0",
     "angular-route": "1.5.0",
     "angular-ui-bootstrap": "1.1.2",
-    "angular-ui-router": "~0.2.18",
+    "angular-ui-router": "0.3.1",
     "bootstrap": "3.3.6",
     "d3": "3.5.16",
     "echarts": "^3.2.3",

@@ -34,9 +34,10 @@ public class TrustAllSSLSocketFactory extends SSLSocketFactory {
         try {
             SSLContext ctx = SSLContext.getInstance("SSL");
             //  ctx.init(null, new TrustManager[]{new TrustAnyTrustManager() {}}, new SecureRandom());
-            ctx.init(null, new TrustManager[]{new TrustAnyTrustManager() {}}, null);
+            ctx.init(null, new TrustManager[] {new TrustAnyTrustManager() {
+            }}, null);
             socketFactory = ctx.getSocketFactory();
-        } catch ( Exception ex ) {
+        } catch (Exception ex) {
             ex.printStackTrace(System.err);
             /* handle exception */
         }
@@ -83,12 +84,12 @@ public class TrustAllSSLSocketFactory extends SSLSocketFactory {
 
     private static class TrustAnyTrustManager implements X509TrustManager {
         @Override
-        public void checkClientTrusted( final X509Certificate[] chain, final String authType ) {
+        public void checkClientTrusted(final X509Certificate[] chain, final String authType) {
 
         }
 
         @Override
-        public void checkServerTrusted( final X509Certificate[] chain, final String authType ) {
+        public void checkServerTrusted(final X509Certificate[] chain, final String authType) {
 
         }
 

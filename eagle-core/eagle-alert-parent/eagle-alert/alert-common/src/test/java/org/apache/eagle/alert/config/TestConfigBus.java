@@ -17,45 +17,68 @@
 package org.apache.eagle.alert.config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.curator.test.TestingServer;
+import org.apache.curator.utils.CloseableUtils;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestConfigBus {
+    protected TestingServer server;
+    protected ConfigBusProducer producer;
+    protected ConfigBusConsumer consumer;
+    protected String topic = "spout";
+    protected ZKConfig config;
+    final AtomicBoolean validate = new AtomicBoolean(false);
+    final AtomicReference<String> configValue = new AtomicReference<>();
 
-    @Ignore
-    @Test
-    public void testConfigChange() throws Exception {
-        String topic = "spout";
-        ZKConfig config = new ZKConfig();
-        config.zkQuorum = "localhost:2181";
+    @Before
+    public void setUp() throws Exception {
+        server = new TestingServer();
+        config = new ZKConfig();
+        config.zkQuorum = server.getConnectString();
         config.zkRoot = "/alert";
         config.zkRetryInterval = 1000;
         config.zkRetryTimes = 3;
         config.connectionTimeoutMs = 3000;
         config.zkSessionTimeoutMs = 10000;
-        ConfigBusProducer producer = new ConfigBusProducer(config);
-        final AtomicBoolean validate = new AtomicBoolean(false);
-        ConfigBusConsumer consumer = new ConfigBusConsumer(config, topic, value -> {
-            validate.set(true);
+        producer = new ConfigBusProducer(config);
+        consumer = new ConfigBusConsumer(config, topic, value -> {
+            validate.set(value.isValueVersionId());
+            configValue.set((String) value.getValue());
             System.out.println("******** get notified of config " + value);
         });
+    }
+
+    @Test
+    public void testConfigChange() throws Exception {
         // first change
-        ConfigValue value = new ConfigValue();
-        value.setValueVersionId(false);
-        value.setValue("testvalue1");
-        producer.send(topic, value);
+        producer.send(topic, createConfigValue(false, "testvalue1"));
 
         Thread.sleep(1000);
+        Assert.assertFalse(validate.get());
+        Assert.assertEquals("testvalue1", configValue.get());
 
         // second change
-        value.setValueVersionId(false);
-        value.setValue("testvalue2");
-        producer.send(topic, value);
-        producer.close();
+        producer.send(topic, createConfigValue(true, "testvalue2"));
         Thread.sleep(1000);
+        Assert.assertEquals("testvalue2", configValue.get());
+    }
+
+    @After
+    public void shutdown() {
+        CloseableUtils.closeQuietly(server);
+        producer.close();
         consumer.close();
-        Assert.assertTrue(validate.get());
+    }
+
+    private ConfigValue createConfigValue(boolean isValueVersionId, String value) {
+        ConfigValue configValue = new ConfigValue();
+        configValue.setValueVersionId(isValueVersionId);
+        configValue.setValue(value);
+        return configValue;
     }
 }

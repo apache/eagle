@@ -56,25 +56,39 @@
 	// ======================================================================================
 	// =                                       Stream                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
+	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application, Entity) {
 		PageConfig.title = "Streams";
 
-		$scope.streamList = $.map(Application.list, function (app) {
-			return (app.streams || []).map(function (stream) {
-				return {
-					streamId: stream.streamId,
-					appType: app.descriptor.type,
-					siteId: app.site.siteId,
-					schema: stream.schema
-				};
+		$scope.streamList = [];
+		Entity.queryMetadata("streams")._then(function (res) {
+			$scope.streamList = $.map(res.data, function (stream) {
+				var application = Application.findProvider(stream.dataSource);
+				return $.extend({application: application}, stream);
 			});
 		});
+
+		$scope.dataSources = {};
+		Entity.queryMetadata("datasources")._then(function(res) {
+			$.each(res.data, function (i, dataSource) {
+				$scope.dataSources[dataSource.name] = dataSource;
+			});
+		});
+
+		$scope.showDataSource = function (stream) {
+			var dataSource = $scope.dataSources[stream.dataSource];
+			console.log(">>>", dataSource);
+			$.dialog({
+				title: dataSource.name,
+				content: $("<pre class='text-break'>").html(JSON.stringify(dataSource, null, "\t")),
+				size: "large"
+			});
+		};
 	});
 
 	// ======================================================================================
 	// =                                       Policy                                       =
 	// ======================================================================================
-	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
+	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
 		PageConfig.title = "Policies";
 
 		$scope.policyList = [];
@@ -87,51 +101,76 @@
 		}
 		updateList();
 
-		$scope.deletePolicy = function (item) {
-			UI.deleteConfirm(item.name)(function (entity, closeFunc) {
-				Entity.deleteMetadata("policies/" + item.name)._promise.finally(function () {
-					closeFunc();
-					updateList();
-				});
-			});
+		$scope.deletePolicy = function(policy) {
+			Policy.delete(policy).then(updateList);
 		};
 
-		$scope.startPolicy = function (policy) {
-			Entity
-				.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/ENABLED", {})
-				._then(updateList);
+		$scope.startPolicy = function(policy) {
+			Policy.start(policy).then(updateList);
 		};
 
-		$scope.stopPolicy = function (policy) {
-			Entity
-				.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})
-				._then(updateList);
+		$scope.stopPolicy = function(policy) {
+			Policy.stop(policy).then(updateList);
 		};
 	});
 
-	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
-		PageConfig.title = $wrapState.param.name;
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
+		PageConfig.title = "Policy";
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
 			{title: "Policy List", path: "/policies"},
 			{title: "Detail"}
 		];
 
-		var policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
-		policyList._promise.then(function () {
-			$scope.policy = policyList[0];
-			console.log("[Policy]", $scope.policy);
+		function updatePolicy() {
+			var policyName = $wrapState.param.name;
+			var encodePolicyName = encodeURIComponent(policyName);
+			var policyList = Entity.queryMetadata("policies/" + encodePolicyName);
+			policyList._promise.then(function () {
+				$scope.policy = policyList[0];
+				console.log("[Policy]", $scope.policy);
 
-			if(!$scope.policy) {
-				$.dialog({
-					title: "OPS",
-					content: "Policy '" + $wrapState.param.name + "' not found!"
-				}, function () {
-					$wrapState.go("policyList");
+				if(!$scope.policy) {
+					$.dialog({
+						title: "OPS",
+						content: "Policy '" + $wrapState.param.name + "' not found!"
+					}, function () {
+						$wrapState.go("policyList");
+					});
+					return;
+				}
+
+				Entity.post("metadata/policies/parse", $scope.policy.definition.value)._then(function (res) {
+					$scope.executionPlan = res.data;
 				});
-			} else {
-				$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
-			}
-		});
+			});
+
+			$scope.policyPublisherList = Entity.queryMetadata("policies/" + encodePolicyName + "/publishments/");
+
+			Entity.queryMetadata("schedulestates")._then(function (res) {
+				var schedule = res.data || {};
+				$scope.assignment = common.array.find(policyName, schedule.assignments, ["policyName"]) || {};
+
+				var queueList = $.map(schedule.monitoredStreams, function (stream) {
+					return stream.queues;
+				});
+				$scope.queue = common.array.find($scope.assignment.queueId, queueList, ["queueId"]);
+			});
+		}
+		updatePolicy();
+
+		$scope.deletePolicy = function() {
+			Policy.delete($scope.policy).then(function () {
+				$wrapState.go("policyList");
+			});
+		};
+
+		$scope.startPolicy = function() {
+			Policy.start($scope.policy).then(updatePolicy);
+		};
+
+		$scope.stopPolicy = function() {
+			Policy.stop($scope.policy).then(updatePolicy);
+		};
 	});
 }());

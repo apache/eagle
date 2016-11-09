@@ -1,0 +1,36 @@
+{
+  "name": "network_symptomatic_join",
+  "description": "Set parentKey of child alerts as docId of device down alert",
+  "inputStreams": [
+    "networkCorrelateIntermediumStream",
+    "deviceDownAlertStream"
+  ],
+  "outputStreams": [
+    "symptomaticAlertOutputStream"
+  ],
+  "definition": {
+    "type": "siddhi",
+    "value": "from networkCorrelateIntermediumStream#window.time(10 min) as left join deviceDownAlertStream[state=='open']#window.time(10 min) as right on left.linkedSwitch == right.entity select left.name, left.pod, left.docId, left.cause, left.firstOccurrenceTime, left.bubble, left.timestamp, left.severity, left.componentType, left.linkedSwitch, left.alertSource, left.entityType, left.ip, left.alertKey, left.message, 'symptomaticAlertOutputStream' as streamName, left.component, left.linkedPort, left.namespace, left.entity, left.dc, left.status, left.endTime, left.lastModifiedTime, right.docId as parentKey insert into symptomaticAlertOutputStream;",
+    "properties": {},
+    "inputStreams": [],
+    "outputStreams": []
+  },
+  "policyStatus": "ENABLED",
+  "partitionSpec": [
+    {
+      "streamId": "networkCorrelateIntermediumStream",
+      "type": "GROUPBY",
+      "columns": [
+        "linkedSwitch"
+      ]
+    },
+    {
+      "streamId": "deviceDownAlertStream",
+      "type": "GROUPBY",
+      "columns": [
+        "entity"
+      ]
+    }
+  ],
+  "parallelismHint": 0
+}

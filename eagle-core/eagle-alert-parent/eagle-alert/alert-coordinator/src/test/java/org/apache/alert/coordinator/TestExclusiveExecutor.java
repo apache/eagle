@@ -16,22 +16,20 @@
  */
 package org.apache.alert.coordinator;
 
+import com.google.common.base.Joiner;
+import org.apache.eagle.alert.config.ZKConfig;
+import org.apache.eagle.alert.coordinator.ExclusiveExecutor;
+import org.apache.eagle.alert.utils.ZookeeperEmbedded;
+import org.junit.*;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.eagle.alert.coordinator.ExclusiveExecutor;
-import org.apache.eagle.alert.utils.ZookeeperEmbedded;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.google.common.base.Joiner;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Ignore
 public class TestExclusiveExecutor {
@@ -59,39 +57,34 @@ public class TestExclusiveExecutor {
 
         System.setOut(newStream);
 
-        ExclusiveExecutor.Runnable runnableOne = new ExclusiveExecutor.Runnable() {
+        ZKConfig zkConfig = new ZKConfig();
+        zkConfig.zkQuorum = "127.0.0.1:2181";
+        zkConfig.zkRetryTimes = 3;
+        zkConfig.zkRoot = "/";
+        zkConfig.connectionTimeoutMs  = 3000;
+        zkConfig.zkRetryInterval  = 1000;
+        zkConfig.zkSessionTimeoutMs = 5000;
 
-            @Override
-            public void run() throws Exception {
-                System.out.println("this is thread one");
+        String path = "/concurrenty";
+        AtomicBoolean lock1 = new AtomicBoolean(false);
+        Runnable runnableOne = () -> { System.out.println("this is thread one"); lock1.set(true);};
+        new Thread(() -> {
+            ExclusiveExecutor executor = new ExclusiveExecutor(zkConfig);
+            try {
+                executor.execute(path, runnableOne);
+            } catch (TimeoutException e) {
             }
-
-        };
-
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                ExclusiveExecutor.execute("/alert/test/leader", runnableOne);
-            }
-
         }).start();
 
-        ExclusiveExecutor.Runnable runnableTwo = new ExclusiveExecutor.Runnable() {
 
-            @Override
-            public void run() throws Exception {
-                System.out.println("this is thread two");
+        AtomicBoolean lock2 = new AtomicBoolean();
+        Runnable runnableTwo = () ->  { System.out.println("this is thread two"); lock2.set(true);};
+        new Thread(() -> {
+            ExclusiveExecutor executor = new ExclusiveExecutor(zkConfig);
+            try {
+                executor.execute(path, runnableTwo);
+            } catch (TimeoutException e) {
             }
-
-        };
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                ExclusiveExecutor.execute("/alert/test/leader", runnableTwo);
-            }
-
         }).start();
 
         Thread.sleep(2000);
@@ -110,8 +103,8 @@ public class TestExclusiveExecutor {
         Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is thread one")));
         Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is thread two")));
 
-        Assert.assertTrue(runnableOne.isCompleted());
-        Assert.assertTrue(runnableTwo.isCompleted());
+        Assert.assertTrue(lock1.get());
+        Assert.assertTrue(lock2.get());
     }
 
 }

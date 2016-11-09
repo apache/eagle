@@ -37,18 +37,19 @@ public class SiddhiAggregator {
     private TimeBatchWindowSpec spec;
     private StreamDefinition sd;
     private InputHandler input;
-    public SiddhiAggregator(TimeBatchWindowSpec spec, StreamDefinition sd, final AggregateHandler handler){
+
+    public SiddhiAggregator(TimeBatchWindowSpec spec, StreamDefinition sd, final AggregateHandler handler) {
         this.spec = spec;
         this.sd = sd;
 
         Map<String, Integer> colIndices = new HashMap<>();
         List<String> colNames = new ArrayList<>();
         int i = 0;
-        for(String col : spec.groupby.cols){
+        for (String col : spec.groupby.cols) {
             colIndices.put(col, i++);
             colNames.add(col);
         }
-        for(Agg agg : spec.aggs){
+        for (Agg agg : spec.aggs) {
             colIndices.put(agg.alias, i++);
             colNames.add(agg.alias);
         }
@@ -63,7 +64,7 @@ public class SiddhiAggregator {
             @Override
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 List<AggregateResult> rows = new ArrayList<AggregateResult>();
-                for(Event e : inEvents) {
+                for (Event e : inEvents) {
                     AggregateResult result = new AggregateResult(e.getData(), colIndices, colNames);
                     rows.add(result);
                 }
@@ -73,28 +74,29 @@ public class SiddhiAggregator {
         runtime.start();
     }
 
-    public void add(Object[] data) throws Exception{
+    public void add(Object[] data) throws Exception {
         input.send(data);
     }
 
     /**
      * example siddhi query
-     *   String ql = "define stream s (host string, timestamp long, metric string, site string, value double);" +
-          "@info(name='query') " +
-          " from s[metric == \"missingblocks\"]#window.externalTimeBatch(timestamp, 1 min, 0) select host, count(value) as avg group by host insert into tmp; ";
+     * String ql = "define stream s (host string, timestamp long, metric string, site string, value double);" +
+     * "@info(name='query') " +
+     * " from s[metric == \"missingblocks\"]#window.externalTimeBatch(timestamp, 1 min, 0) select host, count(value) as avg group by host insert into tmp; ";
+     *
      * @return
      */
-    private String buildSiddhiAggQuery(){
+    private String buildSiddhiAggQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append("define stream s(");
-        if(sd.columns == null || sd.columns.size() == 0) {
+        if (sd.columns == null || sd.columns.size() == 0) {
             throw new IllegalStateException("input stream should contains at least one column");
         }
-        for(Column col : sd.columns){
+        for (Column col : sd.columns) {
             appendColumnDef(sb, col);
             sb.append(",");
         }
-        sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(sb.length() - 1);
         sb.append(");");
 
         sb.append(" @info(name='query') ");
@@ -108,14 +110,14 @@ public class SiddhiAggregator {
         sb.append(spec.start);
         sb.append(")");
         sb.append(" select ");
-        for(String gbField : spec.groupby.cols){
+        for (String gbField : spec.groupby.cols) {
             sb.append(gbField);
             sb.append(",");
         }
-        if(spec.aggs == null){
+        if (spec.aggs == null) {
             throw new IllegalStateException("at least one aggregate function should be present");
         }
-        for(Agg agg : spec.aggs){
+        for (Agg agg : spec.aggs) {
             sb.append(agg.function);
             sb.append("(");
             sb.append(agg.field);
@@ -125,7 +127,7 @@ public class SiddhiAggregator {
         }
         sb.deleteCharAt(sb.length() - 1);
         sb.append(" group by ");
-        for(String gbField : spec.groupby.cols){
+        for (String gbField : spec.groupby.cols) {
             sb.append(gbField);
             sb.append(",");
         }
@@ -135,7 +137,7 @@ public class SiddhiAggregator {
         return sb.toString();
     }
 
-    private void appendColumnDef(StringBuilder sb, Column col){
+    private void appendColumnDef(StringBuilder sb, Column col) {
         sb.append(col.name);
         sb.append(" ");
         sb.append(col.type);

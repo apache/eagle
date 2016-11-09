@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.config;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.slf4j.Logger;
@@ -39,10 +40,9 @@ public class ConfigBusConsumer extends ConfigBusBase {
         LOG.info("monitor change for zkPath " + zkPath);
         cache = new NodeCache(curator, zkPath);
         cache.getListenable().addListener(() -> {
-                // get node value and notify callback
-                ConfigValue v = getConfigValue();
-                callback.onNewConfig(v);
-            }
+            ConfigValue v = getConfigValue();
+            callback.onNewConfig(v);
+        }
         );
         try {
             cache.start();
@@ -54,7 +54,13 @@ public class ConfigBusConsumer extends ConfigBusBase {
 
     public ConfigValue getConfigValue() throws Exception {
         byte[] value = curator.getData().forPath(zkPath);
-        ConfigValue v = mapper.readValue(value, ConfigValue.class);
+        ConfigValue v;
+        try {
+            v = mapper.readValue(value, ConfigValue.class);
+        } catch (JsonParseException e) {
+            LOG.warn("warn getConfigValue parse exception", e.getMessage());
+            v = new ConfigValue();
+        }
         return v;
     }
 }

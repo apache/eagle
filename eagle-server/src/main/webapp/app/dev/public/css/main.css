@@ -129,7 +129,8 @@ table ul {
 	padding: 0 0 0 20px;
 }
 
-table.table pre {
+table.table pre,
+pre.text-break {
 	white-space: pre-wrap;
 	margin: 0;
 }
@@ -219,9 +220,15 @@ ul.stepGuide li > .title {
 /* ========================================================================
  * =                                Policy                                =
  * ======================================================================== */
+.policy-app-list {
+	border-bottom: 1px solid #f4f4f4;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+}
+
 .policy-app-list > a {
 	display: block;
-	font-size: 18px;
+	font-size: 16px;
 }
 
 .policy-app-list > ul {
@@ -266,6 +273,10 @@ ul.stepGuide li > .title {
 	color: #666;
 }
 
+.box > .box-body.responsive {
+	overflow-x: auto;
+}
+
 /* ========================================================================
  * =                                 Tab                                  =
  * ======================================================================== */
@@ -285,6 +296,10 @@ ul.stepGuide li > .title {
 .nav-tabs-custom .nav-tabs .tab-xs a {
 	padding-left: 0;
 	padding-right: 0;
+}
+
+.nav-tabs-custom > .nav-tabs > li.box-tools {
+	padding: 4px 2px 0 0;
 }
 
 /* ========================================================================

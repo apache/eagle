@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,16 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import com.typesafe.config.Config;
-import org.apache.commons.collections.ListUtils;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -27,20 +35,20 @@ import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.base.Objects;
+import com.typesafe.config.Config;
 
 @SuppressWarnings("rawtypes")
 public class AlertPublisherImpl implements AlertPublisher {
+
     private static final long serialVersionUID = 4809983246198138865L;
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherImpl.class);
+
+    private static final String STREAM_NAME_DEFAULT = "_default";
+
     private final String name;
 
-    private volatile Map<String, List<String>> policyPublishPluginMapping = new ConcurrentHashMap<>(1);
+    private volatile Map<String, Set<String>> psPublishPluginMapping = new ConcurrentHashMap<>(1);
     private volatile Map<String, AlertPublishPlugin> publishPluginMapping = new ConcurrentHashMap<>(1);
     private Config config;
     private Map conf;
@@ -74,13 +82,18 @@ public class AlertPublisherImpl implements AlertPublisher {
             LOG.warn("policyId cannot be null for event to be published");
             return;
         }
-        List<String> pubIds = policyPublishPluginMapping.get(policyId);
+        // use default stream name if specified stream publisher is not found
+        Set<String> pubIds = psPublishPluginMapping.get(getPolicyStreamUniqueId(policyId, event.getStreamId()));
         if (pubIds == null) {
-            LOG.warn("Policy {} does *NOT* subscribe any publishment!", policyId);
+            pubIds = psPublishPluginMapping.get(getPolicyStreamUniqueId(policyId));
+        }
+        if (pubIds == null) {
+            LOG.warn("Policy {} Stream {} does *NOT* subscribe any publishment!", policyId, event.getStreamId());
             return;
         }
 
         for (String pubId : pubIds) {
+            @SuppressWarnings("resource")
             AlertPublishPlugin plugin = pubId != null ? publishPluginMapping.get(pubId) : null;
             if (plugin == null) {
                 LOG.warn("Policy {} does *NOT* subscribe any publishment!", policyId);
@@ -100,12 +113,11 @@ public class AlertPublisherImpl implements AlertPublisher {
         publishPluginMapping.values().forEach(plugin -> plugin.close());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public synchronized void onPublishChange(List<Publishment> added,
-                                List<Publishment> removed,
-                                List<Publishment> afterModified,
-                                List<Publishment> beforeModified) {
+                                             List<Publishment> removed,
+                                             List<Publishment> afterModified,
+                                             List<Publishment> beforeModified) {
         if (added == null) {
             added = new ArrayList<>();
         }
@@ -125,7 +137,7 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
 
         // copy and swap to avoid concurrency issue
-        Map<String, List<String>> newPolicyPublishPluginMapping = new HashMap<>(policyPublishPluginMapping);
+        Map<String, Set<String>> newPSPublishPluginMapping = new HashMap<>(psPublishPluginMapping);
         Map<String, AlertPublishPlugin> newPublishMap = new HashMap<>(publishPluginMapping);
 
         // added
@@ -135,7 +147,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
             if (plugin != null) {
                 newPublishMap.put(publishment.getName(), plugin);
-                addPublishmentPolicies(newPolicyPublishPluginMapping, publishment.getPolicyIds(), publishment.getName());
+                addPublishmentPoliciesStreams(newPSPublishPluginMapping, publishment.getPolicyIds(), publishment.getStreamIds(), publishment.getName());
             } else {
                 LOG.error("OnPublishChange alertPublisher {} failed due to invalid format", publishment);
             }
@@ -144,7 +156,7 @@ public class AlertPublisherImpl implements AlertPublisher {
         List<AlertPublishPlugin> toBeClosed = new ArrayList<>();
         for (Publishment publishment : removed) {
             String pubName = publishment.getName();
-            removePublihsPolicies(newPolicyPublishPluginMapping, publishment.getPolicyIds(), pubName);
+            removePublihsPoliciesStreams(newPSPublishPluginMapping, publishment.getPolicyIds(), pubName);
             toBeClosed.add(newPublishMap.get(pubName));
             newPublishMap.remove(publishment.getName());
         }
@@ -152,21 +164,25 @@ public class AlertPublisherImpl implements AlertPublisher {
         for (int i = 0; i < afterModified.size(); i++) {
             String pubName = afterModified.get(i).getName();
             List<String> newPolicies = afterModified.get(i).getPolicyIds();
+            List<String> newStreams = afterModified.get(i).getStreamIds();
             List<String> oldPolicies = beforeModified.get(i).getPolicyIds();
+            List<String> oldStreams = beforeModified.get(i).getStreamIds();
 
-            if (!newPolicies.equals(oldPolicies)) {
-                List<String> deletedPolicies = ListUtils.subtract(oldPolicies, newPolicies);
-                removePublihsPolicies(newPolicyPublishPluginMapping, deletedPolicies, pubName);
-                List<String> addedPolicies = ListUtils.subtract(newPolicies, oldPolicies);
-                addPublishmentPolicies(newPolicyPublishPluginMapping, addedPolicies, pubName);
+            if (!newPolicies.equals(oldPolicies) || !Objects.equal(newStreams, oldStreams)) {
+                // since both policy & stream may change, skip the compare and difference update
+                removePublihsPoliciesStreams(newPSPublishPluginMapping, oldPolicies, pubName);
+                addPublishmentPoliciesStreams(newPSPublishPluginMapping, newPolicies, newStreams, pubName);
             }
             Publishment newPub = afterModified.get(i);
-            newPublishMap.get(pubName).update(newPub.getDedupIntervalMin(), newPub.getProperties());
+
+            // for updated publishment, need to init them too
+            AlertPublishPlugin newPlugin = AlertPublishPluginsFactory.createNotificationPlugin(newPub, config, conf);
+            newPublishMap.replace(pubName, newPlugin);
         }
 
         // now do the swap
         publishPluginMapping = newPublishMap;
-        policyPublishPluginMapping = newPolicyPublishPluginMapping;
+        psPublishPluginMapping = newPSPublishPluginMapping;
 
         // safely close : it depend on plugin to check if want to wait all data to be flushed.
         closePlugins(toBeClosed);
@@ -182,26 +198,51 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
     }
 
-    private void addPublishmentPolicies(Map<String, List<String>> newPolicyPublishPluginMapping, List<String> addedPolicyIds, String pubName) {
+    private void addPublishmentPoliciesStreams(Map<String, Set<String>> newPSPublishPluginMapping,
+                                               List<String> addedPolicyIds, List<String> addedStreamIds, String pubName) {
         if (addedPolicyIds == null || pubName == null) {
             return;
         }
 
+        if (addedStreamIds == null || addedStreamIds.size() <= 0) {
+            addedStreamIds = new ArrayList<String>();
+            addedStreamIds.add(STREAM_NAME_DEFAULT);
+        }
+
         for (String policyId : addedPolicyIds) {
-            newPolicyPublishPluginMapping.putIfAbsent(policyId, new ArrayList<>());
-            newPolicyPublishPluginMapping.get(policyId).add(pubName);
+            for (String streamId : addedStreamIds) {
+                String psUniqueId = getPolicyStreamUniqueId(policyId, streamId);
+                newPSPublishPluginMapping.putIfAbsent(psUniqueId, new HashSet<>());
+                newPSPublishPluginMapping.get(psUniqueId).add(pubName);
+            }
         }
     }
 
-    private synchronized void removePublihsPolicies(Map<String, List<String>> newPolicyPublishPluginMapping, List<String> deletedPolicyIds, String pubName) {
+    private synchronized void removePublihsPoliciesStreams(Map<String, Set<String>> newPSPublishPluginMapping,
+                                                           List<String> deletedPolicyIds, String pubName) {
         if (deletedPolicyIds == null || pubName == null) {
             return;
         }
 
         for (String policyId : deletedPolicyIds) {
-            List<String> publishIds = newPolicyPublishPluginMapping.get(policyId);
-            publishIds.remove(pubName);
+            for (Entry<String, Set<String>> entry : newPSPublishPluginMapping.entrySet()) {
+                if (entry.getKey().startsWith("policyId:" + policyId)) {
+                    entry.getValue().remove(pubName);
+                    break;
+                }
+            }
         }
+    }
+
+    private String getPolicyStreamUniqueId(String policyId) {
+        return getPolicyStreamUniqueId(policyId, STREAM_NAME_DEFAULT);
+    }
+
+    private String getPolicyStreamUniqueId(String policyId, String streamId) {
+        if (StringUtils.isBlank(streamId)) {
+            streamId = STREAM_NAME_DEFAULT;
+        }
+        return String.format("policyId:%s,streamId:%s", policyId, streamId);
     }
 
 }

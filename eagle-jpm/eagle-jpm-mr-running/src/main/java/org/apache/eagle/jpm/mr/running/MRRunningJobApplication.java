@@ -66,7 +66,8 @@ public class MRRunningJobApplication extends StormApplication {
                 mrRunningJobConfig.getEagleServiceConfig(),
                 mrRunningJobConfig.getEndpointConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
-                confKeyKeys),
+                confKeyKeys,
+                config),
                 tasks).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
         return topologyBuilder.createTopology();
     }

@@ -19,14 +19,14 @@ package org.apache.eagle.common;
 import org.apache.commons.net.util.Base64;
 
 /**
- * wrap base64 encoding and decoding, so reduce the confuse of using many Base64 methods. 
+ * wrap base64 encoding and decoding, so reduce the confuse of using many Base64 methods.
  */
 public class EagleBase64Wrapper {
-	public static String encodeByteArray2URLSafeString(byte[] bytes){
-		return Base64.encodeBase64URLSafeString(bytes);
-	}
-	
-	public static byte[] decode(String input){
-		return Base64.decodeBase64(input);
-	}
+    public static String encodeByteArray2URLSafeString(byte[] bytes) {
+        return Base64.encodeBase64URLSafeString(bytes);
+    }
+
+    public static byte[] decode(String input) {
+        return Base64.decodeBase64(input);
+    }
 }

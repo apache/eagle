@@ -16,7 +16,9 @@
  */
 package org.apache.eagle.common;
 
-import org.apache.eagle.common.config.EagleConfigFactory;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.common.config.EagleConfigConstants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,8 +35,13 @@ public class DateTimeUtil {
     public static final long ONEMINUTE = 1L * 60L * 1000L;
     public static final long ONEHOUR = 1L * 60L * 60L * 1000L;
     public static final long ONEDAY = 24L * 60L * 60L * 1000L;
-    //private static TimeZone CURRENT_TIME_ZONE = EagleConfigFactory.load().getTimeZone();
-    private static TimeZone CURRENT_TIME_ZONE = TimeZone.getDefault();
+    public static TimeZone CURRENT_TIME_ZONE;
+
+    static {
+        Config config = ConfigFactory.load();
+        CURRENT_TIME_ZONE = TimeZone.getTimeZone((config.hasPath(EagleConfigConstants.EAGLE_TIME_ZONE)
+            ? config.getString(EagleConfigConstants.EAGLE_TIME_ZONE) : EagleConfigConstants.DEFAULT_EAGLE_TIME_ZONE));
+    }
 
     public static Date humanDateToDate(String date) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -145,10 +152,10 @@ public class DateTimeUtil {
 
     //For mapr
     //exp: 2015-06-06T10:44:22.800Z
-    public static long maprhumanDateToMilliseconds(String date) throws ParseException{
-        date = date.replace('T',' ');
-        date = date.replace('Z',' ');
-        date = date.replace('.',',');
+    public static long maprhumanDateToMilliseconds(String date) throws ParseException {
+        date = date.replace('T', ' ');
+        date = date.replace('Z', ' ');
+        date = date.replace('.', ',');
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS ");
         sdf.setTimeZone(CURRENT_TIME_ZONE);
         Date d = sdf.parse(date);

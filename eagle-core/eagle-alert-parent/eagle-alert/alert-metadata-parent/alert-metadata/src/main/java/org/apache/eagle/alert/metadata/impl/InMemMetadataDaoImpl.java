@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * In memory service for simple service start. Make all service API as
@@ -214,6 +215,12 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId) {
+        List<AlertPublishEvent> result = alerts.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
+        return result;
     }
 
     @Override

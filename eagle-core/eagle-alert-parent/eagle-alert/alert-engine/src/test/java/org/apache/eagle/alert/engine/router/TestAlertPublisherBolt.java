@@ -136,6 +136,7 @@ public class TestAlertPublisherBolt {
     public void testMapComparator() {
         PublishSpec spec1 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec.json"), PublishSpec.class);
         PublishSpec spec2 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec2.json"), PublishSpec.class);
+        PublishSpec spec3 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec3.json"), PublishSpec.class);
         Map<String, Publishment> map1 = new HashMap<>();
         Map<String, Publishment> map2 = new HashMap<>();
         spec1.getPublishments().forEach(p -> map1.put(p.getName(), p));
@@ -148,6 +149,7 @@ public class TestAlertPublisherBolt {
         AlertPublisherBolt publisherBolt = new AlertPublisherBolt("alert-publisher-test", null, null);
         publisherBolt.onAlertPublishSpecChange(spec1, null);
         publisherBolt.onAlertPublishSpecChange(spec2, null);
+        publisherBolt.onAlertPublishSpecChange(spec3, null);
     }
 
     @Test

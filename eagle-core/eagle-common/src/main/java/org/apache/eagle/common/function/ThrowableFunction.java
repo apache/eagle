@@ -1,7 +1,5 @@
 package org.apache.eagle.common.function;
 
-import java.sql.SQLException;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

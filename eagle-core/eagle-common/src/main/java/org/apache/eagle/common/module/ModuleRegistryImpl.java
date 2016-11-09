@@ -24,7 +24,8 @@ import java.util.List;
 
 public class ModuleRegistryImpl implements ModuleRegistry {
     private final LinkedListMultimap<Class<? extends ModuleScope>, Module> moduleRepo;
-    public ModuleRegistryImpl(){
+
+    public ModuleRegistryImpl() {
         moduleRepo = LinkedListMultimap.create();
     }
 
@@ -39,12 +40,13 @@ public class ModuleRegistryImpl implements ModuleRegistry {
     }
 
     @Override
+    public List<Module> getModules() {
+        return moduleRepo.values();
+    }
+
+    @Override
     public List<Class<? extends ModuleScope>> getScopes() {
         return Arrays.asList((Class<? extends ModuleScope>[]) moduleRepo.keys().toArray());
     }
 
-    @Override
-    public List<Module> getModules() {
-        return moduleRepo.values();
-    }
 }

@@ -17,6 +17,7 @@
 package org.apache.eagle.common.module;
 
 /**
- * Global Scope
+ * Global Scope.
  */
-public enum GlobalScope implements ModuleScope {}
+public enum GlobalScope implements ModuleScope {
+}
