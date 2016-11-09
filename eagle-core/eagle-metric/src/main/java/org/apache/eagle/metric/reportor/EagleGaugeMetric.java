@@ -22,9 +22,6 @@ package org.apache.eagle.metric.reportor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Map;
-
 public class EagleGaugeMetric extends EagleMetric {
 
     private static final Logger LOG = LoggerFactory.getLogger(EagleGaugeMetric.class);
