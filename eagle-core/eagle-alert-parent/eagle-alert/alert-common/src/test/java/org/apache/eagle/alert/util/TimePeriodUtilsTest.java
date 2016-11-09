@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.utils;
+
+package org.apache.eagle.alert.util;
 
 import org.apache.eagle.alert.utils.TimePeriodUtils;
 import org.apache.eagle.common.DateTimeUtil;
@@ -87,5 +88,13 @@ public class TimePeriodUtilsTest {
         expect = DateTimeUtil.humanDateToSeconds("2015-07-01 03:00:00");
         result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
         Assert.assertEquals(expect, result);
+    }
+
+
+    @Test
+    public void testPeriod() {
+        Assert.assertEquals(30 * 60 * 1000, TimePeriodUtils.getMillisecondsOfPeriod(Period.parse("PT30m")));
+        Assert.assertEquals(30 * 60 * 1000, TimePeriodUtils.getMillisecondsOfPeriod(Period.millis(30 * 60 * 1000)));
+        Assert.assertEquals("PT1800S", Period.millis(30 * 60 * 1000).toString());
     }
 }

@@ -16,7 +16,11 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import backtype.storm.metric.api.IMetric;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.engine.AlertStreamCollector;
@@ -35,6 +39,10 @@ import org.apache.eagle.alert.engine.utils.SingletonExecutor;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.eagle.alert.utils.AlertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
 
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -42,14 +50,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import com.typesafe.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Since 5/1/16.
@@ -81,6 +81,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         this.streamContext.counter().scope("execute_count").incr();
         try {
             PartitionedEvent pe = deserialize(input.getValueByField(AlertConstants.FIELD_0));
+            LOG.info("Alert bolt {} received event: {}", boltId, pe.getEvent());
             String streamEventVersion = pe.getEvent().getMetaVersion();
 
             if (streamEventVersion == null) {
