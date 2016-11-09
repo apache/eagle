@@ -103,7 +103,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
          */
         List<Object> convertedTuple = converter.convert(tuple);
         if (convertedTuple == null) {
-            LOG.warn("source data {} can't be converted to a stream, ignore this message", tuple);
+            LOG.debug("source data {} can't be converted to a stream, ignore this message", tuple);
             spout.ack(newMessageId);
             return null;
         }
@@ -118,6 +118,8 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
         }
 
         StreamEvent event = convertToStreamEventByStreamDefinition((Long) convertedTuple.get(2), m, sds.get(streamId));
+        LOG.info("Spout from topic {} emit event: {}", topic, event);
+        
         /*
             phase 2: stream repartition
         */
