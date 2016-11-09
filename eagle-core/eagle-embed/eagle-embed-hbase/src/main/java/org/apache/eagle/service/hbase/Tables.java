@@ -46,7 +46,7 @@ public class Tables {
         tables.add("userprofile");
     }
 
-    public List<String> getTables(){
+    public List<String> getTables() {
         return this.tables;
     }
 }
