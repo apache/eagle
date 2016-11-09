@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EagleServiceReporterMetricListener implements EagleMetricListener{
+public class EagleServiceReporterMetricListener implements EagleMetricListener {
 
     private EagleServiceClientImpl client;
     private static final Logger LOG = LoggerFactory.getLogger(EagleServiceReporterMetricListener.class);
@@ -50,13 +50,12 @@ public class EagleServiceReporterMetricListener implements EagleMetricListener{
         try {
             int total = entities.size();
             GenericServiceAPIResponseEntity<String> response = client.create(entities, GenericMetricEntity.GENERIC_METRIC_SERVICE);
-            if(response.isSuccess()) {
+            if (response.isSuccess()) {
                 LOG.info("Wrote " + total + " entities to service");
-            }else{
-                LOG.error("Failed to write " + total + " entities to service, due to server exception: "+ response.getException());
+            } else {
+                LOG.error("Failed to write " + total + " entities to service, due to server exception: " + response.getException());
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error("Got exception while writing entities: ", ex);
         }
     }

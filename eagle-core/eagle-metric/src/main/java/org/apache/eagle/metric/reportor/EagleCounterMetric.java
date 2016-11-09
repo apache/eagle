@@ -44,7 +44,7 @@ public class EagleCounterMetric extends EagleMetric {
         for (EagleMetricListener listener : metricListeners) {
             EagleCounterMetric newEagleMetric = new EagleCounterMetric(this);
             newEagleMetric.name = MetricKeyCodeDecoder.addTimestampToMetricKey(trim(latestUserTimeClock), newEagleMetric.name);
-            listener.onMetricFlushed(Arrays.asList((EagleMetric)newEagleMetric));
+            listener.onMetricFlushed(Arrays.asList((EagleMetric) newEagleMetric));
         }
     }
 
@@ -62,8 +62,7 @@ public class EagleCounterMetric extends EagleMetric {
                 LOG.warn("Something must be wrong, event should come in order of userTimeClock");
             }
             value.addAndGet(d);
-        }
-        else {
+        } else {
             flush(latestUserTimeClock);
             value.getAndSet(1);
             latestUserTimeClock = currentUserTimeClock;

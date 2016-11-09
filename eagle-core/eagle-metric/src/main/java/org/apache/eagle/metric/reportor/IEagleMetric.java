@@ -23,7 +23,7 @@ import com.codahale.metrics.Gauge;
 
 /**
  * It's just a workaround to extends Gauge instead of Metric interface
- * For MetricRegistry's notifyListenerOfRemovedMetric method will throw exception on unknown metric type
+ * For MetricRegistry's notifyListenerOfRemovedMetric method will throw exception on unknown metric type.
  */
 
 public interface IEagleMetric extends Gauge<Double> {
@@ -31,7 +31,8 @@ public interface IEagleMetric extends Gauge<Double> {
     void registerListener(EagleMetricListener listener);
 
     /**
-     * return true if the metric need to be flushed, otherwise return false
+     * return true if the metric need to be flushed, otherwise return false.
+     *
      * @param value
      * @param userTimeClock
      * @return

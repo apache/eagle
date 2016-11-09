@@ -24,7 +24,8 @@ import java.util.List;
 public interface EagleMetricListener {
 
     /**
-     * The method should be called in thread-safe mode
+     * The method should be called in thread-safe mode.
+     *
      * @param metrics
      */
     void onMetricFlushed(List<EagleMetric> metrics);
