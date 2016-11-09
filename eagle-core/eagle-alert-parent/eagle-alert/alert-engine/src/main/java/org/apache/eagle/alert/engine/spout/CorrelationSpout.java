@@ -48,7 +48,6 @@ import java.util.*;
 
 /**
  * wrap KafkaSpout to provide parallel processing of messages for multiple Kafka topics
- *
  * <p>1. onNewConfig() is interface for outside to update new metadata. Upon new metadata, this class will calculate if there is any new topic, removed topic or
  * updated topic</p>
  */
@@ -183,7 +182,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         // decode and get topic
         KafkaMessageIdWrapper id = (KafkaMessageIdWrapper) msgId;
         KafkaSpoutWrapper spout = kafkaSpoutList.get(id.topic);
-        if (spout !=  null) {
+        if (spout != null) {
             spout.ack(id.id);
         }
     }
@@ -194,7 +193,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         KafkaMessageIdWrapper id = (KafkaMessageIdWrapper) msgId;
         LOG.error("Failing message {}, with topic {}", msgId, id.topic);
         KafkaSpoutWrapper spout = kafkaSpoutList.get(id.topic);
-        if (spout !=  null) {
+        if (spout != null) {
             spout.fail(id.id);
         }
     }
@@ -287,8 +286,8 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
      * consumerId by default is EagleConsumer unless it is specified by "stormKafkaEagleConsumer"
      * Note2: put topologyId as part of zkState because one topic by design can be consumed by multiple topologies so one topology needs to know
      * processed offset for itself
-     *
      * <p>TODO: Should avoid use Config.get in deep calling stack, should generate config bean as early as possible
+     * </p>
      *
      * @param conf
      * @param context
@@ -310,6 +309,10 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         String transactionZkRoot = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_ROOT;
         if (config.hasPath("spout.stormKafkaTransactionZkPath")) {
             transactionZkRoot = config.getString("spout.stormKafkaTransactionZkPath");
+        }
+        boolean logEventEnabled = false;
+        if (config.hasPath("topology.logEventEnabled")) {
+            logEventEnabled = config.getBoolean("topology.logEventEnabled");
         }
         // write partition offset etc. into zkRoot+id, see PartitionManager.committedPath
         String zkStateTransactionRelPath = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_RELATIVE_PATH;
@@ -339,7 +342,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
 
         spoutConfig.scheme = createMultiScheme(conf, topic, schemeClsName);
         KafkaSpoutWrapper wrapper = new KafkaSpoutWrapper(spoutConfig, kafkaSpoutMetric);
-        SpoutOutputCollectorWrapper collectorWrapper = new SpoutOutputCollectorWrapper(this, collector, topic, spoutSpec, numOfRouterBolts, sds, this.serializer);
+        SpoutOutputCollectorWrapper collectorWrapper = new SpoutOutputCollectorWrapper(this, collector, topic, spoutSpec, numOfRouterBolts, sds, this.serializer, logEventEnabled);
         wrapper.open(conf, context, collectorWrapper);
 
         if (LOG.isInfoEnabled()) {
@@ -352,8 +355,8 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         Object scheme = SchemeBuilder.buildFromClsName(schemeClsName, topic, conf);
         if (scheme instanceof MultiScheme) {
             return (MultiScheme) scheme;
-        } else if (scheme instanceof  Scheme) {
-            return new SchemeAsMultiScheme((Scheme)scheme);
+        } else if (scheme instanceof Scheme) {
+            return new SchemeAsMultiScheme((Scheme) scheme);
         } else {
             LOG.error("create spout scheme failed.");
             throw new IllegalArgumentException("create spout scheme failed.");
