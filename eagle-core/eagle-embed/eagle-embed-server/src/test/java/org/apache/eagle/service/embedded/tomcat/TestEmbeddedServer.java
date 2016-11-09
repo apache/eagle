@@ -21,10 +21,10 @@ import org.junit.Test;
 
 @Ignore
 public class TestEmbeddedServer {
-	
-	@Test
-	public void test() throws Throwable{
-		String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
-		EmbeddedServer.getInstance(webappDirLocation);
-	}
+
+    @Test
+    public void test() throws Throwable {
+        String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
+        EmbeddedServer.getInstance(webappDirLocation);
+    }
 }
