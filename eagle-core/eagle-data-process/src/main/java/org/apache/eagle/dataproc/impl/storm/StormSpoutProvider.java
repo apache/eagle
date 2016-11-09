@@ -17,7 +17,6 @@
 package org.apache.eagle.dataproc.impl.storm;
 
 import backtype.storm.topology.base.BaseRichSpout;
-
 import com.typesafe.config.Config;
 
 /**
@@ -25,5 +24,5 @@ import com.typesafe.config.Config;
  * which can be retrieved from getSpout method.
  */
 public interface StormSpoutProvider {
-	BaseRichSpout getSpout(Config context);
+    BaseRichSpout getSpout(Config context);
 }

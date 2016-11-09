@@ -18,6 +18,6 @@ package org.apache.eagle.dataproc.impl.storm.kafka;
 
 import java.io.Serializable;
 
-public interface SpoutKafkaMessageDeserializer extends Serializable{
-	public Object deserialize(byte[] arg0);
+public interface SpoutKafkaMessageDeserializer extends Serializable {
+    public Object deserialize(byte[] arg0);
 }
