@@ -37,7 +37,7 @@ public class OozieMetadataBrowseWebResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public OozieMetadataBrowseWebResponse getCoordJobs(@QueryParam("site") String site){
+    public OozieMetadataBrowseWebResponse getCoordJobs(@QueryParam("site") String site) {
 
         OozieMetadataBrowseWebResponse response = new OozieMetadataBrowseWebResponse();
         List<CoordinatorJob> coordinators = null;
@@ -45,7 +45,7 @@ public class OozieMetadataBrowseWebResource {
             OozieMetadataAccessConfig config = new OozieMetadataAccessConfigDAOImpl().getConfig(site);
             OozieMetadataDAO dao = new OozieMetadataDAOImpl(config);
             coordinators = dao.getCoordJobs();
-        } catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("fail getting coordinators", ex);
             response.setException(EagleExceptionWrapper.wrap(ex));
         }
