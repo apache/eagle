@@ -28,6 +28,7 @@ import java.util.List;
 
 public class StreamGroup {
 
+    private boolean dedicated; 
     private List<StreamPartition> streamPartitions = new ArrayList<StreamPartition>();
 
     public StreamGroup() {
@@ -41,8 +42,23 @@ public class StreamGroup {
         this.streamPartitions.add(sp);
     }
 
+    public void addStreamPartition(StreamPartition sp, boolean dedicated) {
+        this.dedicated = dedicated;
+        this.streamPartitions.add(sp);
+    }
+
     public void addStreamPartitions(List<StreamPartition> sps) {
         this.streamPartitions.addAll(sps);
+    }
+
+    public void addStreamPartitions(List<StreamPartition> sps, boolean dedicated) {
+        this.dedicated = dedicated;
+        this.streamPartitions.addAll(sps);
+    }
+
+    @JsonIgnore
+    public boolean isDedicated() {
+        return dedicated;
     }
 
     @JsonIgnore
@@ -72,7 +88,7 @@ public class StreamGroup {
 
     @Override
     public String toString() {
-        return String.format("StreamGroup partitions=: %s ", streamPartitions);
+        return String.format("StreamGroup dedicated=: %s partitions=: %s ", dedicated, streamPartitions);
     }
 
 }

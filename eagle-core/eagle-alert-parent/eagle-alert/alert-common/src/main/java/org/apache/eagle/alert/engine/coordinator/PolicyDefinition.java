@@ -42,6 +42,7 @@ public class PolicyDefinition implements Serializable {
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
+    private boolean dedicated;
 
     // runtime configuration for policy, these are user-invisible
     private int parallelismHint = 1;
@@ -106,6 +107,14 @@ public class PolicyDefinition implements Serializable {
         this.partitionSpec.add(par);
     }
 
+    public boolean isDedicated() {
+        return dedicated;
+    }
+
+    public void setDedicated(boolean dedicated) {
+        this.dedicated = dedicated;
+    }
+
     public int getParallelismHint() {
         return parallelismHint;
     }
@@ -125,13 +134,13 @@ public class PolicyDefinition implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(name)
-                .append(inputStreams)
-                .append(outputStreams)
-                .append(definition)
-                .append(partitionSpec)
-                .append(policyStatus)
-                .append(parallelismHint)
+            .append(name)
+            .append(inputStreams)
+            .append(outputStreams)
+            .append(definition)
+            .append(partitionSpec)
+            .append(policyStatus)
+            .append(parallelismHint)
             .build();
     }
 
@@ -154,9 +163,8 @@ public class PolicyDefinition implements Serializable {
             && (another.definition != null && another.definition.equals(this.definition))
             && Objects.equals(this.definition, another.definition)
             && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
-                && another.policyStatus.equals(this.policyStatus)
-                && another.parallelismHint == this.parallelismHint
-            ) {
+            && another.policyStatus.equals(this.policyStatus)
+            && another.parallelismHint == this.parallelismHint) {
             return true;
         }
         return false;
