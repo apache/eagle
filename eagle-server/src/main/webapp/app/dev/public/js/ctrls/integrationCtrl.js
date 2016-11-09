@@ -92,12 +92,18 @@
 			Site.getPromise().then(function () {
 				$scope.site = Site.find($wrapState.param.id);
 				var uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "descriptor.type");
-				$scope.applicationList = $.map($scope.site.applicationList, function (app) {
-					app.installed = true;
-					return app;
-				}).concat($.map(uninstalledApplicationList, function (oriApp) {
-					return { origin: oriApp };
-				}));
+				$scope.applicationList = common.array.doSort(
+					$.map($scope.site.applicationList, function (app) {
+						app.installed = true;
+						return app;
+					}), ["origin", "name"]
+				).concat(
+					common.array.doSort(
+						$.map(uninstalledApplicationList, function (oriApp) {
+							return {origin: oriApp};
+						}), ["origin", "name"]
+					)
+				);
 			});
 		}
 		mapApplications();
@@ -261,10 +267,11 @@
 			$scope.installLock = true;
 
 			var uuid = $scope.tmpApp.uuid;
-			delete $scope.tmpApp.uuid;
+			var app = $.extend({}, $scope.tmpApp);
+			delete app.uuid;
 
 			if(uuid) {
-				Entity.create("apps/" + uuid, $scope.tmpApp)._then(function () {
+				Entity.create("apps/" + uuid, app)._then(function () {
 					refreshApplications();
 					$("#installMDL").modal("hide");
 				}, function (res) {
@@ -275,7 +282,7 @@
 					$scope.installLock = false;
 				});
 			} else {
-				Entity.create("apps/install", $scope.tmpApp)._then(function () {
+				Entity.create("apps/install", app)._then(function () {
 					refreshApplications();
 					$("#installMDL").modal("hide");
 				}, function (res) {
