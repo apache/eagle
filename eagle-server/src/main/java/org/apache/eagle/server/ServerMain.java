@@ -16,12 +16,15 @@
  */
 package org.apache.eagle.server;
 
+import org.apache.eagle.common.Version;
+
+import java.util.Date;
+
 public class ServerMain {
     public static void main(String[] args) {
         System.out.println(
-              "----------------------------\n"
-            + " Apache Eagle™ (Incubating)\n"
-            + "----------------------------"
+            "\nApache Eagle™ v" + Version.version + ": "
+            + "built with git revision " + Version.gitRevision + " by " + Version.userName + " on " + new Date(Long.parseLong(Version.timestamp))
         );
         System.out.println("\nStarting Eagle Server ...\n");
         try {
