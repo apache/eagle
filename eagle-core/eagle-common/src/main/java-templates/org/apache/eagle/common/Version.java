@@ -41,9 +41,9 @@ public final class Version {
             p.load(resourceAsStream);
             gitRevision = p.getProperty("revision", "unknown");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(),e);
         } finally {
-            LOG.info("Eagle {} {}",Version.version, new Date(Long.parseLong(Version.timestamp)));
+            LOG.info("Eagle {} {}",Version.version, DateTimeUtil.millisecondsToHumanDateWithSeconds(Long.parseLong(Version.timestamp)));
         }
     }
 
