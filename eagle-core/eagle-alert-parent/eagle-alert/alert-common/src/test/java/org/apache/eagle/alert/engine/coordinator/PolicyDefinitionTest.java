@@ -117,4 +117,24 @@ public class PolicyDefinitionTest {
         Assert.assertTrue(pd.hashCode() == pd1.hashCode());//problem  equals() and hashCode() be inconsistent
 
     }
+
+    @Test
+    public void testPolicyDefinitionEqualByPolicyStatus() {
+        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
+        PolicyDefinition policy1 = new PolicyDefinition();
+        policy1.setName("policy1");
+        policy1.setDefinition(definition);
+
+        PolicyDefinition policy2 = new PolicyDefinition();
+        policy2.setName("policy1");
+        policy2.setPolicyStatus(PolicyDefinition.PolicyStatus.DISABLED);
+        policy2.setDefinition(definition);
+
+        PolicyDefinition policy3 = new PolicyDefinition();
+        policy3.setName("policy1");
+        policy3.setDefinition(definition);
+
+        Assert.assertTrue(policy1.equals(policy3));
+        Assert.assertFalse(policy1.equals(policy2));
+    }
 }

@@ -25,6 +25,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class StreamEventTest {
@@ -147,5 +148,44 @@ public class StreamEventTest {
         Object[] values = streamEvent.getData(streamDefinition, "value", "host");
         Assert.assertEquals(10.0, values[0]);
         Assert.assertEquals(1, values[1]);
+    }
+
+    @Test
+    public void testStreamEventEqual() {
+        Long timestamp = System.currentTimeMillis();
+        StreamEvent event1 = mockSimpleStreamEvent(timestamp);
+        StreamEvent event2 = mockSimpleStreamEvent(timestamp);
+        StreamEvent event3 = event2.copy();
+        Assert.assertEquals(event1, event2);
+        Assert.assertEquals(event2, event3);
+    }
+
+    private static StreamEvent mockSimpleStreamEvent(Long timestamp) {
+        return StreamEvent.builder()
+                .schema(mockStreamDefinition("sampleStream_1"))
+                .streamId("sampleStream_1")
+                .timestamep(timestamp)
+                .attributes(new HashMap<String, Object>() {{
+                    put("name", "cpu");
+                    put("value", 60.0);
+                    put("unknown", "unknown column value");
+                }}).build();
+    }
+
+    private static StreamDefinition mockStreamDefinition(String streamId) {
+        StreamDefinition sampleStreamDefinition = new StreamDefinition();
+        List<StreamColumn> streamColumns = new ArrayList<>();
+        streamColumns.add(new StreamColumn.Builder().name("name").type(StreamColumn.Type.STRING).build());
+        streamColumns.add(new StreamColumn.Builder().name("host").type(StreamColumn.Type.STRING).build());
+        streamColumns.add(new StreamColumn.Builder().name("flag").type(StreamColumn.Type.BOOL).build());
+        streamColumns.add(new StreamColumn.Builder().name("timestamp").type(StreamColumn.Type.LONG).build());
+        streamColumns.add(new StreamColumn.Builder().name("value").type(StreamColumn.Type.DOUBLE).build());
+
+        sampleStreamDefinition.setStreamId(streamId);
+        sampleStreamDefinition.setTimeseries(true);
+        sampleStreamDefinition.setValidate(true);
+        sampleStreamDefinition.setDescription("Schema for " + streamId);
+        sampleStreamDefinition.setColumns(streamColumns);
+        return sampleStreamDefinition;
     }
 }
