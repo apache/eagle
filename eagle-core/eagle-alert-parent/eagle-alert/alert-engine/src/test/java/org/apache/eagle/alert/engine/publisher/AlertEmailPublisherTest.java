@@ -20,6 +20,7 @@ import com.dumbster.smtp.SimpleSmtpServer;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.publisher.email.AlertEmailConstants;
 import org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher;
 import org.junit.*;
 import org.slf4j.Logger;
@@ -32,18 +33,21 @@ import java.util.Map;
 public class AlertEmailPublisherTest {
     private static final String EMAIL_PUBLISHER_TEST_POLICY = "EMAIL_PUBLISHER_TEST_POLICY";
     private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPublisherTest.class);
+    private static final int SMTP_PORT = 5025;
     private Config config;
     private SimpleSmtpServer server;
 
     @Before
     public void setUp(){
         config = ConfigFactory.load();
-        server = SimpleSmtpServer.start();
+        server = SimpleSmtpServer.start(SMTP_PORT);
     }
 
     @After
     public void clear(){
-        server.stop();
+        if(server!=null) {
+            server.stop();
+        }
     }
 
     @Test
@@ -53,6 +57,8 @@ public class AlertEmailPublisherTest {
         properties.put(PublishConstants.SUBJECT,"EMAIL_PUBLISHER_TEST_POLICY_ALERT");
         properties.put(PublishConstants.SENDER,"eagle@localhost");
         properties.put(PublishConstants.RECIPIENTS,"somebody@localhost");
+        properties.put(AlertEmailConstants.CONF_MAIL_HOST,"localhost");
+        properties.put(AlertEmailConstants.CONF_MAIL_PORT,String.valueOf(SMTP_PORT));
         Publishment publishment = new Publishment();
         publishment.setName("testEmailPublishment");
         publishment.setType(org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher.class.getName());
