@@ -109,6 +109,49 @@
                     <failsOnError>true</failsOnError>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>1</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                            <goal>create-metadata</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <format>{0,number}</format>
+                    <items>
+                        <item>buildNumber</item>
+                    </items>
+                    <attach>false</attach>
+                    <addOutputDirectoryToResources>true</addOutputDirectoryToResources>
+                    <doCheck>true</doCheck>
+                    <doUpdate>true</doUpdate>
+                    <properties>
+                        <buildNumber>${buildNumber}</buildNumber>
+                        <userName>${user.name}</userName>
+                    </properties>
+                    <useLastCommittedRevision>false</useLastCommittedRevision>
+                    <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>filtering-java-templates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

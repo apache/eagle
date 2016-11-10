@@ -28,11 +28,12 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.common.Version;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
-import org.apache.eagle.server.managedtask.ApplicationTask;
+import org.apache.eagle.server.task.ApplicationTask;
 import org.apache.eagle.server.module.GuiceBundleLoader;
 
 import javax.servlet.DispatcherType;
@@ -69,11 +70,12 @@ class ServerApplication extends Application<ServerConfig> {
 
         BeanConfig swaggerConfig = new BeanConfig();
         swaggerConfig.setTitle(ServerConfig.getServerName());
-        swaggerConfig.setVersion(ServerConfig.getServerVersion());
+        swaggerConfig.setVersion(ServerConfig.getServerVersion().version);
         swaggerConfig.setBasePath(ServerConfig.getApiBasePath());
         swaggerConfig.setResourcePackage(ServerConfig.getResourcePackage());
         swaggerConfig.setLicense(ServerConfig.getLicense());
         swaggerConfig.setLicenseUrl(ServerConfig.getLicenseUrl());
+        swaggerConfig.setDescription(Version.str());
         swaggerConfig.setScan(true);
 
         // Simple CORS filter
