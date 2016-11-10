@@ -28,7 +28,6 @@ import org.apache.eagle.alert.engine.spark.model.*;
 import org.apache.eagle.alert.engine.utils.SpecUtils;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.streaming.kafka.HasOffsetRanges;

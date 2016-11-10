@@ -57,7 +57,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
             if (plugin != null) {
                 publishPluginMapping.put(publishment.getName(), plugin);
-                addPublishmentPolicies(policyPublishPluginMapping, publishment.getPolicyIds(), publishment.getName());
+                addPublishmentPoliciesStreams(psPublishPluginMapping, publishment.getPolicyIds(), new ArrayList<>(), publishment.getName());
             } else {
                 LOG.error("Initialized alertPublisher {} failed due to invalid format", publishment);
             }
