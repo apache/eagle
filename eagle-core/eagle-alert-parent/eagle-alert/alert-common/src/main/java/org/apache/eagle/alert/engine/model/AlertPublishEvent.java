@@ -30,7 +30,7 @@ public class AlertPublishEvent {
     private String policyId;
     private String policyValue;
     private long alertTimestamp;
-    private Map<String, String> alertData;
+    private Map<String, Object> alertData;
 
     public static final String SITE_ID_KEY = "siteId";
     public static final String APP_IDS_KEY = "appIds";
@@ -85,11 +85,11 @@ public class AlertPublishEvent {
         this.policyId = policyId;
     }
 
-    public Map<String, String> getAlertData() {
+    public Map<String, Object> getAlertData() {
         return alertData;
     }
 
-    public void setAlertData(Map<String, String> alertData) {
+    public void setAlertData(Map<String, Object> alertData) {
         this.alertData = alertData;
     }
 

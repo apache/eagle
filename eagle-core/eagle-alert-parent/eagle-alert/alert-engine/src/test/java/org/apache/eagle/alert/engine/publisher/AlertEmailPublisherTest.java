@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AlertEmailPublisherTest {
-    private static final String EMAIL_PUBLISHER_TEST_POLICY = "EMAIL_PUBLISHER_TEST_POLICY";
+    private static final String EMAIL_PUBLISHER_TEST_POLICY = "Test Policy Alert";
     private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPublisherTest.class);
     private static final int SMTP_PORT = 5025;
     private Config config;
@@ -54,7 +54,7 @@ public class AlertEmailPublisherTest {
     public void testAlertEmailPublisher() throws Exception {
         AlertEmailPublisher publisher = new AlertEmailPublisher();
         Map<String, Object> properties = new HashMap<>();
-        properties.put(PublishConstants.SUBJECT,"EMAIL_PUBLISHER_TEST_POLICY_ALERT");
+        properties.put(PublishConstants.SUBJECT,EMAIL_PUBLISHER_TEST_POLICY);
         properties.put(PublishConstants.SENDER,"eagle@localhost");
         properties.put(PublishConstants.RECIPIENTS,"somebody@localhost");
         properties.put(AlertEmailConstants.CONF_MAIL_HOST,"localhost");

@@ -20,10 +20,13 @@
  */
 package org.apache.eagle.alert.engine.publisher.email;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 
+import org.apache.eagle.common.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,10 @@ public class AlertEmailGenerator {
     private String sender;
     private String recipients;
     private String subject;
+
+    private String serverHost = "localhost";
+    private int serverPort = 80;
+
     private Map<String, Object> properties;
 
     private ThreadPoolExecutor executorPool;
@@ -86,13 +93,51 @@ public class AlertEmailGenerator {
         return status;
     }
 
+    /**
+     * TODO Support template-based alert message.
+     */
+    private String renderAlertMessage(AlertStreamEvent event) {
+        return String.format("Alert policy \"%s\" was triggered: %s",event.getPolicyId(), generateAlertDataDesc(event));
+    }
+
+    private String generateAlertDataDesc(AlertStreamEvent event) {
+        if (event.getDataMap() == null) {
+            return "N/A";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String,Object> entry : event.getDataMap().entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
+        }
+        return sb.toString();
+    }
+
     private Map<String, String> buildAlertContext(AlertStreamEvent event) {
         Map<String, String> alertContext = new HashMap<>();
-        alertContext.put(PublishConstants.ALERT_EMAIL_MESSAGE, event.toString());
-        alertContext.put(PublishConstants.ALERT_EMAIL_POLICY, event.getPolicyId());
+        alertContext.put(PublishConstants.ALERT_EMAIL_MESSAGE, renderAlertMessage(event));
+        alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_ID, event.getPolicyId());
+        alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_ID, event.getAlertId());
+        alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA, event.getDataMap().toString());
+        alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA_DESC, generateAlertDataDesc(event));
         alertContext.put(PublishConstants.ALERT_EMAIL_TIMESTAMP, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()));
-        alertContext.put(PublishConstants.ALERT_EMAIL_STREAM, event.getStreamId());
+        alertContext.put(PublishConstants.ALERT_EMAIL_STREAM_ID, event.getStreamId());
         alertContext.put(PublishConstants.ALERT_EMAIL_CREATOR, event.getCreatedBy());
+        alertContext.put(PublishConstants.ALERT_EMAIL_VERSION, Version.version);
+
+        String rootUrl = this.getServerPort() == 80 ? String.format("http://%s",this.getServerHost())
+            : String.format("http://%s:%s",this.getServerHost(), this.getServerPort());
+        try {
+            alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DETAIL_URL,
+                String.format("%s/#/alert/detail/%s", rootUrl, URIUtil.encodeQuery(event.getAlertId(),"UTF-8")));
+            alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_DETAIL_URL,
+                String.format("%s/#/policy/detail/%s",rootUrl, URIUtil.encodeQuery(event.getPolicyId(),"UTF-8")));
+        } catch (URIException e) {
+            LOG.warn(e.getMessage(),e);
+            alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DETAIL_URL,
+                String.format("%s/#/alert/detail/%s", rootUrl, event.getAlertId()));
+            alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_DETAIL_URL,
+                String.format("%s/#/policy/detail/%s",rootUrl, event.getPolicyId()));
+        }
+        alertContext.put(PublishConstants.ALERT_EMAIL_HOME_URL,rootUrl);
         return alertContext;
     }
 
@@ -138,5 +183,21 @@ public class AlertEmailGenerator {
 
     public void setExecutorPool(ThreadPoolExecutor executorPool) {
         this.executorPool = executorPool;
+    }
+
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    public void setServerHost(String serverHost) {
+        this.serverHost = serverHost;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 }

@@ -101,15 +101,15 @@ public class AlertStreamEvent extends StreamEvent {
         this.createdTime = createdTime;
     }
 
-    public Map<String, String> getDataMap() {
-        Map<String, String> event = new HashMap<>();
+    public Map<String, Object> getDataMap() {
+        Map<String, Object> event = new HashMap<>();
         for (StreamColumn column : schema.getColumns()) {
             Object obj = this.getData()[schema.getColumnIndex(column.getName())];
             if (obj == null) {
                 event.put(column.getName(), null);
                 continue;
             }
-            event.put(column.getName(), obj.toString());
+            event.put(column.getName(), obj);
         }
         return event;
     }
