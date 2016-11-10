@@ -75,11 +75,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
-        if (size <= 0) {
-            return handler.list(AlertPublishEvent.class);
-        } else {
-            return handler.listSubset(AlertPublishEvent.class, size);
+        List<AlertPublishEvent> result = handler.list(AlertPublishEvent.class);
+        if (size < 0 || size > result.size()) {
+            size = result.size();
         }
+        return result.subList(result.size() - size, result.size());
     }
 
     @Override
@@ -88,10 +88,13 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId) {
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId, int size) {
         List<AlertPublishEvent> alerts = handler.list(AlertPublishEvent.class);
+        if (size < 0 || size > alerts.size()) {
+            size = alerts.size();
+        }
         List<AlertPublishEvent> result = alerts.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
-        return result;
+        return result.subList(result.size() - size, result.size());
     }
 
     @Override
