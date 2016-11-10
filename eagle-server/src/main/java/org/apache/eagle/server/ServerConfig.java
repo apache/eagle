@@ -19,12 +19,12 @@ package org.apache.eagle.server;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Configuration;
+import org.apache.eagle.common.Version;
 import org.apache.eagle.server.authentication.config.AuthenticationSettings;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ServerConfig extends Configuration {
     private static final String SERVER_NAME = "Apache Eagle";
-    private static final String SERVER_VERSION = "0.5.0-incubating";
     private static final String API_BASE_PATH = "/rest/*";
     private static final String CONTEXT_PATH = "/";
     private static final String RESOURCE_PACKAGE = "org.apache.eagle";
@@ -47,12 +47,12 @@ public class ServerConfig extends Configuration {
         this.auth = auth;
     }
 
-    static String getServerName() {
+    public static String getServerName() {
         return SERVER_NAME;
     }
 
-    static String getServerVersion() {
-        return SERVER_VERSION;
+    public static ServerVersion getServerVersion() {
+        return ServerVersion.CURRENT;
     }
 
     static String getApiBasePath() {
@@ -73,5 +73,19 @@ public class ServerConfig extends Configuration {
 
     static String getLicenseUrl() {
         return LICENSE_URL;
+    }
+
+    public static final class ServerVersion {
+        public final String name = SERVER_NAME;
+        public final String version = Version.version;
+        public final String buildNumber = Version.buildNumber;
+        public final String gitRevision = Version.gitRevision;
+        public final String userName = Version.userName;
+        public final String timestamp = Version.timestamp;
+        public final String description = Version.str();
+
+        private ServerVersion(){}
+
+        private static final ServerVersion CURRENT = new ServerVersion();
     }
 }
