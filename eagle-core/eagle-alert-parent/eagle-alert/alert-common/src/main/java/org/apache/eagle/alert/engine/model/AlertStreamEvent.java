@@ -22,10 +22,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * streamId stands for alert type instead of source event streamId.
@@ -33,6 +30,7 @@ import java.util.Map;
 public class AlertStreamEvent extends StreamEvent {
     private static final long serialVersionUID = 2392131134670106397L;
 
+    private String alertId;
     private String policyId;
     private StreamDefinition schema;
     private String createdBy;
@@ -44,6 +42,7 @@ public class AlertStreamEvent extends StreamEvent {
     }
 
     public AlertStreamEvent(AlertStreamEvent event) {
+        this.alertId = event.getAlertId();
         this.policyId = event.policyId;
         this.schema = event.schema;
         this.createdBy = event.createdBy;
@@ -123,4 +122,13 @@ public class AlertStreamEvent extends StreamEvent {
         this.extraData = extraData;
     }
 
+    public String getAlertId() {
+        return alertId;
+    }
+
+    public void ensureAlertId() {
+        if (this.alertId == null) {
+            this.alertId = UUID.randomUUID().toString();
+        }
+    }
 }

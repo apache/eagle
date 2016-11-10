@@ -22,6 +22,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
+import org.junit.Assert;
 
 import java.util.Arrays;
 
@@ -42,6 +43,8 @@ public class AlertPublisherTestHelper {
         event.setTimestamp(System.currentTimeMillis());
         event.setCreatedTime(System.currentTimeMillis());
         event.setData(data);
+        event.ensureAlertId();
+        Assert.assertNotNull(event.getAlertId());
         return event;
     }
 
