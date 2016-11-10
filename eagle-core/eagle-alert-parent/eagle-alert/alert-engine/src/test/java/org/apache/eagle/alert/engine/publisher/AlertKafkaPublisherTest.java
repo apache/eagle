@@ -16,12 +16,7 @@
  */
 package org.apache.eagle.alert.engine.publisher;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
@@ -31,6 +26,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher;
+import org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -50,7 +46,9 @@ import kafka.message.MessageAndMetadata;
 public class AlertKafkaPublisherTest {
 
     private static final String TEST_TOPIC_NAME = "test";
-
+    private static final String TEST_POLICY_ID = "testPolicy";
+    private static final int TEST_KAFKA_BROKER_PORT = 59092;
+    private static final int TEST_KAFKA_ZOOKEEPER_PORT = 52181;
     private static KafkaEmbedded kafka;
     private static Config config;
 
@@ -58,11 +56,9 @@ public class AlertKafkaPublisherTest {
 
     @BeforeClass
     public static void setup() {
-        kafka = new KafkaEmbedded(9092, 2181);
-
+        kafka = new KafkaEmbedded(TEST_KAFKA_BROKER_PORT, TEST_KAFKA_ZOOKEEPER_PORT);
         System.setProperty("config.resource", "/simple/application-integration.conf");
         config = ConfigFactory.load();
-
         consumeWithOutput(outputMessages);
     }
 
@@ -75,12 +71,9 @@ public class AlertKafkaPublisherTest {
 
     @Test
     public void testAsync() throws Exception {
-        StreamDefinition stream = createStream();
-        PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
-
         AlertKafkaPublisher publisher = new AlertKafkaPublisher();
         Map<String, Object> properties = new HashMap<>();
-        properties.put(PublishConstants.BROKER_LIST, "localhost:9092");
+        properties.put(PublishConstants.BROKER_LIST, "localhost:" + TEST_KAFKA_BROKER_PORT);
         properties.put(PublishConstants.TOPIC, TEST_TOPIC_NAME);
         
         List<Map<String, Object>> kafkaClientConfig = new ArrayList<Map<String, Object>>();
@@ -92,62 +85,48 @@ public class AlertKafkaPublisherTest {
 
         Publishment publishment = new Publishment();
         publishment.setName("testAsyncPublishment");
-        publishment.setType("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
-        publishment.setPolicyIds(Arrays.asList(policy.getName()));
+        publishment.setType(org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher.class.getName());
+        publishment.setPolicyIds(Arrays.asList(TEST_POLICY_ID));
         publishment.setDedupIntervalMin("PT0M");
-        publishment.setSerializer("org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer");
+        publishment.setSerializer(org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer.class.getName());
         publishment.setProperties(properties);
         
         Map<String, String> conf = new HashMap<String, String>();
         publisher.init(config, publishment, conf);
 
-        AlertStreamEvent event = createEvent(stream, policy,
-            new Object[] {System.currentTimeMillis(), "host1", "testPolicy-host1-01", "open", 0, 0});
+        AlertStreamEvent event = AlertPublisherTestHelper.mockEvent(TEST_POLICY_ID);
 
         outputMessages.clear();
 
         publisher.onAlert(event);
         Thread.sleep(3000);
-
         Assert.assertEquals(1, outputMessages.size());
-
         publisher.close();
     }
 
     @Test
     public void testSync() throws Exception {
-        StreamDefinition stream = createStream();
-        PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
-
         AlertKafkaPublisher publisher = new AlertKafkaPublisher();
         Map<String, Object> properties = new HashMap<>();
-        properties.put(PublishConstants.BROKER_LIST, "localhost:9092");
+        properties.put(PublishConstants.BROKER_LIST, "localhost:" + TEST_KAFKA_BROKER_PORT);
         properties.put(PublishConstants.TOPIC, TEST_TOPIC_NAME);
-
         List<Map<String, Object>> kafkaClientConfig = new ArrayList<Map<String, Object>>();
         kafkaClientConfig.add(ImmutableMap.of("name", "producer.type", "value", "sync"));
         properties.put("kafka_client_config", kafkaClientConfig);
-        
         Publishment publishment = new Publishment();
         publishment.setName("testAsyncPublishment");
-        publishment.setType("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
-        publishment.setPolicyIds(Arrays.asList(policy.getName()));
+        publishment.setType(org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher.class.getName());
+        publishment.setPolicyIds(Collections.singletonList(TEST_POLICY_ID));
         publishment.setDedupIntervalMin("PT0M");
-        publishment.setSerializer("org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer");
+        publishment.setSerializer(JsonEventSerializer.class.getName());
         publishment.setProperties(properties);
-        Map<String, String> conf = new HashMap<String, String>();
+        Map<String, String> conf = new HashMap<>();
         publisher.init(config, publishment, conf);
-
-        AlertStreamEvent event = createEvent(stream, policy,
-            new Object[] {System.currentTimeMillis(), "host1", "testPolicy-host1-01", "open", 0, 0});
-
+        AlertStreamEvent event = AlertPublisherTestHelper.mockEvent(TEST_POLICY_ID);
         outputMessages.clear();
-
         publisher.onAlert(event);
         Thread.sleep(3000);
-
         Assert.assertEquals(1, outputMessages.size());
-
         publisher.close();
     }
 
@@ -157,7 +136,7 @@ public class AlertKafkaPublisherTest {
             public void run() {
                 Properties props = new Properties();
                 props.put("group.id", "B");
-                props.put("zookeeper.connect", "127.0.0.1:2181");
+                props.put("zookeeper.connect", "127.0.0.1:" + + TEST_KAFKA_ZOOKEEPER_PORT);
                 props.put("zookeeper.session.timeout.ms", "4000");
                 props.put("zookeeper.sync.time.ms", "2000");
                 props.put("auto.commit.interval.ms", "1000");
@@ -190,71 +169,5 @@ public class AlertKafkaPublisherTest {
         t.start();
     }
 
-    private AlertStreamEvent createEvent(StreamDefinition stream, PolicyDefinition policy, Object[] data) {
-        AlertStreamEvent event = new AlertStreamEvent();
-        event.setPolicyId(policy.getName());
-        event.setSchema(stream);
-        event.setStreamId(stream.getStreamId());
-        event.setTimestamp(System.currentTimeMillis());
-        event.setCreatedTime(System.currentTimeMillis());
-        event.setData(data);
-        return event;
-    }
-
-    private StreamDefinition createStream() {
-        StreamDefinition sd = new StreamDefinition();
-        StreamColumn tsColumn = new StreamColumn();
-        tsColumn.setName("timestamp");
-        tsColumn.setType(StreamColumn.Type.LONG);
-
-        StreamColumn hostColumn = new StreamColumn();
-        hostColumn.setName("host");
-        hostColumn.setType(StreamColumn.Type.STRING);
-
-        StreamColumn alertKeyColumn = new StreamColumn();
-        alertKeyColumn.setName("alertKey");
-        alertKeyColumn.setType(StreamColumn.Type.STRING);
-
-        StreamColumn stateColumn = new StreamColumn();
-        stateColumn.setName("state");
-        stateColumn.setType(StreamColumn.Type.STRING);
-
-        // dedupCount, dedupFirstOccurrence
-
-        StreamColumn dedupCountColumn = new StreamColumn();
-        dedupCountColumn.setName("dedupCount");
-        dedupCountColumn.setType(StreamColumn.Type.LONG);
-
-        StreamColumn dedupFirstOccurrenceColumn = new StreamColumn();
-        dedupFirstOccurrenceColumn.setName(DedupCache.DEDUP_FIRST_OCCURRENCE);
-        dedupFirstOccurrenceColumn.setType(StreamColumn.Type.LONG);
-
-        sd.setColumns(Arrays.asList(tsColumn, hostColumn, alertKeyColumn, stateColumn, dedupCountColumn,
-            dedupFirstOccurrenceColumn));
-        sd.setDataSource("testDatasource");
-        sd.setStreamId("testStream");
-        sd.setDescription("test stream");
-        return sd;
-    }
-
-    private PolicyDefinition createPolicy(String streamName, String policyName) {
-        PolicyDefinition pd = new PolicyDefinition();
-        PolicyDefinition.Definition def = new PolicyDefinition.Definition();
-        // expression, something like "PT5S,dynamic,1,host"
-        def.setValue("test");
-        def.setType("siddhi");
-        pd.setDefinition(def);
-        pd.setInputStreams(Arrays.asList("inputStream"));
-        pd.setOutputStreams(Arrays.asList("outputStream"));
-        pd.setName(policyName);
-        pd.setDescription(String.format("Test policy for stream %s", streamName));
-
-        StreamPartition sp = new StreamPartition();
-        sp.setStreamId(streamName);
-        sp.setColumns(Arrays.asList("host"));
-        sp.setType(StreamPartition.Type.GROUPBY);
-        pd.addPartition(sp);
-        return pd;
-    }
 
 }
