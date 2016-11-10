@@ -27,21 +27,21 @@ public class EmbeddedHbase {
     private HBaseTestingUtility util;
     private MiniHBaseCluster hbaseCluster;
     private static EmbeddedHbase hbase;
-    private int port;    
+    private int port;
     private String znode;
     private static int DEFAULT_PORT = 2181;
     private static String DEFAULT_ZNODE = "/hbase-unsecure";
     private static final Logger LOG = LoggerFactory.getLogger(EmbeddedHbase.class);
-    
+
     private EmbeddedHbase(int port, String znode) {
         this.port = port;
         this.znode = znode;
     }
-    
+
     private EmbeddedHbase(int port) {
         this(port, DEFAULT_ZNODE);
     }
-    
+
     public static EmbeddedHbase getInstance(Configuration conf) {
         if (hbase == null) {
             synchronized (EmbeddedHbase.class) {
@@ -55,7 +55,7 @@ public class EmbeddedHbase {
     }
 
     public static EmbeddedHbase getInstance() {
-        return  getInstance(null);
+        return getInstance(null);
     }
 
     private EmbeddedHbase() {
@@ -70,7 +70,7 @@ public class EmbeddedHbase {
         try {
             util = new HBaseTestingUtility();
             Configuration conf = util.getConfiguration();
-            if(confMap != null) {
+            if (confMap != null) {
                 conf.addResource(confMap);
             }
             conf.setInt("test.hbase.zookeeper.property.clientPort", port);
@@ -81,29 +81,29 @@ public class EmbeddedHbase {
             // start mini hbase cluster
             hbaseCluster = util.startMiniCluster();
             Configuration config = hbaseCluster.getConf();
-            
+
             config.set("zookeeper.session.timeout", "120000");
             config.set("hbase.zookeeper.property.tickTime", "6000");
             config.set(HConstants.HBASE_CLIENT_PAUSE, "3000");
             config.set(HConstants.HBASE_CLIENT_RETRIES_NUMBER, "1");
             config.set(HConstants.HBASE_CLIENT_OPERATION_TIMEOUT, "60000");
-            
+
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     shutdown();
                 }
-            }); 
+            });
         } catch (Throwable t) {
-            LOG.error("Got an exception: ",t);
+            LOG.error("Got an exception: ", t);
         }
     }
 
-    public void shutdown() {        
+    public void shutdown() {
         try {
             util.shutdownMiniCluster();
         } catch (Throwable t) {
-            LOG.info("Got an exception, " + t , t.getCause());
+            LOG.info("Got an exception, " + t, t.getCause());
             try {
                 util.shutdownMiniCluster();
             } catch (Throwable t1) {
@@ -111,15 +111,15 @@ public class EmbeddedHbase {
             }
         }
     }
-    
+
     public void createTable(String tableName, String cf) {
-        try {            
+        try {
             util.createTable(tableName, cf);
         } catch (Exception ex) {
             LOG.warn("Create table failed, probably table already existed, table name: " + tableName);
         }
     }
-    
+
     public void deleteTable(String tableName) {
         try {
             util.deleteTable(tableName);

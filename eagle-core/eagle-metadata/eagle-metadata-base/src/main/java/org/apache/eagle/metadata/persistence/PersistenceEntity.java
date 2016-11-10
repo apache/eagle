@@ -21,18 +21,18 @@ import org.apache.eagle.metadata.utils.UUIDGenerator;
 import java.io.Serializable;
 
 /**
- * Metadata Persistence Entity
+ * Metadata Persistence Entity.
  */
-public abstract class PersistenceEntity implements Serializable{
+public abstract class PersistenceEntity implements Serializable {
     private String uuid;
     private long createdTime;
     private long modifiedTime;
 
-    public String getUuid(){
+    public String getUuid() {
         return this.uuid;
     }
 
-    public void setUuid(String uuid){
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
@@ -52,11 +52,11 @@ public abstract class PersistenceEntity implements Serializable{
         this.modifiedTime = modifiedTime;
     }
 
-    public void ensureDefault(){
-        if(this.uuid == null || this.uuid.isEmpty()){
+    public void ensureDefault() {
+        if (this.uuid == null || this.uuid.isEmpty()) {
             this.uuid = UUIDGenerator.newUUID();
         }
-        if(createdTime == 0){
+        if (createdTime == 0) {
             this.createdTime = System.currentTimeMillis();
         }
         this.modifiedTime = System.currentTimeMillis();

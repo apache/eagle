@@ -106,7 +106,7 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
 
     @Override
     public ApplicationEntity update(ApplicationEntity entity) {
-        Preconditions.checkNotNull(entity.getUuid(),"UUID");
+        Preconditions.checkNotNull(entity.getUuid(), "UUID");
         ApplicationEntity origin = getByUUID(entity.getUuid());
         origin.updateMutable(entity);
         return origin;

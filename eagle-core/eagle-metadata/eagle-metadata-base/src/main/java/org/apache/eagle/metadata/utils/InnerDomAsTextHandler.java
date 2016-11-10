@@ -33,12 +33,12 @@ public abstract class InnerDomAsTextHandler implements DomHandler<String, Stream
     /**
      * Default constructor.
      *
-     * It is up to a JAXB provider to decide which DOM implementation
+     * <p>It is up to a JAXB provider to decide which DOM implementation
      * to use or how that is configured.
      */
     public InnerDomAsTextHandler(String tagName) {
-        this.startTag = String.format("<%s>",tagName);
-        this.endTag = String.format("</%s>",tagName);
+        this.startTag = String.format("<%s>", tagName);
+        this.endTag = String.format("</%s>", tagName);
     }
 
     @Override
@@ -59,7 +59,7 @@ public abstract class InnerDomAsTextHandler implements DomHandler<String, Stream
         try {
             StringReader xmlReader = new StringReader(n);
             return new StreamSource(xmlReader);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

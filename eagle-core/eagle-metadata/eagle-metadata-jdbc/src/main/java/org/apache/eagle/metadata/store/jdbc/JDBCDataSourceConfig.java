@@ -17,31 +17,29 @@
 package org.apache.eagle.metadata.store.jdbc;
 
 /**
- *
- *
  * Configuration:
  *
- * Prefix: <code>metadata.jdbc.*</code>
+ * <p>Prefix: <code>metadata.jdbc.*</code>
  *
- * <code>
- *     metadata {
- *         jdbc {
- *             username = ""
- *             password = ""
- *             driverClassName = "org.h2.Driver"
- *             url = "jdbc:h2:./eagle"
- *             connectionProperties = "encoding=UTF8"
- *         }
- *     }
+ * <p><code>
+ * metadata {
+ * jdbc {
+ * username = ""
+ * password = ""
+ * driverClassName = "org.h2.Driver"
+ * url = "jdbc:h2:./eagle"
+ * connectionProperties = "encoding=UTF8"
+ * }
+ * }
  * </code>
  *
- * https://commons.apache.org/proper/commons-dbcp/configuration.html
+ * <p>https://commons.apache.org/proper/commons-dbcp/configuration.html
  */
 public class JDBCDataSourceConfig {
-    public final static String CONFIG_PREFIX = "metadata.jdbc";
-    private final static String DEFAULT_DRIVER_CLASS = org.h2.Driver.class.getName();
-    private final static String DEFAULT_CONNECTION_PROPERTIES = "encoding=UTF8";
-    private final static String DEFAULT_URL = "jdbc:h2:./eagle";
+    public static final String CONFIG_PREFIX = "metadata.jdbc";
+    private static final String DEFAULT_DRIVER_CLASS = org.h2.Driver.class.getName();
+    private static final String DEFAULT_CONNECTION_PROPERTIES = "encoding=UTF8";
+    private static final String DEFAULT_URL = "jdbc:h2:./eagle";
 
     private String username;
     private String password;
@@ -92,6 +90,6 @@ public class JDBCDataSourceConfig {
     @Override
     public String toString() {
         return String.format("%s { \n driverClassName=%s \n url=%s \n connectionProperties=%s \n username=%s \n password=*****\n}",
-                CONFIG_PREFIX,driverClassName,url,username,connectionProperties);
+            CONFIG_PREFIX, driverClassName, url, username, connectionProperties);
     }
 }

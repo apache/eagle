@@ -25,19 +25,20 @@ import java.util.Map;
 /**
  * TODO: Refactor metric implementation, which is not very solid.
  *
- * metricKey = metricName[/[key=char|whitespace]*]*
+ * <p>metricKey = metricName[/[key=char|whitespace]*]*
  */
 @Deprecated
 public class MetricKeyCodeDecoder {
-    private final static String SEPERATOR = "/";
+    private static final String SEPERATOR = "/";
+
     public static String codeMetricKey(String metricName, Map<String, String> tags) {
         StringBuilder sb = new StringBuilder();
         sb.append(metricName);
         for (Map.Entry<String, String> entry : tags.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            if(key.contains(SEPERATOR)||value.contains(SEPERATOR)){
-                throw new IllegalStateException("Invalid metric tag pair <"+key+":"+value+"> which contains reserved char: "+SEPERATOR);
+            if (key.contains(SEPERATOR) || value.contains(SEPERATOR)) {
+                throw new IllegalStateException("Invalid metric tag pair <" + key + ":" + value + "> which contains reserved char: " + SEPERATOR);
             }
             sb.append(SEPERATOR).append(key).append(":").append(value);
         }
@@ -45,7 +46,7 @@ public class MetricKeyCodeDecoder {
     }
 
     /**
-     * @param name metricName[/[key=char|whitespace]*]*
+     * @param name metricName[/[key=char|whitespace]*]*.
      * @return
      */
     public static EagleMetricKey decodeMetricKey(String name) {
@@ -55,10 +56,10 @@ public class MetricKeyCodeDecoder {
         metricName.tags = new HashMap<>();
         for (int i = 1; i < parts.length; i++) {
             String[] keyValue = parts[i].split(":");
-            if(keyValue.length >1) {
+            if (keyValue.length > 1) {
                 metricName.tags.put(keyValue[0], keyValue[1]);
             } else {
-                throw new IllegalStateException("Failed to decode metric name '"+name+"', because '"+parts[i]+"' is invalid, expected in format: 'key:value'");
+                throw new IllegalStateException("Failed to decode metric name '" + name + "', because '" + parts[i] + "' is invalid, expected in format: 'key:value'");
             }
         }
         return metricName;

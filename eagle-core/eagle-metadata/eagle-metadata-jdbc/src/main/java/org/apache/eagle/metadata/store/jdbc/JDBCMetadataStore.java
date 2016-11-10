@@ -17,6 +17,7 @@
 package org.apache.eagle.metadata.store.jdbc;
 
 
+import com.google.inject.Singleton;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
 import org.apache.eagle.metadata.persistence.MetadataStore;
@@ -26,8 +27,6 @@ import org.apache.eagle.metadata.store.jdbc.provider.JDBCDataSourceProvider;
 import org.apache.eagle.metadata.store.jdbc.provider.JDBCMetadataStoreConfigProvider;
 import org.apache.eagle.metadata.store.jdbc.service.ApplicationEntityServiceJDBCImpl;
 import org.apache.eagle.metadata.store.jdbc.service.SiteEntityServiceJDBCImpl;
-
-import com.google.inject.Singleton;
 
 import javax.sql.DataSource;
 

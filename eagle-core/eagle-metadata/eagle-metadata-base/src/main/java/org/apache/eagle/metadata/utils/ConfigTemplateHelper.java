@@ -18,7 +18,6 @@ package org.apache.eagle.metadata.utils;
 
 import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.model.Configuration;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +28,16 @@ import java.io.InputStream;
 import java.io.StringReader;
 
 public class ConfigTemplateHelper {
-    private final static Logger LOG = LoggerFactory.getLogger(ConfigTemplateHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigTemplateHelper.class);
+
     public static Configuration unmarshallFromXmlStream(InputStream inputStream) throws JAXBException {
-        Preconditions.checkNotNull(inputStream,"Input stream is null");
+        Preconditions.checkNotNull(inputStream, "Input stream is null");
         try {
             JAXBContext jc = JAXBContext.newInstance(Configuration.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
-            return  (Configuration) unmarshaller.unmarshal(inputStream);
-        }catch (Exception ex){
-            LOG.error("Failed to unmarshall ConfigTemplate from stream",ex);
+            return (Configuration) unmarshaller.unmarshal(inputStream);
+        } catch (Exception ex) {
+            LOG.error("Failed to unmarshall ConfigTemplate from stream", ex);
             throw ex;
         }
     }
@@ -45,13 +45,13 @@ public class ConfigTemplateHelper {
     public static Configuration unmarshallFromResource(String resourceName) throws JAXBException {
         String source = resourceName;
         InputStream inputStream = ConfigTemplateHelper.class.getResourceAsStream(resourceName);
-        if(inputStream == null){
-            source = "/"+resourceName;
-//            LOG.debug("Unable to get resource from {}, retrying with ",resourceName,source);
+        if (inputStream == null) {
+            source = "/" + resourceName;
+            // LOG.debug("Unable to get resource from {}, retrying with ",resourceName,source);
             inputStream = ConfigTemplateHelper.class.getResourceAsStream(source);
         }
         Preconditions.checkNotNull(inputStream, "Unable to load stream from resource " + source);
-        Configuration configuration =  unmarshallFromXmlStream(inputStream);
+        Configuration configuration = unmarshallFromXmlStream(inputStream);
         return configuration;
     }
 
@@ -59,9 +59,9 @@ public class ConfigTemplateHelper {
         try {
             JAXBContext jc = JAXBContext.newInstance(Configuration.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
-            return  (Configuration) unmarshaller.unmarshal(new StringReader(xmlConfiguration));
-        }catch (Exception ex){
-            LOG.error("Failed to unmarshall ConfigTemplate from string",ex);
+            return (Configuration) unmarshaller.unmarshal(new StringReader(xmlConfiguration));
+        } catch (Exception ex) {
+            LOG.error("Failed to unmarshall ConfigTemplate from string", ex);
             throw ex;
         }
     }

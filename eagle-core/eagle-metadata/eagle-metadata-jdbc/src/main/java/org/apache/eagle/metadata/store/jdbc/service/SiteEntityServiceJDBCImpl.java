@@ -17,23 +17,21 @@
 
 package org.apache.eagle.metadata.store.jdbc.service;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.SiteEntityService;
 import org.apache.eagle.metadata.store.jdbc.JDBCMetadataQueryService;
 import org.apache.eagle.metadata.store.jdbc.service.orm.RelationToSiteEntity;
 import org.apache.eagle.metadata.store.jdbc.service.orm.SiteEntityToRelation;
-
-import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.inject.Inject;
 
 
 public class SiteEntityServiceJDBCImpl implements SiteEntityService {

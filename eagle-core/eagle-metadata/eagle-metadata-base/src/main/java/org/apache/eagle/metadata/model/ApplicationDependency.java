@@ -51,6 +51,6 @@ public class ApplicationDependency {
 
     @Override
     public String toString() {
-        return String.format("%s:%s (required: %s)",type,version == null ? "*":version, required);
+        return String.format("%s:%s (required: %s)", type, version == null ? "*" : version, required);
     }
 }

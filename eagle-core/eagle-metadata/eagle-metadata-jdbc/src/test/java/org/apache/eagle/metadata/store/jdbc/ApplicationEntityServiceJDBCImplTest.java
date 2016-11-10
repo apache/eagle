@@ -132,6 +132,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
     public void testGetByUUIDOrAppId() {
         applicationEntityService.getByUUIDOrAppId(null, "fake appid");
     }
+
     @Test
     public void testDelApplicationEntity() {
         SiteEntity siteEntity = new SiteEntity();

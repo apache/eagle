@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.config;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -69,8 +70,8 @@ public class TestConfigBus {
     }
 
     @After
-    public void shutdown() {
-        CloseableUtils.closeQuietly(server);
+    public void shutdown() throws IOException {
+        server.stop();
         producer.close();
         consumer.close();
     }

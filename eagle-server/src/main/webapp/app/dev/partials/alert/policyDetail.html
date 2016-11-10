@@ -54,10 +54,22 @@
 
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
-		<!--li><a href="#statistic" data-toggle="tab">Statistic</a></li>
-		<li><a href="#alerts" data-toggle="tab">Alerts</a></li-->
-		<li class="active"><a href="#setting" data-toggle="tab">Setting</a></li>
-		<li><a href="#assignments" data-toggle="tab">Assignments</a></li>
+		<!--li><a href="#statistic" data-toggle="tab">Statistic</a></li-->
+		<li class="active"><a href="#setting" data-toggle="tab" ng-click="setTab('setting')">Setting</a></li>
+		<li><a href="#assignments" data-toggle="tab" ng-click="setTab('assignments')">Assignments</a></li>
+		<li><a href="#alerts" data-toggle="tab" ng-click="setTab('alerts')">Alerts</a></li>
+		<li class="pull-right box-tools" ng-show="tab === 'alerts'">
+			<div class="btn-group">
+				<button class="btn btn-default btn-sm" ng-class="{active: displayType === 'raw'}"
+						tooltip-append-to-body="true" uib-tooltip="raw data" ng-click="displayType = 'raw'">
+					<i class="fa fa-keyboard-o"></i>
+				</button>
+				<button class="btn btn-default btn-sm" ng-class="{active: displayType === 'format'}"
+						tooltip-append-to-body="true" uib-tooltip="format data" ng-click="displayType = 'format'">
+					<i class="fa fa-list"></i>
+				</button>
+			</div>
+		</li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" id="setting">
@@ -133,8 +145,6 @@
 		</div>
 		<div class="tab-pane" id="statistic">statistic
 		</div>
-		<div class="tab-pane" id="alerts">alerts
-		</div>
 		<div class="tab-pane" id="assignments">
 			<table class="table">
 				<tbody>
@@ -147,7 +157,7 @@
 						<td>{{assignment.queueId}}</td>
 					</tr>
 					<tr>
-						<th class="text-no-break">working Slots</th>
+						<th class="text-no-break" width="120">working Slots</th>
 						<td>
 							<div na-block="queue.workingSlots.length > 0">
 								<ul class="no-margin">
@@ -161,6 +171,41 @@
 					</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="tab-pane" id="alerts">
+			<div sort-table="alertList">
+				<table class="table table-bordered">
+					<thead>
+					<tr>
+						<th sortpath="alertTimestamp" width="135">
+							Alert Time
+							<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done || isSorting"></span>
+						</th>
+						<th>Alert Data</th>
+						<th width="10"></th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>{{Time.format(item.alertTimestamp)}}</td>
+						<td class="text-break">
+							<span ng-if="displayType === 'raw'" na-block="item.alertData"></span>
+							<div ng-if="displayType === 'format'" na-block="!!item.alertData">
+								<ul>
+									<li ng-repeat="(key, value) in item.alertData track by $index">
+										<strong>{{key}}:</strong>
+										{{value}}
+									</li>
+								</ul>
+							</div>
+						</td>
+						<td>
+							<a ui-sref="alertDetail({alertId: item.alertId})">Detail</a>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>

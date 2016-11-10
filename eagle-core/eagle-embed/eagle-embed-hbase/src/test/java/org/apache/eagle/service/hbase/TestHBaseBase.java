@@ -17,8 +17,10 @@
 package org.apache.eagle.service.hbase;
 
 import org.apache.hadoop.conf.Configuration;
-import org.junit.*;
-
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 
 @Ignore
@@ -30,8 +32,8 @@ public class TestHBaseBase {
         hbase = EmbeddedHbase.getInstance();
     }
 
-    public static void setupHBaseWithConfig(Configuration config){
-        Assert.assertTrue("HBase test mini cluster should not start",null == hbase);
+    public static void setupHBaseWithConfig(Configuration config) {
+        Assert.assertTrue("HBase test mini cluster should not start", null == hbase);
         hbase = EmbeddedHbase.getInstance(config);
     }
 

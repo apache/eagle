@@ -21,7 +21,6 @@ import org.apache.eagle.common.function.ThrowableFunction;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
-import org.apache.eagle.metadata.store.jdbc.service.ApplicationEntityServiceJDBCImpl;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +34,7 @@ import java.util.Map;
 public class RelationToApplicationEntity implements ThrowableFunction<ResultSet, ApplicationEntity, SQLException> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RelationToApplicationEntity.class);
+
     @Override
     public ApplicationEntity apply(ResultSet resultSet) throws SQLException {
 

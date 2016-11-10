@@ -354,7 +354,7 @@
 					 * @param {[]} res.data.jobTypes
 					 * @param {[]} res.data.jobCounts
 					 */
-					JPM.jobDistribution($scope.site, $scope.type, DURATION_BUCKETS.join(","), startTime, endTime).then(function (res) {
+					JPM.jobDistribution($scope.site, DURATION_BUCKETS.join(","), startTime, endTime).then(function (res) {
 						var data = res.data;
 						var jobTypes = {};
 						$.each(data.jobTypes, function (i, type) {

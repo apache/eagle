@@ -50,6 +50,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     private final String topic;
     private final PartitionedEventSerializer serializer;
     private int numOfRouterBolts;
+    private boolean logEventEnabled;
 
     private volatile List<StreamRepartitionMetadata> streamRepartitionMetadataList;
     private volatile Tuple2StreamConverter converter;
@@ -67,7 +68,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
                                        String topic,
                                        SpoutSpec spoutSpec,
                                        int numGroupbyBolts,
-                                       Map<String, StreamDefinition> sds, PartitionedEventSerializer serializer) {
+                                       Map<String, StreamDefinition> sds, PartitionedEventSerializer serializer, boolean logEventEnabled) {
         super(delegate);
         this.spout = spout;
         this.delegate = delegate;
@@ -77,6 +78,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
         this.numOfRouterBolts = numGroupbyBolts;
         this.sds = sds;
         this.serializer = serializer;
+        this.logEventEnabled = logEventEnabled;
     }
 
     /**
@@ -118,7 +120,9 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
         }
 
         StreamEvent event = convertToStreamEventByStreamDefinition((Long) convertedTuple.get(2), m, sds.get(streamId));
-        LOG.info("Spout from topic {} emit event: {}", topic, event);
+        if (logEventEnabled) {
+            LOG.info("Spout from topic {} emit event: {}", topic, event);
+        }
         
         /*
             phase 2: stream repartition

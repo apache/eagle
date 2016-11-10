@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -45,7 +46,7 @@ public class StreamSortSpec implements Serializable {
     }
 
     public int getWindowPeriodMillis() {
-        if (windowPeriod != null) {
+        if (StringUtils.isNotBlank(windowPeriod)) {
             return TimePeriodUtils.getMillisecondsOfPeriod(Period.parse(windowPeriod));
         } else {
             return 0;
@@ -76,9 +77,9 @@ public class StreamSortSpec implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(windowPeriod)
-            .append(windowMargin)
-            .toHashCode();
+                .append(windowPeriod)
+                .append(windowMargin)
+                .toHashCode();
     }
 
     @Override
@@ -92,14 +93,14 @@ public class StreamSortSpec implements Serializable {
 
         StreamSortSpec another = (StreamSortSpec) that;
         return
-            another.windowPeriod.equals(this.windowPeriod)
-                && another.windowMargin == this.windowMargin;
+                another.windowPeriod.equals(this.windowPeriod)
+                        && another.windowMargin == this.windowMargin;
     }
 
     @Override
     public String toString() {
         return String.format("StreamSortSpec[windowPeriod=%s,windowMargin=%d]",
-            this.getWindowPeriod(),
-            this.getWindowMargin());
+                this.getWindowPeriod(),
+                this.getWindowMargin());
     }
 }

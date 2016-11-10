@@ -15,31 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.alert.model;
+package org.apache.eagle.alert.coordination.model.internal;
 
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestPolicyDefinition {
-
+public class PolicyAssignmentTest {
     @Test
-    public void testEqual() {
-        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
-        PolicyDefinition policy1 = new PolicyDefinition();
-        policy1.setName("policy1");
-        policy1.setDefinition(definition);
+    public void testPolicyAssignment() {
+        PolicyAssignment policyAssignment = new PolicyAssignment("policy", "queue");
+        Assert.assertEquals("policy", policyAssignment.getPolicyName());
+        Assert.assertEquals("queue", policyAssignment.getQueueId());
+        Assert.assertEquals(null, policyAssignment.getVersion());
+        Assert.assertEquals("PolicyAssignment of policy policy, queueId queue, version null !", policyAssignment.toString());
 
-        PolicyDefinition policy2 = new PolicyDefinition();
-        policy2.setName("policy1");
-        policy2.setPolicyStatus(PolicyDefinition.PolicyStatus.DISABLED);
-        policy2.setDefinition(definition);
+        Assert.assertFalse(policyAssignment.equals(new PolicyAssignment("policy", "queue")));
+        Assert.assertFalse(policyAssignment == new PolicyAssignment("policy", "queue"));
+        Assert.assertFalse(policyAssignment.hashCode() == new PolicyAssignment("policy", "queue").hashCode());
 
-        PolicyDefinition policy3 = new PolicyDefinition();
-        policy3.setName("policy1");
-        policy3.setDefinition(definition);
-
-        Assert.assertTrue(policy1.equals(policy3));
-        Assert.assertFalse(policy1.equals(policy2));
     }
 }
