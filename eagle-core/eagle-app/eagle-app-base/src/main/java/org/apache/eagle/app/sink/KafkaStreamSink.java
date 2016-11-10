@@ -18,13 +18,11 @@ package org.apache.eagle.app.sink;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.BasicOutputCollector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-import org.apache.eagle.metadata.utils.StreamIdConversions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +62,9 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     protected void execute(Object key, Map event, OutputCollector collector) throws Exception {
         try {
             String output = new ObjectMapper().writeValueAsString(event);
-            producer.send(new KeyedMessage(this.topicId, key, output));
+            // partition key may cause data skew
+            //producer.send(new KeyedMessage(this.topicId, key, output));
+            producer.send(new KeyedMessage(this.topicId, output));
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw ex;
