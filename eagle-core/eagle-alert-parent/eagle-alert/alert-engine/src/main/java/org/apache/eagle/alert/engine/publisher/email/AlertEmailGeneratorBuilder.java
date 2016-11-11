@@ -61,6 +61,16 @@ public class AlertEmailGeneratorBuilder {
         return this;
     }
 
+    public AlertEmailGeneratorBuilder withServerHost(String serverHost) {
+        generator.setServerHost(serverHost);
+        return this;
+    }
+
+    public AlertEmailGeneratorBuilder withServerPort(int serverPort) {
+        generator.setServerPort(serverPort);
+        return this;
+    }
+
     public AlertEmailGenerator build() {
         return this.generator;
     }

@@ -41,6 +41,6 @@ public class MemoryUsageGaugeSetTest {
         metrics.registerAll(new MemoryUsageGaugeSet());
         metrics.register("sample", (Gauge<Double>) () -> 0.1234);
         reporter.start(1, TimeUnit.SECONDS);
-        Thread.sleep(5000);
+        reporter.close();
     }
 }

@@ -71,8 +71,8 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final String METADATA_CLEAR_PATH = "/metadata/clear";
 
     private static final String EAGLE_CORRELATION_CONTEXT = "metadataService.context";
-    private static final String EAGLE_CORRELATION_SERVICE_PORT = "metadataService.port";
-    private static final String EAGLE_CORRELATION_SERVICE_HOST = "metadataService.host";
+    public static final String EAGLE_CORRELATION_SERVICE_PORT = "metadataService.port";
+    public static final String EAGLE_CORRELATION_SERVICE_HOST = "metadataService.host";
 
     protected static final String CONTENT_TYPE = "Content-Type";
 

@@ -91,7 +91,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             LOG.warn("Policy {} Stream {} does *NOT* subscribe any publishment!", policyId, event.getStreamId());
             return;
         }
-
+        event.ensureAlertId();
         for (String pubId : pubIds) {
             @SuppressWarnings("resource")
             AlertPublishPlugin plugin = pubId != null ? publishPluginMapping.get(pubId) : null;

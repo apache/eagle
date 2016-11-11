@@ -25,6 +25,7 @@ import org.apache.eagle.alert.engine.publisher.email.AlertEmailGenerator;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailGeneratorBuilder;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,17 +47,25 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     private Map<String, Object> emailConfig;
 
     private transient ThreadPoolExecutor executorPool;
+    private String serverHost;
+    private int serverPort;
 
     @Override
     @SuppressWarnings("rawtypes")
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
         super.init(config, publishment, conf);
+        this.serverHost = config.hasPath(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_HOST)
+            ? config.getString(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_HOST) : "localhost";
+        this.serverPort = config.hasPath(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_PORT)
+            ? config.getInt(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_PORT) : 80;
+
         executorPool = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_CORE_SIZE, DEFAULT_THREAD_POOL_MAX_SIZE, DEFAULT_THREAD_POOL_SHRINK_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         LOG.info(" Creating Email Generator... ");
         if (publishment.getProperties() != null) {
             emailConfig = new HashMap<>(publishment.getProperties());
             emailGenerator = createEmailGenerator(emailConfig);
         }
+
     }
 
     @Override
@@ -123,7 +132,10 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             .withSender(sender)
             .withRecipients(recipients)
             .withTplFile(tplFileName)
-            .withExecutorPool(this.executorPool).build();
+            .withExecutorPool(this.executorPool)
+            .withServerHost(this.serverHost)
+            .withServerPort(this.serverPort)
+            .build();
         return gen;
     }
 

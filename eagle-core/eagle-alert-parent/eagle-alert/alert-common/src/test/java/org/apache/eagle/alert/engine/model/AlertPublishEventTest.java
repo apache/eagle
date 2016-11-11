@@ -76,6 +76,7 @@ public class AlertPublishEventTest {
         alertStreamEvent.setSchema(streamDefinition);
         alertStreamEvent.setPolicyId("setPolicyId");
         alertStreamEvent.setCreatedTime(1234);
+        alertStreamEvent.ensureAlertId();
         AlertPublishEvent alertPublishEvent = AlertPublishEvent.createAlertPublishEvent(alertStreamEvent);
         Assert.assertEquals(null, alertPublishEvent.getSiteId());
         Assert.assertTrue(alertPublishEvent.getAlertId() != null);
