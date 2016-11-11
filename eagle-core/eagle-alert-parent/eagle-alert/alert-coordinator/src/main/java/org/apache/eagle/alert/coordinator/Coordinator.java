@@ -26,6 +26,10 @@ import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordinator.impl.MetadataValdiator;
 import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
+import org.apache.eagle.alert.coordinator.trigger.CoordinatorTrigger;
+import org.apache.eagle.alert.coordinator.trigger.DynamicPolicyLoader;
+import org.apache.eagle.alert.coordinator.trigger.PolicyChangeListener;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.slf4j.Logger;
@@ -33,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -192,6 +198,29 @@ public class Coordinator {
         }
     }
 
+    private static class PolicyChangeHandler implements PolicyChangeListener {
+        private static final Logger LOG = LoggerFactory.getLogger(PolicyChangeHandler.class);
+        private Config config;
+        private IMetadataServiceClient client;
+
+        public PolicyChangeHandler(Config config, IMetadataServiceClient client) {
+            this.config = config;
+            this.client = client;
+        }
+
+        @Override
+        public void onPolicyChange(List<PolicyDefinition> allPolicies, Collection<String> addedPolicies,
+                                   Collection<String> removedPolicies, Collection<String> modifiedPolicies) {
+            LOG.info("policy changed ... ");
+            LOG.info("allPolicies: " + allPolicies + ", addedPolicies: " + addedPolicies + ", removedPolicies: "
+                    + removedPolicies + ", modifiedPolicies: " + modifiedPolicies);
+
+            CoordinatorTrigger trigger = new CoordinatorTrigger(config, client);
+            trigger.run();
+
+        }
+    }
+
     public static void startSchedule() {
         Config config = ConfigFactory.load().getConfig(COORDINATOR);
         String host = config.getString(METADATA_SERVICE_HOST);
@@ -208,7 +237,9 @@ public class Coordinator {
             return t;
         });
 
-        // scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+        DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
+        loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
+        scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
 
         Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
         LOG.info("Eagle Coordinator started ...");
