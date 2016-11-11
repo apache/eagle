@@ -19,17 +19,19 @@ package org.apache.eagle.log.base.taggedlog;
 import java.util.Map;
 
 public interface TaggedLogObjectMapper {
-	/**
-	 * when read, business logic should convert schema-less key/value into business object based on its own schema
-	 * @param entity
-	 * @param qualifierValues
-	 */
-	public void populateQualifierValues(TaggedLogAPIEntity entity, Map<String, byte[]> qualifierValues);
-	
-	/**
-	 * when write, business logic should convert business object to schema-less key value
-	 * @param entity
-	 * @return
-	 */
-	public Map<String, byte[]> createQualifierValues(TaggedLogAPIEntity entity);	
+    /**
+     * when read, business logic should convert schema-less key/value into business object based on its own schema.
+     *
+     * @param entity
+     * @param qualifierValues
+     */
+    public void populateQualifierValues(TaggedLogAPIEntity entity, Map<String, byte[]> qualifierValues);
+
+    /**
+     * when write, business logic should convert business object to schema-less key value.
+     *
+     * @param entity
+     * @return
+     */
+    public Map<String, byte[]> createQualifierValues(TaggedLogAPIEntity entity);
 }

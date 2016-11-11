@@ -16,66 +16,78 @@
  */
 package org.apache.eagle.log.base.taggedlog;
 
-import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"success", "exception", "prefixHashCode", "timestamp", "humanTime", "tagNameHashValueHashMap", "fieldNameValueMap"})
 public class RowkeyAPIEntity {
-	boolean success;
-	String exception;
-	int prefixHashCode;
-	long timestamp;
-	String humanTime;
-	Map<Integer, Integer> tagNameHashValueHashMap;
-	Map<String, String> fieldNameValueMap;
-	
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
-	public String getHumanTime() {
-		return humanTime;
-	}
-	public void setHumanTime(String humanTime) {
-		this.humanTime = humanTime;
-	}
-	public int getPrefixHashCode() {
-		return prefixHashCode;
-	}
-	public void setPrefixHashCode(int prefixHashcode) {
-		this.prefixHashCode = prefixHashcode;
-	}
-	public long getTimestamp() {
-		return timestamp;
-	}
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-	public Map<Integer, Integer> getTagNameHashValueHashMap() {
-		return tagNameHashValueHashMap;
-	}
-	public void setTagNameHashValueHashMap(
-			Map<Integer, Integer> tagNameHashValueHashMap) {
-		this.tagNameHashValueHashMap = tagNameHashValueHashMap;
-	}
-	public Map<String, String> getFieldNameValueMap() {
-		return fieldNameValueMap;
-	}
-	public void setFieldNameValueMap(Map<String, String> fieldNameValueMap) {
-		this.fieldNameValueMap = fieldNameValueMap;
-	}
+    boolean success;
+    String exception;
+    int prefixHashCode;
+    long timestamp;
+    String humanTime;
+    Map<Integer, Integer> tagNameHashValueHashMap;
+    Map<String, String> fieldNameValueMap;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
+    public String getHumanTime() {
+        return humanTime;
+    }
+
+    public void setHumanTime(String humanTime) {
+        this.humanTime = humanTime;
+    }
+
+    public int getPrefixHashCode() {
+        return prefixHashCode;
+    }
+
+    public void setPrefixHashCode(int prefixHashcode) {
+        this.prefixHashCode = prefixHashcode;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Map<Integer, Integer> getTagNameHashValueHashMap() {
+        return tagNameHashValueHashMap;
+    }
+
+    public void setTagNameHashValueHashMap(
+        Map<Integer, Integer> tagNameHashValueHashMap) {
+        this.tagNameHashValueHashMap = tagNameHashValueHashMap;
+    }
+
+    public Map<String, String> getFieldNameValueMap() {
+        return fieldNameValueMap;
+    }
+
+    public void setFieldNameValueMap(Map<String, String> fieldNameValueMap) {
+        this.fieldNameValueMap = fieldNameValueMap;
+    }
 }

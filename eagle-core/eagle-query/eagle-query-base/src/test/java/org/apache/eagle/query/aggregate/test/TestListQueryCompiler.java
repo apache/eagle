@@ -19,14 +19,14 @@
 package org.apache.eagle.query.aggregate.test;
 
 import org.apache.eagle.query.ListQueryCompiler;
-import org.apache.eagle.query.parser.EagleQueryParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestListQueryCompiler {
-    private final static Logger LOG = LoggerFactory.getLogger(TestListQueryCompiler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestListQueryCompiler.class);
+
     @Test
     public void test() throws Exception {
         try {

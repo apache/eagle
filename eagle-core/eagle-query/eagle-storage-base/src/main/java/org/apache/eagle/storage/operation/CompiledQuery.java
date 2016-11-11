@@ -16,16 +16,16 @@
  */
 package org.apache.eagle.storage.operation;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.SearchCondition;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.query.ListQueryCompiler;
-import org.apache.eagle.query.aggregate.timeseries.SortOption;
 import org.apache.eagle.query.aggregate.AggregateFunctionType;
+import org.apache.eagle.query.aggregate.timeseries.SortOption;
 import org.apache.eagle.storage.exception.QueryCompileException;
-import org.apache.eagle.common.DateTimeUtil;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +35,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * TODO: refactor to remove hbase related fields
+ * TODO: refactor to remove hbase related fields.
  *
  * @since 3/23/15
  */
 public class CompiledQuery {
-    private final static Logger LOG = LoggerFactory.getLogger(CompiledQuery.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CompiledQuery.class);
     private boolean timeSeries;
 
     public boolean isHasAgg() {
@@ -165,34 +165,37 @@ public class CompiledQuery {
         this.groupByFields = groupByFields;
     }
 
-    private void validateQueryParameters(String startRowkey, int pageSize){
-        if(pageSize < 0){
-            throw new IllegalArgumentException("Positive pageSize value should be always provided. The list query format is:\n" + "eagle-service/rest/list?query=<querystring>&pageSize=10&startRowkey=xyz&startTime=xxx&endTime=xxx");
+    private void validateQueryParameters(String startRowkey, int pageSize) {
+        if (pageSize < 0) {
+            throw new IllegalArgumentException("Positive pageSize value should be always provided. The list query format is:\n"
+                + "eagle-service/rest/list?query=<querystring>&pageSize=10&startRowkey=xyz&startTime=xxx&endTime=xxx");
         }
 
-        if(startRowkey != null && startRowkey.equals("null")){
+        if (startRowkey != null && startRowkey.equals("null")) {
             LOG.warn("startRowkey being null string is not same to startRowkey == null");
         }
         return;
     }
 
-    private void checkNotNull(Object obj,String name){
-        if(obj == null) throw new IllegalArgumentException(name+" should not be null");
+    private void checkNotNull(Object obj, String name) {
+        if (obj == null) {
+            throw new IllegalArgumentException(name + " should not be null");
+        }
     }
 
     protected void compile() throws Exception {
-        validateQueryParameters(this.getRawQuery().getStartRowkey(),this.getRawQuery().getPageSize());
-        checkNotNull(this.rawQuery,"rawQuery instance");
-        checkNotNull(this.rawQuery.getQuery(),"query");
+        validateQueryParameters(this.getRawQuery().getStartRowkey(), this.getRawQuery().getPageSize());
+        checkNotNull(this.rawQuery, "rawQuery instance");
+        checkNotNull(this.rawQuery.getQuery(), "query");
 
-        ListQueryCompiler compiler = new ListQueryCompiler(this.rawQuery.getQuery(),this.rawQuery.isFilterIfMissing());
+        ListQueryCompiler compiler = new ListQueryCompiler(this.rawQuery.getQuery(), this.rawQuery.isFilterIfMissing());
         this.serviceName = compiler.serviceName();
         this.searchCondition = new SearchCondition();
-        this.searchCondition.setOutputVerbose(this.rawQuery.isVerbose() );
+        this.searchCondition.setOutputVerbose(this.rawQuery.isVerbose());
         this.searchCondition.setOutputAlias(compiler.getOutputAlias());
         this.searchCondition.setFilter(compiler.filter());
         this.searchCondition.setQueryExpression(compiler.getQueryExpression());
-        if(compiler.sortOptions() == null && this.rawQuery.getTop() > 0) {
+        if (compiler.sortOptions() == null && this.rawQuery.getTop() > 0) {
             LOG.warn("Parameter \"top\" is only used for sort query! Ignore top parameter this time since it's not a sort query");
         }
 
@@ -212,14 +215,14 @@ public class CompiledQuery {
 
         // 3. Set time range if it's timeseries service
         EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName(serviceName);
-        if(ed.isTimeSeries()){
+        if (ed.isTimeSeries()) {
             // TODO check Time exists for timeseries or topology data
             long endTimeMillis = System.currentTimeMillis();
             long startTimeMills = endTimeMillis - 30 * DateTimeUtil.ONEDAY;
             String endTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(endTimeMillis);
             String startTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(startTimeMills);
 
-            if(this.rawQuery.getStartTime() != null && this.rawQuery.getEndTime() != null) {
+            if (this.rawQuery.getStartTime() != null && this.rawQuery.getEndTime() != null) {
                 endTime = this.rawQuery.getEndTime();
                 startTime = this.rawQuery.getStartTime();
                 endTimeMillis = DateTimeUtil.humanDateToSeconds(endTime) * 1000;
@@ -231,7 +234,7 @@ public class CompiledQuery {
             this.searchCondition.setEndTime(endTime);
             this.setStartTime(startTimeMills);
             this.setEndTime(endTimeMillis);
-        }else{
+        } else {
             this.searchCondition.setStartTime("0");
             this.searchCondition.setEndTime("1");
             this.setStartTime(0);
@@ -248,21 +251,29 @@ public class CompiledQuery {
         List<String> outputFields = compiler.outputFields();
         List<String> groupbyFields = compiler.groupbyFields();
         List<String> aggregateFields = compiler.aggregateFields();
-        Set<String> filterFields = compiler.getFilterFields();
 
         // Start to generate output fields list {
         searchCondition.setOutputAll(compiler.isOutputAll());
-        if(outputFields == null) outputFields = new ArrayList<String>();
-        if(compiler.hasAgg()){
-            if(groupbyFields != null) outputFields.addAll(groupbyFields);
-            if(aggregateFields != null) outputFields.addAll(aggregateFields);
-            if(GenericMetricEntity.GENERIC_METRIC_SERVICE.equals(serviceName) && !outputFields.contains(GenericMetricEntity.VALUE_FIELD)){
+        if (outputFields == null) {
+            outputFields = new ArrayList<String>();
+        }
+        if (compiler.hasAgg()) {
+            if (groupbyFields != null) {
+                outputFields.addAll(groupbyFields);
+            }
+            if (aggregateFields != null) {
+                outputFields.addAll(aggregateFields);
+            }
+            if (GenericMetricEntity.GENERIC_METRIC_SERVICE.equals(serviceName) && !outputFields.contains(GenericMetricEntity.VALUE_FIELD)) {
                 outputFields.add(GenericMetricEntity.VALUE_FIELD);
             }
         }
-        if(filterFields!=null) outputFields.addAll(filterFields);
+        Set<String> filterFields = compiler.getFilterFields();
+        if (filterFields != null) {
+            outputFields.addAll(filterFields);
+        }
         searchCondition.setOutputFields(outputFields);
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             if (compiler.isOutputAll()) {
                 LOG.debug("Output fields: all");
             } else {
@@ -279,7 +290,7 @@ public class CompiledQuery {
         this.timeSeries = timeSeries;
     }
 
-    public long getIntervalMin(){
+    public long getIntervalMin() {
         return this.getRawQuery().getIntervalmin();
     }
 }

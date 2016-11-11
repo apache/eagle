@@ -16,8 +16,10 @@
  */
 package org.apache.eagle.service.generic;
 
+import com.sun.jersey.api.json.JSONWithPadding;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
@@ -28,8 +30,6 @@ import org.apache.eagle.storage.exception.IllegalDataStorageException;
 import org.apache.eagle.storage.operation.*;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import com.sun.jersey.api.json.JSONWithPadding;
-import org.apache.commons.lang.time.StopWatch;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.slf4j.Logger;
@@ -46,25 +46,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @since 3/18/15
- */
+
 @Path(GenericEntityServiceResource.ROOT_PATH)
 @SuppressWarnings("unchecked")
 public class GenericEntityServiceResource {
-    public final static String ROOT_PATH = "/entities";
-    public final static String JSONP_PATH = "jsonp";
-    public final static String DELETE_ENTITIES_PATH = "delete";
-    public final static String ROWKEY_PATH = "rowkey";
+    public static final String ROOT_PATH = "/entities";
+    public static final String JSONP_PATH = "jsonp";
+    public static final String DELETE_ENTITIES_PATH = "delete";
+    public static final String ROWKEY_PATH = "rowkey";
 
-    public final static String FIRST_TIMESTAMP = "firstTimestamp";
-    public final static String LAST_TIMESTAMP = "lastTimestamp";
-    public final static String ELAPSEDMS = "elapsedms";
-    public final static String TOTAL_RESULTS = "totalResults";
+    public static final String FIRST_TIMESTAMP = "firstTimestamp";
+    public static final String LAST_TIMESTAMP = "lastTimestamp";
+    public static final String ELAPSEDMS = "elapsedms";
+    public static final String TOTAL_RESULTS = "totalResults";
 
-    private final static Logger LOG = LoggerFactory.getLogger(GenericEntityServiceResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenericEntityServiceResource.class);
 
-    private List<? extends TaggedLogAPIEntity> unmarshalEntitiesByServie(InputStream inputStream,EntityDefinition entityDefinition) throws IllegalAccessException, InstantiationException, IOException {
+    private List<? extends TaggedLogAPIEntity> unmarshalEntitiesByServie(InputStream inputStream, EntityDefinition entityDefinition) throws IllegalAccessException, InstantiationException,
+        IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(inputStream, TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, entityDefinition.getEntityClass()));
     }
@@ -77,33 +76,33 @@ public class GenericEntityServiceResource {
 
     public GenericServiceAPIResponseEntity updateDatabase(Statement<ModifyResult<String>> statement) {
         GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<>();
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
 
         try {
             stopWatch.start();
             DataStorage dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            if(dataStorage == null){
+            if (dataStorage == null) {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("Data storage is null");
             }
             ModifyResult<String> result = statement.execute(dataStorage);
-            if(result.isSuccess()) {
-                List<String> keys =result.getIdentifiers();
-                if(keys != null) {
+            if (result.isSuccess()) {
+                List<String> keys = result.getIdentifiers();
+                if (keys != null) {
                     response.setObj(keys, String.class);
                     meta.put(TOTAL_RESULTS, keys.size());
                 } else {
                     meta.put(TOTAL_RESULTS, 0);
                 }
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setMeta(meta);
                 response.setSuccess(true);
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             response.setException(e);
-        }finally {
+        } finally {
             stopWatch.stop();
         }
         return response;
@@ -119,82 +118,82 @@ public class GenericEntityServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public GenericServiceAPIResponseEntity create(InputStream inputStream,
-                                                 @QueryParam("serviceName") String serviceName){
+                                                  @QueryParam("serviceName") String serviceName) {
         GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<String>();
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
             EntityDefinition entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
 
-            if(entityDefinition == null){
-                throw new IllegalArgumentException("entity definition of service "+serviceName+" not found");
+            if (entityDefinition == null) {
+                throw new IllegalArgumentException("entity definition of service " + serviceName + " not found");
             }
 
             List<? extends TaggedLogAPIEntity> entities = unmarshalEntitiesByServie(inputStream, entityDefinition);
             DataStorage dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            CreateStatement createStatement = new CreateStatement(entities,entityDefinition);
+            CreateStatement createStatement = new CreateStatement(entities, entityDefinition);
             ModifyResult<String> result = createStatement.execute(dataStorage);
-            if(result.isSuccess()) {
-                List<String> keys =result.getIdentifiers();
-                if(keys != null) {
+            if (result.isSuccess()) {
+                List<String> keys = result.getIdentifiers();
+                if (keys != null) {
                     response.setObj(keys, String.class);
                     response.setObj(keys, String.class);
-                    meta.put(TOTAL_RESULTS,keys.size());
-                }else{
-                    meta.put(TOTAL_RESULTS,0);
+                    meta.put(TOTAL_RESULTS, keys.size());
+                } else {
+                    meta.put(TOTAL_RESULTS, 0);
                 }
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setMeta(meta);
                 response.setSuccess(true);
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             response.setException(e);
-        }finally {
+        } finally {
             stopWatch.stop();
         }
         return response;
     }
 
     @POST
-    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    @Consumes( {MediaType.MULTIPART_FORM_DATA})
     @Produces(MediaType.APPLICATION_JSON)
     public GenericServiceAPIResponseEntity create(@FormDataParam("file") InputStream fileInputStream,
                                                   @FormDataParam("file") FormDataContentDisposition cdh,
                                                   @QueryParam("serviceName") String serviceName) {
         GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<String>();
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
             EntityDefinition entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
 
-            if(entityDefinition == null){
-                throw new IllegalArgumentException("entity definition of service "+serviceName+" not found");
+            if (entityDefinition == null) {
+                throw new IllegalArgumentException("entity definition of service " + serviceName + " not found");
             }
 
             List<? extends TaggedLogAPIEntity> entities = unmarshalEntitiesByServie(fileInputStream, entityDefinition);
             DataStorage dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            CreateStatement createStatement = new CreateStatement(entities,entityDefinition);
+            CreateStatement createStatement = new CreateStatement(entities, entityDefinition);
             ModifyResult<String> result = createStatement.execute(dataStorage);
-            if(result.isSuccess()) {
-                List<String> keys =result.getIdentifiers();
-                if(keys != null) {
+            if (result.isSuccess()) {
+                List<String> keys = result.getIdentifiers();
+                if (keys != null) {
                     response.setObj(keys, String.class);
                     response.setObj(keys, String.class);
-                    meta.put(TOTAL_RESULTS,keys.size());
-                }else{
-                    meta.put(TOTAL_RESULTS,0);
+                    meta.put(TOTAL_RESULTS, keys.size());
+                } else {
+                    meta.put(TOTAL_RESULTS, 0);
                 }
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setMeta(meta);
                 response.setSuccess(true);
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             response.setException(e);
-        }finally {
+        } finally {
             stopWatch.stop();
         }
         return response;
@@ -204,33 +203,33 @@ public class GenericEntityServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public GenericServiceAPIResponseEntity update(InputStream inputStream,
-                                                 @QueryParam("serviceName") String serviceName){
+                                                  @QueryParam("serviceName") String serviceName) {
         GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<String>();
         DataStorage dataStorage;
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
             EntityDefinition entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
 
-            if(entityDefinition == null){
-                throw new IllegalArgumentException("entity definition of service "+serviceName+" not found");
+            if (entityDefinition == null) {
+                throw new IllegalArgumentException("entity definition of service " + serviceName + " not found");
             }
 
             List<? extends TaggedLogAPIEntity> entities = unmarshalEntitiesByServie(inputStream, entityDefinition);
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
 
-            UpdateStatement updateStatement = new UpdateStatement(entities,entityDefinition);
+            UpdateStatement updateStatement = new UpdateStatement(entities, entityDefinition);
             ModifyResult<String> result = updateStatement.execute(dataStorage);
-            if(result.isSuccess()) {
-                List<String> keys =result.getIdentifiers();
-                if(keys != null) {
+            if (result.isSuccess()) {
+                List<String> keys = result.getIdentifiers();
+                if (keys != null) {
                     response.setObj(keys, String.class);
-                    meta.put(TOTAL_RESULTS,keys.size());
-                }else{
-                    meta.put(TOTAL_RESULTS,0);
+                    meta.put(TOTAL_RESULTS, keys.size());
+                } else {
+                    meta.put(TOTAL_RESULTS, 0);
                 }
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setMeta(meta);
                 response.setSuccess(true);
             }
@@ -244,37 +243,37 @@ public class GenericEntityServiceResource {
     }
 
     @PUT
-    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    @Consumes( {MediaType.MULTIPART_FORM_DATA})
     @Produces(MediaType.APPLICATION_JSON)
     public GenericServiceAPIResponseEntity update(@FormDataParam("file") InputStream fileInputStream,
                                                   @FormDataParam("file") FormDataContentDisposition cdh,
-                                                  @QueryParam("serviceName") String serviceName){
+                                                  @QueryParam("serviceName") String serviceName) {
         GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<String>();
         DataStorage dataStorage;
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
             EntityDefinition entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
 
-            if(entityDefinition == null){
-                throw new IllegalArgumentException("entity definition of service "+serviceName+" not found");
+            if (entityDefinition == null) {
+                throw new IllegalArgumentException("entity definition of service " + serviceName + " not found");
             }
 
             List<? extends TaggedLogAPIEntity> entities = unmarshalEntitiesByServie(fileInputStream, entityDefinition);
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
 
-            UpdateStatement updateStatement = new UpdateStatement(entities,entityDefinition);
+            UpdateStatement updateStatement = new UpdateStatement(entities, entityDefinition);
             ModifyResult<String> result = updateStatement.execute(dataStorage);
-            if(result.isSuccess()) {
-                List<String> keys =result.getIdentifiers();
-                if(keys != null) {
+            if (result.isSuccess()) {
+                List<String> keys = result.getIdentifiers();
+                if (keys != null) {
                     response.setObj(keys, String.class);
-                    meta.put(TOTAL_RESULTS,keys.size());
-                }else{
-                    meta.put(TOTAL_RESULTS,0);
+                    meta.put(TOTAL_RESULTS, keys.size());
+                } else {
+                    meta.put(TOTAL_RESULTS, 0);
                 }
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setMeta(meta);
                 response.setSuccess(true);
             }
@@ -288,36 +287,39 @@ public class GenericEntityServiceResource {
     }
 
 
-
     /**
-     * @param value rowkey value
+     * search.
+     * @param value       rowkey value
      * @param serviceName entity service name
      * @return GenericServiceAPIResponseEntity
      */
     @GET
     @Path(ROWKEY_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public GenericServiceAPIResponseEntity search(@QueryParam("value") String value,@QueryParam("serviceName") String serviceName){
+    public GenericServiceAPIResponseEntity search(@QueryParam("value") String value, @QueryParam("serviceName") String serviceName) {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         DataStorage dataStorage;
         StopWatch stopWatch = null;
         try {
-            if(serviceName == null) throw new IllegalArgumentException("serviceName is null");
-            RowkeyQueryStatement queryStatement = new RowkeyQueryStatement(value,serviceName);
+            if (serviceName == null) {
+                throw new IllegalArgumentException("serviceName is null");
+            }
+
             stopWatch = new StopWatch();
             stopWatch.start();
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            if(dataStorage==null){
+            if (dataStorage == null) {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("data storage is null");
             }
+            RowkeyQueryStatement queryStatement = new RowkeyQueryStatement(value, serviceName);
             QueryResult<?> result = queryStatement.execute(dataStorage);
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 meta.put(FIRST_TIMESTAMP, result.getFirstTimestamp());
                 meta.put(LAST_TIMESTAMP, result.getLastTimestamp());
                 meta.put(TOTAL_RESULTS, result.getSize());
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setObj(result.getData());
                 response.setType(result.getEntityType());
                 response.setSuccess(true);
@@ -326,14 +328,17 @@ public class GenericEntityServiceResource {
             }
         } catch (Exception e) {
             response.setException(e);
-            LOG.error(e.getMessage(),e);
-        }finally {
-            if(stopWatch!=null) stopWatch.stop();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (stopWatch != null) {
+                stopWatch.stop();
+            }
         }
         return response;
     }
 
     /**
+     * search with serviceName.
      * @param serviceName entity service name
      * @return GenericServiceAPIResponseEntity
      */
@@ -341,31 +346,33 @@ public class GenericEntityServiceResource {
     @Path(ROWKEY_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public GenericServiceAPIResponseEntity search(InputStream inputStream,@QueryParam("serviceName") String serviceName){
+    public GenericServiceAPIResponseEntity search(InputStream inputStream, @QueryParam("serviceName") String serviceName) {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
         DataStorage dataStorage;
 
         StopWatch stopWatch = null;
         try {
-            if(serviceName == null) throw new IllegalArgumentException("serviceName is null");
+            if (serviceName == null) {
+                throw new IllegalArgumentException("serviceName is null");
+            }
 
             final List<String> values = unmarshalAsStringlist(inputStream);
-            final RowkeyQueryStatement queryStatement = new RowkeyQueryStatement(values,serviceName);
+            final RowkeyQueryStatement queryStatement = new RowkeyQueryStatement(values, serviceName);
 
             stopWatch = new StopWatch();
             stopWatch.start();
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            if(dataStorage==null){
+            if (dataStorage == null) {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("Data storage is null");
             }
             QueryResult<?> result = queryStatement.execute(dataStorage);
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 meta.put(FIRST_TIMESTAMP, result.getFirstTimestamp());
                 meta.put(LAST_TIMESTAMP, result.getLastTimestamp());
                 meta.put(TOTAL_RESULTS, result.getSize());
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
                 response.setObj(result.getData());
                 response.setType(result.getEntityType());
                 response.setSuccess(true);
@@ -374,16 +381,18 @@ public class GenericEntityServiceResource {
             }
         } catch (Exception e) {
             response.setException(e);
-            LOG.error(e.getMessage(),e);
-        }finally {
-            if(stopWatch!=null) stopWatch.stop();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (stopWatch != null) {
+                stopWatch.stop();
+            }
         }
         return response;
     }
 
 
     /**
-     *
+     * search.
      * @param query
      * @param startTime
      * @param endTime
@@ -403,50 +412,50 @@ public class GenericEntityServiceResource {
     @Produces(MediaType.APPLICATION_JSON)
     @SuppressWarnings("unchecked")
     public GenericServiceAPIResponseEntity search(@QueryParam("query") String query,
-                                                 @QueryParam("startTime") String startTime, @QueryParam("endTime") String endTime,
-                                                 @QueryParam("pageSize") int pageSize, @QueryParam("startRowkey") String startRowkey,
-                                                 @QueryParam("treeAgg") boolean treeAgg, @QueryParam("timeSeries") boolean timeSeries,
-                                                 @QueryParam("intervalmin") long intervalmin, @QueryParam("top") int top,
-                                                 @QueryParam("filterIfMissing") boolean filterIfMissing,
-                                                 @QueryParam("parallel") int parallel,
-                                                 @QueryParam("metricName") String metricName,
-                                                 @QueryParam("verbose") Boolean verbose){
+                                                  @QueryParam("startTime") String startTime, @QueryParam("endTime") String endTime,
+                                                  @QueryParam("pageSize") int pageSize, @QueryParam("startRowkey") String startRowkey,
+                                                  @QueryParam("treeAgg") boolean treeAgg, @QueryParam("timeSeries") boolean timeSeries,
+                                                  @QueryParam("intervalmin") long intervalmin, @QueryParam("top") int top,
+                                                  @QueryParam("filterIfMissing") boolean filterIfMissing,
+                                                  @QueryParam("parallel") int parallel,
+                                                  @QueryParam("metricName") String metricName,
+                                                  @QueryParam("verbose") Boolean verbose) {
         RawQuery rawQuery = RawQuery.build()
-                .query(query)
-                .startTime(startTime)
-                .endTime(endTime)
-                .pageSize(pageSize)
-                .startRowkey(startRowkey)
-                .treeAgg(treeAgg)
-                .timeSeries(timeSeries)
-                .intervalMin(intervalmin)
-                .top(top)
-                .filerIfMissing(filterIfMissing)
-                .parallel(parallel)
-                .metricName(metricName)
-                .verbose(verbose)
-                .done();
+            .query(query)
+            .startTime(startTime)
+            .endTime(endTime)
+            .pageSize(pageSize)
+            .startRowkey(startRowkey)
+            .treeAgg(treeAgg)
+            .timeSeries(timeSeries)
+            .intervalMin(intervalmin)
+            .top(top)
+            .filerIfMissing(filterIfMissing)
+            .parallel(parallel)
+            .metricName(metricName)
+            .verbose(verbose)
+            .done();
 
         QueryStatement queryStatement = new QueryStatement(rawQuery);
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
-        Map<String,Object> meta = new HashMap<>();
+        Map<String, Object> meta = new HashMap<>();
 
         DataStorage dataStorage;
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            if(dataStorage==null){
+            if (dataStorage == null) {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("data storage is null");
             }
 
             QueryResult<?> result = queryStatement.execute(dataStorage);
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 meta.put(FIRST_TIMESTAMP, result.getFirstTimestamp());
                 meta.put(LAST_TIMESTAMP, result.getLastTimestamp());
                 meta.put(TOTAL_RESULTS, result.getSize());
-                meta.put(ELAPSEDMS,stopWatch.getTime());
+                meta.put(ELAPSEDMS, stopWatch.getTime());
 
                 response.setObj(result.getData());
                 response.setType(result.getEntityType());
@@ -456,19 +465,19 @@ public class GenericEntityServiceResource {
             }
         } catch (Exception e) {
             response.setException(e);
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
             throw new WebApplicationException(e,
-                    Response.status(Response.Status.BAD_REQUEST)
+                Response.status(Response.Status.BAD_REQUEST)
                     .type(MediaType.APPLICATION_JSON_TYPE)
                     .entity(response).build());
-        }finally {
+        } finally {
             stopWatch.stop();
         }
         return response;
     }
 
     /**
-     *
+     * search with jsonp.
      * @param query
      * @param startTime
      * @param endTime
@@ -497,15 +506,16 @@ public class GenericEntityServiceResource {
                                            @QueryParam("parallel") int parallel,
                                            @QueryParam("metricName") String metricName,
                                            @QueryParam("verbose") Boolean verbose,
-                                           @QueryParam("callback") String callback){
+                                           @QueryParam("callback") String callback) {
         GenericServiceAPIResponseEntity result = search(query, startTime, endTime, pageSize, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing, parallel, metricName, verbose);
-        return new JSONWithPadding(new GenericEntity<GenericServiceAPIResponseEntity>(result){}, callback);
+        return new JSONWithPadding(new GenericEntity<GenericServiceAPIResponseEntity>(result) {
+        }, callback);
     }
 
     /**
      * TODO
      *
-     * Delete by query
+     * <p>Delete by query.
      *
      * @return
      */
@@ -513,65 +523,64 @@ public class GenericEntityServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public GenericServiceAPIResponseEntity deleteByQuery(@QueryParam("query") String query,
-                                                 @QueryParam("startTime") String startTime, @QueryParam("endTime") String endTime,
-                                                 @QueryParam("pageSize") int pageSize, @QueryParam("startRowkey") String startRowkey,
-                                                 @QueryParam("treeAgg") boolean treeAgg, @QueryParam("timeSeries") boolean timeSeries,
-                                                 @QueryParam("intervalmin") long intervalmin, @QueryParam("top") int top,
-                                                 @QueryParam("filterIfMissing") boolean filterIfMissing,
-                                                 @QueryParam("parallel") int parallel,
-                                                 @QueryParam("metricName") String metricName,
-                                                 @QueryParam("verbose") Boolean verbose){
+                                                         @QueryParam("startTime") String startTime, @QueryParam("endTime") String endTime,
+                                                         @QueryParam("pageSize") int pageSize, @QueryParam("startRowkey") String startRowkey,
+                                                         @QueryParam("treeAgg") boolean treeAgg, @QueryParam("timeSeries") boolean timeSeries,
+                                                         @QueryParam("intervalmin") long intervalmin, @QueryParam("top") int top,
+                                                         @QueryParam("filterIfMissing") boolean filterIfMissing,
+                                                         @QueryParam("parallel") int parallel,
+                                                         @QueryParam("metricName") String metricName,
+                                                         @QueryParam("verbose") Boolean verbose) {
         RawQuery rawQuery = RawQuery.build()
-                .query(query)
-                .startTime(startTime)
-                .endTime(endTime)
-                .pageSize(pageSize)
-                .startRowkey(startRowkey)
-                .treeAgg(treeAgg)
-                .timeSeries(timeSeries)
-                .intervalMin(intervalmin)
-                .top(top)
-                .filerIfMissing(filterIfMissing)
-                .parallel(parallel)
-                .metricName(metricName)
-                .verbose(verbose)
-                .done();
+            .query(query)
+            .startTime(startTime)
+            .endTime(endTime)
+            .pageSize(pageSize)
+            .startRowkey(startRowkey)
+            .treeAgg(treeAgg)
+            .timeSeries(timeSeries)
+            .intervalMin(intervalmin)
+            .top(top)
+            .filerIfMissing(filterIfMissing)
+            .parallel(parallel)
+            .metricName(metricName)
+            .verbose(verbose)
+            .done();
 
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
-        Map<String,Object> meta = new HashMap<String, Object>();
+        Map<String, Object> meta = new HashMap<String, Object>();
         DataStorage dataStorage = null;
         StopWatch stopWatch = new StopWatch();
         try {
             stopWatch.start();
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            if(dataStorage==null){
+            if (dataStorage == null) {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("Data storage is null");
             }
 
             DeleteStatement deleteStatement = new DeleteStatement(rawQuery);
             ModifyResult<String> deleteResult = deleteStatement.execute(dataStorage);
-            if(deleteResult.isSuccess()){
+            if (deleteResult.isSuccess()) {
                 meta.put(ELAPSEDMS, stopWatch.getTime());
-                response.setObj(deleteResult.getIdentifiers(),String.class);
+                response.setObj(deleteResult.getIdentifiers(), String.class);
                 response.setSuccess(true);
                 response.setMeta(meta);
             }
             return response;
         } catch (Exception e) {
             response.setException(e);
-            LOG.error(e.getMessage(),e);
-        }finally {
+            LOG.error(e.getMessage(), e);
+        } finally {
             stopWatch.stop();
         }
         return response;
     }
 
     /**
-     *
      * Delete by entity lists
      *
-     * Use "POST /entities/delete" instead of "DELETE  /entities" to walk around jersey DELETE issue for request with body
+     * <p>Use "POST /entities/delete" instead of "DELETE  /entities" to walk around jersey DELETE issue for request with body.
      *
      * @param inputStream
      * @param serviceName
@@ -582,13 +591,15 @@ public class GenericEntityServiceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public GenericServiceAPIResponseEntity deleteEntities(InputStream inputStream,
-                                                 @QueryParam("serviceName") String serviceName,
-                                                 @QueryParam("byId") Boolean deleteById){
+                                                          @QueryParam("serviceName") String serviceName,
+                                                          @QueryParam("byId") Boolean deleteById) {
         GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<String>();
         DataStorage dataStorage = null;
-        Map<String,Object> meta = new HashMap<String, Object>();
+        Map<String, Object> meta = new HashMap<String, Object>();
 
-        if(deleteById == null) deleteById = false;
+        if (deleteById == null) {
+            deleteById = false;
+        }
 
         StopWatch stopWatch = new StopWatch();
 
@@ -597,12 +608,12 @@ public class GenericEntityServiceResource {
             dataStorage = DataStorageManager.getDataStorageByEagleConfig();
             DeleteStatement statement = new DeleteStatement(serviceName);
 
-            if(deleteById) {
-                LOG.info("Deleting "+serviceName+" by ids");
+            if (deleteById) {
+                LOG.info("Deleting " + serviceName + " by ids");
                 List<String> deleteIds = unmarshalAsStringlist(inputStream);
                 statement.setIds(deleteIds);
-            }else {
-                LOG.info("Deleting "+serviceName+" by entities");
+            } else {
+                LOG.info("Deleting " + serviceName + " by entities");
                 EntityDefinition entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
                 if (entityDefinition == null) {
                     throw new IllegalArgumentException("Entity definition of service " + serviceName + " not found");
@@ -627,7 +638,7 @@ public class GenericEntityServiceResource {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             response.setException(e);
-        }finally {
+        } finally {
             stopWatch.stop();
         }
         return response;

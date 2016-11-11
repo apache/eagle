@@ -27,11 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 
-/**
- * @since 3/27/15
- */
 public class EntityRecordMapper<E extends TaggedLogAPIEntity> implements RecordMapper<E> {
-    private final static Logger LOG = LoggerFactory.getLogger(EntityRecordMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EntityRecordMapper.class);
 
     private final JdbcEntityDefinition entityDefinition;
 
@@ -44,7 +41,7 @@ public class EntityRecordMapper<E extends TaggedLogAPIEntity> implements RecordM
         try {
             return JdbcEntitySerDeserHelper.readEntity(resultSet, entityDefinition);
         } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
             throw new TorqueException(e);
         }
     }

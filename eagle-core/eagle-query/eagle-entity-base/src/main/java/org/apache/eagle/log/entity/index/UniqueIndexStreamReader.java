@@ -27,26 +27,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UniqueIndexStreamReader extends IndexStreamReader {
-	public UniqueIndexStreamReader(IndexDefinition indexDef, SearchCondition condition) {
-		super(indexDef, condition, new ArrayList<byte[]>());
-		final IndexType type = indexDef.canGoThroughIndex(condition.getQueryExpression(), indexRowkeys);
-		if (!IndexType.UNIQUE_INDEX.equals(type)) {
-			throw new IllegalArgumentException("This query can't go through index: " + condition.getQueryExpression());
-		}
-	}
+    public UniqueIndexStreamReader(IndexDefinition indexDef, SearchCondition condition) {
+        super(indexDef, condition, new ArrayList<byte[]>());
+        final IndexType type = indexDef.canGoThroughIndex(condition.getQueryExpression(), indexRowkeys);
+        if (!IndexType.UNIQUE_INDEX.equals(type)) {
+            throw new IllegalArgumentException("This query can't go through index: " + condition.getQueryExpression());
+        }
+    }
 
-	public UniqueIndexStreamReader(IndexDefinition indexDef, SearchCondition condition, List<byte[]> indexRowkeys) {
-		super(indexDef, condition, indexRowkeys);
-	}
+    public UniqueIndexStreamReader(IndexDefinition indexDef, SearchCondition condition, List<byte[]> indexRowkeys) {
+        super(indexDef, condition, indexRowkeys);
+    }
 
-	@Override
-	protected LogReader createIndexReader() {
-		final EntityDefinition entityDef = indexDef.getEntityDefinition();
-//		final
-		byte[][] outputQualifiers = null;
-		if(!condition.isOutputAll()) {
-			outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
-		}
-		return new UniqueIndexLogReader(indexDef, indexRowkeys, outputQualifiers, condition.getFilter());
-	}
+    @Override
+    protected LogReader createIndexReader() {
+        final EntityDefinition entityDef = indexDef.getEntityDefinition();
+        byte[][] outputQualifiers = null;
+        if (!condition.isOutputAll()) {
+            outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
+        }
+        return new UniqueIndexLogReader(indexDef, indexRowkeys, outputQualifiers, condition.getFilter());
+    }
 }

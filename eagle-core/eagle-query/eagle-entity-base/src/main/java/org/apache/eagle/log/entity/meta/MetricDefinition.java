@@ -25,44 +25,53 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class MetricDefinition implements Writable {
-	private final static Logger LOG = LoggerFactory.getLogger(MetricDefinition.class);
-	private long interval;
-	private Class<?> singleTimestampEntityClass;
-	public long getInterval() {
-		return interval;
-	}
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
-	public Class<?> getSingleTimestampEntityClass() {
-		return singleTimestampEntityClass;
-	}
-	public void setSingleTimestampEntityClass(Class<?> singleTimestampEntityClass) {
-		this.singleTimestampEntityClass = singleTimestampEntityClass;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(MetricDefinition.class);
+    private long interval;
+    private Class<?> singleTimestampEntityClass;
 
-	private final static String EMPTY="";
-	@Override
-	public void write(DataOutput out) throws IOException {
-		if(LOG.isDebugEnabled()) LOG.debug("Writing metric definition: interval = "+interval+" singleTimestampEntityClass = "+ this.singleTimestampEntityClass);
-		out.writeLong(interval);
-		if(this.singleTimestampEntityClass == null){
-			out.writeUTF(EMPTY);
-		}else {
-			out.writeUTF(this.singleTimestampEntityClass.getName());
-		}
-	}
+    public long getInterval() {
+        return interval;
+    }
 
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		interval = in.readLong();
-		String singleTimestampEntityClassName = in.readUTF();
-		if(!EMPTY.equals(singleTimestampEntityClassName)) {
-			try {
-				this.singleTimestampEntityClass = Class.forName(singleTimestampEntityClassName);
-			} catch (ClassNotFoundException e) {
-				if(LOG.isDebugEnabled()) LOG.warn("Class " + singleTimestampEntityClassName + " not found ");
-			}
-		}
-	}
+    public void setInterval(long interval) {
+        this.interval = interval;
+    }
+
+    public Class<?> getSingleTimestampEntityClass() {
+        return singleTimestampEntityClass;
+    }
+
+    public void setSingleTimestampEntityClass(Class<?> singleTimestampEntityClass) {
+        this.singleTimestampEntityClass = singleTimestampEntityClass;
+    }
+
+    private static final String EMPTY = "";
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Writing metric definition: interval = " + interval + " singleTimestampEntityClass = " + this.singleTimestampEntityClass);
+        }
+        out.writeLong(interval);
+        if (this.singleTimestampEntityClass == null) {
+            out.writeUTF(EMPTY);
+        } else {
+            out.writeUTF(this.singleTimestampEntityClass.getName());
+        }
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        interval = in.readLong();
+        String singleTimestampEntityClassName = in.readUTF();
+        if (!EMPTY.equals(singleTimestampEntityClassName)) {
+            try {
+                this.singleTimestampEntityClass = Class.forName(singleTimestampEntityClassName);
+            } catch (ClassNotFoundException e) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.warn("Class " + singleTimestampEntityClassName + " not found ");
+                }
+            }
+        }
+    }
 }

@@ -24,51 +24,54 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @since : 10/30/14,2014
- */
-public class GenericEntityQuery implements GenericQuery,EntityCreationListener {
-	private static final Logger LOG = LoggerFactory.getLogger(GenericEntityQuery.class);
+public class GenericEntityQuery implements GenericQuery, EntityCreationListener {
+    private static final Logger LOG = LoggerFactory.getLogger(GenericEntityQuery.class);
 
-	private List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
-	private StreamReader reader;
+    private List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
+    private StreamReader reader;
 
-	public GenericEntityQuery(String serviceName, SearchCondition condition, String metricName) throws IllegalAccessException, InstantiationException {
-		if(serviceName.equals(GenericMetricEntity.GENERIC_METRIC_SERVICE)){
-			if(LOG.isDebugEnabled()) LOG.debug("List metric query");
-			if(metricName == null || metricName.isEmpty()){
-				throw new IllegalArgumentException("metricName should not be empty for metric list query");
-			}
-			if(!condition.getOutputFields().contains(GenericMetricEntity.VALUE_FIELD)){
-				condition.getOutputFields().add(GenericMetricEntity.VALUE_FIELD);
-			}
-			reader = new GenericEntityStreamReader(serviceName, condition,metricName);
-		}else{
-			if(LOG.isDebugEnabled()) LOG.debug("List entity query");
-			reader = new GenericEntityStreamReader(serviceName, condition);
-		}
-		reader.register(this);
-	}
+    public GenericEntityQuery(String serviceName, SearchCondition condition, String metricName) throws IllegalAccessException, InstantiationException {
+        if (serviceName.equals(GenericMetricEntity.GENERIC_METRIC_SERVICE)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("List metric query");
+            }
+            if (metricName == null || metricName.isEmpty()) {
+                throw new IllegalArgumentException("metricName should not be empty for metric list query");
+            }
+            if (!condition.getOutputFields().contains(GenericMetricEntity.VALUE_FIELD)) {
+                condition.getOutputFields().add(GenericMetricEntity.VALUE_FIELD);
+            }
+            reader = new GenericEntityStreamReader(serviceName, condition, metricName);
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("List entity query");
+            }
+            reader = new GenericEntityStreamReader(serviceName, condition);
+        }
+        reader.register(this);
+    }
 
-	@Override
-	public long getLastTimestamp() {
-		return reader.getLastTimestamp();
-	}
+    @Override
+    public long getLastTimestamp() {
+        return reader.getLastTimestamp();
+    }
 
-	@Override
-	public void entityCreated(TaggedLogAPIEntity entity){
-		entities.add(entity);
-	}
+    @Override
+    public void entityCreated(TaggedLogAPIEntity entity) {
+        entities.add(entity);
+    }
 
-	@Override
-	public List<TaggedLogAPIEntity> result() throws Exception{
-		if(LOG.isDebugEnabled()) LOG.debug("Start reading as batch mode");
-		reader.readAsStream();
-		return entities;
-	}
+    @Override
+    public List<TaggedLogAPIEntity> result() throws Exception {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start reading as batch mode");
+        }
+        reader.readAsStream();
+        return entities;
+    }
 
-	@Override
-	public long getFirstTimeStamp() {
-		return reader.getFirstTimestamp();
-	}
+    @Override
+    public long getFirstTimeStamp() {
+        return reader.getFirstTimestamp();
+    }
 }

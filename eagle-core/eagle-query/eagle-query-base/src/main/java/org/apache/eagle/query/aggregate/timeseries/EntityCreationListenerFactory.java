@@ -19,7 +19,7 @@ package org.apache.eagle.query.aggregate.timeseries;
 import org.apache.eagle.log.entity.EntityCreationListener;
 
 public class EntityCreationListenerFactory {
-	public static EntityCreationListener synchronizedEntityCreationListener(EntityCreationListener listener){
-		return new SynchronizedEntityCreationListener(listener);
-	}
+    public static EntityCreationListener synchronizedEntityCreationListener(EntityCreationListener listener) {
+        return new SynchronizedEntityCreationListener(listener);
+    }
 }

@@ -22,7 +22,7 @@ import org.apache.eagle.log.entity.repo.EntityRepository;
 
 public class AuditEntityRepository extends EntityRepository {
 
-	public AuditEntityRepository() {
-		entitySet.add(GenericAuditEntity.class);
-	}
+    public AuditEntityRepository() {
+        entitySet.add(GenericAuditEntity.class);
+    }
 }

@@ -16,13 +16,14 @@
  */
 package org.apache.eagle.query.aggregate;
 
-public class IllegalAggregateFieldTypeException extends RuntimeException{
-	static final long serialVersionUID = -4548788354899625887L;
-	public IllegalAggregateFieldTypeException(){
-		super();
-	}
-	
-	public IllegalAggregateFieldTypeException(String message){
-		super(message + ", only count and sum are support");
-	}
+public class IllegalAggregateFieldTypeException extends RuntimeException {
+    static final long serialVersionUID = -4548788354899625887L;
+
+    public IllegalAggregateFieldTypeException() {
+        super();
+    }
+
+    public IllegalAggregateFieldTypeException(String message) {
+        super(message + ", only count and sum are support");
+    }
 }

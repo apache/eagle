@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.storage.jdbc.conn;
 
-/**
- * @since 3/26/15
- */
 public class ConnectionConfig {
     public String getAdapter() {
         return adapter;
@@ -46,7 +43,7 @@ public class ConnectionConfig {
     private String connectionProperties;
 
     /**
-     * Max active connections number
+     * Max active connections number.
      */
     private int connectionMaxActive = 8;
 

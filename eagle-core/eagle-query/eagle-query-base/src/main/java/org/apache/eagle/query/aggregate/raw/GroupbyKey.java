@@ -17,7 +17,6 @@
 package org.apache.eagle.query.aggregate.raw;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.ByteWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Writable;
 
@@ -38,112 +37,116 @@ import java.util.ListIterator;
  * </pre>
  */
 public class GroupbyKey implements Writable {
-	private final WritableList<BytesWritable> value;
+    private final WritableList<BytesWritable> value;
 
-	public void addValue(byte[] value){
-		this.value.add(new BytesWritable(value));
-	}
-	public void addAll(List<BytesWritable> list){
-		this.value.addAll(list);
-	}
+    public void addValue(byte[] value) {
+        this.value.add(new BytesWritable(value));
+    }
 
-	public List<BytesWritable> getValue(){
-		return value;
-	}
+    public void addAll(List<BytesWritable> list) {
+        this.value.addAll(list);
+    }
 
-	/**
-	 * empty constructor
-	 */
-	public GroupbyKey(){
-		this.value = new WritableList<BytesWritable>(BytesWritable.class);
-	}
+    public List<BytesWritable> getValue() {
+        return value;
+    }
 
-	/**
-	 * clear for reuse
-	 */
-	public void clear(){
-		value.clear();
-	}
+    /**
+     * empty constructor.
+     */
+    public GroupbyKey() {
+        this.value = new WritableList<BytesWritable>(BytesWritable.class);
+    }
 
-	/**
-	 * copy constructor
-	 * @param key
-	 */
-	public GroupbyKey(GroupbyKey key){
-		this();
-		ListIterator<BytesWritable> it = key.value.listIterator();
-//		ListIterator<byte[]> it = key.value.listIterator();
-		while(it.hasNext()){
-			this.value.add(it.next());
-		}
-	}
+    /**
+     * clear for reuse.
+     */
+    public void clear() {
+        value.clear();
+    }
 
-	public GroupbyKey(List<byte[]> bytes){
-		this();
-		for(byte[] bt:bytes){
-			this.addValue(bt);
-		}
-	}
+    /**
+     * copy constructor.
+     *
+     * @param key
+     */
+    public GroupbyKey(GroupbyKey key) {
+        this();
+        ListIterator<BytesWritable> it = key.value.listIterator();
+        // ListIterator<byte[]> it = key.value.listIterator();
+        while (it.hasNext()) {
+            this.value.add(it.next());
+        }
+    }
 
-	@Override
-	public boolean equals(Object obj){
-		if(obj == this)
-			return true;
-		if(!(obj instanceof GroupbyKey)){
-			return false;
-		}
-		GroupbyKey that = (GroupbyKey)obj;
-		ListIterator<BytesWritable> e1 = this.value.listIterator();
-		ListIterator<BytesWritable> e2 = that.value.listIterator();
-		while(e1.hasNext() && e2.hasNext()){
-			if(!Arrays.equals(e1.next().getBytes(), e2.next().getBytes()))
-				return false;
-		}
-		return !(e1.hasNext() || e2.hasNext());
-	}
+    public GroupbyKey(List<byte[]> bytes) {
+        this();
+        for (byte[] bt : bytes) {
+            this.addValue(bt);
+        }
+    }
 
-	@Override
-	public String toString() {
-		List<String> items = new ArrayList<>(this.value.size());
-		ListIterator<BytesWritable> iterator = this.value.listIterator();
-		while(iterator.hasNext()){
-			items.add(iterator.next().toString());
-		}
-		return String.format("%s(%s)",this.getClass().getSimpleName(),StringUtils.join(items,","));
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof GroupbyKey)) {
+            return false;
+        }
+        GroupbyKey that = (GroupbyKey) obj;
+        ListIterator<BytesWritable> e1 = this.value.listIterator();
+        ListIterator<BytesWritable> e2 = that.value.listIterator();
+        while (e1.hasNext() && e2.hasNext()) {
+            if (!Arrays.equals(e1.next().getBytes(), e2.next().getBytes())) {
+                return false;
+            }
+        }
+        return !(e1.hasNext() || e2.hasNext());
+    }
 
-	@Override
-	public int hashCode(){
-		ListIterator<BytesWritable> e1 = this.value.listIterator();
-		int hash = 0xFFFFFFFF;
-		while(e1.hasNext()){
-			hash ^= Arrays.hashCode(e1.next().getBytes());
-		}
-		return hash;
-	}
+    @Override
+    public String toString() {
+        List<String> items = new ArrayList<>(this.value.size());
+        ListIterator<BytesWritable> iterator = this.value.listIterator();
+        while (iterator.hasNext()) {
+            items.add(iterator.next().toString());
+        }
+        return String.format("%s(%s)", this.getClass().getSimpleName(), StringUtils.join(items, ","));
+    }
 
-	/**
-	 * Serialize the fields of this object to <code>out</code>.
-	 *
-	 * @param out <code>DataOuput</code> to serialize this object into.
-	 * @throws java.io.IOException
-	 */
-	@Override
-	public void write(DataOutput out) throws IOException {
-		this.value.write(out);
-	}
+    @Override
+    public int hashCode() {
+        ListIterator<BytesWritable> e1 = this.value.listIterator();
+        int hash = 0xFFFFFFFF;
+        while (e1.hasNext()) {
+            hash ^= Arrays.hashCode(e1.next().getBytes());
+        }
+        return hash;
+    }
 
-	/**
-	 * Deserialize the fields of this object from <code>in</code>.
-	 * <p/>
-	 * <p>For efficiency, implementations should attempt to re-use storage in the
-	 * existing object where possible.</p>
-	 *
-	 * @param in <code>DataInput</code> to deseriablize this object from.
-	 * @throws java.io.IOException
-	 */
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		this.value.readFields(in);
-	}
+    /**
+     * Serialize the fields of this object to <code>out</code>.
+     *
+     * @param out <code>DataOuput</code> to serialize this object into.
+     * @throws java.io.IOException
+     */
+    @Override
+    public void write(DataOutput out) throws IOException {
+        this.value.write(out);
+    }
+
+    /**
+     * Deserialize the fields of this object from <code>in</code>.
+     * <p/>
+     * <p>For efficiency, implementations should attempt to re-use storage in the
+     * existing object where possible.</p>
+     *
+     * @param in <code>DataInput</code> to deseriablize this object from.
+     * @throws java.io.IOException
+     */
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.value.readFields(in);
+    }
 }

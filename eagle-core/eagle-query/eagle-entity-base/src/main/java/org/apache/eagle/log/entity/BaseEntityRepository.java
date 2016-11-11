@@ -18,9 +18,9 @@ package org.apache.eagle.log.entity;
 
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public class BaseEntityRepository  extends EntityRepository {
+public class BaseEntityRepository extends EntityRepository {
 
-	public BaseEntityRepository() {
-		entitySet.add(GenericMetricEntity.class);
-	}
+    public BaseEntityRepository() {
+        entitySet.add(GenericMetricEntity.class);
+    }
 }

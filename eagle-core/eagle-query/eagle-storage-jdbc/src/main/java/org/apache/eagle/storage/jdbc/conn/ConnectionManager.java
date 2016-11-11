@@ -18,12 +18,9 @@ package org.apache.eagle.storage.jdbc.conn;
 
 import java.sql.Connection;
 
-/**
- * @since 3/27/15
- */
 public interface ConnectionManager {
     /**
-     *
+     * init.
      * @param config
      * @throws Exception
      */
@@ -32,35 +29,35 @@ public interface ConnectionManager {
     ConnectionConfig getConfig();
 
     /**
-     *
+     * getConnnetion.
      * @return
      * @throws Exception
      */
     Connection getConnection() throws Exception;
 
     /**
-     * Get default database StatementExecutor
+     * Get default database StatementExecutor.
      *
      * @return StatementExecutor implementation
      */
     <T extends StatementExecutor> T getStatementExecutor();
 
     /**
-     * Get default database StatementExecutor
+     * Get default database StatementExecutor.
      *
      * @return StatementExecutor implementation
      */
     <T extends StatementExecutor> T getStatementExecutor(String tableName);
 
     /**
-     *
+     * close connection.
      * @param connection
      * @throws Exception
      */
     void close(Connection connection) throws Exception;
 
     /**
-     *
+     * shutdown.
      * @throws Exception
      */
     void shutdown() throws Exception;

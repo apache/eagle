@@ -16,39 +16,40 @@
  */
 package org.apache.eagle.query.parser;
 
-import org.apache.eagle.query.antlr.generated.EagleFilterLexer;
-import org.apache.eagle.query.antlr.generated.EagleFilterParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.apache.eagle.query.antlr.generated.EagleFilterLexer;
+import org.apache.eagle.query.antlr.generated.EagleFilterParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EagleQueryParser {
-	private static final Logger LOG = LoggerFactory.getLogger(EagleQueryParser.class);
-	private String _query;
-	public EagleQueryParser(String query){
-		_query = query;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(EagleQueryParser.class);
+    private String query;
 
-	public ORExpression parse() throws EagleQueryParseException{
-		try{
-			EagleFilterLexer lexer = new EagleFilterLexer(new ANTLRInputStream(_query));
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			tokens.fill();
-			EagleFilterParser p = new EagleFilterParser(tokens);
-			p.setErrorHandler(new EagleANTLRErrorStrategy());
-			p.setBuildParseTree(true);
-			EagleQueryFilterListenerImpl listener = new EagleQueryFilterListenerImpl(); 
-			p.addParseListener(listener);
-			EagleFilterParser.FilterContext fc = p.filter();
-			if(fc.exception != null){
-				LOG.error("Can not successfully parse the query:" + _query, fc.exception);
-				throw fc.exception;
-			}
-			return listener.result();
-		}catch(Exception ex){
-			LOG.error("Can not successfully parse the query:", ex);
-			throw new EagleQueryParseException("can not successfully parse the query:" + _query);
-		}
-	}
+    public EagleQueryParser(String query) {
+        this.query = query;
+    }
+
+    public ORExpression parse() throws EagleQueryParseException {
+        try {
+            EagleFilterLexer lexer = new EagleFilterLexer(new ANTLRInputStream(query));
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            tokens.fill();
+            EagleFilterParser p = new EagleFilterParser(tokens);
+            p.setErrorHandler(new EagleANTLRErrorStrategy());
+            p.setBuildParseTree(true);
+            EagleQueryFilterListenerImpl listener = new EagleQueryFilterListenerImpl();
+            p.addParseListener(listener);
+            EagleFilterParser.FilterContext fc = p.filter();
+            if (fc.exception != null) {
+                LOG.error("Can not successfully parse the query:" + query, fc.exception);
+                throw fc.exception;
+            }
+            return listener.result();
+        } catch (Exception ex) {
+            LOG.error("Can not successfully parse the query:", ex);
+            throw new EagleQueryParseException("can not successfully parse the query:" + query);
+        }
+    }
 }

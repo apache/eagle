@@ -22,18 +22,20 @@ import java.util.List;
 /**
  * this is default comparator for aggregation. The behavior is to sort by groupby fields ascendantly
  */
-public class GroupbyFieldsComparator implements Comparator<List<String>>{
-	@Override 
-    public int compare(List<String> list1, List<String> list2){
-		if(list1 == null || list2 == null || list1.size() != list2.size())
-			throw new IllegalArgumentException("2 list of groupby fields must be non-null and have the same size");
-		int r = 0;
-		int index = 0;
-		for(String s1 : list1){
-			r = s1.compareTo(list2.get(index++));
-			if(r != 0)
-				return r;
-		}
-		return r;
-	}
+public class GroupbyFieldsComparator implements Comparator<List<String>> {
+    @Override
+    public int compare(List<String> list1, List<String> list2) {
+        if (list1 == null || list2 == null || list1.size() != list2.size()) {
+            throw new IllegalArgumentException("2 list of groupby fields must be non-null and have the same size");
+        }
+        int r = 0;
+        int index = 0;
+        for (String s1 : list1) {
+            r = s1.compareTo(list2.get(index++));
+            if (r != 0) {
+                return r;
+            }
+        }
+        return r;
+    }
 }

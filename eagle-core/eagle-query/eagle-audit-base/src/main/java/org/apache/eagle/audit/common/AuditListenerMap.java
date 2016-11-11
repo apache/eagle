@@ -21,7 +21,7 @@ import org.apache.eagle.audit.listener.AuditListener;
 import org.apache.eagle.audit.listener.AuditListenerProxy;
 
 public final class AuditListenerMap extends BaseAuditListenerMap<AuditListener> {
-	
+
     private static final AuditListener[] EMPTY = {};
 
     @Override

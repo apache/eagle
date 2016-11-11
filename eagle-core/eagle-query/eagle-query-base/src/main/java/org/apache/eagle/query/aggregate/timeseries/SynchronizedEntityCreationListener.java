@@ -19,18 +19,18 @@ package org.apache.eagle.query.aggregate.timeseries;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.EntityCreationListener;
 
-public class SynchronizedEntityCreationListener implements EntityCreationListener{
-	private Object mutex = new Object();
-	private EntityCreationListener listener;
-	
-	public SynchronizedEntityCreationListener(EntityCreationListener listener){
-		this.listener = listener;
-	}
-	
-	@Override
-	public void entityCreated(TaggedLogAPIEntity entity) throws Exception{
-		synchronized(mutex){
-			listener.entityCreated(entity);
-		}
-	}
+public class SynchronizedEntityCreationListener implements EntityCreationListener {
+    private Object mutex = new Object();
+    private EntityCreationListener listener;
+
+    public SynchronizedEntityCreationListener(EntityCreationListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void entityCreated(TaggedLogAPIEntity entity) throws Exception {
+        synchronized (mutex) {
+            listener.entityCreated(entity);
+        }
+    }
 }

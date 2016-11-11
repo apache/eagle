@@ -23,9 +23,9 @@ import org.junit.Test;
 
 public class TestJdbcEntityDefinition {
     @Test
-    public void testColumnClassType(){
+    public void testColumnClassType() {
         try {
-            Assert.assertEquals(Integer.class,TestTimeSeriesAPIEntity.class.getDeclaredField("field2").getType());
+            Assert.assertEquals(Integer.class, TestTimeSeriesAPIEntity.class.getDeclaredField("field2").getType());
         } catch (NoSuchFieldException e) {
             Assert.fail(e.getMessage());
         }

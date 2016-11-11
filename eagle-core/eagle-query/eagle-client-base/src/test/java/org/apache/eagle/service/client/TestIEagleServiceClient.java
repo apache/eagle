@@ -30,8 +30,9 @@ import java.util.List;
 
 public class TestIEagleServiceClient extends ClientTestBase {
     IEagleServiceClient client;
+
     //@Before
-    public void setUp(){
+    public void setUp() {
         client = new EagleServiceClientImpl("localhost", EagleConfigFactory.load().getServicePort());
     }
 
@@ -47,11 +48,11 @@ public class TestIEagleServiceClient extends ClientTestBase {
         client = new EagleServiceClientImpl("localhost", EagleConfigFactory.load().getServicePort());
         List<GenericMetricEntity> metricEntityList = new ArrayList<GenericMetricEntity>();
         GenericServiceAPIResponseEntity<String> unTypedResponse = client.create(metricEntityList);
-        GenericServiceAPIResponseEntity<String> weakTypedResponse = client.create(metricEntityList,GenericMetricEntity.GENERIC_METRIC_SERVICE);
-        GenericServiceAPIResponseEntity<String> strongTypedResponse = client.create(metricEntityList,GenericMetricEntity.class);
+        GenericServiceAPIResponseEntity<String> weakTypedResponse = client.create(metricEntityList, GenericMetricEntity.GENERIC_METRIC_SERVICE);
+        GenericServiceAPIResponseEntity<String> strongTypedResponse = client.create(metricEntityList, GenericMetricEntity.class);
 
         GenericServiceAPIResponseEntity<GenericMetricEntity> weakTypedSearchResponse = client.search("").send();
-        if(weakTypedSearchResponse!=null) {
+        if (weakTypedSearchResponse != null) {
             Class<GenericMetricEntity> typedClazz = weakTypedSearchResponse.getType();
             List<GenericMetricEntity> typedEntities = weakTypedSearchResponse.getObj();
         }

@@ -16,31 +16,31 @@
  */
 /**
  * <h1>Eagle Storage Extension - JDBC</h1>
- *
+ * <p>
  * <h2>Configuration</h2>
  * <ul>
- *  <li>
- *     eagle.storage.type: <code>jdbc</code>
- *  </li>
- *  <li>
- *     eagle.storage.adapter:
- *      <code>mysql</code>
- *      <code>mysql</code>
- *      <code>oracle</code>
- *      <code>postgres</code>
- *      <code>mssql</code>
- *      <code>hsqldb</code>
- *      <code>derby</code>
- *  </li>
- *  <li>eagle.storage.username</li>
- *  <li>eagle.storage.password</li>
- *  <li>eagle.storage.database</li>
- *  <li>eagle.storage.connection.url</li>
- *  <li>eagle.storage.connection.props</li>
- *  <li>eagle.storage.driver.class</li>
- *  <li>eagle.storage.connection.max</li>
+ * <li>
+ * eagle.storage.type: <code>jdbc</code>
+ * </li>
+ * <li>
+ * eagle.storage.adapter:
+ * <code>mysql</code>
+ * <code>mysql</code>
+ * <code>oracle</code>
+ * <code>postgres</code>
+ * <code>mssql</code>
+ * <code>hsqldb</code>
+ * <code>derby</code>
+ * </li>
+ * <li>eagle.storage.username</li>
+ * <li>eagle.storage.password</li>
+ * <li>eagle.storage.database</li>
+ * <li>eagle.storage.connection.url</li>
+ * <li>eagle.storage.connection.props</li>
+ * <li>eagle.storage.driver.class</li>
+ * <li>eagle.storage.connection.max</li>
  * </ul>
- *
+ * <p>
  * Sample:
  * <pre>
  *   eagle.storage.type=jdbc
@@ -53,30 +53,30 @@
  *   eagle.storage.driver.class=com.mysql.jdbc.Driver
  *   eagle.storage.connection.max=8
  * </pre>
- *
+ * <p>
  * <h2>Rowkey</h2>
- *
+ * <p>
  * We simply use UUID as row key of entities and use the key as the primary key named "uuid" in RDBMS table schema
- *
+ * <p>
  * <h2>Features</h2>
  * <ul>
- *  <li>Support basic entity operation like  CREATE, READ, UPDATE and DELETE</li>
- *  <li>Support flatten aggregation query</li>
- *  <li>Support customized entity field type (JdbcEntityDefinitionManager#registerJdbcSerDeser) </li>
+ * <li>Support basic entity operation like  CREATE, READ, UPDATE and DELETE</li>
+ * <li>Support flatten aggregation query</li>
+ * <li>Support customized entity field type (JdbcEntityDefinitionManager#registerJdbcSerDeser) </li>
  * </ul>
- *
+ * <p>
  * <h2>Dependencies</h2>
  * <ul>
- *     <li>Apache DB - Torque: http://db.apache.org/torque/torque-4.0/index.html</li>
- *     <li>Apache DB - DdlUtils: https://db.apache.org/ddlutils/</li>
+ * <li>Apache DB - Torque: http://db.apache.org/torque/torque-4.0/index.html</li>
+ * <li>Apache DB - DdlUtils: https://db.apache.org/ddlutils/</li>
  * </ul>
- *
+ * <p>
  * <h2>TO-DO</h2>
  * <ul>
- *     <li>Support time-series based aggregation</li>
- *     <li>Investigate why writing performance becomes slower as records count in table increases</li>
- *     <li>Implement batch insert in JdbcEntityWriterImpl</li>
- *     <li>Implement DDL Management to generate default table schema DDL according entity definition</li>
+ * <li>Support time-series based aggregation</li>
+ * <li>Investigate why writing performance becomes slower as records count in table increases</li>
+ * <li>Implement batch insert in JdbcEntityWriterImpl</li>
+ * <li>Implement DDL Management to generate default table schema DDL according entity definition</li>
  * </ul>
  *
  * @since 3/26/15

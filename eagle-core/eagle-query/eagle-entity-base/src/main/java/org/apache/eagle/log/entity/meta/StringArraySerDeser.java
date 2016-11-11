@@ -16,79 +16,80 @@
  */
 package org.apache.eagle.log.entity.meta;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.eagle.common.ByteUtil;
 
+import java.io.UnsupportedEncodingException;
+
 /**
- * String array entity serializer and deserializer
- *
+ * String array entity serializer and deserializer.
  */
 public class StringArraySerDeser implements EntitySerDeser<String[]> {
 
-	public static final int MAX_STRING_LENGTH = 65535;
-	public static final String UTF_8 = "UTF-8";
-	
-	@Override
-	public String[] deserialize(byte[] bytes) {
-		if(bytes == null || bytes.length < 4)
-			return null;
-		int offset = 0;
-		// get size of int array
-		final int size = ByteUtil.bytesToInt(bytes, offset);
-		offset += 4;
-		final String[] strings = new String[size];
-		try {
-			for(int i = 0; i < size; i++) {
-				final int len = ByteUtil.bytesToInt(bytes, offset);
-				offset += 4;
-				strings[i] = new String(bytes, offset, len, UTF_8);
-				offset += len;
-			}
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalArgumentException("Invalid byte array");
-		}
-		return strings;
-	}
-	
-	/**
-	 *  size + str1 length + str1 + str2 length + str2 + ...
-	 *   4B        4B         n1B        4B        n2B
-	 *  
-	 * @param obj
-	 * @return
-	 */
-	@Override
-	public byte[] serialize(String[] array) {
-		if(array == null)
-			return null;
-		final int size = array.length;
-		final byte[][] tmp = new byte[size][];
-		int total = 4 + 4 * size;
-		for (int i = 0; i < size; ++i) {
-			try {
-				tmp[i] = array[i].getBytes(UTF_8);
-			} catch (UnsupportedEncodingException e) {
-				throw new IllegalArgumentException("String doesn't support UTF-8 encoding: " + array[i]);
-			}
-			total += tmp[i].length;
-		}
-		final byte[] result = new byte[total];
-		int offset = 0;
-		ByteUtil.intToBytes(size, result, offset);
-		offset += 4;
-		for (int i = 0; i < size; ++i) {
-			ByteUtil.intToBytes(tmp[i].length, result, offset);
-			offset += 4;
-			System.arraycopy(tmp[i], 0, result, offset, tmp[i].length);
-			offset += tmp[i].length;
-		}
-		return result;
-	}
+    public static final int MAX_STRING_LENGTH = 65535;
+    public static final String UTF_8 = "UTF-8";
 
-	@Override
-	public Class<String[]> type() {
-		return String[].class;
-	}
+    @Override
+    public String[] deserialize(byte[] bytes) {
+        if (bytes == null || bytes.length < 4) {
+            return null;
+        }
+        int offset = 0;
+        // get size of int array
+        final int size = ByteUtil.bytesToInt(bytes, offset);
+        offset += 4;
+        final String[] strings = new String[size];
+        try {
+            for (int i = 0; i < size; i++) {
+                final int len = ByteUtil.bytesToInt(bytes, offset);
+                offset += 4;
+                strings[i] = new String(bytes, offset, len, UTF_8);
+                offset += len;
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Invalid byte array");
+        }
+        return strings;
+    }
+
+    /**
+     * size + str1 length + str1 + str2 length + str2 + ...
+     * 4B        4B         n1B        4B        n2B
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public byte[] serialize(String[] array) {
+        if (array == null) {
+            return null;
+        }
+        final int size = array.length;
+        final byte[][] tmp = new byte[size][];
+        int total = 4 + 4 * size;
+        for (int i = 0; i < size; ++i) {
+            try {
+                tmp[i] = array[i].getBytes(UTF_8);
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalArgumentException("String doesn't support UTF-8 encoding: " + array[i]);
+            }
+            total += tmp[i].length;
+        }
+        final byte[] result = new byte[total];
+        int offset = 0;
+        ByteUtil.intToBytes(size, result, offset);
+        offset += 4;
+        for (int i = 0; i < size; ++i) {
+            ByteUtil.intToBytes(tmp[i].length, result, offset);
+            offset += 4;
+            System.arraycopy(tmp[i], 0, result, offset, tmp[i].length);
+            offset += tmp[i].length;
+        }
+        return result;
+    }
+
+    @Override
+    public Class<String[]> type() {
+        return String[].class;
+    }
 
 }

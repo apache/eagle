@@ -19,55 +19,51 @@ package org.apache.eagle.query.aggregate;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- *
- * @since : 11/7/14,2014
- */
-public class AggregateCondition implements Serializable{
-	private static final long serialVersionUID = 1L;
-	private List<String> groupbyFields;
-	private List<AggregateFunctionType> aggregateFunctionTypes;
-	private List<String> aggregateFields;
-	private boolean timeSeries;
-	private long intervalMS;
+public class AggregateCondition implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private List<String> groupbyFields;
+    private List<AggregateFunctionType> aggregateFunctionTypes;
+    private List<String> aggregateFields;
+    private boolean timeSeries;
+    private long intervalMS;
 
-	public List<String> getGroupbyFields() {
-		return groupbyFields;
-	}
+    public List<String> getGroupbyFields() {
+        return groupbyFields;
+    }
 
-	public void setGroupbyFields(List<String> groupbyFields) {
-		this.groupbyFields = groupbyFields;
-	}
+    public void setGroupbyFields(List<String> groupbyFields) {
+        this.groupbyFields = groupbyFields;
+    }
 
-	public List<AggregateFunctionType> getAggregateFunctionTypes() {
-		return aggregateFunctionTypes;
-	}
+    public List<AggregateFunctionType> getAggregateFunctionTypes() {
+        return aggregateFunctionTypes;
+    }
 
-	public void setAggregateFunctionTypes(List<AggregateFunctionType> aggregateFunctionTypes) {
-		this.aggregateFunctionTypes = aggregateFunctionTypes;
-	}
+    public void setAggregateFunctionTypes(List<AggregateFunctionType> aggregateFunctionTypes) {
+        this.aggregateFunctionTypes = aggregateFunctionTypes;
+    }
 
-	public List<String> getAggregateFields() {
-		return aggregateFields;
-	}
+    public List<String> getAggregateFields() {
+        return aggregateFields;
+    }
 
-	public void setAggregateFields(List<String> aggregateFields) {
-		this.aggregateFields = aggregateFields;
-	}
+    public void setAggregateFields(List<String> aggregateFields) {
+        this.aggregateFields = aggregateFields;
+    }
 
-	public boolean isTimeSeries() {
-		return timeSeries;
-	}
+    public boolean isTimeSeries() {
+        return timeSeries;
+    }
 
-	public void setTimeSeries(boolean timeSeries) {
-		this.timeSeries = timeSeries;
-	}
+    public void setTimeSeries(boolean timeSeries) {
+        this.timeSeries = timeSeries;
+    }
 
-	public long getIntervalMS() {
-		return intervalMS;
-	}
+    public long getIntervalMS() {
+        return intervalMS;
+    }
 
-	public void setIntervalMS(long intervalMS) {
-		this.intervalMS = intervalMS;
-	}
+    public void setIntervalMS(long intervalMS) {
+        this.intervalMS = intervalMS;
+    }
 }

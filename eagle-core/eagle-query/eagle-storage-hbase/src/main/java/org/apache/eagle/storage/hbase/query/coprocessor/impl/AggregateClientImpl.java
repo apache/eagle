@@ -85,20 +85,20 @@ public class AggregateClientImpl implements AggregateClient {
                         BlockingRpcCallback<AggregateProtos.AggregateResult> rpcCallback = new BlockingRpcCallback<>();
                         if (timeSeries) {
                             AggregateProtos.TimeSeriesAggregateRequest timeSeriesAggregateRequest = ProtoBufConverter
-                                    .toPBTimeSeriesRequest(
-                                            entityDefinition,
-                                            scan,
-                                            groupbyFields,
-                                            _aggregateFuncTypesBytes,
-                                            aggregatedFields,
-                                            startTime,
-                                            endTime,
-                                            intervalMin);
+                                .toPBTimeSeriesRequest(
+                                    entityDefinition,
+                                    scan,
+                                    groupbyFields,
+                                    _aggregateFuncTypesBytes,
+                                    aggregatedFields,
+                                    startTime,
+                                    endTime,
+                                    intervalMin);
                             instance.timeseriesAggregate(null, timeSeriesAggregateRequest, rpcCallback);
                             return rpcCallback.get();
                         } else {
                             AggregateProtos.AggregateRequest aggregateRequest = ProtoBufConverter.toPBRequest(
-                                    entityDefinition, scan, groupbyFields, _aggregateFuncTypesBytes, aggregatedFields);
+                                entityDefinition, scan, groupbyFields, _aggregateFuncTypesBytes, aggregatedFields);
                             instance.aggregate(null, aggregateRequest, rpcCallback);
                             return rpcCallback.get();
                         }

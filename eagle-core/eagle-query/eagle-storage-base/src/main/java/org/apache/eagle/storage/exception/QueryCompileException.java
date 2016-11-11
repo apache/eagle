@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.storage.exception;
 
-/**
- * @since 3/23/15
- */
 public class QueryCompileException extends Exception {
     public QueryCompileException() {
         super();

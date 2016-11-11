@@ -19,16 +19,16 @@ package org.apache.eagle.log.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 /**
- * just a shadow class to avoid dynamically create the class and instantiate using reflection
+ * just a shadow class to avoid dynamically create the class and instantiate using reflection.
  */
 public class GenericMetricShadowEntity extends TaggedLogAPIEntity {
-	private double value;
+    private double value;
 
-	public double getValue() {
-		return value;
-	}
+    public double getValue() {
+        return value;
+    }
 
-	public void setValue(double value) {
-		this.value = value;
-	}
+    public void setValue(double value) {
+        this.value = value;
+    }
 }

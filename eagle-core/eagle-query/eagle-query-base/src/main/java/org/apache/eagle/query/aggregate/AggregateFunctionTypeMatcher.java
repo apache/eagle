@@ -17,25 +17,25 @@
 package org.apache.eagle.query.aggregate;
 
 public class AggregateFunctionTypeMatcher {
-	private final AggregateFunctionType type;
-	private final boolean matched;
-	private final String field;
+    private final AggregateFunctionType type;
+    private final boolean matched;
+    private final String field;
 
-	public AggregateFunctionTypeMatcher(AggregateFunctionType type, boolean matched, String field){
-		this.type = type;
-		this.matched = matched;
-		this.field = field;
-	}
-	
-	public boolean find(){
-		return this.matched;
-	}
-	
-	public String field(){
-		return this.field;
-	}
-	
-	public AggregateFunctionType type(){
-		return this.type;
-	}
+    public AggregateFunctionTypeMatcher(AggregateFunctionType type, boolean matched, String field) {
+        this.type = type;
+        this.matched = matched;
+        this.field = field;
+    }
+
+    public boolean find() {
+        return this.matched;
+    }
+
+    public String field() {
+        return this.field;
+    }
+
+    public AggregateFunctionType type() {
+        return this.type;
+    }
 }

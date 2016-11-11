@@ -1,8 +1,5 @@
 package org.apache.eagle.storage.jdbc;
 
-import org.apache.eagle.log.entity.meta.EntityDefinition;
-import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
-import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.storage.DataStorageManager;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -30,7 +27,7 @@ import java.util.TimeZone;
 public class JdbcStorageTestBase {
     JdbcStorage storage;
     long baseTimestamp;
-    final static Logger LOG = LoggerFactory.getLogger(TestJdbcStorage.class);
+    static final Logger LOG = LoggerFactory.getLogger(TestJdbcStorage.class);
 
     @Before
     public void setUp() throws Exception {

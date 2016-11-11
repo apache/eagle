@@ -18,8 +18,8 @@ package org.apache.eagle.service.client.impl;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.EagleServiceClientException;
+import org.apache.eagle.service.client.IEagleServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BatchSender implements Closeable {
-    private final static Logger LOG = LoggerFactory.getLogger(BatchSender.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BatchSender.class);
     private final List<TaggedLogAPIEntity> entityBucket;
     private final IEagleServiceClient client;
 
@@ -38,13 +38,15 @@ public class BatchSender implements Closeable {
     }
 
     protected void setBatchSize(int batchSize) {
-        if(batchSize<0) throw new IllegalArgumentException("batch size should be "+batchSize);
+        if (batchSize < 0) {
+            throw new IllegalArgumentException("batch size should be " + batchSize);
+        }
         this.batchSize = batchSize;
     }
 
     private int batchSize;
 
-    public BatchSender(IEagleServiceClient client, int batchSize){
+    public BatchSender(IEagleServiceClient client, int batchSize) {
         this.setBatchSize(batchSize);
         this.client = client;
         this.entityBucket = new LinkedList<TaggedLogAPIEntity>();
@@ -52,7 +54,7 @@ public class BatchSender implements Closeable {
 
     public BatchSender send(TaggedLogAPIEntity entity) throws IOException, EagleServiceClientException {
         this.entityBucket.add(entity);
-        if(this.entityBucket.size()>=this.batchSize){
+        if (this.entityBucket.size() >= this.batchSize) {
             flush();
         }
         return this;
@@ -60,24 +62,24 @@ public class BatchSender implements Closeable {
 
     public BatchSender send(List<TaggedLogAPIEntity> entities) throws IOException, EagleServiceClientException {
         this.entityBucket.addAll(entities);
-        if(this.entityBucket.size()>= this.batchSize){
+        if (this.entityBucket.size() >= this.batchSize) {
             flush();
         }
         return this;
     }
 
     public void flush() throws IOException, EagleServiceClientException {
-        if(this.entityBucket.size() == 0 && LOG.isDebugEnabled()){
+        if (this.entityBucket.size() == 0 && LOG.isDebugEnabled()) {
             LOG.debug("No entities to flush");
             return;
         }
 
-        LOG.info("Writing "+this.entityBucket.size()+" entities");
+        LOG.info("Writing " + this.entityBucket.size() + " entities");
         GenericServiceAPIResponseEntity<String> response = this.client.create(this.entityBucket);
-        if(!response.isSuccess()){
-            LOG.error("Got service exception: "+response.getException());
-            throw new IOException("Service exception"+response.getException());
-        }else{
+        if (!response.isSuccess()) {
+            LOG.error("Got service exception: " + response.getException());
+            throw new IOException("Service exception" + response.getException());
+        } else {
             this.entityBucket.clear();
         }
     }

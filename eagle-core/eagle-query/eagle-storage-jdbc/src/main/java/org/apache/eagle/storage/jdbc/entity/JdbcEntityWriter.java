@@ -20,14 +20,10 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 import java.util.List;
 
-/**
- * @since 3/27/15
- */
 public interface JdbcEntityWriter<E extends TaggedLogAPIEntity> {
     /**
      * <h2>Consistency Guarantee</h2>
-     *
-     * Rollback all changes if any single entity throws exception to make sure consistency guarantee
+     * Rollback all changes if any single entity throws exception to make sure consistency guarantee.
      *
      * @param entities entities to write
      * @return primary keys' list

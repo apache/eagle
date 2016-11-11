@@ -16,43 +16,46 @@
  */
 package org.apache.eagle.log.entity;
 
-import org.apache.eagle.log.entity.meta.DoubleSerDeser;
 import org.apache.eagle.common.ByteUtil;
-import org.junit.Assert;
+import org.apache.eagle.log.entity.meta.DoubleSerDeser;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestDoubleSerDeser {
 
-	@Test
-	public void test() {
-		DoubleSerDeser dsd = new DoubleSerDeser();
-		//byte[] t = {'N', 'a', 'N'};
-		byte [] t = dsd.serialize(Double.NaN); 
-	
-		Double d = dsd.deserialize(t);
-		System.out.println(d);
-		//Double d = dsd.deserialize(t);		
-	}
+    @Test
+    public void test() {
+        DoubleSerDeser dsd = new DoubleSerDeser();
+        //byte[] t = {'N', 'a', 'N'};
+        byte[] t = dsd.serialize(Double.NaN);
 
-	/**
-	 * @link http://en.wikipedia.org/wiki/Double-precision_floating-point_format
-	 */
-	@Test
-	public void testIEEE754_Binary64_DoublePrecisionFloatingPointFormat(){
-		for(Double last = null,i=Math.pow(-2.0,33);i< Math.pow(2.0,33);i+=Math.pow(2.0,10)){
-			if(last != null){
-				Assert.assertTrue(i > last);
-				if(last < 0 && i <0){
-					Assert.assertTrue("Negative double value and its  serialization Binary array have negative correlation", new BinaryComparator(ByteUtil.doubleToBytes(i)).compareTo(ByteUtil.doubleToBytes(last)) < 0);
-				}else if(last < 0 && i >=0){
-					Assert.assertTrue("Binary array for negative double is always greater than any positive doubles' ",new BinaryComparator(ByteUtil.doubleToBytes(i)).compareTo(ByteUtil.doubleToBytes(last)) < 0);
-				}else if(last >= 0){
-					Assert.assertTrue("Positive double value and its  serialization Binary array have positive correlation",new BinaryComparator(ByteUtil.doubleToBytes(i)).compareTo(ByteUtil.doubleToBytes(last)) > 0);
-				}
-			}
-			last = i;
-		}
-		Assert.assertTrue("Binary array for negative double is always greater than any positive doubles'",new BinaryComparator(ByteUtil.doubleToBytes(-1.0)).compareTo(ByteUtil.doubleToBytes(Math.pow(2.0,32)))>0) ;
-	}
+        Double d = dsd.deserialize(t);
+        System.out.println(d);
+        //Double d = dsd.deserialize(t);
+    }
+
+    /**
+     * @link http://en.wikipedia.org/wiki/Double-precision_floating-point_format
+     */
+    @Test
+    public void testIEEE754_Binary64_DoublePrecisionFloatingPointFormat() {
+        for (Double last = null, i = Math.pow(-2.0, 33); i < Math.pow(2.0, 33); i += Math.pow(2.0, 10)) {
+            if (last != null) {
+                Assert.assertTrue(i > last);
+                if (last < 0 && i < 0) {
+                    Assert.assertTrue("Negative double value and its  serialization Binary array have negative correlation", new BinaryComparator(ByteUtil.doubleToBytes(i)).compareTo(ByteUtil
+                        .doubleToBytes(last)) < 0);
+                } else if (last < 0 && i >= 0) {
+                    Assert.assertTrue("Binary array for negative double is always greater than any positive doubles' ", new BinaryComparator(ByteUtil.doubleToBytes(i)).compareTo(ByteUtil
+                        .doubleToBytes(last)) < 0);
+                } else if (last >= 0) {
+                    Assert.assertTrue("Positive double value and its  serialization Binary array have positive correlation", new BinaryComparator(ByteUtil.doubleToBytes(i)).compareTo(ByteUtil
+                        .doubleToBytes(last)) > 0);
+                }
+            }
+            last = i;
+        }
+        Assert.assertTrue("Binary array for negative double is always greater than any positive doubles'", new BinaryComparator(ByteUtil.doubleToBytes(-1.0)).compareTo(ByteUtil.doubleToBytes(Math.pow(2.0, 32))) > 0);
+    }
 }

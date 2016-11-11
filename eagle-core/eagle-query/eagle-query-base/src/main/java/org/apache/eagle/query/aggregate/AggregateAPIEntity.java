@@ -16,54 +16,63 @@
  */
 package org.apache.eagle.query.aggregate;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class AggregateAPIEntity {
-	private long numDirectDescendants;
-	private long numTotalDescendants;
-	private String key;
-	private SortedMap<String, AggregateAPIEntity> entityList = new TreeMap<String, AggregateAPIEntity>();
-	private List<AggregateAPIEntity> sortedList = new ArrayList<AggregateAPIEntity>();
+    private long numDirectDescendants;
+    private long numTotalDescendants;
+    private String key;
+    private SortedMap<String, AggregateAPIEntity> entityList = new TreeMap<String, AggregateAPIEntity>();
+    private List<AggregateAPIEntity> sortedList = new ArrayList<AggregateAPIEntity>();
 
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	@JsonProperty("sL")
-	public List<AggregateAPIEntity> getSortedList() {
-		return sortedList;
-	}
-	public void setSortedList(List<AggregateAPIEntity> sortedList) {
-		this.sortedList = sortedList;
-	}
-	@JsonProperty("eL")
-	public SortedMap<String, AggregateAPIEntity> getEntityList() {
-		return entityList;
-	}
-	public void setEntityList(SortedMap<String, AggregateAPIEntity> entityList) {
-		this.entityList = entityList;
-	}
-	@JsonProperty("nDD")
-	public long getNumDirectDescendants() {
-		return numDirectDescendants;
-	}
-	public void setNumDirectDescendants(long numDirectDescendants) {
-		this.numDirectDescendants = numDirectDescendants;
-	}
-	@JsonProperty("nTD")
-	public long getNumTotalDescendants() {
-		return numTotalDescendants;
-	}
-	public void setNumTotalDescendants(long numTotalDescendants) {
-		this.numTotalDescendants = numTotalDescendants;
-	}
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    @JsonProperty("sL")
+    public List<AggregateAPIEntity> getSortedList() {
+        return sortedList;
+    }
+
+    public void setSortedList(List<AggregateAPIEntity> sortedList) {
+        this.sortedList = sortedList;
+    }
+
+    @JsonProperty("eL")
+    public SortedMap<String, AggregateAPIEntity> getEntityList() {
+        return entityList;
+    }
+
+    public void setEntityList(SortedMap<String, AggregateAPIEntity> entityList) {
+        this.entityList = entityList;
+    }
+
+    @JsonProperty("nDD")
+    public long getNumDirectDescendants() {
+        return numDirectDescendants;
+    }
+
+    public void setNumDirectDescendants(long numDirectDescendants) {
+        this.numDirectDescendants = numDirectDescendants;
+    }
+
+    @JsonProperty("nTD")
+    public long getNumTotalDescendants() {
+        return numTotalDescendants;
+    }
+
+    public void setNumTotalDescendants(long numTotalDescendants) {
+        this.numTotalDescendants = numTotalDescendants;
+    }
 }

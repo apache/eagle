@@ -19,10 +19,10 @@ package org.apache.eagle.log.entity;
 import java.io.Closeable;
 import java.io.IOException;
 
-public interface LogReader<T> extends Closeable{
-	public void open() throws IOException;
+public interface LogReader<T> extends Closeable {
+    public void open() throws IOException;
 
-	public void close() throws IOException;
-	
-	public T read() throws IOException;
+    public void close() throws IOException;
+
+    public T read() throws IOException;
 }

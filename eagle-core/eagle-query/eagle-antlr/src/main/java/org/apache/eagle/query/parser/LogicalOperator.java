@@ -17,7 +17,7 @@
 package org.apache.eagle.query.parser;
 
 public enum LogicalOperator {
-	AND,
-	OR,
-	NOT
+    AND,
+    OR,
+    NOT
 }

@@ -26,17 +26,17 @@ import java.net.URI;
  */
 public class TestUri {
     @Test
-    public void testUri(){
+    public void testUri() {
         String url = "eagle:hbase://zk1:2181,zk2:2181/hbase?connectionTimeout=12";
         String cleanURI = url.substring(6);
 
         URI uri = URI.create(cleanURI);
-        Assert.assertEquals("hbase",uri.getScheme());
+        Assert.assertEquals("hbase", uri.getScheme());
 
         // the problem is here, can not parse host and port
-        Assert.assertEquals(null,uri.getHost());
+        Assert.assertEquals(null, uri.getHost());
 
-        Assert.assertEquals(-1,uri.getPort());
-        Assert.assertEquals("/hbase",uri.getPath());
+        Assert.assertEquals(-1, uri.getPort());
+        Assert.assertEquals("/hbase", uri.getPath());
     }
 }

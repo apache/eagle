@@ -24,48 +24,46 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-public class RawAggregator implements QualifierCreationListener,GroupbyKeyAggregatable {
-	private List<String> groupbyFields;
-	private GroupbyKey key;
-	private static final byte[] UNASSIGNED = "unassigned".getBytes();
-	private RawGroupbyBucket bucket;
+public class RawAggregator implements QualifierCreationListener, GroupbyKeyAggregatable {
+    private List<String> groupbyFields;
+    private GroupbyKey key;
+    private static final byte[] UNASSIGNED = "unassigned".getBytes();
+    private RawGroupbyBucket bucket;
 
-	public RawAggregator(List<String> groupbyFields, List<AggregateFunctionType> aggregateFunctionTypes, List<String> aggregatedFields, EntityDefinition ed){
-		this.groupbyFields = groupbyFields;
-		key = new GroupbyKey();
-		bucket = new RawGroupbyBucket(aggregateFunctionTypes, aggregatedFields, ed);
-	}
+    public RawAggregator(List<String> groupbyFields, List<AggregateFunctionType> aggregateFunctionTypes, List<String> aggregatedFields, EntityDefinition ed) {
+        this.groupbyFields = groupbyFields;
+        key = new GroupbyKey();
+        bucket = new RawGroupbyBucket(aggregateFunctionTypes, aggregatedFields, ed);
+    }
 
-	@Override
-	public void qualifierCreated(Map<String, byte[]> qualifiers){
-		key.clear();
-		ListIterator<String> it = groupbyFields.listIterator();
-		while(it.hasNext()){
-			byte[] groupbyFieldValue = qualifiers.get(it.next());
-			if(groupbyFieldValue == null){
-				key.addValue(UNASSIGNED);
-			}else{
-				key.addValue(groupbyFieldValue);
-			}
-		}
-		GroupbyKey newKey = null;
-		if(bucket.exists(key)){
-			newKey = key;
-		}else{
-			newKey = new GroupbyKey(key);
-		}
-		
-		bucket.addDatapoint(newKey, qualifiers);
-	}
+    @Override
+    public void qualifierCreated(Map<String, byte[]> qualifiers) {
+        key.clear();
+        ListIterator<String> it = groupbyFields.listIterator();
+        while (it.hasNext()) {
+            byte[] groupbyFieldValue = qualifiers.get(it.next());
+            if (groupbyFieldValue == null) {
+                key.addValue(UNASSIGNED);
+            } else {
+                key.addValue(groupbyFieldValue);
+            }
+        }
+        GroupbyKey newKey = null;
+        if (bucket.exists(key)) {
+            newKey = key;
+        } else {
+            newKey = new GroupbyKey(key);
+        }
 
-	/**
-	 * @return
-	 */
-	public Map<List<String>, List<Double>> result(){
-		return bucket.result();
-	}
+        bucket.addDatapoint(newKey, qualifiers);
+    }
 
-	public List<GroupbyKeyValue> getGroupbyKeyValues(){
-		return bucket.groupbyKeyValues();
-	}
+
+    public Map<List<String>, List<Double>> result() {
+        return bucket.result();
+    }
+
+    public List<GroupbyKeyValue> getGroupbyKeyValues() {
+        return bucket.groupbyKeyValues();
+    }
 }

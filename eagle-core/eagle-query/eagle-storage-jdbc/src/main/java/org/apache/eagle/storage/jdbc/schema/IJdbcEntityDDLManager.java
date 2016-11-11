@@ -16,11 +16,10 @@
  */
 package org.apache.eagle.storage.jdbc.schema;
 
-/**
- * @since 3/27/15
- */
 public interface IJdbcEntityDDLManager {
     void init();
+
     void reinit();
+
     void shutdown();
 }

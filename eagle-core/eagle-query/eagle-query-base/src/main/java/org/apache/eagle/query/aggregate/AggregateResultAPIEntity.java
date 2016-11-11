@@ -18,35 +18,42 @@ package org.apache.eagle.query.aggregate;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class AggregateResultAPIEntity {
-	private boolean success;
-	private String exception;
-	private long elapsedms;
-	private AggregateAPIEntity entity;
+    private boolean success;
+    private String exception;
+    private long elapsedms;
+    private AggregateAPIEntity entity;
 
-	public long getElapsedms() {
-		return elapsedms;
-	}
-	public void setElapsedms(long elapsedms) {
-		this.elapsedms = elapsedms;
-	}
-	public AggregateAPIEntity getEntity() {
-		return entity;
-	}
-	public void setEntity(AggregateAPIEntity entity) {
-		this.entity = entity;
-	}
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
+    public long getElapsedms() {
+        return elapsedms;
+    }
+
+    public void setElapsedms(long elapsedms) {
+        this.elapsedms = elapsedms;
+    }
+
+    public AggregateAPIEntity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(AggregateAPIEntity entity) {
+        this.entity = entity;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
 }

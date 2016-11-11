@@ -23,6 +23,7 @@ import org.apache.hadoop.hbase.client.coprocessor.Batch;
  * <h1>AggregateResultCallback Interface</h1>
  * Merge coprocessor results from different regions and generate final aggregate result
  * <br/>
+ *
  * @see org.apache.hadoop.hbase.client.HTableInterface#coprocessorService(Class, byte[], byte[], Batch.Call, Batch.Callback)
  */
 public interface AggregateResultCallback extends Batch.Callback<AggregateProtos.AggregateResult> {

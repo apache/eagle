@@ -16,42 +16,46 @@
  */
 package org.apache.eagle.log.entity;
 
-import java.util.List;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import java.util.List;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"success", "exception", "encodedRowkeys"})
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown=true)
-public class GenericCreateAPIResponseEntity{
-	private boolean success;
-	private String exception;
-	private List<String> encodedRowkeys;
-	
-	public List<String> getEncodedRowkeys() {
-		return encodedRowkeys;
-	}
-	public void setEncodedRowkeys(List<String> encodedRowkeys) {
-		this.encodedRowkeys = encodedRowkeys;
-	}
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GenericCreateAPIResponseEntity {
+    private boolean success;
+    private String exception;
+    private List<String> encodedRowkeys;
+
+    public List<String> getEncodedRowkeys() {
+        return encodedRowkeys;
+    }
+
+    public void setEncodedRowkeys(List<String> encodedRowkeys) {
+        this.encodedRowkeys = encodedRowkeys;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
 }

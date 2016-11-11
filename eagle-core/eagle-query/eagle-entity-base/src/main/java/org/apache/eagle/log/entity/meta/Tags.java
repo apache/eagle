@@ -22,10 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * specify list of tag names which are used by embracing hbase table
+ * specify list of tag names which are used by embracing hbase table.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Tags {
-	String[] value() default {""};
+    String[] value() default {""};
 }

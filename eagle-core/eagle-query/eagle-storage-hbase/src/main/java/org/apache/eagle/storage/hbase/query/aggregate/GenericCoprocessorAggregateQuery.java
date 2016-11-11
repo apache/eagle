@@ -36,7 +36,6 @@ import org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator;
 import org.apache.eagle.query.aggregate.timeseries.TimeSeriesPostFlatAggregateSort;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResult;
 import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateResultCallbackImpl;
-
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.slf4j.Logger;
@@ -198,7 +197,7 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
             reader.close();
         }
     }
-    
+
     /**
      * Factory method for {@link GroupAggregateQueryReader}.
      * <pre>
@@ -314,7 +313,7 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
 
             // aggregated data points only
             Map<List<String>, List<double[]>> timeseriesDataPoints = convertToTimeSeriesDataPoints(result);
-            
+
             // return time-series data points without sort
             if (this.query.sortOptions == null) {
                 return new ArrayList<>(timeseriesDataPoints.entrySet());

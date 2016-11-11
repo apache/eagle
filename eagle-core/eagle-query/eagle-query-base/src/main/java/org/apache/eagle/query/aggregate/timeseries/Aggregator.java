@@ -20,10 +20,10 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 public interface Aggregator {
     /**
-     * Accumulate callback
+     * Accumulate callback.
      *
      * @param entity accumulated entity instance
      * @throws Exception
      */
-	public void accumulate(TaggedLogAPIEntity entity) throws Exception;
+    public void accumulate(TaggedLogAPIEntity entity) throws Exception;
 }

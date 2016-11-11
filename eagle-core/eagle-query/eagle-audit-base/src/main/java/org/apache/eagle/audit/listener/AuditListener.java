@@ -20,6 +20,6 @@ package org.apache.eagle.audit.listener;
 import org.apache.eagle.audit.common.AuditEvent;
 
 public interface AuditListener extends java.util.EventListener {
-	
-	void auditEvent(AuditEvent event);
+
+    void auditEvent(AuditEvent event);
 }

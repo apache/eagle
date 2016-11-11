@@ -18,17 +18,15 @@ package org.apache.eagle.storage.spi;
 
 import org.apache.eagle.storage.DataStorage;
 
-/**
- * @since 3/20/15
- */
 public interface DataStorageServiceProvider<T extends DataStorage> {
     /**
+     * get unique storage type.
      * @return unique storage type
      */
     String getType();
 
     /**
-     *
+     * get storage instance.
      * @return storage instance
      */
     T getStorage();

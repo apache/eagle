@@ -16,11 +16,6 @@
  */
 package org.apache.eagle.log.entity;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.hadoop.hbase.client.HTableFactory;
 import org.apache.hadoop.hbase.client.HTableInterface;
@@ -28,125 +23,131 @@ import org.apache.hadoop.hbase.client.Put;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class HBaseLogWriter implements LogWriter {
-	private static Logger LOG = LoggerFactory.getLogger(HBaseLogWriter.class);
-	private static byte[] EMPTY_INDEX_QUALIFER_VALUE = "".getBytes();
-	
-	private HTableInterface tbl;
-	private String table;
-	private String columnFamily;
-	
-	public HBaseLogWriter(String table, String columnFamily) {
-		// TODO assert for non-null of table and columnFamily
-		this.table = table;
-		this.columnFamily = columnFamily;
-	}
-	
-	@Override
-	public void open() throws IOException {
-		try{
-			tbl = EagleConfigFactory.load().getHTable(this.table);
-//			LOGGER.info("HBase table " + table + " audo reflush is " + (tbl.isAutoFlush() ? "enabled" : "disabled"));
-		}catch(Exception ex){
-			LOG.error("Cannot create htable", ex);
-			throw new IOException(ex);
-		}
-	}
+    private static Logger LOG = LoggerFactory.getLogger(HBaseLogWriter.class);
+    private static byte[] EMPTY_INDEX_QUALIFER_VALUE = "".getBytes();
 
-	@Override
-	public void close() throws IOException {
-		if(tbl != null){
-			new HTableFactory().releaseHTableInterface(tbl);
-		}
-	}
+    private HTableInterface tbl;
+    private String table;
+    private String columnFamily;
 
-	@Override
-	public void flush() throws IOException {
-		tbl.flushCommits();
-	}
-	
-	protected void populateColumnValues(Put p, InternalLog log){
-		Map<String, byte[]> qualifierValues = log.getQualifierValues();
-		// iterate all qualifierValues
-		for(Map.Entry<String, byte[]> entry : qualifierValues.entrySet()){
-			p.add(columnFamily.getBytes(), entry.getKey().getBytes(), entry.getValue());
-		}
-		
-		Map<String, String> tags = log.getTags();
-		// iterate all tags, each tag will be stored as a column qualifier
-		if(tags != null){
-			for(Map.Entry<String, String> entry : tags.entrySet()){
-				// TODO need a consistent handling of null values
-				if(entry.getValue() != null)
-					p.add(columnFamily.getBytes(), entry.getKey().getBytes(), entry.getValue().getBytes());
-			}
-		}
-	}
+    public HBaseLogWriter(String table, String columnFamily) {
+        // TODO assert for non-null of table and columnFamily
+        this.table = table;
+        this.columnFamily = columnFamily;
+    }
 
-	/**
-	 * TODO need think about if multi-PUT is necessary, by checking if autoFlush works
-	 */
-	@Override
-	public byte[] write(InternalLog log) throws IOException{
-		final byte[] rowkey = RowkeyBuilder.buildRowkey(log);
-		final Put p = new Put(rowkey);
-		populateColumnValues(p, log);
-		tbl.put(p);
-		final List<byte[]> indexRowkeys = log.getIndexRowkeys();
-		if (indexRowkeys != null) {
-			writeIndexes(rowkey, indexRowkeys);
-		}
-		return rowkey;
-	}
+    @Override
+    public void open() throws IOException {
+        try {
+            tbl = EagleConfigFactory.load().getHTable(this.table);
+            // LOGGER.info("HBase table " + table + " audo reflush is " + (tbl.isAutoFlush() ? "enabled" : "disabled"));
+        } catch (Exception ex) {
+            LOG.error("Cannot create htable", ex);
+            throw new IOException(ex);
+        }
+    }
 
-	/**
-	 * TODO need think about if multi-PUT is necessary, by checking if autoFlush works
-	 */
-	public List<byte[]> write(List<InternalLog> logs) throws IOException{
-		final List<Put> puts = new ArrayList<Put>(logs.size());
-		final List<byte[]> result = new ArrayList<byte[]>(logs.size());
-		for (InternalLog log : logs) {
-			final byte[] rowkey = RowkeyBuilder.buildRowkey(log);
-			final Put p = new Put(rowkey);
-			populateColumnValues(p, log);
-			puts.add(p);
-			final List<byte[]> indexRowkeys = log.getIndexRowkeys();
-			if (indexRowkeys != null) {
-				writeIndexes(rowkey, indexRowkeys, puts);
-			}
-			result.add(rowkey);
-		}
-		tbl.put(puts);
-		return result;
-	}
-	
-	@Override
-	public void updateByRowkey(byte[] rowkey, InternalLog log) throws IOException{
-		Put p = new Put(rowkey);
-		populateColumnValues(p, log);
-		tbl.put(p);
-		final List<byte[]> indexRowkeys = log.getIndexRowkeys();
-		if (indexRowkeys != null) {
-			writeIndexes(rowkey, indexRowkeys);
-		}
-	}
+    @Override
+    public void close() throws IOException {
+        if (tbl != null) {
+            new HTableFactory().releaseHTableInterface(tbl);
+        }
+    }
 
-	private void writeIndexes(byte[] rowkey, List<byte[]> indexRowkeys) throws IOException {
-		for (byte[] indexRowkey : indexRowkeys) {
-			Put p = new Put(indexRowkey);
-			p.add(columnFamily.getBytes(), rowkey, EMPTY_INDEX_QUALIFER_VALUE);
-			tbl.put(p);
-		}
-	}
+    @Override
+    public void flush() throws IOException {
+        tbl.flushCommits();
+    }
 
-	private void writeIndexes(byte[] rowkey, List<byte[]> indexRowkeys, List<Put> puts) throws IOException {
-		for (byte[] indexRowkey : indexRowkeys) {
-			Put p = new Put(indexRowkey);
-			p.add(columnFamily.getBytes(), rowkey, EMPTY_INDEX_QUALIFER_VALUE);
-			puts.add(p);
-//			tbl.put(p);
-		}
-	}
+    protected void populateColumnValues(Put p, InternalLog log) {
+        Map<String, byte[]> qualifierValues = log.getQualifierValues();
+        // iterate all qualifierValues
+        for (Map.Entry<String, byte[]> entry : qualifierValues.entrySet()) {
+            p.add(columnFamily.getBytes(), entry.getKey().getBytes(), entry.getValue());
+        }
 
-	
+        Map<String, String> tags = log.getTags();
+        // iterate all tags, each tag will be stored as a column qualifier
+        if (tags != null) {
+            for (Map.Entry<String, String> entry : tags.entrySet()) {
+                // TODO need a consistent handling of null values
+                if (entry.getValue() != null) {
+                    p.add(columnFamily.getBytes(), entry.getKey().getBytes(), entry.getValue().getBytes());
+                }
+            }
+        }
+    }
+
+    /**
+     * TODO need think about if multi-PUT is necessary, by checking if autoFlush works.
+     */
+    @Override
+    public byte[] write(InternalLog log) throws IOException {
+        final byte[] rowkey = RowkeyBuilder.buildRowkey(log);
+        final Put p = new Put(rowkey);
+        populateColumnValues(p, log);
+        tbl.put(p);
+        final List<byte[]> indexRowkeys = log.getIndexRowkeys();
+        if (indexRowkeys != null) {
+            writeIndexes(rowkey, indexRowkeys);
+        }
+        return rowkey;
+    }
+
+    /**
+     * TODO need think about if multi-PUT is necessary, by checking if autoFlush works.
+     */
+    public List<byte[]> write(List<InternalLog> logs) throws IOException {
+        final List<Put> puts = new ArrayList<Put>(logs.size());
+        final List<byte[]> result = new ArrayList<byte[]>(logs.size());
+        for (InternalLog log : logs) {
+            final byte[] rowkey = RowkeyBuilder.buildRowkey(log);
+            final Put p = new Put(rowkey);
+            populateColumnValues(p, log);
+            puts.add(p);
+            final List<byte[]> indexRowkeys = log.getIndexRowkeys();
+            if (indexRowkeys != null) {
+                writeIndexes(rowkey, indexRowkeys, puts);
+            }
+            result.add(rowkey);
+        }
+        tbl.put(puts);
+        return result;
+    }
+
+    @Override
+    public void updateByRowkey(byte[] rowkey, InternalLog log) throws IOException {
+        Put p = new Put(rowkey);
+        populateColumnValues(p, log);
+        tbl.put(p);
+        final List<byte[]> indexRowkeys = log.getIndexRowkeys();
+        if (indexRowkeys != null) {
+            writeIndexes(rowkey, indexRowkeys);
+        }
+    }
+
+    private void writeIndexes(byte[] rowkey, List<byte[]> indexRowkeys) throws IOException {
+        for (byte[] indexRowkey : indexRowkeys) {
+            Put p = new Put(indexRowkey);
+            p.add(columnFamily.getBytes(), rowkey, EMPTY_INDEX_QUALIFER_VALUE);
+            tbl.put(p);
+        }
+    }
+
+    private void writeIndexes(byte[] rowkey, List<byte[]> indexRowkeys, List<Put> puts) throws IOException {
+        for (byte[] indexRowkey : indexRowkeys) {
+            Put p = new Put(indexRowkey);
+            p.add(columnFamily.getBytes(), rowkey, EMPTY_INDEX_QUALIFER_VALUE);
+            puts.add(p);
+            // tbl.put(p);
+        }
+    }
+
+
 }

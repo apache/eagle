@@ -25,25 +25,25 @@ import java.io.Serializable;
 /**
  * Some common codes to enable DAO through eagle service including service host/post, credential population etc.
  */
-public class EagleServiceConnector implements Serializable{
+public class EagleServiceConnector implements Serializable {
     private final String eagleServiceHost;
     private final Integer eagleServicePort;
     private String username;
     private String password;
 
-    public String getEagleServiceHost(){
+    public String getEagleServiceHost() {
         return this.eagleServiceHost;
     }
 
-    public Integer getEagleServicePort(){
+    public Integer getEagleServicePort() {
         return this.eagleServicePort;
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
@@ -58,10 +58,11 @@ public class EagleServiceConnector implements Serializable{
         this.password = password;
     }
 
-    public EagleServiceConnector(Config config){
+    public EagleServiceConnector(Config config) {
         this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
         this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-        if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) && config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
+        if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) && config.hasPath(EagleConfigConstants.EAGLE_PROPS + ""
+            + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
             this.username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
             this.password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
         }

@@ -20,7 +20,7 @@ import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
  * limitations under the License.
  */
 public class JdbcEntityUtils {
-    public static Qualifier getColumnQualifier(JdbcEntityDefinition entityDefinition,String columnName){
+    public static Qualifier getColumnQualifier(JdbcEntityDefinition entityDefinition, String columnName) {
         return entityDefinition.getInternal().getDisplayNameMap().get(columnName);
     }
 }

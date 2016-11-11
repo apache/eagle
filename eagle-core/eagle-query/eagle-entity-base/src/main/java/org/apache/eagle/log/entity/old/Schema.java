@@ -17,8 +17,11 @@
 package org.apache.eagle.log.entity.old;
 
 public interface Schema {
-	public boolean isTag(String qualifier);
-	public String getTable();
-	public String getColumnFamily();
-	public String getPrefix();
+    public boolean isTag(String qualifier);
+
+    public String getTable();
+
+    public String getColumnFamily();
+
+    public String getPrefix();
 }

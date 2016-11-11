@@ -26,12 +26,11 @@ import java.util.List;
 
 /**
  * Coprocessor-based Aggregation Universal Client Interface.
- *
  * <h2>Flat or RAW Aggregation:</h2>
+ *
  * @see #aggregate(HTableInterface, EntityDefinition, Scan, List, List, List)
  * <h2>Time Series Aggregation:</h2>
  * @see #aggregate(HTableInterface, EntityDefinition, Scan, List, List, List, boolean, long, long, long)
- *
  */
 public interface AggregateClient {
 

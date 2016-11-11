@@ -118,9 +118,9 @@ public class CoprocessorITSuite {
         try {
             EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
             final List<GroupbyKeyValue> result = client.aggregate(table, ed,
-                    scan, Arrays.asList("cluster", "datacenter"),
-                    Collections.singletonList(AggregateFunctionType.count),
-                    Collections.singletonList("field2")).getKeyValues();
+                scan, Arrays.asList("cluster", "datacenter"),
+                Collections.singletonList(AggregateFunctionType.count),
+                Collections.singletonList("field2")).getKeyValues();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("COUNT");
             }
@@ -206,12 +206,12 @@ public class CoprocessorITSuite {
         try {
             EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
             final List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"),
-                    Arrays.asList(AggregateFunctionType.min,
-                            AggregateFunctionType.max,
-                            AggregateFunctionType.avg,
-                            AggregateFunctionType.count,
-                            AggregateFunctionType.sum),
-                    Arrays.asList("field2", "field2", "field2", "field2", "field2")).getKeyValues();
+                Arrays.asList(AggregateFunctionType.min,
+                    AggregateFunctionType.max,
+                    AggregateFunctionType.avg,
+                    AggregateFunctionType.count,
+                    AggregateFunctionType.sum),
+                Arrays.asList("field2", "field2", "field2", "field2", "field2")).getKeyValues();
             logGroupbyKeyValue(result);
             Assert.assertNotNull(result);
             Assert.assertTrue(result.size() > 0);
@@ -240,7 +240,9 @@ public class CoprocessorITSuite {
             for (DoubleWritable dw : val.getValue()) {
                 vals.add(dw.get());
             }
-            if (LOG.isDebugEnabled()) LOG.debug("KEY: " + keys + ", VALUE: " + vals);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("KEY: " + keys + ", VALUE: " + vals);
+            }
         }
     }
 }

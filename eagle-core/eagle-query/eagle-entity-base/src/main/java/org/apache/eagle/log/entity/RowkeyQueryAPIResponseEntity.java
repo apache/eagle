@@ -18,28 +18,33 @@ package org.apache.eagle.log.entity;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class RowkeyQueryAPIResponseEntity {
-	private boolean success;
-	private String exception;
-	private Object obj;
+    private boolean success;
+    private String exception;
+    private Object obj;
 
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
-	public Object getObj() {
-		return obj;
-	}
-	public void setObj(Object obj) {
-		this.obj = obj;
-	}
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public void setObj(Object obj) {
+        this.obj = obj;
+    }
 }

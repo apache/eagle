@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public class TestDllUtils {
     @Test
-    public void testTable(){
+    public void testTable() {
         Table table = new Table();
         Column column = new Column();
         column.setName("id");

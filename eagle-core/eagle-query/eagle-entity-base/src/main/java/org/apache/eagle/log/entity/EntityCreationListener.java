@@ -19,8 +19,8 @@ package org.apache.eagle.log.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 /**
- * Interface to notify creation event of an entity 
+ * Interface to notify creation event of an entity.
  */
 public interface EntityCreationListener {
-	public void entityCreated(TaggedLogAPIEntity entity) throws Exception;
+    public void entityCreated(TaggedLogAPIEntity entity) throws Exception;
 }

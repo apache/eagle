@@ -20,8 +20,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 
-/**
- */
 public class RawQuery {
     private String query;
     private String startTime;
@@ -142,17 +140,21 @@ public class RawQuery {
         this.metricName = metricName;
     }
 
-    public static Builder build(){
+    public static Builder build() {
         return new Builder();
     }
-    public static class Builder{
+
+    public static class Builder {
         private final RawQuery rawQuery;
-        public Builder(){
-            this.rawQuery= new RawQuery();
+
+        public Builder() {
+            this.rawQuery = new RawQuery();
         }
-        public RawQuery done(){
+
+        public RawQuery done() {
             return this.rawQuery;
         }
+
         public Builder query(String query) {
             this.rawQuery.setQuery(query);
             return this;
@@ -214,7 +216,9 @@ public class RawQuery {
         }
 
         public Builder verbose(Boolean verbose) {
-            if(verbose == null) verbose = true;
+            if (verbose == null) {
+                verbose = true;
+            }
             this.rawQuery.setVerbose(verbose);
             return this;
         }

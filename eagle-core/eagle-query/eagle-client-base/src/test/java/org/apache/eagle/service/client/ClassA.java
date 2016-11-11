@@ -22,14 +22,14 @@ import org.codehaus.jackson.annotate.JsonTypeName;
 @JsonTypeName("ClassA")
 public class ClassA extends Base {
 
-	private int a;
+    private int a;
 
-	public int getA() {
-		return a;
-	}
+    public int getA() {
+        return a;
+    }
 
-	public void setA(int a) {
-		this.a = a;
-	}
-	
+    public void setA(int a) {
+        this.a = a;
+    }
+
 }

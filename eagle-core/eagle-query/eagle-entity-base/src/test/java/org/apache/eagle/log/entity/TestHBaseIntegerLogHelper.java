@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.log.entity;
 
+import org.apache.eagle.common.ByteUtil;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.common.ByteUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,37 +31,37 @@ import java.util.Map;
  * @since : 11/10/14,2014
  */
 public class TestHBaseIntegerLogHelper {
-	@Test
-	public void testTimeSeriesAPIEntity(){
-		InternalLog internalLog = new InternalLog();
-		Map<String,byte[]> map = new HashMap<String,byte[]>();
-		TestTimeSeriesAPIEntity apiEntity = new TestTimeSeriesAPIEntity();
-		EntityDefinition ed = null;
-		try {
-			ed = EntityDefinitionManager.getEntityByServiceName("TestTimeSeriesAPIEntity");
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		map.put("a", ByteUtil.intToBytes(12));
-		map.put("c", ByteUtil.longToBytes(123432432l));
-		map.put("cluster", new String("cluster4ut").getBytes());
-		map.put("datacenter", new String("datacenter4ut").getBytes());
+    @Test
+    public void testTimeSeriesAPIEntity() {
+        InternalLog internalLog = new InternalLog();
+        Map<String, byte[]> map = new HashMap<String, byte[]>();
+        TestTimeSeriesAPIEntity apiEntity = new TestTimeSeriesAPIEntity();
+        EntityDefinition ed = null;
+        try {
+            ed = EntityDefinitionManager.getEntityByServiceName("TestTimeSeriesAPIEntity");
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        map.put("a", ByteUtil.intToBytes(12));
+        map.put("c", ByteUtil.longToBytes(123432432l));
+        map.put("cluster", new String("cluster4ut").getBytes());
+        map.put("datacenter", new String("datacenter4ut").getBytes());
 
-		internalLog.setQualifierValues(map);
-		internalLog.setTimestamp(System.currentTimeMillis());
+        internalLog.setQualifierValues(map);
+        internalLog.setTimestamp(System.currentTimeMillis());
 
-		try {
-			TaggedLogAPIEntity entity = HBaseInternalLogHelper.buildEntity(internalLog, ed);
-			Assert.assertTrue(entity instanceof TestTimeSeriesAPIEntity);
-			TestTimeSeriesAPIEntity tsentity = (TestTimeSeriesAPIEntity) entity;
-			Assert.assertEquals("cluster4ut",tsentity.getTags().get("cluster"));
-			Assert.assertEquals("datacenter4ut",tsentity.getTags().get("datacenter"));
-			Assert.assertEquals(12,tsentity.getField1());
-			Assert.assertEquals(123432432l,tsentity.getField3());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            TaggedLogAPIEntity entity = HBaseInternalLogHelper.buildEntity(internalLog, ed);
+            Assert.assertTrue(entity instanceof TestTimeSeriesAPIEntity);
+            TestTimeSeriesAPIEntity tsentity = (TestTimeSeriesAPIEntity) entity;
+            Assert.assertEquals("cluster4ut", tsentity.getTags().get("cluster"));
+            Assert.assertEquals("datacenter4ut", tsentity.getTags().get("datacenter"));
+            Assert.assertEquals(12, tsentity.getField1());
+            Assert.assertEquals(123432432l, tsentity.getField3());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

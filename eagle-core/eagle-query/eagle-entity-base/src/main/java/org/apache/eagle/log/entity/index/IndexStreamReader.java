@@ -26,69 +26,69 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-public abstract class IndexStreamReader  extends StreamReader {
-	protected final IndexDefinition indexDef;
-	protected final SearchCondition condition;
-	protected final List<byte[]> indexRowkeys;
-	protected LogReader<InternalLog> reader;
-	protected long lastTimestamp = 0;
-	protected long firstTimestamp = 0;
-	
-	protected static final Logger LOG = LoggerFactory.getLogger(IndexStreamReader.class);
+public abstract class IndexStreamReader extends StreamReader {
+    protected final IndexDefinition indexDef;
+    protected final SearchCondition condition;
+    protected final List<byte[]> indexRowkeys;
+    protected LogReader<InternalLog> reader;
+    protected long lastTimestamp = 0;
+    protected long firstTimestamp = 0;
 
-	public IndexStreamReader(IndexDefinition indexDef, SearchCondition condition, List<byte[]> indexRowkeys) {
-		this.indexDef = indexDef;
-		this.condition = condition;
-		this.indexRowkeys = indexRowkeys;
-		this.reader = null;
-	}
+    protected static final Logger LOG = LoggerFactory.getLogger(IndexStreamReader.class);
 
-	@Override
-	public long getLastTimestamp() {
-		return lastTimestamp;
-	}
+    public IndexStreamReader(IndexDefinition indexDef, SearchCondition condition, List<byte[]> indexRowkeys) {
+        this.indexDef = indexDef;
+        this.condition = condition;
+        this.indexRowkeys = indexRowkeys;
+        this.reader = null;
+    }
 
-	@Override
-	public long getFirstTimestamp() {
-		return this.firstTimestamp;
-	}
+    @Override
+    public long getLastTimestamp() {
+        return lastTimestamp;
+    }
 
-	@Override
-	public void readAsStream() throws Exception {
-		if (reader == null) {
-			reader = createIndexReader();
-		}
-		final EntityDefinition entityDef = indexDef.getEntityDefinition();
-		try{
-			reader.open();
-			InternalLog log;
-			int count = 0;
-			while ((log = reader.read()) != null) {
-				TaggedLogAPIEntity entity = HBaseInternalLogHelper.buildEntity(log, entityDef);
-				entity.setSerializeAlias(condition.getOutputAlias());
-				entity.setSerializeVerbose(condition.isOutputVerbose());
+    @Override
+    public long getFirstTimestamp() {
+        return this.firstTimestamp;
+    }
 
-				if (lastTimestamp == 0 || lastTimestamp < entity.getTimestamp()) {
-					lastTimestamp = entity.getTimestamp();
-				}
-				if(firstTimestamp == 0 || firstTimestamp > entity.getTimestamp()){
-					firstTimestamp = entity.getTimestamp();
-				}
-				for(EntityCreationListener l : _listeners){
-					l.entityCreated(entity);
-				}
-				if(++count == condition.getPageSize()) {
-					break;
-				}
-			}
-		}catch(IOException ioe){
-			LOG.error("Fail reading log", ioe);
-			throw ioe;
-		}finally{
-			reader.close();
-		}		
-	}
+    @Override
+    public void readAsStream() throws Exception {
+        if (reader == null) {
+            reader = createIndexReader();
+        }
+        final EntityDefinition entityDef = indexDef.getEntityDefinition();
+        try {
+            reader.open();
+            InternalLog log;
+            int count = 0;
+            while ((log = reader.read()) != null) {
+                TaggedLogAPIEntity entity = HBaseInternalLogHelper.buildEntity(log, entityDef);
+                entity.setSerializeAlias(condition.getOutputAlias());
+                entity.setSerializeVerbose(condition.isOutputVerbose());
 
-	protected abstract LogReader createIndexReader();
-	
+                if (lastTimestamp == 0 || lastTimestamp < entity.getTimestamp()) {
+                    lastTimestamp = entity.getTimestamp();
+                }
+                if (firstTimestamp == 0 || firstTimestamp > entity.getTimestamp()) {
+                    firstTimestamp = entity.getTimestamp();
+                }
+                for (EntityCreationListener l : listeners) {
+                    l.entityCreated(entity);
+                }
+                if (++count == condition.getPageSize()) {
+                    break;
+                }
+            }
+        } catch (IOException ioe) {
+            LOG.error("Fail reading log", ioe);
+            throw ioe;
+        } finally {
+            reader.close();
+        }
+    }
+
+    protected abstract LogReader createIndexReader();
+
 }

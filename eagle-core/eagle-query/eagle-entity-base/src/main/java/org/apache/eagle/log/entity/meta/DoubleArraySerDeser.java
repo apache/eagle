@@ -18,51 +18,50 @@ package org.apache.eagle.log.entity.meta;
 
 import org.apache.eagle.common.ByteUtil;
 
-public class DoubleArraySerDeser implements EntitySerDeser<double[]>{
+public class DoubleArraySerDeser implements EntitySerDeser<double[]> {
 
-	public DoubleArraySerDeser(){}
+    public DoubleArraySerDeser() {
+    }
 
-	private final int SIZE = 8;
-		@Override
-		public double[] deserialize(byte[] bytes){
-			if((bytes.length-4) % SIZE != 0)
-				return null;
-			int offset = 0;
-			// get size of int array
-			int size = ByteUtil.bytesToInt(bytes, offset);
-			offset += 4;
-			double[] values = new double[size];
-			for(int i=0; i<size; i++){
-				values[i] = ByteUtil.bytesToDouble(bytes, offset);
-				offset += SIZE;
-			}
-			return values;
-		}
-		
-		/**
-		 * 
-		 * @param obj
-		 * @return
-		 */
-		@Override
-		public byte[] serialize(double[] obj){
-			if(obj == null)
-				return null;
-			int size = obj.length;
-			byte[] array = new byte[4 + SIZE*size];
-			byte[] first = ByteUtil.intToBytes(size);
-			int offset = 0;
-			System.arraycopy(first, 0, array, offset, first.length);
-			offset += first.length;
-			for(int i=0; i<size; i++){
-				System.arraycopy(ByteUtil.doubleToBytes(obj[i]), 0, array, offset, SIZE);
-				offset += SIZE;
-			}
-			return array;
-		}
+    private final int size = 8;
 
-	@Override
-	public Class<double[]> type() {
-		return double[].class;
-	}
+    @Override
+    public double[] deserialize(byte[] bytes) {
+        if ((bytes.length - 4) % size != 0) {
+            return null;
+        }
+        int offset = 0;
+        // get size of int array
+        int size = ByteUtil.bytesToInt(bytes, offset);
+        offset += 4;
+        double[] values = new double[size];
+        for (int i = 0; i < size; i++) {
+            values[i] = ByteUtil.bytesToDouble(bytes, offset);
+            offset += this.size;
+        }
+        return values;
+    }
+
+    @Override
+    public byte[] serialize(double[] obj) {
+        if (obj == null) {
+            return null;
+        }
+        int size = obj.length;
+        byte[] array = new byte[4 + this.size * size];
+        byte[] first = ByteUtil.intToBytes(size);
+        int offset = 0;
+        System.arraycopy(first, 0, array, offset, first.length);
+        offset += first.length;
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(ByteUtil.doubleToBytes(obj[i]), 0, array, offset, this.size);
+            offset += this.size;
+        }
+        return array;
+    }
+
+    @Override
+    public Class<double[]> type() {
+        return double[].class;
+    }
 }

@@ -47,27 +47,27 @@ public class TestAggregateResultCallback {
         // -----------------------------------------------------------------------------
 
         AggregateResultCallback callback = new AggregateResultCallbackImpl(Arrays.asList(
-                AggregateFunctionType.max,
-                AggregateFunctionType.min,
-                AggregateFunctionType.count,
-                AggregateFunctionType.avg,
-                AggregateFunctionType.sum));
+            AggregateFunctionType.max,
+            AggregateFunctionType.min,
+            AggregateFunctionType.count,
+            AggregateFunctionType.avg,
+            AggregateFunctionType.sum));
         AggregateResult result1 = AggregateResult.build(
-                Arrays.asList(
-                        new String[]{"a", "b"},
-                        new String[]{"a", "b"},
-                        new String[]{"a", "b", "c"},
-                        new String[]{"a", "b", "c"}
-                ),
-                Arrays.asList(
-                        new double[]{1.0, 2.0, 3.0, 4.0, 5.0},
-                        new double[]{2.0, 3.0, 6.0, 5.0, 6.0},
-                        new double[]{3.0, 3.0, 5.0, 5.0, 6.0},
-                        new double[]{4.0, 5.0, 5.0, 5.0, 7.0}
-                ),
-                Arrays.asList(3, 6, 5, 5),
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
+            Arrays.asList(
+                new String[] {"a", "b"},
+                new String[] {"a", "b"},
+                new String[] {"a", "b", "c"},
+                new String[] {"a", "b", "c"}
+            ),
+            Arrays.asList(
+                new double[] {1.0, 2.0, 3.0, 4.0, 5.0},
+                new double[] {2.0, 3.0, 6.0, 5.0, 6.0},
+                new double[] {3.0, 3.0, 5.0, 5.0, 6.0},
+                new double[] {4.0, 5.0, 5.0, 5.0, 7.0}
+            ),
+            Arrays.asList(3, 6, 5, 5),
+            System.currentTimeMillis(),
+            System.currentTimeMillis()
         );
         callback.update(null, null, result1);
         AggregateResult callbackResult = callback.result();
@@ -130,11 +130,11 @@ public class TestAggregateResultCallback {
     @Test
     public void testUpdatePerformance() {
         AggregateResultCallback callback = new AggregateResultCallbackImpl(
-                Arrays.asList(
-                        AggregateFunctionType.max,
-                        AggregateFunctionType.min,
-                        AggregateFunctionType.count,
-                        AggregateFunctionType.avg));
+            Arrays.asList(
+                AggregateFunctionType.max,
+                AggregateFunctionType.min,
+                AggregateFunctionType.count,
+                AggregateFunctionType.avg));
 
         for (int i = 0; i < 1000000; i++) {
             AggregateResult result1 = new AggregateResult();

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @since 3/27/15
  */
 public class TestQueryCriteriaBuilder {
-    private final static Logger LOG = LoggerFactory.getLogger(TestQueryCriteriaBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestQueryCriteriaBuilder.class);
     private JdbcEntityDefinition jdbcEntityDefinition;
 
     @Before
@@ -52,7 +52,7 @@ public class TestQueryCriteriaBuilder {
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
 
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,jdbcEntityDefinition);
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query, jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
     }
@@ -66,7 +66,7 @@ public class TestQueryCriteriaBuilder {
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
 
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,jdbcEntityDefinition);
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query, jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
     }
@@ -81,7 +81,7 @@ public class TestQueryCriteriaBuilder {
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
 
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,jdbcEntityDefinition);
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query, jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
     }

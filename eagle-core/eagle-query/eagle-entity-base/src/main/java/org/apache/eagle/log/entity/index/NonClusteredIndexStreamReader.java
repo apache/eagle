@@ -27,25 +27,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NonClusteredIndexStreamReader extends IndexStreamReader {
-	public NonClusteredIndexStreamReader(IndexDefinition indexDef, SearchCondition condition) {
-		super(indexDef, condition, new ArrayList<byte[]>());
-		final IndexType type = indexDef.canGoThroughIndex(condition.getQueryExpression(), indexRowkeys);
-		if (!IndexType.NON_CLUSTER_INDEX.equals(type)) {
-			throw new IllegalArgumentException("This query can't go through index: " + condition.getQueryExpression());
-		}
-	}
+    public NonClusteredIndexStreamReader(IndexDefinition indexDef, SearchCondition condition) {
+        super(indexDef, condition, new ArrayList<byte[]>());
+        final IndexType type = indexDef.canGoThroughIndex(condition.getQueryExpression(), indexRowkeys);
+        if (!IndexType.NON_CLUSTER_INDEX.equals(type)) {
+            throw new IllegalArgumentException("This query can't go through index: " + condition.getQueryExpression());
+        }
+    }
 
-	public NonClusteredIndexStreamReader(IndexDefinition indexDef, SearchCondition condition, List<byte[]> indexRowkeys) {
-		super(indexDef, condition, indexRowkeys);
-	}
+    public NonClusteredIndexStreamReader(IndexDefinition indexDef, SearchCondition condition, List<byte[]> indexRowkeys) {
+        super(indexDef, condition, indexRowkeys);
+    }
 
-	@Override
-	protected LogReader createIndexReader() {
-		final EntityDefinition entityDef = indexDef.getEntityDefinition();
-		byte[][] outputQualifiers = null;
-		if(!condition.isOutputAll()) {
-			outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
-		}
-		return new NonClusteredIndexLogReader(indexDef, indexRowkeys, outputQualifiers, condition.getFilter());
-	}
+    @Override
+    protected LogReader createIndexReader() {
+        final EntityDefinition entityDef = indexDef.getEntityDefinition();
+        byte[][] outputQualifiers = null;
+        if (!condition.isOutputAll()) {
+            outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
+        }
+        return new NonClusteredIndexLogReader(indexDef, indexRowkeys, outputQualifiers, condition.getFilter());
+    }
 }

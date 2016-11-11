@@ -44,14 +44,14 @@ public class AggregateResultCallbackImpl implements AggregateResultCallback {
     private long stopTimestamp;
 
     // Start RPC call time (i.e constructor initialized time)
-    private final long _start;
+    private final long start;
 
     public AggregateResultCallbackImpl(List<AggregateFunctionType> aggregateFunctionTypes) {
         this.numFuncs = aggregateFunctionTypes.size();
         for (AggregateFunctionType type : aggregateFunctionTypes) {
             functionFactories.add(FunctionFactory.locateFunctionFactory(type));
         }
-        this._start = System.currentTimeMillis();
+        this.start = System.currentTimeMillis();
     }
 
     public long getKVCounter() {
@@ -78,10 +78,10 @@ public class AggregateResultCallbackImpl implements AggregateResultCallback {
         final long _stop = System.currentTimeMillis();
         if (this.getRegionCounter() > 0) {
             LOG.info(String.format("result = %d rows, startTime = %d, endTime = %d, source = %d rows, regions = %d, , spend = %d ms",
-                mergedKeyValues.size(), this.startTimestamp, this.stopTimestamp, this.getKVCounter(), this.getRegionCounter(), (_stop - _start)));
+                mergedKeyValues.size(), this.startTimestamp, this.stopTimestamp, this.getKVCounter(), this.getRegionCounter(), (_stop - start)));
         } else {
             LOG.info(String.format("result = %d rows, startTime = %d, endTime = %d, source = %d rows, spend = %d ms",
-                mergedKeyValues.size(), this.startTimestamp, this.stopTimestamp, this.getKVCounter(), (_stop - _start)));
+                mergedKeyValues.size(), this.startTimestamp, this.stopTimestamp, this.getKVCounter(), (_stop - start)));
         }
         AggregateResult result = new AggregateResult();
         result.setKeyValues(mergedKeyValues);

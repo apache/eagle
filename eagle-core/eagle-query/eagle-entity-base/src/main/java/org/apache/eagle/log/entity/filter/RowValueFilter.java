@@ -34,34 +34,36 @@ import java.util.List;
 
 /**
  * TODO: Critical performance problem!!!
- * TODO: Refactor to specified multi-column filter so that avoid return all qualifier columns from region server to client side
+ * TODO: Refactor to specified multi-column filter so that avoid return all qualifier columns from region server to client side.
  *
  * @since 2014/11/17
  */
 public class RowValueFilter extends FilterBase {
-    private final static Logger LOG = LoggerFactory.getLogger(RowValueFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RowValueFilter.class);
     private boolean filterOutRow = false;
     private WritableComparable<List<KeyValue>> comparator;
 
     // TODO: Use qualifiers to reduce network tranfer
-//    private List<byte[]> qualifiers;
-    public RowValueFilter(){}
+    // private List<byte[]> qualifiers;
+    public RowValueFilter() {
+    }
 
     /**
      * Filter out row if WritableComparable.compareTo return 0
+     *
      * @param comparator <code>WritableComparable[List[KeyValue]]</code>
      */
-    public RowValueFilter(WritableComparable<List<KeyValue>> comparator){
+    public RowValueFilter(WritableComparable<List<KeyValue>> comparator) {
         this.comparator = comparator;
     }
 
-//    public RowValueFilter(List<byte[]> qualifiers,WritableComparable<List<KeyValue>> comparator){
-//        this.qualifiers = qualifiers;
-//        this.comparator = comparator;
-//    }
+    // public RowValueFilter(List<byte[]> qualifiers,WritableComparable<List<KeyValue>> comparator){
+    //    this.qualifiers = qualifiers;
+    //    this.comparator = comparator;
+    // }
 
     /**
-     * Old interface in hbase-0.94
+     * Old interface in hbase-0.94.
      *
      * @param out
      * @throws IOException
@@ -77,7 +79,6 @@ public class RowValueFilter extends FilterBase {
      * @param in
      * @throws IOException
      */
-//    @Override
     @Deprecated
     public void readFields(DataInput in) throws IOException {
         this.comparator = new BooleanExpressionComparator();
@@ -101,20 +102,20 @@ public class RowValueFilter extends FilterBase {
      * TODO: Currently still use older serialization method from hbase-0.94, need to migrate into ProtoBuff based
      */
     // Override static method
-    public static Filter parseFrom(final byte [] pbBytes) throws DeserializationException {
+    public static Filter parseFrom(final byte[] pbBytes) throws DeserializationException {
         ByteArrayDataInput byteArrayDataInput = ByteStreams.newDataInput(pbBytes);
         RowValueFilter filter = new RowValueFilter();
         try {
             filter.readFields(byteArrayDataInput);
         } catch (IOException e) {
-            LOG.error("Got error to deserialize RowValueFilter from PB bytes",e);
+            LOG.error("Got error to deserialize RowValueFilter from PB bytes", e);
             throw new DeserializationException(e);
         }
         return filter;
     }
 
     @Override
-    public boolean hasFilterRow(){
+    public boolean hasFilterRow() {
         return true;
     }
 
@@ -124,21 +125,21 @@ public class RowValueFilter extends FilterBase {
     }
 
     @Override
+    public boolean filterRow() {
+        return filterOutRow;
+    }
+
+    @Override
     public void reset() {
         this.filterOutRow = false;
     }
 
     @Override
-    public boolean filterRow(){
-        return filterOutRow;
-    }
-
-    @Override
     public String toString() {
-        return super.toString()+" ( "+this.comparator.toString()+" )";
+        return super.toString() + " ( " + this.comparator.toString() + " )";
     }
 
-//    public List<byte[]> getQualifiers() {
-//        return qualifiers;
-//    }
+    // public List<byte[]> getQualifiers() {
+    //    return qualifiers;
+    // }
 }

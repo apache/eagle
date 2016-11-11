@@ -17,16 +17,10 @@
 
 package org.apache.eagle.audit.common;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
-abstract class BaseAuditListenerMap <L extends EventListener> {
+abstract class BaseAuditListenerMap<L extends EventListener> {
 
     private Map<String, L[]> map;
 
@@ -40,8 +34,8 @@ abstract class BaseAuditListenerMap <L extends EventListener> {
         }
         L[] array = this.map.get(name);
         int size = (array != null)
-                ? array.length
-                : 0;
+            ? array.length
+            : 0;
 
         L[] clone = newArray(size + 1);
         clone[size] = listener;
@@ -63,8 +57,7 @@ abstract class BaseAuditListenerMap <L extends EventListener> {
                             System.arraycopy(array, 0, clone, 0, i);
                             System.arraycopy(array, i + 1, clone, i, size - i);
                             this.map.put(name, clone);
-                        }
-                        else {
+                        } else {
                             this.map.remove(name);
                             if (this.map.isEmpty()) {
                                 this.map = null;
@@ -79,8 +72,8 @@ abstract class BaseAuditListenerMap <L extends EventListener> {
 
     public final synchronized L[] get(String name) {
         return (this.map != null)
-                ? this.map.get(name)
-                : null;
+            ? this.map.get(name)
+            : null;
     }
 
     public final void set(String name, L[] listeners) {
@@ -89,8 +82,7 @@ abstract class BaseAuditListenerMap <L extends EventListener> {
                 this.map = new HashMap<String, L[]>();
             }
             this.map.put(name, listeners);
-        }
-        else if (this.map != null) {
+        } else if (this.map != null) {
             this.map.remove(name);
             if (this.map.isEmpty()) {
                 this.map = null;
@@ -141,8 +133,8 @@ abstract class BaseAuditListenerMap <L extends EventListener> {
 
     public final Set<Entry<String, L[]>> getEntries() {
         return (this.map != null)
-                ? this.map.entrySet()
-                : Collections.<Entry<String, L[]>>emptySet();
+            ? this.map.entrySet()
+            : Collections.<Entry<String, L[]>>emptySet();
     }
 
     public abstract L extract(L listener);

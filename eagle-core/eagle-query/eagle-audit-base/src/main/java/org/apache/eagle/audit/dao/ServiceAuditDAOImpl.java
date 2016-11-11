@@ -17,8 +17,6 @@
 
 package org.apache.eagle.audit.dao;
 
-import java.util.List;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.audit.common.AuditConstants;
 import org.apache.eagle.audit.entity.GenericAuditEntity;
@@ -29,148 +27,150 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class ServiceAuditDAOImpl implements ServiceAuditDAO {
-	
-    private final Logger LOG = LoggerFactory.getLogger(ServiceAuditDAOImpl.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceAuditDAOImpl.class);
     private final EagleServiceConnector connector;
-    
-    public ServiceAuditDAOImpl(EagleServiceConnector connector){
+
+    public ServiceAuditDAOImpl(EagleServiceConnector connector) {
         this.connector = connector;
     }
 
-	@Override
+    @Override
     public List<GenericAuditEntity> findPolicyAudit(String site, String application) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDefinitionService\" AND @site=\"" + site + "\" AND @application=\"" + application + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDefinitionService\" AND @site=\"" + site + "\" AND @application=\"" + application + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}    	
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
     }
 
-	@Override
+    @Override
     public List<GenericAuditEntity> findSiteAudit(String site) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDataSourceService\" AND @site=\"" + site + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDataSourceService\" AND @site=\"" + site + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}    	
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
     }
-    
-	@Override
+
+    @Override
     public List<GenericAuditEntity> findDataSourceAudit(String application) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDataSourceService\" AND @application=\"" + application + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDataSourceService\" AND @application=\"" + application + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}  	
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
     }
-    
-	@Override
-	public List<GenericAuditEntity> findServiceAudit(String serviceName) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"" + serviceName + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
-            client.close();
-            if (response.getException() != null) {
-                throw new Exception("Exception in querying eagle service: " + response.getException());
-            }
-            return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}
-	}
 
-	@Override
-	public List<GenericAuditEntity> findServiceAuditByUser(String serviceName, String userID) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"" + serviceName + "\" AND @userID=\"" + userID + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+    @Override
+    public List<GenericAuditEntity> findServiceAudit(String serviceName) throws Exception {
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"" + serviceName + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}
-	}
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
+    }
 
-	@Override
-	public List<GenericAuditEntity> findServiceAuditByAction(String serviceName, String action) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"" + serviceName + "\" AND @actionTaken=\"" + action + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+    @Override
+    public List<GenericAuditEntity> findServiceAuditByUser(String serviceName, String userID) throws Exception {
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"" + serviceName + "\" AND @userID=\"" + userID + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}
-	}
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
+    }
 
-	@Override
-	public List<GenericAuditEntity> findUserServiceAudit(String userID) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@userID=\"" + userID + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+    @Override
+    public List<GenericAuditEntity> findServiceAuditByAction(String serviceName, String action) throws Exception {
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"" + serviceName + "\" AND @actionTaken=\"" + action + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}
-	}
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
+    }
 
-	@Override
-	public List<GenericAuditEntity> findUserServiceAuditByAction(String userID, String action) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@userID=\"" + userID + "\" AND @actionTaken=\"" + action + "\"]{*}";
-            GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+    @Override
+    public List<GenericAuditEntity> findUserServiceAudit(String userID) throws Exception {
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@userID=\"" + userID + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
                 throw new Exception("Exception in querying eagle service: " + response.getException());
             }
             return response.getObj();
-		} catch (Exception exception) {
-			LOG.error("Exception in retrieving audit entry: " + exception);
-			throw new IllegalStateException(exception);
-		}
-	}
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    @Override
+    public List<GenericAuditEntity> findUserServiceAuditByAction(String userID, String action) throws Exception {
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@userID=\"" + userID + "\" AND @actionTaken=\"" + action + "\"]{*}";
+            GenericServiceAPIResponseEntity<GenericAuditEntity> response = client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
+            client.close();
+            if (response.getException() != null) {
+                throw new Exception("Exception in querying eagle service: " + response.getException());
+            }
+            return response.getObj();
+        } catch (Exception exception) {
+            LOG.error("Exception in retrieving audit entry: " + exception);
+            throw new IllegalStateException(exception);
+        }
+    }
 }

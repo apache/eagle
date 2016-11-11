@@ -21,70 +21,83 @@ import java.util.Map;
 
 public class ListGroupByQueryAPIResponseEntity {
 
-	private boolean success;
-	private String exception;
-	private int totalResults;
-	private long elapsedms;
-	private List<Entry> obj;
-	private long lastTimestamp;
+    private boolean success;
+    private String exception;
+    private int totalResults;
+    private long elapsedms;
+    private List<Entry> obj;
+    private long lastTimestamp;
 
-	public long getElapsedms() {
-		return elapsedms;
-	}
-	public void setElapsedms(long elapsedms) {
-		this.elapsedms = elapsedms;
-	}
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
-	public int getTotalResults() {
-		return totalResults;
-	}
-	public void setTotalResults(int totalResults) {
-		this.totalResults = totalResults;
-	}
-	public List<Entry> getObj() {
-		return obj;
-	}
-	public void setObj(List<Entry> obj) {
-		this.obj = obj;
-	}
-	
-	public long getLastTimestamp() {
-		return lastTimestamp;
-	}
+    public long getElapsedms() {
+        return elapsedms;
+    }
 
-	public void setLastTimestamp(long lastTimestamp) {
-		this.lastTimestamp = lastTimestamp;
-	}
+    public void setElapsedms(long elapsedms) {
+        this.elapsedms = elapsedms;
+    }
 
-	public static class Entry implements Map.Entry<List<String>, List<Double>> {
+    public boolean isSuccess() {
+        return success;
+    }
 
-		private List<String> key;
-		private List<Double> value;
-		public List<String> getKey() {
-			return key;
-		}
-		public void setKey(List<String> key) {
-			this.key = key;
-		}
-		public List<Double> getValue() {
-			return value;
-		}
-		@Override
-		public List<Double> setValue(List<Double> value) {
-			List<Double> old = this.value;
-			this.value = value;
-			return old;
-		}
-	}
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
+    public int getTotalResults() {
+        return totalResults;
+    }
+
+    public void setTotalResults(int totalResults) {
+        this.totalResults = totalResults;
+    }
+
+    public List<Entry> getObj() {
+        return obj;
+    }
+
+    public void setObj(List<Entry> obj) {
+        this.obj = obj;
+    }
+
+    public long getLastTimestamp() {
+        return lastTimestamp;
+    }
+
+    public void setLastTimestamp(long lastTimestamp) {
+        this.lastTimestamp = lastTimestamp;
+    }
+
+    public static class Entry implements Map.Entry<List<String>, List<Double>> {
+
+        private List<String> key;
+        private List<Double> value;
+
+        public List<String> getKey() {
+            return key;
+        }
+
+        public void setKey(List<String> key) {
+            this.key = key;
+        }
+
+        public List<Double> getValue() {
+            return value;
+        }
+
+        @Override
+        public List<Double> setValue(List<Double> value) {
+            List<Double> old = this.value;
+            this.value = value;
+            return old;
+        }
+    }
 }

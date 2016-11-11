@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public class TestJdbcEntitySchemaManager {
     @Test
-    public void testSetup(){
+    public void testSetup() {
         JdbcEntitySchemaManager.getInstance().init();
         JdbcEntitySchemaManager.getInstance().init();
     }

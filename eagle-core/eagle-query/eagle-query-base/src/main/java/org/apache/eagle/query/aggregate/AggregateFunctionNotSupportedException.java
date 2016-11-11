@@ -16,13 +16,14 @@
  */
 package org.apache.eagle.query.aggregate;
 
-public class AggregateFunctionNotSupportedException extends RuntimeException{
-	static final long serialVersionUID = -4548788354899625887L;
-	public AggregateFunctionNotSupportedException(){
-		super();
-	}
-	
-	public AggregateFunctionNotSupportedException(String message){
-		super(message);
-	}
+public class AggregateFunctionNotSupportedException extends RuntimeException {
+    static final long serialVersionUID = -4548788354899625887L;
+
+    public AggregateFunctionNotSupportedException() {
+        super();
+    }
+
+    public AggregateFunctionNotSupportedException(String message) {
+        super(message);
+    }
 }

@@ -22,9 +22,9 @@ import org.junit.Test;
 
 public class TestEntityRepositoryScanner {
 
-	@Test
-	public void testScan() throws InstantiationException, IllegalAccessException {
-		EntityRepositoryScanner.scan();
-		Assert.assertNotNull(EntityDefinitionManager.getEntityByServiceName("MetricMetadataService"));
-	}
+    @Test
+    public void testScan() throws InstantiationException, IllegalAccessException {
+        EntityRepositoryScanner.scan();
+        Assert.assertNotNull(EntityDefinitionManager.getEntityByServiceName("MetricMetadataService"));
+    }
 }

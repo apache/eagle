@@ -20,30 +20,34 @@ package org.apache.eagle.query.aggregate.timeseries;
  * sum(field1), max(field2) groupby(field3, field4) sort by field1 asc, field3 desc
  * There are 2 SortOption object, then
  * the 1st one is inGroupby=false, index=0, ascendent=true
- * the 2nd one is inGroupby=true, index=1, ascendent=false
- *
+ * the 2nd one is inGroupby=true, index=1, ascendent=false.
  */
 public class SortOption {
-	private boolean inGroupby; // sort field defaultly is not from groupby fields 
-	private int index; // index relative to list of groupby fields or list of functions
-	private boolean ascendant; //asc or desc
+    private boolean inGroupby; // sort field defaultly is not from groupby fields
+    private int index; // index relative to list of groupby fields or list of functions
+    private boolean ascendant; //asc or desc
 
-	public boolean isInGroupby() {
-		return inGroupby;
-	}
-	public void setInGroupby(boolean inGroupby) {
-		this.inGroupby = inGroupby;
-	}
-	public int getIndex() {
-		return index;
-	}
-	public void setIndex(int index) {
-		this.index = index;
-	}
-	public boolean isAscendant() {
-		return ascendant;
-	}
-	public void setAscendant(boolean ascendant) {
-		this.ascendant = ascendant;
-	}
+    public boolean isInGroupby() {
+        return inGroupby;
+    }
+
+    public void setInGroupby(boolean inGroupby) {
+        this.inGroupby = inGroupby;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public boolean isAscendant() {
+        return ascendant;
+    }
+
+    public void setAscendant(boolean ascendant) {
+        this.ascendant = ascendant;
+    }
 }

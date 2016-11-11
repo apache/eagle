@@ -20,9 +20,6 @@ import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 
-/**
- * @since 3/23/15
- */
 public abstract class DataStorageBase implements DataStorage<String> {
     @Override
     public CompiledQuery compile(RawQuery query) throws QueryCompileException {

@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.storage;
 
+import org.apache.commons.configuration.AbstractConfiguration;
+import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.eagle.storage.exception.IllegalDataStorageException;
 import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.spi.TestDataStorage;
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.configuration.CombinedConfiguration;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -39,7 +39,7 @@ public class TestDataStorageLoader {
         assert dataStorage2 instanceof TestDataStorage;
 
         AbstractConfiguration configuration = new CombinedConfiguration();
-        configuration.addProperty(DataStorageManager.EAGLE_STORAGE_TYPE,"test");
+        configuration.addProperty(DataStorageManager.EAGLE_STORAGE_TYPE, "test");
         DataStorage dataStorage3 = DataStorageManager.newDataStorage(configuration);
         assert dataStorage3 instanceof TestDataStorage;
 

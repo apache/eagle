@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.log.entity;
 
+import org.apache.eagle.common.EagleBase64Wrapper;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
-import org.apache.eagle.common.EagleBase64Wrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,52 +27,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GenericEntityWriter {
-	private static final Logger LOG = LoggerFactory.getLogger(GenericEntityWriter.class);
-	private EntityDefinition entityDef;
+    private static final Logger LOG = LoggerFactory.getLogger(GenericEntityWriter.class);
+    private EntityDefinition entityDef;
 
-	public GenericEntityWriter(String serviceName) throws InstantiationException, IllegalAccessException{
-		this.entityDef = EntityDefinitionManager.getEntityByServiceName(serviceName);
-		checkNotNull(entityDef, "serviceName");
-	}
+    public GenericEntityWriter(String serviceName) throws InstantiationException, IllegalAccessException {
+        this.entityDef = EntityDefinitionManager.getEntityByServiceName(serviceName);
+        checkNotNull(entityDef, "serviceName");
+    }
 
-	public GenericEntityWriter(EntityDefinition entityDef) throws InstantiationException, IllegalAccessException{
-		this.entityDef = entityDef;
-		checkNotNull(entityDef, "serviceName");
-	}
-	
-	private void checkNotNull(Object o, String message) {
-		if(o == null){
-			throw new IllegalArgumentException(message + " should not be null");
-		}
-	}
+    public GenericEntityWriter(EntityDefinition entityDef) throws InstantiationException, IllegalAccessException {
+        this.entityDef = entityDef;
+        checkNotNull(entityDef, "serviceName");
+    }
 
-	/**
-	 * @param entities
-	 * @return row keys
-	 * @throws Exception
-	 */
-	public List<String> write(List<? extends TaggedLogAPIEntity> entities) throws Exception{
-		HBaseLogWriter writer = new HBaseLogWriter(entityDef.getTable(), entityDef.getColumnFamily());
-		List<String> rowkeys = new ArrayList<String>(entities.size());
-		List<InternalLog> logs = new ArrayList<InternalLog>(entities.size());
-		
-		try{
-			writer.open();
-			for(TaggedLogAPIEntity entity : entities){
-				final InternalLog entityLog = HBaseInternalLogHelper.convertToInternalLog(entity, entityDef);
-				logs.add(entityLog);
-			}
-			List<byte[]> bRowkeys  = writer.write(logs);
-			for (byte[] rowkey : bRowkeys) {
-				rowkeys.add(EagleBase64Wrapper.encodeByteArray2URLSafeString(rowkey));
-			}
+    private void checkNotNull(Object o, String message) {
+        if (o == null) {
+            throw new IllegalArgumentException(message + " should not be null");
+        }
+    }
 
-		}catch(Exception ex){
-			LOG.error("fail writing tagged log", ex);
-			throw ex;
-		}finally{
-			writer.close();
-	 	}
-		return rowkeys;
-	}
+    public List<String> write(List<? extends TaggedLogAPIEntity> entities) throws Exception {
+        HBaseLogWriter writer = new HBaseLogWriter(entityDef.getTable(), entityDef.getColumnFamily());
+        List<String> rowkeys = new ArrayList<String>(entities.size());
+        List<InternalLog> logs = new ArrayList<InternalLog>(entities.size());
+
+        try {
+            writer.open();
+            for (TaggedLogAPIEntity entity : entities) {
+                final InternalLog entityLog = HBaseInternalLogHelper.convertToInternalLog(entity, entityDef);
+                logs.add(entityLog);
+            }
+            List<byte[]> bRowkeys = writer.write(logs);
+            for (byte[] rowkey : bRowkeys) {
+                rowkeys.add(EagleBase64Wrapper.encodeByteArray2URLSafeString(rowkey));
+            }
+
+        } catch (Exception ex) {
+            LOG.error("fail writing tagged log", ex);
+            throw ex;
+        } finally {
+            writer.close();
+        }
+        return rowkeys;
+    }
 }

@@ -37,103 +37,109 @@ import java.io.IOException;
  * }
  * </pre>
  *
- * TODO: Add self-described serializer or deserializer for meta bytes array, so that any side of the RPC will know how to read/write meta information
+ * <p>TODO: Add self-described serializer or deserializer for meta bytes array, so that any side of the RPC will know how to read/write meta information
  *
  * @since : 11/4/14,2014
  */
-public class GroupbyValue implements Writable{
-	private final WritableList<DoubleWritable> value;
-	private WritableList<BytesWritable> meta;
-	private int initialCapacity=1;
-	public GroupbyValue(){
-		this(1);
-	}
-	/**
-	 * Constructs an empty list with the specified initial capacity.
-	 *
-	 * @param   initialCapacity   the initial capacity of the list
-	 * @exception IllegalArgumentException if the specified initial capacity
-	 *            is negative
-	 */
-	public GroupbyValue(int initialCapacity ){
-		this.initialCapacity = initialCapacity;
-		this.value = new WritableList<DoubleWritable>(DoubleWritable.class,this.initialCapacity);
-		this.meta = new WritableList<BytesWritable>(BytesWritable.class,this.initialCapacity);
-	}
+public class GroupbyValue implements Writable {
+    private final WritableList<DoubleWritable> value;
+    private WritableList<BytesWritable> meta;
+    private int initialCapacity = 1;
 
-	public WritableList<DoubleWritable> getValue(){
-		return this.value;
-	}
+    public GroupbyValue() {
+        this(1);
+    }
 
-	public WritableList<BytesWritable> getMeta(){
-		return this.meta;
-	}
+    /**
+     * Constructs an empty list with the specified initial capacity.
+     *
+     * @param initialCapacity the initial capacity of the list
+     * @throws IllegalArgumentException if the specified initial capacity
+     *                                  is negative
+     */
+    public GroupbyValue(int initialCapacity) {
+        this.initialCapacity = initialCapacity;
+        this.value = new WritableList<DoubleWritable>(DoubleWritable.class, this.initialCapacity);
+        this.meta = new WritableList<BytesWritable>(BytesWritable.class, this.initialCapacity);
+    }
 
-	public DoubleWritable get(int index){
-		return this.value.get(index);
-	}
+    public WritableList<DoubleWritable> getValue() {
+        return this.value;
+    }
 
-	public BytesWritable getMeta(int index){
-		if(this.meta==null) return null;
-		return this.meta.get(index);
-	}
+    public WritableList<BytesWritable> getMeta() {
+        return this.meta;
+    }
 
-	// Values
-	public void add(DoubleWritable value){
-		this.value.add(value);
-	}
-	public void add(Double value){
-		this.value.add(new DoubleWritable(value));
-	}
+    public BytesWritable getMeta(int index) {
+        if (this.meta == null) {
+            return null;
+        }
+        return this.meta.get(index);
+    }
 
-	public void set(int index,DoubleWritable value){
-		this.value.set(index, value);
-	}
+    public DoubleWritable get(int index) {
+        return this.value.get(index);
+    }
 
-	//////////////
-	// Meta
-	/////////////
-	public void addMeta(BytesWritable meta){
-		this.meta.add(meta);
-	}
+    // Values
+    public void add(DoubleWritable value) {
+        this.value.add(value);
+    }
 
-	public void addMeta(int meta){
-		this.meta.add(new BytesWritable(ByteUtil.intToBytes(meta)));
-	}
+    public void add(Double value) {
+        this.value.add(new DoubleWritable(value));
+    }
 
-	public void setMeta(int index,BytesWritable meta){
-		this.meta.set(index,meta);
-	}
-	public void setMeta(int index,int meta){
-		this.meta.set(index, new BytesWritable(ByteUtil.intToBytes(meta)));
-	}
+    public void set(int index, DoubleWritable value) {
+        this.value.set(index, value);
+    }
 
-	/**
-	 * Serialize the fields of this object to <code>out</code>.
-	 *
-	 * @param out <code>DataOuput</code> to serialize this object into.
-	 * @throws java.io.IOException
-	 */
-	@Override
-	public void write(DataOutput out) throws IOException {
-		out.writeInt(this.initialCapacity);
-		this.value.write(out);
-		this.meta.write(out);
-	}
+    //////////////
+    // Meta
+    /////////////
+    public void addMeta(BytesWritable meta) {
+        this.meta.add(meta);
+    }
 
-	/**
-	 * Deserialize the fields of this object from <code>in</code>.
-	 * <p/>
-	 * <p>For efficiency, implementations should attempt to re-use storage in the
-	 * existing object where possible.</p>
-	 *
-	 * @param in <code>DataInput</code> to deseriablize this object from.
-	 * @throws java.io.IOException
-	 */
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		this.initialCapacity = in.readInt();
-		this.value.readFields(in);
-		this.meta.readFields(in);
-	}
+    public void addMeta(int meta) {
+        this.meta.add(new BytesWritable(ByteUtil.intToBytes(meta)));
+    }
+
+    public void setMeta(int index, BytesWritable meta) {
+        this.meta.set(index, meta);
+    }
+
+    public void setMeta(int index, int meta) {
+        this.meta.set(index, new BytesWritable(ByteUtil.intToBytes(meta)));
+    }
+
+    /**
+     * Serialize the fields of this object to <code>out</code>.
+     *
+     * @param out <code>DataOuput</code> to serialize this object into.
+     * @throws java.io.IOException
+     */
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeInt(this.initialCapacity);
+        this.value.write(out);
+        this.meta.write(out);
+    }
+
+    /**
+     * Deserialize the fields of this object from <code>in</code>.
+     * <p/>
+     * <p>For efficiency, implementations should attempt to re-use storage in the
+     * existing object where possible.</p>
+     *
+     * @param in <code>DataInput</code> to deseriablize this object from.
+     * @throws java.io.IOException
+     */
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.initialCapacity = in.readInt();
+        this.value.readFields(in);
+        this.meta.readFields(in);
+    }
 }

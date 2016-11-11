@@ -25,29 +25,27 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 /**
+ * EagleServiceAsyncClient.
  * @see IEagleServiceClient
  */
-public interface EagleServiceAsyncClient extends Closeable{
+public interface EagleServiceAsyncClient extends Closeable {
     /**
-     *
      * @param <E>
      * @param entities
      * @param serviceName
      * @return
      */
-    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> create(final List<E> entities,final String serviceName) throws IOException, EagleServiceClientException;
+    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> create(final List<E> entities, final String serviceName) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param entityClass
      * @param <E>
      * @return
      */
-    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> create(final List<E> entities,final Class<E> entityClass) throws IOException, EagleServiceClientException;
+    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> create(final List<E> entities, final Class<E> entityClass) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param <E>
      * @return
@@ -55,7 +53,6 @@ public interface EagleServiceAsyncClient extends Closeable{
     <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> create(final List<E> entities) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param <E>
      * @return
@@ -63,23 +60,21 @@ public interface EagleServiceAsyncClient extends Closeable{
     <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> delete(final List<E> entities) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param <E>
      * @return
      */
-    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> delete(final List<E> entities,final String serviceName) throws IOException, EagleServiceClientException;
+    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> delete(final List<E> entities, final String serviceName) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param <E>
      * @return
      */
-    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> delete(final List<E> entities,final Class<E> entityClass) throws IOException, EagleServiceClientException;
+    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> delete(final List<E> entities, final Class<E> entityClass) throws IOException, EagleServiceClientException;
 
     /**
-     *
+     * delete.
      * @param request
      * @return
      */
@@ -93,23 +88,20 @@ public interface EagleServiceAsyncClient extends Closeable{
     <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> update(final List<E> entities) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param <E>
      * @return
      */
-    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> update(final List<E> entities,final String serviceName) throws IOException, EagleServiceClientException;
+    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> update(final List<E> entities, final String serviceName) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param entities
      * @param <E>
      * @return
      */
-    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> update(final List<E> entities,final Class<E> entityClass) throws IOException, EagleServiceClientException;
+    <E extends TaggedLogAPIEntity> Future<GenericServiceAPIResponseEntity<String>> update(final List<E> entities, final Class<E> entityClass) throws IOException, EagleServiceClientException;
 
     /**
-     *
      * @param request
      * @return
      */

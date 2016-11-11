@@ -27,17 +27,18 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Preconditions;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-/**
- * @since 3/18/15
- */
+
 public class GenericServiceAPIResponseEntityDeserializer extends JsonDeserializer<GenericServiceAPIResponseEntity> {
-    private final static String META_FIELD="meta";
-    private final static String SUCCESS_FIELD="success";
-    private final static String EXCEPTION_FIELD="exception";
-    private final static String OBJ_FIELD="obj";
-    private final static String TYPE_FIELD="type";
+    private static final String META_FIELD = "meta";
+    private static final String SUCCESS_FIELD = "success";
+    private static final String EXCEPTION_FIELD = "exception";
+    private static final String OBJ_FIELD = "obj";
+    private static final String TYPE_FIELD = "type";
 
     @Override
     public GenericServiceAPIResponseEntity deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
@@ -45,40 +46,40 @@ public class GenericServiceAPIResponseEntityDeserializer extends JsonDeserialize
         ObjectCodec objectCodec = jp.getCodec();
 
         JsonNode rootNode = jp.getCodec().readTree(jp);
-        if(rootNode.isObject()){
-            Iterator<Map.Entry<String,JsonNode>> fields = rootNode.fields();
+        if (rootNode.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
             JsonNode objNode = null;
-            while(fields.hasNext()){
-                Map.Entry<String,JsonNode> field = fields.next();
-                if (META_FIELD.equals(field.getKey()) && field.getValue() != null)
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                if (META_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     entity.setMeta(objectCodec.readValue(field.getValue().traverse(), Map.class));
-                else if(SUCCESS_FIELD.equals(field.getKey()) && field.getValue() != null){
+                } else if (SUCCESS_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     entity.setSuccess(field.getValue().booleanValue());
-                }else if(EXCEPTION_FIELD.equals(field.getKey()) && field.getValue() != null){
+                } else if (EXCEPTION_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     entity.setException(new Exception(field.getValue().textValue()));
-                }else if(TYPE_FIELD.endsWith(field.getKey())  && field.getValue() != null){
-                    Preconditions.checkNotNull(field.getValue().textValue(),"Response type class is null");
+                } else if (TYPE_FIELD.endsWith(field.getKey()) && field.getValue() != null) {
+                    Preconditions.checkNotNull(field.getValue().textValue(), "Response type class is null");
                     try {
                         entity.setType(Class.forName(field.getValue().textValue()));
                     } catch (ClassNotFoundException e) {
                         throw new IOException(e);
                     }
-                }else if(OBJ_FIELD.equals(field.getKey()) && field.getValue() != null){
+                } else if (OBJ_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     objNode = field.getValue();
                 }
             }
 
-            if(objNode!=null) {
-                JavaType collectionType=null;
+            if (objNode != null) {
+                JavaType collectionType = null;
                 if (entity.getType() != null) {
                     collectionType = TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, entity.getType());
-                }else{
+                } else {
                     collectionType = TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, Map.class);
                 }
                 List obj = objectCodec.readValue(objNode.traverse(), collectionType);
                 entity.setObj(obj);
             }
-        }else{
+        } else {
             throw new IOException("root node is not object");
         }
         return entity;

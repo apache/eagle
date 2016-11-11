@@ -17,7 +17,7 @@
 /**
  * <h2>Consistency Guarantee</h2>
  * <ul>
- *     <li> Rollback all changes if any single entity throws exception to make sure consistency guarantee </li>
+ * <li> Rollback all changes if any single entity throws exception to make sure consistency guarantee </li>
  * </ul>
  *
  * @since 3/31/15

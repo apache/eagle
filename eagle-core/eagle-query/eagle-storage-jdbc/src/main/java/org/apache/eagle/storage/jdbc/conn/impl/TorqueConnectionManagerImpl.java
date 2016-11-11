@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.storage.jdbc.conn.impl;
 
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.conn.ConnectionConfig;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManager;
-import org.apache.commons.configuration.BaseConfiguration;
-import org.apache.commons.configuration.Configuration;
 import org.apache.torque.Torque;
 import org.apache.torque.TorqueException;
 import org.slf4j.Logger;
@@ -28,28 +28,29 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 
-/**
- * @since 3/27/15
- */
 public class TorqueConnectionManagerImpl implements ConnectionManager {
-    private final static Logger LOG = LoggerFactory.getLogger(TorqueConnectionManagerImpl.class);
-    public final static String DEFAULT_DATA_SOURCE_FACTORY_CLASS = "org.apache.torque.dsfactory.SharedPoolDataSourceFactory";
+    private static final Logger LOG = LoggerFactory.getLogger(TorqueConnectionManagerImpl.class);
+    public static final String DEFAULT_DATA_SOURCE_FACTORY_CLASS = "org.apache.torque.dsfactory.SharedPoolDataSourceFactory";
 
     private ConnectionConfig config;
 
     @Override
     public void init(ConnectionConfig config) throws Exception {
-        if(this.config != null) LOG.warn("Resetting config");
+        if (this.config != null) {
+            LOG.warn("Resetting config");
+        }
         this.config = config;
 
-        if(!Torque.isInit()) {
+        if (!Torque.isInit()) {
             try {
-                if(LOG.isDebugEnabled()) LOG.debug("Apache Torque initializing");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Apache Torque initializing");
+                }
                 Torque.init(buildConfiguration(config));
             } catch (TorqueException e) {
                 throw new Exception(e);
             }
-        }else{
+        } else {
             LOG.warn("Apache Torque has already been initialized, ignore");
         }
     }
@@ -64,7 +65,7 @@ public class TorqueConnectionManagerImpl implements ConnectionManager {
         try {
             return Torque.getConnection();
         } catch (TorqueException e) {
-            LOG.error("Failed to get connection",e);
+            LOG.error("Failed to get connection", e);
             throw new Exception(e);
         }
     }
@@ -81,7 +82,7 @@ public class TorqueConnectionManagerImpl implements ConnectionManager {
     @Override
     public TorqueStatementPeerImpl getStatementExecutor(String tableName) {
         TorqueStatementPeerImpl statementPeer = new TorqueStatementPeerImpl();
-        statementPeer.init(this.getConfig(),tableName);
+        statementPeer.init(this.getConfig(), tableName);
         return statementPeer;
     }
 
@@ -107,35 +108,35 @@ public class TorqueConnectionManagerImpl implements ConnectionManager {
      * @param config
      * @return
      */
-    private Configuration buildConfiguration(ConnectionConfig config){
+    private Configuration buildConfiguration(ConnectionConfig config) {
         Configuration configuration = new BaseConfiguration();
 
 
         String databaseName = config.getDatabaseName();
-        if(databaseName==null){
-            LOG.warn(JdbcConstants.EAGLE_DATABASE+" is null, trying default database name as: eagle");
+        if (databaseName == null) {
+            LOG.warn(JdbcConstants.EAGLE_DATABASE + " is null, trying default database name as: eagle");
             databaseName = "eagle";
         }
 
-        LOG.info("Using default database: "+databaseName+" (adapter: "+config.getAdapter()+")");
+        LOG.info("Using default database: " + databaseName + " (adapter: " + config.getAdapter() + ")");
 
-        configuration.addProperty("torque.database.default",config.getDatabaseName());
+        configuration.addProperty("torque.database.default", config.getDatabaseName());
 
         // This factory uses the SharedDataSource available in the commons-dbcp package
-        configuration.addProperty(String.format("torque.dsfactory.%s.factory",databaseName), DEFAULT_DATA_SOURCE_FACTORY_CLASS);
+        configuration.addProperty(String.format("torque.dsfactory.%s.factory", databaseName), DEFAULT_DATA_SOURCE_FACTORY_CLASS);
 
         // mysql, oracle, ...
-        configuration.addProperty(String.format("torque.database.%s.adapter",databaseName),config.getAdapter());
+        configuration.addProperty(String.format("torque.database.%s.adapter", databaseName), config.getAdapter());
 
         // "org.gjt.mm.mysql.Driver"
-        configuration.addProperty(String.format("torque.dsfactory.%s.connection.driver",databaseName),config.getDriverClassName());
+        configuration.addProperty(String.format("torque.dsfactory.%s.connection.driver", databaseName), config.getDriverClassName());
 
-        configuration.addProperty(String.format("torque.dsfactory.%s.connection.url",databaseName),config.getConnectionUrl());
-        configuration.addProperty(String.format("torque.dsfactory.%s.connection.user",databaseName),config.getUserName());
-        configuration.addProperty(String.format("torque.dsfactory.%s.connection.password",databaseName),config.getPassword());
-        configuration.addProperty(String.format("torque.dsfactory.%s.pool.maxActive",databaseName),Integer.toString(config.getConnectionMaxActive()));
-//        configuration.addProperty(String.format("torque.dsfactory.%s.pool.minIdle",databaseName),Integer.toString(config.getConnectionMinIdle()));
-//        configuration.addProperty(String.format("torque.dsfactory.%s.pool.initialSize",databaseName),Integer.toString(config.getConnectionInitialSize()));
+        configuration.addProperty(String.format("torque.dsfactory.%s.connection.url", databaseName), config.getConnectionUrl());
+        configuration.addProperty(String.format("torque.dsfactory.%s.connection.user", databaseName), config.getUserName());
+        configuration.addProperty(String.format("torque.dsfactory.%s.connection.password", databaseName), config.getPassword());
+        configuration.addProperty(String.format("torque.dsfactory.%s.pool.maxActive", databaseName), Integer.toString(config.getConnectionMaxActive()));
+        // configuration.addProperty(String.format("torque.dsfactory.%s.pool.minIdle",databaseName),Integer.toString(config.getConnectionMinIdle()));
+        // configuration.addProperty(String.format("torque.dsfactory.%s.pool.initialSize",databaseName),Integer.toString(config.getConnectionInitialSize()));
 
         return configuration;
     }
