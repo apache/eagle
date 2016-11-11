@@ -26,7 +26,6 @@ import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordinator.impl.MetadataValdiator;
 import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
-import org.apache.eagle.alert.coordinator.trigger.CoordinatorTrigger;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.slf4j.Logger;
@@ -209,7 +208,7 @@ public class Coordinator {
             return t;
         });
 
-        scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+        // scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
 
         Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
         LOG.info("Eagle Coordinator started ...");
