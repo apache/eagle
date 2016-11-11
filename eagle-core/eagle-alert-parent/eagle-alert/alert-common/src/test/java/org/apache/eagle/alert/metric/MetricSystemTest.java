@@ -188,7 +188,7 @@ public class MetricSystemTest {
         sink.report();
         sink.stop();
         String result = bytes.toString();
-        result = result.substring(result.indexOf(END_LINE) + 1);//remove first line
+        result = result.substring(result.indexOf(END_LINE) + END_LINE.length());//remove first line
         Assert.assertEquals("" + END_LINE + "" +
                 "-- Gauges ----------------------------------------------------------------------" + END_LINE + "" +
                 "name" + END_LINE + "" +

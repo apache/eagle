@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.server.managedtask;
+package org.apache.eagle.server.task;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
 import io.dropwizard.lifecycle.Managed;
-import org.apache.eagle.app.service.impl.ApplicationStatusUpdateServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

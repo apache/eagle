@@ -202,7 +202,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
         if (size > 0 && size <= alerts.size()) {
-            return alerts.subList(0, size);
+            return alerts.subList(alerts.size() - size, alerts.size());
         }
         return alerts;
     }
@@ -218,9 +218,12 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId) {
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId, int size) {
+        if (size < 0 || size > alerts.size()) {
+            size = alerts.size();
+        }
         List<AlertPublishEvent> result = alerts.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
-        return result;
+        return result.subList(result.size() - size, result.size());
     }
 
     @Override
