@@ -17,17 +17,17 @@
 package org.apache.eagle.alert.coordination.model.internal;
 
 
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Objects;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StreamGroup {
 
+    private boolean dedicated; 
     private List<StreamPartition> streamPartitions = new ArrayList<StreamPartition>();
 
     public StreamGroup() {
@@ -41,8 +41,23 @@ public class StreamGroup {
         this.streamPartitions.add(sp);
     }
 
+    public void addStreamPartition(StreamPartition sp, boolean dedicated) {
+        this.dedicated = dedicated;
+        this.streamPartitions.add(sp);
+    }
+
     public void addStreamPartitions(List<StreamPartition> sps) {
         this.streamPartitions.addAll(sps);
+    }
+
+    public void addStreamPartitions(List<StreamPartition> sps, boolean dedicated) {
+        this.dedicated = dedicated;
+        this.streamPartitions.addAll(sps);
+    }
+
+    @JsonIgnore
+    public boolean isDedicated() {
+        return dedicated;
     }
 
     @JsonIgnore
@@ -58,7 +73,7 @@ public class StreamGroup {
     @Override
     public int hashCode() {
         // implicitly all groups in stream groups will be built for hash code
-        return new HashCodeBuilder().append(streamPartitions).build();
+        return new HashCodeBuilder().append(streamPartitions).append(dedicated).build();
     }
 
     @Override
@@ -67,12 +82,12 @@ public class StreamGroup {
             return false;
         }
         StreamGroup o = (StreamGroup) obj;
-        return Objects.equal(this.streamPartitions, o.streamPartitions);
+        return Objects.equal(this.streamPartitions, o.streamPartitions) && Objects.equal(this.dedicated, o.dedicated);
     }
 
     @Override
     public String toString() {
-        return String.format("StreamGroup partitions=: %s ", streamPartitions);
+        return String.format("StreamGroup dedicated=: %s partitions=: %s ", dedicated, streamPartitions);
     }
 
 }
