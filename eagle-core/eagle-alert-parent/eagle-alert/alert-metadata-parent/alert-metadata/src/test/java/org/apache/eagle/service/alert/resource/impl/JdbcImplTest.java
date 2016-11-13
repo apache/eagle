@@ -47,7 +47,7 @@ public class JdbcImplTest {
     public static void setup() {
         System.setProperty("config.resource", "/application-mysql.conf");
         ConfigFactory.invalidateCaches();
-        Config config = ConfigFactory.load().getConfig("datastore");
+        Config config = ConfigFactory.load();
         dao = new JdbcMetadataDaoImpl(config);
     }
 

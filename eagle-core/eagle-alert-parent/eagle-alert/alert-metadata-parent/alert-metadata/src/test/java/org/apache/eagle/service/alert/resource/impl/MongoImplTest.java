@@ -72,7 +72,7 @@ public class MongoImplTest {
 
         System.setProperty("config.resource", "/application-mongo.conf");
         ConfigFactory.invalidateCaches();
-        Config config = ConfigFactory.load().getConfig("datastore");
+        Config config = ConfigFactory.load();
         dao = new MongoMetadataDaoImpl(config);
 
     }

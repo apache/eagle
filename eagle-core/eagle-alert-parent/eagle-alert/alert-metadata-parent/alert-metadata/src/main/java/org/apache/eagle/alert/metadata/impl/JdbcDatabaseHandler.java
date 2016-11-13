@@ -18,6 +18,7 @@
 
 package org.apache.eagle.alert.metadata.impl;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,6 +28,7 @@ import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
 import java.util.HashMap;
@@ -51,7 +53,7 @@ public class JdbcDatabaseHandler {
     private Map<String, String> tblNameMap = new HashMap<>();
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private Connection connection = null;
+    private DataSource dataSource;
 
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -61,11 +63,20 @@ public class JdbcDatabaseHandler {
         // "jdbc:mysql://dbhost/database?" + "user=sqluser&password=sqluserpw"
         this.tblNameMap = JdbcSchemaManager.tblNameMap;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
             JdbcSchemaManager.getInstance().init(config);
-            connection = MetadataUtils.getJdbcConnection(config);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            BasicDataSource bDatasource = new BasicDataSource();
+            bDatasource.setDriverClassName(config.getString(MetadataUtils.JDBC_DRIVER_PATH));
+            if (config.hasPath(MetadataUtils.JDBC_USERNAME_PATH)) {
+                bDatasource.setUsername(config.getString(MetadataUtils.JDBC_USERNAME_PATH));
+                bDatasource.setPassword(config.getString(MetadataUtils.JDBC_PASSWORD_PATH));
+            }
+            bDatasource.setUrl(config.getString(MetadataUtils.JDBC_URL_PATH));
+            if (config.hasPath(MetadataUtils.JDBC_CONNECTION_PROPERTIES_PATH)) {
+                bDatasource.setConnectionProperties(config.getString(MetadataUtils.JDBC_CONNECTION_PROPERTIES_PATH));
+            }
+            this.dataSource = bDatasource;
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -85,7 +96,9 @@ public class JdbcDatabaseHandler {
         Savepoint savepoint = null;
         String key = null;
         String value = null;
+        Connection connection = null;
         try {
+            connection = dataSource.getConnection();
             statement = connection.prepareStatement(String.format(INSERT_STATEMENT, tb));
             key = MetadataUtils.getKey(t);
             value = mapper.writeValueAsString(t);
@@ -102,7 +115,7 @@ public class JdbcDatabaseHandler {
             connection.commit();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e.getCause());
-            if (e.getMessage().toLowerCase().contains("duplicate")) {
+            if (e.getMessage().toLowerCase().contains("duplicate") && connection != null) {
                 LOG.info("Detected duplicated entity");
                 try {
                     connection.rollback(savepoint);
@@ -124,6 +137,13 @@ public class JdbcDatabaseHandler {
                     LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
                 }
             }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
         }
         return result;
     }
@@ -131,7 +151,9 @@ public class JdbcDatabaseHandler {
     private <T> OpResult update(String tb, String key, String value) throws SQLException {
         OpResult result = new OpResult();
         PreparedStatement statement = null;
+        Connection connection = null;
         try {
+            connection = dataSource.getConnection();
             statement = connection.prepareStatement(String.format(UPDATE_STATEMENT, tb));
             Clob clob = connection.createClob();
             clob.setString(1, value);
@@ -141,12 +163,19 @@ public class JdbcDatabaseHandler {
             int status = statement.executeUpdate();
             LOG.info("update {} entities from table {}", status, tb);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
         } finally {
             if (statement != null) {
                 statement.close();
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
             }
         }
         return result;
@@ -182,7 +211,9 @@ public class JdbcDatabaseHandler {
     public <T> T executeSelectByIdStatement(Class<T> clz, String id) {
         String tb = getTableName(clz.getSimpleName());
         List<T> result = new LinkedList<>();
+        Connection connection = null;
         try {
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(String.format(QUERY_CONDITION_STATEMENT, tb));
             statement.setString(1, id);
             ResultSet rs = statement.executeQuery();
@@ -199,7 +230,15 @@ public class JdbcDatabaseHandler {
             rs.close();
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
         }
         if (result.isEmpty()) {
             return null;
@@ -211,7 +250,9 @@ public class JdbcDatabaseHandler {
     public <T> List<T> executeSelectStatement(Class<T> clz, String query) {
         String tb = getTableName(clz.getSimpleName());
         List<T> result = new LinkedList<>();
+        Connection connection = null;
         try {
+            connection = dataSource.getConnection();
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
@@ -227,7 +268,15 @@ public class JdbcDatabaseHandler {
             rs.close();
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
         }
         return result;
     }
@@ -235,7 +284,9 @@ public class JdbcDatabaseHandler {
     public <T> OpResult remove(String clzName, String key) {
         String tb = getTableName(clzName);
         OpResult result = new OpResult();
+        Connection connection = null;
         try {
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb, key));
             statement.setString(1, key);
             int status = statement.executeUpdate();
@@ -246,20 +297,21 @@ public class JdbcDatabaseHandler {
         } catch (SQLException e) {
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
-            //e.printStackTrace();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
         }
         return result;
     }
 
     public void close() throws IOException {
         //JdbcSchemaManager.getInstance().shutdown();
-        try {
-            if (this.connection != null) {
-                this.connection.close();
-            }
-        } catch (SQLException e) {
-            LOG.warn(e.getMessage());
-        }
     }
 
 }
