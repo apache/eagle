@@ -19,12 +19,13 @@ package org.apache.eagle.alert.coordination.model;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A slot is simply a bolt.
  */
-public class WorkSlot {
+public class WorkSlot implements Serializable {
     public String topologyName;
     public String boltId;
 
@@ -64,7 +65,7 @@ public class WorkSlot {
         }
         WorkSlot workSlot = (WorkSlot) other;
         return Objects.equals(topologyName, workSlot.topologyName)
-            && Objects.equals(boltId, workSlot.boltId);
+                && Objects.equals(boltId, workSlot.boltId);
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.apache.eagle.alert.engine.coordinator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,7 +28,7 @@ import java.util.Objects;
  * @since Apr 11, 2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Publishment {
+public class Publishment implements Serializable {
 
     private String name;
     private String type;

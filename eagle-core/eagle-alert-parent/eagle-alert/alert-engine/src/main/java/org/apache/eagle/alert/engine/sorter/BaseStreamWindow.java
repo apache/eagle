@@ -23,6 +23,7 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,14 +31,14 @@ import java.util.concurrent.atomic.AtomicLong;
  * TODO: Make sure thread-safe.
  * TODO: Leverage Off-Heap Memory to persist append-only events collection.
  */
-public abstract class BaseStreamWindow implements StreamWindow {
+public abstract class BaseStreamWindow implements StreamWindow, Serializable {
     private final long endTime;
     private final long startTime;
     private final long margin;
     private final AtomicBoolean expired;
     private final long createdTime;
     private static final Logger LOG = LoggerFactory.getLogger(BaseStreamWindow.class);
-    private PartitionedEventCollector collector;
+    private transient PartitionedEventCollector collector;
     private final AtomicLong lastFlushedStreamTime;
     private final AtomicLong lastFlushedSystemTime;
 
@@ -90,7 +91,7 @@ public abstract class BaseStreamWindow implements StreamWindow {
 
     public boolean accept(final long eventTime) {
         return !expired() && eventTime >= startTime && eventTime < endTime
-            && eventTime >= lastFlushedStreamTime.get(); // dropped
+                && eventTime >= lastFlushedStreamTime.get(); // dropped
     }
 
     public boolean expired() {
@@ -117,15 +118,15 @@ public abstract class BaseStreamWindow implements StreamWindow {
         if (!expired()) {
             if (clock.getTime() >= endTime + margin) {
                 LOG.info("Expiring {} at stream time:{}, latency:{}, window: {}", clock.getStreamId(),
-                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
+                        DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
                 lastFlushedStreamTime.set(clock.getTime());
                 lastFlushedSystemTime.set(globalSystemTime);
                 flush();
                 expired.set(true);
             } else if (globalSystemTime - lastFlushedSystemTime.get() >= endTime + margin - startTime && size() > 0) {
                 LOG.info("Flushing {} at system time: {}, stream time: {}, latency: {}, window: {}", clock.getStreamId(),
-                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(globalSystemTime),
-                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
+                        DateTimeUtil.millisecondsToHumanDateWithMilliseconds(globalSystemTime),
+                        DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
                 lastFlushedStreamTime.set(clock.getTime());
                 lastFlushedSystemTime.set(globalSystemTime);
                 flush();
@@ -174,11 +175,11 @@ public abstract class BaseStreamWindow implements StreamWindow {
     @Override
     public String toString() {
         return String.format("StreamWindow[period=[%s,%s), margin=%s ms, size=%s, reject=%s]",
-            DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime),
-            DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.endTime),
-            this.margin,
-            size(),
-            this.rejectTime() == 0 ? DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime) : DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.rejectTime())
+                DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime),
+                DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.endTime),
+                this.margin,
+                size(),
+                this.rejectTime() == 0 ? DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime) : DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.rejectTime())
         );
     }
 }
