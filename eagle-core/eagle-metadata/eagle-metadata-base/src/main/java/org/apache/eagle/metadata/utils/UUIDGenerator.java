@@ -19,7 +19,7 @@ package org.apache.eagle.metadata.utils;
 import java.util.UUID;
 
 public class UUIDGenerator {
-    public static String newUUID(){
+    public static String newUUID() {
         return UUID.randomUUID().toString();
     }
 }

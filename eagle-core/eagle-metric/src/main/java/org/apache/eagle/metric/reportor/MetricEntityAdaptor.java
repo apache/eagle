@@ -28,19 +28,18 @@ public class MetricEntityAdaptor {
         //TODO: add other type metric support
         EagleMetricKey metricName = MetricKeyCodeDecoder.decodeTSMetricKey(name);
         if (metric instanceof EagleCounterMetric) {
-            EagleCounterMetric counter = (EagleCounterMetric)metric;
+            EagleCounterMetric counter = (EagleCounterMetric) metric;
             GenericMetricEntity entity = new GenericMetricEntity();
             entity.setPrefix(metricName.metricName);
-            entity.setValue(new double[]{counter.getValue()});
+            entity.setValue(new double[] {counter.getValue()});
             entity.setTags(metricName.tags);
             entity.setTimestamp(metricName.timestamp);
             return entity;
-        }
-        else if (metric instanceof EagleGaugeMetric) {
-            EagleGaugeMetric gauge = (EagleGaugeMetric)metric;
+        } else if (metric instanceof EagleGaugeMetric) {
+            EagleGaugeMetric gauge = (EagleGaugeMetric) metric;
             GenericMetricEntity entity = new GenericMetricEntity();
             entity.setPrefix(metricName.metricName);
-            entity.setValue(new double[]{gauge.getValue()});
+            entity.setValue(new double[] {gauge.getValue()});
             entity.setTags(metricName.tags);
             entity.setTimestamp(metricName.timestamp);
             return entity;

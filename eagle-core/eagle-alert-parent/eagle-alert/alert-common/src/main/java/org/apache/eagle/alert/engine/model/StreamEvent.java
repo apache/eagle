@@ -95,7 +95,8 @@ public class StreamEvent implements Serializable {
         }
         if (obj instanceof StreamEvent) {
             StreamEvent another = (StreamEvent) obj;
-            return Objects.equals(this.streamId, another.streamId) && this.timestamp == another.timestamp && Arrays.deepEquals(this.data, another.data);
+            return Objects.equals(this.streamId, another.streamId) && this.timestamp == another.timestamp
+                    && Arrays.deepEquals(this.data, another.data) && Objects.equals(this.metaVersion, another.metaVersion);
         }
         return false;
     }
@@ -113,10 +114,10 @@ public class StreamEvent implements Serializable {
             }
         }
         return String.format("StreamEvent[stream=%S,timestamp=%s,data=[%s],metaVersion=%s]",
-            this.getStreamId(),
-            DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
-            StringUtils.join(dataStrings, ","),
-            this.getMetaVersion());
+                this.getStreamId(),
+                DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
+                StringUtils.join(dataStrings, ","),
+                this.getMetaVersion());
     }
 
     public static StreamEventBuilder builder() {

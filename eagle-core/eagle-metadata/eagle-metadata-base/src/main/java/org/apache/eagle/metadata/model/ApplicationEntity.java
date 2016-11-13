@@ -105,10 +105,10 @@ public class ApplicationEntity extends PersistenceEntity {
     public void ensureDefault() {
         super.ensureDefault();
 
-        Preconditions.checkNotNull(this.getSite(),"site is null");
-        Preconditions.checkNotNull(this.getSite().getSiteId(),"siteId is null");
-        Preconditions.checkNotNull(this.getDescriptor(),"descriptor is null");
-        Preconditions.checkNotNull(this.getDescriptor().getType(),"descriptor type is null");
+        Preconditions.checkNotNull(this.getSite(), "site is null");
+        Preconditions.checkNotNull(this.getSite().getSiteId(), "siteId is null");
+        Preconditions.checkNotNull(this.getDescriptor(), "descriptor is null");
+        Preconditions.checkNotNull(this.getDescriptor().getType(), "descriptor type is null");
 
         if (this.appId == null) {
             this.appId = String.format("%s_%s", this.getDescriptor().getType(), this.getSite().getSiteId()).toUpperCase();
@@ -181,9 +181,9 @@ public class ApplicationEntity extends PersistenceEntity {
     }
 
     /**
-     * Update mutable fields from another ApplicationEntity
+     * Update mutable fields from another ApplicationEntity.
      */
-    public void updateMutable(ApplicationEntity entityToUpdate){
+    public void updateMutable(ApplicationEntity entityToUpdate) {
         this.ensureDefault();
 
         this.setJarPath(entityToUpdate.getJarPath());

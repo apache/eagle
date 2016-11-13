@@ -82,7 +82,7 @@ public interface IMetadataDao extends Closeable {
 
     AlertPublishEvent getAlertPublishEvent(String alertId);
 
-    List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId);
+    List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId, int size);
 
     OpResult addAlertPublishEvent(AlertPublishEvent event);
 

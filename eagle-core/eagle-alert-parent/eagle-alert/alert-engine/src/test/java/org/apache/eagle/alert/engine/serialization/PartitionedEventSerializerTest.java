@@ -213,13 +213,6 @@ public class PartitionedEventSerializerTest {
     }
 
     @Test
-    public void testPeriod() {
-        Assert.assertEquals(30 * 60 * 1000, TimePeriodUtils.getMillisecondsOfPeriod(Period.parse("PT30m")));
-        Assert.assertEquals(30 * 60 * 1000, TimePeriodUtils.getMillisecondsOfPeriod(Period.millis(30 * 60 * 1000)));
-        Assert.assertEquals("PT1800S", Period.millis(30 * 60 * 1000).toString());
-    }
-
-    @Test
     public void testPartitionType() {
 
     }

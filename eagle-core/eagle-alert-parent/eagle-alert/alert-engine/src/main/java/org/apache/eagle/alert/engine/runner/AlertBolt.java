@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,11 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import backtype.storm.metric.api.IMetric;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.engine.AlertStreamCollector;
@@ -35,6 +39,10 @@ import org.apache.eagle.alert.engine.utils.SingletonExecutor;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.eagle.alert.utils.AlertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
 
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -42,14 +50,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import com.typesafe.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Since 5/1/16.
@@ -63,6 +63,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     private PolicyGroupEvaluator policyGroupEvaluator;
     private AlertStreamCollector alertOutputCollector;
     private String boltId;
+    private boolean logEventEnabled;
     private volatile Object outputLock;
     // mapping from policy name to PolicyDefinition
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
@@ -74,6 +75,10 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         this.boltId = boltId;
         this.policyGroupEvaluator = new PolicyGroupEvaluatorImpl(boltId + "-evaluator_stage1"); // use bolt id as evaluatorId.
         // TODO next stage evaluator
+
+        if (config.hasPath("topology.logEventEnabled")) {
+            logEventEnabled = config.getBoolean("topology.logEventEnabled");
+        }
     }
 
     @Override
@@ -81,6 +86,9 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         this.streamContext.counter().scope("execute_count").incr();
         try {
             PartitionedEvent pe = deserialize(input.getValueByField(AlertConstants.FIELD_0));
+            if (logEventEnabled) {
+                LOG.info("Alert bolt {} received event: {}", boltId, pe.getEvent());
+            }
             String streamEventVersion = pe.getEvent().getMetaVersion();
 
             if (streamEventVersion == null) {

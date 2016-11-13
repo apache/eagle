@@ -24,4 +24,6 @@ public class CoordinatorConstants {
     public static final String BOLT_PARALLELISM = "boltParallelism";
     public static final String NUM_OF_ALERT_BOLTS_PER_TOPOLOGY = "numOfAlertBoltsPerTopology";
     public static final String POLICIES_PER_BOLT = "policiesPerBolt";
+    public static final String REUSE_BOLT_IN_STREAMS = "reuseBoltInStreams";
+    public static final String STREAMS_PER_BOLT = "streamsPerBolt";
 }

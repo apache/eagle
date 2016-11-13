@@ -23,5 +23,6 @@ import java.util.Collection;
 
 public abstract class ApplicationStatusUpdateService extends AbstractScheduledService {
     public abstract void updateApplicationEntityStatus(Collection<ApplicationEntity> applicationEntities);
+
     public abstract void updateApplicationEntityStatus(ApplicationEntity applicationEntity);
- }
+}

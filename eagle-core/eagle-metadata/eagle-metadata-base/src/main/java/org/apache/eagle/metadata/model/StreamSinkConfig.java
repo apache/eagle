@@ -20,6 +20,8 @@ import java.io.Serializable;
 
 public interface StreamSinkConfig extends Serializable {
     String getType();
+
     Class<?> getSinkType();
+
     Class<? extends StreamSinkConfig> getConfigType();
 }

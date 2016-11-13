@@ -356,7 +356,11 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
-        return list(alerts, AlertPublishEvent.class);
+        List<AlertPublishEvent> result = list(alerts, AlertPublishEvent.class);
+        if (size < 0 || size > result.size()) {
+            size = result.size();
+        }
+        return result.subList(result.size() - size, result.size());
     }
 
     @Override
@@ -370,10 +374,13 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId) {
-        List<AlertPublishEvent> results = list(alerts, AlertPublishEvent.class);
-        List<AlertPublishEvent> ret = results.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
-        return ret;
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId, int size) {
+        List<AlertPublishEvent> events = list(alerts, AlertPublishEvent.class);
+        if (size < 0 || size > events.size()) {
+            size = events.size();
+        }
+        List<AlertPublishEvent> result = events.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
+        return events.subList(result.size() - size, result.size());
     }
 
     @Override

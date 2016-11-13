@@ -19,6 +19,7 @@ package org.apache.eagle.alert.engine.model;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import backtype.storm.tuple.Tuple;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -63,9 +64,9 @@ public class PartitionedEvent implements Serializable {
         if (obj instanceof PartitionedEvent) {
             PartitionedEvent another = (PartitionedEvent) obj;
             return !(this.partitionKey != another.getPartitionKey()
-                || !Objects.equals(this.event, another.getEvent())
-                || !Objects.equals(this.partition, another.getPartition())
-                || !Objects.equals(this.anchor, another.anchor));
+                    || !Objects.equals(this.event, another.getEvent())
+                    || !Objects.equals(this.partition, another.getPartition())
+                    || !Objects.equals(this.anchor, another.anchor));
         } else {
             return false;
         }
@@ -74,10 +75,11 @@ public class PartitionedEvent implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(partitionKey)
-            .append(event)
-            .append(partition)
-            .build();
+                .append(partitionKey)
+                .append(event)
+                .append(partition)
+                .append(anchor)
+                .build();
     }
 
     public StreamEvent getEvent() {

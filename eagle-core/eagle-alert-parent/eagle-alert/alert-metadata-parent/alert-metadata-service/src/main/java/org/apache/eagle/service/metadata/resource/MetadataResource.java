@@ -244,8 +244,9 @@ public class MetadataResource {
 
     @Path("/policies/{policyId}/alerts")
     @GET
-    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(@PathParam("policyId") String policyId) {
-        return dao.getAlertPublishEventByPolicyId(policyId);
+    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(@PathParam("policyId") String policyId,
+                                                                  @QueryParam("size") int size) {
+        return dao.getAlertPublishEventByPolicyId(policyId, size);
     }
 
     @Path("/policies/{policyId}/publishments")

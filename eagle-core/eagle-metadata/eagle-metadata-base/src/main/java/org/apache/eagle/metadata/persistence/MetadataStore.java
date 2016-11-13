@@ -20,5 +20,5 @@ import com.google.inject.AbstractModule;
 import org.apache.eagle.common.module.ModuleScope;
 
 public abstract class MetadataStore extends AbstractModule implements ModuleScope {
-    
+
 }

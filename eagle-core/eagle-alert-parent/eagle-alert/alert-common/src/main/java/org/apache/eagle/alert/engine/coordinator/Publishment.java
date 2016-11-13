@@ -135,28 +135,29 @@ public class Publishment {
         if (obj instanceof Publishment) {
             Publishment p = (Publishment) obj;
             return (Objects.equals(name, p.getName()) && Objects.equals(type, p.getType())
-                && Objects.equals(dedupIntervalMin, p.getDedupIntervalMin())
-                && Objects.equals(dedupFields, p.getDedupFields())
-                && Objects.equals(dedupStateField, p.getDedupStateField())
-                && Objects.equals(overrideDeduplicator, p.getOverrideDeduplicator())
-                && Objects.equals(policyIds, p.getPolicyIds())
-                && Objects.equals(streamIds, p.getStreamIds())
-                && properties.equals(p.getProperties()));
+                    && Objects.equals(dedupIntervalMin, p.getDedupIntervalMin())
+                    && Objects.equals(dedupFields, p.getDedupFields())
+                    && Objects.equals(dedupStateField, p.getDedupStateField())
+                    && Objects.equals(overrideDeduplicator, p.getOverrideDeduplicator())
+                    && Objects.equals(policyIds, p.getPolicyIds())
+                    && Objects.equals(streamIds, p.getStreamIds())
+                    && properties.equals(p.getProperties()));
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(type).append(dedupIntervalMin).append(policyIds)
-            .append(properties).build();
+        return new HashCodeBuilder().append(name).append(type).append(dedupIntervalMin).append(dedupFields)
+                .append(dedupStateField).append(overrideDeduplicator).append(policyIds).append(streamIds)
+                .append(properties).build();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Publishment[name:").append(name).append(",type:").append(type).append(",policyId:")
-            .append(policyIds).append(",properties:").append(properties);
+                .append(policyIds).append(",properties:").append(properties);
         return sb.toString();
     }
 
