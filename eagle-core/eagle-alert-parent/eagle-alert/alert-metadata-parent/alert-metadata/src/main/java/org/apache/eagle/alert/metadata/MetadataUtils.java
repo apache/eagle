@@ -36,6 +36,15 @@ import java.sql.SQLException;
 public class MetadataUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetadataUtils.class);
+    public static final String META_DATA = "metadata";
+    public static final String ALERT_META_DATA_DAO = "metadataDao";
+    public static final String JDBC_USERNAME_PATH = "jdbc.username";
+    public static final String JDBC_PASSWORD_PATH = "jdbc.password";
+    public static final String JDBC_DRIVER_PATH = "jdbc.driverClassName";
+    public static final String JDBC_DATABASE_PATH = "jdbc.database";
+    public static final String JDBC_CONNECTION_PATH = "jdbc.connection";
+    public static final String JDBC_CONNECTION_PROPERTIES_PATH = "jdbc.connectionProperties";
+    public static final String MONGO_CONNECTION_PATH = "mongo.connection";
 
     public static <T> String getKey(T t) {
         if (t instanceof StreamDefinition) {
@@ -67,11 +76,17 @@ public class MetadataUtils {
 
     public static Connection getJdbcConnection(Config config) {
         Connection connection = null;
-        String conn = config.getString("connection");
         try {
-            connection = DriverManager.getConnection(conn);
+            if (config.hasPath(JDBC_USERNAME_PATH)) {
+                connection = DriverManager.getConnection(
+                        config.getString(JDBC_CONNECTION_PATH),
+                        config.getString(JDBC_USERNAME_PATH),
+                        config.getString(JDBC_PASSWORD_PATH));
+            } else {
+                connection = DriverManager.getConnection(config.getString(JDBC_CONNECTION_PATH));
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
         return connection;
     }

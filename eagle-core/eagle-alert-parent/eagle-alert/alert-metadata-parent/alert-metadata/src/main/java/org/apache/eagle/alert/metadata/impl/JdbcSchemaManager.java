@@ -84,7 +84,7 @@ public class JdbcSchemaManager {
             this.platform = PlatformFactory.createNewPlatformInstance("mysql");
 
             connection = MetadataUtils.getJdbcConnection(config);
-            String dbName = config.getString("database");
+            String dbName = config.getString(MetadataUtils.JDBC_DATABASE_PATH);
             this.database = platform.readModelFromDatabase(connection, dbName);
             LOG.info("Loaded " + database);
 

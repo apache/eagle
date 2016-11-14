@@ -42,7 +42,7 @@ public class JDBCDataSourceProviderTest extends JDBCMetadataTestBase {
 
     @Test
     public void testDataSourceConfig() {
-        Assert.assertEquals("jdbc:h2:mem:test;INIT=RUNSCRIPT FROM './src/test/resources/init.sql'", dataSourceConfig.getUrl());
+        Assert.assertEquals("jdbc:h2:mem:test;INIT=RUNSCRIPT FROM './src/test/resources/init.sql'", dataSourceConfig.getConnection());
         Assert.assertEquals(null, dataSourceConfig.getUsername());
         Assert.assertEquals(null, dataSourceConfig.getPassword());
         Assert.assertEquals("encoding=UTF8;timeout=60", dataSourceConfig.getConnectionProperties());

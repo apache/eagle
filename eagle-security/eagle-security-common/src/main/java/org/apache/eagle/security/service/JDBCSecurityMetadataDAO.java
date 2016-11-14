@@ -262,14 +262,14 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
         Connection connection;
         try {
             if (config.hasPath("metadata.jdbc.username")) {
-                connection = DriverManager.getConnection(config.getString("metadata.jdbc.url"),
+                connection = DriverManager.getConnection(config.getString("metadata.jdbc.connection"),
                         config.getString("metadata.jdbc.username"),
                         config.getString("metadata.jdbc.password"));
             } else {
-                connection = DriverManager.getConnection(config.getString("metadata.jdbc.url"));
+                connection = DriverManager.getConnection(config.getString("metadata.jdbc.connection"));
             }
         } catch (Exception e) {
-            LOG.error("error get connection for {}", config.getString("metadata.jdbc.url"), e);
+            LOG.error("error get connection for {}", config.getString("metadata.jdbc.connection"), e);
             throw e;
         }
         return connection;
