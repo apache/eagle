@@ -41,9 +41,9 @@ public class EagleQueryFilterListenerImpl implements EagleFilterListener {
     }
 
     public void exitEquation(EagleFilterParser.EquationContext ctx) {
-        TerminalNode id = ctx.id();
-        TerminalNode op = ctx.op();
-        List<TerminalNode> values = ctx.value();
+        TerminalNode id = ctx.ID();
+        TerminalNode op = ctx.OP();
+        List<TerminalNode> values = ctx.VALUE();
         TerminalNode value = values.get(0);
 
         if (values.size() == 2) {
@@ -126,7 +126,7 @@ public class EagleQueryFilterListenerImpl implements EagleFilterListener {
             return; // does nothing for a combine which has only one equation
         }
 
-        if ((ctx.lparen() != null) && (ctx.rparen() != null)) {
+        if ((ctx.LPAREN() != null) && (ctx.RPAREN() != null)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("lparen + RPAREN rule matched, skip ...");
             }
@@ -134,7 +134,7 @@ public class EagleQueryFilterListenerImpl implements EagleFilterListener {
         }
         ORExpression orExprRight = stack.pop();
         ORExpression orExprLeft = stack.pop();
-        TerminalNode node = ctx.and();
+        TerminalNode node = ctx.AND();
         if (node != null) {
             ORExpression newORExpr = new ORExpression();
             for (ANDExpression left : orExprLeft.getANDExprList()) {
@@ -149,7 +149,7 @@ public class EagleQueryFilterListenerImpl implements EagleFilterListener {
             return;
         }
 
-        node = ctx.or();
+        node = ctx.OR();
         if (node != null) {
             ORExpression newORExpr = new ORExpression();
             for (ANDExpression andExpr : orExprLeft.getANDExprList()) {

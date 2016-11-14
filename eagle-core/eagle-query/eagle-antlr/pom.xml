@@ -49,6 +49,7 @@
                 <configuration>
                     <failOnViolation>true</failOnViolation>
                     <failsOnError>true</failsOnError>
+                    <excludes>org/apache/eagle/query/antlr/generated/*</excludes>
                 </configuration>
             </plugin>
         </plugins>

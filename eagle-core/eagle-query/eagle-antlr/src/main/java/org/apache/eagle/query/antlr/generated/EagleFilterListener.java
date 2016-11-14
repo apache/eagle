@@ -24,45 +24,34 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * {@link EagleFilterParser}.
  */
 public interface EagleFilterListener extends ParseTreeListener {
-    /**
-     * Enter a parse tree produced by {@link EagleFilterParser#filter}.
-     *
-     * @param ctx the parse tree
-     */
-    void enterFilter(EagleFilterParser.FilterContext ctx);
-
-    /**
-     * Exit a parse tree produced by {@link EagleFilterParser#filter}.
-     *
-     * @param ctx the parse tree
-     */
-    void exitFilter(EagleFilterParser.FilterContext ctx);
-
-    /**
-     * Enter a parse tree produced by {@link EagleFilterParser#combine}.
-     *
-     * @param ctx the parse tree
-     */
-    void enterCombine(EagleFilterParser.CombineContext ctx);
-
-    /**
-     * Exit a parse tree produced by {@link EagleFilterParser#combine}.
-     *
-     * @param ctx the parse tree
-     */
-    void exitCombine(EagleFilterParser.CombineContext ctx);
-
-    /**
-     * Enter a parse tree produced by {@link EagleFilterParser#equation}.
-     *
-     * @param ctx the parse tree
-     */
-    void enterEquation(EagleFilterParser.EquationContext ctx);
-
-    /**
-     * Exit a parse tree produced by {@link EagleFilterParser#equation}.
-     *
-     * @param ctx the parse tree
-     */
-    void exitEquation(EagleFilterParser.EquationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EagleFilterParser#filter}.
+	 * @param ctx the parse tree
+	 */
+	void enterFilter(EagleFilterParser.FilterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EagleFilterParser#filter}.
+	 * @param ctx the parse tree
+	 */
+	void exitFilter(EagleFilterParser.FilterContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EagleFilterParser#combine}.
+	 * @param ctx the parse tree
+	 */
+	void enterCombine(EagleFilterParser.CombineContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EagleFilterParser#combine}.
+	 * @param ctx the parse tree
+	 */
+	void exitCombine(EagleFilterParser.CombineContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EagleFilterParser#equation}.
+	 * @param ctx the parse tree
+	 */
+	void enterEquation(EagleFilterParser.EquationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EagleFilterParser#equation}.
+	 * @param ctx the parse tree
+	 */
+	void exitEquation(EagleFilterParser.EquationContext ctx);
 }
