@@ -23,6 +23,7 @@ import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.google.inject.Inject;
@@ -40,7 +41,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Inject
     public JdbcMetadataDaoImpl(Config config) {
-        handler = new JdbcDatabaseHandler(config);
+        handler = new JdbcDatabaseHandler(config.getConfig(MetadataUtils.META_DATA));
     }
 
     @Override

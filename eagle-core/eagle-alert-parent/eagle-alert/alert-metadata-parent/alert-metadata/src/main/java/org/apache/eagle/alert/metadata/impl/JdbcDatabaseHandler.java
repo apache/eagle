@@ -70,7 +70,7 @@ public class JdbcDatabaseHandler {
                 bDatasource.setUsername(config.getString(MetadataUtils.JDBC_USERNAME_PATH));
                 bDatasource.setPassword(config.getString(MetadataUtils.JDBC_PASSWORD_PATH));
             }
-            bDatasource.setUrl(config.getString(MetadataUtils.JDBC_URL_PATH));
+            bDatasource.setUrl(config.getString(MetadataUtils.JDBC_CONNECTION_PATH));
             if (config.hasPath(MetadataUtils.JDBC_CONNECTION_PROPERTIES_PATH)) {
                 bDatasource.setConnectionProperties(config.getString(MetadataUtils.JDBC_CONNECTION_PROPERTIES_PATH));
             }

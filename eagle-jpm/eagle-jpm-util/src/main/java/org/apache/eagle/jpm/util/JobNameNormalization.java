@@ -62,7 +62,7 @@ public class JobNameNormalization {
         try {
             // load normalization rules
             String key = JOB_NAME_NORMALIZATION_RULES_KEY.toLowerCase();
-            String value = conf.getString(key) != null ? conf.getString(key) : Constants.JOB_NAME_NORMALIZATION_RULES_KEY_DEFAULT;
+            String value = conf.hasPath(key) && conf.getString(key) != null ? conf.getString(key) : Constants.JOB_NAME_NORMALIZATION_RULES_KEY_DEFAULT;
             // multiple rules are concatenated with semicolon, i.e. ;
             String[] rules = value.split(MULTIPLE_RULE_DILIMITER);
             for (String rule : rules) {

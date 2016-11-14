@@ -38,24 +38,25 @@ public class MetadataDaoFactory {
 
     private MetadataDaoFactory() {
         Config config = ConfigFactory.load();
-        if (!config.hasPath(MetadataUtils.ALERT_META_DATA_DAO)) {
-            LOG.warn("metadata.alertMetadataDao is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(config);
+        Config metaDataConfig = config.getConfig(MetadataUtils.META_DATA);
+        if (metaDataConfig != null) {
+            LOG.warn("metadata is not configured, use in-memory store !!!");
+            dao = new InMemMetadataDaoImpl(metaDataConfig);
         } else {
-            String clsName = config.getString(MetadataUtils.ALERT_META_DATA_DAO);
+            String clsName = metaDataConfig.getString(MetadataUtils.ALERT_META_DATA_DAO);
             Class<?> clz;
             try {
                 clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
                 if (IMetadataDao.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor(Config.class);
                     LOG.info("metadata.alertMetadataDao loaded: " + clsName);
-                    dao = (IMetadataDao) cotr.newInstance(config);
+                    dao = (IMetadataDao) cotr.newInstance(metaDataConfig);
                 } else {
-                    throw new Exception("metadata.alertMetadataDao configuration need to be implementation of IMetadataDao! ");
+                    throw new Exception("metadata.metadataDao configuration need to be implementation of IMetadataDao! ");
                 }
             } catch (Exception e) {
                 LOG.error("error when initialize the dao, fall back to in memory mode!", e);
-                dao = new InMemMetadataDaoImpl(config);
+                dao = new InMemMetadataDaoImpl(metaDataConfig);
             }
         }
     }

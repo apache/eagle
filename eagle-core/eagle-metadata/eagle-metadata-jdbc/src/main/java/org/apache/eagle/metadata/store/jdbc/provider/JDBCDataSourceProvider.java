@@ -38,7 +38,7 @@ public class JDBCDataSourceProvider implements Provider<DataSource> {
         datasource.setDriverClassName(config.getDriverClassName());
         datasource.setUsername(config.getUsername());
         datasource.setPassword(config.getPassword());
-        datasource.setUrl(config.getUrl());
+        datasource.setUrl(config.getConnection());
         datasource.setConnectionProperties(config.getConnectionProperties());
         LOGGER.info("Register JDBCDataSourceShutdownHook");
         Runtime.getRuntime().addShutdownHook(new Thread("JDBCDataSourceShutdownHook") {

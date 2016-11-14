@@ -64,8 +64,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final int DEFAULT_CAPPED_MAX_SIZE = 500 * 1024 * 1024;
     private static final int DEFAULT_CAPPED_MAX_DOCUMENTS = 20000;
-    private static final String MANGO_CAPPED_MAX_SIZE = "metadata.mongo.cappedMaxSize";
-    private static final String MANGO_CAPPED_MAX_DOCUMENTS = "metadata.mongo.cappedMaxDocuments";
+    private static final String MANGO_CAPPED_MAX_SIZE = "mongo.cappedMaxSize";
+    private static final String MANGO_CAPPED_MAX_DOCUMENTS = "mongo.cappedMaxDocuments";
 
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -99,7 +99,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     @Inject
     public MongoMetadataDaoImpl(Config config) {
-        this.connection = config.getString(MetadataUtils.MONGO_URL_PATH);
+        this.connection = config.getString(MetadataUtils.MONGO_CONNECTION_PATH);
         this.cappedMaxSize = config.hasPath(MANGO_CAPPED_MAX_SIZE) ? config.getInt(MANGO_CAPPED_MAX_SIZE) : DEFAULT_CAPPED_MAX_SIZE;
         this.cappedMaxDocuments = config.hasPath(MANGO_CAPPED_MAX_DOCUMENTS) ? config.getInt(MANGO_CAPPED_MAX_DOCUMENTS) : DEFAULT_CAPPED_MAX_DOCUMENTS;
         this.client = new MongoClient(new MongoClientURI(this.connection));

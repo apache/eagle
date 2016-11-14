@@ -44,7 +44,7 @@ public class JDBCDataSourceConfig {
     private String username;
     private String password;
     private String driverClassName = DEFAULT_DRIVER_CLASS;
-    private String url = DEFAULT_URL;
+    private String connection = DEFAULT_URL;
     private String database;
     private String connectionProperties = DEFAULT_CONNECTION_PROPERTIES;
 
@@ -72,12 +72,12 @@ public class JDBCDataSourceConfig {
         this.driverClassName = driverClassName;
     }
 
-    public String getUrl() {
-        return url;
+    public String getConnection() {
+        return connection;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setConnection(String connection) {
+        this.connection = connection;
     }
 
     public String getDatabase() {
@@ -98,7 +98,7 @@ public class JDBCDataSourceConfig {
 
     @Override
     public String toString() {
-        return String.format("%s { \n driverClassName=%s \n url=%s \n database=%s \n connectionProperties=%s \n username=%s \n password=*****\n}",
-                CONFIG_PREFIX,driverClassName,url, database, connectionProperties, username);
+        return String.format("%s { \n driverClassName=%s \n connection=%s \n database=%s \n connectionProperties=%s \n username=%s \n password=*****\n}",
+                CONFIG_PREFIX,driverClassName,connection, database, connectionProperties, username);
     }
 }

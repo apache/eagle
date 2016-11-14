@@ -34,6 +34,7 @@ import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.AfterClass;
@@ -73,7 +74,7 @@ public class MongoImplTest {
         System.setProperty("config.resource", "/application-mongo.conf");
         ConfigFactory.invalidateCaches();
         Config config = ConfigFactory.load();
-        dao = new MongoMetadataDaoImpl(config);
+        dao = new MongoMetadataDaoImpl(config.getConfig(MetadataUtils.META_DATA));
 
     }
 
