@@ -50,6 +50,8 @@ public class MRHistoryJobApplicationHealthCheck extends HealthCheck {
                     eagleServiceConfig.username,
                     eagleServiceConfig.password);
 
+            client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
                     Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
                     mrHistoryJobConfig.getJobHistoryEndpointConfig().site);
