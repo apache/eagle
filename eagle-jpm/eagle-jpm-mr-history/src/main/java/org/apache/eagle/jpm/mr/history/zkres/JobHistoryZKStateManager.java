@@ -23,7 +23,6 @@ import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.ZKStateConfig;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
@@ -217,9 +216,7 @@ public class JobHistoryZKStateManager {
         LOG.info("trying to truncate all data for day " + date);
         // we need lock before we do truncate
         String path = zkRoot + "/" + ZNODE_JOBS + "/" + date;
-        InterProcessMutex lock = new InterProcessMutex(curator, path);
         try {
-            lock.acquire();
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("really truncated all data for day " + date);
@@ -233,13 +230,6 @@ public class JobHistoryZKStateManager {
         } catch (Exception e) {
             LOG.error("fail truncating processed jobs", e);
             throw new RuntimeException(e);
-        } finally {
-            try {
-                lock.release();
-            } catch (Exception e) {
-                LOG.error("fail releasing lock", e);
-                throw new RuntimeException(e);
-            }
         }
     }
 
