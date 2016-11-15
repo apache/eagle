@@ -43,15 +43,13 @@
     <configuration>
         <property>
             <name>service.host</name>
-            <value>localhost</value>
             <displayName>Eagle Service Host</displayName>
-            <description>Eagle Service Host, default: localhost</description>
+            <description>Set additional eagle service host, default: using current host</description>
         </property>
         <property>
             <name>service.port</name>
-            <value>8080</value>
             <displayName>Eagle Service Port</displayName>
-            <description>Eagle Service Port, default: 8080</description>
+            <description>Set additional eagle service port, default: using current port</description>
         </property>
     </configuration>
 </application>
