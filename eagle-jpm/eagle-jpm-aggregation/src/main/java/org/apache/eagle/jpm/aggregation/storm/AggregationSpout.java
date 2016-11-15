@@ -72,7 +72,7 @@ public class AggregationSpout extends BaseRichSpout {
                 return;
             }
 
-            long currentJobTime = System.currentTimeMillis();//this.jobProcessTime.fetchLatestJobProcessTime();
+            long currentJobTime = this.jobProcessTime.fetchLatestJobProcessTime();
             //1, get last updateTime;
             lastUpdateTime = AggregationTimeManager.instance().readLastFinishTime();
             if (lastUpdateTime == 0L) {

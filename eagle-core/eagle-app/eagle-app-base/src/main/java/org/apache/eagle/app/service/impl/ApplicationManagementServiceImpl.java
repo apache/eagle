@@ -23,7 +23,6 @@ import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.healthy.ApplicationHealthCheckManager;
 import org.apache.eagle.app.service.*;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.metadata.exceptions.ApplicationWrongStatusException;

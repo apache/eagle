@@ -19,7 +19,6 @@ package org.apache.eagle.jpm.mr.history;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;

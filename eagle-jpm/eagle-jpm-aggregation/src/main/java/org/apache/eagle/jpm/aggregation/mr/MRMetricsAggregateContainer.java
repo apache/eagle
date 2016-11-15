@@ -72,8 +72,9 @@ public class MRMetricsAggregateContainer implements MetricsAggregateContainer, S
                 .pageSize(10)
                 .send();
 
-            List<JobProcessTimeStampEntity> entities = response.getObj();
-            return entities.get(0).getCurrentTimeStamp();
+            List<Map<List<String>, List<Double>>> results = response.getObj();
+            long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
+            return currentProcessTimeStamp;
         } catch (Exception e) {
             LOG.warn("{}", e);
         }
