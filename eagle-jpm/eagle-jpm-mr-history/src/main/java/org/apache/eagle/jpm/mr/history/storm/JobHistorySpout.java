@@ -139,7 +139,7 @@ public class JobHistorySpout extends BaseRichSpout {
         }
         JobIdFilter jobIdFilter = new JobIdFilterByPartition(new DefaultJobIdPartitioner(), numTotalPartitions, partitionId);
         JobHistoryZKStateManager.instance().init(appConfig.getZkStateConfig());
-        JobHistoryZKStateManager.instance().ensureJobPartitions(numTotalPartitions);
+        JobHistoryZKStateManager.instance().ensureJobPartition(partitionId, numTotalPartitions);
         interceptor.setSpoutOutputCollector(collector);
 
         try {
