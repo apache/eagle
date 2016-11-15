@@ -143,7 +143,6 @@ public class JobHistorySpout extends BaseRichSpout {
         interceptor.setSpoutOutputCollector(collector);
 
         try {
-            Thread.sleep(100000);
             jhfLCM = new JobHistoryDAOImpl(jobHistoryEndpointConfig);
             driver = new JHFCrawlerDriverImpl(
                 callback,
