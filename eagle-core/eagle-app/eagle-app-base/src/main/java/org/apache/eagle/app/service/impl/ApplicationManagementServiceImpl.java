@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.Application;
+import org.apache.eagle.app.healthy.ApplicationHealthCheckManager;
 import org.apache.eagle.app.service.*;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.metadata.exceptions.ApplicationWrongStatusException;
@@ -46,6 +47,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     private final ApplicationEntityService applicationEntityService;
     private final IMetadataDao alertMetadataService;
     private final Config config;
+    private final ApplicationHealthCheckService applicationHealthCheckService;
 
     @Inject private Injector currentInjector;
 
@@ -55,12 +57,14 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         SiteEntityService siteEntityService,
         ApplicationProviderService applicationProviderService,
         ApplicationEntityService applicationEntityService,
-        IMetadataDao alertMetadataService) {
+        IMetadataDao alertMetadataService,
+        ApplicationHealthCheckService applicationHealthCheckService) {
         this.config = config;
         this.siteEntityService = siteEntityService;
         this.applicationProviderService = applicationProviderService;
         this.applicationEntityService = applicationEntityService;
         this.alertMetadataService = alertMetadataService;
+        this.applicationHealthCheckService = applicationHealthCheckService;
     }
 
     @Override
@@ -112,6 +116,8 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationAction applicationAction = new ApplicationAction(applicationProvider.getApplication(), applicationEntity, config, alertMetadataService);
         applicationAction.doInstall();
 
+        applicationHealthCheckService.register(applicationEntity);
+
         // UpdateMetadata
         ApplicationEntity result =  applicationEntityService.create(applicationEntity);
 
@@ -151,6 +157,9 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
                     listener.init(appEntity);
                     listener.afterUninstall();
                 });
+
+                applicationHealthCheckService.unregister(appEntity);
+
                 return applicationEntityService.delete(appEntity);
             } else {
                 throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
