@@ -58,6 +58,10 @@ public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheck
 
     @Override
     public void register(ApplicationEntity appEntity) {
+        if (environment == null) {
+            LOG.warn("environment is null, can not register");
+            return;
+        }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
         HealthCheck applicationHealthCheck = appProvider.getApplication().getAppHealthCheck(
                 ConfigFactory.parseMap(appEntity.getConfiguration())
@@ -70,6 +74,10 @@ public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheck
 
     @Override
     public void unregister(ApplicationEntity appEntity) {
+        if (environment == null) {
+            LOG.warn("environment is null, can not unregister");
+            return;
+        }
         this.environment.healthChecks().unregister(appEntity.getAppId());
         LOG.info("successfully unregister health check for {}", appEntity.getAppId());
     }
