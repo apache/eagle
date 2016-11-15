@@ -17,6 +17,8 @@
 
 package org.apache.eagle.app.spi;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.common.module.ModuleRegistry;
@@ -69,4 +71,13 @@ public interface ApplicationProvider<T extends Application> {
      * Extend application modules like Web Resource, Metadata Store, etc.
      */
     void register(ModuleRegistry registry);
+
+    default HealthCheck getAppHealthCheck(Config config) {
+        return new HealthCheck() {
+            @Override
+            protected Result check() throws Exception {
+                return Result.healthy();
+            }
+        };
+    }
 }

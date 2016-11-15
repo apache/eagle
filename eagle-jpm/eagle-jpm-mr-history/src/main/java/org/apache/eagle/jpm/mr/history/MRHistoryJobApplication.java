@@ -77,9 +77,4 @@ public class MRHistoryJobApplication extends StormApplication {
 
         return topologyBuilder.createTopology();
     }
-
-    @Override
-    public HealthCheck getAppHealthCheck(Config config) {
-        return new MRHistoryJobApplicationHealthCheck(config);
-    }
 }

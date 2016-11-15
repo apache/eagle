@@ -63,7 +63,7 @@ public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheck
             return;
         }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
-        HealthCheck applicationHealthCheck = appProvider.getApplication().getAppHealthCheck(
+        HealthCheck applicationHealthCheck = appProvider.getAppHealthCheck(
                 ConfigFactory.parseMap(appEntity.getConfiguration())
                         .withFallback(config)
                         .withFallback(ConfigFactory.parseMap(appEntity.getContext()))
