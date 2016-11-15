@@ -53,7 +53,7 @@ public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, U
         }
     }
 
-    private Hashtable<String, String> getContextEnvironment(String sanitizedUsername, String password) {
+    Hashtable<String, String> getContextEnvironment(String sanitizedUsername, String password) {
         String providerUrl = settings.getProviderUrl();
         if (providerUrl == null) {
             throw new IllegalArgumentException("providerUrl of the ldap service shouldn't be null");
@@ -75,11 +75,11 @@ public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, U
         return env;
     }
 
-    private String comprisePrincipal(String sanitizedUsername) {
+    String comprisePrincipal(String sanitizedUsername) {
         return settings.getPrincipalTemplate().replaceAll("\\$\\{USERNAME\\}", sanitizedUsername);
     }
 
-    private String sanitizeUsername(String username) {
+    String sanitizeUsername(String username) {
         return username.replaceAll("[^a-zA-Z0-9_.]", "");
     }
 
