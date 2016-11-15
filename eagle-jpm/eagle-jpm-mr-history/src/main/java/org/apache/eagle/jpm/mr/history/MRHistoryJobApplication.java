@@ -17,6 +17,7 @@
 package org.apache.eagle.jpm.mr.history;
 
 import backtype.storm.topology.BoltDeclarer;
+import com.codahale.metrics.health.HealthCheck;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
@@ -75,5 +76,10 @@ public class MRHistoryJobApplication extends StormApplication {
         kafkaBoltDeclarer.shuffleGrouping(spoutName);
 
         return topologyBuilder.createTopology();
+    }
+
+    @Override
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new MRHistoryJobApplicationHealthCheck(config);
     }
 }

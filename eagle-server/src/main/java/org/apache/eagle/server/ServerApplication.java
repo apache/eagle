@@ -28,6 +28,7 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.common.Version;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -93,5 +94,9 @@ class ServerApplication extends Application<ServerConfig> {
         ApplicationStatusUpdateService applicationStatusUpdateService = injector.getInstance(ApplicationStatusUpdateService.class);
         Managed updateAppStatusTask = new ApplicationTask(applicationStatusUpdateService);
         environment.lifecycle().manage(updateAppStatusTask);
+
+        //init application health check environment
+        ApplicationHealthCheckService applicationHealthCheckService = injector.getInstance(ApplicationHealthCheckService.class);
+        applicationHealthCheckService.init(environment);
     }
 }

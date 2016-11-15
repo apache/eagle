@@ -46,6 +46,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     private final ApplicationEntityService applicationEntityService;
     private final IMetadataDao alertMetadataService;
     private final Config config;
+    private final ApplicationHealthCheckService applicationHealthCheckService;
 
     @Inject private Injector currentInjector;
 
@@ -55,12 +56,14 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         SiteEntityService siteEntityService,
         ApplicationProviderService applicationProviderService,
         ApplicationEntityService applicationEntityService,
-        IMetadataDao alertMetadataService) {
+        IMetadataDao alertMetadataService,
+        ApplicationHealthCheckService applicationHealthCheckService) {
         this.config = config;
         this.siteEntityService = siteEntityService;
         this.applicationProviderService = applicationProviderService;
         this.applicationEntityService = applicationEntityService;
         this.alertMetadataService = alertMetadataService;
+        this.applicationHealthCheckService = applicationHealthCheckService;
     }
 
     @Override
@@ -112,6 +115,8 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationAction applicationAction = new ApplicationAction(applicationProvider.getApplication(), applicationEntity, config, alertMetadataService);
         applicationAction.doInstall();
 
+        applicationHealthCheckService.register(applicationEntity);
+
         // UpdateMetadata
         ApplicationEntity result =  applicationEntityService.create(applicationEntity);
 
@@ -151,6 +156,9 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
                     listener.init(appEntity);
                     listener.afterUninstall();
                 });
+
+                applicationHealthCheckService.unregister(appEntity);
+
                 return applicationEntityService.delete(appEntity);
             } else {
                 throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");

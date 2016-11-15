@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app;
 
+import com.codahale.metrics.health.HealthCheck;
 import org.apache.eagle.app.environment.Environment;
 import com.typesafe.config.Config;
 
@@ -54,4 +55,13 @@ public interface Application<
     Class<? extends E> getEnvironmentType();
 
     boolean isExecutable();
+
+    default HealthCheck getAppHealthCheck(Config config) {
+        return new HealthCheck() {
+            @Override
+            protected Result check() throws Exception {
+                return Result.healthy();
+            }
+        };
+    }
 }
