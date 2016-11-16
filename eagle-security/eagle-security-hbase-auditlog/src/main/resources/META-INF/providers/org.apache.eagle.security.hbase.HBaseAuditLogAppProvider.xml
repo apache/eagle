@@ -192,34 +192,21 @@
     </streams>
     <docs>
         <install>
-            # Step 1: Create source kafka topic named "${site}_example_source_topic"
-
-            ./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
-
-            # Step 2: Set up data collector to flow data into kafka topic in
-
-            ./bin/logstash -f log_collector.conf
-
-            ## `log_collector.conf` sample as following:
-
-            input {
-
-            }
-            filter {
-
-            }
-            output{
-
-            }
-
-            # Step 3: start application
-
-            # Step 4: monitor with featured portal or alert with policies
+            <b>How to Install</b>
+            <ol>
+                <li>Create two kafka topics: <code>hbase_audit_log_{SITE_ID}, hbase_audit_log_enriched_{SITE_ID}</code></li>
+                <li>Setup a log collecting tool you like to stream audit log into topic <code>hbase_audit_log_{SITE_ID}</code></li>
+                <li>Click "Install" button and edit configurations in general and advanced lists according to your requirements </li>
+                <li>Check the new generated stream <code>HBASE_AUDIT_LOG_ENRICHED_STREAM_{SITE_ID}</code> at Alert -> Streams</li>
+            </ol>
         </install>
         <uninstall>
-            # Step 1: stop and uninstall application
-            # Step 2: delete kafka topic named "${site}_example_source_topic"
-            # Step 3: stop logstash
+            <b>How to Uninstall</b>
+            <ol>
+                <li>Click "Stop" button to stop the running application</li>
+                <li>Remove three kafka topics</li>
+                <li>Click "Uninstall" button which will remove stream <code>HBASE_AUDIT_LOG_ENRICHED_STREAM_{SITE_ID}</code></li>
+            </ol>
         </uninstall>
     </docs>
 </application>

@@ -24,12 +24,6 @@
     <configuration>
         <!-- org.apache.eagle.topology.TopologyCheckApp -->
         <property>
-            <name>dataExtractorConfig.site</name>
-            <displayName>site</displayName>
-            <description>Site</description>
-            <value>sandbox</value>
-        </property>
-        <property>
             <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
             <displayName>Fetch Data Interval in Secs</displayName>
             <description>Fetch Data Interval in Secs</description>
