@@ -31,14 +31,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheckService {
+public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckService {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationHealthCheckServiceImpl.class);
 
     private final ApplicationProviderService applicationProviderService;
     private final ApplicationEntityService applicationEntityService;
     private final Config config;
     private Environment environment;
+    private Map<String, HealthCheck> appHealthChecks = new HashMap<>();
+    private final Object lock = new Object();
+    private int initialDelay = 10;
+    private int period = 10;
 
     @Inject
     public ApplicationHealthCheckServiceImpl(ApplicationProviderService applicationProviderService,
@@ -52,6 +59,10 @@ public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheck
     @Override
     public void init(Environment environment) {
         this.environment = environment;
+        registerAll();
+    }
+
+    private void registerAll() {
         Collection<ApplicationEntity> applicationEntities = applicationEntityService.findAll();
         applicationEntities.forEach(this::register);
     }
@@ -69,7 +80,12 @@ public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheck
                         .withFallback(ConfigFactory.parseMap(appEntity.getContext()))
         );
         this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck);
-        LOG.info("successfully register health check for {}", appEntity.getAppId());
+        synchronized (lock) {
+            if (!appHealthChecks.containsKey(appEntity.getAppId())) {
+                appHealthChecks.put(appEntity.getAppId(), applicationHealthCheck);
+                LOG.info("successfully register health check for {}", appEntity.getAppId());
+            }
+        }
     }
 
     @Override
@@ -79,6 +95,31 @@ public class ApplicationHealthCheckServiceImpl implements ApplicationHealthCheck
             return;
         }
         this.environment.healthChecks().unregister(appEntity.getAppId());
+        synchronized (lock) {
+            appHealthChecks.remove(appEntity.getAppId());
+        }
         LOG.info("successfully unregister health check for {}", appEntity.getAppId());
+    }
+
+    @Override
+    protected void runOneIteration() throws Exception {
+        LOG.info("start application health check");
+        registerAll();
+        synchronized (lock) {
+            for (String appId : appHealthChecks.keySet()) {
+                LOG.info("check application {}", appId);
+                HealthCheck.Result result = appHealthChecks.get(appId).execute();
+                if (result.isHealthy()) {
+                    LOG.info("application {} is healthy", appId);
+                } else {
+                    LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
+                }
+            }
+        }
+    }
+
+    @Override
+    protected Scheduler scheduler() {
+        return Scheduler.newFixedRateSchedule(initialDelay, period, TimeUnit.SECONDS);
     }
 }
