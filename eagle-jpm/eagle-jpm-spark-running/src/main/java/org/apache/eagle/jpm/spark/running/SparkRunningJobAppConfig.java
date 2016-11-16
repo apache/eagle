@@ -32,7 +32,7 @@ public class SparkRunningJobAppConfig implements Serializable {
     static final String JOB_FETCH_SPOUT_NAME = "sparkRunningJobFetchSpout";
     static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
 
-    static final String DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT = "/app/spark/running";
+    static final String DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT = "/apps/spark/running";
 
     ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
