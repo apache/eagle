@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @since Apr 12, 2016
- *
  */
 public class MetadataDaoFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MetadataDaoFactory.class);

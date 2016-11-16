@@ -38,11 +38,11 @@ public class MetadataDaoFactory {
 
     private MetadataDaoFactory() {
         Config config = ConfigFactory.load();
-        Config metaDataConfig = config.getConfig(MetadataUtils.META_DATA);
-        if (metaDataConfig != null) {
+        if (!config.hasPath(MetadataUtils.META_DATA)) {
             LOG.warn("metadata is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(metaDataConfig);
+            dao = new InMemMetadataDaoImpl(config);
         } else {
+        	Config metaDataConfig = config.getConfig(MetadataUtils.META_DATA);
             String clsName = metaDataConfig.getString(MetadataUtils.ALERT_META_DATA_DAO);
             Class<?> clz;
             try {
