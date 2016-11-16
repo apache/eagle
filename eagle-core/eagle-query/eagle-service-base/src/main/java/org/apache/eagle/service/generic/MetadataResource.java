@@ -25,10 +25,10 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -50,6 +50,12 @@ public class MetadataResource {
 	final static String PATH_RESOURCE = "resource";
 	final static String PATH_SERVICE = "service";
 
+	final static String SERVICE_COUNT = "count";
+	final static String SERVICE_SERVICES = "services";
+
+	final static String RESOURCE_BASE = "base";
+	final static String RESOURCE_RESOURCES = "resources";
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response index(@Context Application application,
@@ -70,9 +76,9 @@ public class MetadataResource {
 		String basePath = request.getRequestURL().toString();
 		basePath = basePath.substring(0,basePath.length() - PATH_META.length() - PATH_RESOURCE.length() -1);
 		ObjectNode root = JsonNodeFactory.instance.objectNode();
-		root.put("base",basePath);
+		root.put(RESOURCE_BASE,basePath);
 		ArrayNode resources = JsonNodeFactory.instance.arrayNode();
-		root.put( "resources", resources );
+		root.put( RESOURCE_RESOURCES, resources );
 
 		for ( Class<?> aClass : application.getClasses()){
 			if ( isAnnotatedResourceClass(aClass)){
@@ -145,8 +151,9 @@ public class MetadataResource {
 //			serviceNode.put(entry.getKey(),entityDefationitionAsJson(entry.getValue()));
 			services.add(entityDefationitionAsJson(entry.getValue()));
 		}
-		root.put("count",entities.keySet().size());
-		root.put("services",services);
+
+		root.put(SERVICE_COUNT,entities.keySet().size());
+		root.put(SERVICE_SERVICES,services);
 		return Response.ok().entity(root).build();
 	}
 
