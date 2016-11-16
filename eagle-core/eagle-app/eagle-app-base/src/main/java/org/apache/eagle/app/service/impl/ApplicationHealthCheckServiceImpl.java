@@ -83,10 +83,9 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         synchronized (lock) {
             if (!appHealthChecks.containsKey(appEntity.getAppId())) {
                 appHealthChecks.put(appEntity.getAppId(), applicationHealthCheck);
+                LOG.info("successfully register health check for {}", appEntity.getAppId());
             }
-
         }
-        LOG.info("successfully register health check for {}", appEntity.getAppId());
     }
 
     @Override
@@ -101,6 +100,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         }
         LOG.info("successfully unregister health check for {}", appEntity.getAppId());
     }
+
     @Override
     protected void runOneIteration() throws Exception {
         LOG.info("start application health check");
