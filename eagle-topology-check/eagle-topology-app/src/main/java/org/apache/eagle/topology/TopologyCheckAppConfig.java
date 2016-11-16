@@ -68,7 +68,7 @@ public class TopologyCheckAppConfig implements Serializable {
     private void init(Config config) {
         this.config = config;
 
-        this.dataExtractorConfig.site = config.getString("dataExtractorConfig.site");
+        this.dataExtractorConfig.site = config.getString("siteId");
         this.dataExtractorConfig.fetchDataIntervalInSecs = config.getLong("dataExtractorConfig.fetchDataIntervalInSecs");
         this.dataExtractorConfig.parseThreadPoolSize = MAX_NUM_THREADS;
         if (config.hasPath("dataExtractorConfig.parseThreadPoolSize")) {

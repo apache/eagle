@@ -19,7 +19,6 @@
 package org.apache.eagle.jpm.spark.running;
 
 import com.typesafe.config.ConfigValue;
-import org.apache.eagle.common.config.ConfigOptionParser;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +32,13 @@ public class SparkRunningJobAppConfig implements Serializable {
     static final String JOB_FETCH_SPOUT_NAME = "sparkRunningJobFetchSpout";
     static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
 
+    static final String DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT = "/apps/spark/running";
+
     ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
 
     private ZKStateConfig zkStateConfig;
-    private TopologyConfig topologyConfig;
-
-    public TopologyConfig getTopologyConfig() {
-        return topologyConfig;
-    }
 
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
@@ -62,20 +58,12 @@ public class SparkRunningJobAppConfig implements Serializable {
 
     private EndpointConfig endpointConfig;
 
-    public static class TopologyConfig implements Serializable {
-        public int jobFetchSpoutParallism;
-        public int jobFetchSpoutTasksNum;
-        public int jobParseBoltParallism;
-        public int jobParseBoltTasksNum;
-    }
-
     public static class ZKStateConfig implements Serializable {
         public String zkQuorum;
         public String zkRoot;
         public int zkSessionTimeoutMs;
         public int zkRetryTimes;
         public int zkRetryInterval;
-        public String zkPort;
         public boolean recoverEnabled;
     }
 
@@ -92,6 +80,10 @@ public class SparkRunningJobAppConfig implements Serializable {
         public String site;
         public int fetchRunningJobInterval;
         public int parseThreadPoolSize;
+        public int jobFetchSpoutParallism;
+        public int jobFetchSpoutTasksNum;
+        public int jobParseBoltParallism;
+        public int jobParseBoltTasksNum;
     }
 
     public static class EndpointConfig implements Serializable {
@@ -106,69 +98,61 @@ public class SparkRunningJobAppConfig implements Serializable {
 
     private Config config;
 
-    private static SparkRunningJobAppConfig manager = new SparkRunningJobAppConfig();
-
-    private SparkRunningJobAppConfig() {
+    private SparkRunningJobAppConfig(Config config) {
         this.eagleServiceConfig = new EagleServiceConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.endpointConfig = new EndpointConfig();
         this.endpointConfig.hdfs = new HashMap<>();
         this.zkStateConfig = new ZKStateConfig();
-        this.topologyConfig = new TopologyConfig();
+        init(config);
     }
 
-    public static SparkRunningJobAppConfig getInstance(String[] args) {
-        try {
-            LOG.info("Loading from configuration file");
-            manager.init(new ConfigOptionParser().load(args));
-        } catch (Exception e) {
-            LOG.error("failed to load config");
-        }
-        return manager;
-    }
-
-    public static SparkRunningJobAppConfig getInstance(Config config) {
-        manager.init(config);
-        return manager;
+    public static SparkRunningJobAppConfig newInstance(Config config) {
+        return new SparkRunningJobAppConfig(config);
     }
 
     private void init(Config config) {
         this.config = config;
-        this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
-        this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
-        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeperConfig.zkRetryTimes");
-        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeperConfig.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("zookeeperConfig.zkRoot");
-        this.zkStateConfig.recoverEnabled = config.getBoolean("zookeeperConfig.recoverEnabled");
 
-
-        // parse eagle service endpoint
-        this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
-        String port = config.getString("eagleProps.eagleService.port");
-        this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
-        this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
-        this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
-        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("eagleProps.eagleService.readTimeOutSeconds");
-        this.eagleServiceConfig.maxFlushNum = config.getInt("eagleProps.eagleService.maxFlushNum");
-
-        //parse job extractor
-        this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
-        this.jobExtractorConfig.fetchRunningJobInterval = config.getInt("jobExtractorConfig.fetchRunningJobInterval");
-        this.jobExtractorConfig.parseThreadPoolSize = config.getInt("jobExtractorConfig.parseThreadPoolSize");
-
-        //parse endpointConfig config
-        this.endpointConfig.eventLog = config.getString("endpointConfig.eventLog");
-        for (Map.Entry<String, ConfigValue> entry : config.getConfig("endpointConfig.hdfs").entrySet()) {
-            this.endpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
+        this.zkStateConfig.zkQuorum = config.getString("zookeeper.zkQuorum");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRoot = DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT;
+        if (config.hasPath("zookeeper.zkRoot")) {
+            this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
+        }
+        this.zkStateConfig.recoverEnabled = false;
+        if (config.hasPath("jobExtractorConfig.recoverEnabled")) {
+            this.zkStateConfig.recoverEnabled = config.getBoolean("jobExtractorConfig.recoverEnabled");
         }
 
-        this.endpointConfig.rmUrls = config.getString("endpointConfig.rmUrls").split(",");
+        // parse eagle service endpoint
+        this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");
+        this.eagleServiceConfig.eagleServicePort = config.getInt("service.port");
+        this.eagleServiceConfig.username = config.getString("service.username");
+        this.eagleServiceConfig.password = config.getString("service.password");
+        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("service.readTimeOutSeconds");
+        this.eagleServiceConfig.maxFlushNum = 500;
+        if (config.hasPath("service.maxFlushNum")) {
+            this.eagleServiceConfig.maxFlushNum = config.getInt("service.maxFlushNum");
+        }
 
-        this.topologyConfig.jobFetchSpoutParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_FETCH_SPOUT_NAME);
-        this.topologyConfig.jobFetchSpoutTasksNum = config.getInt("envContextConfig.tasks." + JOB_FETCH_SPOUT_NAME);
-        this.topologyConfig.jobParseBoltParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_PARSE_BOLT_NAME);
-        this.topologyConfig.jobParseBoltTasksNum = config.getInt("envContextConfig.tasks." + JOB_PARSE_BOLT_NAME);
+        //parse job extractor
+        this.jobExtractorConfig.site = config.getString("siteId");
+        this.jobExtractorConfig.fetchRunningJobInterval = config.getInt("jobExtractorConfig.fetchRunningJobInterval");
+        this.jobExtractorConfig.parseThreadPoolSize = config.getInt("jobExtractorConfig.parseThreadPoolSize");
+        this.jobExtractorConfig.jobFetchSpoutParallism = config.getInt("jobExtractorConfig.numOfSpoutExecutors");
+        this.jobExtractorConfig.jobFetchSpoutTasksNum = config.getInt("jobExtractorConfig.numOfSpoutTasks");
+        this.jobExtractorConfig.jobParseBoltParallism = config.getInt("jobExtractorConfig.numOfParseBoltExecutors");
+        this.jobExtractorConfig.jobParseBoltTasksNum = config.getInt("jobExtractorConfig.numOfParserBoltTasks");
+
+        //parse endpointConfig config
+        this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
+        this.endpointConfig.eventLog = config.getString("dataSourceConfig.hdfs.baseDir");
+        for (Map.Entry<String, ConfigValue> entry : config.getConfig("dataSourceConfig.hdfs").entrySet()) {
+            this.endpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
+        }
 
         LOG.info("Successfully initialized SparkRunningJobAppConfig");
         LOG.info("site: " + this.jobExtractorConfig.site);
