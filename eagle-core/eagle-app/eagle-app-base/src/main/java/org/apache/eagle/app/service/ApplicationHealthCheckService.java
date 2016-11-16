@@ -17,13 +17,14 @@
 
 package org.apache.eagle.app.service;
 
+import com.google.common.util.concurrent.AbstractScheduledService;
 import io.dropwizard.setup.Environment;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 
-public interface ApplicationHealthCheckService {
-    void init(Environment environment);
+public abstract class ApplicationHealthCheckService extends AbstractScheduledService {
+    public abstract void init(Environment environment);
 
-    void register(ApplicationEntity appEntity);
+    public abstract void register(ApplicationEntity appEntity);
 
-    void unregister(ApplicationEntity appEntity);
+    public abstract void unregister(ApplicationEntity appEntity);
 }

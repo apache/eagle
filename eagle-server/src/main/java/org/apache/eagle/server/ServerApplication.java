@@ -107,5 +107,7 @@ class ServerApplication extends Application<ServerConfig> {
 
         // Initialize application health check environment
         applicationHealthCheckService.init(environment);
+        Managed appHealthCheckTask = new ApplicationTask(applicationHealthCheckService);
+        environment.lifecycle().manage(appHealthCheckTask);
     }
 }
