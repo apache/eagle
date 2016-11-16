@@ -66,6 +66,10 @@ auth:
     # default or leave it a blank string.
     strategy: simple
 
+    # the absolute path of ssl certificate file. This attribute is required conditional only when the auth -> mode is set
+    # as "ldap" and providerUrl starting with "ldaps://".
+    certificateAbsolutePath: /certificate/absolute/path
+
     # timeout expression for connecting to ldap service endpoint
     connectingTimeout: 500ms
 

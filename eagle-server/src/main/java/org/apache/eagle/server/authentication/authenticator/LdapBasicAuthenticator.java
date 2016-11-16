@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.directory.InitialDirContext;
+import java.io.File;
 import java.util.Hashtable;
 
 public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, User> {
@@ -34,6 +35,10 @@ public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, U
     private static final String LDAP_LDAP_CTX_FACTORY_NAME = "com.sun.jndi.ldap.LdapCtxFactory";
     private static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
     private static final String LDAP_READ_TIMEOUT_KEY = "com.sun.jndi.ldap.read.timeout";
+    private static final String SYS_PROP_SSL_KEY_STORE = "javax.net.ssl.keyStore";
+    private static final String SYS_PROP_SSL_TRUST_STORE = "javax.net.ssl.trustStore";
+    private static final String LDAPS_URL_PREFIX = "ldaps://";
+    private static final String SSL_PROTOCOL_VALUE = "ssl";
     private LdapSettings settings = null;
 
     public LdapBasicAuthenticator(LdapSettings settings) {
@@ -68,6 +73,21 @@ public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, U
         String strategy = settings.getStrategy();
         if (!"".equals(strategy)) {
             env.put(Context.SECURITY_AUTHENTICATION, strategy);
+        }
+
+        if (providerUrl.toLowerCase().startsWith(LDAPS_URL_PREFIX)) { // using ldap over ssl to authenticate
+            env.put(Context.SECURITY_PROTOCOL, SSL_PROTOCOL_VALUE);
+
+            String certificateAbsolutePath = settings.getCertificateAbsolutePath();
+            if (certificateAbsolutePath == null || "".equals(certificateAbsolutePath)) {
+                throw new RuntimeException("The attribute 'certificateAbsolutePath' must be set when using ldap over ssl to authenticate.");
+            }
+            if (!new File(certificateAbsolutePath).exists()) {
+                throw new RuntimeException(String.format("The file specified not existing: %s", certificateAbsolutePath));
+            }
+
+            System.setProperty(SYS_PROP_SSL_KEY_STORE, certificateAbsolutePath);
+            System.setProperty(SYS_PROP_SSL_TRUST_STORE, certificateAbsolutePath);
         }
 
         env.put(Context.SECURITY_PRINCIPAL, comprisePrincipal(sanitizedUsername));
