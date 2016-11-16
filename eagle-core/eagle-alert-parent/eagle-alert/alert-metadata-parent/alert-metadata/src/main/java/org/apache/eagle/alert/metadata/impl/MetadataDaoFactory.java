@@ -16,9 +16,9 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
-import org.apache.eagle.alert.metadata.IMetadataDao;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +38,14 @@ public class MetadataDaoFactory {
 
     private MetadataDaoFactory() {
         Config config = ConfigFactory.load();
-        Config metaDataConfig = config.getConfig(MetadataUtils.META_DATA);
-        if (metaDataConfig != null) {
+        if (!config.hasPath(MetadataUtils.META_DATA)) {
             LOG.warn("metadata is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(metaDataConfig);
+            dao = new InMemMetadataDaoImpl(null);
         } else {
-            String clsName = metaDataConfig.getString(MetadataUtils.ALERT_META_DATA_DAO);
-            Class<?> clz;
+            Config metaDataConfig = config.getConfig(MetadataUtils.META_DATA);
             try {
+                String clsName = metaDataConfig.getString(MetadataUtils.ALERT_META_DATA_DAO);
+                Class<?> clz;
                 clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
                 if (IMetadataDao.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor(Config.class);
