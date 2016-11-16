@@ -23,172 +23,89 @@
     <appClass>org.apache.eagle.jpm.spark.running.SparkRunningJobApp</appClass>
     <configuration>
         <!-- org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig -->
-        <property>
-            <name>envContextConfig.env</name>
-            <value>local</value>
-            <displayName>Environment</displayName>
-            <description>Execution environment</description>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkQuorum</name>
-            <displayName>zkQuorum</displayName>
-            <description>Zookeeper Quorum</description>
-            <value>sandbox.hortonworks.com:2181</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkPort</name>
-            <displayName>zkPort</displayName>
-            <description>Zookeeper Port</description>
-            <value>2181</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkSessionTimeoutMs</name>
-            <displayName>zkSessionTimeoutMs</displayName>
-            <description>Zookeeper session timeoutMs</description>
-            <value>15000</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryTimes</name>
-            <displayName>zkRetryTimes</displayName>
-            <description>zookeeperConfig.zkRetryTimes</description>
-            <value>3</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryInterval</name>
-            <displayName>zkRetryInterval</displayName>
-            <description>zookeeperConfig.zkRetryInterval</description>
-            <value>20000</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRoot</name>
-            <value>/apps/spark/running</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.recoverEnabled</name>
-            <description>zookeeperConfig.recoverEnabled</description>
-            <value>false</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.host</name>
-            <description>eagleProps.eagleService.host</description>
-            <value>sandbox.hortonworks.com</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.port</name>
-            <description>eagleProps.eagleService.port</description>
-            <value>9099</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.username</name>
-            <description>eagleProps.eagleService.username</description>
-            <value>admin</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.password</name>
-            <description>eagleProps.eagleService.password</description>
-            <value>secret</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.readTimeOutSeconds</name>
-            <description>eagleProps.eagleService.readTimeOutSeconds</description>
-            <value>20</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.maxFlushNum</name>
-            <description>eagleProps.eagleService.maxFlushNum</description>
-            <value>500</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.site</name>
-            <description>jobExtractorConfig.site</description>
-            <value>sandbox</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.fetchRunningJobInterval</name>
-            <description>jobExtractorConfig.fetchRunningJobInterval</description>
-            <value>15</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.parseThreadPoolSize</name>
-            <description>jobExtractorConfig.parseThreadPoolSize</description>
-            <value>5</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.eventLog</name>
-            <description>dataSourceConfig.eventLog</description>
-            <value>/spark-history</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.nnEndpoint</name>
-            <description>dataSourceConfig.nnEndpoint</description>
-            <value>hdfs://sandbox.hortonworks.com:8020</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.keytab</name>
-            <description>dataSourceConfig.keytab</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.principal</name>
-            <description>dataSourceConfig.principal</description>
-            <value></value>
-        </property>
+
         <property>
             <name>dataSourceConfig.rmUrls</name>
-            <description>dataSourceConfig.rmUrls</description>
+            <displayName>resource manager url</displayName>
+            <description>url to fetch finished spark job list</description>
             <value>http://sandbox.hortonworks.com:8088</value>
+            <required>true</required>
         </property>
         <property>
-            <name>envContextConfig.parallelismConfig.sparkRunningJobFetchSpout</name>
+            <name>dataSourceConfig.hdfs.fs.defaultFS</name>
+            <displayName>hdfs url</displayName>
+            <description>target hdfs to crawl log data</description>
+            <value>hdfs://sandbox.hortonworks.com:8020</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.hdfs.baseDir</name>
+            <displayName>hdfs base path for spark job data</displayName>
+            <description>hdfs base path for spark job data</description>
+            <value>/spark-history</value>
+            <required>true</required>
+        </property>
+
+        <property>
+            <name>workers</name>
+            <displayName>topology workers</displayName>
+            <description>topology workers</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>jobExtractorConfig.numOfSpoutExecutors</name>
+            <displayName>spout executors</displayName>
             <description>Parallelism of sparkRunningJobFetchSpout </description>
             <value>1</value>
         </property>
         <property>
-            <name>envContextConfig.tasks.sparkRunningJobFetchSpout</name>
+            <name>jobExtractorConfig.numOfSpoutTasks</name>
+            <displayName>spout tasks</displayName>
             <description>Tasks Num of sparkRunningJobFetchSpout </description>
             <value>4</value>
         </property>
         <property>
-            <name>envContextConfig.parallelismConfig.sparkRunningJobParseBolt</name>
+            <name>jobExtractorConfig.numOfParseBoltExecutors</name>
+            <displayName>parser bolt parallelism hint</displayName>
             <description>Parallelism of sparkRunningJobParseBolt </description>
             <value>1</value>
         </property>
         <property>
-            <name>envContextConfig.tasks.sparkRunningJobParseBolt</name>
+            <name>jobExtractorConfig.numOfParserBoltTasks</name>
+            <displayName>parser bolt tasks</displayName>
             <description>Tasks Num of sparkRunningJobParseBolt</description>
             <value>4</value>
+        </property>
+        <property>
+            <name>topology.message.timeout.secs</name>
+            <displayName>topology message timeout (secs)</displayName>
+            <description>default timeout is 30s</description>
+            <value>30</value>
+        </property>
+
+        <property>
+            <name>jobExtractorConfig.recoverEnabled</name>
+            <displayName>recover enabled</displayName>
+            <description>if recover is needed when restart</description>
+            <value>false</value>
+        </property>
+        <property>
+            <name>jobExtractorConfig.fetchRunningJobInterval</name>
+            <displayName>spout fetch data interval</displayName>
+            <description>spout fetch data interval (in milliseconds)</description>
+            <value>15</value>
+        </property>
+        <property>
+            <name>jobExtractorConfig.parseThreadPoolSize</name>
+            <displayName>thread pool size for data parsing</displayName>
+            <description>thread pool size for data parsing</description>
+            <value>5</value>
         </property>
     </configuration>
     <docs>
         <install>
-            # Step 1: Create source kafka topic named "${site}_example_source_topic"
-
-            ./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
-
-            # Step 2: Set up data collector to flow data into kafka topic in
-
-            ./bin/logstash -f log_collector.conf
-
-            ## `log_collector.conf` sample as following:
-
-            input {
-
-            }
-            filter {
-
-            }
-            output{
-
-            }
-
-            # Step 3: start application
-
-            # Step 4: monitor with featured portal or alert with policies
         </install>
         <uninstall>
-            # Step 1: stop and uninstall application
-            # Step 2: delete kafka topic named "${site}_example_source_topic"
-            # Step 3: stop logstash
         </uninstall>
     </docs>
 </application>

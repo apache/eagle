@@ -68,8 +68,8 @@
         <property>
             <name>topology.message.timeout.secs</name>
             <displayName>topology message timeout (secs)</displayName>
-            <description>default timeout is 30s</description>
-            <value>30</value>
+            <description>default timeout is 300s</description>
+            <value>300</value>
             <required>false</required>
         </property>
 
