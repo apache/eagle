@@ -33,6 +33,8 @@ public class SparkRunningJobAppConfig implements Serializable {
     static final String JOB_FETCH_SPOUT_NAME = "sparkRunningJobFetchSpout";
     static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
 
+    static final String DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT = "/app/spark/running";
+
     ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -134,23 +136,30 @@ public class SparkRunningJobAppConfig implements Serializable {
 
     private void init(Config config) {
         this.config = config;
-        this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
-        this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
-        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeperConfig.zkRetryTimes");
-        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeperConfig.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("zookeeperConfig.zkRoot");
-        this.zkStateConfig.recoverEnabled = config.getBoolean("zookeeperConfig.recoverEnabled");
 
+        this.zkStateConfig.zkQuorum = config.getString("zookeeper.zkQuorum");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRoot = DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT;
+        if (config.hasPath("zookeeper.zkRoot")) {
+            this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
+        }
+        this.zkStateConfig.recoverEnabled = false;
+        if (config.hasPath("jobExtractorConfig.recoverEnabled")) {
+            this.zkStateConfig.recoverEnabled = config.getBoolean("jobExtractorConfig.recoverEnabled");
+        }
 
         // parse eagle service endpoint
-        this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
-        String port = config.getString("eagleProps.eagleService.port");
-        this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
-        this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
-        this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
-        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("eagleProps.eagleService.readTimeOutSeconds");
-        this.eagleServiceConfig.maxFlushNum = config.getInt("eagleProps.eagleService.maxFlushNum");
+        this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");
+        this.eagleServiceConfig.eagleServicePort = config.getInt("service.port");
+        this.eagleServiceConfig.username = config.getString("service.username");
+        this.eagleServiceConfig.password = config.getString("service.password");
+        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("service.readTimeOutSeconds");
+        this.eagleServiceConfig.maxFlushNum = 500;
+        if (config.hasPath("eagleProps.eagleService.maxFlushNum")) {
+            this.eagleServiceConfig.maxFlushNum = config.getInt("eagleProps.eagleService.maxFlushNum");
+        }
 
         //parse job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
