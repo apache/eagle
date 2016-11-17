@@ -90,6 +90,12 @@
         </property>
 
         <property>
+            <name>spark.jobConf.additional.info</name>
+            <displayName>additional spark job config info</displayName>
+            <description>additional job config list</description>
+            <value></value>
+        </property>
+        <property>
             <name>spark.defaultVal.spark.executor.memory</name>
             <displayName>spark.executor.memory</displayName>
             <value>1g</value>
