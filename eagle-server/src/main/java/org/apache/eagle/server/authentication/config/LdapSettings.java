@@ -24,6 +24,7 @@ public class LdapSettings {
     private String providerUrl = "";
     private String strategy = "";
     private String principalTemplate = "";
+    private String certificateAbsolutePath = "";
     private Duration connectingTimeout = Duration.parse("500ms");
     private Duration readingTimeout = Duration.parse("500ms");
 
@@ -79,6 +80,17 @@ public class LdapSettings {
     @JsonProperty
     public LdapSettings setReadingTimeout(Duration readingTimeout) {
         this.readingTimeout = readingTimeout;
+        return this;
+    }
+
+    @JsonProperty
+    public String getCertificateAbsolutePath() {
+        return certificateAbsolutePath;
+    }
+
+    @JsonProperty
+    public LdapSettings setCertificateAbsolutePath(String certificateAbsolutePath) {
+        this.certificateAbsolutePath = certificateAbsolutePath;
         return this;
     }
 }
