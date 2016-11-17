@@ -27,10 +27,6 @@
     <artifactId>eagle-security-oozie-web</artifactId>
     <name>eagle-security-oozie-web</name>
     <url>http://maven.apache.org</url>
-    <properties>
-        <powermock.version>1.6.5</powermock.version>
-        <easymock.version>3.4</easymock.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.eagle</groupId>
