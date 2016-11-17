@@ -23,12 +23,13 @@ import org.junit.Test;
 
 public class TestEntityDefinitionManager {
     @Test
-    public void testCreateEntityDefinition(){
+    public void testCreateEntityDefinition() {
         EntityDefinition entityDefinition = EntityDefinitionManager.createEntityDefinition(TestLogAPIEntity.class);
         Assert.assertNotNull(entityDefinition);
     }
+
     @Test
-    public void testCreateMetricEntityDefinition(){
+    public void testCreateMetricEntityDefinition() {
         EntityDefinition entityDefinition = EntityDefinitionManager.createEntityDefinition(GenericMetricEntity.class);
         Assert.assertNotNull(entityDefinition);
     }

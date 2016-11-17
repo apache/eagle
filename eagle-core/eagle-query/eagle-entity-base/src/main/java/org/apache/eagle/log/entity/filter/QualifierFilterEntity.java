@@ -24,82 +24,85 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class QualifierFilterEntity implements Writable{
-	public String key;
-	public String value;
-	public ComparisonOperator op;
-	public TokenType valueType;
-	public TokenType keyType;
+public class QualifierFilterEntity implements Writable {
+    public String key;
+    public String value;
+    public ComparisonOperator op;
+    public TokenType valueType;
+    public TokenType keyType;
 
-	public QualifierFilterEntity(){}
-	public QualifierFilterEntity(String key, String value, ComparisonOperator comp, TokenType keyType, TokenType valueType) {
-		super();
-		this.key = key;
-		this.value = value;
-		this.op = comp;
-		this.keyType = keyType;
-		this.valueType = valueType;
-	}
+    public QualifierFilterEntity() {
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public QualifierFilterEntity(String key, String value, ComparisonOperator comp, TokenType keyType, TokenType valueType) {
+        super();
+        this.key = key;
+        this.value = value;
+        this.op = comp;
+        this.keyType = keyType;
+        this.valueType = valueType;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public ComparisonOperator getOp() {
-		return op;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public void setOp(ComparisonOperator op) {
-		this.op = op;
-	}
+    public ComparisonOperator getOp() {
+        return op;
+    }
 
-	public TokenType getValueType() {
-		return valueType;
-	}
+    public void setOp(ComparisonOperator op) {
+        this.op = op;
+    }
 
-	public void setValueType(TokenType valueType) {
-		this.valueType = valueType;
-	}
+    public TokenType getValueType() {
+        return valueType;
+    }
 
-	public void setKeyType(TokenType keyType){
-		this.keyType = keyType;
-	}
-	public TokenType getKeyType(){
-		return this.keyType;
-	}
+    public void setValueType(TokenType valueType) {
+        this.valueType = valueType;
+    }
 
-	@Override
-	public String toString() {
-		return String.format("%s %s %s",this.key,this.op,this.value);
-	}
+    public void setKeyType(TokenType keyType) {
+        this.keyType = keyType;
+    }
 
-	@Override
-	public void write(DataOutput out) throws IOException {
-		out.writeUTF(this.key);
-		out.writeUTF(this.getValue());
-		out.writeUTF(this.op.name());
-		out.writeUTF(this.keyType.name());
-		out.writeUTF(this.valueType.name());
-	}
+    public TokenType getKeyType() {
+        return this.keyType;
+    }
 
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		this.key = in.readUTF();
-		this.value = in.readUTF();
-		this.op = ComparisonOperator.valueOf(in.readUTF());
-		this.keyType = TokenType.valueOf(in.readUTF());
-		this.valueType = TokenType.valueOf(in.readUTF());
-	}
+    @Override
+    public String toString() {
+        return String.format("%s %s %s", this.key, this.op, this.value);
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeUTF(this.key);
+        out.writeUTF(this.getValue());
+        out.writeUTF(this.op.name());
+        out.writeUTF(this.keyType.name());
+        out.writeUTF(this.valueType.name());
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.key = in.readUTF();
+        this.value = in.readUTF();
+        this.op = ComparisonOperator.valueOf(in.readUTF());
+        this.keyType = TokenType.valueOf(in.readUTF());
+        this.valueType = TokenType.valueOf(in.readUTF());
+    }
 }

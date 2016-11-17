@@ -21,65 +21,67 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum AggregateFunctionType{
-	count("^(count)$"),
-	sum("^sum\\((.*)\\)$"),
-	avg("^avg\\((.*)\\)$"),
-	max("^max\\((.*)\\)$"),
-	min("^min\\((.*)\\)$");
-	
-	private Pattern pattern;
-	private AggregateFunctionType(String patternString){
-		this.pattern = Pattern.compile(patternString);
-	}
+public enum AggregateFunctionType {
+    count("^(count)$"),
+    sum("^sum\\((.*)\\)$"),
+    avg("^avg\\((.*)\\)$"),
+    max("^max\\((.*)\\)$"),
+    min("^min\\((.*)\\)$");
 
-	/**
-	 * This method is thread safe
-	 * match and retrieve back the aggregated fields, for count, aggregateFields can be null
-	 * @param function
-	 * @return
-	 */
-	public AggregateFunctionTypeMatcher matcher(String function){
-		Matcher m = pattern.matcher(function);
+    private Pattern pattern;
 
-		if(m.find()){
-			return new AggregateFunctionTypeMatcher(this, true, m.group(1));
-		}else{
-			return new AggregateFunctionTypeMatcher(this, false, null);
-		}
-	}
+    private AggregateFunctionType(String patternString) {
+        this.pattern = Pattern.compile(patternString);
+    }
 
-	public static AggregateFunctionTypeMatcher matchAll(String function){
-		for(AggregateFunctionType type : values()){
-			Matcher m = type.pattern.matcher(function);
-			if(m.find()){
-				return new AggregateFunctionTypeMatcher(type, true, m.group(1));
-			}
-		}
-		return new AggregateFunctionTypeMatcher(null, false, null);
-	}
+    /**
+     * This method is thread safe
+     * match and retrieve back the aggregated fields, for count, aggregateFields can be null.
+     *
+     * @param function
+     * @return
+     */
+    public AggregateFunctionTypeMatcher matcher(String function) {
+        Matcher m = pattern.matcher(function);
 
-	public static byte[] serialize(AggregateFunctionType type){
-		return type.name().getBytes();
-	}
+        if (m.find()) {
+            return new AggregateFunctionTypeMatcher(this, true, m.group(1));
+        } else {
+            return new AggregateFunctionTypeMatcher(this, false, null);
+        }
+    }
 
-	public static AggregateFunctionType deserialize(byte[] type){
-		return valueOf(new String(type));
-	}
+    public static AggregateFunctionTypeMatcher matchAll(String function) {
+        for (AggregateFunctionType type : values()) {
+            Matcher m = type.pattern.matcher(function);
+            if (m.find()) {
+                return new AggregateFunctionTypeMatcher(type, true, m.group(1));
+            }
+        }
+        return new AggregateFunctionTypeMatcher(null, false, null);
+    }
 
-	public static List<byte[]> toBytesList(List<AggregateFunctionType> types){
-		List<byte[]> result = new ArrayList<byte[]>();
-		for(AggregateFunctionType type:types){
-			result.add(serialize(type));
-		}
-		return result;
-	}
+    public static byte[] serialize(AggregateFunctionType type) {
+        return type.name().getBytes();
+    }
 
-	public static List<AggregateFunctionType> fromBytesList(List<byte[]> types){
-		List<AggregateFunctionType> result = new ArrayList<AggregateFunctionType>();
-		for(byte[] bs:types){
-			result.add(deserialize(bs));
-		}
-		return result;
-	}
+    public static AggregateFunctionType deserialize(byte[] type) {
+        return valueOf(new String(type));
+    }
+
+    public static List<byte[]> toBytesList(List<AggregateFunctionType> types) {
+        List<byte[]> result = new ArrayList<byte[]>();
+        for (AggregateFunctionType type : types) {
+            result.add(serialize(type));
+        }
+        return result;
+    }
+
+    public static List<AggregateFunctionType> fromBytesList(List<byte[]> types) {
+        List<AggregateFunctionType> result = new ArrayList<AggregateFunctionType>();
+        for (byte[] bs : types) {
+            result.add(deserialize(bs));
+        }
+        return result;
+    }
 }

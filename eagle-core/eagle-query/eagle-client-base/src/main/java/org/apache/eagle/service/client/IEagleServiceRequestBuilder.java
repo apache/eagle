@@ -19,21 +19,20 @@ package org.apache.eagle.service.client;
 import org.apache.eagle.service.client.impl.*;
 
 /**
- *
- * IEagleServiceClient extension interfaces
+ * IEagleServiceClient extension interfaces.
  *
  * @see IEagleServiceClient
  */
 public interface IEagleServiceRequestBuilder {
     /**
-     * Search pipe API
+     * Search pipe API.
      *
      * @return
      */
     SearchRequestBuilder search();
 
     /**
-     * Search pipe API
+     * Search pipe API.
      *
      * @param query
      * @return
@@ -41,15 +40,14 @@ public interface IEagleServiceRequestBuilder {
     SearchRequestBuilder search(String query);
 
     /**
-     *
-     * Delete pipe API
+     * Delete pipe API.
      *
      * @return
      */
     DeleteRequestBuilder delete();
 
     /**
-     * Metric sender
+     * Metric sender.
      *
      * @param metricName
      * @return
@@ -57,7 +55,7 @@ public interface IEagleServiceRequestBuilder {
     MetricSender metric(String metricName);
 
     /**
-     * Batch entities sender
+     * Batch entities sender.
      *
      * @param batchSize
      * @return
@@ -65,14 +63,14 @@ public interface IEagleServiceRequestBuilder {
     BatchSender batch(int batchSize);
 
     /**
-     * Async service client requester
+     * Async service client requester.
      *
      * @return
      */
     EagleServiceAsyncClient async();
 
     /**
-     * Parallel service client requester
+     * Parallel service client requester.
      *
      * @param parallelNum
      * @return

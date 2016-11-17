@@ -19,10 +19,10 @@ package org.apache.eagle.log.entity;
 import java.util.Map;
 
 public interface QualifierCreationListener {
-	/**
-	 * Qualifier <b>display name</b> mapped to qualifier value in bytes[]
-	 *
-	 * @param qualifiers
-	 */
-	public void qualifierCreated(Map<String, byte[]> qualifiers);
+    /**
+     * Qualifier <b>display name</b> mapped to qualifier value in bytes[].
+     *
+     * @param qualifiers
+     */
+    public void qualifierCreated(Map<String, byte[]> qualifiers);
 }

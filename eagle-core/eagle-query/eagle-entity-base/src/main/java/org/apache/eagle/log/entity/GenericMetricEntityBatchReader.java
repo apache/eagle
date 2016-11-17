@@ -23,32 +23,36 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericMetricEntityBatchReader  implements EntityCreationListener{
-	private static final Logger LOG = LoggerFactory.getLogger(GenericEntityBatchReader.class);
-	
-	private List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
-	private GenericEntityStreamReader reader;
-	
-	public GenericMetricEntityBatchReader(String metricName, SearchCondition condition) throws Exception{
-		reader = new GenericEntityStreamReader(GenericMetricEntity.GENERIC_METRIC_SERVICE, condition, metricName);
-	}
-	
-	public long getLastTimestamp() {
-		return reader.getLastTimestamp();
-	}
-	public long getFirstTimestamp() {
-		return reader.getFirstTimestamp();
-	}
-	@Override
-	public void entityCreated(TaggedLogAPIEntity entity){
-		entities.add(entity);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> List<T> read() throws Exception{
-		if(LOG.isDebugEnabled()) LOG.debug("Start reading as batch mode");
-		reader.register(this);
-		reader.readAsStream();
-		return (List<T>)entities;
-	}
+public class GenericMetricEntityBatchReader implements EntityCreationListener {
+    private static final Logger LOG = LoggerFactory.getLogger(GenericEntityBatchReader.class);
+
+    private List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
+    private GenericEntityStreamReader reader;
+
+    public GenericMetricEntityBatchReader(String metricName, SearchCondition condition) throws Exception {
+        reader = new GenericEntityStreamReader(GenericMetricEntity.GENERIC_METRIC_SERVICE, condition, metricName);
+    }
+
+    public long getLastTimestamp() {
+        return reader.getLastTimestamp();
+    }
+
+    public long getFirstTimestamp() {
+        return reader.getFirstTimestamp();
+    }
+
+    @Override
+    public void entityCreated(TaggedLogAPIEntity entity) {
+        entities.add(entity);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> List<T> read() throws Exception {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start reading as batch mode");
+        }
+        reader.register(this);
+        reader.readAsStream();
+        return (List<T>) entities;
+    }
 }

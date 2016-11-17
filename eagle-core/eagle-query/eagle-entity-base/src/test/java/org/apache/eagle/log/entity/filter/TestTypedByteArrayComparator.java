@@ -28,23 +28,23 @@ import org.junit.Test;
  */
 public class TestTypedByteArrayComparator {
     @Test
-    public void testCompare(){
+    public void testCompare() {
         EntitySerDeser serDeser = new DoubleSerDeser();
-        TypedByteArrayComparator comparator = new TypedByteArrayComparator(serDeser.serialize(0.9),serDeser.type());
+        TypedByteArrayComparator comparator = new TypedByteArrayComparator(serDeser.serialize(0.9), serDeser.type());
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(0.8)) > 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(1.1)) < 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(0.9)) == 0);
-        Assert.assertTrue(comparator.compareTo(serDeser.serialize(- 0.9)) > 0);
+        Assert.assertTrue(comparator.compareTo(serDeser.serialize(-0.9)) > 0);
 
         serDeser = new IntSerDeser();
-        comparator = new TypedByteArrayComparator(serDeser.serialize(9),serDeser.type());
+        comparator = new TypedByteArrayComparator(serDeser.serialize(9), serDeser.type());
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(8)) > 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(11)) < 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(9)) == 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(-9)) > 0);
 
         serDeser = new LongSerDeser();
-        comparator = new TypedByteArrayComparator(serDeser.serialize(9l),serDeser.type());
+        comparator = new TypedByteArrayComparator(serDeser.serialize(9l), serDeser.type());
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(8l)) > 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(11l)) < 0);
         Assert.assertTrue(comparator.compareTo(serDeser.serialize(9l)) == 0);
@@ -52,10 +52,10 @@ public class TestTypedByteArrayComparator {
     }
 
     @Test
-    public void testClassName(){
-        Assert.assertEquals("long",long.class.getName());
+    public void testClassName() {
+        Assert.assertEquals("long", long.class.getName());
         Assert.assertEquals("java.lang.Long", Long.class.getName());
-        Assert.assertEquals("long",long.class.toString());
+        Assert.assertEquals("long", long.class.toString());
         Assert.assertEquals("class java.lang.Long", Long.class.toString());
     }
 }

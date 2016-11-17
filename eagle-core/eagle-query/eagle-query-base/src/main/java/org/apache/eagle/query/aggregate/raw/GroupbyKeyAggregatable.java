@@ -19,21 +19,18 @@ package org.apache.eagle.query.aggregate.raw;
 import java.util.List;
 
 /**
- * The generic interface to unify the GroupbyKeyValue-based results of different 
+ * The generic interface to unify the GroupbyKeyValue-based results of different
  * business logic aggregates like RawAggregator or TimeSeriesAggregator
  *
  * @see org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator
  * @see RawAggregator
- *
  * @since : 11/3/14,2014
- *
  */
 public interface GroupbyKeyAggregatable {
-	/**
-	 * @see RawAggregator#getGroupbyKeyValues()
-	 * @see org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator#getGroupbyKeyValues()
-	 * 
-	 * @return
-	 */
-	public List<GroupbyKeyValue> getGroupbyKeyValues();
+    /**
+     * @return
+     * @see RawAggregator#getGroupbyKeyValues()
+     * @see org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator#getGroupbyKeyValues()
+     */
+    public List<GroupbyKeyValue> getGroupbyKeyValues();
 }

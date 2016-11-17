@@ -26,7 +26,6 @@ import org.apache.eagle.query.aggregate.AggregateFunctionType;
 import org.apache.eagle.query.aggregate.timeseries.SortOption;
 import org.apache.eagle.storage.hbase.query.aggregate.GenericCoprocessorAggregateQuery;
 import org.apache.eagle.storage.hbase.query.aggregate.GenericInMemoryAggregateQuery;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,22 +136,22 @@ public class GenericQueryBuilder {
             aggregateCondition.setIntervalMS(this.intervalmin * 60 * 1000);
             if (EagleConfigFactory.load().isCoprocessorEnabled()) {
                 return new GenericCoprocessorAggregateQuery(this.serviceName,
-                        this.searchCondition,
-                        aggregateCondition,
-                        this.metricName,
-                        this.sortOptions,
-                        this.sortFunctionTypes,
-                        this.sortFields,
-                        this.top);
+                    this.searchCondition,
+                    aggregateCondition,
+                    this.metricName,
+                    this.sortOptions,
+                    this.sortFunctionTypes,
+                    this.sortFields,
+                    this.top);
             } else {
                 return new GenericInMemoryAggregateQuery(this.serviceName,
-                        this.searchCondition,
-                        aggregateCondition,
-                        this.metricName,
-                        this.sortOptions,
-                        this.sortFunctionTypes,
-                        this.sortFields,
-                        this.top);
+                    this.searchCondition,
+                    aggregateCondition,
+                    this.metricName,
+                    this.sortOptions,
+                    this.sortFunctionTypes,
+                    this.sortFields,
+                    this.top);
             }
         } else {
             if (LOG.isDebugEnabled()) {

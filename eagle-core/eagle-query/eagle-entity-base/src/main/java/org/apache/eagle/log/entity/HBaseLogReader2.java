@@ -28,59 +28,60 @@ import java.util.Date;
 import java.util.List;
 
 public class HBaseLogReader2 extends AbstractHBaseLogReader<InternalLog> {
-	protected ResultScanner rs;
+    protected ResultScanner rs;
 
-	public HBaseLogReader2(EntityDefinition ed, List<String> partitions, Date startTime, Date endTime, Filter filter, String lastScanKey, byte[][] outputQualifiers) {
-		super(ed, partitions, startTime, endTime, filter, lastScanKey, outputQualifiers);
-	}
+    public HBaseLogReader2(EntityDefinition ed, List<String> partitions, Date startTime, Date endTime, Filter filter, String lastScanKey, byte[][] outputQualifiers) {
+        super(ed, partitions, startTime, endTime, filter, lastScanKey, outputQualifiers);
+    }
 
-	/**
-	 * This constructor supports partition.
-	 *
-	 * @param ed               entity definition
-	 * @param partitions       partition values, which is sorted in partition definition order. TODO: in future we need to support
-	 *                         multiple values for one partition field
-	 * @param startTime        start time of the query
-	 * @param endTime          end time of the query
-	 * @param filter           filter for the hbase scan
-	 * @param lastScanKey      the key of last scan
-	 * @param outputQualifiers the bytes of output qualifier names
-	 * @param prefix           can be populated from outside world specifically for generic metric reader
-	 */
-	public HBaseLogReader2(EntityDefinition ed, List<String> partitions, Date startTime, Date endTime, Filter filter, String lastScanKey, byte[][] outputQualifiers, String prefix) {
-		super(ed, partitions, startTime, endTime, filter, lastScanKey, outputQualifiers, prefix);
-	}
+    /**
+     * This constructor supports partition.
+     *
+     * @param ed               entity definition
+     * @param partitions       partition values, which is sorted in partition definition order. TODO: in future we need to support
+     *                         multiple values for one partition field
+     * @param startTime        start time of the query
+     * @param endTime          end time of the query
+     * @param filter           filter for the hbase scan
+     * @param lastScanKey      the key of last scan
+     * @param outputQualifiers the bytes of output qualifier names
+     * @param prefix           can be populated from outside world specifically for generic metric reader
+     */
+    public HBaseLogReader2(EntityDefinition ed, List<String> partitions, Date startTime, Date endTime, Filter filter, String lastScanKey, byte[][] outputQualifiers, String prefix) {
+        super(ed, partitions, startTime, endTime, filter, lastScanKey, outputQualifiers, prefix);
+    }
 
-	@Override
-	protected void onOpen(HTableInterface tbl, Scan scan) throws IOException {
-		rs = tbl.getScanner(scan);
-	}
+    @Override
+    protected void onOpen(HTableInterface tbl, Scan scan) throws IOException {
+        rs = tbl.getScanner(scan);
+    }
 
-	/**
-	 * <h2>Close:</h2>
-	 * 1. Call super.close(): release current table connection <br></br>
-	 * 2. Close Scanner<br></br>
-	 *
-	 * @throws IOException
-	 */
-	@Override
-	public void close() throws IOException {
-		super.close();
-		if(rs != null){
-			rs.close();
-		}
-	}
+    /**
+     * <h2>Close:</h2>
+     * 1. Call super.close(): release current table connection
+     * 2. Close Scanner.
+     *
+     * @throws IOException
+     */
+    @Override
+    public void close() throws IOException {
+        super.close();
+        if (rs != null) {
+            rs.close();
+        }
+    }
 
-	@Override
-	public InternalLog read() throws IOException {
-		if (rs == null)
-			throw new IllegalArgumentException(
-					"ResultScanner must be initialized before reading");
-		InternalLog t = null;
-		Result r = rs.next();
-		if (r != null) {
-			t = HBaseInternalLogHelper.parse(_ed, r, qualifiers);
-		}
-		return t;
-	}
+    @Override
+    public InternalLog read() throws IOException {
+        if (rs == null) {
+            throw new IllegalArgumentException(
+                "ResultScanner must be initialized before reading");
+        }
+        InternalLog t = null;
+        Result r = rs.next();
+        if (r != null) {
+            t = HBaseInternalLogHelper.parse(entityDefinition, r, qualifiers);
+        }
+        return t;
+    }
 }

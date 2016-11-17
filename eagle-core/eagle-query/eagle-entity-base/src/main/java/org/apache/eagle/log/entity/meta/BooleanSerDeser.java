@@ -16,39 +16,37 @@
  */
 package org.apache.eagle.log.entity.meta;
 
-/**
- * @since : 7/3/14,2014
- */
 public class BooleanSerDeser implements EntitySerDeser<Boolean> {
 
-	public BooleanSerDeser(){}
+    public BooleanSerDeser() {
+    }
 
-	@Override
-	public Boolean deserialize(byte[] bytes){
-		if(bytes != null && bytes.length > 0){
-			if(bytes[0] == 0){
-				return false;
-			}else if(bytes[0] == 1){
-				return true;
-			}
-		}
-		return null;
-	}
+    @Override
+    public Boolean deserialize(byte[] bytes) {
+        if (bytes != null && bytes.length > 0) {
+            if (bytes[0] == 0) {
+                return false;
+            } else if (bytes[0] == 1) {
+                return true;
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public byte[] serialize(Boolean obj){
-		if(obj != null){
-			if(obj){
-				return new byte[]{1};
-			}else{
-				return new byte[]{0};
-			}
-		}
-		return null;
-	}
+    @Override
+    public byte[] serialize(Boolean obj) {
+        if (obj != null) {
+            if (obj) {
+                return new byte[] {1};
+            } else {
+                return new byte[] {0};
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public Class<Boolean> type() {
-		return Boolean.class;
-	}
+    @Override
+    public Class<Boolean> type() {
+        return Boolean.class;
+    }
 }

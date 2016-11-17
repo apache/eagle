@@ -26,19 +26,19 @@ public class TestDouble2DArraySerDeser {
     private Double2DArraySerDeser double2DArraySerDeser = new Double2DArraySerDeser();
 
     @Test
-    public void testSerDeser(){
-        double[][] data = new double[][]{
-                {0,1,2,4},
-                {4,2,1,0},
-                {4},
-                null,
-                {}
+    public void testSerDeser() {
+        double[][] data = new double[][] {
+            {0, 1, 2, 4},
+            {4, 2, 1, 0},
+            {4},
+            null,
+            {}
         };
 
         byte[] bytes = double2DArraySerDeser.serialize(data);
         double[][] data2 = double2DArraySerDeser.deserialize(bytes);
 
-        assert  data.length == data2.length;
+        assert data.length == data2.length;
         assert data[0].length == data2[0].length;
         assert data[1].length == data2[1].length;
         assert data[2].length == data2[2].length;

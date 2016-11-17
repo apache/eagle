@@ -22,14 +22,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class EagleServiceSingleEntityQueryRequest {
-	private String query;
-	private String startRowkey;
-	private int pageSize;
-	private long startTime;
-	private long endTime;
-	private boolean treeAgg;
-	private String metricName;
-	private boolean filterIfMissing;
+    private String query;
+    private String startRowkey;
+    private int pageSize;
+    private long startTime;
+    private long endTime;
+    private boolean treeAgg;
+    private String metricName;
+    private boolean filterIfMissing;
 
     public boolean isVerbose() {
         return verbose;
@@ -40,129 +40,132 @@ public class EagleServiceSingleEntityQueryRequest {
     }
 
     private boolean verbose;
-	
-	public String getMetricName() {
-		return metricName;
-	}
 
-	public void setMetricName(String metricName) {
-		this.metricName = metricName;
-	}
+    public String getMetricName() {
+        return metricName;
+    }
 
-	public String getQuery() {
-		return query;
-	}
+    public void setMetricName(String metricName) {
+        this.metricName = metricName;
+    }
 
-	public void setQuery(String query) {
-		this.query = query;
-	}
+    public String getQuery() {
+        return query;
+    }
 
-	public String getStartRowkey() {
-		return startRowkey;
-	}
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
-	public void setStartRowkey(String startRowkey) {
-		this.startRowkey = startRowkey;
-	}
+    public String getStartRowkey() {
+        return startRowkey;
+    }
 
-	public boolean isTreeAgg() {
-		return treeAgg;
-	}
+    public void setStartRowkey(String startRowkey) {
+        this.startRowkey = startRowkey;
+    }
 
-	public void setTreeAgg(boolean treeAgg) {
-		this.treeAgg = treeAgg;
-	}
+    public boolean isTreeAgg() {
+        return treeAgg;
+    }
 
-	public long getStartTime() {
-		return startTime;
-	}
+    public void setTreeAgg(boolean treeAgg) {
+        this.treeAgg = treeAgg;
+    }
 
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
+    public long getStartTime() {
+        return startTime;
+    }
 
-	public long getEndTime() {
-		return endTime;
-	}
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
-	}
+    public long getEndTime() {
+        return endTime;
+    }
 
-	public int getPageSize() {
-		return pageSize;
-	}
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
 
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-	
-	public boolean getFilterIfMissing() {
-		return filterIfMissing;
-	}
+    public int getPageSize() {
+        return pageSize;
+    }
 
-	public void setFilterIfMissing(boolean filterIfMissing) {
-		this.filterIfMissing = filterIfMissing;
-	}
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
 
-	public String getQueryParameterString() throws EagleServiceClientException {
-		if (pageSize < 0) {
-			throw new EagleServiceClientException("pageSize can't be less than 0, pageSize: " + pageSize);
-		}
+    public boolean getFilterIfMissing() {
+        return filterIfMissing;
+    }
 
-		// startTime and endTime is optional
-		
-		final StringBuilder sb = new StringBuilder();
-		// query
-//        try {
-//            sb.append("query=").append(URLEncoder.encode(query,"UTF-8"));
-            sb.append("query=").append(query);
-//        } catch (UnsupportedEncodingException e) {
-//            throw new EagleServiceClientException(e);
-//        }
+    public void setFilterIfMissing(boolean filterIfMissing) {
+        this.filterIfMissing = filterIfMissing;
+    }
+
+    public String getQueryParameterString() throws EagleServiceClientException {
+        if (pageSize < 0) {
+            throw new EagleServiceClientException("pageSize can't be less than 0, pageSize: " + pageSize);
+        }
+
+        // startTime and endTime is optional
+
+        final StringBuilder sb = new StringBuilder();
+        // query
+        // try {
+        // sb.append("query=").append(URLEncoder.encode(query,"UTF-8"));
+        sb.append("query=").append(query);
+        // catch (UnsupportedEncodingException e) {
+        // throw new EagleServiceClientException(e);
+        // }
 
         // startRowkey
-		if (startRowkey != null) {
-			sb.append("&startRowkey=").append(startRowkey);
-		}
-		// pageSize
-		sb.append("&pageSize=").append(this.pageSize);
-		if (startTime !=0 || endTime != 0) {
-			Date date = new Date(startTime);
-			SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
+        if (startRowkey != null) {
+            sb.append("&startRowkey=").append(startRowkey);
+        }
+        // pageSize
+        sb.append("&pageSize=").append(this.pageSize);
+        if (startTime != 0 || endTime != 0) {
+            Date date = new Date(startTime);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
             dateFormatter.setTimeZone(EagleConfigFactory.load().getTimeZone());
-			String timeString = dateFormatter.format(date);
-			sb.append("&startTime=").append(timeString);
-			date.setTime(endTime);
-			timeString = dateFormatter.format(date);
-			sb.append("&endTime=").append(timeString);
-		}
-		// tree aggregate
-		sb.append("&treeAgg=").append(treeAgg);
-		
-		// for metric read
-		if(metricName != null){
-			sb.append("&metricName=").append(metricName);
-		}
-		
-		if (filterIfMissing == true) { 
-			sb.append("&filterIfMissing=").append("true");
-		}
-		return sb.toString();
-	}
+            String timeString = dateFormatter.format(date);
+            sb.append("&startTime=").append(timeString);
+            date.setTime(endTime);
+            timeString = dateFormatter.format(date);
+            sb.append("&endTime=").append(timeString);
+        }
+        // tree aggregate
+        sb.append("&treeAgg=").append(treeAgg);
 
-    public static Builder build(){
+        // for metric read
+        if (metricName != null) {
+            sb.append("&metricName=").append(metricName);
+        }
+
+        if (filterIfMissing == true) {
+            sb.append("&filterIfMissing=").append("true");
+        }
+        return sb.toString();
+    }
+
+    public static Builder build() {
         return new Builder();
     }
 
-    public static class Builder{
+    public static class Builder {
         private final EagleServiceSingleEntityQueryRequest rawQuery;
-        public Builder(){
-            this.rawQuery= new EagleServiceSingleEntityQueryRequest();
+
+        public Builder() {
+            this.rawQuery = new EagleServiceSingleEntityQueryRequest();
         }
-        public EagleServiceSingleEntityQueryRequest done(){
+
+        public EagleServiceSingleEntityQueryRequest done() {
             return this.rawQuery;
         }
+
         public Builder query(String query) {
             this.rawQuery.setQuery(query);
             return this;

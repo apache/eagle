@@ -19,8 +19,8 @@ package org.apache.eagle.query.aggregate.raw;
 import org.junit.Test;
 
 public class TestRawHBaseLogReaderAndAgg {
-	@Test
-	public void testRawReaderAndAgg(){
-		
-	}
+    @Test
+    public void testRawReaderAndAgg() {
+
+    }
 }

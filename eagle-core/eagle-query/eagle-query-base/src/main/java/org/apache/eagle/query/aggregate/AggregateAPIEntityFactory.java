@@ -17,5 +17,5 @@
 package org.apache.eagle.query.aggregate;
 
 public interface AggregateAPIEntityFactory {
-	public AggregateAPIEntity create();
+    public AggregateAPIEntity create();
 }

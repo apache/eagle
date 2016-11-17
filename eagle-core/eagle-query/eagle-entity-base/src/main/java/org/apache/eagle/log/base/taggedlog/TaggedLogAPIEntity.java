@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.log.base.taggedlog;
 
-import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
-
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -28,6 +25,8 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
     // track what qualifiers are changed
     private Set<String> modifiedProperties = new HashSet<String>();
     protected PropertyChangeSupport pcs
-            = new PropertyChangeSupport(this);
+        = new PropertyChangeSupport(this);
 
 
     public Map<String, String> getSerializeAlias() {
@@ -197,7 +196,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
                 String writerName = writer.getName();
                 if (modified.contains(writerName) || basePropertyNames.contains(writerName)) {
                     if ((!entity.isSerializeVerbose() && verboseFields.contains(writerName))
-                            || (timestamp.equals(writerName) && !EntityDefinitionManager.isTimeSeries(entity.getClass()))) {
+                        || (timestamp.equals(writerName) && !EntityDefinitionManager.isTimeSeries(entity.getClass()))) {
                         // log skip
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("skip field");

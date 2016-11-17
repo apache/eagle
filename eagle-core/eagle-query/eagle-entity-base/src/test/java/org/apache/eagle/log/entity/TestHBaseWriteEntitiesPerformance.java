@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.log.entity;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;
 import org.junit.*;
-import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
         int wroteCount = 0;
         List<String> rowkeys = new ArrayList<String>();
         List<TestLogAPIEntity> list = new ArrayList<TestLogAPIEntity>();
-        for (int i = 0 ; i <= count;i++) {
+        for (int i = 0; i <= count; i++) {
             TestLogAPIEntity e = new TestLogAPIEntity();
             e.setTimestamp(new Date().getTime());
             e.setField1(i);
@@ -87,14 +87,16 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
             e.getTags().put("class", e.toString());
             list.add(e);
 
-            if ( list.size() >= 1000) {
+            if (list.size() >= 1000) {
                 try {
                     StopWatch watch = new StopWatch();
                     watch.start();
                     rowkeys.addAll(writer.write(list));
                     watch.stop();
                     wroteCount += list.size();
-                    if (LOG.isDebugEnabled()) LOG.debug("Wrote "+wroteCount+" / "+count+" entities"+" in "+watch.getTime()+" ms");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Wrote " + wroteCount + " / " + count + " entities" + " in " + watch.getTime() + " ms");
+                    }
                     list.clear();
                 } catch (Exception e1) {
                     Assert.fail(e1.getMessage());
@@ -105,11 +107,15 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
         try {
             rowkeys.addAll(writer.write(list));
             wroteCount += list.size();
-            if (LOG.isDebugEnabled()) LOG.debug("wrote "+wroteCount+" / "+count+" entities");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("wrote " + wroteCount + " / " + count + " entities");
+            }
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
-        if (LOG.isDebugEnabled()) LOG.debug("done "+count+" entities");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("done " + count + " entities");
+        }
         return rowkeys;
     }
 

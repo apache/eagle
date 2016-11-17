@@ -16,63 +16,62 @@
  */
 package org.apache.eagle.log.entity.old;
 
+import org.apache.eagle.common.EagleBase64Wrapper;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.base.taggedlog.TaggedLogObjectMapper;
+import org.apache.eagle.log.entity.InternalLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.eagle.log.base.taggedlog.TaggedLogObjectMapper;
-import org.apache.eagle.log.entity.InternalLog;
-import org.apache.eagle.common.EagleBase64Wrapper;
-
 public class GenericByRowkeyReader {
-	private static final Logger LOG = LoggerFactory.getLogger(GenericByRowkeyReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenericByRowkeyReader.class);
 
-	private TaggedLogObjectMapper mapper;
-	private String table;
-	private String columnFamily;
-	private boolean outputAll;
-	private List<String> outputColumns;
-	private GenericReader.EntityFactory entityFactory;
-	
-	public GenericByRowkeyReader(TaggedLogObjectMapper mapper, GenericReader.EntityFactory entityFactory, String table, String columnFamily, boolean outputAll, List<String> outputColumns){
-		this.mapper = mapper;
-		this.entityFactory = entityFactory;
-		this.table = table;
-		this.columnFamily = columnFamily;
-		this.outputAll = outputAll;
-		this.outputColumns = outputColumns;
-	}
-	
-	public List<TaggedLogAPIEntity> read(List<String> rowkeys) throws IOException{
-		HBaseLogByRowkeyReader reader = new HBaseLogByRowkeyReader(this.table, this.columnFamily, 
-				outputAll, outputColumns);
-		List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
-		try{
-			reader.open();
-			for(String rowkeyString : rowkeys){
-				byte[] rowkey = EagleBase64Wrapper.decode(rowkeyString);
-				InternalLog log = reader.get(rowkey);
-				TaggedLogAPIEntity entity = entityFactory.create();
-				entities.add(entity);
-				entity.setTags(log.getTags());
-				entity.setTimestamp(log.getTimestamp());
-				entity.setEncodedRowkey(log.getEncodedRowkey());
-				entity.setPrefix(log.getPrefix());
-				Map<String, byte[]> qualifierValues = log.getQualifierValues();
-				mapper.populateQualifierValues(entity, qualifierValues);
-			}
-		}catch(IOException ex){
-			LOG.error("Fail read by rowkey", ex);
-			throw ex;
-		}finally{
-			reader.close();
-		}
-		
-		return entities;
-	}
+    private TaggedLogObjectMapper mapper;
+    private String table;
+    private String columnFamily;
+    private boolean outputAll;
+    private List<String> outputColumns;
+    private GenericReader.EntityFactory entityFactory;
+
+    public GenericByRowkeyReader(TaggedLogObjectMapper mapper, GenericReader.EntityFactory entityFactory, String table, String columnFamily, boolean outputAll, List<String> outputColumns) {
+        this.mapper = mapper;
+        this.entityFactory = entityFactory;
+        this.table = table;
+        this.columnFamily = columnFamily;
+        this.outputAll = outputAll;
+        this.outputColumns = outputColumns;
+    }
+
+    public List<TaggedLogAPIEntity> read(List<String> rowkeys) throws IOException {
+        HBaseLogByRowkeyReader reader = new HBaseLogByRowkeyReader(this.table, this.columnFamily,
+            outputAll, outputColumns);
+        List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
+        try {
+            reader.open();
+            for (String rowkeyString : rowkeys) {
+                byte[] rowkey = EagleBase64Wrapper.decode(rowkeyString);
+                InternalLog log = reader.get(rowkey);
+                TaggedLogAPIEntity entity = entityFactory.create();
+                entities.add(entity);
+                entity.setTags(log.getTags());
+                entity.setTimestamp(log.getTimestamp());
+                entity.setEncodedRowkey(log.getEncodedRowkey());
+                entity.setPrefix(log.getPrefix());
+                Map<String, byte[]> qualifierValues = log.getQualifierValues();
+                mapper.populateQualifierValues(entity, qualifierValues);
+            }
+        } catch (IOException ex) {
+            LOG.error("Fail read by rowkey", ex);
+            throw ex;
+        } finally {
+            reader.close();
+        }
+
+        return entities;
+    }
 }

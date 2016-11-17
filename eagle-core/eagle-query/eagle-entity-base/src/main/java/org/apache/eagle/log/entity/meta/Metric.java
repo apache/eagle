@@ -21,9 +21,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target( {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Metric {
-	// interval with million seconds
-	long interval() default 60000;
+    // interval with million seconds
+    long interval() default 60000;
 }

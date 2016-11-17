@@ -21,12 +21,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target( {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Index {
 
     public String name();
+
     public String[] columns();
+
     public boolean unique();
-//	boolean unique() default true;
+    // boolean unique() default true;
 }

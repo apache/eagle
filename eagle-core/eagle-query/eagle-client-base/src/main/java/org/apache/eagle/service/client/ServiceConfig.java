@@ -21,7 +21,7 @@ package org.apache.eagle.service.client;
 
 import java.io.Serializable;
 
-public class ServiceConfig implements Serializable{
+public class ServiceConfig implements Serializable {
     public String serviceHost;
     public Integer servicePort;
     public String username;

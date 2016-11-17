@@ -20,40 +20,43 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum SortFieldOrderType {
-	key("^(key)=(asc|desc)$"),
-	count("^(count)=(asc|desc)$"),
-	sum("^sum\\((.*)\\)=(asc|desc)$"),
-	avg("^avg\\((.*)\\)(asc|desc)$"),
-	max("^max\\((.*)\\)(asc|desc)$"),
-	min("^min\\((.*)\\)(asc|desc)$");
-	
-	private Pattern pattern;
-	private SortFieldOrderType(String patternString){
-		this.pattern = Pattern.compile(patternString);
-	}
+    key("^(key)=(asc|desc)$"),
+    count("^(count)=(asc|desc)$"),
+    sum("^sum\\((.*)\\)=(asc|desc)$"),
+    avg("^avg\\((.*)\\)(asc|desc)$"),
+    max("^max\\((.*)\\)(asc|desc)$"),
+    min("^min\\((.*)\\)(asc|desc)$");
 
-	/**
-	 * This method is thread safe
-	 * match and retrieve back the aggregated fields, for count, aggregateFields can be null
-	 * @param sortFieldOrder
-	 * @return
-	 */
-	public SortFieldOrderTypeMatcher matcher(String sortFieldOrder){
-		Matcher m = pattern.matcher(sortFieldOrder);
-		
-		if(m.find()){
-			return new SortFieldOrderTypeMatcher(true, m.group(1), m.group(2));
-		}else{
-			return new SortFieldOrderTypeMatcher(false, null, null);
-		}
-	}
-	
-	public static AggregateParams.SortFieldOrder matchAll(String sortFieldOrder){
-		for(SortFieldOrderType type : SortFieldOrderType.values()){
-			SortFieldOrderTypeMatcher m = type.matcher(sortFieldOrder);
-			if(m.find())
-				return m.sortFieldOrder();
-		}
-		return null;
-	}
+    private Pattern pattern;
+
+    private SortFieldOrderType(String patternString) {
+        this.pattern = Pattern.compile(patternString);
+    }
+
+    /**
+     * This method is thread safe
+     * match and retrieve back the aggregated fields, for count, aggregateFields can be null.
+     *
+     * @param sortFieldOrder
+     * @return
+     */
+    public SortFieldOrderTypeMatcher matcher(String sortFieldOrder) {
+        Matcher m = pattern.matcher(sortFieldOrder);
+
+        if (m.find()) {
+            return new SortFieldOrderTypeMatcher(true, m.group(1), m.group(2));
+        } else {
+            return new SortFieldOrderTypeMatcher(false, null, null);
+        }
+    }
+
+    public static AggregateParams.SortFieldOrder matchAll(String sortFieldOrder) {
+        for (SortFieldOrderType type : SortFieldOrderType.values()) {
+            SortFieldOrderTypeMatcher m = type.matcher(sortFieldOrder);
+            if (m.find()) {
+                return m.sortFieldOrder();
+            }
+        }
+        return null;
+    }
 }

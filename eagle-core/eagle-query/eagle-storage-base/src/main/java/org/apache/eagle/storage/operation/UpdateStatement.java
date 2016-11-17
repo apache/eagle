@@ -25,15 +25,12 @@ import org.apache.eagle.storage.result.ModifyResult;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @since 3/18/15
- */
 public class UpdateStatement implements Statement<ModifyResult<String>> {
     private final List<? extends TaggedLogAPIEntity> entities;
 
     private final EntityDefinition entityDefinition;
 
-    public UpdateStatement(List<? extends TaggedLogAPIEntity> entities,String serviceName){
+    public UpdateStatement(List<? extends TaggedLogAPIEntity> entities, String serviceName) {
         this.entities = entities;
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
@@ -44,13 +41,13 @@ public class UpdateStatement implements Statement<ModifyResult<String>> {
         }
     }
 
-    public UpdateStatement(List<? extends TaggedLogAPIEntity> entities,EntityDefinition entityDefinition){
+    public UpdateStatement(List<? extends TaggedLogAPIEntity> entities, EntityDefinition entityDefinition) {
         this.entities = entities;
         this.entityDefinition = entityDefinition;
     }
 
     @Override
     public ModifyResult<String> execute(DataStorage storage) throws IOException {
-        return storage.update(entities,this.entityDefinition);
+        return storage.update(entities, this.entityDefinition);
     }
 }

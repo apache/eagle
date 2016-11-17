@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.query.parser;
 
-public class EagleQueryParseException extends Exception{
-	private static final long serialVersionUID = -8440811651318471641L;
+public class EagleQueryParseException extends Exception {
+    private static final long serialVersionUID = -8440811651318471641L;
 
-	public EagleQueryParseException(String message){
-		super(message);
-	}
+    public EagleQueryParseException(String message) {
+        super(message);
+    }
 
-	public EagleQueryParseException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public EagleQueryParseException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -22,13 +22,11 @@ import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 
 /**
  * Default Eagle framework entity repository class.
- * 
- *
  */
 public class DefaultEntityRepository extends EntityRepository {
-	public DefaultEntityRepository() {
-		entitySet.add(MetricMetadataEntity.class);
-		entitySet.add(TestLogAPIEntity.class);
-		entitySet.add(TestTimeSeriesAPIEntity.class);
-	}
+    public DefaultEntityRepository() {
+        entitySet.add(MetricMetadataEntity.class);
+        entitySet.add(TestLogAPIEntity.class);
+        entitySet.add(TestTimeSeriesAPIEntity.class);
+    }
 }

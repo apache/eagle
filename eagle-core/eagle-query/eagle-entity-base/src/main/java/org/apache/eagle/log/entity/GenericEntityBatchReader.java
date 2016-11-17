@@ -23,36 +23,41 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericEntityBatchReader implements EntityCreationListener{
-	private static final Logger LOG = LoggerFactory.getLogger(GenericEntityBatchReader.class);
-	
-	private List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
-	private StreamReader reader;
-	
-	public GenericEntityBatchReader(String serviceName, SearchCondition condition) throws InstantiationException, IllegalAccessException{
-		reader = new GenericEntityStreamReader(serviceName, condition);
-		reader.register(this);
-	}
-	
-	public GenericEntityBatchReader(StreamReader reader) throws InstantiationException, IllegalAccessException{
-		this.reader = reader;
-		reader.register(this);
-	}
-	
-	public long getLastTimestamp() {
-		return reader.getLastTimestamp();
-	}
-	public long getFirstTimestamp(){ return reader.getFirstTimestamp();}
-	
-	@Override
-	public void entityCreated(TaggedLogAPIEntity entity){
-		entities.add(entity);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> List<T> read() throws Exception{
-		if(LOG.isDebugEnabled()) LOG.debug("Start reading as batch mode");
-		reader.readAsStream();
-		return (List<T>)entities;
-	}
+public class GenericEntityBatchReader implements EntityCreationListener {
+    private static final Logger LOG = LoggerFactory.getLogger(GenericEntityBatchReader.class);
+
+    private List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
+    private StreamReader reader;
+
+    public GenericEntityBatchReader(String serviceName, SearchCondition condition) throws InstantiationException, IllegalAccessException {
+        reader = new GenericEntityStreamReader(serviceName, condition);
+        reader.register(this);
+    }
+
+    public GenericEntityBatchReader(StreamReader reader) throws InstantiationException, IllegalAccessException {
+        this.reader = reader;
+        reader.register(this);
+    }
+
+    public long getLastTimestamp() {
+        return reader.getLastTimestamp();
+    }
+
+    public long getFirstTimestamp() {
+        return reader.getFirstTimestamp();
+    }
+
+    @Override
+    public void entityCreated(TaggedLogAPIEntity entity) {
+        entities.add(entity);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> List<T> read() throws Exception {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start reading as batch mode");
+        }
+        reader.readAsStream();
+        return (List<T>) entities;
+    }
 }

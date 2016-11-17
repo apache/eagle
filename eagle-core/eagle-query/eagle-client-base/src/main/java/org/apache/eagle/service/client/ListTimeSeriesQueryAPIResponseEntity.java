@@ -16,69 +16,82 @@
  */
 package org.apache.eagle.service.client;
 
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
+
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-
-@JsonPropertyOrder({ "success", "exception", "elapsems", "totalResults", "elapsedms", "obj" })
+@JsonPropertyOrder( {"success", "exception", "elapsems", "totalResults", "elapsedms", "obj"})
 public class ListTimeSeriesQueryAPIResponseEntity {
 
-	private boolean success;
-	private String exception;
-	private int totalResults;
-	private long elapsedms;
-	private List<Entry> obj;
+    private boolean success;
+    private String exception;
+    private int totalResults;
+    private long elapsedms;
+    private List<Entry> obj;
 
-	public long getElapsedms() {
-		return elapsedms;
-	}
-	public void setElapsedms(long elapsedms) {
-		this.elapsedms = elapsedms;
-	}
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
-	public int getTotalResults() {
-		return totalResults;
-	}
-	public void setTotalResults(int totalResults) {
-		this.totalResults = totalResults;
-	}
-	public List<Entry> getObj() {
-		return obj;
-	}
-	public void setObj(List<Entry> obj) {
-		this.obj = obj;
-	}
-	
-	public static class Entry implements Map.Entry<List<String>, List<double[]>> {
+    public long getElapsedms() {
+        return elapsedms;
+    }
 
-		private List<String> key;
-		private List<double[]> value;
-		public List<String> getKey() {
-			return key;
-		}
-		public void setKey(List<String> key) {
-			this.key = key;
-		}
-		public List<double[]> getValue() {
-			return value;
-		}
-		@Override
-		public List<double[]> setValue(List<double[]> value) {
-			List<double[]> old = this.value;
-			this.value = value;
-			return old;
-		}
-	}
+    public void setElapsedms(long elapsedms) {
+        this.elapsedms = elapsedms;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
+    public int getTotalResults() {
+        return totalResults;
+    }
+
+    public void setTotalResults(int totalResults) {
+        this.totalResults = totalResults;
+    }
+
+    public List<Entry> getObj() {
+        return obj;
+    }
+
+    public void setObj(List<Entry> obj) {
+        this.obj = obj;
+    }
+
+    public static class Entry implements Map.Entry<List<String>, List<double[]>> {
+
+        private List<String> key;
+        private List<double[]> value;
+
+        public List<String> getKey() {
+            return key;
+        }
+
+        public void setKey(List<String> key) {
+            this.key = key;
+        }
+
+        public List<double[]> getValue() {
+            return value;
+        }
+
+        @Override
+        public List<double[]> setValue(List<double[]> value) {
+            List<double[]> old = this.value;
+            this.value = value;
+            return old;
+        }
+    }
 }

@@ -17,74 +17,82 @@
 
 package org.apache.eagle.audit.dao;
 
-import java.util.List;
-
 import org.apache.eagle.audit.entity.GenericAuditEntity;
+
+import java.util.List;
 
 public interface ServiceAuditDAO {
 
-	/**
-	 * Retrieve all audits of alert definition for a specific site and data source.
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findPolicyAudit(String site, String dataSource) throws Exception;
+    /**
+     * Retrieve all audits of alert definition for a specific site and data source.
+     *
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findPolicyAudit(String site, String dataSource) throws Exception;
 
-	/**
-	 * Retrieve all audits of site definition for the given site.
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findSiteAudit(String site) throws Exception;
-	
-	/**
-	 * Retrieve all audits of datasource definition for the given data source.
-	 * @param dataSource
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findDataSourceAudit(String dataSource) throws Exception;
-	
-	/**
-	 * Retrieve all audits specific to a service.
-	 * @param serviceName
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findServiceAudit(String serviceName) throws Exception;
-	
-	/**
-	 * Retrieve all audits specific to a service and specific to a userID.
-	 * @param serviceName
-	 * @param userID
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findServiceAuditByUser(String serviceName, String userID) throws Exception;
-	
-	/**
-	 * Retrieve all audits specific to a service and specific to an action.
-	 * @param serviceName
-	 * @param action
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findServiceAuditByAction(String serviceName, String action) throws Exception;
-	
-	/**
-	 * Retrieve all audits specific to a user.
-	 * @param userID
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findUserServiceAudit(String userID) throws Exception;
-	
-	/**
-	 * Retrieve all audits specific to a user and specific to an action.
-	 * @param userID
-	 * @param action
-	 * @return
-	 * @throws Exception
-	 */
-	List<GenericAuditEntity> findUserServiceAuditByAction(String userID, String action) throws Exception;
+    /**
+     * Retrieve all audits of site definition for the given site.
+     *
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findSiteAudit(String site) throws Exception;
+
+    /**
+     * Retrieve all audits of datasource definition for the given data source.
+     *
+     * @param dataSource
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findDataSourceAudit(String dataSource) throws Exception;
+
+    /**
+     * Retrieve all audits specific to a service.
+     *
+     * @param serviceName
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findServiceAudit(String serviceName) throws Exception;
+
+    /**
+     * Retrieve all audits specific to a service and specific to a userID.
+     *
+     * @param serviceName
+     * @param userID
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findServiceAuditByUser(String serviceName, String userID) throws Exception;
+
+    /**
+     * Retrieve all audits specific to a service and specific to an action.
+     *
+     * @param serviceName
+     * @param action
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findServiceAuditByAction(String serviceName, String action) throws Exception;
+
+    /**
+     * Retrieve all audits specific to a user.
+     *
+     * @param userID
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findUserServiceAudit(String userID) throws Exception;
+
+    /**
+     * Retrieve all audits specific to a user and specific to an action.
+     *
+     * @param userID
+     * @param action
+     * @return
+     * @throws Exception
+     */
+    List<GenericAuditEntity> findUserServiceAuditByAction(String userID, String action) throws Exception;
 }

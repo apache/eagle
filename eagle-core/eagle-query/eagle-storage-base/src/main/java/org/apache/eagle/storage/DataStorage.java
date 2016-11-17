@@ -20,9 +20,9 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.operation.CompiledQuery;
+import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import org.apache.eagle.storage.operation.RawQuery;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,38 +30,38 @@ import java.util.List;
 /**
  * Eagle DataStorage Interface
  *
- * Interface description:
+ * <p>Interface description:
  * 1) TaggedLogAPIEntity (Why not InternalLog: it's deeply hbase specific and all values are converted to byte[] which is unnecessary for other database like mysql)
  * 2) EntityDefinition
- * 3) Assume all ID are in type of String like encoded rowkey to hbase and UUID for RDBMS
+ * 3) Assume all ID are in type of String like encoded rowkey to hbase and UUID for RDBMS.
  *
  * @since 3/18/15
  */
 public interface DataStorage<I> {
 
     /**
-     * Initialize when data storage is created
+     * Initialize when data storage is created.
      *
      * @throws IOException
      */
     void init() throws IOException;
 
     /**
-     * Execute update operation
+     * Execute update operation.
      *
      * @throws IOException
      */
     <E extends TaggedLogAPIEntity> ModifyResult<I> update(List<E> entities, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * Execute create operation
+     * Execute create operation.
      *
      * @throws IOException
      */
     <E extends TaggedLogAPIEntity> ModifyResult<I> create(List<E> entities, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * Execute delete operation by entities
+     * Execute delete operation by entities.
      *
      * @param entities
      * @return
@@ -70,38 +70,39 @@ public interface DataStorage<I> {
     <E extends TaggedLogAPIEntity> ModifyResult<I> delete(List<E> entities, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * Execute delete operation by entity ids
-     *
-     * @throws IOException
-     */
-    ModifyResult<I> deleteByID(List<I> ids, EntityDefinition entityDefinition) throws IOException;
-
-    /**
-     * Execute delete operation
+     * Execute delete operation.
      *
      * @throws IOException
      */
     ModifyResult<I> delete(CompiledQuery query, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * Execute query to return a list of results, may not always tagged entities
+     * Execute delete operation by entity ids.
+     *
+     * @throws IOException
+     */
+    ModifyResult<I> deleteByID(List<I> ids, EntityDefinition entityDefinition) throws IOException;
+
+    /**
+     * Execute query to return a list of results, may not always tagged entities.
      *
      * @throws IOException
      */
     <E extends Object> QueryResult<E> query(CompiledQuery query, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * Execute query to return a list of results
-     * @param ids id set
+     * Execute query to return a list of results.
+     *
+     * @param ids              id set
      * @param entityDefinition entity definition
-     * @param <E> result item type
+     * @param <E>              result item type
      * @return QueryResult object
      * @throws IOException
      */
     <E extends Object> QueryResult<E> queryById(List<I> ids, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * close data storage
+     * close data storage.
      *
      * @throws IOException
      */

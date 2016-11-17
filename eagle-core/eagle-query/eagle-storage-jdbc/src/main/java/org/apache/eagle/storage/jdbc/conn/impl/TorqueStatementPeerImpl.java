@@ -23,12 +23,10 @@ import org.apache.torque.adapter.IDMethod;
 import org.apache.torque.map.TableMap;
 import org.apache.torque.util.BasePeerImpl;
 
-/**
- * @since 3/29/15
- */
 public class TorqueStatementPeerImpl<T> implements StatementExecutor {
     private BasePeerImpl<T> basePeer;
-    public TorqueStatementPeerImpl(){
+
+    public TorqueStatementPeerImpl() {
         this.basePeer = new BasePeerImpl<T>();
     }
 
@@ -40,7 +38,7 @@ public class TorqueStatementPeerImpl<T> implements StatementExecutor {
     @Override
     public void init(ConnectionConfig config, String tableName) {
         this.basePeer.setDatabaseName(config.getDatabaseName());
-        TableMap tableMap = new TableMap(tableName,null,null);
+        TableMap tableMap = new TableMap(tableName, null, null);
         tableMap.setPrimaryKeyMethodInfo(IDMethod.NO_ID_METHOD);
         this.basePeer.setTableMap(tableMap);
     }
@@ -52,7 +50,7 @@ public class TorqueStatementPeerImpl<T> implements StatementExecutor {
         return _primaryKeyBuilderInstance;
     }
 
-    public BasePeerImpl<T> delegate(){
+    public BasePeerImpl<T> delegate() {
         return this.basePeer;
     }
 }

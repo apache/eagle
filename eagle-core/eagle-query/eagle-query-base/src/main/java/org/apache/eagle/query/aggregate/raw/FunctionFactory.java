@@ -21,55 +21,55 @@ import org.apache.eagle.query.aggregate.AggregateFunctionType;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class FunctionFactory{
-	public abstract Function createFunction();
+public abstract class FunctionFactory {
+    public abstract Function createFunction();
 
-	public static class AvgFactory extends FunctionFactory {
-		@Override
-		public Function createFunction(){
-			return new Function.Avg();
-		}
-	}
+    public static class AvgFactory extends FunctionFactory {
+        @Override
+        public Function createFunction() {
+            return new Function.Avg();
+        }
+    }
 
-	public static class MaxFactory extends FunctionFactory {
-		@Override
-		public Function createFunction(){
-			return new Function.Max();
-		}
-	}
+    public static class MaxFactory extends FunctionFactory {
+        @Override
+        public Function createFunction() {
+            return new Function.Max();
+        }
+    }
 
-	public static class MinFactory extends FunctionFactory {
-		@Override
-		public Function createFunction(){
-			return new Function.Min();
-		}
-	}
+    public static class MinFactory extends FunctionFactory {
+        @Override
+        public Function createFunction() {
+            return new Function.Min();
+        }
+    }
 
-	public static class CountFactory extends FunctionFactory {
-		@Override
-		public Function createFunction(){
-			return new Function.Count();
-		}
-	}
+    public static class CountFactory extends FunctionFactory {
+        @Override
+        public Function createFunction() {
+            return new Function.Count();
+        }
+    }
 
-	public static class SumFactory extends FunctionFactory {
-		@Override
-		public Function createFunction(){
-			return new Function.Sum();
-		}
-	}
+    public static class SumFactory extends FunctionFactory {
+        @Override
+        public Function createFunction() {
+            return new Function.Sum();
+        }
+    }
 
-	public static FunctionFactory locateFunctionFactory(AggregateFunctionType funcType){
-		return _functionFactories.get(funcType.name());
-	}
+    public static FunctionFactory locateFunctionFactory(AggregateFunctionType funcType) {
+        return _functionFactories.get(funcType.name());
+    }
 
-	private static Map<String, FunctionFactory> _functionFactories = new HashMap<String, FunctionFactory>();
-	static{
-		_functionFactories.put(AggregateFunctionType.count.name(), new CountFactory());
-		_functionFactories.put(AggregateFunctionType.sum.name(), new SumFactory());
-		_functionFactories.put(AggregateFunctionType.min.name(), new MinFactory());
-		_functionFactories.put(AggregateFunctionType.max.name(), new MaxFactory());
-		_functionFactories.put(AggregateFunctionType.avg.name(), new AvgFactory());
-	}
+    private static Map<String, FunctionFactory> _functionFactories = new HashMap<String, FunctionFactory>();
+
+    static {
+        _functionFactories.put(AggregateFunctionType.count.name(), new CountFactory());
+        _functionFactories.put(AggregateFunctionType.sum.name(), new SumFactory());
+        _functionFactories.put(AggregateFunctionType.min.name(), new MinFactory());
+        _functionFactories.put(AggregateFunctionType.max.name(), new MaxFactory());
+        _functionFactories.put(AggregateFunctionType.avg.name(), new AvgFactory());
+    }
 }
-	

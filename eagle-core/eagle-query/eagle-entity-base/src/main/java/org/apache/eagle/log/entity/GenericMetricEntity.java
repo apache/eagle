@@ -22,32 +22,32 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * GenericMetricEntity should use prefix field which is extended from TaggedLogAPIEntity as metric name
- * metric name is used to partition the metric tables
+ * metric name is used to partition the metric tables.
  */
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eagle_metric")
 @ColumnFamily("f")
 @Prefix(GenericMetricEntity.GENERIC_METRIC_PREFIX_PLACE_HOLDER)
 @Service(GenericMetricEntity.GENERIC_METRIC_SERVICE)
 @TimeSeries(true)
-@Metric(interval=60000)
+@Metric(interval = 60000)
 @ServicePath(path = "/metric")
 // TODO:
-@Tags({"site","application","policyId","alertExecutorId", "streamName","source","partitionSeq"})
+@Tags( {"site", "application", "policyId", "alertExecutorId", "streamName", "source", "partitionSeq"})
 public class GenericMetricEntity extends TaggedLogAPIEntity {
-	public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
-	public static final String GENERIC_METRIC_PREFIX_PLACE_HOLDER = "GENERIC_METRIC_PREFIX_PLACEHODLER";
-	public static final String VALUE_FIELD ="value";
+    public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
+    public static final String GENERIC_METRIC_PREFIX_PLACE_HOLDER = "GENERIC_METRIC_PREFIX_PLACEHODLER";
+    public static final String VALUE_FIELD = "value";
 
-	@Column("a")
-	private double[] value;
+    @Column("a")
+    private double[] value;
 
-	public double[] getValue() {
-		return value;
-	}
+    public double[] getValue() {
+        return value;
+    }
 
-	public void setValue(double[] value) {
-		this.value = value;
-		pcs.firePropertyChange("value", null, null);
-	}
+    public void setValue(double[] value) {
+        this.value = value;
+        pcs.firePropertyChange("value", null, null);
+    }
 }

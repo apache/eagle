@@ -18,9 +18,6 @@ package org.apache.eagle.storage.result;
 
 import java.util.List;
 
-/**
- * @since 3/18/15
- */
 public class ModifyResult<I> extends Result {
     public List<I> getIdentifiers() {
         return identifiers;

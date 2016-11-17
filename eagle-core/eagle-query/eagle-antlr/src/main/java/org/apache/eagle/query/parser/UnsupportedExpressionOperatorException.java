@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.query.parser;
 
-public class UnsupportedExpressionOperatorException extends RuntimeException{
-	private static final long serialVersionUID = 565210592983703093L;
+public class UnsupportedExpressionOperatorException extends RuntimeException {
+    private static final long serialVersionUID = 565210592983703093L;
 
-	public UnsupportedExpressionOperatorException(String message){
-		super(message);
-	}
+    public UnsupportedExpressionOperatorException(String message) {
+        super(message);
+    }
 }

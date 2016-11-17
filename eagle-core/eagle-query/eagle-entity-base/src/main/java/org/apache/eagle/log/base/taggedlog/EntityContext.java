@@ -20,21 +20,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EntityContext {
-	private Map<String, Object> context;
+    private Map<String, Object> context;
 
-	public Map<String, Object> getContext() {
-		return context;
-	}
-	
-	public EntityContext() {
-		this.context = new HashMap<>();
-	}
-	
-	protected EntityContext(EntityContext context) {
-		this.context = new HashMap<>(context.context);
-	}
-	
-	public EntityContext cloneEntity() {
-		return new EntityContext(this);
-	}
+    public Map<String, Object> getContext() {
+        return context;
+    }
+
+    public EntityContext() {
+        this.context = new HashMap<>();
+    }
+
+    protected EntityContext(EntityContext context) {
+        this.context = new HashMap<>(context.context);
+    }
+
+    public EntityContext cloneEntity() {
+        return new EntityContext(this);
+    }
 }

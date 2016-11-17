@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.service.client.impl;
 
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
-import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.service.client.IEagleServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,63 +30,63 @@ import java.net.URLEncoder;
 public class SearchRequestBuilder {
     private final EagleServiceSingleEntityQueryRequest request;
     private final IEagleServiceClient client;
-    private final static Logger LOG = LoggerFactory.getLogger(SearchRequestBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SearchRequestBuilder.class);
 
     public SearchRequestBuilder(IEagleServiceClient client) {
         this.request = new EagleServiceSingleEntityQueryRequest();
         this.client = client;
     }
 
-    public SearchRequestBuilder query(String query){
+    public SearchRequestBuilder query(String query) {
         try {
-            this.request.setQuery(URLEncoder.encode(query,"UTF-8"));
+            this.request.setQuery(URLEncoder.encode(query, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
         }
         return this;
     }
 
-    public SearchRequestBuilder startRowkey(String startRowkey){
+    public SearchRequestBuilder startRowkey(String startRowkey) {
         this.request.setStartRowkey(startRowkey);
         return this;
     }
 
-    public SearchRequestBuilder pageSize(int pageSize){
+    public SearchRequestBuilder pageSize(int pageSize) {
         this.request.setPageSize(pageSize);
         return this;
     }
 
-    public SearchRequestBuilder startTime(long startTime){
+    public SearchRequestBuilder startTime(long startTime) {
         this.request.setStartTime(startTime);
         return this;
     }
 
-    public SearchRequestBuilder startTime(String startTime){
+    public SearchRequestBuilder startTime(String startTime) {
         this.request.setStartTime(DateTimeUtil.humanDateToMillisecondsWithoutException(startTime));
         return this;
     }
 
-    public SearchRequestBuilder endTime(long endTime){
+    public SearchRequestBuilder endTime(long endTime) {
         this.request.setEndTime(endTime);
         return this;
     }
 
-    public SearchRequestBuilder endTime(String endTime){
+    public SearchRequestBuilder endTime(String endTime) {
         this.request.setEndTime(DateTimeUtil.humanDateToMillisecondsWithoutException(endTime));
         return this;
     }
 
-    public SearchRequestBuilder treeAgg(boolean treeAgg){
+    public SearchRequestBuilder treeAgg(boolean treeAgg) {
         this.request.setTreeAgg(treeAgg);
         return this;
     }
 
-    public SearchRequestBuilder metricName(String metricName){
+    public SearchRequestBuilder metricName(String metricName) {
         this.request.setMetricName(metricName);
         return this;
     }
 
-    public SearchRequestBuilder filterIfMissing(Boolean filterIfMissing){
+    public SearchRequestBuilder filterIfMissing(Boolean filterIfMissing) {
         this.request.setFilterIfMissing(filterIfMissing);
         return this;
     }

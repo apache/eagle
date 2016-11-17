@@ -20,9 +20,6 @@ import org.apache.eagle.storage.jdbc.conn.PrimaryKeyBuilder;
 
 import java.util.UUID;
 
-/**
- * @since 3/29/15
- */
 public class UUIDPrimaryKeyBuilder implements PrimaryKeyBuilder<String> {
     @Override
     public <T> String build(T t) {

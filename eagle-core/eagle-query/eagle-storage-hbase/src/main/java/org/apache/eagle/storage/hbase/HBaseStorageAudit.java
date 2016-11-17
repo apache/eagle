@@ -17,8 +17,6 @@
 
 package org.apache.eagle.storage.hbase;
 
-import static org.apache.eagle.audit.common.AuditConstants.*;
-
 import org.apache.eagle.audit.common.AuditEvent;
 import org.apache.eagle.audit.entity.GenericAuditEntity;
 import org.apache.eagle.audit.listener.AuditListener;
@@ -29,7 +27,6 @@ import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.operation.CreateStatement;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -40,6 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.eagle.audit.common.AuditConstants.*;
 
 /**
  * Implementation of AuditListener class.

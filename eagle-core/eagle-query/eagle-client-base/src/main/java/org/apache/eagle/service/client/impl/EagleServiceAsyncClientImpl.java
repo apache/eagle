@@ -19,9 +19,9 @@ package org.apache.eagle.service.client.impl;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceAsyncClient;
-import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
+import org.apache.eagle.service.client.IEagleServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 
 public class EagleServiceAsyncClientImpl implements EagleServiceAsyncClient {
     private final IEagleServiceClient client;
-    private final static Logger LOG = LoggerFactory.getLogger(EagleServiceAsyncClientImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EagleServiceAsyncClientImpl.class);
 
     public EagleServiceAsyncClientImpl(IEagleServiceClient client) {
         this.client = client;
@@ -40,7 +40,9 @@ public class EagleServiceAsyncClientImpl implements EagleServiceAsyncClient {
 
     @Override
     public void close() throws IOException {
-        if(LOG.isDebugEnabled()) LOG.debug("Executor service is shutting down");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Executor service is shutting down");
+        }
         this.client.getJerseyClient().getExecutorService().shutdown();
     }
 
@@ -49,7 +51,7 @@ public class EagleServiceAsyncClientImpl implements EagleServiceAsyncClient {
         return this.client.getJerseyClient().getExecutorService().submit(new Callable<GenericServiceAPIResponseEntity<String>>() {
             @Override
             public GenericServiceAPIResponseEntity<String> call() throws Exception {
-                return client.create(entities,serviceName);
+                return client.create(entities, serviceName);
             }
         });
     }
@@ -59,7 +61,7 @@ public class EagleServiceAsyncClientImpl implements EagleServiceAsyncClient {
         return this.client.getJerseyClient().getExecutorService().submit(new Callable<GenericServiceAPIResponseEntity<String>>() {
             @Override
             public GenericServiceAPIResponseEntity<String> call() throws Exception {
-                return client.create(entities,entityClass);
+                return client.create(entities, entityClass);
             }
         });
     }
@@ -99,7 +101,7 @@ public class EagleServiceAsyncClientImpl implements EagleServiceAsyncClient {
         return this.client.getJerseyClient().getExecutorService().submit(new Callable<GenericServiceAPIResponseEntity<String>>() {
             @Override
             public GenericServiceAPIResponseEntity<String> call() throws Exception {
-                return client.create(entities,entityClass);
+                return client.create(entities, entityClass);
             }
         });
     }

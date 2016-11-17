@@ -16,61 +16,63 @@
  */
 package org.apache.eagle.query.aggregate.timeseries;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * only numeric aggregation is supported and number type supported is double
+ * only numeric aggregation is supported and number type supported is double.
  */
 public class TimeSeriesBucket {
-	private final static Logger LOG = LoggerFactory.getLogger(TimeSeriesBucket.class);
-	private long startTime;
-	private long endTime;
-	private long interval;
-	
-	// map of aggregation function to aggregated values 
-	List<double[]> aggregatedValues = new ArrayList<double[]>();
-	
-	// align from the startTime
-	/**
-	 * 
-	 * @param startTime milliseconds
-	 * @param endTime milliseconds
-	 * @param intervalMillseconds
-	 * @param aggFunctions
-	 */
-	public TimeSeriesBucket(long startTime, long endTime, long intervalms, int numAggFunctions){
-		int count =(int)((endTime-startTime)/intervalms);
-		for(int i=0; i<numAggFunctions; i++){
-			aggregatedValues.add(new double[count]);
-		}
-	}
-	
-	/**
-	 * add datapoint which has a list of values for different aggregate functions
-	 * for example, sum(numHosts), count(*), avg(timespan) etc
-	 * @param timestamp
-	 * @param values
-	 */
-	public void addDataPoint(long timestamp, List<Double> values){
-		// locate timeseries bucket
-		if(timestamp < startTime || timestamp > endTime){
-			LOG.warn("timestamp<startTime or timestamp>endTime, ignore this datapoint." + timestamp + "," + startTime + ":" + endTime);
-			return;
-		}
-		int located =(int)((timestamp - startTime)/interval);
-		int index = 0;
-		for(Double src : values){
-			double[] timeSeriesValues = aggregatedValues.get(index);
-			timeSeriesValues[located] += src;
-			index++;
-		}
-	}
-	
-	public List<double[]> aggregatedValues(){
-		return this.aggregatedValues;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(TimeSeriesBucket.class);
+    private long startTime;
+    private long endTime;
+    private long interval;
+
+    // map of aggregation function to aggregated values
+    List<double[]> aggregatedValues = new ArrayList<double[]>();
+
+    // align from the startTime
+
+    /**
+     * constructor.
+     * @param startTime           milliseconds
+     * @param endTime             milliseconds
+     * @param intervalMillseconds
+     * @param aggFunctions
+     */
+    public TimeSeriesBucket(long startTime, long endTime, long intervalms, int numAggFunctions) {
+        int count = (int) ((endTime - startTime) / intervalms);
+        for (int i = 0; i < numAggFunctions; i++) {
+            aggregatedValues.add(new double[count]);
+        }
+    }
+
+    /**
+     * add datapoint which has a list of values for different aggregate functions
+     * for example, sum(numHosts), count(*), avg(timespan) etc.
+     *
+     * @param timestamp
+     * @param values
+     */
+    public void addDataPoint(long timestamp, List<Double> values) {
+        // locate timeseries bucket
+        if (timestamp < startTime || timestamp > endTime) {
+            LOG.warn("timestamp<startTime or timestamp>endTime, ignore this datapoint." + timestamp + "," + startTime + ":" + endTime);
+            return;
+        }
+        int located = (int) ((timestamp - startTime) / interval);
+        int index = 0;
+        for (Double src : values) {
+            double[] timeSeriesValues = aggregatedValues.get(index);
+            timeSeriesValues[located] += src;
+            index++;
+        }
+    }
+
+    public List<double[]> aggregatedValues() {
+        return this.aggregatedValues;
+    }
 }

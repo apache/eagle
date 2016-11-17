@@ -24,13 +24,10 @@ import org.apache.eagle.storage.result.QueryResult;
 
 import java.io.IOException;
 
-/**
- * @since 3/18/15
- */
-public class QueryStatement implements Statement<QueryResult<?>>{
+public class QueryStatement implements Statement<QueryResult<?>> {
     private final RawQuery query;
 
-    public QueryStatement(RawQuery queryCondition){
+    public QueryStatement(RawQuery queryCondition) {
         this.query = queryCondition;
     }
 

@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * @since 3/20/15
  */
-public class TestHBaseStorageLoader  extends TestHBaseBase {
+public class TestHBaseStorageLoader extends TestHBaseBase {
     @Test
     public void testHBaseStorageLoader() throws IllegalDataStorageTypeException {
 

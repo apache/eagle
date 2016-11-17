@@ -17,8 +17,8 @@
 package org.apache.eagle.storage.jdbc.criteria.impl;
 
 import org.apache.eagle.log.entity.EntityQualifierUtils;
-import org.apache.eagle.storage.jdbc.criteria.CriterionBuilder;
 import org.apache.eagle.query.parser.*;
+import org.apache.eagle.storage.jdbc.criteria.CriterionBuilder;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.torque.ColumnImpl;
 import org.apache.torque.criteria.Criterion;
@@ -28,9 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-/**
- * @since 3/27/15
- */
 public class ExpressionCriterionBuilder implements CriterionBuilder {
     private final String tableName;
     private final ORExpression expression;
@@ -45,21 +42,21 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
     @Override
     public Criterion build() {
         Criterion orCriterion = null;
-        for(ANDExpression andExpression:expression.getANDExprList()){
+        for (ANDExpression andExpression : expression.getANDExprList()) {
             Criterion andCriterion = null;
-            for(AtomicExpression atomicExpression : andExpression.getAtomicExprList()){
+            for (AtomicExpression atomicExpression : andExpression.getAtomicExprList()) {
                 Criterion atomicCriterion = toAtomicCriterion(atomicExpression);
-                if(andCriterion == null){
+                if (andCriterion == null) {
                     andCriterion = atomicCriterion;
-                }else{
+                } else {
                     andCriterion = andCriterion.and(atomicCriterion);
                 }
             }
 
-            if(andCriterion!=null){
-                if(orCriterion == null){
+            if (andCriterion != null) {
+                if (orCriterion == null) {
                     orCriterion = andCriterion;
-                }else{
+                } else {
                     orCriterion = orCriterion.or(andCriterion);
                 }
             }
@@ -67,40 +64,41 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
         return orCriterion;
     }
 
-    private Criterion toAtomicCriterion(AtomicExpression atomic){
+    private Criterion toAtomicCriterion(AtomicExpression atomic) {
         Class<?> columnType = locateColumnType(atomic);
-        Object left = toColumn(atomic.getKeyType(), atomic.getKey(),atomic.getOp(),columnType);
-        Object right = toColumn(atomic.getValueType(), atomic.getValue(), atomic.getOp(),columnType);
+        Object left = toColumn(atomic.getKeyType(), atomic.getKey(), atomic.getOp(), columnType);
+        Object right = toColumn(atomic.getValueType(), atomic.getValue(), atomic.getOp(), columnType);
         SqlEnum op = toSqlEnum(atomic.getOp());
-        return new Criterion(left,right,op);
+        return new Criterion(left, right, op);
     }
 
     private Class<?> locateColumnType(AtomicExpression atomic) {
         String columnName = null;
-        if(atomic.getKeyType().equals(TokenType.ID)){
-            columnName =  parseEntityAttribute(atomic.getKey());
-        }else if(atomic.getValueType().equals(TokenType.ID)){
+        if (atomic.getKeyType().equals(TokenType.ID)) {
+            columnName = parseEntityAttribute(atomic.getKey());
+        } else if (atomic.getValueType().equals(TokenType.ID)) {
             columnName = parseEntityAttribute(atomic.getValue());
         }
-        if(jdbcEntityDefinition.getInternal().getDisplayNameMap().containsKey(columnName)){
+        if (jdbcEntityDefinition.getInternal().getDisplayNameMap().containsKey(columnName)) {
             try {
                 return jdbcEntityDefinition.getColumnType(columnName);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
-        }else{
+        } else {
             return null;
         }
     }
 
     /**
-     * this place is used for rewriting query for jdbc connection
+     * this place is used for rewriting query for jdbc connection.
+     *
      * @param tokenType
      * @param value
      * @param op
      * @return
      */
-    private Object toColumn(TokenType tokenType,String value,ComparisonOperator op, Class<?> columnType) {
+    private Object toColumn(TokenType tokenType, String value, ComparisonOperator op, Class<?> columnType) {
         if (op.equals(ComparisonOperator.CONTAINS) && tokenType.equals(TokenType.STRING)) {
             return "%" + value + "%";
         } else if (tokenType.equals(TokenType.ID)) {
@@ -110,17 +108,17 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
         } else if (tokenType.equals(TokenType.NUMBER)) {
             // TODO: currently only treat all number value as double
             // NOTE: Must use Number Object instead of primitive type
-            if(columnType.equals(Long.class) || columnType.equals(long.class)) {
+            if (columnType.equals(Long.class) || columnType.equals(long.class)) {
                 return Long.parseLong(value);
-            } else if(columnType.equals(int.class) || columnType.equals(Integer.class)){
+            } else if (columnType.equals(int.class) || columnType.equals(Integer.class)) {
                 return Integer.parseInt(value);
-            }else {
+            } else {
                 return Double.parseDouble(value);
             }
-        } else if (op.equals(ComparisonOperator.LIKE) && value.equals(".*")){
+        } else if (op.equals(ComparisonOperator.LIKE) && value.equals(".*")) {
             return "%";
-        } else{
-            if((boolean.class.equals(columnType) || Boolean.class.equals(columnType)) && value != null){
+        } else {
+            if ((boolean.class.equals(columnType) || Boolean.class.equals(columnType)) && value != null) {
                 return Boolean.valueOf(value);
             }
             // TODO: parse type according entity field type
@@ -128,24 +126,25 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
         }
     }
 
-    private SqlEnum toSqlEnum(ComparisonOperator op){
+    private SqlEnum toSqlEnum(ComparisonOperator op) {
         SqlEnum sqlEnum = _opSqlEnum.get(op);
-        if(sqlEnum == null){
-            throw new IllegalArgumentException("Failed to convert ComparisonOperator:"+op+" to SqlEnum");
+        if (sqlEnum == null) {
+            throw new IllegalArgumentException("Failed to convert ComparisonOperator:" + op + " to SqlEnum");
         }
         return sqlEnum;
     }
 
-    private static String parseEntityAttribute(String fieldName){
+    private static String parseEntityAttribute(String fieldName) {
         Matcher m = TokenConstant.ID_PATTERN.matcher(fieldName);
-        if(m.find()){
+        if (m.find()) {
             return m.group(1);
         }
         return fieldName;
     }
 
-    private final static Map<ComparisonOperator,SqlEnum> _opSqlEnum = new HashMap<ComparisonOperator,SqlEnum>();
-    static{
+    private static final Map<ComparisonOperator, SqlEnum> _opSqlEnum = new HashMap<ComparisonOperator, SqlEnum>();
+
+    static {
         _opSqlEnum.put(ComparisonOperator.CONTAINS, SqlEnum.LIKE);
         _opSqlEnum.put(ComparisonOperator.EQUAL, SqlEnum.EQUAL);
         _opSqlEnum.put(ComparisonOperator.NOT_EQUAL, SqlEnum.NOT_EQUAL);

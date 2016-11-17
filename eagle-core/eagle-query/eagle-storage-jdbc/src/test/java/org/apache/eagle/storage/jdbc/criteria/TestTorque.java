@@ -39,19 +39,19 @@ import java.util.UUID;
  * @since 3/27/15
  */
 public class TestTorque {
-    final static Logger LOG = LoggerFactory.getLogger(TestTorque.class);
+    static final Logger LOG = LoggerFactory.getLogger(TestTorque.class);
 
     //@Before
     public void setUp() throws TorqueException {
         Configuration configuration = new BaseConfiguration();
-        configuration.addProperty("torque.database.default","eagle");
-        configuration.addProperty("torque.database.eagle.adapter","mysql");
-        configuration.addProperty("torque.dsfactory.eagle.factory","org.apache.torque.dsfactory.SharedPoolDataSourceFactory");
+        configuration.addProperty("torque.database.default", "eagle");
+        configuration.addProperty("torque.database.eagle.adapter", "mysql");
+        configuration.addProperty("torque.dsfactory.eagle.factory", "org.apache.torque.dsfactory.SharedPoolDataSourceFactory");
 
-        configuration.addProperty("torque.dsfactory.eagle.connection.driver","org.gjt.mm.mysql.Driver");
-        configuration.addProperty("torque.dsfactory.eagle.connection.url","jdbc:mysql://localhost:3306/eagle");
-        configuration.addProperty("torque.dsfactory.eagle.connection.user","eagle");
-        configuration.addProperty("torque.dsfactory.eagle.connection.password","eagle");
+        configuration.addProperty("torque.dsfactory.eagle.connection.driver", "org.gjt.mm.mysql.Driver");
+        configuration.addProperty("torque.dsfactory.eagle.connection.url", "jdbc:mysql://localhost:3306/eagle");
+        configuration.addProperty("torque.dsfactory.eagle.connection.user", "eagle");
+        configuration.addProperty("torque.dsfactory.eagle.connection.password", "eagle");
 
         Torque.init(configuration);
     }
@@ -64,7 +64,7 @@ public class TestTorque {
         crit.addSelectColumn(new ColumnImpl("column2"));
         crit.addSelectColumn(new ColumnImpl("column2/100"));
 
-        crit.where(new ColumnImpl("column1"),SqlEnum.GREATER_EQUAL);
+        crit.where(new ColumnImpl("column1"), SqlEnum.GREATER_EQUAL);
 
         crit.addFrom("tableName");
         crit.addAlias("column1", "c1");
@@ -79,12 +79,12 @@ public class TestTorque {
 
         Connection connection = Torque.getConnection();
         PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1,1000);
+        statement.setInt(1, 1000);
 
         try {
             ResultSet result = statement.executeQuery();
-        }catch (SQLException ex){
-            LOG.warn(ex.getMessage(),ex);
+        } catch (SQLException ex) {
+            LOG.warn(ex.getMessage(), ex);
         } finally {
             connection.close();
         }
@@ -107,8 +107,8 @@ public class TestTorque {
         BasePeerImpl basePeer = new BasePeerImpl();
         basePeer.setDatabaseName("eagle");
         ColumnValues columnValues = new ColumnValues();
-        columnValues.put(new ColumnImpl("unittest_testtsentity","uuid"),new JdbcTypedValue(UUID.randomUUID().toString(),Types.VARCHAR));
-        columnValues.put(new ColumnImpl("unittest_testtsentity","field1"),new JdbcTypedValue(34,Types.INTEGER));
+        columnValues.put(new ColumnImpl("unittest_testtsentity", "uuid"), new JdbcTypedValue(UUID.randomUUID().toString(), Types.VARCHAR));
+        columnValues.put(new ColumnImpl("unittest_testtsentity", "field1"), new JdbcTypedValue(34, Types.INTEGER));
         basePeer.doInsert(columnValues);
     }
 

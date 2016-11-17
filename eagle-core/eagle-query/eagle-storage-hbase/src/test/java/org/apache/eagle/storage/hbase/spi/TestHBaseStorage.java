@@ -76,7 +76,7 @@ public class TestHBaseStorage extends TestHBaseBase {
         gc.set(2014, 1, 6, 1, 40, 12);
         gc.setTimeZone(TimeZone.getTimeZone("UTC"));
         baseTimestamp = gc.getTime().getTime();
-        LOG.info("timestamp: {}" , baseTimestamp);
+        LOG.info("timestamp: {}", baseTimestamp);
     }
 
     @Test

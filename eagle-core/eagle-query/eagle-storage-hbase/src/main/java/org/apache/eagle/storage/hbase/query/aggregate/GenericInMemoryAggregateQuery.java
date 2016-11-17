@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.hbase.query.aggregate;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.*;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
@@ -24,8 +25,6 @@ import org.apache.eagle.query.GenericQuery;
 import org.apache.eagle.query.aggregate.AggregateCondition;
 import org.apache.eagle.query.aggregate.AggregateFunctionType;
 import org.apache.eagle.query.aggregate.timeseries.*;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class GenericInMemoryAggregateQuery implements GenericQuery {
     public GenericInMemoryAggregateQuery(String serviceName, SearchCondition condition,
                                          AggregateCondition aggregateCondition, String metricName,
                                          List<SortOption> sortOptions, List<AggregateFunctionType> sortFunctionTypes, List<String> sortFields, int top)
-            throws InstantiationException, IllegalAccessException {
+        throws InstantiationException, IllegalAccessException {
         checkNotNull(serviceName, "serviceName");
         this.searchCondition = condition;
         this.entityDef = EntityDefinitionManager.getEntityByServiceName(serviceName);
@@ -175,7 +174,7 @@ public class GenericInMemoryAggregateQuery implements GenericQuery {
             }
             TimeSeriesAggregator tsAgg = new TimeSeriesAggregator(groupbyFields,
                 aggregateCondition.getAggregateFunctionTypes(), aggregateFields,
-                    DateTimeUtil.humanDateToDate(searchCondition.getStartTime()).getTime(),
+                DateTimeUtil.humanDateToDate(searchCondition.getStartTime()).getTime(),
                 DateTimeUtil.humanDateToDate(searchCondition.getEndTime()).getTime(), aggregateCondition.getIntervalMS());
             reader.register(tsAgg);
 

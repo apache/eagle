@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.storage.hbase;
 
-import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_CREATE;
-import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_DELETE;
-import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_UPDATE;
-
 import org.apache.eagle.common.EagleBase64Wrapper;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericEntityWriter;
@@ -34,7 +30,6 @@ import org.apache.eagle.storage.hbase.query.GenericQueryBuilder;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +38,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.eagle.audit.common.AuditConstants.*;
 
 public class HBaseStorage extends DataStorageBase {
 
@@ -128,15 +125,15 @@ public class HBaseStorage extends DataStorageBase {
         try {
             LOG.info("Querying for deleting: " + query);
             GenericQuery reader = GenericQueryBuilder
-                    .select(query.getSearchCondition().getOutputFields())
-                    .from(query.getServiceName(), query.getRawQuery().getMetricName()).where(query.getSearchCondition())
-                    .groupBy(query.isHasAgg(), query.getGroupByFields(), query.getAggregateFunctionTypes(), query.getAggregateFields())
-                    .timeSeries(query.getRawQuery().isTimeSeries(), query.getRawQuery().getIntervalmin())
-                    .treeAgg(query.getRawQuery().isTreeAgg())
-                    .orderBy(query.getSortOptions(), query.getSortFunctions(), query.getSortFields())
-                    .top(query.getRawQuery().getTop())
-                    .parallel(query.getRawQuery().getParallel())
-                    .build();
+                .select(query.getSearchCondition().getOutputFields())
+                .from(query.getServiceName(), query.getRawQuery().getMetricName()).where(query.getSearchCondition())
+                .groupBy(query.isHasAgg(), query.getGroupByFields(), query.getAggregateFunctionTypes(), query.getAggregateFields())
+                .timeSeries(query.getRawQuery().isTimeSeries(), query.getRawQuery().getIntervalmin())
+                .treeAgg(query.getRawQuery().isTreeAgg())
+                .orderBy(query.getSortOptions(), query.getSortFunctions(), query.getSortFields())
+                .top(query.getRawQuery().getTop())
+                .parallel(query.getRawQuery().getParallel())
+                .build();
             List<? extends TaggedLogAPIEntity> entities = reader.result();
             if (entities != null) {
                 LOG.info("Deleting " + entities.size() + " entities");
@@ -159,15 +156,15 @@ public class HBaseStorage extends DataStorageBase {
         QueryResult<E> result = new QueryResult<E>();
         try {
             GenericQuery reader = GenericQueryBuilder
-                    .select(query.getSearchCondition().getOutputFields())
-                    .from(query.getServiceName(), query.getRawQuery().getMetricName()).where(query.getSearchCondition())
-                    .groupBy(query.isHasAgg(), query.getGroupByFields(), query.getAggregateFunctionTypes(), query.getAggregateFields())
-                    .timeSeries(query.getRawQuery().isTimeSeries(), query.getRawQuery().getIntervalmin())
-                    .treeAgg(query.getRawQuery().isTreeAgg())
-                    .orderBy(query.getSortOptions(), query.getSortFunctions(), query.getSortFields())
-                    .top(query.getRawQuery().getTop())
-                    .parallel(query.getRawQuery().getParallel())
-                    .build();
+                .select(query.getSearchCondition().getOutputFields())
+                .from(query.getServiceName(), query.getRawQuery().getMetricName()).where(query.getSearchCondition())
+                .groupBy(query.isHasAgg(), query.getGroupByFields(), query.getAggregateFunctionTypes(), query.getAggregateFields())
+                .timeSeries(query.getRawQuery().isTimeSeries(), query.getRawQuery().getIntervalmin())
+                .treeAgg(query.getRawQuery().isTreeAgg())
+                .orderBy(query.getSortOptions(), query.getSortFunctions(), query.getSortFields())
+                .top(query.getRawQuery().getTop())
+                .parallel(query.getRawQuery().getParallel())
+                .build();
             List<E> entities = reader.result();
             result.setData(entities);
             result.setFirstTimestamp(reader.getFirstTimeStamp());

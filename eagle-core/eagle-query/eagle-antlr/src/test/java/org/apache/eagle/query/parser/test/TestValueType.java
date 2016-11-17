@@ -22,52 +22,52 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestValueType {
-	@Test
-	public void testLocateValueType(){
-		Assert.assertEquals(TokenType.EXP, TokenType.locate("EXP{ 1+1 = 2 }"));
-		Assert.assertEquals(TokenType.EXP, TokenType.locate("EXP{ sum(a + b) > 1 }"));
+    @Test
+    public void testLocateValueType() {
+        Assert.assertEquals(TokenType.EXP, TokenType.locate("EXP{ 1+1 = 2 }"));
+        Assert.assertEquals(TokenType.EXP, TokenType.locate("EXP{ sum(a + b) > 1 }"));
 
-		Assert.assertEquals(TokenType.STRING, TokenType.locate("\"\""));
-		Assert.assertEquals(TokenType.STRING, TokenType.locate("\"abc\""));
+        Assert.assertEquals(TokenType.STRING, TokenType.locate("\"\""));
+        Assert.assertEquals(TokenType.STRING, TokenType.locate("\"abc\""));
 
-		Assert.assertEquals(TokenType.LIST, TokenType.locate("(1,\"ab\")"));
-		Assert.assertEquals(TokenType.LIST, TokenType.locate("(\"\",\"ab\")"));
+        Assert.assertEquals(TokenType.LIST, TokenType.locate("(1,\"ab\")"));
+        Assert.assertEquals(TokenType.LIST, TokenType.locate("(\"\",\"ab\")"));
 
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("1"));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("1.234"));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("-1.234"));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("+1.234"));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("- 1.234"));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("+ 1.234"));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("    + 1.234 "));
-		Assert.assertEquals(TokenType.NUMBER, TokenType.locate("    + 1.234     "));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("1"));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("1.234"));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("-1.234"));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("+1.234"));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("- 1.234"));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("+ 1.234"));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("    + 1.234 "));
+        Assert.assertEquals(TokenType.NUMBER, TokenType.locate("    + 1.234     "));
 
-		Assert.assertEquals(TokenType.NULL, TokenType.locate("null"));
-		Assert.assertEquals(TokenType.NULL, TokenType.locate("NULL"));
+        Assert.assertEquals(TokenType.NULL, TokenType.locate("null"));
+        Assert.assertEquals(TokenType.NULL, TokenType.locate("NULL"));
 
-		Assert.assertEquals(TokenType.STRING,TokenType.locate("\"SELECT start.hr AS hr,\n" +
-				" ...details.inst_type(Stage-10)\""));
+        Assert.assertEquals(TokenType.STRING, TokenType.locate("\"SELECT start.hr AS hr,\n" +
+            " ...details.inst_type(Stage-10)\""));
 
-		// Bad format
-		boolean gotEx = false;
-		try{
-			TokenType.locate("+ 1.234.567");
-		}catch (IllegalArgumentException ex){
-			gotEx = true;
-		}
-		Assert.assertTrue(gotEx);
-	}
+        // Bad format
+        boolean gotEx = false;
+        try {
+            TokenType.locate("+ 1.234.567");
+        } catch (IllegalArgumentException ex) {
+            gotEx = true;
+        }
+        Assert.assertTrue(gotEx);
+    }
 
-	@Test
-	public void testParseExpressionContent(){
-		String expression = "EXP{ @fieldName /2 } AS a";
-		Assert.assertEquals(" @fieldName /2 ", TokenConstant.parseExpressionContent(expression));
+    @Test
+    public void testParseExpressionContent() {
+        String expression = "EXP{ @fieldName /2 } AS a";
+        Assert.assertEquals(" @fieldName /2 ", TokenConstant.parseExpressionContent(expression));
 
 
-		expression = "EXP{ @fieldName /2 } a";
-		Assert.assertEquals(" @fieldName /2 ", TokenConstant.parseExpressionContent(expression));
+        expression = "EXP{ @fieldName /2 } a";
+        Assert.assertEquals(" @fieldName /2 ", TokenConstant.parseExpressionContent(expression));
 
-		expression = "EXP{ @fieldName /2 }";
-		Assert.assertEquals(" @fieldName /2 ", TokenConstant.parseExpressionContent(expression));
-	}
+        expression = "EXP{ @fieldName /2 }";
+        Assert.assertEquals(" @fieldName /2 ", TokenConstant.parseExpressionContent(expression));
+    }
 }

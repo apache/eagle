@@ -18,22 +18,24 @@ package org.apache.eagle.log.entity.meta;
 
 public class StringSerDeser implements EntitySerDeser<String> {
 
-	public StringSerDeser(){}
+    public StringSerDeser() {
+    }
 
-	@Override
-	public String deserialize(byte[] bytes){
-		return new String(bytes);
-	}
-	
-	@Override
-	public byte[] serialize(String obj){
-		if(obj == null)
-			return null;
-		return obj.getBytes();
-	}
+    @Override
+    public String deserialize(byte[] bytes) {
+        return new String(bytes);
+    }
 
-	@Override
-	public Class<String> type() {
-		return String.class;
-	}
+    @Override
+    public byte[] serialize(String obj) {
+        if (obj == null) {
+            return null;
+        }
+        return obj.getBytes();
+    }
+
+    @Override
+    public Class<String> type() {
+        return String.class;
+    }
 }

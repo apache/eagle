@@ -19,14 +19,14 @@ package org.apache.eagle.log.entity;
 import java.io.Closeable;
 import java.io.IOException;
 
-public interface LogWriter extends Closeable{
-	public void flush() throws IOException;
+public interface LogWriter extends Closeable {
+    public void flush() throws IOException;
 
-	public void open() throws IOException;
+    public void open() throws IOException;
 
-	public void close() throws IOException;
+    public void close() throws IOException;
 
-	public byte[] write(InternalLog log) throws IOException;
-	
-	public void updateByRowkey(byte[] rowkey, InternalLog log) throws IOException;
+    public byte[] write(InternalLog log) throws IOException;
+
+    public void updateByRowkey(byte[] rowkey, InternalLog log) throws IOException;
 }

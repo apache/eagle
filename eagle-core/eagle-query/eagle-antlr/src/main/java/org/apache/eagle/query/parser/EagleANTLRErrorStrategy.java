@@ -19,30 +19,31 @@ package org.apache.eagle.query.parser;
 import org.antlr.v4.runtime.*;
 
 public class EagleANTLRErrorStrategy extends DefaultErrorStrategy {
-	/** Instead of recovering from exception {@code e}, re-throw it wrapped
-	 *  in a {@link org.antlr.v4.runtime.misc.ParseCancellationException} so it is not caught by the
-	 *  rule function catches.  Use {@link Exception#getCause()} to get the
-	 *  original {@link org.antlr.v4.runtime.RecognitionException}.
-	 */
-	@Override
-	public void recover(Parser recognizer, RecognitionException e) {
-		for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
-			context.exception = e;
-		}
-		super.recover(recognizer,e);
-	}
+    /**
+     * Instead of recovering from exception {@code e}, re-throw it wrapped
+     * in a {@link org.antlr.v4.runtime.misc.ParseCancellationException} so it is not caught by the
+     * rule function catches.  Use {@link Exception#getCause()} to get the
+     * original {@link org.antlr.v4.runtime.RecognitionException}.
+     */
+    @Override
+    public void recover(Parser recognizer, RecognitionException e) {
+        for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
+            context.exception = e;
+        }
+        super.recover(recognizer, e);
+    }
 
-	/** Make sure we don't attempt to recover inline; if the parser
-	 *  successfully recovers, it won't throw an exception.
-	 */
-	@Override
-	public Token recoverInline(Parser recognizer)
-			throws RecognitionException
-	{
-		InputMismatchException e = new InputMismatchException(recognizer);
-		for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
-			context.exception = e;
-		}
-		return super.recoverInline(recognizer);
-	}
+    /**
+     * Make sure we don't attempt to recover inline; if the parser
+     * successfully recovers, it won't throw an exception.
+     */
+    @Override
+    public Token recoverInline(Parser recognizer)
+        throws RecognitionException {
+        InputMismatchException e = new InputMismatchException(recognizer);
+        for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
+            context.exception = e;
+        }
+        return super.recoverInline(recognizer);
+    }
 }

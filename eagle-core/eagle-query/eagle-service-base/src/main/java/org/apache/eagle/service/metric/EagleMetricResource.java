@@ -16,43 +16,41 @@
  */
 package org.apache.eagle.service.metric;
 
-import java.util.List;
+import org.apache.eagle.log.entity.GenericCreateAPIResponseEntity;
+import org.apache.eagle.log.entity.GenericEntityWriter;
+import org.apache.eagle.log.entity.GenericMetricEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.eagle.log.entity.GenericCreateAPIResponseEntity;
-import org.apache.eagle.log.entity.GenericEntityWriter;
-import org.apache.eagle.log.entity.GenericMetricEntity;
+import java.util.List;
 
 @Path(EagleMetricResource.METRIC_URL_PATH)
 public class EagleMetricResource {
-	private static final Logger LOG = LoggerFactory.getLogger(EagleMetricResource.class);
-	public static final String METRIC_URL_PATH = "/metric";
-	
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public GenericCreateAPIResponseEntity createGenericMetricEntity(List<GenericMetricEntity> entities) {
-		GenericCreateAPIResponseEntity result = new GenericCreateAPIResponseEntity();
-		try{
-			GenericEntityWriter writer = new GenericEntityWriter(GenericMetricEntity.GENERIC_METRIC_SERVICE);
-			List<String> rowkeys = null;
-			rowkeys = writer.write(entities);
-			result.setEncodedRowkeys(rowkeys);
-			result.setSuccess(true);
-			return result;
-		}catch(Exception ex){
-			LOG.error("Fail writing Generic Metric entity", ex);
-			result.setSuccess(false);
-			result.setException(ex.getMessage());
-			return result;
-		}
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(EagleMetricResource.class);
+    public static final String METRIC_URL_PATH = "/metric";
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public GenericCreateAPIResponseEntity createGenericMetricEntity(List<GenericMetricEntity> entities) {
+        GenericCreateAPIResponseEntity result = new GenericCreateAPIResponseEntity();
+        try {
+            GenericEntityWriter writer = new GenericEntityWriter(GenericMetricEntity.GENERIC_METRIC_SERVICE);
+            List<String> rowkeys = null;
+            rowkeys = writer.write(entities);
+            result.setEncodedRowkeys(rowkeys);
+            result.setSuccess(true);
+            return result;
+        } catch (Exception ex) {
+            LOG.error("Fail writing Generic Metric entity", ex);
+            result.setSuccess(false);
+            result.setException(ex.getMessage());
+            return result;
+        }
+    }
 }

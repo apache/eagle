@@ -19,36 +19,46 @@ package org.apache.eagle.storage.jdbc.conn;
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
 
-/**
- * @since 3/26/15
- */
+
 public class ConnectionConfigFactory {
     /**
-     * Read connection config from config.properties
+     * Read connection config from config.properties.
      *
      * @return
      */
-    public static ConnectionConfig getFromEagleConfig(){
+    public static ConnectionConfig getFromEagleConfig() {
         String username = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DB_USERNAME);
         String password = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DB_PASSWORD);
         String connUrl = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_URL);
-        String connProps = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_PROPS);
-        String adapter = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_ADAPTER);
-        String databaseName = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DATABASE);
-        String driverClass = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DRIVER_CLASS);
-        String connMaxSize = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_MAX_SIZE);
 
         ConnectionConfig config = new ConnectionConfig();
-        if(username != null) config.setUserName(username);
-        if(password != null)config.setPassword(password);
-        if(connUrl != null) config.setConnectionUrl(connUrl);
-        if(connProps!=null) config.setConnectionProperties(connProps);
-        if(adapter!=null) config.setAdapter(adapter);
-        if(databaseName!=null) config.setDatabaseName(databaseName);
-        if(driverClass!=null) config.setDriverClassName(driverClass);
-
-
-        if(connMaxSize!=null){
+        if (username != null) {
+            config.setUserName(username);
+        }
+        if (password != null) {
+            config.setPassword(password);
+        }
+        if (connUrl != null) {
+            config.setConnectionUrl(connUrl);
+        }
+        String connProps = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_PROPS);
+        if (connProps != null) {
+            config.setConnectionProperties(connProps);
+        }
+        String adapter = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_ADAPTER);
+        if (adapter != null) {
+            config.setAdapter(adapter);
+        }
+        String databaseName = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DATABASE);
+        if (databaseName != null) {
+            config.setDatabaseName(databaseName);
+        }
+        String driverClass = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DRIVER_CLASS);
+        if (driverClass != null) {
+            config.setDriverClassName(driverClass);
+        }
+        String connMaxSize = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_MAX_SIZE);
+        if (connMaxSize != null) {
             config.setConnectionMaxActive(Integer.parseInt(connMaxSize));
         }
 

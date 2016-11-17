@@ -31,8 +31,8 @@ public class EagleFilterParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		WHITESPACE=1, OP=2, AND=3, OR=4, ID=5, VALUE=6, SINGLE_VALUE=7, EXPR=8, 
-		NUMBER=9, NULL=10, SET=11, DOUBLEQUOTED_STRING=12, LPAREN=13, RPAREN=14, 
+		WHITESPACE=1, OP=2, AND=3, OR=4, ID=5, VALUE=6, SINGLE_VALUE=7, EXPR=8,
+		NUMBER=9, NULL=10, SET=11, DOUBLEQUOTED_STRING=12, LPAREN=13, RPAREN=14,
 		LBRACE=15, RBRACE=16;
 	public static final int
 		RULE_filter = 0, RULE_combine = 1, RULE_equation = 2;
@@ -41,12 +41,12 @@ public class EagleFilterParser extends Parser {
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, null, null, null, null, null, null, null, null, null, null, null, 
+		null, null, null, null, null, null, null, null, null, null, null, null,
 		null, "'('", "')'", "'{'", "'}'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, "WHITESPACE", "OP", "AND", "OR", "ID", "VALUE", "SINGLE_VALUE", 
-		"EXPR", "NUMBER", "NULL", "SET", "DOUBLEQUOTED_STRING", "LPAREN", "RPAREN", 
+		null, "WHITESPACE", "OP", "AND", "OR", "ID", "VALUE", "SINGLE_VALUE",
+		"EXPR", "NUMBER", "NULL", "SET", "DOUBLEQUOTED_STRING", "LPAREN", "RPAREN",
 		"LBRACE", "RBRACE"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
@@ -241,7 +241,7 @@ public class EagleFilterParser extends Parser {
 						}
 						break;
 					}
-					} 
+					}
 				}
 				setState(27);
 				_errHandler.sync(this);

@@ -22,7 +22,8 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,19 +42,19 @@ public class CoprocessorToolITSuite {
     }
 
     private void testRegisterCoprocessor(String tableName) throws Exception {
-        CoprocessorTool.main(new String[]{
-                "--register",
-                "--config", "hbase-site-sandbox.xml",
-                "--table", tableName,
-                "--jar", remoteJarPath,
-                "--localJar", localJarPath});
+        CoprocessorTool.main(new String[] {
+            "--register",
+            "--config", "hbase-site-sandbox.xml",
+            "--table", tableName,
+            "--jar", remoteJarPath,
+            "--localJar", localJarPath});
     }
 
     private void testUnregisterCoprocessor(String tableName) throws Exception {
-        CoprocessorTool.main(new String[]{
-                "--unregister",
-                "--config", "hbase-site-sandbox.xml",
-                "--table", tableName
+        CoprocessorTool.main(new String[] {
+            "--unregister",
+            "--config", "hbase-site-sandbox.xml",
+            "--table", tableName
         });
     }
 

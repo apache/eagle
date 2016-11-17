@@ -20,14 +20,11 @@ import org.apache.eagle.storage.operation.CompiledQuery;
 
 import java.util.List;
 
-/**
- * @since 3/27/15
- */
 public interface JdbcEntityReader {
     /**
-     *
+     * query.
      * @param query query
-     * @param <E> entity type
+     * @param <E>   entity type
      * @return result entities list
      * @throws Exception
      */
@@ -36,13 +33,13 @@ public interface JdbcEntityReader {
     public <E extends Object> List<E> query(List<String> pk) throws Exception;
 
     /**
-     *
+     * getResultFirstTimestamp.
      * @return firstTimestamp
      */
     public Long getResultFirstTimestamp();
 
     /**
-     *
+     * getResultFirstTimestamp.
      * @return lastTimeStamp
      */
     public Long getResultLastTimestamp();

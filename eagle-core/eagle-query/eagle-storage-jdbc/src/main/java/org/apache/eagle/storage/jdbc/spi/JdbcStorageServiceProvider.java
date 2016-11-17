@@ -19,12 +19,9 @@ package org.apache.eagle.storage.jdbc.spi;
 import org.apache.eagle.storage.jdbc.JdbcStorage;
 import org.apache.eagle.storage.spi.DataStorageServiceProvider;
 
-/**
- * @since 3/20/15
- */
 @SuppressWarnings("unused")
 public class JdbcStorageServiceProvider implements DataStorageServiceProvider<JdbcStorage> {
-    private final static String JDBC = "jdbc";
+    private static final String JDBC = "jdbc";
 
     @Override
     public String getType() {

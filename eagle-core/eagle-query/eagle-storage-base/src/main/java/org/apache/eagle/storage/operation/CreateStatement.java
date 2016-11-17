@@ -25,14 +25,11 @@ import org.apache.eagle.storage.result.ModifyResult;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @since 3/18/15
- */
 public class CreateStatement implements Statement<ModifyResult<String>> {
     private final List<? extends TaggedLogAPIEntity> entities;
     private final EntityDefinition entityDefinition;
 
-    public CreateStatement(List<? extends TaggedLogAPIEntity> entities,String serviceName){
+    public CreateStatement(List<? extends TaggedLogAPIEntity> entities, String serviceName) {
         this.entities = entities;
 
         try {
@@ -44,22 +41,22 @@ public class CreateStatement implements Statement<ModifyResult<String>> {
         }
     }
 
-    public CreateStatement(List<? extends TaggedLogAPIEntity> entities,EntityDefinition entityDefinition){
+    public CreateStatement(List<? extends TaggedLogAPIEntity> entities, EntityDefinition entityDefinition) {
         this.entities = entities;
         this.entityDefinition = entityDefinition;
     }
 
-    private void checkNotNull(Object obj,String fieldName){
-        if(obj == null){
-            throw new IllegalArgumentException(fieldName+" is null");
+    private void checkNotNull(Object obj, String fieldName) {
+        if (obj == null) {
+            throw new IllegalArgumentException(fieldName + " is null");
         }
     }
 
     @Override
     public ModifyResult<String> execute(DataStorage dataStorage) throws IOException {
         try {
-            checkNotNull(this.entities,"entities");
-            checkNotNull(this.entityDefinition,"entity definition");
+            checkNotNull(this.entities, "entities");
+            checkNotNull(this.entityDefinition, "entity definition");
             return dataStorage.create(entities, this.entityDefinition);
         } catch (IOException e) {
             throw e;

@@ -16,20 +16,20 @@
  */
 package org.apache.eagle.query.aggregate.test;
 
-import java.util.Arrays;
-
 import org.apache.eagle.query.aggregate.timeseries.GroupbyFieldsComparator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 
 public class TestGroupbyFieldComparator {
-	@Test
-	public void testStringListCompare(){
-		GroupbyFieldsComparator c = new GroupbyFieldsComparator();
-		Assert.assertTrue(c.compare(Arrays.asList("ab"), Arrays.asList("ac"))<0);
-		Assert.assertTrue(c.compare(Arrays.asList("xy"), Arrays.asList("cd"))>0);
-		Assert.assertTrue(c.compare(Arrays.asList("xy"), Arrays.asList("xy"))==0);
-		Assert.assertTrue(c.compare(Arrays.asList("xy", "ab"), Arrays.asList("xy", "ac"))<0);
-	}
+    @Test
+    public void testStringListCompare() {
+        GroupbyFieldsComparator c = new GroupbyFieldsComparator();
+        Assert.assertTrue(c.compare(Arrays.asList("ab"), Arrays.asList("ac")) < 0);
+        Assert.assertTrue(c.compare(Arrays.asList("xy"), Arrays.asList("cd")) > 0);
+        Assert.assertTrue(c.compare(Arrays.asList("xy"), Arrays.asList("xy")) == 0);
+        Assert.assertTrue(c.compare(Arrays.asList("xy", "ab"), Arrays.asList("xy", "ac")) < 0);
+    }
 }

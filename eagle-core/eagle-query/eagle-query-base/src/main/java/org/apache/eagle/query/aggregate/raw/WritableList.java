@@ -24,81 +24,79 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 
-/**
- * @since : 11/6/14,2014
- */
-public class WritableList<E extends Writable> extends ArrayList<E> implements Writable{
-	private Class<E> itemTypeClass;
 
-	public WritableList(Class<E> typeClass){
-		this.itemTypeClass = typeClass;
-	}
+public class WritableList<E extends Writable> extends ArrayList<E> implements Writable {
+    private Class<E> itemTypeClass;
 
-	public WritableList(Class<E> typeClass,int initialCapacity){
-		super(initialCapacity);
-		this.itemTypeClass = typeClass;
-	}
+    public WritableList(Class<E> typeClass) {
+        this.itemTypeClass = typeClass;
+    }
+
+    public WritableList(Class<E> typeClass, int initialCapacity) {
+        super(initialCapacity);
+        this.itemTypeClass = typeClass;
+    }
 
 
-	/**
-	 * <h3> Get item class by </h3>
-	 * <pre>
-	 * (Class<E>) ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-	 * </pre>
-	 */
-	@Deprecated
-	public WritableList(){
-		this.itemTypeClass = (Class<E>) ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-	}
+    /**
+     * <h3> Get item class by </h3>
+     * <pre>
+     * (Class) ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0].
+     * </pre>
+     */
+    @Deprecated
+    public WritableList() {
+        this.itemTypeClass = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
 
-	private void check() throws IOException{
-		if(this.itemTypeClass == null){
-			throw new IOException("Class Type of WritableArrayList<E extends Writable> is null");
-		}
-	}
+    private void check() throws IOException {
+        if (this.itemTypeClass == null) {
+            throw new IOException("Class Type of WritableArrayList<E extends Writable> is null");
+        }
+    }
 
-	public Class<E> getItemClass(){
-		return itemTypeClass;
-	}
+    public Class<E> getItemClass() {
+        return itemTypeClass;
+    }
 
-	/**
-	 * Serialize the fields of this object to <code>out</code>.
-	 *
-	 * @param out <code>DataOuput</code> to serialize this object into.
-	 * @throws java.io.IOException
-	 */
-	@Override
-	public void write(DataOutput out) throws IOException {
-		this.check();
-		out.writeInt(this.size());
-		for(Writable item: this){
-			item.write(out);
-		}
-	}
+    /**
+     * Serialize the fields of this object to <code>out</code>.
+     *
+     * @param out <code>DataOuput</code> to serialize this object into.
+     * @throws java.io.IOException
+     */
+    @Override
+    public void write(DataOutput out) throws IOException {
+        this.check();
+        out.writeInt(this.size());
+        for (Writable item : this) {
+            item.write(out);
+        }
+    }
 
-	/**
-	 * Deserialize the fields of this object from <code>in</code>.
-	 * <p/>
-	 * <p>For efficiency, implementations should attempt to re-use storage in the
-	 * existing object where possible.</p>
-	 *
-	 * @param in <code>DataInput</code> to deseriablize this object from.
-	 * @throws java.io.IOException
-	 */
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		this.check();
-		int size = in.readInt();
-		for(int i=0;i<size;i++){
-			try {
-				E item = itemTypeClass.newInstance();
-				item.readFields(in);
-				this.add(item);
-			} catch (InstantiationException e) {
-				throw new IOException("Got exception to create instance for class: "+itemTypeClass+": "+e.getMessage(),e);
-			} catch (IllegalAccessException e) {
-				throw new IOException("Got exception to create instance for class: "+itemTypeClass+": "+e.getMessage(),e);
-			}
-		}
-	}
+    /**
+     * Deserialize the fields of this object from <code>in</code>.
+     * <p/>
+     * <p>For efficiency, implementations should attempt to re-use storage in the
+     * existing object where possible.</p>
+     *
+     * @param in <code>DataInput</code> to deseriablize this object from.
+     * @throws java.io.IOException
+     */
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.check();
+        int size = in.readInt();
+        for (int i = 0; i < size; i++) {
+            try {
+                E item = itemTypeClass.newInstance();
+                item.readFields(in);
+                this.add(item);
+            } catch (InstantiationException e) {
+                throw new IOException("Got exception to create instance for class: " + itemTypeClass + ": " + e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                throw new IOException("Got exception to create instance for class: " + itemTypeClass + ": " + e.getMessage(), e);
+            }
+        }
+    }
 }

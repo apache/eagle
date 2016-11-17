@@ -18,18 +18,18 @@ package org.apache.eagle.query.aggregate.timeseries;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
-public class SynchronizedAggregator implements Aggregator{
-	private Object mutex = new Object();
-	private Aggregator agg;
-	
-	public SynchronizedAggregator(Aggregator agg){
-		this.agg = agg;
-	}
-	
-	@Override
-	public void accumulate(TaggedLogAPIEntity entity) throws Exception{
-		synchronized(mutex){
-			agg.accumulate(entity);
-		}
-	}
-}	
+public class SynchronizedAggregator implements Aggregator {
+    private Object mutex = new Object();
+    private Aggregator agg;
+
+    public SynchronizedAggregator(Aggregator agg) {
+        this.agg = agg;
+    }
+
+    @Override
+    public void accumulate(TaggedLogAPIEntity entity) throws Exception {
+        synchronized (mutex) {
+            agg.accumulate(entity);
+        }
+    }
+}

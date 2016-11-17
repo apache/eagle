@@ -22,7 +22,7 @@ import org.apache.eagle.storage.result.Result;
 import java.io.IOException;
 
 /**
- * Fluent API Wrapper statements
+ * Fluent API Wrapper statements.
  *
  * @since 3/18/15
  */

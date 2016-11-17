@@ -19,17 +19,17 @@ package org.apache.eagle.audit.common;
 
 public class AuditConstants {
 
-	public static final String AUDIT_SERVICE_ENDPOINT = "AuditService";
-	
-	// HBase Operations
-	public static final String AUDIT_EVENT_CREATE = "CREATE";
-	public static final String AUDIT_EVENT_UPDATE = "UPDATE";
-	public static final String AUDIT_EVENT_DELETE = "DELETE";
-	
-	// Audit table details
-	public static final String AUDIT_TABLE = "serviceAudit";
-	public static final String AUDIT_COLUMN_SERVICE_NAME = "serviceName"; 
-	public static final String AUDIT_COLUMN_USER_ID = "userID";
-	public static final String AUDIT_COLUMN_OPERATION = "operation";
-	public static final String AUDIT_COLUMN_TIMESTAMP = "auditTimestamp";
+    public static final String AUDIT_SERVICE_ENDPOINT = "AuditService";
+
+    // HBase Operations
+    public static final String AUDIT_EVENT_CREATE = "CREATE";
+    public static final String AUDIT_EVENT_UPDATE = "UPDATE";
+    public static final String AUDIT_EVENT_DELETE = "DELETE";
+
+    // Audit table details
+    public static final String AUDIT_TABLE = "serviceAudit";
+    public static final String AUDIT_COLUMN_SERVICE_NAME = "serviceName";
+    public static final String AUDIT_COLUMN_USER_ID = "userID";
+    public static final String AUDIT_COLUMN_OPERATION = "operation";
+    public static final String AUDIT_COLUMN_TIMESTAMP = "auditTimestamp";
 }

@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 
-public class ConcurrentSender implements Closeable{
+public class ConcurrentSender implements Closeable {
     private final int parallelNum;
     private final IEagleServiceClient client;
     private final SynchronousQueue<TaggedLogAPIEntity> queue;
@@ -38,17 +38,17 @@ public class ConcurrentSender implements Closeable{
     private long batchInterval = 3 * 1000;
     private boolean isStarted = false;
 
-    private final static Logger LOG = LoggerFactory.getLogger(ConcurrentSender.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentSender.class);
 
     public ConcurrentSender(IEagleServiceClient client, int parallelNum) {
         this.parallelNum = parallelNum;
         this.client = client;
-        this.queue= new SynchronousQueue<TaggedLogAPIEntity>();
+        this.queue = new SynchronousQueue<TaggedLogAPIEntity>();
         this.handlers = Collections.synchronizedList(new LinkedList<Handler>());
     }
 
-    public void start(){
-        if(!this.isStarted) {
+    public void start() {
+        if (!this.isStarted) {
             LOG.info("Starting with handlers = " + this.parallelNum + ", batchSize = " + this.batchSize + ", batchInterval (ms) = " + this.batchInterval);
 
             for (int i = 0; i < this.parallelNum; i++) {
@@ -62,30 +62,30 @@ public class ConcurrentSender implements Closeable{
             }
 
             this.isStarted = true;
-        }else{
+        } else {
             LOG.warn("Already started");
         }
     }
 
-    public ConcurrentSender batchSize(int batchSize){
+    public ConcurrentSender batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
     }
 
-    public ConcurrentSender batchInterval(long batchInterval){
+    public ConcurrentSender batchInterval(long batchInterval) {
         this.batchInterval = batchInterval;
         return this;
     }
 
     public ConcurrentSender send(final List<? extends TaggedLogAPIEntity> entities) throws InterruptedException {
-        for(TaggedLogAPIEntity entity:entities){
+        for (TaggedLogAPIEntity entity : entities) {
             this.send(entity);
         }
         return this;
     }
 
     public ConcurrentSender send(final TaggedLogAPIEntity entity) throws InterruptedException {
-        if(!this.isStarted){
+        if (!this.isStarted) {
             this.start();
         }
         this.queue.put(entity);
@@ -94,12 +94,12 @@ public class ConcurrentSender implements Closeable{
 
     @Override
     public void close() throws IOException {
-        for(Handler handler: handlers){
+        for (Handler handler : handlers) {
             handler.close();
         }
     }
 
-    private class Handler extends BatchSender implements Runnable{
+    private class Handler extends BatchSender implements Runnable {
         private final long batchInterval;
         private final SynchronousQueue<TaggedLogAPIEntity> localQueue;
 
@@ -114,45 +114,50 @@ public class ConcurrentSender implements Closeable{
 
         @Override
         public void run() {
-            if(LOG.isDebugEnabled()) LOG.debug("Starting ...");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Starting ...");
+            }
             lastFlushTime = System.currentTimeMillis();
 
-            while(!isStopped){
+            while (!isStopped) {
                 TaggedLogAPIEntity entity = null;
                 try {
                     entity = this.localQueue.take();
                 } catch (InterruptedException e) {
-                    LOG.error(e.getMessage(),e);
+                    LOG.error(e.getMessage(), e);
                 }
 
-                if(entity!=null){
+                if (entity != null) {
                     try {
                         this.send(entity);
                     } catch (IOException e) {
-                        LOG.error(e.getMessage(),e);
+                        LOG.error(e.getMessage(), e);
                     } catch (EagleServiceClientException e) {
-                        LOG.error(e.getMessage(),e);
+                        LOG.error(e.getMessage(), e);
                     }
                     long currentTimestamp = System.currentTimeMillis();
 
-                    if((currentTimestamp - this.lastFlushTime) >= this.batchInterval){
-                        if(LOG.isDebugEnabled())
-                            LOG.info(String.format("%s - %s >= %s",currentTimestamp,this.lastFlushTime,this.batchInterval));
+                    if ((currentTimestamp - this.lastFlushTime) >= this.batchInterval) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.info(String.format("%s - %s >= %s", currentTimestamp, this.lastFlushTime, this.batchInterval));
+                        }
 
                         try {
                             this.flush();
                         } catch (IOException e) {
-                            LOG.error(e.getMessage(),e);
+                            LOG.error(e.getMessage(), e);
                         } catch (EagleServiceClientException e) {
-                            LOG.error(e.getMessage(),e);
+                            LOG.error(e.getMessage(), e);
                         }
                     }
-                }else{
+                } else {
                     LOG.warn("Got null entity");
                 }
             }
 
-            if(LOG.isDebugEnabled()) LOG.debug("Stopping ...");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Stopping ...");
+            }
         }
 
         @Override

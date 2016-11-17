@@ -18,24 +18,26 @@ package org.apache.eagle.log.entity.meta;
 
 import org.apache.eagle.common.ByteUtil;
 
-public class DoubleSerDeser implements EntitySerDeser<Double>{
+public class DoubleSerDeser implements EntitySerDeser<Double> {
 
-	@Override
-	public Double deserialize(byte[] bytes){
-		if(bytes.length < 8)
-			return null;
-		return ByteUtil.bytesToDouble(bytes);
-	}
-	
-	@Override
-	public byte[] serialize(Double obj){
-		if(obj == null)
-			return null;
-		return ByteUtil.doubleToBytes(obj);
-	}
+    @Override
+    public Double deserialize(byte[] bytes) {
+        if (bytes.length < 8) {
+            return null;
+        }
+        return ByteUtil.bytesToDouble(bytes);
+    }
 
-	@Override
-	public Class<Double> type(){
-		return Double.class;
-	}
+    @Override
+    public byte[] serialize(Double obj) {
+        if (obj == null) {
+            return null;
+        }
+        return ByteUtil.doubleToBytes(obj);
+    }
+
+    @Override
+    public Class<Double> type() {
+        return Double.class;
+    }
 }

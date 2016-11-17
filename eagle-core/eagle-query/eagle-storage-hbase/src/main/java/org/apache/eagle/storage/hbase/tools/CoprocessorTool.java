@@ -17,9 +17,8 @@
 
 package org.apache.eagle.storage.hbase.tools;
 
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
-
 import org.apache.commons.cli.*;
+import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -72,7 +71,7 @@ public class CoprocessorTool extends Configured implements Tool {
                 LOGGER.info("Path: {} not exist, uploading jar ...", path.toString());
                 if (localJarPath == null) {
                     throw new IOException("local jar path is not given, please manually upload coprocessor jar onto hdfs at " + jarPath
-                            + " and retry, or provide local coprocessor jar path through CLI argument and upload automatically");
+                        + " and retry, or provide local coprocessor jar path through CLI argument and upload automatically");
                 }
                 LOGGER.info("Copying from local {} to {}", localJarPath, jarPath);
                 fs.copyFromLocalFile(new Path(localJarPath), path);
@@ -91,7 +90,7 @@ public class CoprocessorTool extends Configured implements Tool {
                 tableDescriptor = admin.getTableDescriptor(table);
             }
             tableDescriptor.addCoprocessor(AggregateProtocolEndPoint.class.getName(),
-                    path, Coprocessor.PRIORITY_USER, new HashMap<>());
+                path, Coprocessor.PRIORITY_USER, new HashMap<>());
             admin.modifyTable(table, tableDescriptor);
             LOGGER.info("Succeed to enable coprocessor on table " + tableName);
         }

@@ -17,7 +17,9 @@
 package org.apache.eagle.log.entity.meta;
 
 public interface EntitySerDeser<T> {
-	public T deserialize(byte[] bytes);
-	public byte[] serialize(T t);
-	public Class<T> type();
+    public T deserialize(byte[] bytes);
+
+    public byte[] serialize(T t);
+
+    public Class<T> type();
 }

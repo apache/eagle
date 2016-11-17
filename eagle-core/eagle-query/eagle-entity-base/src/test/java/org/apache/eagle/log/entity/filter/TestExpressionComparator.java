@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class TestExpressionComparator {
     @Test
-    public void testCompareToForEval(){
+    public void testCompareToForEval() {
         QualifierFilterEntity entity = new QualifierFilterEntity();
         // a+b >= a+100.0
         entity.setKey("a/b");
@@ -36,36 +36,36 @@ public class TestExpressionComparator {
         entity.setValueType(TokenType.EXP);
         entity.setOp(ComparisonOperator.GREATER_OR_EQUAL);
         EntityDefinition qualifierDisplayNameMap = null;
-        BooleanExpressionComparator comparator = new BooleanExpressionComparator(entity,qualifierDisplayNameMap);
+        BooleanExpressionComparator comparator = new BooleanExpressionComparator(entity, qualifierDisplayNameMap);
 
-        Map<String,Double> context = new HashMap<String,Double>();
-        Assert.assertEquals("Should return 0 because not given enough variable",0,comparator.compareTo(context));
+        Map<String, Double> context = new HashMap<String, Double>();
+        Assert.assertEquals("Should return 0 because not given enough variable", 0, comparator.compareTo(context));
 
         context.put("a", 80.0);
-        context.put("b",20.0);
-        context.put("c",3.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("b", 20.0);
+        context.put("c", 3.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",80.0);
-        context.put("b",20.0);
-        context.put("c",4.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 80.0);
+        context.put("b", 20.0);
+        context.put("c", 4.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",80.0);
-        context.put("b",20.0);
-        context.put("c",5.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 80.0);
+        context.put("b", 20.0);
+        context.put("c", 5.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
         // Return false once any Double.isInfinite ( 80.0 / 0.0 )
-        Assert.assertTrue(Double.isInfinite( 80.0 / 0.0 ));
-        context.put("a",80.0);
-        context.put("b",0.0);
+        Assert.assertTrue(Double.isInfinite(80.0 / 0.0));
+        context.put("a", 80.0);
+        context.put("b", 0.0);
         context.put("c", 5.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        Assert.assertEquals(0, comparator.compareTo(context));
     }
 
     @Test
-    public void testCompareToForOp(){
+    public void testCompareToForOp() {
         QualifierFilterEntity entity = new QualifierFilterEntity();
 
         // a+b >= a+100.0
@@ -74,122 +74,122 @@ public class TestExpressionComparator {
         entity.setOp(ComparisonOperator.GREATER_OR_EQUAL);
         EntityDefinition qualifierDisplayNameMap = new EntityDefinition();
 
-        BooleanExpressionComparator comparator = new BooleanExpressionComparator(entity,qualifierDisplayNameMap);
+        BooleanExpressionComparator comparator = new BooleanExpressionComparator(entity, qualifierDisplayNameMap);
 
-        Map<String,Double> context = new HashMap<String,Double>();
-        context.put("a",100.1);
-        context.put("b",100.1);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        Map<String, Double> context = new HashMap<String, Double>();
+        context.put("a", 100.1);
+        context.put("b", 100.1);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",100.1);
-        context.put("b",100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",100.0);
-        context.put("b",99.9);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.0);
+        context.put("b", 99.9);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", 100.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",-100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", -100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
         // a+b = a+100.0
         entity.setOp(ComparisonOperator.GREATER);
-        comparator = new BooleanExpressionComparator(entity,qualifierDisplayNameMap);
+        comparator = new BooleanExpressionComparator(entity, qualifierDisplayNameMap);
 
-        context.put("a",100.1);
-        context.put("b",100.1);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.1);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",100.1);
-        context.put("b",100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",100.0);
-        context.put("b",99.9);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.0);
+        context.put("b", 99.9);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", 100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",-100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", -100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
         // a+b = a+100.0
         entity.setOp(ComparisonOperator.LESS);
-        comparator = new BooleanExpressionComparator(entity,qualifierDisplayNameMap);
+        comparator = new BooleanExpressionComparator(entity, qualifierDisplayNameMap);
 
-        context.put("a",100.1);
-        context.put("b",100.1);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.1);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",100.1);
-        context.put("b",100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",100.0);
-        context.put("b",99.9);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.0);
+        context.put("b", 99.9);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", 100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",-100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", -100.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
         // a+b <= a+100.0
         entity.setOp(ComparisonOperator.LESS_OR_EQUAL);
-        comparator = new BooleanExpressionComparator(entity,qualifierDisplayNameMap);
+        comparator = new BooleanExpressionComparator(entity, qualifierDisplayNameMap);
 
-        context.put("a",100.1);
-        context.put("b",100.1);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.1);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",100.1);
-        context.put("b",100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",100.0);
-        context.put("b",99.9);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.0);
+        context.put("b", 99.9);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", 100.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",-100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", -100.0);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
         entity.setOp(ComparisonOperator.NOT_EQUAL);
-        comparator = new BooleanExpressionComparator(entity,qualifierDisplayNameMap);
+        comparator = new BooleanExpressionComparator(entity, qualifierDisplayNameMap);
 
-        context.put("a",100.1);
-        context.put("b",100.1);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.1);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",100.1);
-        context.put("b",100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", 100.1);
+        context.put("b", 100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",100.0);
-        context.put("b",99.9);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        context.put("a", 100.0);
+        context.put("b", 99.9);
+        Assert.assertEquals(1, comparator.compareTo(context));
 
-        context.put("a",-200.0);
-        context.put("b",100.0);
-        Assert.assertEquals(0,comparator.compareTo(context));
+        context.put("a", -200.0);
+        context.put("b", 100.0);
+        Assert.assertEquals(0, comparator.compareTo(context));
 
-        context.put("a",-200.0);
+        context.put("a", -200.0);
         context.put("b", -100.0);
-        Assert.assertEquals(1,comparator.compareTo(context));
+        Assert.assertEquals(1, comparator.compareTo(context));
     }
 }

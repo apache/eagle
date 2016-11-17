@@ -17,48 +17,47 @@
 package org.apache.eagle.log.entity.meta;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
 public class TestArraySerDeser {
-	
-	@Test
-	public void testIntArraySerDeser(){
-		IntArraySerDeser serDeser = new IntArraySerDeser();
-		int[] ints = new int[] {1, 34, 21, 82};
-		byte[] bytes = serDeser.serialize(ints);
-		Assert.assertEquals((ints.length+1)*4, bytes.length);
-		int[] targets = serDeser.deserialize(bytes);
-		Assert.assertEquals(ints.length, targets.length);
-		for(int i=0; i<ints.length; i++){
-			Assert.assertEquals(ints[i], targets[i]);
-		}
-	}
-	
-	@Test
-	public void testDoubleArraySerDeser(){
-		DoubleArraySerDeser serDeser = new DoubleArraySerDeser();
-		double[] doubles = new double[] {1.0, 34.0, 21.0, 82.0};
-		byte[] bytes = serDeser.serialize(doubles);
-		Assert.assertEquals(4 + doubles.length*8, bytes.length);
-		double[] targets = serDeser.deserialize(bytes);
-		Assert.assertEquals(doubles.length, targets.length);
-		for(int i=0; i<doubles.length; i++){
-			Assert.assertEquals(doubles[i], targets[i], 0.0001);
-		}
-	}
 
-	@Test
-	public void testStringArraySerDeser(){
-		StringArraySerDeser serDeser = new StringArraySerDeser();
-		String[] sources = new String[] {"a", "", "1", "2", "3"};
-		byte[] bytes = serDeser.serialize(sources);
-		Assert.assertEquals(4 + sources.length*4 + 4, bytes.length);
-		String[] targets = serDeser.deserialize(bytes);
-		Assert.assertEquals(sources.length, targets.length);
-		for(int i=0; i<sources.length; i++){
-			Assert.assertEquals(sources[i], targets[i]);
-		}
-	}
+    @Test
+    public void testIntArraySerDeser() {
+        IntArraySerDeser serDeser = new IntArraySerDeser();
+        int[] ints = new int[] {1, 34, 21, 82};
+        byte[] bytes = serDeser.serialize(ints);
+        Assert.assertEquals((ints.length + 1) * 4, bytes.length);
+        int[] targets = serDeser.deserialize(bytes);
+        Assert.assertEquals(ints.length, targets.length);
+        for (int i = 0; i < ints.length; i++) {
+            Assert.assertEquals(ints[i], targets[i]);
+        }
+    }
+
+    @Test
+    public void testDoubleArraySerDeser() {
+        DoubleArraySerDeser serDeser = new DoubleArraySerDeser();
+        double[] doubles = new double[] {1.0, 34.0, 21.0, 82.0};
+        byte[] bytes = serDeser.serialize(doubles);
+        Assert.assertEquals(4 + doubles.length * 8, bytes.length);
+        double[] targets = serDeser.deserialize(bytes);
+        Assert.assertEquals(doubles.length, targets.length);
+        for (int i = 0; i < doubles.length; i++) {
+            Assert.assertEquals(doubles[i], targets[i], 0.0001);
+        }
+    }
+
+    @Test
+    public void testStringArraySerDeser() {
+        StringArraySerDeser serDeser = new StringArraySerDeser();
+        String[] sources = new String[] {"a", "", "1", "2", "3"};
+        byte[] bytes = serDeser.serialize(sources);
+        Assert.assertEquals(4 + sources.length * 4 + 4, bytes.length);
+        String[] targets = serDeser.deserialize(bytes);
+        Assert.assertEquals(sources.length, targets.length);
+        for (int i = 0; i < sources.length; i++) {
+            Assert.assertEquals(sources[i], targets[i]);
+        }
+    }
 
 }

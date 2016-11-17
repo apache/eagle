@@ -20,54 +20,54 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestGroupbyKey {
-	@Test
-	public void testGroupbyKey(){
-		GroupbyKey key1 = new GroupbyKey();
-		Assert.assertEquals(0, key1.getValue().size());
-		
-		key1.addValue(new byte[]{1, 3, 5});
-		Assert.assertEquals(1, key1.getValue().size());
-		
-		key1.clear();
-		Assert.assertEquals(0, key1.getValue().size());
-		
-		key1.addValue(new byte[]{1, 3, 5});
-		GroupbyKey key2 = new GroupbyKey();
-		key2.addValue(new byte[]{1, 3, 5});
-		Assert.assertEquals(key1, key2);
-		
-		GroupbyKey key3 = new GroupbyKey(key1);
-		Assert.assertEquals(key1, key3);
-		Assert.assertEquals(key2, key3);
-	}
-	
-	@Test
-	public void testGroupbyKeyComparator(){
-		GroupbyKeyComparator comparator = new GroupbyKeyComparator();
-		GroupbyKey key1 = new GroupbyKey();
-		key1.addValue("hello".getBytes());
-		GroupbyKey key2 = new GroupbyKey();
-		key2.addValue("world".getBytes());
-		int r = comparator.compare(key1, key2);
-		Assert.assertTrue(r < 0);
-		
-		key2.clear();
-		key2.addValue("friend".getBytes());
-		r = comparator.compare(key1, key2);
-		Assert.assertTrue(r > 0);
-		
-		key2.clear();
-		key2.addValue("hello".getBytes());
-		r = comparator.compare(key1, key2);
-		Assert.assertTrue(r == 0);
-		
-		key1.clear();
-		key2.clear();
-		key1.addValue("hello".getBytes());
-		key1.addValue("tom".getBytes());
-		key2.addValue("hello".getBytes());
-		key2.addValue("jackie".getBytes());
-		r = comparator.compare(key1, key2);
-		Assert.assertTrue(r > 0);
-	}
+    @Test
+    public void testGroupbyKey() {
+        GroupbyKey key1 = new GroupbyKey();
+        Assert.assertEquals(0, key1.getValue().size());
+
+        key1.addValue(new byte[] {1, 3, 5});
+        Assert.assertEquals(1, key1.getValue().size());
+
+        key1.clear();
+        Assert.assertEquals(0, key1.getValue().size());
+
+        key1.addValue(new byte[] {1, 3, 5});
+        GroupbyKey key2 = new GroupbyKey();
+        key2.addValue(new byte[] {1, 3, 5});
+        Assert.assertEquals(key1, key2);
+
+        GroupbyKey key3 = new GroupbyKey(key1);
+        Assert.assertEquals(key1, key3);
+        Assert.assertEquals(key2, key3);
+    }
+
+    @Test
+    public void testGroupbyKeyComparator() {
+        GroupbyKeyComparator comparator = new GroupbyKeyComparator();
+        GroupbyKey key1 = new GroupbyKey();
+        key1.addValue("hello".getBytes());
+        GroupbyKey key2 = new GroupbyKey();
+        key2.addValue("world".getBytes());
+        int r = comparator.compare(key1, key2);
+        Assert.assertTrue(r < 0);
+
+        key2.clear();
+        key2.addValue("friend".getBytes());
+        r = comparator.compare(key1, key2);
+        Assert.assertTrue(r > 0);
+
+        key2.clear();
+        key2.addValue("hello".getBytes());
+        r = comparator.compare(key1, key2);
+        Assert.assertTrue(r == 0);
+
+        key1.clear();
+        key2.clear();
+        key1.addValue("hello".getBytes());
+        key1.addValue("tom".getBytes());
+        key2.addValue("hello".getBytes());
+        key2.addValue("jackie".getBytes());
+        r = comparator.compare(key1, key2);
+        Assert.assertTrue(r > 0);
+    }
 }

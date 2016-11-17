@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.service.client.impl;
 
+import com.sun.jersey.api.client.WebResource;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
-import com.sun.jersey.api.client.WebResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,32 +31,32 @@ import java.util.List;
 import java.util.Map;
 
 public class EagleServiceClientImpl extends EagleServiceBaseClient {
-    private final static Logger LOG = LoggerFactory.getLogger(EagleServiceClientImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EagleServiceClientImpl.class);
 
-    public EagleServiceClientImpl(String host, int port){
+    public EagleServiceClientImpl(String host, int port) {
         super(host, port);
     }
 
-    public EagleServiceClientImpl(EagleServiceConnector connector){
+    public EagleServiceClientImpl(EagleServiceConnector connector) {
         this(connector.getEagleServiceHost(), connector.getEagleServicePort(), connector.getUsername(), connector.getPassword());
     }
 
-    public EagleServiceClientImpl(String host, int port, String username, String password){
+    public EagleServiceClientImpl(String host, int port, String username, String password) {
         super(host, port, username, password);
     }
 
-    public EagleServiceClientImpl(String host, int port, String basePath, String username, String password){
+    public EagleServiceClientImpl(String host, int port, String basePath, String username, String password) {
         super(host, port, basePath, username, password);
     }
 
-    private String getWholePath(String urlString){
-    	return getBaseEndpoint() + urlString;
+    private String getWholePath(String urlString) {
+        return getBaseEndpoint() + urlString;
     }
 
     @Override
-    public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> create(List<E> entities, String serviceName) throws IOException,EagleServiceClientException {
-        checkNotNull(serviceName,"serviceName");
-        checkNotNull(entities,"entities");
+    public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> create(List<E> entities, String serviceName) throws IOException, EagleServiceClientException {
+        checkNotNull(serviceName, "serviceName");
+        checkNotNull(entities, "entities");
 
         final GenericServiceAPIResponseEntity<String> response;
         response = postEntitiesWithService(GENERIC_ENTITY_PATH, entities, serviceName);
@@ -68,18 +68,20 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
 
     @Override
     public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> create(List<E> entities) throws IOException, EagleServiceClientException {
-        checkNotNull(entities,"entities");
+        checkNotNull(entities, "entities");
 
-        Map<String,List<E>> serviceEntityMap = groupEntitiesByService(entities);
-        if(LOG.isDebugEnabled()) LOG.debug("Creating entities for "+serviceEntityMap.keySet().size()+" services");
+        Map<String, List<E>> serviceEntityMap = groupEntitiesByService(entities);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating entities for " + serviceEntityMap.keySet().size() + " services");
+        }
 
         List<String> createdKeys = new LinkedList<String>();
 
-        for(Map.Entry<String,List<E>> entry: serviceEntityMap.entrySet()){
-            GenericServiceAPIResponseEntity<String> response = create(entry.getValue(),entry.getKey());
-            if(!response.isSuccess()){
-                throw new IOException("Service side exception: "+response.getException());
-            }else if(response.getObj()!=null){
+        for (Map.Entry<String, List<E>> entry : serviceEntityMap.entrySet()) {
+            GenericServiceAPIResponseEntity<String> response = create(entry.getValue(), entry.getKey());
+            if (!response.isSuccess()) {
+                throw new IOException("Service side exception: " + response.getException());
+            } else if (response.getObj() != null) {
                 createdKeys.addAll(response.getObj());
             }
         }
@@ -91,18 +93,20 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
 
     @Override
     public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> delete(List<E> entities) throws IOException, EagleServiceClientException {
-        checkNotNull(entities,"entities");
+        checkNotNull(entities, "entities");
 
-        Map<String,List<E>> serviceEntityMap = groupEntitiesByService(entities);
-        if(LOG.isDebugEnabled()) LOG.debug("Creating entities for "+serviceEntityMap.keySet().size()+" services");
+        Map<String, List<E>> serviceEntityMap = groupEntitiesByService(entities);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating entities for " + serviceEntityMap.keySet().size() + " services");
+        }
 
         List<String> deletedKeys = new LinkedList<String>();
-        for(Map.Entry<String,List<E>> entry: serviceEntityMap.entrySet()){
+        for (Map.Entry<String, List<E>> entry : serviceEntityMap.entrySet()) {
             GenericServiceAPIResponseEntity<String> response = delete(entry.getValue(), entry.getKey());
-            if(!response.isSuccess()){
-                LOG.error("Got service exception: "+response.getException());
+            if (!response.isSuccess()) {
+                LOG.error("Got service exception: " + response.getException());
                 throw new IOException(response.getException());
-            }else if(response.getObj()!=null){
+            } else if (response.getObj() != null) {
                 deletedKeys.addAll(response.getObj());
             }
         }
@@ -114,60 +118,64 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> delete(List<E> entities, String serviceName) throws IOException,EagleServiceClientException {
-        checkNotNull(entities,"entities");
-        checkNotNull(serviceName,"serviceName");
+    public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> delete(List<E> entities, String serviceName) throws IOException, EagleServiceClientException {
+        checkNotNull(entities, "entities");
+        checkNotNull(serviceName, "serviceName");
 
-        return postEntitiesWithService(GENERIC_ENTITY_DELETE_PATH,entities,serviceName);
+        return postEntitiesWithService(GENERIC_ENTITY_DELETE_PATH, entities, serviceName);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public GenericServiceAPIResponseEntity<String> delete(EagleServiceSingleEntityQueryRequest request) throws IOException,EagleServiceClientException {
+    public GenericServiceAPIResponseEntity<String> delete(EagleServiceSingleEntityQueryRequest request) throws IOException, EagleServiceClientException {
         String queryString = request.getQueryParameterString();
         StringBuilder sb = new StringBuilder();
         sb.append(GENERIC_ENTITY_PATH);
         sb.append("?");
         sb.append(queryString);
-        final String urlString =  sb.toString();
+        final String urlString = sb.toString();
 
-        if(!this.silence) LOG.info("Going to delete by querying service: " + getWholePath(urlString));
+        if (!this.silence) {
+            LOG.info("Going to delete by querying service: " + getWholePath(urlString));
+        }
         WebResource r = getWebResource(urlString);
         return putAuthHeaderIfNeeded(r.accept(DEFAULT_MEDIA_TYPE)
-                                      .header(CONTENT_TYPE, DEFAULT_HTTP_HEADER_CONTENT_TYPE))
-                                      .delete(GenericServiceAPIResponseEntity.class);
+            .header(CONTENT_TYPE, DEFAULT_HTTP_HEADER_CONTENT_TYPE))
+            .delete(GenericServiceAPIResponseEntity.class);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public GenericServiceAPIResponseEntity<String> deleteById(List<String> ids, String serviceName) throws EagleServiceClientException, IOException {
-        checkNotNull(serviceName,"serviceName");
-        checkNotNull(ids,"ids");
+        checkNotNull(serviceName, "serviceName");
+        checkNotNull(ids, "ids");
 
         final String json = marshall(ids);
         final WebResource r = getWebResource(GENERIC_ENTITY_DELETE_PATH);
-        return putAuthHeaderIfNeeded(r.queryParam(SERVICE_NAME,serviceName)
-                                       .queryParam(DELETE_BY_ID, "true")
-                                       .accept(DEFAULT_MEDIA_TYPE))
-                                       .header(CONTENT_TYPE, DEFAULT_HTTP_HEADER_CONTENT_TYPE)
-                                       .post(GenericServiceAPIResponseEntity.class, json);
+        return putAuthHeaderIfNeeded(r.queryParam(SERVICE_NAME, serviceName)
+            .queryParam(DELETE_BY_ID, "true")
+            .accept(DEFAULT_MEDIA_TYPE))
+            .header(CONTENT_TYPE, DEFAULT_HTTP_HEADER_CONTENT_TYPE)
+            .post(GenericServiceAPIResponseEntity.class, json);
     }
 
     @Override
     public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> update(List<E> entities) throws IOException, EagleServiceClientException {
-        checkNotNull(entities,"entities");
+        checkNotNull(entities, "entities");
 
-        Map<String,List<E>> serviceEntityMap = groupEntitiesByService(entities);
-        if(LOG.isDebugEnabled()) LOG.debug("Updating entities for "+serviceEntityMap.keySet().size()+" services");
+        Map<String, List<E>> serviceEntityMap = groupEntitiesByService(entities);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating entities for " + serviceEntityMap.keySet().size() + " services");
+        }
 
         List<String> createdKeys = new LinkedList<String>();
 
-        for(Map.Entry<String,List<E>> entry: serviceEntityMap.entrySet()){
+        for (Map.Entry<String, List<E>> entry : serviceEntityMap.entrySet()) {
             GenericServiceAPIResponseEntity<String> response = update(entry.getValue(), entry.getKey());
-            if(!response.isSuccess()){
-                throw new IOException("Got service exception when updating service "+entry.getKey()+" : "+response.getException());
-            }else{
-                if(response.getObj()!=null) {
+            if (!response.isSuccess()) {
+                throw new IOException("Got service exception when updating service " + entry.getKey() + " : " + response.getException());
+            } else {
+                if (response.getObj() != null) {
                     createdKeys.addAll(response.getObj());
                 }
             }
@@ -181,10 +189,10 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
 
     @Override
     public <E extends TaggedLogAPIEntity> GenericServiceAPIResponseEntity<String> update(List<E> entities, String serviceName) throws IOException, EagleServiceClientException {
-        checkNotNull(entities,"entities");
-        checkNotNull(serviceName,"serviceName");
+        checkNotNull(entities, "entities");
+        checkNotNull(serviceName, "serviceName");
 
-        return putEntitiesWithService(GENERIC_ENTITY_PATH,entities,serviceName);
+        return putEntitiesWithService(GENERIC_ENTITY_PATH, entities, serviceName);
     }
 
     @Override
@@ -195,11 +203,13 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
         sb.append(GENERIC_ENTITY_PATH);
         sb.append("?");
         sb.append(queryString);
-        final String urlString =  sb.toString();
-        if(!this.silence) LOG.info("Going to query service: " + getWholePath(urlString));
+        final String urlString = sb.toString();
+        if (!this.silence) {
+            LOG.info("Going to query service: " + getWholePath(urlString));
+        }
         WebResource r = getWebResource(urlString);
         return putAuthHeaderIfNeeded(r.accept(DEFAULT_MEDIA_TYPE))
-                                       .header(CONTENT_TYPE, DEFAULT_HTTP_HEADER_CONTENT_TYPE)
-                                       .get(GenericServiceAPIResponseEntity.class);
+            .header(CONTENT_TYPE, DEFAULT_HTTP_HEADER_CONTENT_TYPE)
+            .get(GenericServiceAPIResponseEntity.class);
     }
 }

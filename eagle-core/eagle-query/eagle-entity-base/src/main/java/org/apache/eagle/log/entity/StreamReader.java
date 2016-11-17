@@ -20,36 +20,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class StreamReader {
-	protected List<EntityCreationListener> _listeners = new ArrayList<EntityCreationListener>();
+    protected List<EntityCreationListener> listeners = new ArrayList<EntityCreationListener>();
 
-	/**
-	 * Listener can be only notified after it is added to listener list
-	 * @param listener
-	 */
-	public synchronized void register(EntityCreationListener listener){
-		_listeners.add(listener);
-	}
-	
-	/**
-	 * Listener can not get notification once after it is removed from listener list
-	 * @param listener
-	 */
-	public synchronized void unregister(EntityCreationListener listener){
-		_listeners.remove(listener);
-	}
-	
-	public abstract void readAsStream() throws Exception;
-	
-	/**
-	 * Get scanned last entity timestamp
-	 * 
-	 * @return
-	 */
-	public abstract long getLastTimestamp();
-	
-	/**
-	 * Get scanned first entity timestamp
-	 * @return
-	 */
-	public abstract long getFirstTimestamp();
+    /**
+     * Listener can be only notified after it is added to listener list.
+     *
+     * @param listener
+     */
+    public synchronized void register(EntityCreationListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Listener can not get notification once after it is removed from listener list.
+     *
+     * @param listener
+     */
+    public synchronized void unregister(EntityCreationListener listener) {
+        listeners.remove(listener);
+    }
+
+    public abstract void readAsStream() throws Exception;
+
+    /**
+     * Get scanned last entity timestamp.
+     *
+     * @return
+     */
+    public abstract long getLastTimestamp();
+
+    /**
+     * Get scanned first entity timestamp.
+     *
+     * @return
+     */
+    public abstract long getFirstTimestamp();
 }

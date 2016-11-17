@@ -22,19 +22,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Partition annotation will impact the rowkey generation for Eagle entities. Once an entity class 
- * has defined the partition fields for an Eagle entity, the hash codes of the defined partition 
+ * Partition annotation will impact the rowkey generation for Eagle entities. Once an entity class
+ * has defined the partition fields for an Eagle entity, the hash codes of the defined partition
  * fields will be placed just after prefix field, and before timestamp field.
- * 
- *
  */
-@Target({ElementType.TYPE})
+@Target( {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Partition
-{
+public @interface Partition {
     /**
      * Order in which annotated tags are to be regarded as data partitions.
      */
-    public String[] value() default { };
+    public String[] value() default {};
 
 }

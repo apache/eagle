@@ -17,39 +17,40 @@
 package org.apache.eagle.query.parser;
 
 public enum ComparisonOperator {
-	EQUAL("="),
-	LIKE("=~"),
-	IN("IN"),
-	NOT_IN("NOT IN"),
-	LESS("<"),
-	LESS_OR_EQUAL("<="),
-	GREATER(">"),
-	GREATER_OR_EQUAL(">="),
-	NOT_EQUAL("!="),
-	NOT_LIKE("!=~"),
-	CONTAINS("CONTAINS"),
-	NOT_CONTAINS("NOT CONTAINS"),
-	IS("IS"),
-	IS_NOT("IS NOT");
+    EQUAL("="),
+    LIKE("=~"),
+    IN("IN"),
+    NOT_IN("NOT IN"),
+    LESS("<"),
+    LESS_OR_EQUAL("<="),
+    GREATER(">"),
+    GREATER_OR_EQUAL(">="),
+    NOT_EQUAL("!="),
+    NOT_LIKE("!=~"),
+    CONTAINS("CONTAINS"),
+    NOT_CONTAINS("NOT CONTAINS"),
+    IS("IS"),
+    IS_NOT("IS NOT");
 
-	private final String _op;
-	private ComparisonOperator(String op){
-		_op = op;
-	}
-	
-	public String toString(){
-		return _op;
-	}
-	
-	public static ComparisonOperator locateOperator(String op){
-		op = op.replaceAll("\\s+"," ");
-		for(ComparisonOperator o : ComparisonOperator.values()){
-			if(op.toUpperCase().equals(o._op)){
-				return o;
-			}
-		}
-		throw new UnsupportedExpressionOperatorException(op);
-	}
+    private final String op;
+
+    private ComparisonOperator(String op) {
+        this.op = op;
+    }
+
+    public String toString() {
+        return op;
+    }
+
+    public static ComparisonOperator locateOperator(String op) {
+        op = op.replaceAll("\\s+", " ");
+        for (ComparisonOperator o : ComparisonOperator.values()) {
+            if (op.toUpperCase().equals(o.op)) {
+                return o;
+            }
+        }
+        throw new UnsupportedExpressionOperatorException(op);
+    }
 }
 
 

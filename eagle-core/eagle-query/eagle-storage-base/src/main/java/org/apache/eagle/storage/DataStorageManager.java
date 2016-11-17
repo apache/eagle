@@ -27,17 +27,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * @since 3/20/15
- */
 public class DataStorageManager {
-    public final static String EAGLE_STORAGE_TYPE = "eagle.service.storage-type";
-    public final static String DEFAULT_DATA_STORAGE_TYPE = "hbase";
+    public static final String EAGLE_STORAGE_TYPE = "eagle.service.storage-type";
+    public static final String DEFAULT_DATA_STORAGE_TYPE = "hbase";
 
-    private final static Logger LOG = LoggerFactory.getLogger(DataStorageManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataStorageManager.class);
 
     /**
-     * Get data storage without cache
+     * Get data storage without cache.
      *
      * @param type
      * @throws IllegalDataStorageTypeException
@@ -58,15 +55,47 @@ public class DataStorageManager {
         return dataStorage;
     }
 
+    /**
+     * Get data storage by configuration.
+     *
+     * @param configuration
+     * @return
+     * @throws IllegalDataStorageTypeException
+     */
+    public static DataStorage newDataStorage(Configuration configuration) throws IllegalDataStorageTypeException {
+        String storageType = configuration.getString(EAGLE_STORAGE_TYPE);
+        if (storageType == null) {
+            throw new IllegalDataStorageTypeException(EAGLE_STORAGE_TYPE + " is null");
+        }
+        return newDataStorage(storageType);
+    }
+
+    /**
+     * Get data storage by properties.
+     *
+     * @param properties
+     * @return
+     * @throws IllegalDataStorageTypeException
+     */
+    public static DataStorage newDataStorage(Properties properties) throws IllegalDataStorageTypeException {
+        String storageType = (String) properties.get(EAGLE_STORAGE_TYPE);
+        if (storageType == null) {
+            LOG.error(EAGLE_STORAGE_TYPE + " is null");
+            throw new IllegalDataStorageTypeException(EAGLE_STORAGE_TYPE + " is null");
+        }
+        return newDataStorage(storageType);
+    }
+
     private static DataStorage singletonStorageInstance;
 
     /**
-     * get storage class by type configured as eagle.storage.type from eagle configuration: config.properties
+     * get storage class by type configured as eagle.storage.
+     * type from eagle configuration: config.properties.
      *
      * @return DataStorage instance
      * @throws IllegalDataStorageTypeException
      */
-    public synchronized static DataStorage getDataStorageByEagleConfig(boolean cache) throws IllegalDataStorageTypeException {
+    public static synchronized DataStorage getDataStorageByEagleConfig(boolean cache) throws IllegalDataStorageTypeException {
         String storageType = EagleConfigFactory.load().getStorageType();
 
         if (!cache) {
@@ -84,41 +113,12 @@ public class DataStorageManager {
     }
 
     /**
+     * GetDataStorageByEagleConfig.
      * @return DataStorage instance by singleton pattern
      * @throws IllegalDataStorageTypeException
      */
-    public synchronized static DataStorage getDataStorageByEagleConfig() throws IllegalDataStorageTypeException {
+    public static synchronized DataStorage getDataStorageByEagleConfig() throws IllegalDataStorageTypeException {
         return getDataStorageByEagleConfig(true);
     }
 
-    /**
-     * Get data storage by configuration
-     *
-     * @param configuration
-     * @return
-     * @throws IllegalDataStorageTypeException
-     */
-    public static DataStorage newDataStorage(Configuration configuration) throws IllegalDataStorageTypeException {
-        String storageType = configuration.getString(EAGLE_STORAGE_TYPE);
-        if (storageType == null) {
-            throw new IllegalDataStorageTypeException(EAGLE_STORAGE_TYPE + " is null");
-        }
-        return newDataStorage(storageType);
-    }
-
-    /**
-     * Get data storage by properties
-     *
-     * @param properties
-     * @return
-     * @throws IllegalDataStorageTypeException
-     */
-    public static DataStorage newDataStorage(Properties properties) throws IllegalDataStorageTypeException {
-        String storageType = (String) properties.get(EAGLE_STORAGE_TYPE);
-        if (storageType == null) {
-            LOG.error(EAGLE_STORAGE_TYPE + " is null");
-            throw new IllegalDataStorageTypeException(EAGLE_STORAGE_TYPE + " is null");
-        }
-        return newDataStorage(storageType);
-    }
 }

@@ -19,7 +19,7 @@ package org.apache.eagle.storage.jdbc;
 import java.sql.Types;
 
 /**
- * Jdbc Storage Constants
+ * Jdbc Storage Constants.
  */
 public class JdbcConstants {
     // Eagle JDBC Schema

@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.query.aggregate.raw;
 
-/**
- * @since : 11/11/14,2014
- */
 public interface GroupbyKeyValueCreationListener {
-	void keyValueCreated(GroupbyKeyValue kv);
+    void keyValueCreated(GroupbyKeyValue kv);
 }

@@ -16,7 +16,7 @@
  */
 /**
  * Manage RDBMS schemas according java entity definition
- *
+ * <p>
  * TODO: not implemented yet
  *
  * @since 3/31/15

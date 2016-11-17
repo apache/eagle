@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.util.Map;
 
 public class EntityJsonModule extends SimpleModule {
-    public EntityJsonModule(){
-        addSerializer(Map.Entry.class,new MapEntrySerializer());
+    public EntityJsonModule() {
+        addSerializer(Map.Entry.class, new MapEntrySerializer());
     }
 }

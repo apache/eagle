@@ -16,27 +16,26 @@
  */
 package org.apache.eagle.log.entity.index;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.log.entity.HBaseInternalLogHelper;
 import org.apache.eagle.log.entity.InternalLog;
+import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTableFactory;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Result;
 
-import org.apache.eagle.log.entity.meta.EntityDefinition;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RowKeyLogReader extends IndexLogReader {
-	private final EntityDefinition ed;
-	private final List<byte[]> rowkeys;
+    private final EntityDefinition ed;
+    private final List<byte[]> rowkeys;
     private final byte[][] qualifiers;
     private HTableInterface tbl;
-	private boolean isOpen = false;
-	private Result[] entityResult;
+    private boolean isOpen = false;
+    private Result[] entityResult;
     private int getIndex = -1;
 
     public RowKeyLogReader(EntityDefinition ed, byte[] rowkey) {
@@ -46,38 +45,39 @@ public class RowKeyLogReader extends IndexLogReader {
         this.qualifiers = null;
     }
 
-	public RowKeyLogReader(EntityDefinition ed, byte[] rowkey,byte[][] qualifiers) {
-		this.ed = ed;
-		this.rowkeys = new ArrayList<>();
+    public RowKeyLogReader(EntityDefinition ed, byte[] rowkey, byte[][] qualifiers) {
+        this.ed = ed;
+        this.rowkeys = new ArrayList<>();
         this.rowkeys.add(rowkey);
         this.qualifiers = qualifiers;
-	}
+    }
 
-	public RowKeyLogReader(EntityDefinition ed, List<byte[]> rowkeys,byte[][] qualifiers) {
-		this.ed = ed;
-		this.rowkeys = rowkeys;
+    public RowKeyLogReader(EntityDefinition ed, List<byte[]> rowkeys, byte[][] qualifiers) {
+        this.ed = ed;
+        this.rowkeys = rowkeys;
         this.qualifiers = qualifiers;
-	}
+    }
 
-	@Override
-	public void open() throws IOException {
-		if (isOpen)
-			return; // silently return
-		try {
-			tbl = EagleConfigFactory.load().getHTable(ed.getTable());
-		} catch (RuntimeException ex) {
-			throw new IOException(ex);
-		}
-		final byte[] family = ed.getColumnFamily().getBytes();
+    @Override
+    public void open() throws IOException {
+        if (isOpen) {
+            return; // silently return
+        }
+        try {
+            tbl = EagleConfigFactory.load().getHTable(ed.getTable());
+        } catch (RuntimeException ex) {
+            throw new IOException(ex);
+        }
+        final byte[] family = ed.getColumnFamily().getBytes();
         List<Get> gets = new ArrayList<>(this.rowkeys.size());
 
-        for(byte[] rowkey:rowkeys) {
+        for (byte[] rowkey : rowkeys) {
             Get get = new Get(rowkey);
             get.addFamily(family);
 
-            if(qualifiers != null) {
-                for(byte[] qualifier: qualifiers){
-                    get.addColumn(family,qualifier);
+            if (qualifiers != null) {
+                for (byte[] qualifier : qualifiers) {
+                    get.addColumn(family, qualifier);
                 }
             }
 
@@ -85,23 +85,23 @@ public class RowKeyLogReader extends IndexLogReader {
         }
 
         entityResult = tbl.get(gets);
-		isOpen = true;
-	}
+        isOpen = true;
+    }
 
-	@Override
-	public void close() throws IOException {
-		if(tbl != null){
-			new HTableFactory().releaseHTableInterface(tbl);
-		}
-	}
+    @Override
+    public void close() throws IOException {
+        if (tbl != null) {
+            new HTableFactory().releaseHTableInterface(tbl);
+        }
+    }
 
-	@Override
-	public InternalLog read() throws IOException {
-        if(entityResult == null || entityResult.length == 0 || this.getIndex >= entityResult.length - 1){
+    @Override
+    public InternalLog read() throws IOException {
+        if (entityResult == null || entityResult.length == 0 || this.getIndex >= entityResult.length - 1) {
             return null;
         }
-        getIndex ++;
-		InternalLog t = HBaseInternalLogHelper.parse(ed, entityResult[getIndex], this.qualifiers);
-		return t;
-	}
+        getIndex++;
+        InternalLog t = HBaseInternalLogHelper.parse(ed, entityResult[getIndex], this.qualifiers);
+        return t;
+    }
 }

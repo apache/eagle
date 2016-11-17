@@ -31,15 +31,17 @@ public class EncodedRowkeyPrimaryKeyBuilder implements PrimaryKeyBuilder<String>
 
     @Override
     public <T> String build(T t) {
-        if(t == null) return null;
+        if (t == null) {
+            return null;
+        }
 
         try {
             EntityDefinition entityDefinition
-                    = EntityDefinitionManager.getEntityDefinitionByEntityClass((Class<? extends TaggedLogAPIEntity>) t.getClass());
-            return EagleBase64Wrapper.encodeByteArray2URLSafeString(RowkeyHelper.getRowkey((TaggedLogAPIEntity) t,entityDefinition));
+                = EntityDefinitionManager.getEntityDefinitionByEntityClass((Class<? extends TaggedLogAPIEntity>) t.getClass());
+            return EagleBase64Wrapper.encodeByteArray2URLSafeString(RowkeyHelper.getRowkey((TaggedLogAPIEntity) t, entityDefinition));
         } catch (Exception e) {
-            LOG.error("Got error to build rowKey for {}",t,e);
-            throw new RuntimeException("Got error to build rowKey",e);
+            LOG.error("Got error to build rowKey for {}", t, e);
+            throw new RuntimeException("Got error to build rowKey", e);
         }
     }
 }

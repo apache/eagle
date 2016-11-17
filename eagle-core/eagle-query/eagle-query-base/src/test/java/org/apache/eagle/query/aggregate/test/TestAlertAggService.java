@@ -16,26 +16,25 @@
  */
 package org.apache.eagle.query.aggregate.test;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.junit.Test;
-
 public class TestAlertAggService {
-	@Test
-	public void testCompileAndSplitCondition(){
-		List<String> alertTagNameValues = new ArrayList<String>();
-		String tagNameValue1 = "cluster=cluster1";
-		String tagNameValue2 = "category=checkHadoopFS";
-		String tagNameValue3 = "category=highloadDisk";
-		String tagNameValue4 = "cluster=dc124";
-		String tagNameValue5 = "category=lowloadDisk";
-		alertTagNameValues.add(tagNameValue1);
-		alertTagNameValues.add(tagNameValue2);
-		alertTagNameValues.add(tagNameValue3);
-		alertTagNameValues.add(tagNameValue4);
-		alertTagNameValues.add(tagNameValue5);
+    @Test
+    public void testCompileAndSplitCondition() {
+        List<String> alertTagNameValues = new ArrayList<String>();
+        String tagNameValue1 = "cluster=cluster1";
+        String tagNameValue2 = "category=checkHadoopFS";
+        String tagNameValue3 = "category=highloadDisk";
+        String tagNameValue4 = "cluster=dc124";
+        String tagNameValue5 = "category=lowloadDisk";
+        alertTagNameValues.add(tagNameValue1);
+        alertTagNameValues.add(tagNameValue2);
+        alertTagNameValues.add(tagNameValue3);
+        alertTagNameValues.add(tagNameValue4);
+        alertTagNameValues.add(tagNameValue5);
 //		AlertAggResource r = new AlertAggResource();
 //		List<List<String>> result = r.compileAndSplitConditions(alertTagNameValues);
 //		Assert.assertEquals(result.size(), 3);
@@ -51,6 +50,6 @@ public class TestAlertAggService {
 //		Assert.assertTrue(result.get(2).contains(tagNameValue5));
 //		Assert.assertTrue(result.get(2).contains(tagNameValue1));
 //		Assert.assertTrue(result.get(2).contains(tagNameValue4));
-	}
+    }
 }
 

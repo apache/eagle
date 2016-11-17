@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * 
+ *
  */
 package org.apache.eagle.log.entity;
 
@@ -24,44 +24,45 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 
-/**
- * @since Sep 12, 2014
- */
 public class EntityUniq {
-	
-	public Map<String, String> tags;
-	public Long timestamp;
-	public long createdTime; // for cache removal;
-	
-	public EntityUniq(Map<String, String> tags, long timestamp) {
-		this.tags = new HashMap<String, String>(tags);
-		this.timestamp = timestamp;
-		this.createdTime = System.currentTimeMillis();
-	}
-	
-	@Override	
-	public boolean equals(Object obj) {		
-		if (obj instanceof EntityUniq) {
-			EntityUniq au = (EntityUniq) obj;
-			if (tags.size() != au.tags.size()) return false;
-			for (Entry<String, String> keyValue : au.tags.entrySet()) {
-				boolean keyExist = tags.containsKey(keyValue.getKey());
-				if ( !keyExist || !tags.get(keyValue.getKey()).equals(keyValue.getValue())) {				
-					return false;
-				}
-			}
-			if (!timestamp.equals(au.timestamp)) return false;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public int hashCode() {	
-		int hashCode = 0;
-		for (String value : tags.values()) {
-			hashCode ^= value.hashCode();	
-		}
-		return hashCode ^= timestamp.hashCode();
-	}
+
+    public Map<String, String> tags;
+    public Long timestamp;
+    public long createdTime; // for cache removal;
+
+    public EntityUniq(Map<String, String> tags, long timestamp) {
+        this.tags = new HashMap<String, String>(tags);
+        this.timestamp = timestamp;
+        this.createdTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EntityUniq) {
+            EntityUniq au = (EntityUniq) obj;
+            if (tags.size() != au.tags.size()) {
+                return false;
+            }
+            for (Entry<String, String> keyValue : au.tags.entrySet()) {
+                boolean keyExist = tags.containsKey(keyValue.getKey());
+                if (!keyExist || !tags.get(keyValue.getKey()).equals(keyValue.getValue())) {
+                    return false;
+                }
+            }
+            if (!timestamp.equals(au.timestamp)) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        for (String value : tags.values()) {
+            hashCode ^= value.hashCode();
+        }
+        return hashCode ^= timestamp.hashCode();
+    }
 }

@@ -21,10 +21,10 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 
 //@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME )
-@JsonSubTypes({
-    @JsonSubTypes.Type(value=ClassA.class, name="ClassA"),
-    @JsonSubTypes.Type(value=ClassB.class, name="ClassB")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes( {
+    @JsonSubTypes.Type(value = ClassA.class, name = "ClassA"),
+    @JsonSubTypes.Type(value = ClassB.class, name = "ClassB")
 })
 public abstract class Base {
 

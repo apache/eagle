@@ -18,9 +18,6 @@ package org.apache.eagle.storage.jdbc.criteria;
 
 import org.apache.torque.criteria.Criteria;
 
-/**
- * @since 3/27/15
- */
 public interface CriteriaBuilder {
     Criteria build();
 }

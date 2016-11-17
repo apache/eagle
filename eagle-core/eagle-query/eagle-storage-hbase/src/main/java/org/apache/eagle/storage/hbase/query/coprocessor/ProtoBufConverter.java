@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.storage.hbase.query.coprocessor;
 
-import org.apache.eagle.log.entity.meta.EntityDefinition;
-import org.apache.eagle.storage.hbase.query.coprocessor.generated.AggregateProtos;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.protobuf.ByteString;
+import org.apache.eagle.log.entity.meta.EntityDefinition;
+import org.apache.eagle.storage.hbase.query.coprocessor.generated.AggregateProtos;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil;
 import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
@@ -44,11 +44,11 @@ public final class ProtoBufConverter {
     }
 
     public static AggregateProtos.AggregateRequest toPBRequest(
-            EntityDefinition entityDefinition, Scan scan, List<String> groupbyFields,
-            List<byte[]> aggregateFuncTypesBytes, List<String> aggregatedFields) throws IOException {
+        EntityDefinition entityDefinition, Scan scan, List<String> groupbyFields,
+        List<byte[]> aggregateFuncTypesBytes, List<String> aggregatedFields) throws IOException {
         AggregateProtos.AggregateRequest.Builder builder = AggregateProtos.AggregateRequest.newBuilder()
-                .setEntityDefinition(AggregateProtos.EntityDefinition.newBuilder().setByteArray(writableToByteString(entityDefinition)))
-                .setScan(toPBScan(scan));
+            .setEntityDefinition(AggregateProtos.EntityDefinition.newBuilder().setByteArray(writableToByteString(entityDefinition)))
+            .setScan(toPBScan(scan));
 
         for (String groupbyField : groupbyFields) {
             builder.addGroupbyFields(groupbyField);
@@ -72,11 +72,11 @@ public final class ProtoBufConverter {
     }
 
     public static AggregateProtos.TimeSeriesAggregateRequest toPBTimeSeriesRequest(
-            EntityDefinition entityDefinition, Scan scan, List<String> groupbyFields,
-            List<byte[]> aggregateFuncTypesBytes, List<String> aggregatedFields,
-            long startTime, long endTime, long intervalMin) throws IOException {
+        EntityDefinition entityDefinition, Scan scan, List<String> groupbyFields,
+        List<byte[]> aggregateFuncTypesBytes, List<String> aggregatedFields,
+        long startTime, long endTime, long intervalMin) throws IOException {
         AggregateProtos.TimeSeriesAggregateRequest.Builder builder =
-                AggregateProtos.TimeSeriesAggregateRequest.newBuilder()
+            AggregateProtos.TimeSeriesAggregateRequest.newBuilder()
                 .setEntityDefinition(AggregateProtos.EntityDefinition.newBuilder().setByteArray(writableToByteString(entityDefinition)))
                 .setScan(toPBScan(scan));
 
@@ -140,7 +140,7 @@ public final class ProtoBufConverter {
         ByteArrayDataOutput output = ByteStreams.newDataOutput();
         result.write(output);
         return AggregateProtos.AggregateResult.newBuilder()
-                .setByteArray(ByteString.copyFrom(output.toByteArray()))
-                .build();
+            .setByteArray(ByteString.copyFrom(output.toByteArray()))
+            .build();
     }
 }

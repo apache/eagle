@@ -43,18 +43,18 @@ public class TestGenericMetricStorage extends JdbcStorageTestBase {
     @Override
     public void setUp() throws Exception {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(GenericMetricEntity.class);
-        entityDefinition.setTags(new String[]{"site","application"});
+        entityDefinition.setTags(new String[] {"site", "application"});
         super.setUp();
     }
 
-    private GenericMetricEntity newMetric(){
+    private GenericMetricEntity newMetric() {
         GenericMetricEntity instance = new GenericMetricEntity();
         instance.setPrefix(metricName);
         instance.setTags(new HashMap<String, String>() {{
             put("site", "unittest_site");
             put("application", "unittest_application");
         }});
-        instance.setValue(new double[]{random.nextDouble()});
+        instance.setValue(new double[] {random.nextDouble()});
         instance.setTimestamp(System.currentTimeMillis());
         return instance;
     }
@@ -63,8 +63,8 @@ public class TestGenericMetricStorage extends JdbcStorageTestBase {
     public void testWrite1000Metrics() throws InterruptedException, IOException {
         // Write 1000 entities
         List<GenericMetricEntity> entityList = new ArrayList<>();
-        int i= 0;
-        while( i++ < 1000){
+        int i = 0;
+        while (i++ < 1000) {
             entityList.add(newMetric());
             Thread.sleep(1);
         }
@@ -82,10 +82,10 @@ public class TestGenericMetricStorage extends JdbcStorageTestBase {
         long endTime = System.currentTimeMillis();
         // init read in time range [startTime, endTime)
         RawQuery rawQuery = new RawQuery();
-        rawQuery.setQuery(GenericMetricEntity.GENERIC_METRIC_SERVICE+"[]{*}");
+        rawQuery.setQuery(GenericMetricEntity.GENERIC_METRIC_SERVICE + "[]{*}");
         rawQuery.setMetricName(metricName);
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime + 1000));
         rawQuery.setPageSize(10000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
@@ -98,10 +98,10 @@ public class TestGenericMetricStorage extends JdbcStorageTestBase {
         testWrite1000Metrics();
         long endTime = System.currentTimeMillis();
         RawQuery rawQuery = new RawQuery();
-        rawQuery.setQuery(GenericMetricEntity.GENERIC_METRIC_SERVICE+"[@site=\"unittest_site\" AND @application=\"unittest_application\"]<@site>{sum(value)}");
+        rawQuery.setQuery(GenericMetricEntity.GENERIC_METRIC_SERVICE + "[@site=\"unittest_site\" AND @application=\"unittest_application\"]<@site>{sum(value)}");
         rawQuery.setMetricName(metricName);
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime + 1000));
         rawQuery.setPageSize(10000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
@@ -115,12 +115,12 @@ public class TestGenericMetricStorage extends JdbcStorageTestBase {
         testWrite1000Metrics();
         long endTime = System.currentTimeMillis();
         RawQuery rawQuery = new RawQuery();
-        rawQuery.setQuery(GenericMetricEntity.GENERIC_METRIC_SERVICE+"[@site=\"unittest_site\" AND @application=\"unittest_application\"]<@site>{sum(value)}");
+        rawQuery.setQuery(GenericMetricEntity.GENERIC_METRIC_SERVICE + "[@site=\"unittest_site\" AND @application=\"unittest_application\"]<@site>{sum(value)}");
         rawQuery.setMetricName(metricName);
         rawQuery.setTimeSeries(true);
         rawQuery.setIntervalmin(10);
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime + 10*60*1000));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime + 10 * 60 * 1000));
         rawQuery.setPageSize(10000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);

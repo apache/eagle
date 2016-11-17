@@ -20,7 +20,6 @@ import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.storage.DataStorage;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
