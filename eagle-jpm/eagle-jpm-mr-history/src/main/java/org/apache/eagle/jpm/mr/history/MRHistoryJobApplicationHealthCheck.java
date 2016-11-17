@@ -19,6 +19,7 @@ package org.apache.eagle.jpm.mr.history;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -79,7 +80,7 @@ public class MRHistoryJobApplicationHealthCheck extends HealthCheck {
                 return Result.healthy();
             }
         } catch (Exception e) {
-            return Result.unhealthy(e);
+            return Result.unhealthy(ExceptionUtils.getStackTrace(e.getCause()));
         }
     }
 }
