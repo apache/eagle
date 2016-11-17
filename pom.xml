@@ -296,6 +296,8 @@
         <scalatest.version>2.2.4</scalatest.version>
         <mockito.version>1.8.1-rc1</mockito.version>
         <tomcat.embed.version>7.0.55</tomcat.embed.version>
+        <powermock.version>1.6.5</powermock.version>
+        <easymock.version>3.4</easymock.version>
 
         <!-- Machine Learning -->
         <ejml.version>0.25</ejml.version>
