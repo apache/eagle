@@ -151,9 +151,9 @@ http://localhost:9090/rest/metadata/policies POST
 	"properties": {
 	  "subject":"alert when user is hadoop",
 	  "template":"",
-	  "sender": "yupu@ebay.com",
-	  "recipients": "jianzhchen@ebay.com",
-	  "mail.smtp.host":"atom.corp.ebay.com",
+	  "sender": "abc@bcd.com",
+	  "recipients": "abc@bcd.com",
+	  "mail.smtp.host":"abc@bcd.com",
 	  "connection": "plaintext",
 	  "mail.smtp.port": "25"
 	},
