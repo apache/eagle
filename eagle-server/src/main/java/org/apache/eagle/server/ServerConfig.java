@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.server;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Configuration;
 import org.apache.eagle.common.Version;
 import org.apache.eagle.server.authentication.config.AuthenticationSettings;
@@ -32,10 +30,6 @@ public class ServerConfig extends Configuration {
     private static final String LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0";
 
     private AuthenticationSettings auth = new AuthenticationSettings();
-
-    public Config getConfig() {
-        return ConfigFactory.load();
-    }
 
     @JsonProperty("auth")
     public AuthenticationSettings getAuth() {

@@ -17,8 +17,10 @@
 package org.apache.eagle.app.module;
 
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.service.impl.ApplicationHealthCheckServiceImpl;
 import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
 import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
 import org.apache.eagle.app.service.impl.ApplicationStatusUpdateServiceImpl;
@@ -45,5 +47,6 @@ public class ApplicationGuiceModule extends AbstractModule {
         bind(ApplicationDescService.class).toProvider(Providers.of(appProviderInst));
         bind(ApplicationManagementService.class).to(ApplicationManagementServiceImpl.class).in(Singleton.class);
         bind(ApplicationStatusUpdateService.class).to(ApplicationStatusUpdateServiceImpl.class).in(Singleton.class);
+        bind(ApplicationHealthCheckService.class).to(ApplicationHealthCheckServiceImpl.class).in(Singleton.class);
     }
 }

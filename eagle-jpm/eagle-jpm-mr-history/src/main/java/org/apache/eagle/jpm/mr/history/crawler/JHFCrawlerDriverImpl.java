@@ -250,9 +250,11 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private void clearProcessedJob(Calendar cal) {
         // clear all already processed jobs some days before current processing date (PROCESSED_JOB_KEEP_DAYS)
         cal.add(Calendar.DATE, -1 - PROCESSED_JOB_KEEP_DAYS);
-        String line = String.format(FORMAT_JOB_PROCESS_DATE, cal.get(Calendar.YEAR),
+        String date = String.format(FORMAT_JOB_PROCESS_DATE, cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
-        JobHistoryZKStateManager.instance().truncateProcessedJob(line);
+        if (partitionId == 0) {
+            JobHistoryZKStateManager.instance().truncateProcessedJob(date);
+        }
     }
 
     private boolean isToday() {

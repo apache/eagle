@@ -565,7 +565,6 @@ public class MRJobParser implements Runnable {
                 fetchMRRunningInfo();
             } catch (Exception e) {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
-                e.printStackTrace();
             } finally {
                 for (String jobId : mrJobEntityMap.keySet()) {
                     mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));

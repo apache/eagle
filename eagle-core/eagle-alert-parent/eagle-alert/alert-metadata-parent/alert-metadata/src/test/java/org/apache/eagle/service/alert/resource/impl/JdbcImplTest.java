@@ -29,6 +29,7 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.*;
@@ -47,8 +48,8 @@ public class JdbcImplTest {
     public static void setup() {
         System.setProperty("config.resource", "/application-mysql.conf");
         ConfigFactory.invalidateCaches();
-        Config config = ConfigFactory.load().getConfig("datastore");
-        dao = new JdbcMetadataDaoImpl(config);
+        Config config = ConfigFactory.load();
+        dao = new JdbcMetadataDaoImpl(config.getConfig(MetadataUtils.META_DATA));
     }
 
     @AfterClass

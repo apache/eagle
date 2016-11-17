@@ -18,6 +18,7 @@ org.apache.eagle.alert.app.AlertUnitTopologyAppProvider
 ## DAM
 org.apache.eagle.security.hbase.HBaseAuditLogAppProvider
 org.apache.eagle.security.auditlog.HdfsAuditLogAppProvider
+org.apache.eagle.security.oozie.parse.OozieAuditLogAppProvider
 
 ## JPM
 org.apache.eagle.app.jpm.JPMWebApplicationProvider

@@ -65,31 +65,6 @@
             <description>default timeout is 30s</description>
             <value>300</value>
         </property>
-        <!-- zookeeper config -->
-        <property>
-            <name>zkStateConfig.zkQuorum</name>
-            <displayName>zookeeper quorum list</displayName>
-            <description>zookeeper to store topology metadata</description>
-            <value>sandbox.hortonworks.com:2181</value>
-        </property>
-        <property>
-            <name>zkStateConfig.zkSessionTimeoutMs</name>
-            <displayName>zookeeper session timeout (ms)</displayName>
-            <description>Zookeeper session timeoutMs</description>
-            <value>15000</value>
-        </property>
-        <property>
-            <name>zkStateConfig.zkRetryTimes</name>
-            <displayName>zookeeper connection retry times</displayName>
-            <description>retry times for zookeeper connection</description>
-            <value>3</value>
-        </property>
-        <property>
-            <name>zkStateConfig.zkRetryInterval</name>
-            <displayName>zookeeper connection retry interval</displayName>
-            <description>retry interval for zookeeper connection</description>
-            <value>20000</value>
-        </property>
 
         <!-- datasource config -->
         <property>
@@ -107,13 +82,19 @@
             <required>true</required>
         </property>
         <property>
-            <name>dataSourceConfig.baseDir</name>
+            <name>dataSourceConfig.hdfs.baseDir</name>
             <displayName>hdfs base path for spark job data</displayName>
             <description>hdfs base path for spark job data</description>
             <value>/spark-history</value>
             <required>true</required>
         </property>
 
+        <property>
+            <name>spark.jobConf.additional.info</name>
+            <displayName>additional spark job config info</displayName>
+            <description>additional job config list</description>
+            <value></value>
+        </property>
         <property>
             <name>spark.defaultVal.spark.executor.memory</name>
             <displayName>spark.executor.memory</displayName>

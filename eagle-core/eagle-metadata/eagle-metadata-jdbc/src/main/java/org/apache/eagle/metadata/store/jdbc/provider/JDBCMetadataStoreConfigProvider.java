@@ -32,9 +32,14 @@ public class JDBCMetadataStoreConfigProvider implements Provider<JDBCDataSourceC
 
     @Override
     public JDBCDataSourceConfig get() {
-        JDBCDataSourceConfig dataSourceConfig = new ObjectMapper().convertValue(
-            config.getConfig(JDBCDataSourceConfig.CONFIG_PREFIX).root().unwrapped(), JDBCDataSourceConfig.class);
-        LOGGER.info("JDBC Configuration: {}", dataSourceConfig);
-        return dataSourceConfig;
+        try {
+            JDBCDataSourceConfig dataSourceConfig = new ObjectMapper().convertValue(
+                    config.getConfig(JDBCDataSourceConfig.CONFIG_PREFIX).root().unwrapped(), JDBCDataSourceConfig.class);
+            LOGGER.info("JDBC Configuration: {}", dataSourceConfig);
+            return dataSourceConfig;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return null;
+        }
     }
 }

@@ -19,6 +19,7 @@ package org.apache.eagle.metadata.store.jdbc;
 
 import com.google.inject.Singleton;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
 import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
@@ -33,6 +34,7 @@ import javax.sql.DataSource;
 public class JDBCMetadataStore extends MetadataStore {
     @Override
     protected void configure() {
+        System.setProperty(MetadataUtils.META_DATA + "." + MetadataUtils.ALERT_META_DATA_DAO, JdbcMetadataDaoImpl.class.getCanonicalName());
         bind(IMetadataDao.class).to(JdbcMetadataDaoImpl.class).in(Singleton.class);
         bind(DataSource.class).toProvider(JDBCDataSourceProvider.class).in(Singleton.class);
         bind(JDBCDataSourceConfig.class).toProvider(JDBCMetadataStoreConfigProvider.class).in(Singleton.class);

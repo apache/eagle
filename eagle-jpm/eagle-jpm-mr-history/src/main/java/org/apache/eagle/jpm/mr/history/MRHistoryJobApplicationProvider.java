@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.jpm.mr.history;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
@@ -30,5 +32,10 @@ public class MRHistoryJobApplicationProvider extends AbstractApplicationProvider
     @Override
     public Optional<ApplicationListener> getApplicationListener() {
         return Optional.of(new MRHistoryJobApplicationListener());
+    }
+
+    @Override
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new MRHistoryJobApplicationHealthCheck(config);
     }
 }

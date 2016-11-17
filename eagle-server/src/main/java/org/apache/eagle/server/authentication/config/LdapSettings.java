@@ -16,127 +16,81 @@
  */
 package org.apache.eagle.server.authentication.config;
 
+import io.dropwizard.util.Duration;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class LdapSettings {
-    private String uri = null;
-    private String userFilter = null;
-    private String groupFilter = null;
-    private String userNameAttribute = null;
-    private String groupNameAttribute = null;
-    private String groupMembershipAttribute = null;
-    private String groupClassName = null;
-    private String[] restrictToGroups = null;
-    private String connectTimeout = null;
-    private String readTimeout = null;
+
+    private String providerUrl = "";
+    private String strategy = "";
+    private String principalTemplate = "";
+    private String certificateAbsolutePath = "";
+    private Duration connectingTimeout = Duration.parse("500ms");
+    private Duration readingTimeout = Duration.parse("500ms");
 
     @JsonProperty
-    public String getUri() {
-        return uri;
+    public String getProviderUrl() {
+        return providerUrl;
     }
 
     @JsonProperty
-    public LdapSettings setUri(String uri) {
-        this.uri = uri;
+    public LdapSettings setProviderUrl(String providerUrl) {
+        this.providerUrl = providerUrl;
         return this;
     }
 
     @JsonProperty
-    public String getUserFilter() {
-        return userFilter;
+    public String getPrincipalTemplate() {
+        return principalTemplate;
     }
 
     @JsonProperty
-    public LdapSettings setUserFilter(String userFilter) {
-        this.userFilter = userFilter;
+    public LdapSettings setPrincipalTemplate(String principalTemplate) {
+        this.principalTemplate = principalTemplate;
         return this;
     }
 
     @JsonProperty
-    public String getGroupFilter() {
-        return groupFilter;
+    public String getStrategy() {
+        return strategy;
     }
 
     @JsonProperty
-    public LdapSettings setGroupFilter(String groupFilter) {
-        this.groupFilter = groupFilter;
+    public LdapSettings setStrategy(String strategy) {
+        this.strategy = strategy;
         return this;
     }
 
     @JsonProperty
-    public String getUserNameAttribute() {
-        return userNameAttribute;
+    public Duration getConnectingTimeout() {
+        return connectingTimeout;
     }
 
     @JsonProperty
-    public LdapSettings setUserNameAttribute(String userNameAttribute) {
-        this.userNameAttribute = userNameAttribute;
+    public LdapSettings setConnectingTimeout(Duration connectingTimeout) {
+        this.connectingTimeout = connectingTimeout;
         return this;
     }
 
     @JsonProperty
-    public String getGroupNameAttribute() {
-        return groupNameAttribute;
+    public Duration getReadingTimeout() {
+        return readingTimeout;
     }
 
     @JsonProperty
-    public LdapSettings setGroupNameAttribute(String groupNameAttribute) {
-        this.groupNameAttribute = groupNameAttribute;
+    public LdapSettings setReadingTimeout(Duration readingTimeout) {
+        this.readingTimeout = readingTimeout;
         return this;
     }
 
     @JsonProperty
-    public String getGroupMembershipAttribute() {
-        return groupMembershipAttribute;
+    public String getCertificateAbsolutePath() {
+        return certificateAbsolutePath;
     }
 
     @JsonProperty
-    public LdapSettings setGroupMembershipAttribute(String groupMembershipAttribute) {
-        this.groupMembershipAttribute = groupMembershipAttribute;
-        return this;
-    }
-
-    @JsonProperty
-    public String getGroupClassName() {
-        return groupClassName;
-    }
-
-    @JsonProperty
-    public LdapSettings setGroupClassName(String groupClassName) {
-        this.groupClassName = groupClassName;
-        return this;
-    }
-
-    @JsonProperty
-    public String[] getRestrictToGroups() {
-        return restrictToGroups;
-    }
-
-    @JsonProperty
-    public LdapSettings setRestrictToGroups(String[] restrictToGroups) {
-        this.restrictToGroups = restrictToGroups;
-        return this;
-    }
-
-    @JsonProperty
-    public String getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    @JsonProperty
-    public LdapSettings setConnectTimeout(String connectTimeout) {
-        this.connectTimeout = connectTimeout;
-        return this;
-    }
-
-    @JsonProperty
-    public String getReadTimeout() {
-        return readTimeout;
-    }
-
-    @JsonProperty
-    public LdapSettings setReadTimeout(String readTimeout) {
-        this.readTimeout = readTimeout;
+    public LdapSettings setCertificateAbsolutePath(String certificateAbsolutePath) {
+        this.certificateAbsolutePath = certificateAbsolutePath;
         return this;
     }
 }

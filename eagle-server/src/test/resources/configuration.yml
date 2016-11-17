@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 server:
   applicationConnectors:
     - type: http
@@ -52,15 +53,25 @@ auth:
 
   # for ldap authentication, effective only when auth.mode=ldap
   ldap:
-    uri: ldaps://ldap.server.address:636
-    userFilter: ou=x,dc=y,dc=z
-    groupFilter: ou=x,dc=y,dc=z
-    userNameAttribute: cn
-    groupNameAttribute: cn
-    groupMembershipAttribute: memberUid
-    groupClassName: posixGroup
-    restrictToGroups:
-      - user
-      - admin
-    connectTimeout: 500ms
-    readTimeout: 500ms
+    # url providing ldap service. By convention, the port for typical ldap service is 389, and ldap service over ssl
+    # uses port 636 with protocol "ldaps", which requires certificates pre-installed.
+    providerUrl: ldap://server.address.or.domain:port
+
+    # template string containing ${USERNAME} placeholder. This is designed for some orgs who don't use plain usernames
+    # to authenticate, e.g. they may use its members' email address as the username: ${USERNAME}@some.org. When username
+    # is supposed to be recognized originally, just configure this parameter as ${USERNAME}
+    principalTemplate: ${USERNAME}@maybe.email.suffix
+
+    # string of strategy used by ldap service. "simple" is usually supported in most circumstances, we can use it by
+    # default or leave it a blank string.
+    strategy: simple
+
+    # the absolute path of ssl certificate file. This attribute is required conditional only when the auth -> mode is set
+    # as "ldap" and providerUrl starting with "ldaps://".
+    certificateAbsolutePath: /certificate/absolute/path
+
+    # timeout expression for connecting to ldap service endpoint
+    connectingTimeout: 500ms
+
+    # timeout expression for reading from ldap service
+    readingTimeout: 500ms

@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.server;
 
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import io.dropwizard.Application;
@@ -28,6 +28,7 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.common.Version;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -35,18 +36,30 @@ import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
 import org.apache.eagle.server.task.ApplicationTask;
 import org.apache.eagle.server.module.GuiceBundleLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
 class ServerApplication extends Application<ServerConfig> {
-    private GuiceBundle guiceBundle;
+    private static final Logger LOG = LoggerFactory.getLogger(ServerApplication.class);
+    @Inject
+    private ApplicationStatusUpdateService applicationStatusUpdateService;
+    @Inject
+    private ApplicationHealthCheckService applicationHealthCheckService;
 
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
-        guiceBundle = GuiceBundleLoader.load();
+        LOG.debug("Loading and registering guice bundle");
+        GuiceBundle<ServerConfig> guiceBundle = GuiceBundleLoader.load();
         bootstrap.addBundle(guiceBundle);
+
+        LOG.debug("Loading and registering static AssetsBundle on /assets");
         bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html", "/"));
+
+        LOG.debug("Initializing guice injector context for current ServerApplication");
+        guiceBundle.getInjector().injectMembers(this);
     }
 
     @Override
@@ -82,16 +95,19 @@ class ServerApplication extends Application<ServerConfig> {
         environment.servlets().addFilter(SimpleCORSFiler.class.getName(), new SimpleCORSFiler())
             .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
-        // register authentication provider
+        // Register authentication provider
         environment.jersey().register(new BasicAuthProviderBuilder(configuration.getAuth(), environment).build());
 
-        // context listener
+        // Context listener
         environment.servlets().addServletListeners(new CoordinatorListener());
 
-        // run application status service in background
-        Injector injector = guiceBundle.getInjector();
-        ApplicationStatusUpdateService applicationStatusUpdateService = injector.getInstance(ApplicationStatusUpdateService.class);
+        // Run application status service in background
         Managed updateAppStatusTask = new ApplicationTask(applicationStatusUpdateService);
         environment.lifecycle().manage(updateAppStatusTask);
+
+        // Initialize application health check environment
+        applicationHealthCheckService.init(environment);
+        Managed appHealthCheckTask = new ApplicationTask(applicationHealthCheckService);
+        environment.lifecycle().manage(appHealthCheckTask);
     }
 }

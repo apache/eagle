@@ -115,10 +115,15 @@ public class JHFSparkEventReader {
         app.setConfig(new JobConfig());
         JSONObject sparkProps = (JSONObject) event.get("Spark Properties");
 
-        String[] additionalJobConf = conf.getString("basic.jobConf.additional.info").split(",\\s*");
         String[] props = {"spark.yarn.app.id", "spark.executor.memory", "spark.driver.host", "spark.driver.port",
             "spark.driver.memory", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
             "spark.yarn.am.cores", "spark.yarn.executor.memoryOverhead", "spark.yarn.driver.memoryOverhead", "spark.yarn.am.memoryOverhead", "spark.master"};
+
+        String[] additionalJobConf = null;
+        if (conf.hasPath("spark.jobConf.additional.info")) {
+            additionalJobConf = conf.getString("spark.jobConf.additional.info").split(",\\s*");
+        }
+
         String[] jobConf = (String[]) ArrayUtils.addAll(additionalJobConf, props);
         for (String prop : jobConf) {
             if (sparkProps.containsKey(prop)) {

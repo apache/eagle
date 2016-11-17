@@ -16,9 +16,10 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
-import org.apache.eagle.alert.metadata.IMetadataDao;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,25 +38,25 @@ public class MetadataDaoFactory {
 
     private MetadataDaoFactory() {
         Config config = ConfigFactory.load();
-        Config datastoreConfig = config.getConfig("datastore");
-        if (datastoreConfig == null) {
-            LOG.warn("datastore is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(datastoreConfig);
+        if (!config.hasPath(MetadataUtils.META_DATA)) {
+            LOG.warn("metadata is not configured, use in-memory store !!!");
+            dao = new InMemMetadataDaoImpl(null);
         } else {
-            String clsName = datastoreConfig.getString("metadataDao");
-            Class<?> clz;
+            Config metaDataConfig = config.getConfig(MetadataUtils.META_DATA);
             try {
+                String clsName = metaDataConfig.getString(MetadataUtils.ALERT_META_DATA_DAO);
+                Class<?> clz;
                 clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
                 if (IMetadataDao.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor(Config.class);
-                    LOG.info("metadada DAO loaded: " + clsName);
-                    dao = (IMetadataDao) cotr.newInstance(datastoreConfig);
+                    LOG.info("metadata.alertMetadataDao loaded: " + clsName);
+                    dao = (IMetadataDao) cotr.newInstance(metaDataConfig);
                 } else {
-                    throw new Exception("metadataDao configuration need to be implementation of IMetadataDao! ");
+                    throw new Exception("metadata.metadataDao configuration need to be implementation of IMetadataDao! ");
                 }
             } catch (Exception e) {
                 LOG.error("error when initialize the dao, fall back to in memory mode!", e);
-                dao = new InMemMetadataDaoImpl(datastoreConfig);
+                dao = new InMemMetadataDaoImpl(metaDataConfig);
             }
         }
     }

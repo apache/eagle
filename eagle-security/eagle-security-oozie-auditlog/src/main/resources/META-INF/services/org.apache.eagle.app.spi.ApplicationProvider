@@ -13,14 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-metadata {
-  metadataDao = org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl
-  jdbc {
-    url = "localhost:27017"
-  }
-  properties {
-
-  }
-}
-
+org.apache.eagle.security.oozie.parse.OozieAuditLogAppProvider

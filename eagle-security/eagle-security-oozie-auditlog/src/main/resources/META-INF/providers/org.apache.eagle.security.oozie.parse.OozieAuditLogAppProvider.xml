@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-  ~ /*
-  ~  *
-  ~  *  * Licensed to the Apache Software Foundation (ASF) under one or more
-  ~  *  * contributor license agreements.  See the NOTICE file distributed with
-  ~  *  * this work for additional information regarding copyright ownership.
-  ~  *  * The ASF licenses this file to You under the Apache License, Version 2.0
-  ~  *  * (the "License"); you may not use this file except in compliance with
-  ~  *  * the License.  You may obtain a copy of the License at
-  ~  *  * <p/>
-  ~  *  * http://www.apache.org/licenses/LICENSE-2.0
-  ~  *  * <p/>
-  ~  *  * Unless required by applicable law or agreed to in writing, software
-  ~  *  * distributed under the License is distributed on an "AS IS" BASIS,
-  ~  *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~  *  * See the License for the specific language governing permissions and
-  ~  *  * limitations under the License.
-  ~  *
-  ~  */
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   -->
 
 <application>
-    <type>HDFS_AUDIT_LOG_MONITOR_APP</type>
-    <name>Hdfs Audit Log Monitor</name>
+    <type>OOZIE_AUDIT_LOG_MONITOR</type>
+    <name>Oozie Audit Log Monitor</name>
     <version>0.5.0-incubating</version>
+    <appClass>org.apache.eagle.security.oozie.parse.OozieAuditLogApplication</appClass>
     <configuration>
         <!-- topology related configurations -->
         <property>
@@ -31,6 +28,12 @@
             <displayName>storm workers</displayName>
             <value>1</value>
             <description>number of topology workers</description>
+        </property>
+        <property>
+            <name>topology.numOfJoinTasks</name>
+            <displayName>Topology Join Tasks</displayName>
+            <value>2</value>
+            <description>number of join tasks</description>
         </property>
         <property>
             <name>topology.numOfSpoutTasks</name>
@@ -62,19 +65,13 @@
             <value>2</value>
             <description>number of sink tasks</description>
         </property>
-        <property>
-            <name>topology.message.timeout.secs</name>
-            <displayName>topology message timeout (secs)</displayName>
-            <description>default timeout is 60s</description>
-            <value>60</value>
-        </property>
 
         <!-- data source configurations -->
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>Kafka Topic for Data Consumption</displayName>
-            <value>hdfs_audit_log</value>
-            <description>kafka topic for data consumption</description>
+            <value>oozie_audit_log</value>
+            <description>data source topic</description>
         </property>
         <property>
             <name>dataSourceConfig.zkConnection</name>
@@ -84,11 +81,16 @@
             <required>true</required>
         </property>
         <property>
+            <name>dataSourceConfig.txZkServers</name>
+            <displayName>Kafka Zookeeper servers</displayName>
+            <value>localhost:2181</value>
+            <description>zookeeper server for offset transaction</description>
+        </property>
+        <property>
             <name>dataSourceConfig.schemeCls</name>
             <displayName>Kafka Consumer SchemeCls</displayName>
             <value>storm.kafka.StringScheme</value>
             <description>scheme class</description>
-            <required>true</required>
         </property>
 
         <!-- data enrich configurations -->
@@ -99,11 +101,37 @@
             <description>interval in seconds for polling</description>
         </property>
 
+        <!-- eagle service configurations -->
+        <property>
+            <name>eagleService.host</name>
+            <displayName>Eagle Service Host</displayName>
+            <value>localhost</value>
+            <description>eagle service host</description>
+        </property>
+        <property>
+            <name>eagleService.port</name>
+            <displayName>Eagle Service Port</displayName>
+            <value>9090</value>
+            <description>eagle service port</description>
+        </property>
+        <property>
+            <name>eagleService.username</name>
+            <displayName>Eagle Service Username</displayName>
+            <value>admin</value>
+            <description>eagle service username</description>
+        </property>
+        <property>
+            <name>eagleService.password</name>
+            <displayName>Eagle Service Password</displayName>
+            <value>secret</value>
+            <description>eagle service password</description>
+        </property>
+
         <!-- data sink configurations -->
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>Kafka Topic for Parsed Data Sink</displayName>
-            <value>hdfs_audit_log_enriched</value>
+            <value>oozie_audit_log_enriched</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
@@ -111,7 +139,6 @@
             <displayName>Kafka BrokerList for Data Sink</displayName>
             <value>localhost:6667</value>
             <description>kafka broker list</description>
-            <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.serializerClass</name>
@@ -150,78 +177,67 @@
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
         </property>
-
-        <!-- web app related configurations -->
-        <property>
-            <name>fs.defaultFS</name>
-            <displayName>fs.defaultFS</displayName>
-            <value>hdfs://localhost:8020</value>
-            <description>hdfs endpoint</description>
-        </property>
     </configuration>
     <streams>
         <stream>
-            <streamId>hdfs_audit_log_enriched_stream</streamId>
-            <description>Hdfs Audit Log Enriched Stream</description>
+            <streamId>oozie_audit_log_stream</streamId>
+            <description>oozie Audit Log Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
                 <column>
-                    <name>src</name>
+                    <name>user</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>dst</name>
+                    <name>ip</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>host</name>
+                    <name>jobId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>operation</name>
                     <type>string</type>
                 </column>
                 <column>
                     <name>timestamp</name>
                     <type>long</type>
                 </column>
-                <column>
-                    <name>allowed</name>
-                    <type>bool</type>
-                </column>
-                <column>
-                    <name>user</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>cmd</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>sensitivityType</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>securityZone</name>
-                    <type>string</type>
-                </column>
             </columns>
         </stream>
     </streams>
     <docs>
         <install>
-            <b>How to Install</b>
-            <ol>
-                <li>Create two kafka topics: <code>hdfs_audit_log_{SITE_ID}, hdfs_audit_log_enriched_{SITE_ID}</code></li>
-                <li>Setup a log collecting tool you like to stream audit log into topic <code>hdfs_audit_log_{SITE_ID}</code></li>
-                <li>Click "Install" button and edit configurations in general and advanced lists according to your requirements </li>
-                <li>Check the new generated stream <code>HDFS_AUDIT_LOG_ENRICHED_STREAM_{SITE_ID}</code> at Alert -> Streams</li>
-            </ol>
+            # Step 1: Create source kafka topic named "${site}_example_source_topic"
+
+            ./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
+
+            # Step 2: Set up data collector to flow data into kafka topic in
+
+            ./bin/logstash -f log_collector.conf
+
+            ## `log_collector.conf` sample as following:
+
+            input {
+
+            }
+            filter {
+
+            }
+            output{
+
+            }
+
+            # Step 3: start application
+
+            # Step 4: monitor with featured portal or alert with policies
         </install>
         <uninstall>
-            <b>How to Uninstall</b>
-            <ol>
-                <li>Click "Stop" button to stop the running application</li>
-                <li>Remove three kafka topics</li>
-                <li>Click "Uninstall" button which will remove stream <code>HDFS_AUDIT_LOG_ENRICHED_STREAM_{SITE_ID}</code></li>
-            </ol>
+            # Step 1: stop and uninstall application
+            # Step 2: delete kafka topic named "${site}_example_source_topic"
+            # Step 3: stop logstash
         </uninstall>
     </docs>
 </application>
