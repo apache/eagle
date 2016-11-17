@@ -59,28 +59,21 @@
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>HBase Zookeeper Quorum</displayName>
             <description>HBase Zookeeper Quorum</description>
-            <value>sandbox.hortonworks.com:2181</value>
-            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkZnodeParent</name>
             <displayName>Hbase Zookeeper Znode Parent Root</displayName>
             <description>Hbase Zookeeper Znode Parent Root</description>
-            <value>/hbase-unsecure</value>
-            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
             <displayName>Hbase Zookeeper Client Port</displayName>
             <description>Hbase Zookeeper Client Port</description>
-            <value>2181</value>
-            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.hbase.kerberos.master.principal</name>
             <displayName>Hbase Master Principal</displayName>
             <description>Hbase Master Principal</description>
-            <value>hadoop/_HOST@EXAMPLE.COM</value>
         </property>
 
         <property>
