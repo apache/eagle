@@ -58,17 +58,11 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
         while (count++ < MAX_RETRY_COUNT && !success) {
             LOG.info("Sending email, tried: " + count + ", max: " + MAX_RETRY_COUNT);
             try {
-                EagleMailClient client = new EagleMailClient(properties);
-
                 String recipients = config.getString(CONF_MAIL_RECIPIENTS);
                 if (recipients == null || recipients.equals("")) {
                     LOG.error("Recipients is null, skip sending emails ");
                     return;
                 }
-                String sender = config.getString(CONF_MAIL_SENDER);
-                String cc = config.hasPath(CONF_MAIL_CC) ? config.getString(CONF_MAIL_CC) : null;
-
-                String title = config.getString(CONF_MAIL_SUBJECT) + ": " + appId;
 
                 final VelocityContext context = new VelocityContext();
                 Map<String, Object> unHealthyContext = new HashMap<>();
@@ -76,7 +70,15 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                 unHealthyContext.put("unHealthyMessage", result.getMessage());
                 context.put(UNHEALTHY_CONTEXT, unHealthyContext);
 
-                success = client.send(sender, recipients, cc, title, config.getString(CONF_MAIL_TEMPLATE), context, null);
+                EagleMailClient client = new EagleMailClient(properties);
+                success = client.send(config.getString(CONF_MAIL_SENDER),
+                        recipients,
+                        config.hasPath(CONF_MAIL_CC) ? config.getString(CONF_MAIL_CC) : null,
+                        config.getString(CONF_MAIL_SUBJECT) + ": " + appId,
+                        config.getString(CONF_MAIL_TEMPLATE),
+                        context,
+                        null);
+
                 LOG.info("Success of sending email: " + success);
                 if (!success && count < MAX_RETRY_COUNT) {
                     LOG.info("Sleep for a while before retrying");
