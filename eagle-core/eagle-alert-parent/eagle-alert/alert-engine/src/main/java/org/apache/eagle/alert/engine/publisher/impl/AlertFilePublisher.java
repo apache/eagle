@@ -35,10 +35,10 @@ public class AlertFilePublisher extends AbstractPublishPlugin {
                 fileName = (String) publishment.getProperties().get(PublishConstants.FILE_NAME);
             }
             if (publishment.getProperties().containsKey(PublishConstants.ROTATE_EVERY_KB)) {
-                rotateSize = (int) publishment.getProperties().get(PublishConstants.ROTATE_EVERY_KB);
+                rotateSize = Integer.valueOf(publishment.getProperties().get(PublishConstants.ROTATE_EVERY_KB).toString());
             }
             if (publishment.getProperties().containsKey(PublishConstants.NUMBER_OF_FILES)) {
-                numOfFiles = (int) publishment.getProperties().get(PublishConstants.NUMBER_OF_FILES);
+                numOfFiles = Integer.valueOf(publishment.getProperties().get(PublishConstants.NUMBER_OF_FILES).toString());
             }
         }
         handler = new FileHandler(fileName, rotateSize * 1024, numOfFiles, true);
