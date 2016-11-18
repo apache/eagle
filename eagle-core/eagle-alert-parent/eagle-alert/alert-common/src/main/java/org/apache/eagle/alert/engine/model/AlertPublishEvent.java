@@ -19,10 +19,8 @@
 package org.apache.eagle.alert.engine.model;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.eagle.common.DateTimeUtil;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.Map;
 
