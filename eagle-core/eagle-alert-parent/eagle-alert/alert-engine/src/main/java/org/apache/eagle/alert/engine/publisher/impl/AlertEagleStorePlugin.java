@@ -54,12 +54,6 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public void update(String dedupIntervalMin, Map<String, Object> pluginProperties) {
-        deduplicator.setDedupIntervalMin(dedupIntervalMin);
-    }
-
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
         List<AlertStreamEvent> eventList = this.dedup(event);
@@ -75,7 +69,7 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
 
     @Override
     protected Logger getLogger() {
-        return null;
+        return LOG;
     }
 
 }
