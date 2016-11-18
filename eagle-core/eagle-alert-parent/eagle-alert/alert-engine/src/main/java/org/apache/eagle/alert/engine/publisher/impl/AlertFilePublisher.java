@@ -33,7 +33,7 @@ import java.util.logging.SimpleFormatter;
 
 public class AlertFilePublisher extends AbstractPublishPlugin {
 
-    private Logger filelogger = Logger.getLogger(AlertFilePublisher.class.getName());;
+    private Logger filelogger = Logger.getLogger(AlertFilePublisher.class.getName());
     private FileHandler handler;
 
 
