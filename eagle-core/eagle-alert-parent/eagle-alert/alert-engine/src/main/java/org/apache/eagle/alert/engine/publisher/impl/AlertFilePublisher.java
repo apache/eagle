@@ -18,24 +18,26 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
+import org.apache.eagle.common.DateTimeUtil;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
+
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-import java.util.logging.FileHandler;
-import java.util.logging.SimpleFormatter;
+import java.util.logging.*;
 
 public class AlertFilePublisher extends AbstractPublishPlugin {
 
     private Logger filelogger = Logger.getLogger(AlertFilePublisher.class.getName());
     private FileHandler handler;
-
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String DEFAULT_FILE_NAME = "eagle-alert.log";
     private static final int DEFAULT_ROTATE_SIZE_KB = 1024;
@@ -60,9 +62,18 @@ public class AlertFilePublisher extends AbstractPublishPlugin {
             }
         }
         handler = new FileHandler(fileName, rotateSize * 1024, numOfFiles, true);
-        handler.setFormatter(new SimpleFormatter());
+        handler.setFormatter(new AlertFileFormatter());
         filelogger.addHandler(handler);
         filelogger.setUseParentHandlers(false);
+    }
+
+    class AlertFileFormatter extends Formatter {
+
+        @Override
+        public String format(LogRecord record) {
+            return String.format("%s %s\n", DateTimeUtil.millisecondsToHumanDateWithSeconds(record.getMillis()),
+                    record.getMessage());
+        }
     }
 
     @Override
@@ -73,7 +84,8 @@ public class AlertFilePublisher extends AbstractPublishPlugin {
         }
         for (AlertStreamEvent e : eventList) {
             //filelogger.info(e.toString());
-            filelogger.info(AlertPublishEvent.createAlertPublishEvent(e).toString());
+            AlertPublishEvent alert = AlertPublishEvent.createAlertPublishEvent(e);
+            filelogger.info(objectMapper.writeValueAsString(alert));
         }
     }
 
