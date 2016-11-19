@@ -40,7 +40,7 @@ public class AlertFilePublisherTest {
         String tempDir = System.getProperty(property);
         System.out.println("OS current temporary directory is " + tempDir);
 
-        properties.put(PublishConstants.FILE_NAME, tempDir+"eagle-alert.log");
+        //properties.put(PublishConstants.FILE_NAME, tempDir+"eagle-alert.log");
 
         Publishment publishment = new Publishment();
         publishment.setName("testFilePublishment");
