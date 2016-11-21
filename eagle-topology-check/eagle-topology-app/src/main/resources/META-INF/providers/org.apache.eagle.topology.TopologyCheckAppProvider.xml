@@ -58,56 +58,46 @@
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>HBase Zookeeper Quorum</displayName>
-            <description>HBase Zookeeper Quorum</description>
+            <description>HBase Zookeeper Quorum (Optional)</description>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkZnodeParent</name>
             <displayName>Hbase Zookeeper Znode Parent Root</displayName>
-            <description>Hbase Zookeeper Znode Parent Root</description>
+            <description>Hbase Zookeeper Znode Parent Root (Optional)</description>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
             <displayName>Hbase Zookeeper Client Port</displayName>
-            <description>Hbase Zookeeper Client Port</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
-            <displayName>Hbase Master Principal</displayName>
-            <description>Hbase Master Principal</description>
+            <description>Hbase Zookeeper Client Port (Optional)</description>
         </property>
 
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.eagle.principal</name>
-            <displayName>Hbase Eagle Principal</displayName>
-            <description>Hbase Master Principal</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.eagle.keytab</name>
-            <displayName>Hbase Eagle KeyTab</displayName>
-            <description>Hbase Eagle KeyTab</description>
-            <value></value>
-        </property>
 
         <property>
             <name>dataSourceConfig.hdfs.namenodeUrl</name>
             <displayName>Hdfs Namenode Web URL</displayName>
-            <description>Hdfs Namenode Web URL</description>
+            <description>Hdfs Namenode Web URL for HDFS monitor</description>
             <value>http://sandbox.hortonworks.com:50070</value>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.mr.rmUrl</name>
             <displayName>Resource Manager URL</displayName>
-            <description>Resource Manager URL</description>
+            <description>Resource manager url for YARN monitor</description>
             <value>http://sandbox.hortonworks.com:8088</value>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.mr.historyServerUrl</name>
             <displayName>History Server URL</displayName>
-            <description>History Server URL</description>
+            <description>History Server URL for HBASE monitor (Optional)</description>
             <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.enabled</name>
+            <displayName>HBase Config Enabled</displayName>
+            <description>HBase Topology Monitor Enabled</description>
+            <value>false</value>
+            <required>true</required>
         </property>
 
         <property>

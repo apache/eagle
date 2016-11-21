@@ -55,10 +55,10 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
         this.hBaseConfiguration.set("zookeeper.znode.parent", hBaseConfig.zkRoot);
         this.hBaseConfiguration.set("hbase.client.retries.number", hBaseConfig.zkRetryTimes);
         // kerberos authentication
-        this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_PRINCIPAL_KEY, hBaseConfig.eaglePrincipal);
-        this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.eagleKeytab);
         if (hBaseConfig.eaglePrincipal != null && hBaseConfig.eagleKeytab != null
                 && !hBaseConfig.eaglePrincipal.isEmpty() && !hBaseConfig.eagleKeytab.isEmpty()) {
+            this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_PRINCIPAL_KEY, hBaseConfig.eaglePrincipal);
+            this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.eagleKeytab);
             this.kerberosEnable = true;
             this.hBaseConfiguration.set("hbase.security.authentication", "kerberos");
             this.hBaseConfiguration.set("hbase.master.kerberos.principal", hBaseConfig.hbaseMasterPrincipal);
