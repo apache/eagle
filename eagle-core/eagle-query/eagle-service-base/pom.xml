@@ -28,7 +28,7 @@
 
     <artifactId>eagle-service-base</artifactId>
     <packaging>jar</packaging>
-    <name>Eagle::Core::Service::Base</name>
+    <name>Eagle::Core::Query::ServiceBase</name>
 
     <dependencies>
         <!-- put eagle-storage-base dependency at the top for using asm 4.0 jar !-->

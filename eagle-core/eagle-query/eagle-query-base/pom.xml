@@ -28,7 +28,7 @@
 
     <artifactId>eagle-query-base</artifactId>
 
-    <name>Eagle::Core::Query::Base</name>
+    <name>Eagle::Core::Query::QueryBase</name>
 
     <dependencies>
         <dependency>

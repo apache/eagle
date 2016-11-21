@@ -29,7 +29,7 @@
 
     <artifactId>eagle-client-base</artifactId>
     <packaging>jar</packaging>
-    <name>Eagle::Core::Client::Base</name>
+    <name>Eagle::Core::Query::ClientBase</name>
 
     <dependencies>
         <dependency>

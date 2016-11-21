@@ -27,7 +27,7 @@
     </parent>
     <artifactId>eagle-embed-server</artifactId>
     <packaging>jar</packaging>
-    <name>Eagle::Core::Embed::Server</name>
+    <name>Eagle::Core::Embed::EmbedServer</name>
     <dependencies>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
