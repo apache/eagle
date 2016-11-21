@@ -216,24 +216,20 @@ public class CompiledQuery {
             // TODO check Time exists for timeseries or topology data
             long endTimeMillis = System.currentTimeMillis();
             long startTimeMills = endTimeMillis - 30 * DateTimeUtil.ONEDAY;
-            String endTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(endTimeMillis);
-            String startTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(startTimeMills);
 
             if(this.rawQuery.getStartTime() != null && this.rawQuery.getEndTime() != null) {
-                endTime = this.rawQuery.getEndTime();
-                startTime = this.rawQuery.getStartTime();
-                endTimeMillis = DateTimeUtil.humanDateToSeconds(endTime) * 1000;
-                startTimeMills = DateTimeUtil.humanDateToSeconds(startTime) * 1000;
+                endTimeMillis = DateTimeUtil.parseTimeStrToMilliseconds(rawQuery.getEndTime());
+                startTimeMills = DateTimeUtil.parseTimeStrToMilliseconds(rawQuery.getStartTime());
             } else {
                 LOG.warn("startTime or endTime is not given, use [currentSystemTime - 30 days, currentSystemTime]");
             }
-            this.searchCondition.setStartTime(startTime);
-            this.searchCondition.setEndTime(endTime);
+            this.searchCondition.setStartTime(startTimeMills);
+            this.searchCondition.setEndTime(endTimeMillis);
             this.setStartTime(startTimeMills);
             this.setEndTime(endTimeMillis);
         }else{
-            this.searchCondition.setStartTime("0");
-            this.searchCondition.setEndTime("1");
+            this.searchCondition.setStartTime(0);
+            this.searchCondition.setEndTime(1);
             this.setStartTime(0);
             this.setEndTime(1);
         }
