@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.eagle.service.alert.resource.impl;
+package org.apache.eagle.alert.metadata.impl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -30,7 +30,6 @@ import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.*;
 import org.slf4j.Logger;

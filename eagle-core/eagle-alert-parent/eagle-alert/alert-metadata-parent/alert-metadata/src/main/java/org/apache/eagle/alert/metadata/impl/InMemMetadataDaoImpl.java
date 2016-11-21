@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
+import org.apache.commons.collections.bag.SynchronizedBag;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -296,7 +297,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public OpResult clear() {
+    public synchronized OpResult clear() {
         LOG.info("clear models...");
         this.assignments.clear();
         this.clusters.clear();
