@@ -22,7 +22,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.eagle.app.service.impl.ApplicationHealthCheckBase;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -36,8 +35,8 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
 
     private TopologyCheckAppConfig topologyCheckAppConfig;
 
-    public TopologyCheckApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        super(config, applicationEntityService);
+    public TopologyCheckApplicationHealthCheck(Config config) {
+        super(config);
         topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
     }
 

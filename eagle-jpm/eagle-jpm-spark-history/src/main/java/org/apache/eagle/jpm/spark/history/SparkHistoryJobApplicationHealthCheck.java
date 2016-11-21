@@ -23,7 +23,6 @@ import org.apache.eagle.app.service.impl.ApplicationHealthCheckBase;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -37,8 +36,8 @@ public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthChec
 
     private SparkHistoryJobAppConfig sparkHistoryJobAppConfig;
 
-    public SparkHistoryJobApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        super(config, applicationEntityService);
+    public SparkHistoryJobApplicationHealthCheck(Config config) {
+        super(config);
         this.sparkHistoryJobAppConfig = SparkHistoryJobAppConfig.newInstance(config);
     }
 

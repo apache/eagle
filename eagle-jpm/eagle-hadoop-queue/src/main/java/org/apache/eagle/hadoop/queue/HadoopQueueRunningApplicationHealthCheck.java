@@ -24,7 +24,6 @@ import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -38,8 +37,8 @@ public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthC
 
     private HadoopQueueRunningAppConfig hadoopQueueRunningAppConfig;
 
-    public HadoopQueueRunningApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        super(config, applicationEntityService);
+    public HadoopQueueRunningApplicationHealthCheck(Config config) {
+        super(config);
         this.hadoopQueueRunningAppConfig = new HadoopQueueRunningAppConfig(config);
     }
 

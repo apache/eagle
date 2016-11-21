@@ -19,6 +19,7 @@ package org.apache.eagle.app.service.impl;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dropwizard.setup.Environment;
@@ -54,6 +55,9 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private static final String HEALTH_PERIOD_PATH = "application.healthCheck.period";
     private static final String HEALTH_PUBLISHER_PATH = "application.healthCheck.publisher";
     private static final String HEALTH_PUBLISHER_IMPL_PATH = "application.healthCheck.publisher.publisherImpl";
+
+    @Inject
+    private Injector currentInjector;
 
     @Inject
     public ApplicationHealthCheckServiceImpl(ApplicationProviderService applicationProviderService,
@@ -107,10 +111,10 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         HealthCheck applicationHealthCheck = appProvider.getAppHealthCheck(
                         ConfigFactory.parseMap(appEntity.getContext())
                         .withFallback(config)
-                        .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration())),
-                applicationEntityService
+                        .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration()))
         );
         this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck);
+        currentInjector.injectMembers(applicationHealthCheck);
         synchronized (lock) {
             if (!appHealthChecks.containsKey(appEntity.getAppId())) {
                 appHealthChecks.put(appEntity.getAppId(), applicationHealthCheck);

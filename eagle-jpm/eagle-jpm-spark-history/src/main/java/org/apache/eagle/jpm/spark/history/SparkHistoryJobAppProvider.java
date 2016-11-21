@@ -20,7 +20,6 @@ package org.apache.eagle.jpm.spark.history;
 import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<SparkHistoryJobApp> {
     @Override
@@ -29,7 +28,7 @@ public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<Spar
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        return new SparkHistoryJobApplicationHealthCheck(config, applicationEntityService);
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new SparkHistoryJobApplicationHealthCheck(config);
     }
 }

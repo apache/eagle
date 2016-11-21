@@ -19,7 +19,6 @@ package org.apache.eagle.hadoop.queue;
 import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 public class HadoopQueueRunningAppProvider extends AbstractApplicationProvider<HadoopQueueRunningApp> {
     public HadoopQueueRunningApp getApplication() {
@@ -27,7 +26,7 @@ public class HadoopQueueRunningAppProvider extends AbstractApplicationProvider<H
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        return new HadoopQueueRunningApplicationHealthCheck(config, applicationEntityService);
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new HadoopQueueRunningApplicationHealthCheck(config);
     }
 }

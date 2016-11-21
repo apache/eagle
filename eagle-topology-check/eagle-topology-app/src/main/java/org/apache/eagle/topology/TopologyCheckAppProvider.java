@@ -21,7 +21,6 @@ package org.apache.eagle.topology;
 import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 public class TopologyCheckAppProvider extends AbstractApplicationProvider<TopologyCheckApp> {
     @Override
@@ -30,7 +29,7 @@ public class TopologyCheckAppProvider extends AbstractApplicationProvider<Topolo
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        return new TopologyCheckApplicationHealthCheck(config, applicationEntityService);
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new TopologyCheckApplicationHealthCheck(config);
     }
 }

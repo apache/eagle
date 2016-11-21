@@ -18,6 +18,7 @@
 package org.apache.eagle.app.service.impl;
 
 import com.codahale.metrics.health.HealthCheck;
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
@@ -29,11 +30,11 @@ public abstract class ApplicationHealthCheckBase extends HealthCheck {
 
     protected Config config;
 
+    @Inject
     private ApplicationEntityService applicationEntityService;
 
-    protected ApplicationHealthCheckBase(Config config, ApplicationEntityService applicationEntityService) {
+    protected ApplicationHealthCheckBase(Config config) {
         this.config = config;
-        this.applicationEntityService = applicationEntityService;
     }
 
     protected ApplicationEntity.Status getApplicationStatus() {

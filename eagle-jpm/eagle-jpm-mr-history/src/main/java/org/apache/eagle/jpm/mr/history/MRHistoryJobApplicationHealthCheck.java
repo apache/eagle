@@ -23,7 +23,6 @@ import org.apache.eagle.app.service.impl.ApplicationHealthCheckBase;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -37,8 +36,8 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
 
     private MRHistoryJobConfig mrHistoryJobConfig;
 
-    public MRHistoryJobApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        super(config, applicationEntityService);
+    public MRHistoryJobApplicationHealthCheck(Config config) {
+        super(config);
         mrHistoryJobConfig = MRHistoryJobConfig.newInstance(config);
     }
 
