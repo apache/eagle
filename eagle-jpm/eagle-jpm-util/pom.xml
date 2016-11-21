@@ -27,7 +27,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>eagle-jpm-util</artifactId>
-    <name>eagle-jpm-util</name>
+    <name>Eagle::App::JPM::Utils</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

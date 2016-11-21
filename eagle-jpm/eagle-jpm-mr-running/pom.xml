@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-jpm-mr-running</artifactId>
-    <name>eagle-jpm-mr-running</name>
+    <name>Eagle::App::JPM::MRRunningJob</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

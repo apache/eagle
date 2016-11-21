@@ -29,7 +29,7 @@
     <artifactId>eagle-query-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>eagle-query-parent</name>
+    <name>Eagle::Core::Query::Parent</name>
 
     <modules>
         <module>eagle-antlr</module>

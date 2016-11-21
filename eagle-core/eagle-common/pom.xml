@@ -29,7 +29,7 @@
 
     <artifactId>eagle-common</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-common</name>
+    <name>Eagle::Core::Common</name>
 
     <dependencies>
         <dependency>

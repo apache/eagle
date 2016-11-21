@@ -24,7 +24,7 @@
         <version>0.5.0-incubating-SNAPSHOT</version>
     </parent>
     <artifactId>eagle-security-common</artifactId>
-    <name>eagle-security-common</name>
+    <name>Eagle::App::Security::Common</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

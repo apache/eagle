@@ -29,6 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-app-utils</artifactId>
+    <name>Eagle::Core::App::Utils</name>
     <packaging>jar</packaging>
 
     <dependencies>

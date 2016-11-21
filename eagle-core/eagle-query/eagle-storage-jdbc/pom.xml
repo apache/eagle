@@ -28,6 +28,8 @@
 
     <artifactId>eagle-storage-jdbc</artifactId>
 
+    <name>Eagle::Core::Query::JDBCStorage</name>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.eagle</groupId>

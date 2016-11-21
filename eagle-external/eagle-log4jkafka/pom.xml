@@ -27,6 +27,7 @@
     <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-log4jkafka</artifactId>
+    <name>Eagle::External::Log4jKafkaAppender</name>
 
     <dependencies>
         <dependency>

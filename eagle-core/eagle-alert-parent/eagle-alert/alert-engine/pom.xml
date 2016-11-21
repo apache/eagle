@@ -22,6 +22,7 @@
     </parent>
 
     <artifactId>alert-engine</artifactId>
+    <name>Eagle::Core::Alert::Engine</name>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -28,7 +28,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>eagle-jpm-parent</artifactId>
-    <name>eagle-jpm-parent</name>
+    <name>Eagle::App::JPM::Parent</name>
     <description>eagle job performance monitoring project</description>
     <packaging>pom</packaging>
 

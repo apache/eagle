@@ -28,8 +28,8 @@
     </parent>
 
     <artifactId>eagle-alert-service</artifactId>
+    <name>Eagle::Core::Alert::Service</name>
     <packaging>jar</packaging>
-    <name>eagle-alert-service</name>
 
     <dependencies>
         <dependency>

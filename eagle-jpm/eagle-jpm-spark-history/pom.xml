@@ -27,7 +27,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>eagle-jpm-spark-history</artifactId>
-    <name>eagle-jpm-spark-history</name>
+    <name>Eagle::App::JPM::SparkHistoryJob</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

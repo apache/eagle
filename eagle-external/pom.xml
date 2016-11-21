@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-external-parent</artifactId>
+    <name>Eagle::External::Parent</name>
     <packaging>pom</packaging>
 
     <modules>

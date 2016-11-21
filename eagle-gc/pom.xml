@@ -28,7 +28,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>eagle-gc</artifactId>
-    <name>eagle-gc</name>
+    <name>Eagle::App::GcLogMonitor</name>
     <description>eagle gc activity monitoring project</description>
     <packaging>jar</packaging>
     <dependencies>

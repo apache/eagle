@@ -28,7 +28,7 @@
 
     <artifactId>eagle-metric</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-metric</name>
+    <name>Eagle::Core::Metric</name>
 
     <dependencies>
         <dependency>

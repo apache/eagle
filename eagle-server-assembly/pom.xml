@@ -26,7 +26,7 @@
         <version>0.5.0-incubating-SNAPSHOT</version>
     </parent>
     <artifactId>eagle-server-assembly</artifactId>
-    <name>eagle-server-assembly</name>
+    <name>Eagle::Server::Assembly</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
