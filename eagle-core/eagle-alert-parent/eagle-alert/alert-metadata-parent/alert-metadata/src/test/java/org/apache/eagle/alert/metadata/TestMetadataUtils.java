@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.alert.metadata;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -26,13 +24,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
 
 /**
  * Created by luokun on 2016/11/16.
@@ -62,19 +55,5 @@ public class TestMetadataUtils {
         Object obj = new Object();
         MetadataUtils.getKey(obj);
     }
-
-    /*
-    @Test
-    public void testGetJdbcConnection() throws Exception {
-        System.setProperty("config.resource", "/application-mysql.conf");
-        ConfigFactory.invalidateCaches();
-        Config config = ConfigFactory.load().getConfig(MetadataUtils.META_DATA);
-        Connection connection = null;
-        PowerMockito.mockStatic(MetadataUtils.class);
-        PowerMockito.when(MetadataUtils.getJdbcConnection(Mockito.any())).thenReturn(Mockito.mock(Connection.class));
-        MetadataUtils.getJdbcConnection(config);
-        Assert.assertNull(connection);
-    }
-    */
 
 }
