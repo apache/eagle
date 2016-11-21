@@ -20,6 +20,7 @@ import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public class MRHistoryJobApplicationProvider extends AbstractApplicationProvider
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config) {
-        return new MRHistoryJobApplicationHealthCheck(config);
+    public HealthCheck getAppHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
+        return new MRHistoryJobApplicationHealthCheck(config, applicationEntityService);
     }
 }

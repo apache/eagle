@@ -105,9 +105,10 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
         HealthCheck applicationHealthCheck = appProvider.getAppHealthCheck(
-                ConfigFactory.parseMap(appEntity.getConfiguration())
+                        ConfigFactory.parseMap(appEntity.getContext())
                         .withFallback(config)
-                        .withFallback(ConfigFactory.parseMap(appEntity.getContext()))
+                        .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration())),
+                applicationEntityService
         );
         this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck);
         synchronized (lock) {
@@ -137,7 +138,6 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         registerAll();
         synchronized (lock) {
             for (String appId : appHealthChecks.keySet()) {
-                LOG.info("check application {}", appId);
                 HealthCheck.Result result = appHealthChecks.get(appId).execute();
                 if (result.isHealthy()) {
                     LOG.info("application {} is healthy", appId);

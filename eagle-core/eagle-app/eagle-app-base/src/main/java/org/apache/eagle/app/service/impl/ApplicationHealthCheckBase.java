@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.history;
+package org.apache.eagle.app.service.impl;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 
-public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<SparkHistoryJobApp> {
-    @Override
-    public SparkHistoryJobApp getApplication() {
-        return new SparkHistoryJobApp();
+public abstract class ApplicationHealthCheckBase extends HealthCheck {
+    private static final String APP_ID_PATH = "appId";
+    protected static final long DEFAULT_MAX_DELAY_TIME = 2 * 60 * 60 * 1000L;
+    protected static final String MAX_DELAY_TIME_KEY = "application.maxDelayTime";
+
+    protected Config config;
+
+    private ApplicationEntityService applicationEntityService;
+
+    protected ApplicationHealthCheckBase(Config config, ApplicationEntityService applicationEntityService) {
+        this.config = config;
+        this.applicationEntityService = applicationEntityService;
     }
 
-    @Override
-    public HealthCheck getAppHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
-        return new SparkHistoryJobApplicationHealthCheck(config, applicationEntityService);
+    protected ApplicationEntity.Status getApplicationStatus() {
+        ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(null, config.getString(APP_ID_PATH));
+        return applicationEntity.getStatus();
     }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.mr.history;
+package org.apache.eagle.jpm.spark.history;
 
 import com.typesafe.config.Config;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -32,26 +32,26 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBase {
-    private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobApplicationHealthCheck.class);
+public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBase {
+    private static final Logger LOG = LoggerFactory.getLogger(SparkHistoryJobApplicationHealthCheck.class);
 
-    private MRHistoryJobConfig mrHistoryJobConfig;
+    private SparkHistoryJobAppConfig sparkHistoryJobAppConfig;
 
-    public MRHistoryJobApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
+    public SparkHistoryJobApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
         super(config, applicationEntityService);
-        mrHistoryJobConfig = MRHistoryJobConfig.newInstance(config);
+        this.sparkHistoryJobAppConfig = SparkHistoryJobAppConfig.newInstance(config);
     }
 
     @Override
     public Result check() {
-        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = mrHistoryJobConfig.getEagleServiceConfig();
+        SparkHistoryJobAppConfig.EagleInfo eagleServiceConfig = sparkHistoryJobAppConfig.eagleInfo;
         IEagleServiceClient client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.host,
+                eagleServiceConfig.port,
                 eagleServiceConfig.username,
                 eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.timeout * 1000);
 
         try {
             ApplicationEntity.Status status = getApplicationStatus();
@@ -60,9 +60,9 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
                 return Result.unhealthy(message);
             }
 
-            String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
-                    Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
-                    mrHistoryJobConfig.getJobHistoryEndpointConfig().site);
+            String query = String.format("%s[@site=\"%s\"]<@site>{max(endTime)}",
+                    Constants.SPARK_APP_SERVICE_ENDPOINT_NAME,
+                    sparkHistoryJobAppConfig.stormConfig.siteId);
 
             GenericServiceAPIResponseEntity response = client
                     .search(query)
@@ -75,11 +75,11 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
             long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
             long currentTimeStamp = System.currentTimeMillis();
             long maxDelayTime = DEFAULT_MAX_DELAY_TIME;
-            if (mrHistoryJobConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
-                maxDelayTime = mrHistoryJobConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
+            if (sparkHistoryJobAppConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
+                maxDelayTime = sparkHistoryJobAppConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
             }
 
-            if (currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
+            if (currentTimeStamp - currentProcessTimeStamp > maxDelayTime * 3) {
                 String message = String.format("Current process time is %sms, delay %s hours",
                         currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L / 60);
                 return Result.unhealthy(message);

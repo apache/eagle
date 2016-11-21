@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.mr.history;
+package org.apache.eagle.topology;
 
 import com.typesafe.config.Config;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.eagle.app.service.impl.ApplicationHealthCheckBase;
-import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
@@ -32,26 +31,26 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBase {
-    private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobApplicationHealthCheck.class);
+public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckBase {
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyCheckApplicationHealthCheck.class);
 
-    private MRHistoryJobConfig mrHistoryJobConfig;
+    private TopologyCheckAppConfig topologyCheckAppConfig;
 
-    public MRHistoryJobApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
+    public TopologyCheckApplicationHealthCheck(Config config, ApplicationEntityService applicationEntityService) {
         super(config, applicationEntityService);
-        mrHistoryJobConfig = MRHistoryJobConfig.newInstance(config);
+        topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
     }
 
     @Override
     public Result check() {
-        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = mrHistoryJobConfig.getEagleServiceConfig();
+        //FIXME, this application owner please add eagle server config to Class TopologyCheckAppConfig
         IEagleServiceClient client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
-                eagleServiceConfig.username,
-                eagleServiceConfig.password);
+                topologyCheckAppConfig.getConfig().getString("service.host"),
+                topologyCheckAppConfig.getConfig().getInt("service.port"),
+                topologyCheckAppConfig.getConfig().getString("service.username"),
+                topologyCheckAppConfig.getConfig().getString("service.password"));
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(topologyCheckAppConfig.getConfig().getInt("service.readTimeOutSeconds") * 1000);
 
         try {
             ApplicationEntity.Status status = getApplicationStatus();
@@ -60,23 +59,23 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
                 return Result.unhealthy(message);
             }
 
-            String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
-                    Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
-                    mrHistoryJobConfig.getJobHistoryEndpointConfig().site);
+            String query = String.format("%s[@site=\"%s\"]<@site>{max(timestamp)}",
+                    TopologyConstants.GENERIC_METRIC_SERVICE,
+                    topologyCheckAppConfig.dataExtractorConfig.site);
 
             GenericServiceAPIResponseEntity response = client
                     .search(query)
-                    .startTime(0L)
+                    .metricName(String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, TopologyConstants.REGIONSERVER_ROLE))
+                    .startTime(System.currentTimeMillis() - 2 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
-                    .pageSize(10)
+                    .pageSize(Integer.MAX_VALUE)
                     .send();
-
             List<Map<List<String>, List<Double>>> results = response.getObj();
             long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
             long currentTimeStamp = System.currentTimeMillis();
             long maxDelayTime = DEFAULT_MAX_DELAY_TIME;
-            if (mrHistoryJobConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
-                maxDelayTime = mrHistoryJobConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
+            if (topologyCheckAppConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
+                maxDelayTime = topologyCheckAppConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
             }
 
             if (currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
