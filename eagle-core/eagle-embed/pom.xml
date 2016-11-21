@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-embed-parent</artifactId>
+    <name>Eagle::Core::Embed::Parent</name>
     <packaging>pom</packaging>
 
     <modules>

@@ -27,7 +27,7 @@
     <artifactId>eagle-parent</artifactId>
     <version>0.5.0-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Apache Eagle Parent</name>
+    <name>Eagle::Parent</name>
     <url>https://eagle.incubator.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>

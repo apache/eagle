@@ -28,7 +28,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>eagle-security-parent</artifactId>
-    <name>eagle-security-parent</name>
+    <name>Eagle::App::Security::Parent</name>
     <description>eagle security data activity monitoring project</description>
     <packaging>pom</packaging>
 

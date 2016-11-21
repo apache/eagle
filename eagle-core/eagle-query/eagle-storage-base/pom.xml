@@ -25,6 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-storage-base</artifactId>
+    <name>Eagle::Core::Query::StorageBase</name>
 
     <dependencies>
         <dependency>

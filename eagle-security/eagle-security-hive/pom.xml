@@ -24,7 +24,7 @@
 		<version>0.5.0-incubating-SNAPSHOT</version>
 	</parent>
 	<artifactId>eagle-security-hive</artifactId>
-	<name>eagle-security-hive</name>
+	<name>Eagle::App::Security::HiveSecurity</name>
 	<url>http://maven.apache.org</url>
 	<packaging>jar</packaging>
 

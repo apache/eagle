@@ -28,6 +28,8 @@
 
     <artifactId>eagle-query-base</artifactId>
 
+    <name>Eagle::Core::Query::Base</name>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.eagle</groupId>

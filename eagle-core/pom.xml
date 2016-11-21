@@ -28,7 +28,7 @@
 
     <artifactId>eagle-core</artifactId>
     <packaging>pom</packaging>
-    <name>eagle core</name>
+    <name>Eagle::Core::Parent</name>
     <description>Distributed Real-time Monitoring and Alerting Framework Core</description>
 
     <properties>

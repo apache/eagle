@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-storage-hbase</artifactId>
+    <name>Eagle::Core::Query::HBaseStorage</name>
 
     <dependencies>
         <!-- added for jira EAGLE-47 -->

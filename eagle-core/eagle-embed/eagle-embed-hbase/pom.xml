@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-embed-hbase</artifactId>
+    <name>Eagle::Core::Embed::HBase</name>
     <packaging>jar</packaging>
 
     <dependencies>

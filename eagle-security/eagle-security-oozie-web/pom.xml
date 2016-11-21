@@ -25,7 +25,7 @@
         <version>0.5.0-incubating-SNAPSHOT</version>
     </parent>
     <artifactId>eagle-security-oozie-web</artifactId>
-    <name>eagle-security-oozie-web</name>
+    <name>Eagle::App::Security::OozieService</name>
     <url>http://maven.apache.org</url>
     <properties>
         <powermock.version>1.6.5</powermock.version>

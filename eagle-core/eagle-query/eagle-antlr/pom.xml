@@ -28,7 +28,7 @@
 
     <artifactId>eagle-antlr</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-antlr</name>
+    <name>Eagle::Core::Query::Antlr</name>
 
     <dependencies>
         <dependency>

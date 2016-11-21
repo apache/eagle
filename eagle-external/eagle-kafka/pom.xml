@@ -25,6 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-kafka</artifactId>
+    <name>Eagle::External::KafkaExtension</name>
 
     <dependencies>
         <dependency>

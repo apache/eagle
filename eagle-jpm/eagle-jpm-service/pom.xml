@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-jpm-service</artifactId>
+    <name>Eagle::App::JPM::JobService</name>
 
     <dependencies>
         <dependency>

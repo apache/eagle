@@ -21,6 +21,7 @@
     </parent>
 
     <artifactId>alert-devtools</artifactId>
+    <name>Eagle::Core::Alert::DevTools</name>
 
     <properties>
         <maven-scala.version>2.15.0</maven-scala.version>

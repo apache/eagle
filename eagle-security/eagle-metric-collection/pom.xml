@@ -26,7 +26,7 @@
     </parent>
     <artifactId>eagle-metric-collection</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-metric-collection</name>
+    <name>Eagle::App::Security::MetricCollection</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
