@@ -34,8 +34,8 @@ import java.util.Map;
  * 7. pagination: pageSize and startRowkey
  */
 public class SearchCondition{
-	private String startTime;
-	private String endTime;
+	private long startTime;
+	private long endTime;
 	private Filter filter;
 	private List<String> outputFields;
 	private boolean outputAll;
@@ -113,16 +113,16 @@ public class SearchCondition{
 	public void setOutputFields(List<String> outputFields) {
 		this.outputFields = outputFields;
 	}
-	public String getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
-	public void setStartTime(String startTime) {
+	public void setStartTime(long startTime) {
 		this.startTime = startTime;
 	}
-	public String getEndTime() {
+	public long getEndTime() {
 		return endTime;
 	}
-	public void setEndTime(String endTime) {
+	public void setEndTime(long endTime) {
 		this.endTime = endTime;
 	}
 	public List<String> getPartitionValues() {

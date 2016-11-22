@@ -174,9 +174,11 @@ public class GenericInMemoryAggregateQuery implements GenericQuery {
                 reader = new GenericMetricEntityDecompactionStreamReader(this.prefix, searchCondition);
             }
             TimeSeriesAggregator tsAgg = new TimeSeriesAggregator(groupbyFields,
-                aggregateCondition.getAggregateFunctionTypes(), aggregateFields,
-                    DateTimeUtil.humanDateToDate(searchCondition.getStartTime()).getTime(),
-                DateTimeUtil.humanDateToDate(searchCondition.getEndTime()).getTime(), aggregateCondition.getIntervalMS());
+                    aggregateCondition.getAggregateFunctionTypes(),
+                    aggregateFields,
+                    searchCondition.getStartTime(),
+                    searchCondition.getEndTime(),
+                    aggregateCondition.getIntervalMS());
             reader.register(tsAgg);
 
             // for sorting

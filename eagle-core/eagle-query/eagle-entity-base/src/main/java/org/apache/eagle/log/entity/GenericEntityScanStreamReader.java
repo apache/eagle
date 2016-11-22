@@ -80,8 +80,8 @@ public class GenericEntityScanStreamReader extends StreamReader {
 		}
 		// Process the time range if needed
 		if(entityDef.isTimeSeries()){
-			start = DateTimeUtil.humanDateToDate(condition.getStartTime());
-			end = DateTimeUtil.humanDateToDate(condition.getEndTime());
+			start = new Date(condition.getStartTime());
+			end = new Date(condition.getEndTime());
 		}else{
 			start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
 			end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
