@@ -24,7 +24,6 @@ import org.apache.eagle.log.entity.SearchCondition;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.query.ListQueryCompiler;
 import org.apache.eagle.service.hbase.EmbeddedHbase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Assert;
@@ -32,12 +31,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class TestHBaseLogReader2 {
 	private final static Logger LOG = LoggerFactory.getLogger(TestHBaseLogReader2.class);
@@ -80,8 +74,8 @@ public class TestHBaseLogReader2 {
 		writer.write(entities);
 
 		// for timezone difference between UTC & localtime, enlarge the search range
-		long queryStartTimestamp = timestamp1-24*60*60*1000;
-		long queryEndTimestamp = timestamp1+24*60*60*1000;
+		long queryStartTimestamp = timestamp1 - DateTimeUtil.ONEDAY;
+		long queryEndTimestamp = timestamp1 + DateTimeUtil.ONEDAY;
 		LOG.info("Query start timestamp:" + queryStartTimestamp);
 		LOG.info("Query end  timestamp:" + queryEndTimestamp);
 
@@ -100,8 +94,8 @@ public class TestHBaseLogReader2 {
 
 		condition.setStartRowkey(null);
 		condition.setPageSize(Integer.MAX_VALUE);
-		condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(0));
-		condition.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryEndTimestamp));
+		condition.setStartTime(0);
+		condition.setEndTime(queryEndTimestamp);
 
 		GenericEntityBatchReader reader = new GenericEntityBatchReader(serviceName, condition);
 		List<TestTimeSeriesAPIEntity> list = reader.read();
@@ -111,18 +105,18 @@ public class TestHBaseLogReader2 {
 		Assert.assertEquals("field7", list.get(0).getField7());
 
 		// for timezone difference between UTC & localtime, enlarge the search range
-		queryStartTimestamp = timestamp1-24*60*60*1000;
-		queryEndTimestamp = timestamp2+24*60*60*1000;  // eagle timestamp is rounded to seconds
-		condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryStartTimestamp));
-		condition.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryEndTimestamp));
+		queryStartTimestamp = timestamp1 - DateTimeUtil.ONEDAY;
+		queryEndTimestamp = timestamp2 + DateTimeUtil.ONEDAY;  // eagle timestamp is rounded to seconds
+		condition.setStartTime(queryStartTimestamp);
+		condition.setEndTime(queryEndTimestamp);
 		reader = new GenericEntityBatchReader(serviceName, condition);
 		list = reader.read();
 		Assert.assertEquals(2, list.size());
 
 		queryStartTimestamp = timestamp1;
 		queryEndTimestamp = timestamp1;  // eagle timestamp is rounded to seconds
-		condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryStartTimestamp));
-		condition.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryEndTimestamp));
+		condition.setStartTime(queryStartTimestamp);
+		condition.setEndTime(queryEndTimestamp);
 		reader = new GenericEntityBatchReader(serviceName, condition);
 		list = reader.read();
 		Assert.assertEquals(0, list.size());

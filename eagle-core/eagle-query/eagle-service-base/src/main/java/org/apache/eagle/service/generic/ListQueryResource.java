@@ -117,8 +117,8 @@ public class ListQueryResource {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName(serviceName);
 			if(ed.isTimeSeries()){
 				// TODO check timestamp exists for timeseries or topology data
-				condition.setStartTime(startTime);
-				condition.setEndTime(endTime);
+				condition.setStartTime(DateTimeUtil.parseTimeStrToMilliseconds(startTime));
+				condition.setEndTime(DateTimeUtil.parseTimeStrToMilliseconds(endTime));
 			}
 
 			// 4. Set HBase start scanning rowkey if given
@@ -240,8 +240,8 @@ public class ListQueryResource {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName(serviceName);
 			if(ed.isTimeSeries()){
 				// TODO check timestamp exists for timeseries or topology data
-				condition.setStartTime(startTime);
-				condition.setEndTime(endTime);
+				condition.setStartTime(DateTimeUtil.parseTimeStrToMilliseconds(startTime));
+				condition.setEndTime(DateTimeUtil.parseTimeStrToMilliseconds(endTime));
 			}
 			condition.setOutputVerbose(verbose==null || verbose );
 			condition.setOutputAlias(comp.getOutputAlias());
@@ -399,7 +399,7 @@ public class ListQueryResource {
 					LOG.info("Output: " + StringUtils.join(condition.getOutputFields(), ", "));
 				}
 				TimeSeriesAggregator tsAgg = new TimeSeriesAggregator(groupbyFields, comp.aggregateFunctionTypes(), aggregateFields,
-						DateTimeUtil.humanDateToDate(condition.getStartTime()).getTime(), DateTimeUtil.humanDateToDate(condition.getEndTime()).getTime(), intervalmin*60*1000);
+						condition.getStartTime(), condition.getEndTime(), intervalmin*60*1000);
 				if(parallel <= 0){
 					reader.register(tsAgg);
 				}else{

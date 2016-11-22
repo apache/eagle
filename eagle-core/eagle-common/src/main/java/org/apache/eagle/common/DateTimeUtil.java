@@ -161,4 +161,12 @@ public class DateTimeUtil {
         Date d = sdf.parse(date);
         return d.getTime();
     }
+
+    public static long parseTimeStrToMilliseconds(String timeStr) throws ParseException {
+        try {
+            return Long.valueOf(timeStr);
+        } catch (Exception ex) {
+            return humanDateToSeconds(timeStr) * ONESECOND;
+        }
+    }
 }
