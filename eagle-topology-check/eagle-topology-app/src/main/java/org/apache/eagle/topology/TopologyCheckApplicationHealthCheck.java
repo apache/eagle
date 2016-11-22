@@ -85,7 +85,7 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
                 return Result.healthy();
             }
         } catch (Exception e) {
-            return Result.unhealthy(ExceptionUtils.getStackTrace(e.getCause()));
+            return Result.unhealthy(ExceptionUtils.getStackTrace(e));
         } finally {
             client.getJerseyClient().destroy();
             try {

@@ -65,7 +65,7 @@ public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthChec
 
             GenericServiceAPIResponseEntity response = client
                     .search(query)
-                    .startTime(0L)
+                    .startTime(System.currentTimeMillis() - 24 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
                     .pageSize(10)
                     .send();
@@ -86,7 +86,7 @@ public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthChec
                 return Result.healthy();
             }
         } catch (Exception e) {
-            return Result.unhealthy(ExceptionUtils.getStackTrace(e.getCause()));
+            return Result.unhealthy(ExceptionUtils.getStackTrace(e));
         } finally {
             client.getJerseyClient().destroy();
             try {
