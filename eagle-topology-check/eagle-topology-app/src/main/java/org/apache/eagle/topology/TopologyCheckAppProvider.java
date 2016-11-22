@@ -18,11 +18,18 @@
 
 package org.apache.eagle.topology;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 public class TopologyCheckAppProvider extends AbstractApplicationProvider<TopologyCheckApp> {
     @Override
     public TopologyCheckApp getApplication() {
         return new TopologyCheckApp();
+    }
+
+    @Override
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new TopologyCheckApplicationHealthCheck(config);
     }
 }
