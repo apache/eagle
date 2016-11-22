@@ -17,11 +17,18 @@
 
 package org.apache.eagle.jpm.spark.history;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<SparkHistoryJobApp> {
     @Override
     public SparkHistoryJobApp getApplication() {
         return new SparkHistoryJobApp();
+    }
+
+    @Override
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new SparkHistoryJobApplicationHealthCheck(config);
     }
 }

@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.mr.history;
+package org.apache.eagle.hadoop.queue;
 
 import com.typesafe.config.Config;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.eagle.app.service.impl.ApplicationHealthCheckBase;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -31,26 +32,26 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBase {
-    private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobApplicationHealthCheck.class);
+public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthCheckBase {
+    private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningApplicationHealthCheck.class);
 
-    private MRHistoryJobConfig mrHistoryJobConfig;
+    private HadoopQueueRunningAppConfig hadoopQueueRunningAppConfig;
 
-    public MRHistoryJobApplicationHealthCheck(Config config) {
+    public HadoopQueueRunningApplicationHealthCheck(Config config) {
         super(config);
-        mrHistoryJobConfig = MRHistoryJobConfig.newInstance(config);
+        this.hadoopQueueRunningAppConfig = new HadoopQueueRunningAppConfig(config);
     }
 
     @Override
     public Result check() {
-        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = mrHistoryJobConfig.getEagleServiceConfig();
+        HadoopQueueRunningAppConfig.EagleProps eagleServiceConfig = this.hadoopQueueRunningAppConfig.eagleProps;
         IEagleServiceClient client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
-                eagleServiceConfig.username,
-                eagleServiceConfig.password);
+                eagleServiceConfig.eagleService.host,
+                eagleServiceConfig.eagleService.port,
+                eagleServiceConfig.eagleService.username,
+                eagleServiceConfig.eagleService.password);
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(60000);
 
         try {
             ApplicationEntity.Status status = getApplicationStatus();
@@ -59,23 +60,23 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
                 return Result.unhealthy(message);
             }
 
-            String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
-                    Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
-                    mrHistoryJobConfig.getJobHistoryEndpointConfig().site);
+            String query = String.format("%s[@site=\"%s\"]<@site>{max(timestamp)}",
+                    Constants.GENERIC_METRIC_SERVICE,
+                    hadoopQueueRunningAppConfig.eagleProps.site);
 
             GenericServiceAPIResponseEntity response = client
                     .search(query)
-                    .startTime(0L)
+                    .metricName(HadoopClusterConstants.MetricName.HADOOP_CLUSTER_ALLOCATED_MEMORY)
+                    .startTime(System.currentTimeMillis() - 2 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
-                    .pageSize(10)
+                    .pageSize(Integer.MAX_VALUE)
                     .send();
-
             List<Map<List<String>, List<Double>>> results = response.getObj();
             long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
             long currentTimeStamp = System.currentTimeMillis();
             long maxDelayTime = DEFAULT_MAX_DELAY_TIME;
-            if (mrHistoryJobConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
-                maxDelayTime = mrHistoryJobConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
+            if (hadoopQueueRunningAppConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
+                maxDelayTime = hadoopQueueRunningAppConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
             }
 
             if (currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {

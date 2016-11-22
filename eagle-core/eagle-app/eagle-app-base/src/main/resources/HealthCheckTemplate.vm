@@ -23,7 +23,7 @@
 <body>
     #set ( $elem = $unHealthyContext )
 
-<p><b>Message: </b>$elem["appId"] is delayed</p>
+<p><b>Message: </b>$elem["appId"] has delayed</p>
 <p><b>Detail: </b>$elem["unHealthyMessage"]</p>
 
 </body>
