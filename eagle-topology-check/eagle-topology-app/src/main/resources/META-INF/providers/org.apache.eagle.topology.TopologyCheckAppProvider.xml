@@ -26,25 +26,25 @@
         <property>
             <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
             <displayName>Fetch Data Interval in Secs</displayName>
-            <description>Fetch Data Interval in Secs</description>
+            <description>fetch data interval in secs</description>
             <value>300</value>
         </property>
         <property>
             <name>dataExtractorConfig.parseThreadPoolSize</name>
             <displayName>Parser Thread Pool Size</displayName>
-            <description>Parser Thread Pool Size</description>
+            <description>parser thread pool size</description>
             <value>5</value>
         </property>
         <property>
             <name>dataExtractorConfig.numDataFetcherSpout</name>
             <displayName>Spout Task Number</displayName>
-            <description>Spout Task Number</description>
+            <description>spout task number</description>
             <value>1</value>
         </property>
         <property>
             <name>dataExtractorConfig.numEntityPersistBolt</name>
             <displayName>Bolt Task Number</displayName>
-            <description>Bolt Task Number</description>
+            <description>bolt task number</description>
             <value>1</value>
         </property>
 
@@ -58,56 +58,46 @@
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>HBase Zookeeper Quorum</displayName>
-            <description>HBase Zookeeper Quorum</description>
+            <description>hbase zookeeper quorum (optional)</description>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkZnodeParent</name>
             <displayName>Hbase Zookeeper Znode Parent Root</displayName>
-            <description>Hbase Zookeeper Znode Parent Root</description>
+            <description>hbase zookeeper znode parent root (optional)</description>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
             <displayName>Hbase Zookeeper Client Port</displayName>
-            <description>Hbase Zookeeper Client Port</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
-            <displayName>Hbase Master Principal</displayName>
-            <description>Hbase Master Principal</description>
+            <description>hbase zookeeper client port (optional)</description>
         </property>
 
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.eagle.principal</name>
-            <displayName>Hbase Eagle Principal</displayName>
-            <description>Hbase Master Principal</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hbase.kerberos.eagle.keytab</name>
-            <displayName>Hbase Eagle KeyTab</displayName>
-            <description>Hbase Eagle KeyTab</description>
-            <value></value>
-        </property>
 
         <property>
             <name>dataSourceConfig.hdfs.namenodeUrl</name>
             <displayName>Hdfs Namenode Web URL</displayName>
-            <description>Hdfs Namenode Web URL</description>
+            <description>hdfs namenode web url for HDFS monitor</description>
             <value>http://sandbox.hortonworks.com:50070</value>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.mr.rmUrl</name>
             <displayName>Resource Manager URL</displayName>
-            <description>Resource Manager URL</description>
+            <description>resource manager url for YARN monitor</description>
             <value>http://sandbox.hortonworks.com:8088</value>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.mr.historyServerUrl</name>
             <displayName>History Server URL</displayName>
-            <description>History Server URL</description>
+            <description>URL for history server monitor (optional)</description>
             <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.enabled</name>
+            <displayName>HBase Config Enabled</displayName>
+            <description>enabled for HBase monitor</description>
+            <value>false</value>
+            <required>true</required>
         </property>
 
         <property>
@@ -122,25 +112,25 @@
             <name>dataSinkConfig.topic</name>
             <displayName>Topic For Kafka Data Sink</displayName>
             <value>topology_health_check</value>
-            <description>Topic For Kafka Data Sink</description>
+            <description>topic For kafka data sink</description>
         </property>
         <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>Kafka Broker List</displayName>
             <value>server.eagle.apache.org:9092</value>
-            <description>Kafka Broker List</description>
+            <description>kafka broker list</description>
         </property>
         <property>
             <name>dataSinkConfig.serializerClass</name>
             <displayName>Serializer Class Kafka Message Value</displayName>
             <value>kafka.serializer.StringEncoder</value>
-            <description>Serializer Class Kafka Message Value</description>
+            <description>serializer class kafka message value</description>
         </property>
         <property>
             <name>dataSinkConfig.keySerializerClass</name>
             <displayName>Serializer Class Kafka Message Key</displayName>
             <value>kafka.serializer.StringEncoder</value>
-            <description>Serializer Class Kafka Message Key</description>
+            <description>serializer class kafka message key</description>
         </property>
 
     </configuration>
