@@ -116,4 +116,20 @@ public class ClusterInfo implements Serializable {
     public void setHadoopVersionBuiltOn(String hadoopVersionBuiltOn) {
         this.hadoopVersionBuiltOn = hadoopVersionBuiltOn;
     }
+
+    @Override
+    public String toString() {
+        return "ClusterInfo{"
+                + "id=" + id
+                + ", startedOn=" + startedOn
+                + ", state='" + state + '\''
+                + ", haState='" + haState + '\''
+                + ", resourceManagerVersion='" + resourceManagerVersion + '\''
+                + ", resourceManagerBuildVersion='" + resourceManagerBuildVersion + '\''
+                + ", resourceManagerVersionBuiltOn='" + resourceManagerVersionBuiltOn + '\''
+                + ", hadoopVersion='" + hadoopVersion + '\''
+                + ", hadoopBuildVersion='" + hadoopBuildVersion + '\''
+                + ", hadoopVersionBuiltOn='" + hadoopVersionBuiltOn + '\''
+                + '}';
+    }
 }

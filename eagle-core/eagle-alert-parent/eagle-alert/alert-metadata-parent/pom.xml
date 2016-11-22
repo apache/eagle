@@ -21,6 +21,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alert-metadata-parent</artifactId>
+    <name>Eagle::Core::Alert::Metadata</name>
     <packaging>pom</packaging>
 
     <modules>

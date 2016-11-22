@@ -207,4 +207,29 @@ public class AppInfo implements Serializable {
         this.runningContainers = runningContainers;
     }
 
+    @Override
+    public String toString() {
+        return "AppInfo{"
+                + "id='" + id + '\''
+                + ", user='" + user + '\''
+                + ", name='" + name + '\''
+                + ", queue='" + queue + '\''
+                + ", state='" + state + '\''
+                + ", finalStatus='" + finalStatus + '\''
+                + ", progress=" + progress
+                + ", trackingUI='" + trackingUI + '\''
+                + ", trackingUrl='" + trackingUrl + '\''
+                + ", diagnostics='" + diagnostics + '\''
+                + ", clusterId='" + clusterId + '\''
+                + ", applicationType='" + applicationType + '\''
+                + ", startedTime=" + startedTime
+                + ", finishedTime=" + finishedTime
+                + ", elapsedTime=" + elapsedTime
+                + ", amContainerLogs='" + amContainerLogs + '\''
+                + ", amHostHttpAddress='" + amHostHttpAddress + '\''
+                + ", allocatedMB=" + allocatedMB
+                + ", allocatedVCores=" + allocatedVCores
+                + ", runningContainers=" + runningContainers
+                + '}';
+    }
 }

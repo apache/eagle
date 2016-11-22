@@ -29,6 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-topology-app</artifactId>
+    <name>Eagle::App::TopologyCheck::AppProvider</name>
     <packaging>jar</packaging>
 
     <dependencies>

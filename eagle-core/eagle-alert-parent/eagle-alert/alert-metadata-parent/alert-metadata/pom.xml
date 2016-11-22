@@ -21,6 +21,7 @@
     </parent>
 
     <artifactId>alert-metadata</artifactId>
+    <name>Eagle::Core::Alert::MetadataBase</name>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -26,6 +26,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-metadata-mongo</artifactId>
+    <name>Eagle::Core::Metadata::MongoDB</name>
 
     <dependencies>
         <dependency>

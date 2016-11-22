@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-metadata</artifactId>
+    <name>Eagle::Core::Metadata</name>
     <packaging>pom</packaging>
     <modules>
         <module>eagle-metadata-jdbc</module>

@@ -25,9 +25,8 @@
     </parent>
 
     <artifactId>eagle-alert-parent</artifactId>
+    <name>Eagle::Core::Alert</name>
     <packaging>pom</packaging>
-
-    <name>eagle-alert-parent</name>
 
     <modules>
         <module>eagle-alert</module>

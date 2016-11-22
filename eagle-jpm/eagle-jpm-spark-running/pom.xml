@@ -27,7 +27,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>eagle-jpm-spark-running</artifactId>
-    <name>eagle-jpm-spark-running</name>
+    <name>Eagle::App::JPM::SparkRunningJob</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

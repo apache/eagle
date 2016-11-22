@@ -20,6 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>alert-service</artifactId>
+    <name>Eagle::Core::Alert::ServiceApp</name>
     <description>Alert Service: Coordinator + Metadata</description>
     <packaging>jar</packaging>
 

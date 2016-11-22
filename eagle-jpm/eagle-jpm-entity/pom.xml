@@ -27,9 +27,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-jpm-entity</artifactId>
+    <name>Eagle::App::JPM::Entity</name>
     <packaging>jar</packaging>
-
-    <name>eagle-jpm-entity</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

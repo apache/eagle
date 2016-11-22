@@ -25,6 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-examples</artifactId>
+    <name>Eagle::Example::Parent</name>
     <packaging>pom</packaging>
     <modules>
         <module>eagle-app-example</module>

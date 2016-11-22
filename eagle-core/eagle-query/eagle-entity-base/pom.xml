@@ -28,7 +28,7 @@
 
     <artifactId>eagle-entity-base</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-entity-base</name>
+    <name>Eagle::Core::Query::EntityBase</name>
 
     <dependencies>
         <!-- put extcos dependency at the top for using asm 4.0 jar !-->

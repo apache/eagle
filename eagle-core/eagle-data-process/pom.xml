@@ -25,6 +25,7 @@
         <version>0.5.0-incubating-SNAPSHOT</version>
     </parent>
     <artifactId>eagle-data-process</artifactId>
+    <name>Eagle::Core::DataProcess</name>
     <packaging>jar</packaging>
     <description>Eagle Data Process Framework</description>
 

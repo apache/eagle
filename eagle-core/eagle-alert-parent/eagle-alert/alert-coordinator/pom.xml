@@ -23,7 +23,7 @@
     <artifactId>alert-coordinator</artifactId>
     <packaging>jar</packaging>
 
-    <name>alert-coordinator</name>
+    <name>Eagle::Core::Alert::Coordinator</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

@@ -27,7 +27,7 @@
     <artifactId>eagle-parent</artifactId>
     <version>0.5.0-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Apache Eagle Parent</name>
+    <name>Eagle::Parent</name>
     <url>https://eagle.incubator.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>
@@ -296,6 +296,8 @@
         <scalatest.version>2.2.4</scalatest.version>
         <mockito.version>1.8.1-rc1</mockito.version>
         <tomcat.embed.version>7.0.55</tomcat.embed.version>
+        <powermock.version>1.6.5</powermock.version>
+        <easymock.version>3.4</easymock.version>
 
         <!-- Machine Learning -->
         <ejml.version>0.25</ejml.version>
@@ -318,6 +320,8 @@
         <!-- dropwizard -->
         <dropwizard.version>0.7.1</dropwizard.version>
         <dropwizard-guice.version>0.7.0.2</dropwizard-guice.version>
+        <!-- serverlet which dropwizard depends on-->
+        <org.eclipse.jetty.orbit.javax.servlet.version>3.0.0.v201112011016</org.eclipse.jetty.orbit.javax.servlet.version>
     </properties>
 
     <dependencyManagement>

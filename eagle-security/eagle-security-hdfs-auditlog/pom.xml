@@ -25,7 +25,7 @@
     </parent>
     <artifactId>eagle-security-hdfs-auditlog</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-security-hdfs-auditlog</name>
+    <name>Eagle::App::Security::HdfsAuditLog</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

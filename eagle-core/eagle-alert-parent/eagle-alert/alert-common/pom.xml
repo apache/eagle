@@ -22,6 +22,7 @@
     </parent>
 
     <artifactId>alert-common</artifactId>
+    <name>Eagle::Core::Alert::Common</name>
     <packaging>jar</packaging>
 
     <dependencies>

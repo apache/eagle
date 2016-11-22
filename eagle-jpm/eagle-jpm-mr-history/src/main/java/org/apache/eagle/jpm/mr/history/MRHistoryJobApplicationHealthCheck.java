@@ -17,10 +17,12 @@
 
 package org.apache.eagle.jpm.mr.history;
 
-import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.eagle.app.service.impl.ApplicationHealthCheckBase;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -29,28 +31,33 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public class MRHistoryJobApplicationHealthCheck extends HealthCheck {
+public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBase {
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobApplicationHealthCheck.class);
 
     private MRHistoryJobConfig mrHistoryJobConfig;
-    private static final long DEFAULT_MAX_DELAY_TIME = 2 * 60 * 60 * 1000L;
-    private static final String MAX_DELAY_TIME_KEY = "application.maxDelayTime";
 
     public MRHistoryJobApplicationHealthCheck(Config config) {
+        super(config);
         mrHistoryJobConfig = MRHistoryJobConfig.newInstance(config);
     }
 
     @Override
     public Result check() {
-        try {
-            MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = mrHistoryJobConfig.getEagleServiceConfig();
-            IEagleServiceClient client = new EagleServiceClientImpl(
-                    eagleServiceConfig.eagleServiceHost,
-                    eagleServiceConfig.eagleServicePort,
-                    eagleServiceConfig.username,
-                    eagleServiceConfig.password);
+        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = mrHistoryJobConfig.getEagleServiceConfig();
+        IEagleServiceClient client = new EagleServiceClientImpl(
+                eagleServiceConfig.eagleServiceHost,
+                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.username,
+                eagleServiceConfig.password);
 
-            client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+
+        try {
+            ApplicationEntity.Status status = getApplicationStatus();
+            if (!status.toString().equals(ApplicationEntity.Status.RUNNING.toString())) {
+                String message = String.format("Application is not running, status is %s", status.toString());
+                return Result.unhealthy(message);
+            }
 
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
                     Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
@@ -72,14 +79,21 @@ public class MRHistoryJobApplicationHealthCheck extends HealthCheck {
             }
 
             if (currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
-                String message = String.format("current process time %sms, delay %sms",
-                        currentProcessTimeStamp, currentTimeStamp - currentProcessTimeStamp);
+                String message = String.format("Current process time is %sms, delay %s hours",
+                        currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L / 60);
                 return Result.unhealthy(message);
             } else {
                 return Result.healthy();
             }
         } catch (Exception e) {
-            return Result.unhealthy(e);
+            return Result.unhealthy(ExceptionUtils.getStackTrace(e.getCause()));
+        } finally {
+            client.getJerseyClient().destroy();
+            try {
+                client.close();
+            } catch (Exception e) {
+                LOG.warn("{}", e);
+            }
         }
     }
 }

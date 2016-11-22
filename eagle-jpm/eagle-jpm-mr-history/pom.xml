@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-jpm-mr-history</artifactId>
-    <name>eagle-jpm-mr-history</name>
+    <name>Eagle::App::JPM::MRHistoryJob</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

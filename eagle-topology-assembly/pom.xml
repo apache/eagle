@@ -32,7 +32,7 @@
         <version>0.5.0-incubating-SNAPSHOT</version>
     </parent>
     <artifactId>eagle-topology-assembly</artifactId>
-    <name>eagle-topology-assembly</name>
+    <name>Eagle::App::Assembly</name>
     <url>http://maven.apache.org</url>
     <packaging>jar</packaging>
     <dependencies>

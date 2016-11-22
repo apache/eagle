@@ -26,7 +26,7 @@
     </parent>
     <artifactId>eagle-security-maprfs-auditlog</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-security-maprfs-auditlog</name>
+    <name>Eagle::App::Security::MapRFSAuditLog</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

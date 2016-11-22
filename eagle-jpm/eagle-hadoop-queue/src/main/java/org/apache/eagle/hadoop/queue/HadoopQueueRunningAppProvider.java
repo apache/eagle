@@ -16,10 +16,17 @@
  */
 package org.apache.eagle.hadoop.queue;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 public class HadoopQueueRunningAppProvider extends AbstractApplicationProvider<HadoopQueueRunningApp> {
     public HadoopQueueRunningApp getApplication() {
         return new HadoopQueueRunningApp();
+    }
+
+    @Override
+    public HealthCheck getAppHealthCheck(Config config) {
+        return new HadoopQueueRunningApplicationHealthCheck(config);
     }
 }

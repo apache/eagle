@@ -19,9 +19,11 @@ package org.apache.eagle.app.service.impl;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dropwizard.setup.Environment;
+import org.apache.eagle.app.service.ApplicationHealthCheckPublisher;
 import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
@@ -30,6 +32,7 @@ import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,12 +43,21 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
 
     private final ApplicationProviderService applicationProviderService;
     private final ApplicationEntityService applicationEntityService;
+    private ApplicationHealthCheckPublisher applicationHealthCheckPublisher;
     private final Config config;
     private Environment environment;
     private Map<String, HealthCheck> appHealthChecks = new HashMap<>();
     private final Object lock = new Object();
     private int initialDelay = 10;
-    private int period = 10;
+    private int period = 300;
+
+    private static final String HEALTH_INITIAL_DELAY_PATH = "application.healthCheck.initialDelay";
+    private static final String HEALTH_PERIOD_PATH = "application.healthCheck.period";
+    private static final String HEALTH_PUBLISHER_PATH = "application.healthCheck.publisher";
+    private static final String HEALTH_PUBLISHER_IMPL_PATH = "application.healthCheck.publisher.publisherImpl";
+
+    @Inject
+    private Injector currentInjector;
 
     @Inject
     public ApplicationHealthCheckServiceImpl(ApplicationProviderService applicationProviderService,
@@ -54,6 +66,28 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         this.applicationProviderService = applicationProviderService;
         this.applicationEntityService = applicationEntityService;
         this.config = config;
+        if (this.config.hasPath(HEALTH_INITIAL_DELAY_PATH)) {
+            this.initialDelay = this.config.getInt(HEALTH_INITIAL_DELAY_PATH);
+        }
+
+        if (this.config.hasPath(HEALTH_PERIOD_PATH)) {
+            this.period = this.config.getInt(HEALTH_PERIOD_PATH);
+        }
+
+        this.applicationHealthCheckPublisher = null;
+        if (this.config.hasPath(HEALTH_PUBLISHER_PATH)) {
+            try {
+                String className = this.config.getString(HEALTH_PUBLISHER_IMPL_PATH);
+                Class<?> clz;
+                clz = Thread.currentThread().getContextClassLoader().loadClass(className);
+                if (ApplicationHealthCheckPublisher.class.isAssignableFrom(clz)) {
+                    Constructor<?> cotr = clz.getConstructor(Config.class);
+                    this.applicationHealthCheckPublisher = (ApplicationHealthCheckPublisher)cotr.newInstance(this.config.getConfig(HEALTH_PUBLISHER_PATH));
+                }
+            } catch (Exception e) {
+                LOG.warn("exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
+            }
+        }
     }
 
     @Override
@@ -75,11 +109,12 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
         HealthCheck applicationHealthCheck = appProvider.getAppHealthCheck(
-                ConfigFactory.parseMap(appEntity.getConfiguration())
+                        ConfigFactory.parseMap(appEntity.getContext())
                         .withFallback(config)
-                        .withFallback(ConfigFactory.parseMap(appEntity.getContext()))
+                        .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration()))
         );
         this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck);
+        currentInjector.injectMembers(applicationHealthCheck);
         synchronized (lock) {
             if (!appHealthChecks.containsKey(appEntity.getAppId())) {
                 appHealthChecks.put(appEntity.getAppId(), applicationHealthCheck);
@@ -107,12 +142,18 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         registerAll();
         synchronized (lock) {
             for (String appId : appHealthChecks.keySet()) {
-                LOG.info("check application {}", appId);
                 HealthCheck.Result result = appHealthChecks.get(appId).execute();
                 if (result.isHealthy()) {
                     LOG.info("application {} is healthy", appId);
                 } else {
                     LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
+                    if (this.applicationHealthCheckPublisher != null) {
+                        try {
+                            this.applicationHealthCheckPublisher.onUnHealthApplication(appId, result);
+                        } catch (Exception e) {
+                            LOG.warn("failed to send email for unhealthy application {}", appId, e.getCause());
+                        }
+                    }
                 }
             }
         }

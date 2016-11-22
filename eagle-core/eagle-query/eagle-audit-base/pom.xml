@@ -30,7 +30,7 @@
 
     <artifactId>eagle-audit-base</artifactId>
     <packaging>jar</packaging>
-    <name>eagle-audit-base</name>
+    <name>Eagle::Core::Query::AuditBase</name>
 
     <dependencies>
 

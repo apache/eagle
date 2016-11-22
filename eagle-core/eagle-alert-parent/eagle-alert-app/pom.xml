@@ -24,6 +24,7 @@
     <version>0.5.0-incubating-SNAPSHOT</version>
   </parent>
   <artifactId>eagle-alert-app</artifactId>
+  <name>Eagle::Core::Alert::App</name>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
