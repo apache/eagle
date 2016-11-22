@@ -162,8 +162,8 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
         }
         // Process the time range if needed
         if (entityDef.isTimeSeries()) {
-            start = DateTimeUtil.humanDateToDate(searchCondition.getStartTime());
-            end = DateTimeUtil.humanDateToDate(searchCondition.getEndTime());
+            start = new Date(searchCondition.getStartTime());
+            end = new Date(searchCondition.getEndTime());
         } else {
             start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
             end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
@@ -278,8 +278,8 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
             super(reader, query);
             try {
                 if (entityDef.isTimeSeries()) {
-                    this.start = DateTimeUtil.humanDateToDate(searchCondition.getStartTime());
-                    this.end = DateTimeUtil.humanDateToDate(searchCondition.getEndTime());
+                    this.start = new Date(searchCondition.getStartTime());
+                    this.end = new Date(searchCondition.getEndTime());
                 } else {
                     start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
                     end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
