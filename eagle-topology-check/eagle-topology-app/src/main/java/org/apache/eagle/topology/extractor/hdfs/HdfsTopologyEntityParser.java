@@ -252,6 +252,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private HdfsServiceTopologyAPIEntity createHdfsServiceEntity(String roleType, String hostname, long updateTime) {
         HdfsServiceTopologyAPIEntity entity = new HdfsServiceTopologyAPIEntity();
         entity.setTimestamp(updateTime);
+        entity.setLastUpdateTime(updateTime);
         Map<String, String> tags = new HashMap<String, String>();
         entity.setTags(tags);
         tags.put(SITE_TAG, site);

@@ -19,6 +19,7 @@
 package org.apache.eagle.alert.engine.model;
 
 import com.google.common.base.Preconditions;
+import org.apache.eagle.common.DateTimeUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -106,5 +107,15 @@ public class AlertPublishEvent {
         }
         alertEvent.setAlertData(event.getDataMap());
         return alertEvent;
+    }
+
+    public String toString() {
+        return String.format("%s %s alertId=%s, siteId=%s, policyId=%s, alertData=%s",
+            DateTimeUtil.millisecondsToHumanDateWithSeconds(alertTimestamp),
+            DateTimeUtil.CURRENT_TIME_ZONE.getID(),
+            alertId,
+            siteId,
+            policyId,
+            alertData.toString());
     }
 }
