@@ -19,6 +19,8 @@ package org.apache.eagle.app.service;
 
 import com.codahale.metrics.health.HealthCheck;
 
+import java.util.Map;
+
 public interface ApplicationHealthCheckPublisher {
-    void onUnHealthApplication(String appId, HealthCheck.Result result);
+    void onUnHealthApplication(Map<String, HealthCheck.Result> results);
 }

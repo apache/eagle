@@ -50,7 +50,7 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
     }
 
     @Override
-    public void onUnHealthApplication(String appId, HealthCheck.Result result) {
+    public void onUnHealthApplication(Map<String, HealthCheck.Result> results) {
         Properties properties = parseMailClientConfig();
         if (properties == null) {
             return;
@@ -68,9 +68,12 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                 }
 
                 final VelocityContext context = new VelocityContext();
+                Map<String, String> appMsgs = new HashMap<>();
+                for (String appId : results.keySet()) {
+                    appMsgs.put(appId, results.get(appId).getMessage());
+                }
                 Map<String, Object> unHealthyContext = new HashMap<>();
-                unHealthyContext.put("appId", appId);
-                unHealthyContext.put("unHealthyMessage", result.getMessage());
+                unHealthyContext.put("appMsgs", appMsgs);
                 unHealthyContext.put("appMgmtUrl", "http://" + config.getString(SERVICE_HOST) + ":" + config.getInt(SERVICE_PORT) + "/#/integration/site");
                 unHealthyContext.put("healthCheckUrl", "http://" + config.getString(SERVICE_HOST) + ":" + HEALTH_CHECK_PORT + "/healthcheck");
                 context.put(UNHEALTHY_CONTEXT, unHealthyContext);
@@ -79,7 +82,7 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                 success = client.send(config.getString(CONF_MAIL_SENDER),
                         recipients,
                         config.hasPath(CONF_MAIL_CC) ? config.getString(CONF_MAIL_CC) : null,
-                        config.getString(CONF_MAIL_SUBJECT) + ": " + appId,
+                        config.getString(CONF_MAIL_SUBJECT),
                         config.getString(CONF_MAIL_TEMPLATE),
                         context,
                         null);
@@ -94,9 +97,9 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
             }
         }
         if (success) {
-            LOG.info("Successfully send unhealthy email of application {}", appId);
+            LOG.info("Successfully send unhealthy email");
         } else {
-            LOG.warn("Fail sending unhealthy email of application {} after tries {} times", appId, MAX_RETRY_COUNT);
+            LOG.warn("Fail sending unhealthy email after tries {} times", MAX_RETRY_COUNT);
         }
     }
 

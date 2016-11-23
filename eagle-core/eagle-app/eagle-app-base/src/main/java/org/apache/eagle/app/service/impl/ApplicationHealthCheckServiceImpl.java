@@ -33,9 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckService {
@@ -55,7 +53,13 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private static final String HEALTH_PERIOD_PATH = "application.healthCheck.period";
     private static final String HEALTH_PUBLISHER_PATH = "application.healthCheck.publisher";
     private static final String HEALTH_PUBLISHER_IMPL_PATH = "application.healthCheck.publisher.publisherImpl";
+    private static final String HEALTH_CHECK_DAILY_SEND_HOUR_PATH = "application.healthCheck.publisher.dailySendHour";
     private static final String SERVICE_PATH = "service";
+    private static final String TIMEZONE_PATH = "service.timezone";
+    private static final String HEALTHY = "OK";
+    private boolean hasSendDaily = false;
+
+    private TimeZone timeZone;
 
     @Inject
     private Injector currentInjector;
@@ -90,6 +94,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                 LOG.warn("exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
             }
         }
+        this.timeZone = TimeZone.getTimeZone(config.getString(TIMEZONE_PATH));
     }
 
     @Override
@@ -143,6 +148,13 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         LOG.info("start application health check");
         registerAll();
 
+        boolean isDaily = false;
+        int dailySendHour = config.getInt(HEALTH_CHECK_DAILY_SEND_HOUR_PATH);
+
+        GregorianCalendar cal = new GregorianCalendar(timeZone);
+        if (cal.get(Calendar.HOUR_OF_DAY) % dailySendHour == 0 && !hasSendDaily) {
+            isDaily = true;
+        }
         Map<String, HealthCheck> copyAppHealthChecks = new HashMap<>();
         synchronized (lock) {
             for (String appId : appHealthChecks.keySet()) {
@@ -150,19 +162,32 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
             }
         }
 
+        Map<String, HealthCheck.Result> results = new HashMap<>();
         for (String appId : copyAppHealthChecks.keySet()) {
             HealthCheck.Result result = copyAppHealthChecks.get(appId).execute();
             if (result.isHealthy()) {
-                LOG.info("application {} is healthy", appId);
-            } else {
-                LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
-                if (this.applicationHealthCheckPublisher != null) {
-                    try {
-                        this.applicationHealthCheckPublisher.onUnHealthApplication(appId, result);
-                    } catch (Exception e) {
-                        LOG.warn("failed to send email for unhealthy application {}", appId, e);
+                if (isDaily) {
+                    if (result.getMessage() == null || result.getMessage().isEmpty()) {
+                        results.put(appId, HealthCheck.Result.healthy(HEALTHY));
+                    } else {
+                        results.put(appId, result);
                     }
                 }
+                LOG.info("application {} is healthy", appId);
+            } else {
+                results.put(appId, result);
+                LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
+            }
+        }
+
+        if (this.applicationHealthCheckPublisher != null) {
+            try {
+                this.applicationHealthCheckPublisher.onUnHealthApplication(results);
+                if (isDaily) {
+                    hasSendDaily = true;
+                }
+            } catch (Exception e) {
+                LOG.warn("failed to send email for unhealthy applications", e);
             }
         }
 
