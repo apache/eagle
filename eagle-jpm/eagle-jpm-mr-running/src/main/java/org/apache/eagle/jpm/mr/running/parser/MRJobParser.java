@@ -43,6 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.*;
@@ -93,10 +94,10 @@ public class MRJobParser implements Runnable {
                        List<String> configKeys,
                        Config config) {
         this.app = app;
-        this.mrJobEntityMap = new HashMap<>();
-        this.mrJobEntityMap = mrJobMap;
-        if (this.mrJobEntityMap == null) {
+        if (mrJobMap == null) {
             this.mrJobEntityMap = new HashMap<>();
+        } else {
+            this.mrJobEntityMap = mrJobMap;
         }
         this.mrJobConfigs = new HashMap<>();
 
@@ -106,7 +107,7 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
-        this.parserStatus  = ParserStatus.FINISHED;
+        this.parserStatus = ParserStatus.FINISHED;
         this.rmResourceFetcher = rmResourceFetcher;
         this.finishedTaskIds = new HashSet<>();
         this.configKeys = configKeys;
@@ -152,7 +153,7 @@ public class MRJobParser implements Runnable {
         List<Function<String, Boolean>> functions = new ArrayList<>();
         functions.add(fetchJobConfig);
         functions.add(fetchJobCounters);
-        if ((int)(Math.random() * 10) % FLUSH_TASKS_EVERY_TIME == 0) {
+        if ((int) (Math.random() * 10) % FLUSH_TASKS_EVERY_TIME == 0) {
             functions.add(fetchTasks);
         }
 
@@ -281,11 +282,11 @@ public class MRJobParser implements Runnable {
                 counterValues.put(key, item.getTotalCounterValue());
                 if (counterGroupName.equals(Constants.JOB_COUNTER)) {
                     if (key.equals(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
-                        jobExecutionAPIEntity.setDataLocalMaps((int)item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setDataLocalMaps((int) item.getTotalCounterValue());
                     } else if (key.equals(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
-                        jobExecutionAPIEntity.setRackLocalMaps((int)item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setRackLocalMaps((int) item.getTotalCounterValue());
                     } else if (key.equals(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
-                        jobExecutionAPIEntity.setTotalLaunchedMaps((int)item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setTotalLaunchedMaps((int) item.getTotalCounterValue());
                     }
                 }
             }
@@ -305,10 +306,10 @@ public class MRJobParser implements Runnable {
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
         String taskCounterURL = app.getTrackingUrl()
-            + Constants.MR_JOBS_URL + "/"
-            + jobId + "/" + Constants.MR_TASKS_URL + "/"
-            + taskId + "/" + Constants.MR_JOB_COUNTERS_URL
-            + "?" + Constants.ANONYMOUS_PARAMETER;
+                + Constants.MR_JOBS_URL + "/"
+                + jobId + "/" + Constants.MR_TASKS_URL + "/"
+                + taskId + "/" + Constants.MR_JOB_COUNTERS_URL
+                + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         TaskCounters taskCounters = null;
         try {
@@ -351,9 +352,9 @@ public class MRJobParser implements Runnable {
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
         String taskAttemptURL = app.getTrackingUrl()
-            + Constants.MR_JOBS_URL + "/"
-            + jobId + "/" + Constants.MR_TASKS_URL + "/"
-            + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+                + Constants.MR_JOBS_URL + "/"
+                + jobId + "/" + Constants.MR_TASKS_URL + "/"
+                + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         List<MRTaskAttempt> taskAttempts = null;
         try {
@@ -413,20 +414,20 @@ public class MRJobParser implements Runnable {
         Comparator<MRTask> byElapsedTimeDecrease = (e1, e2) -> -1 * Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
         //2, get finished bottom n
         Iterator<MRTask> taskIteratorIncrease = tasks.stream()
-            .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
-            .sorted(byElapsedTimeIncrease).iterator();
+                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+                .sorted(byElapsedTimeIncrease).iterator();
         needFetchAttemptTasks(taskIteratorIncrease, needFetchAttemptTasks);
 
         //3, fetch finished top n
         Iterator<MRTask> taskIteratorDecrease = tasks.stream()
-            .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
-            .sorted(byElapsedTimeDecrease).iterator();
+                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+                .sorted(byElapsedTimeDecrease).iterator();
         needFetchAttemptTasks(taskIteratorDecrease, needFetchAttemptTasks);
 
         //4, fetch running top n
         taskIteratorDecrease = tasks.stream()
-            .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
-            .sorted(byElapsedTimeDecrease).iterator();
+                .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
+                .sorted(byElapsedTimeDecrease).iterator();
         needFetchAttemptTasks(taskIteratorDecrease, needFetchAttemptTasks);
 
         return needFetchAttemptTasks;
@@ -492,9 +493,9 @@ public class MRJobParser implements Runnable {
             mrJobEntityCreationHandler.add(taskExecutionAPIEntity);
 
             if (task.getState().equals(Constants.TaskState.SUCCEEDED.toString())
-                || task.getState().equals(Constants.TaskState.FAILED.toString())
-                || task.getState().equals(Constants.TaskState.KILLED.toString())
-                || task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
+                    || task.getState().equals(Constants.TaskState.FAILED.toString())
+                    || task.getState().equals(Constants.TaskState.KILLED.toString())
+                    || task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
                 //LOG.info("mr job {} task {} has finished", jobId, task.getId());
                 this.finishedTaskIds.add(task.getId());
             }

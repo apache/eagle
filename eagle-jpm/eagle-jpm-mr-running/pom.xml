@@ -81,6 +81,22 @@
             <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
+       <!-- <dependency>
+            <groupId>org.apache.storm</groupId>
+            <artifactId>storm-core</artifactId>
+            <version>0.9.3-rc2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>-->
     </dependencies>
     <build>
         <resources>
