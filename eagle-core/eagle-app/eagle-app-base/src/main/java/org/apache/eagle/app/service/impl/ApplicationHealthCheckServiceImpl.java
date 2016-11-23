@@ -155,6 +155,10 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         if (cal.get(Calendar.HOUR_OF_DAY) % dailySendHour == 0 && !hasSendDaily) {
             isDaily = true;
         }
+
+        if (cal.get(Calendar.HOUR_OF_DAY) % dailySendHour != 0) {
+            hasSendDaily = false;
+        }
         Map<String, HealthCheck> copyAppHealthChecks = new HashMap<>();
         synchronized (lock) {
             for (String appId : appHealthChecks.keySet()) {
