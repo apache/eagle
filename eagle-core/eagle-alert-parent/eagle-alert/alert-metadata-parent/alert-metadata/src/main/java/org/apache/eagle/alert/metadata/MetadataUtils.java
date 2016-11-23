@@ -75,6 +75,7 @@ public class MetadataUtils {
     }
 
     public static Connection getJdbcConnection(Config config) {
+
         Connection connection = null;
         try {
             if (config.hasPath(JDBC_USERNAME_PATH)) {
