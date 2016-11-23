@@ -35,6 +35,11 @@ public class PublishConstants {
     public static final String BROKER_LIST = "kafka_broker";
     public static final String WRITE_MODE = "kafka_write_mode";
 
+    // local rotated file constants
+    public static final String FILE_NAME = "fileName";
+    public static final String ROTATE_EVERY_KB = "rotate_every_kb";
+    public static final String NUMBER_OF_FILES = "number_of_files";
+
     // slack specific constants
     public static final String TOKEN = "token";
     public static final String CHANNELS = "channels";

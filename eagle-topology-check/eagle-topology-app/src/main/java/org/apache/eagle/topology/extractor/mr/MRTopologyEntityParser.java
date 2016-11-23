@@ -203,6 +203,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
 
     private MRServiceTopologyAPIEntity createEntity(String roleType, String hostname, long updateTime) {
         MRServiceTopologyAPIEntity entity = new MRServiceTopologyAPIEntity();
+        entity.setTimestamp(updateTime);
         entity.setLastUpdateTime(updateTime);
         Map<String, String> tags = new HashMap<String, String>();
         entity.setTags(tags);

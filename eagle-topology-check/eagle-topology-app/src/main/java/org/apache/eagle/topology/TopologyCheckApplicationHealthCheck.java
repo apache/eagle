@@ -64,7 +64,7 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
 
             GenericServiceAPIResponseEntity response = client
                     .search(query)
-                    .metricName(String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, TopologyConstants.REGIONSERVER_ROLE))
+                    .metricName(String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, TopologyConstants.DATA_NODE_ROLE))
                     .startTime(System.currentTimeMillis() - 2 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
                     .pageSize(Integer.MAX_VALUE)
@@ -85,7 +85,7 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
                 return Result.healthy();
             }
         } catch (Exception e) {
-            return Result.unhealthy(ExceptionUtils.getStackTrace(e.getCause()));
+            return Result.unhealthy(ExceptionUtils.getStackTrace(e));
         } finally {
             client.getJerseyClient().destroy();
             try {
