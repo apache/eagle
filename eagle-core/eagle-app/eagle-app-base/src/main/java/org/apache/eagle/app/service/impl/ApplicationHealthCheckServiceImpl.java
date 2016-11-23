@@ -83,7 +83,8 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                 clz = Thread.currentThread().getContextClassLoader().loadClass(className);
                 if (ApplicationHealthCheckPublisher.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor(Config.class);
-                    this.applicationHealthCheckPublisher = (ApplicationHealthCheckPublisher)cotr.newInstance(this.config.getConfig(HEALTH_PUBLISHER_PATH).withFallback(this.config.getConfig(SERVICE_PATH)));
+                    this.applicationHealthCheckPublisher = (ApplicationHealthCheckPublisher)cotr.newInstance(
+                            this.config.getConfig(HEALTH_PUBLISHER_PATH).withFallback(this.config.getConfig(SERVICE_PATH)));
                 }
             } catch (Exception e) {
                 LOG.warn("exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
