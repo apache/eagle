@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.storm;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
@@ -87,40 +88,31 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
             } else {
                 apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
                 LOG.info("get {} apps from resource manager", apps.size());
-                Set<String> running = new HashSet<>();
-                for (AppInfo appInfo : apps) {
-                    running.add(appInfo.getId());
-                }
-                Iterator<String> appIdIterator = this.runningYarnApps.iterator();
-                while (appIdIterator.hasNext()) {
-                    String appId = appIdIterator.next();
-                    boolean hasFinished = true;
-                    for (AppInfo appInfo : apps) {
-                        if (appId.equals(appInfo.getId())) {
-                            hasFinished = false;
-                        }
-                    }
 
-                    if (hasFinished) {
-                        try {
-                            Map<String, JobExecutionAPIEntity> result = this.runningJobManager.recoverYarnApp(appId);
-                            if (result.size() > 0) {
-                                if (mrApps == null) {
-                                    mrApps = new HashMap<>();
-                                }
-                                mrApps.put(appId, result);
-                                AppInfo appInfo = result.get(result.keySet().iterator().next()).getAppInfo();
-                                appInfo.setState(Constants.AppState.FINISHED.toString());
-                                apps.add(appInfo);
+                Set<String> runningAppIdsAtThisTime = runningAppIdsAtThisTime(apps);
+                Set<String> runningAppIdsAtPreviousTime = this.runningYarnApps;
+                Set<String> finishedAppIds = getFinishedAppIds(runningAppIdsAtThisTime, runningAppIdsAtPreviousTime);
+
+                Iterator<String> finishedAppIdIterator = finishedAppIds.iterator();
+                while (finishedAppIdIterator.hasNext()) {
+                    String appId = finishedAppIdIterator.next();
+                    try {
+                        Map<String, JobExecutionAPIEntity> result = this.runningJobManager.recoverYarnApp(appId);
+                        if (result.size() > 0) {
+                            if (mrApps == null) {
+                                mrApps = new HashMap<>();
                             }
-                        } catch (KeeperException.NoNodeException e) {
-                            LOG.warn("{}", e);
-                            LOG.warn("yarn app {} has finished", appId);
+                            mrApps.put(appId, result);
+                            AppInfo appInfo = result.get(result.keySet().iterator().next()).getAppInfo();
+                            appInfo.setState(Constants.AppState.FINISHED.toString());
+                            apps.add(appInfo);
                         }
+                    } catch (KeeperException.NoNodeException e) {
+                        LOG.warn("{}", e);
+                        LOG.warn("yarn app {} has finished", appId);
                     }
                 }
-
-                this.runningYarnApps = running;
+                this.runningYarnApps = runningAppIdsAtThisTime;
                 LOG.info("get {} total apps(contains finished)", apps.size());
             }
 
@@ -139,6 +131,20 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
         } finally {
             Utils.sleep(endpointConfig.fetchRunningJobInterval);
         }
+    }
+
+
+    private Set<String> getFinishedAppIds(Set<String> runningAppIdsAtThisTime, Set<String> runningAppIdsAtPreviousTime) {
+        Set<String> finishedAppIds = new HashSet<>(CollectionUtils.subtract(runningAppIdsAtPreviousTime, runningAppIdsAtThisTime));
+        return finishedAppIds;
+    }
+
+    private Set<String> runningAppIdsAtThisTime(List<AppInfo> apps) {
+        Set<String> running = new HashSet<>();
+        for (AppInfo appInfo : apps) {
+            running.add(appInfo.getId());
+        }
+        return running;
     }
 
     private Map<String, Map<String, JobExecutionAPIEntity>> recoverRunningApps() {
