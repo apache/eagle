@@ -94,13 +94,13 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                 LOG.warn("exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
             }
         }
-        this.timeZone = TimeZone.getTimeZone(config.getString(TIMEZONE_PATH));
     }
 
     @Override
     public void init(Environment environment) {
         this.environment = environment;
         registerAll();
+        this.timeZone = TimeZone.getTimeZone(config.getString(TIMEZONE_PATH));
     }
 
     private void registerAll() {
