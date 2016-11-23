@@ -51,6 +51,9 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
 
     @Override
     public void onUnHealthApplication(Map<String, HealthCheck.Result> results) {
+        if (results.size() == 0) {
+            return;
+        }
         Properties properties = parseMailClientConfig();
         if (properties == null) {
             return;
