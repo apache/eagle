@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -26,8 +28,6 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
-import com.google.inject.Inject;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -296,7 +296,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public OpResult clear() {
+    public synchronized OpResult clear() {
         LOG.info("clear models...");
         this.assignments.clear();
         this.clusters.clear();
