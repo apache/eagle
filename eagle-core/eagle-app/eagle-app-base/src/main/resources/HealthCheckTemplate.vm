@@ -23,8 +23,22 @@
 <body>
     #set ( $elem = $unHealthyContext )
 
-<p><b>Message: </b>$elem["appId"] has delayed</p>
-<p><b>Detail: </b>$elem["unHealthyMessage"]</p>
+
+<p><b>Health Check: </b>$elem["healthCheckUrl"]</p>
+<p><b>Appliaction Management: </b>$elem["appMgmtUrl"]</p>
+
+<table border="1">
+    <tr>
+        <th><b>Application ID</b></th>
+        <td><b>Health Check Message</b></td>
+    </tr>
+    #foreach($appId in ${elem["appMsgs"].keySet()})
+    <tr>
+        <th>$appId</th>
+        <td>${elem["appMsgs"].get($appId)}</td>
+    </tr>
+    #end
+</table>
 
 </body>
 </html>

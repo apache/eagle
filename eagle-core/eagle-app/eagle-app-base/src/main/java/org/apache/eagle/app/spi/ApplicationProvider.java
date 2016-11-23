@@ -23,7 +23,6 @@ import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
