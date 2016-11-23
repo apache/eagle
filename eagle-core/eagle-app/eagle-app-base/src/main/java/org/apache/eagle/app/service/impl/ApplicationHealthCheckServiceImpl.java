@@ -55,6 +55,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private static final String HEALTH_PERIOD_PATH = "application.healthCheck.period";
     private static final String HEALTH_PUBLISHER_PATH = "application.healthCheck.publisher";
     private static final String HEALTH_PUBLISHER_IMPL_PATH = "application.healthCheck.publisher.publisherImpl";
+    private static final String SERVICE_PATH = "service";
 
     @Inject
     private Injector currentInjector;
@@ -82,7 +83,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                 clz = Thread.currentThread().getContextClassLoader().loadClass(className);
                 if (ApplicationHealthCheckPublisher.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor(Config.class);
-                    this.applicationHealthCheckPublisher = (ApplicationHealthCheckPublisher)cotr.newInstance(this.config.getConfig(HEALTH_PUBLISHER_PATH));
+                    this.applicationHealthCheckPublisher = (ApplicationHealthCheckPublisher)cotr.newInstance(this.config.getConfig(HEALTH_PUBLISHER_PATH).withFallback(this.config.getConfig(SERVICE_PATH)));
                 }
             } catch (Exception e) {
                 LOG.warn("exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
@@ -140,23 +141,30 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     protected void runOneIteration() throws Exception {
         LOG.info("start application health check");
         registerAll();
+
+        Map<String, HealthCheck> copyAppHealthChecks = new HashMap<>();
         synchronized (lock) {
             for (String appId : appHealthChecks.keySet()) {
-                HealthCheck.Result result = appHealthChecks.get(appId).execute();
-                if (result.isHealthy()) {
-                    LOG.info("application {} is healthy", appId);
-                } else {
-                    LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
-                    if (this.applicationHealthCheckPublisher != null) {
-                        try {
-                            this.applicationHealthCheckPublisher.onUnHealthApplication(appId, result);
-                        } catch (Exception e) {
-                            LOG.warn("failed to send email for unhealthy application {}", appId, e.getCause());
-                        }
+                copyAppHealthChecks.put(appId, appHealthChecks.get(appId));
+            }
+        }
+
+        for (String appId : copyAppHealthChecks.keySet()) {
+            HealthCheck.Result result = copyAppHealthChecks.get(appId).execute();
+            if (result.isHealthy()) {
+                LOG.info("application {} is healthy", appId);
+            } else {
+                LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
+                if (this.applicationHealthCheckPublisher != null) {
+                    try {
+                        this.applicationHealthCheckPublisher.onUnHealthApplication(appId, result);
+                    } catch (Exception e) {
+                        LOG.warn("failed to send email for unhealthy application {}", appId, e);
                     }
                 }
             }
         }
+
     }
 
     @Override

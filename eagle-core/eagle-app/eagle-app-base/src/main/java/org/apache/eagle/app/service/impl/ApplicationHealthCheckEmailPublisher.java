@@ -39,6 +39,9 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
     private static final String CONF_MAIL_CC = "mail.smtp.cc";
     private static final String CONF_MAIL_TEMPLATE = "mail.smtp.template";
     private static final String UNHEALTHY_CONTEXT = "unHealthyContext";
+    private static final Integer HEALTH_CHECK_PORT = 9091;
+    private static final String SERVICE_HOST = "host";
+    private static final String SERVICE_PORT = "port";
 
     private Config config;
 
@@ -68,6 +71,8 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                 Map<String, Object> unHealthyContext = new HashMap<>();
                 unHealthyContext.put("appId", appId);
                 unHealthyContext.put("unHealthyMessage", result.getMessage());
+                unHealthyContext.put("appMgmtUrl", "http://" + config.getString(SERVICE_HOST) + ":" + config.getInt(SERVICE_PORT) + "/#/integration/site");
+                unHealthyContext.put("healthCheckUrl", "http://" + config.getString(SERVICE_HOST) + ":" + HEALTH_CHECK_PORT + "/healthcheck");
                 context.put(UNHEALTHY_CONTEXT, unHealthyContext);
 
                 EagleMailClient client = new EagleMailClient(properties);

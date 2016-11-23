@@ -25,6 +25,7 @@
 
 <p><b>Message: </b>$elem["appId"] has delayed</p>
 <p><b>Detail: </b>$elem["unHealthyMessage"]</p>
-
+<p><b>Health Check: </b>$elem["healthCheckUrl"]</p>
+<p><b>Appliaction Management: </b>$elem["appMgmtUrl"]</p>
 </body>
 </html>
