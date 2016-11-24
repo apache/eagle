@@ -51,7 +51,7 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
     }
 
     @Override
-    public void onUnHealthApplication(Map<String, HealthCheck.Result> results) {
+    public void onUnHealthApplication(String type, Map<String, HealthCheck.Result> results) {
         if (results.size() == 0) {
             return;
         }
@@ -110,7 +110,7 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                         System.getProperty("user.name") + "@" + hostname,
                         recipients,
                         config.hasPath(CONF_MAIL_CC) ? config.getString(CONF_MAIL_CC) : null,
-                        subject,
+                        type + subject,
                         config.getString(CONF_MAIL_TEMPLATE),
                         context,
                         null);

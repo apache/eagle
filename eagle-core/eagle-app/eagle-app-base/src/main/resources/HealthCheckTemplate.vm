@@ -24,8 +24,8 @@
     #set ( $elem = $unHealthyContext )
 
 
-<p><b>Health Check: </b>$elem["healthCheckUrl"]</p>
-<p><b>Appliaction Management: </b>$elem["appMgmtUrl"]</p>
+<p><b>Health Check: </b><a href=$elem["healthCheckUrl"]>$elem["healthCheckUrl"]</a></p>
+<p><b>Appliaction Management: </b><a href=$elem["appMgmtUrl"]>$elem["appMgmtUrl"]</a></p>
 
 <table border="1">
     <tr>

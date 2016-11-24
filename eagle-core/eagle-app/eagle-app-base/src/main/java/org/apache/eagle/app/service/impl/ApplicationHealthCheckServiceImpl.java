@@ -57,6 +57,9 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private static final String SERVICE_PATH = "service";
     private static final String TIMEZONE_PATH = "service.timezone";
     private static final String HEALTHY = "OK";
+    private static final String DAILY_TYPE = "[DAILY] - ";
+    private static final String ERROR_TYPE = "[ERROR] - ";
+
     private boolean hasSendDaily = false;
 
     private TimeZone timeZone;
@@ -184,9 +187,13 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
             }
         }
 
+        String type = ERROR_TYPE;
         if (this.applicationHealthCheckPublisher != null) {
             try {
-                this.applicationHealthCheckPublisher.onUnHealthApplication(results);
+                if (isDaily) {
+                    type = DAILY_TYPE;
+                }
+                this.applicationHealthCheckPublisher.onUnHealthApplication(type, results);
                 if (isDaily) {
                     hasSendDaily = true;
                 }
