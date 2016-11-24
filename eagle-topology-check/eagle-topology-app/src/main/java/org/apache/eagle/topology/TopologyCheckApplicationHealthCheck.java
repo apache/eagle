@@ -45,10 +45,10 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
     public Result check() {
         //FIXME, this application owner please add eagle server config to Class TopologyCheckAppConfig
         IEagleServiceClient client = new EagleServiceClientImpl(
-                "lvsapdes0005.stratus.lvs.ebay.com",//topologyCheckAppConfig.getConfig().getString("service.host"),
-                8080,//topologyCheckAppConfig.getConfig().getInt("service.port"),
-                "admin",//topologyCheckAppConfig.getConfig().getString("service.username"),
-                "secret");//topologyCheckAppConfig.getConfig().getString("service.password"));
+                topologyCheckAppConfig.getConfig().getString("service.host"),
+                topologyCheckAppConfig.getConfig().getInt("service.port"),
+                topologyCheckAppConfig.getConfig().getString("service.username"),
+                topologyCheckAppConfig.getConfig().getString("service.password"));
 
         client.getJerseyClient().setReadTimeout(topologyCheckAppConfig.getConfig().getInt("service.readTimeOutSeconds") * 1000);
 
@@ -92,7 +92,7 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
     private long getServiceLatestUpdateTime(String serviceName, IEagleServiceClient client) throws Exception {
         String query = String.format("%s[@site=\"%s\"]<@site>{max(lastUpdateTime)}",
                 serviceName,
-                "ares");//topologyCheckAppConfig.dataExtractorConfig.site);
+                topologyCheckAppConfig.dataExtractorConfig.site);
 
         GenericServiceAPIResponseEntity response = client
                 .search(query)
