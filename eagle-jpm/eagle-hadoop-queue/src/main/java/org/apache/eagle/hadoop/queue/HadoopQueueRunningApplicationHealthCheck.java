@@ -34,6 +34,7 @@ import java.util.Map;
 
 public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthCheckBase {
     private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningApplicationHealthCheck.class);
+    private static final long DEFAULT_MAX_DELAY_TIME = 10 * 60 * 1000L;
 
     private HadoopQueueRunningAppConfig hadoopQueueRunningAppConfig;
 
@@ -81,8 +82,8 @@ public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthC
             }
 
             if (!message.isEmpty() || currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
-                message += String.format("Current process time is %sms, delay %s hours.",
-                        currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L / 60);
+                message += String.format("Current process time is %sms, delay %s minutes.",
+                        currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L);
                 return Result.unhealthy(message);
             } else {
                 return Result.healthy();

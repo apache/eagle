@@ -22,5 +22,5 @@ import com.codahale.metrics.health.HealthCheck;
 import java.util.Map;
 
 public interface ApplicationHealthCheckPublisher {
-    void onUnHealthApplication(Map<String, HealthCheck.Result> results);
+    void onUnHealthApplication(String type, Map<String, HealthCheck.Result> results);
 }
