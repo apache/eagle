@@ -26,6 +26,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -72,8 +73,15 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
 
                 final VelocityContext context = new VelocityContext();
                 Map<String, String> appMsgs = new HashMap<>();
+                int unhealthyCount = 0;
+                int healthyCount = 0;
                 for (String appId : results.keySet()) {
                     appMsgs.put(appId, results.get(appId).getMessage());
+                    if (!results.get(appId).isHealthy()) {
+                        unhealthyCount++;
+                    } else {
+                        healthyCount++;
+                    }
                 }
                 Map<String, Object> unHealthyContext = new HashMap<>();
                 unHealthyContext.put("appMsgs", appMsgs);
@@ -81,11 +89,28 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                 unHealthyContext.put("healthCheckUrl", "http://" + config.getString(SERVICE_HOST) + ":" + HEALTH_CHECK_PORT + "/healthcheck");
                 context.put(UNHEALTHY_CONTEXT, unHealthyContext);
 
+                String subject = "";
+                if (healthyCount > 0) {
+                    subject += healthyCount + " healthy app(s)";
+                }
+                if (unhealthyCount > 0) {
+                    if (!subject.isEmpty()) {
+                        subject += ", ";
+                    }
+                    subject += unhealthyCount + " unhealthy app(s)";
+                }
+                subject = config.getString(CONF_MAIL_SUBJECT) + ": " + subject;
                 EagleMailClient client = new EagleMailClient(properties);
-                success = client.send(config.getString(CONF_MAIL_SENDER),
+                String hostname = InetAddress.getLocalHost().getHostName();
+                if (!hostname.endsWith(".com")) {
+                    //avoid invalid host exception
+                    hostname += ".com";
+                }
+                success = client.send(
+                        System.getProperty("user.name") + "@" + hostname,
                         recipients,
                         config.hasPath(CONF_MAIL_CC) ? config.getString(CONF_MAIL_CC) : null,
-                        config.getString(CONF_MAIL_SUBJECT),
+                        subject,
                         config.getString(CONF_MAIL_TEMPLATE),
                         context,
                         null);

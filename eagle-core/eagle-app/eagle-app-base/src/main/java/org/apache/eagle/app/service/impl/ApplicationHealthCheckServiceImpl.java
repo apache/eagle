@@ -152,11 +152,11 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         int dailySendHour = config.getInt(HEALTH_CHECK_DAILY_SEND_HOUR_PATH);
 
         GregorianCalendar cal = new GregorianCalendar(timeZone);
-        if (cal.get(Calendar.HOUR_OF_DAY) % dailySendHour == 0 && !hasSendDaily) {
+        if (cal.get(Calendar.HOUR_OF_DAY) == dailySendHour && !hasSendDaily) {
             isDaily = true;
         }
 
-        if (cal.get(Calendar.HOUR_OF_DAY) % dailySendHour != 0) {
+        if (cal.get(Calendar.HOUR_OF_DAY) != dailySendHour) {
             hasSendDaily = false;
         }
         Map<String, HealthCheck> copyAppHealthChecks = new HashMap<>();
