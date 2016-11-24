@@ -59,19 +59,11 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
                 message += String.format("Application is not RUNNING, status is %s. ", status.toString());
             }
 
-            String query = String.format("%s[@site=\"%s\"]<@site>{max(timestamp)}",
-                    TopologyConstants.GENERIC_METRIC_SERVICE,
-                    topologyCheckAppConfig.dataExtractorConfig.site);
-
-            GenericServiceAPIResponseEntity response = client
-                    .search(query)
-                    .metricName(String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, TopologyConstants.DATA_NODE_ROLE))
-                    .startTime(System.currentTimeMillis() - 2 * 60 * 60000L)
-                    .endTime(System.currentTimeMillis())
-                    .pageSize(Integer.MAX_VALUE)
-                    .send();
-            List<Map<List<String>, List<Double>>> results = response.getObj();
-            long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
+            long currentProcessTimeStamp = Math.min(
+                    Math.min(
+                        getServiceLatestUpdateTime(TopologyConstants.HBASE_INSTANCE_SERVICE_NAME, client),
+                        getServiceLatestUpdateTime(TopologyConstants.HDFS_INSTANCE_SERVICE_NAME, client)
+                    ), getServiceLatestUpdateTime(TopologyConstants.MR_INSTANCE_SERVICE_NAME, client));
             long currentTimeStamp = System.currentTimeMillis();
             long maxDelayTime = DEFAULT_MAX_DELAY_TIME;
             if (topologyCheckAppConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
@@ -95,5 +87,23 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
                 LOG.warn("{}", e);
             }
         }
+    }
+
+    private long getServiceLatestUpdateTime(String serviceName, IEagleServiceClient client) throws Exception {
+        String query = String.format("%s[@site=\"%s\"]<@site>{max(lastUpdateTime)}",
+                serviceName,
+                topologyCheckAppConfig.dataExtractorConfig.site);
+
+        GenericServiceAPIResponseEntity response = client
+                .search(query)
+                .pageSize(10)
+                .send();
+
+        List<Map<List<String>, List<Double>>> results = response.getObj();
+        if (results.size() == 0) {
+            return Long.MAX_VALUE;
+        }
+        long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
+        return currentProcessTimeStamp;
     }
 }
