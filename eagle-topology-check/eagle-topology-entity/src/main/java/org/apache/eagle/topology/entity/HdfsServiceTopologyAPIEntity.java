@@ -43,6 +43,8 @@ public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     private long writtenTxidDiff;
     @Column("g")
     private long lastUpdateTime;
+    @Column("h")
+    private String version;
 
     public long getLastUpdateTime() {
         return lastUpdateTime;
@@ -106,5 +108,16 @@ public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
         this.writtenTxidDiff = writtenTxidDiff;
         valueChanged("writtenTxidDiff");
     }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+        valueChanged("version");
+    }
+
+
 }
 

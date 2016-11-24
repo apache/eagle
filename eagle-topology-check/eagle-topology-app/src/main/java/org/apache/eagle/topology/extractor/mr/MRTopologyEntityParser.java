@@ -46,7 +46,7 @@ import static org.apache.eagle.topology.TopologyConstants.*;
 
 public class MRTopologyEntityParser implements TopologyEntityParser {
 
-    private String [] rmUrls;
+    private String[] rmUrls;
     private String historyServerUrl;
     private String site;
     private TopologyRackResolver rackResolver;
@@ -91,9 +91,10 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 // reSelect url
             }
         }
-        if (result.getMasterNodes().isEmpty()) {
-            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.RESOURCE_MANAGER_ROLE, 0, site, timestamp));
-        }
+
+        double value = result.getMasterNodes().isEmpty() ? 0 : result.getMasterNodes().size() * 1d / rmUrls.length;
+        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.RESOURCE_MANAGER_ROLE, value, site, timestamp));
+
         doCheckHistoryServer(timestamp, result);
         return result;
     }

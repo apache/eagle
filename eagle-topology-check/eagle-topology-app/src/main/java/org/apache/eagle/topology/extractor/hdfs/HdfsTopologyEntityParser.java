@@ -72,6 +72,8 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private static final String DATA_NODE_CAPACITY = "capacity";
     private static final String DATA_NODE_ADMIN_STATE = "adminState";
     private static final String DATA_NODE_FAILED_VOLUMN = "volfails";
+    private static final String DATA_NODE_VERSION = "version";
+    private static final String NAME_NODE_VERSION = "Version";
 
     private static final String DATA_NODE_DECOMMISSIONED = "Decommissioned";
     private static final String DATA_NODE_DECOMMISSIONED_STATE = "decommissioned";
@@ -115,9 +117,18 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         final String urlString = buildFSNamesystemURL(url);
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
         final JMXBean bean = jmxBeanMap.get(JMX_FS_NAME_SYSTEM_BEAN_NAME);
+
+        final String nameNodeUrlString = buildNamenodeInfo(url);
+        final Map<String, JMXBean> nameNodeMap = JMXQueryHelper.query(nameNodeUrlString);
+        final JMXBean nameNodeBean = nameNodeMap.get(JMX_NAMENODE_INFO);
+
         if (bean == null || bean.getPropertyMap() == null) {
             throw new ServiceNotResponseException("Invalid JMX format, FSNamesystem bean is null!");
         }
+        if (nameNodeBean == null || nameNodeBean.getPropertyMap() == null) {
+            throw new ServiceNotResponseException("Invalid JMX format, NameNode bean is null!");
+        }
+
         final String hostname = (String) bean.getPropertyMap().get(HA_NAME);
         HdfsServiceTopologyAPIEntity result = createHdfsServiceEntity(TopologyConstants.NAME_NODE_ROLE, hostname, updateTime);
         final String state = (String) bean.getPropertyMap().get(HA_STATE);
@@ -128,6 +139,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         result.setUsedCapacityTB(Double.toString(capacityUsedGB / 1024));
         final Integer blocksTotal = (Integer) bean.getPropertyMap().get(BLOCKS_TOTAL);
         result.setNumBlocks(Integer.toString(blocksTotal));
+        result.setVersion((String) nameNodeBean.getPropertyMap().get(NAME_NODE_VERSION));
         return result;
     }
 
@@ -240,6 +252,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             } else {
                 entity.setStatus(TopologyConstants.DATA_NODE_LIVE_STATUS);
             }
+            entity.setVersion(String.valueOf(liveNode.get(DATA_NODE_VERSION)));
             numLiveNodes++;
             result.getSlaveNodes().add(entity);
         }

@@ -90,7 +90,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             GenericServiceAPIResponseEntity<TopologyBaseAPIEntity> response = client.search().query(query).pageSize(Integer.MAX_VALUE).send();
             if (response.isSuccess() && response.getObj() != null) {
                 for (TopologyBaseAPIEntity entity : response.getObj()) {
-                    if (!availableHostnames.contains(generateKey(entity))) {
+                    if (availableHostnames != null && availableHostnames.size() > 0 && !availableHostnames.contains(generateKey(entity))) {
                         entitiesForDeletion.add(entity);
                     }
                 }

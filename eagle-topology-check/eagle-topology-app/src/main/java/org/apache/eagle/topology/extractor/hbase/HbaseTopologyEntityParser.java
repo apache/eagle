@@ -46,7 +46,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
     private Boolean kerberosEnable = false;
     private TopologyRackResolver rackResolver;
 
-    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig, TopologyRackResolver resolver) {
+    public HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig, TopologyRackResolver resolver) {
         this.site = site;
         this.rackResolver = resolver;
         this.hBaseConfiguration = HBaseConfiguration.create();
@@ -56,7 +56,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
         this.hBaseConfiguration.set("hbase.client.retries.number", hBaseConfig.zkRetryTimes);
         // kerberos authentication
         if (hBaseConfig.eaglePrincipal != null && hBaseConfig.eagleKeytab != null
-                && !hBaseConfig.eaglePrincipal.isEmpty() && !hBaseConfig.eagleKeytab.isEmpty()) {
+            && !hBaseConfig.eaglePrincipal.isEmpty() && !hBaseConfig.eagleKeytab.isEmpty()) {
             this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_PRINCIPAL_KEY, hBaseConfig.eaglePrincipal);
             this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.eagleKeytab);
             this.kerberosEnable = true;
@@ -103,6 +103,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
             }
             double liveRatio = liveServers * 1d / (liveServers + deadServers);
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.REGIONSERVER_ROLE, liveRatio, site, timestamp));
+            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HMASTER_ROLE, 1d, site, timestamp));
             return result;
         } catch (RuntimeException e) {
             e.printStackTrace();
