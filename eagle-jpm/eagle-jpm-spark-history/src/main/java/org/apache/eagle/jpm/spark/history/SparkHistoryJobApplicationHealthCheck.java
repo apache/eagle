@@ -65,7 +65,7 @@ public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthChec
 
             GenericServiceAPIResponseEntity response = client
                     .search(query)
-                    .startTime(System.currentTimeMillis() - 24 * 60 * 60000L)
+                    .startTime(System.currentTimeMillis() - 12 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
                     .pageSize(10)
                     .send();

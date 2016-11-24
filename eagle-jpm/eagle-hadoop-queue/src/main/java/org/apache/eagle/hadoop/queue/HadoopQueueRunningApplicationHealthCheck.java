@@ -71,7 +71,7 @@ public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthC
                     .metricName(HadoopClusterConstants.MetricName.HADOOP_CLUSTER_ALLOCATED_MEMORY)
                     .startTime(System.currentTimeMillis() - 24 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
-                    .pageSize(Integer.MAX_VALUE)
+                    .pageSize(10)
                     .send();
             List<Map<List<String>, List<Double>>> results = response.getObj();
             long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
