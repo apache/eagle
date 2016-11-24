@@ -27,6 +27,7 @@ import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity;
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
@@ -107,7 +108,9 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                     ((JobExecutionAPIEntity) entity).getCurrentState());
 
                 metricEntities.addAll(jobExecutionMetricsCreationListener.generateMetrics((JobExecutionAPIEntity)entity));
-                emitFailedJob((JobExecutionAPIEntity)entity);
+                if (((JobExecutionAPIEntity)entity).getCurrentState().equals(Constants.JobState.FAILED.toString())) {
+                    emitFailedJob((JobExecutionAPIEntity) entity);
+                }
             } else if (entity instanceof JobEventAPIEntity) {
                 jobEvents.add((JobEventAPIEntity) entity);
             } else if (entity instanceof TaskExecutionAPIEntity) {

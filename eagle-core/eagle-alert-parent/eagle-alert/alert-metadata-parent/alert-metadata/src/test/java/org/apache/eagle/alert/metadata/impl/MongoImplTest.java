@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.service.alert.resource.impl;
+package org.apache.eagle.alert.metadata.impl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -35,7 +35,6 @@ import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.AfterClass;
 import org.junit.Assert;

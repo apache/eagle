@@ -26,6 +26,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -39,6 +40,9 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
     private static final String CONF_MAIL_CC = "mail.smtp.cc";
     private static final String CONF_MAIL_TEMPLATE = "mail.smtp.template";
     private static final String UNHEALTHY_CONTEXT = "unHealthyContext";
+    private static final Integer HEALTH_CHECK_PORT = 9091;
+    private static final String SERVICE_HOST = "host";
+    private static final String SERVICE_PORT = "port";
 
     private Config config;
 
@@ -47,7 +51,10 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
     }
 
     @Override
-    public void onUnHealthApplication(String appId, HealthCheck.Result result) {
+    public void onUnHealthApplication(Map<String, HealthCheck.Result> results) {
+        if (results.size() == 0) {
+            return;
+        }
         Properties properties = parseMailClientConfig();
         if (properties == null) {
             return;
@@ -65,16 +72,45 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
                 }
 
                 final VelocityContext context = new VelocityContext();
+                Map<String, String> appMsgs = new HashMap<>();
+                int unhealthyCount = 0;
+                int healthyCount = 0;
+                for (String appId : results.keySet()) {
+                    appMsgs.put(appId, results.get(appId).getMessage());
+                    if (!results.get(appId).isHealthy()) {
+                        unhealthyCount++;
+                    } else {
+                        healthyCount++;
+                    }
+                }
                 Map<String, Object> unHealthyContext = new HashMap<>();
-                unHealthyContext.put("appId", appId);
-                unHealthyContext.put("unHealthyMessage", result.getMessage());
+                unHealthyContext.put("appMsgs", appMsgs);
+                unHealthyContext.put("appMgmtUrl", "http://" + config.getString(SERVICE_HOST) + ":" + config.getInt(SERVICE_PORT) + "/#/integration/site");
+                unHealthyContext.put("healthCheckUrl", "http://" + config.getString(SERVICE_HOST) + ":" + HEALTH_CHECK_PORT + "/healthcheck");
                 context.put(UNHEALTHY_CONTEXT, unHealthyContext);
 
+                String subject = "";
+                if (healthyCount > 0) {
+                    subject += healthyCount + " healthy app(s)";
+                }
+                if (unhealthyCount > 0) {
+                    if (!subject.isEmpty()) {
+                        subject += ", ";
+                    }
+                    subject += unhealthyCount + " unhealthy app(s)";
+                }
+                subject = config.getString(CONF_MAIL_SUBJECT) + ": " + subject;
                 EagleMailClient client = new EagleMailClient(properties);
-                success = client.send(config.getString(CONF_MAIL_SENDER),
+                String hostname = InetAddress.getLocalHost().getHostName();
+                if (!hostname.endsWith(".com")) {
+                    //avoid invalid host exception
+                    hostname += ".com";
+                }
+                success = client.send(
+                        System.getProperty("user.name") + "@" + hostname,
                         recipients,
                         config.hasPath(CONF_MAIL_CC) ? config.getString(CONF_MAIL_CC) : null,
-                        config.getString(CONF_MAIL_SUBJECT) + ": " + appId,
+                        subject,
                         config.getString(CONF_MAIL_TEMPLATE),
                         context,
                         null);
@@ -89,9 +125,9 @@ public class ApplicationHealthCheckEmailPublisher implements ApplicationHealthCh
             }
         }
         if (success) {
-            LOG.info("Successfully send unhealthy email of application {}", appId);
+            LOG.info("Successfully send unhealthy email");
         } else {
-            LOG.warn("Fail sending unhealthy email of application {} after tries {} times", appId, MAX_RETRY_COUNT);
+            LOG.warn("Fail sending unhealthy email after tries {} times", MAX_RETRY_COUNT);
         }
     }
 

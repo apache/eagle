@@ -52,11 +52,11 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
 
         client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
 
+        String message = "";
         try {
             ApplicationEntity.Status status = getApplicationStatus();
             if (!status.toString().equals(ApplicationEntity.Status.RUNNING.toString())) {
-                String message = String.format("Application is not running, status is %s", status.toString());
-                return Result.unhealthy(message);
+                message += String.format("Application is not RUNNING, status is %s. ", status.toString());
             }
 
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
@@ -78,15 +78,15 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
                 maxDelayTime = mrHistoryJobConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
             }
 
-            if (currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
-                String message = String.format("Current process time is %sms, delay %s hours",
+            if (!message.isEmpty() || currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
+                message += String.format("Current process time is %sms, delay %s hours.",
                         currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L / 60);
                 return Result.unhealthy(message);
             } else {
                 return Result.healthy();
             }
         } catch (Exception e) {
-            return Result.unhealthy(ExceptionUtils.getStackTrace(e));
+            return Result.unhealthy(printMessages(message, "An exception was caught when fetch application current process time: ", ExceptionUtils.getStackTrace(e)));
         } finally {
             client.getJerseyClient().destroy();
             try {

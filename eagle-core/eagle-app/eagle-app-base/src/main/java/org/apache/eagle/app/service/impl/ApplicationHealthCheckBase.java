@@ -23,6 +23,9 @@ import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public abstract class ApplicationHealthCheckBase extends HealthCheck {
     private static final String APP_ID_PATH = "appId";
     protected static final long DEFAULT_MAX_DELAY_TIME = 2 * 60 * 60 * 1000L;
@@ -40,5 +43,14 @@ public abstract class ApplicationHealthCheckBase extends HealthCheck {
     protected ApplicationEntity.Status getApplicationStatus() {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(null, config.getString(APP_ID_PATH));
         return applicationEntity.getStatus();
+    }
+
+    protected String printMessages(String ... messages) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw, true);
+        for (int i = 0; i < messages.length; i++) {
+            pw.println(messages[i]);
+        }
+        return sw.getBuffer().toString();
     }
 }
