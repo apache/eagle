@@ -1,0 +1,61 @@
+﻿{
+  "tasks": {
+    "task": [
+      {
+        "startTime": 1479876517555,
+        "finishTime": 0,
+        "elapsedTime": 45860,
+        "progress": 51.469738,
+        "id": "task_1479206441898_164690_m_000000",
+        "state": "RUNNING",
+        "type": "MAP",
+        "successfulAttempt": "",
+        "status": "viewfs://xxxxxxx/ds=2016-07-23/part-r-00033:0+32910369 > map"
+      },
+      {
+        "startTime": 1479876517593,
+        "finishTime": 0,
+        "elapsedTime": 45823,
+        "progress": 66.7,
+        "id": "task_1479206441898_164690_m_000002",
+        "state": "RUNNING",
+        "type": "MAP",
+        "successfulAttempt": "",
+        "status": "viewfs://xxxxxxx/ds=2016-07-24/part-r-00077:0+32681218 > sort"
+      },
+      {
+        "startTime": 1479876517458,
+        "finishTime": 0,
+        "elapsedTime": 45958,
+        "progress": 43.647263,
+        "id": "task_1479206441898_164690_m_000003",
+        "state": "RUNNING",
+        "type": "MAP",
+        "successfulAttempt": "",
+        "status": "viewfs://xxxxxxx/ds=2016-07-20/part-r-00029:0+32561596 > map"
+      },
+      {
+        "startTime": 1479876515478,
+        "finishTime": 0,
+        "elapsedTime": 0,
+        "progress": 0.0,
+        "id": "task_1479206441898_164690_r_001097",
+        "state": "SCHEDULED",
+        "type": "REDUCE",
+        "successfulAttempt": "",
+        "status": "NEW"
+      },
+      {
+        "startTime": 1479876515479,
+        "finishTime": 0,
+        "elapsedTime": 0,
+        "progress": 0.0,
+        "id": "task_1479206441898_164690_r_001098",
+        "state": "SCHEDULED",
+        "type": "REDUCE",
+        "successfulAttempt": "",
+        "status": "NEW"
+      }
+    ]
+  }
+}
