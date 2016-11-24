@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.utils;
 
-public class AlertConstants {
-    public static final String FIELD_0 = "f0";
-    public static final String FIELD_1 = "f1";
-    public static final String FIELD_2 = "f2";
-    public static final String FIELD_3 = "f3";
+package org.apache.eagle.metadata.model;
 
-    public static final String DEFAULT_SPOUT_NAME = "alertEngineSpout";
-    public static final String DEFAULT_ROUTERBOLT_NAME = "streamRouterBolt";
+import org.apache.eagle.log.entity.repo.EntityRepository;
 
-    public static final String ALERT_SERVICE_ENDPOINT_NAME = "AlertService";
+public class AlertEntityRepository extends EntityRepository {
+
+    public AlertEntityRepository() {
+        registerEntity(AlertEntity.class);
+    }
 }
