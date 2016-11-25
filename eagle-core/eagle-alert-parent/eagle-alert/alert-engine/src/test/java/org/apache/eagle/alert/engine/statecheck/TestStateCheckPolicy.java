@@ -24,6 +24,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.TupleImpl;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -57,9 +58,9 @@ public class TestStateCheckPolicy {
             @Override
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 verified.set(true);
-                Assert.assertEquals("perfmon_latency_check_output2", tuple.get(0));
+                Assert.assertEquals("perfmon_latency_stream", ((PublishPartition) tuple.get(0)).getStreamId());
                 AlertStreamEvent event = (AlertStreamEvent) tuple.get(1);
-                System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
+                System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", ((PublishPartition) tuple.get(0)).getStreamId(), tuple));
                 return null;
             }
 
@@ -83,6 +84,16 @@ public class TestStateCheckPolicy {
         AlertBolt alertBolt = TestAlertBolt.createAlertBolt(collector);
         AlertBoltSpec spec = createAlertSpec();
         Map<String, StreamDefinition> definitionMap = createStreamMap();
+        
+        
+        List<PolicyDefinition> policies = mapper.readValue(TestStateCheckPolicy.class.getResourceAsStream("/statecheck/policies.json"),
+                new TypeReference<List<PolicyDefinition>>() {
+                });
+        List<StreamDefinition> streams = mapper.readValue(TestStateCheckPolicy.class.getResourceAsStream("/statecheck/streamdefinitions.json"),
+                new TypeReference<List<StreamDefinition>>() {
+                });
+        spec.addPublishPartition(streams.get(0).getStreamId(), policies.get(0).getName(), "testPublishBolt", null);
+        
         alertBolt.onAlertBoltSpecChange(spec, definitionMap);
 
         // send data now

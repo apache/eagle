@@ -19,15 +19,19 @@ package org.apache.eagle.alert.engine.coordinator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @since Apr 11, 2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Publishment {
+
+    public static final String STREAM_NAME_DEFAULT = "_default";
 
     private String name;
     private String type;
@@ -41,6 +45,16 @@ public class Publishment {
     private Map<String, Object> properties;
     // the class name to extend the IEventSerializer interface
     private String serializer;
+
+    private Set<String> partitionColumns = new HashSet<>();
+
+    public Set<String> getPartitionColumns() {
+        return partitionColumns;
+    }
+
+    public void setPartitionColumns(Set<String> partitionColumns) {
+        this.partitionColumns = partitionColumns;
+    }
 
     public String getName() {
         return name;
@@ -135,13 +149,13 @@ public class Publishment {
         if (obj instanceof Publishment) {
             Publishment p = (Publishment) obj;
             return (Objects.equals(name, p.getName()) && Objects.equals(type, p.getType())
-                    && Objects.equals(dedupIntervalMin, p.getDedupIntervalMin())
-                    && Objects.equals(dedupFields, p.getDedupFields())
-                    && Objects.equals(dedupStateField, p.getDedupStateField())
-                    && Objects.equals(overrideDeduplicator, p.getOverrideDeduplicator())
-                    && Objects.equals(policyIds, p.getPolicyIds())
-                    && Objects.equals(streamIds, p.getStreamIds())
-                    && properties.equals(p.getProperties()));
+                && Objects.equals(dedupIntervalMin, p.getDedupIntervalMin())
+                && Objects.equals(dedupFields, p.getDedupFields())
+                && Objects.equals(dedupStateField, p.getDedupStateField())
+                && Objects.equals(overrideDeduplicator, p.getOverrideDeduplicator())
+                && Objects.equals(policyIds, p.getPolicyIds())
+                && Objects.equals(streamIds, p.getStreamIds())
+                && properties.equals(p.getProperties()));
         }
         return false;
     }
@@ -149,15 +163,15 @@ public class Publishment {
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(name).append(type).append(dedupIntervalMin).append(dedupFields)
-                .append(dedupStateField).append(overrideDeduplicator).append(policyIds).append(streamIds)
-                .append(properties).build();
+            .append(dedupStateField).append(overrideDeduplicator).append(policyIds).append(streamIds)
+            .append(properties).build();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Publishment[name:").append(name).append(",type:").append(type).append(",policyId:")
-                .append(policyIds).append(",properties:").append(properties);
+            .append(policyIds).append(",properties:").append(properties);
         return sb.toString();
     }
 

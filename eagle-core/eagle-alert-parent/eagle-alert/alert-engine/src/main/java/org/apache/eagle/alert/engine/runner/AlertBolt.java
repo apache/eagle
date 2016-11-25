@@ -16,18 +16,22 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
-import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.MetadataType;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorWrapper;
@@ -61,12 +65,14 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     private static final Logger LOG = LoggerFactory.getLogger(AlertBolt.class);
     private static final long serialVersionUID = -4132297691448945672L;
     private PolicyGroupEvaluator policyGroupEvaluator;
-    private AlertStreamCollector alertOutputCollector;
+    private AlertBoltOutputCollectorWrapper alertOutputCollector;
     private String boltId;
     private boolean logEventEnabled;
     private volatile Object outputLock;
     // mapping from policy name to PolicyDefinition
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
+
+    private volatile Set<PublishPartition> cachedPublishPartitions = new HashSet<>();
 
     private AlertBoltSpec spec;
 
@@ -174,6 +180,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         super.cleanup();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized void onAlertBoltSpecChange(AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
         List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
@@ -188,6 +195,24 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         comparator.compare();
 
         policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
+
+        // update alert output collector
+        Set<PublishPartition> tempPublishPartitions = new HashSet<>();
+        spec.getPublishPartitions().forEach(p -> {
+            if (newPolicies.stream().filter(o -> o.getName().equals(p.getPolicyId())).count() > 0) {
+                tempPublishPartitions.add(p);
+            }
+        });
+
+        Collection<PublishPartition> addedPublishPartitions = CollectionUtils.subtract(tempPublishPartitions, cachedPublishPartitions);
+        Collection<PublishPartition> removedPublishPartitions = CollectionUtils.subtract(cachedPublishPartitions, tempPublishPartitions);
+        Collection<PublishPartition> modifiedPublishPartitions = CollectionUtils.intersection(tempPublishPartitions, cachedPublishPartitions);
+
+        LOG.debug("added PublishPartition " + addedPublishPartitions);
+        LOG.debug("removed PublishPartition " + removedPublishPartitions);
+        LOG.debug("modified PublishPartition " + modifiedPublishPartitions);
+
+        alertOutputCollector.onAlertBoltSpecChange(addedPublishPartitions, removedPublishPartitions, modifiedPublishPartitions);
 
         // switch
         cachedPolicies = newPoliciesMap;

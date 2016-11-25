@@ -28,6 +28,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
@@ -86,9 +87,10 @@ public class TestAlertBolt {
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 alertCount.incrementAndGet();
                 mutex.release();
-                Assert.assertEquals("testAlertStream", tuple.get(0));
+                Assert.assertEquals("testAlertStream", ((PublishPartition) tuple.get(0)).getStreamId());
+                Assert.assertEquals("testAlertPublish", ((PublishPartition) tuple.get(0)).getPublishId());
                 AlertStreamEvent event = (AlertStreamEvent) tuple.get(1);
-                System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
+                System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", ((PublishPartition) tuple.get(0)).getStreamId(), tuple));
                 return null;
             }
 
@@ -107,6 +109,7 @@ public class TestAlertBolt {
             @Override
             public void reportError(Throwable error) {
             }
+            
         });
         AlertBolt bolt = createAlertBolt(collector);
 
@@ -141,6 +144,7 @@ public class TestAlertBolt {
         pd.getDefinition().value = "from cpuUsageStream[col1=='value1' OR col1=='value2'] select col1 insert into testAlertStream;";
         spec.addBoltPolicy("alertBolt1", pd.getName());
         spec.getBoltPoliciesMap().put("alertBolt1", new ArrayList<PolicyDefinition>(Arrays.asList(pd)));
+        spec.addPublishPartition("testAlertStream", "policy1", "testAlertPublish", null);
         bolt.onAlertBoltSpecChange(spec, sds);
 
         // contruct GeneralTopologyContext
@@ -166,7 +170,8 @@ public class TestAlertBolt {
         event2.setData(data);
         event2.setStreamId(streamId);
         PartitionedEvent partitionedEvent2 = new PartitionedEvent(event2, sp, 1001);
-
+        
+        Thread.sleep(3000);
         Tuple input = new TupleImpl(context, Collections.singletonList(partitionedEvent1), taskId, "default");
         Tuple input2 = new TupleImpl(context, Collections.singletonList(partitionedEvent2), taskId, "default");
         bolt.execute(input);
@@ -426,6 +431,8 @@ public class TestAlertBolt {
         StreamDefinition sdTest = new StreamDefinition();
         sdTest.setStreamId(TEST_STREAM);
         sds.put(sdTest.getStreamId(), sdTest);
+        
+        boltSpecs.addPublishPartition(TEST_STREAM, "policy-definition", "testAlertPublish", null);
 
         bolt.onAlertBoltSpecChange(boltSpecs, sds);
 

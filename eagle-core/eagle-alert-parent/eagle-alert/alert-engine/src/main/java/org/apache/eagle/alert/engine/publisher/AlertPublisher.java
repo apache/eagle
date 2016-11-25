@@ -16,11 +16,13 @@
  */
 package org.apache.eagle.alert.engine.publisher;
 
-import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import com.typesafe.config.Config;
-
 import java.io.Serializable;
 import java.util.Map;
+
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+
+import com.typesafe.config.Config;
 
 public interface AlertPublisher extends AlertPublishListener, Serializable {
     @SuppressWarnings("rawtypes")
@@ -28,7 +30,8 @@ public interface AlertPublisher extends AlertPublishListener, Serializable {
 
     String getName();
 
-    void nextEvent(AlertStreamEvent event);
+    void nextEvent(PublishPartition partition, AlertStreamEvent event);
 
     void close();
+
 }
