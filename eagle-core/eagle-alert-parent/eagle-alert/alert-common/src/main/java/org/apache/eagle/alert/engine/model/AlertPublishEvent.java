@@ -33,8 +33,10 @@ public class AlertPublishEvent {
     private long alertTimestamp;
     private Map<String, Object> alertData;
 
+    public static final String ALERT_ID_KEY = "alertId";
     public static final String SITE_ID_KEY = "siteId";
     public static final String APP_IDS_KEY = "appIds";
+    public static final String POLICY_ID_KEY = "policyId";
     public static final String POLICY_VALUE_KEY = "policyValue";
 
     public String getAlertId() {
