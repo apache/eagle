@@ -35,7 +35,7 @@ import java.util.Map;
 @Partition({"siteId"})
 @Indexes({
         @Index(name = "Index_1_policyId", columns = { "policyId" }, unique = true)
-})
+        })
 public class AlertEntity extends TaggedLogAPIEntity {
     @Column("a")
     private List<String> appIds;
