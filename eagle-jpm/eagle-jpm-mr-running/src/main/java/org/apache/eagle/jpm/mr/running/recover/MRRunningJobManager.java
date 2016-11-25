@@ -32,9 +32,9 @@ import java.util.Map;
 public class MRRunningJobManager implements Serializable {
     private RunningJobManager runningJobManager;
 
-    public MRRunningJobManager(MRRunningJobConfig.ZKStateConfig config) {
+    public MRRunningJobManager(MRRunningJobConfig.ZKStateConfig config, String siteId) {
         this.runningJobManager = new RunningJobManager(config.zkQuorum,
-                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot);
+                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot, siteId);
     }
 
     public Map<String, JobExecutionAPIEntity> recoverYarnApp(String appId) throws Exception {

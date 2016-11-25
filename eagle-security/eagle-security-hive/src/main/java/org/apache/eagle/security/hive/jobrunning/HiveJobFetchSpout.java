@@ -94,26 +94,26 @@ public class HiveJobFetchSpout extends BaseRichSpout {
         this.partitionId = calculatePartitionId(context);
         // sanity verify 0<=partitionId<=numTotalPartitions-1
         if (partitionId < 0 || partitionId > crawlConfig.controlConfig.numTotalPartitions) {
-            throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId " +
-                partitionId + " and numTotalPartitions " + crawlConfig.controlConfig.numTotalPartitions);
+            throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId "
+                    + partitionId + " and numTotalPartitions " + crawlConfig.controlConfig.numTotalPartitions);
         }
         Class<? extends JobIdPartitioner> partitionerCls = crawlConfig.controlConfig.partitionerCls;
         try {
             this.jobFilter = new JobIdFilterByPartition(partitionerCls.newInstance(),
-                crawlConfig.controlConfig.numTotalPartitions, partitionId);
+                    crawlConfig.controlConfig.numTotalPartitions, partitionId);
         } catch (Exception e) {
             LOG.error("failing instantiating job partitioner class " + partitionerCls.getCanonicalName());
             throw new IllegalStateException(e);
         }
         this.collector = collector;
         this.runningJobManager = new RunningJobManager(crawlConfig.zkStateConfig.zkQuorum,
-            crawlConfig.zkStateConfig.zkSessionTimeoutMs,
-            crawlConfig.zkStateConfig.zkRetryTimes,
-            crawlConfig.zkStateConfig.zkRetryInterval,
-            crawlConfig.zkStateConfig.zkRoot);
+                crawlConfig.zkStateConfig.zkSessionTimeoutMs,
+                crawlConfig.zkStateConfig.zkRetryTimes,
+                crawlConfig.zkStateConfig.zkRetryInterval,
+                crawlConfig.zkStateConfig.zkRoot, crawlConfig.siteId);
         this.lastFinishAppTime = this.runningJobManager.recoverLastFinishedTime(partitionId);
-        if (this.lastFinishAppTime == 0l) {
-            this.lastFinishAppTime = Calendar.getInstance().getTimeInMillis() - 24 * 60 * 60000l;//one day ago
+        if (this.lastFinishAppTime == 0L) {
+            this.lastFinishAppTime = Calendar.getInstance().getTimeInMillis() - 24 * 60 * 60000L;//one day ago
             this.runningJobManager.updateLastFinishTime(partitionId, this.lastFinishAppTime);
         }
     }
@@ -129,7 +129,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
             handleApps(apps, true);
 
             long fetchTime = Calendar.getInstance().getTimeInMillis();
-            if (fetchTime - this.lastFinishAppTime > 60000l) {
+            if (fetchTime - this.lastFinishAppTime > 60000L) {
                 apps = rmResourceFetcher.getResource(Constants.ResourceType.COMPLETE_MR_JOB, Long.toString(this.lastFinishAppTime));
                 if (apps == null) {
                     apps = new ArrayList<>();

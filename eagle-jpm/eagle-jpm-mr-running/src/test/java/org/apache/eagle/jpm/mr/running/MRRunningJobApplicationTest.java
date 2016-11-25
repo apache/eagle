@@ -58,15 +58,18 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @PowerMockIgnore({"javax.*"})
 public class MRRunningJobApplicationTest {
 
-    public static final String RM_URL = "http://sandbox.hortonworks.com:50030/ws/v1/cluster/apps?applicationTypes=MAPREDUCE&state=RUNNING&anonymous=true";
-    public static final String RUNNING_YARNAPPS = "[application_1479206441898_35341, application_1479206441898_30784]";
-    public static final String TUPLE_1 = "[application_1479206441898_30784, AppInfo{id='application_1479206441898_30784', user='xxx', name='oozie:launcher:T=shell:W=wf_co_xxx_xxx_v3:A=extract_org_data:ID=0002383-161115184801730-oozie-oozi-W', queue='xxx', state='RUNNING', finalStatus='UNDEFINED', progress=95.0, trackingUI='ApplicationMaster', trackingUrl='http://host.domain.com:8088/proxy/application_1479206441898_30784/', diagnostics='', clusterId='1479206441898', applicationType='MAPREDUCE', startedTime=1479328221694, finishedTime=0, elapsedTime=13367402, amContainerLogs='http://host.domain.com:8088/node/containerlogs/container_e11_1479206441898_30784_01_000001/xxx', amHostHttpAddress='host.domain.com:8088', allocatedMB=3072, allocatedVCores=2, runningContainers=2}, null]";
-    public static final String TUPLE_2 = "[application_1479206441898_35341, AppInfo{id='application_1479206441898_35341', user='yyy', name='insert overwrite table inter...a.xxx(Stage-3)', queue='yyy', state='RUNNING', finalStatus='UNDEFINED', progress=59.545456, trackingUI='ApplicationMaster', trackingUrl='http://host.domain.com:8088/proxy/application_1479206441898_35341/', diagnostics='', clusterId='1479206441898', applicationType='MAPREDUCE', startedTime=1479341511477, finishedTime=0, elapsedTime=77619, amContainerLogs='http://host.domain.com:8042/node/containerlogs/container_e11_1479206441898_35341_01_000005/yyy', amHostHttpAddress='host.domain.com:8042', allocatedMB=27648, allocatedVCores=6, runningContainers=6}, null]";
+    private static final String RM_URL = "http://sandbox.hortonworks.com:50030/ws/v1/cluster/apps?applicationTypes=MAPREDUCE&state=RUNNING&anonymous=true";
+    private static final String RUNNING_YARNAPPS = "[application_1479206441898_35341, application_1479206441898_30784]";
+    private static final String TUPLE_1 = "[application_1479206441898_30784, AppInfo{id='application_1479206441898_30784', user='xxx', name='oozie:launcher:T=shell:W=wf_co_xxx_xxx_v3:A=extract_org_data:ID=0002383-161115184801730-oozie-oozi-W', queue='xxx', state='RUNNING', finalStatus='UNDEFINED', progress=95.0, trackingUI='ApplicationMaster', trackingUrl='http://host.domain.com:8088/proxy/application_1479206441898_30784/', diagnostics='', clusterId='1479206441898', applicationType='MAPREDUCE', startedTime=1479328221694, finishedTime=0, elapsedTime=13367402, amContainerLogs='http://host.domain.com:8088/node/containerlogs/container_e11_1479206441898_30784_01_000001/xxx', amHostHttpAddress='host.domain.com:8088', allocatedMB=3072, allocatedVCores=2, runningContainers=2}, null]";
+    private static final String TUPLE_2 = "[application_1479206441898_35341, AppInfo{id='application_1479206441898_35341', user='yyy', name='insert overwrite table inter...a.xxx(Stage-3)', queue='yyy', state='RUNNING', finalStatus='UNDEFINED', progress=59.545456, trackingUI='ApplicationMaster', trackingUrl='http://host.domain.com:8088/proxy/application_1479206441898_35341/', diagnostics='', clusterId='1479206441898', applicationType='MAPREDUCE', startedTime=1479341511477, finishedTime=0, elapsedTime=77619, amContainerLogs='http://host.domain.com:8042/node/containerlogs/container_e11_1479206441898_35341_01_000005/yyy', amHostHttpAddress='host.domain.com:8042', allocatedMB=27648, allocatedVCores=6, runningContainers=6}, null]";
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
+    private static Config config = ConfigFactory.load();
+    private static String siteId;
 
     @BeforeClass
     public static void setupMapper() throws Exception {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+        siteId = config.getString("siteId");
     }
 
 
@@ -77,8 +80,6 @@ public class MRRunningJobApplicationTest {
         when(Executors.newFixedThreadPool(anyInt())).thenReturn(executorService);
 
 
-        MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
-        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(any()).thenReturn(mrRunningJobManager);
         Config config = ConfigFactory.load();
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
         List<String> confKeyKeys = makeConfKeyKeys(mrRunningJobConfig);
@@ -88,6 +89,8 @@ public class MRRunningJobApplicationTest {
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys,
                 config);
+        MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
+        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig(), siteId).thenReturn(mrRunningJobManager);
         mrRunningJobParseBolt.prepare(null, null, null);
         InputStream previousmrrunningapp = this.getClass().getResourceAsStream("/previousmrrunningapp.json");
         AppsWrapper appsWrapper = OBJ_MAPPER.readValue(previousmrrunningapp, AppsWrapper.class);
@@ -235,7 +238,7 @@ public class MRRunningJobApplicationTest {
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(ConfigFactory.load());
         mrRunningJobConfig.getEndpointConfig().fetchRunningJobInterval = 1;
         MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
-        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig()).thenReturn(mrRunningJobManager);
+        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig(), siteId).thenReturn(mrRunningJobManager);
 
         InputStream app35341 = this.getClass().getResourceAsStream("/application_1479206441898_35341.json");
         AppsWrapper appWrapper = OBJ_MAPPER.readValue(app35341, AppsWrapper.class);

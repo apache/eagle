@@ -74,14 +74,20 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
     @SuppressWarnings("unchecked")
     @Override
     public void execute(Tuple tuple) {
-        AppInfo appInfo = (AppInfo)tuple.getValue(1);
-        Map<String, SparkAppEntity> sparkApp = (Map<String, SparkAppEntity>)tuple.getValue(2);
+        AppInfo appInfo = (AppInfo) tuple.getValue(1);
+        Map<String, SparkAppEntity> sparkApp = (Map<String, SparkAppEntity>) tuple.getValue(2);
 
         LOG.info("get spark yarn application " + appInfo.getId());
 
         SparkApplicationParser applicationParser;
         if (!runningSparkParsers.containsKey(appInfo.getId())) {
-            applicationParser = new SparkApplicationParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, sparkApp, new SparkRunningJobManager(zkStateConfig), resourceFetcher);
+            applicationParser = new SparkApplicationParser(eagleServiceConfig,
+                    endpointConfig,
+                    jobExtractorConfig,
+                    appInfo,
+                    sparkApp,
+                    new SparkRunningJobManager(zkStateConfig, jobExtractorConfig.site),
+                    resourceFetcher);
             runningSparkParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {
@@ -97,7 +103,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
                 });
 
         if (appInfo.getState().equals(Constants.AppState.FINISHED.toString())
-            || applicationParser.status() == SparkApplicationParser.ParserStatus.FINISHED) {
+                || applicationParser.status() == SparkApplicationParser.ParserStatus.FINISHED) {
             applicationParser.setStatus(SparkApplicationParser.ParserStatus.RUNNING);
             executorService.execute(applicationParser);
         }

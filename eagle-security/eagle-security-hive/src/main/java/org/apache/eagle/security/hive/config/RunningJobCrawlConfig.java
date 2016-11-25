@@ -21,25 +21,27 @@ import org.apache.eagle.jpm.util.JobIdPartitioner;
 
 import java.io.Serializable;
 
-public class RunningJobCrawlConfig implements Serializable{
+public class RunningJobCrawlConfig implements Serializable {
     private static final long serialVersionUID = 1L;
     public RunningJobEndpointConfig endPointConfig;
     public ControlConfig controlConfig;
     public ZKStateConfig zkStateConfig;
+    public String siteId;
 
-    public RunningJobCrawlConfig(RunningJobEndpointConfig endPointConfig, ControlConfig controlConfig, ZKStateConfig zkStateConfig){
+    public RunningJobCrawlConfig(RunningJobEndpointConfig endPointConfig, ControlConfig controlConfig, ZKStateConfig zkStateConfig, String siteId) {
         this.endPointConfig = endPointConfig;
         this.controlConfig = controlConfig;
         this.zkStateConfig = zkStateConfig;
+        this.siteId = siteId;
     }
 
-    public static class RunningJobEndpointConfig implements Serializable{
+    public static class RunningJobEndpointConfig implements Serializable {
         private static final long serialVersionUID = 1L;
         public String[] RMBasePaths;
         public String HSBasePath;
     }
 
-    public static class ControlConfig implements Serializable{
+    public static class ControlConfig implements Serializable {
         private static final long serialVersionUID = 1L;
         public boolean jobConfigEnabled;
         public boolean jobInfoEnabled;

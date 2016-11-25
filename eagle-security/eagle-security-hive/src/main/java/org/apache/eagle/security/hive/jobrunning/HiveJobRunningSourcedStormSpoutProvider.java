@@ -27,19 +27,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HiveJobRunningSourcedStormSpoutProvider {
-	private static final Logger LOG = LoggerFactory.getLogger(HiveJobRunningSourcedStormSpoutProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HiveJobRunningSourcedStormSpoutProvider.class);
 
-	public BaseRichSpout getSpout(Config config, int parallelism){
-		RunningJobEndpointConfig endPointConfig = new RunningJobEndpointConfig();
-		String RMEndPoints = config.getString("dataSourceConfig.RMEndPoints");
-		endPointConfig.RMBasePaths = RMEndPoints.split(",");
+    public BaseRichSpout getSpout(Config config, int parallelism) {
+        RunningJobEndpointConfig endPointConfig = new RunningJobEndpointConfig();
+        String RMEndPoints = config.getString("dataSourceConfig.RMEndPoints");
+        endPointConfig.RMBasePaths = RMEndPoints.split(",");
 
-		String HSEndPoint = config.getString("dataSourceConfig.HSEndPoint");
-		endPointConfig.HSBasePath = HSEndPoint;
+        String HSEndPoint = config.getString("dataSourceConfig.HSEndPoint");
+        endPointConfig.HSBasePath = HSEndPoint;
 
-		ControlConfig controlConfig = new ControlConfig();
-		controlConfig.jobInfoEnabled = true;
-		controlConfig.jobConfigEnabled = true;
+        ControlConfig controlConfig = new ControlConfig();
+        controlConfig.jobInfoEnabled = true;
+        controlConfig.jobConfigEnabled = true;
         controlConfig.numTotalPartitions = parallelism <= 0 ? 1 : parallelism;
 
         boolean zkCleanupTimeSet = config.hasPath("dataSourceConfig.zkCleanupTimeInday");
@@ -56,24 +56,24 @@ public class HiveJobRunningSourcedStormSpoutProvider {
         controlConfig.sizeOfJobCompletedInfoQueue = sizeOfJobCompletedInfoQueue ? config.getInt("dataSourceConfig.sizeOfJobCompletedInfoQueue") : 10000;
 
         //controlConfig.numTotalPartitions = parallelism == null ? 1 : parallelism;
-		ZKStateConfig zkStateConfig = new ZKStateConfig();
-		zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
-		zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot");
-		zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
-		zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
-		zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
-		RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig);
+        ZKStateConfig zkStateConfig = new ZKStateConfig();
+        zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
+        zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot");
+        zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
+        zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
+        zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
+        String siteId = config.getString("siteId");
+        RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig, siteId);
 
-		try{
-			controlConfig.partitionerCls = (Class<? extends DefaultJobIdPartitioner>)Class.forName(config.getString("dataSourceConfig.partitionerCls"));
-		}
-		catch(Exception ex){
-			LOG.warn("failing find job id partitioner class " + config.getString("dataSourceConfig.partitionerCls"));
-			//throw new IllegalStateException("jobId partitioner class does not exist " + config.getString("dataSourceConfig.partitionerCls"));
+        try {
+            controlConfig.partitionerCls = (Class<? extends DefaultJobIdPartitioner>) Class.forName(config.getString("dataSourceConfig.partitionerCls"));
+        } catch (Exception ex) {
+            LOG.warn("failing find job id partitioner class " + config.getString("dataSourceConfig.partitionerCls"));
+            //throw new IllegalStateException("jobId partitioner class does not exist " + config.getString("dataSourceConfig.partitionerCls"));
             controlConfig.partitionerCls = DefaultJobIdPartitioner.class;
         }
 
-		HiveJobFetchSpout spout = new HiveJobFetchSpout(crawlConfig);
-		return spout;
-	}
+        HiveJobFetchSpout spout = new HiveJobFetchSpout(crawlConfig);
+        return spout;
+    }
 }

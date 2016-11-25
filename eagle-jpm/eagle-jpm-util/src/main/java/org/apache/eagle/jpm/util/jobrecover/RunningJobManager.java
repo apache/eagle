@@ -18,6 +18,8 @@
 
 package org.apache.eagle.jpm.util.jobrecover;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.framework.CuratorFramework;
@@ -39,8 +41,10 @@ public class RunningJobManager implements Serializable {
     private static final String ENTITY_TAGS_KEY = "entityTags";
     private static final String APP_INFO_KEY = "appInfo";
     private static final String ZNODE_LAST_FINISH_TIME = "lastFinishTime";
+    public static final String LOCK_PATH = "/locks";
+    private final InterProcessMutex lock;
 
-    private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) throws Exception {
+    private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) {
         return CuratorFrameworkFactory.newClient(
                 zkQuorum,
                 zkSessionTimeoutMs,
@@ -49,12 +53,21 @@ public class RunningJobManager implements Serializable {
         );
     }
 
-    public RunningJobManager(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval, String zkRoot) {
+    public RunningJobManager(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval, String zkRoot, String siteId) {
         this.zkRoot = zkRoot;
+        curator = newCurator(zkQuorum, zkSessionTimeoutMs, zkRetryTimes, zkRetryInterval);
+        curator.start();
+        String lockPath;
+        if (StringUtils.isNotBlank(siteId)) {
+            lockPath = "/" + siteId + LOCK_PATH;
+        } else {
+            lockPath = LOCK_PATH;
+        }
+        lock = new InterProcessMutex(curator, lockPath);
+
+        LOG.info("InterProcessMutex lock path is " + lockPath);
 
         try {
-            curator = newCurator(zkQuorum, zkSessionTimeoutMs, zkRetryTimes, zkRetryInterval);
-            curator.start();
             if (curator.checkExists().forPath(this.zkRoot) == null) {
                 curator.create()
                         .creatingParentsIfNeeded()
@@ -142,7 +155,6 @@ public class RunningJobManager implements Serializable {
 
     public boolean update(String yarnAppId, String jobId, Map<String, String> tags, AppInfo app) {
         String path = this.zkRoot + "/" + yarnAppId + "/" + jobId;
-        //InterProcessMutex lock = new InterProcessMutex(curator, path);
         Map<String, String> appInfo = new HashMap<>();
         appInfo.put("id", app.getId());
         appInfo.put("user", app.getUser());
@@ -169,7 +181,7 @@ public class RunningJobManager implements Serializable {
         fields.put(ENTITY_TAGS_KEY, (new JSONObject(tags)).toString());
         fields.put(APP_INFO_KEY, (new JSONObject(appInfo)).toString());
         try {
-            //lock.acquire();
+            lock.acquire();
             JSONObject object = new JSONObject(fields);
             if (curator.checkExists().forPath(path) == null) {
                 curator.create()
@@ -183,7 +195,7 @@ public class RunningJobManager implements Serializable {
             LOG.error("failed to update job {} for yarn app {} ", jobId, yarnAppId);
         } finally {
             try {
-                //lock.release();
+                lock.release();
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
             }
@@ -193,9 +205,8 @@ public class RunningJobManager implements Serializable {
 
     public void delete(String yarnAppId, String jobId) {
         String path = this.zkRoot + "/" + yarnAppId + "/" + jobId;
-        //InterProcessMutex lock = new InterProcessMutex(curator, path);
         try {
-            //lock.acquire();
+            lock.acquire();
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("delete job {} for yarn app {}, path {} ", jobId, yarnAppId, path);
@@ -208,7 +219,7 @@ public class RunningJobManager implements Serializable {
             LOG.error("failed to delete job {} for yarn app {}, path {}, {}", jobId, yarnAppId, path, e);
         } finally {
             try {
-                //lock.release();
+                lock.release();
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
 
@@ -218,9 +229,8 @@ public class RunningJobManager implements Serializable {
 
     public void delete(String yarnAppId) {
         String path = this.zkRoot + "/" + yarnAppId;
-        //InterProcessMutex lock = new InterProcessMutex(curator, path);
         try {
-            //lock.acquire();
+            lock.acquire();
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().forPath(path);
                 LOG.info("delete yarn app {}, path {} ", yarnAppId, path);
@@ -229,7 +239,7 @@ public class RunningJobManager implements Serializable {
             LOG.error("failed to delete yarn app {}, path {} ", yarnAppId, path);
         } finally {
             try {
-                //lock.release();
+                lock.release();
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
             }
@@ -243,14 +253,14 @@ public class RunningJobManager implements Serializable {
         while (keysItr.hasNext()) {
             String key = keysItr.next();
             result.put(key, new HashMap<>());
-            String value = (String)object.get(key);
+            String value = (String) object.get(key);
 
             JSONObject jsonObject = new JSONObject(value);
             Map<String, String> items = result.get(key);
             Iterator<String> keyItemItr = jsonObject.keys();
             while (keyItemItr.hasNext()) {
                 String itemKey = keyItemItr.next();
-                items.put(itemKey, (String)jsonObject.get(itemKey));
+                items.put(itemKey, (String) jsonObject.get(itemKey));
             }
         }
         return result;

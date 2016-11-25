@@ -69,14 +69,14 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(endpointConfig.parseJobThreadPoolSize);
 
-        this.runningJobManager = new MRRunningJobManager(zkStateConfig);
+        this.runningJobManager = new MRRunningJobManager(zkStateConfig, endpointConfig.site);
         this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 
     @Override
     public void execute(Tuple tuple) {
-        AppInfo appInfo = (AppInfo)tuple.getValue(1);
-        Map<String, JobExecutionAPIEntity> mrJobs = (Map<String, JobExecutionAPIEntity>)tuple.getValue(2);
+        AppInfo appInfo = (AppInfo) tuple.getValue(1);
+        Map<String, JobExecutionAPIEntity> mrJobs = (Map<String, JobExecutionAPIEntity>) tuple.getValue(2);
 
         LOG.info("get mr yarn application " + appInfo.getId());
 
@@ -100,7 +100,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
                 });
 
         if (appInfo.getState().equals(Constants.AppState.FINISHED.toString())
-            || applicationParser.status() == MRJobParser.ParserStatus.FINISHED) {
+                || applicationParser.status() == MRJobParser.ParserStatus.FINISHED) {
             applicationParser.setStatus(MRJobParser.ParserStatus.RUNNING);
             executorService.execute(applicationParser);
         }
