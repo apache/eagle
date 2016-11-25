@@ -93,21 +93,26 @@ class Helper:
         url = ":".join([host, str(port)])
         result = None
         response = None
-        try:
-            if https:
-                logging.info("Reading https://" + str(url) + path)
-                c = httplib.HTTPSConnection(url, timeout=57)
-                c.request("GET", path)
-                response = c.getresponse()
-            else:
-                logging.info("Reading http://" + str(url) + path)
-                response = urllib2.urlopen("http://" + str(url) + path, timeout=57)
-            logging.debug("Got response")
-            result = response.read()
-        finally:
-            if response is not None:
-                response.close()
-            return result
+        attempts = 0
+        while attempts < 2:
+            try:
+                if https:
+                    logging.info("Reading https://" + str(url) + path)
+                    c = httplib.HTTPSConnection(url, timeout=28)
+                    c.request("GET", path)
+                    response = c.getresponse()
+                else:
+                    logging.info("Reading http://" + str(url) + path)
+                    response = urllib2.urlopen("http://" + str(url) + path, timeout=28)
+                logging.debug("Got response")
+                result = response.read()
+            except Exception as e:
+                logging.warning(e)
+                attempts += 1
+            finally:
+                if response is not None:
+                    response.close()
+                return result
 
 
 class JmxReader(object):
