@@ -18,10 +18,24 @@ package org.apache.eagle.app.service;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;
+import org.apache.eagle.alert.metric.MetricConfigs;
+import org.apache.eagle.app.Application;
+import org.apache.eagle.app.environment.impl.StaticEnvironment;
+import org.apache.eagle.metadata.model.ApplicationDesc;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.SiteEntity;
 import org.junit.Assert;
 import org.junit.Test;
+import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ApplicationActionTest {
     /**
@@ -44,5 +58,49 @@ public class ApplicationActionTest {
         Assert.assertTrue(mergedConfig.hasPath("ENV_CONFIG"));
         Assert.assertEquals("appConfig.withFallback(envConfig): appConfig will override envConfig, envConfig is used as default config",
                 "APP",mergedConfig.getString("SCOPE"));
+    }
+
+    @Test
+    public void testDoAction() {
+        Application application = mock(Application.class);
+        when(application.getEnvironmentType()).thenReturn(StaticEnvironment.class);
+        SiteEntity siteEntity = new SiteEntity();
+        siteEntity.setSiteId("testsiteid");
+        siteEntity.setSiteName("testsitename");
+        siteEntity.setDescription("testdesc");
+        ApplicationDesc applicationDesc = new ApplicationDesc();
+        List<StreamDefinition> streamDefinitions = new ArrayList<>();
+        StreamDefinition sd = new StreamDefinition();
+        sd.setStreamId("streamId");
+        sd.setDescription("desc");
+        sd.setValidate(true);
+        sd.setTimeseries(false);
+        sd.setDataSource("ds1");
+        sd.setSiteId("siteId");
+        streamDefinitions.add(sd);
+        applicationDesc.setStreams(streamDefinitions);
+        applicationDesc.setType("type1");
+        ApplicationEntity metadata = new ApplicationEntity();
+        metadata.setAppId("appId");
+        metadata.setSite(siteEntity);
+        metadata.setDescriptor(applicationDesc);
+        metadata.setMode(ApplicationEntity.Mode.LOCAL);
+        metadata.setJarPath(applicationDesc.getJarPath());
+        Map<String, Object> configure = new HashedMap();
+        configure.put("a", "b");
+        metadata.setConfiguration(configure);
+        metadata.setContext(configure);
+        Config serverConfig = ConfigFactory.parseMap(new HashMap<String,String>(){{
+            put("dataSinkConfig.topic", "test_topic");
+            put("dataSinkConfig.brokerList", "sandbox.hortonworks.com:6667");
+            put(MetricConfigs.METRIC_PREFIX_CONF, "eagle.");
+        }});
+        IMetadataDao alertMetadataService = new InMemMetadataDaoImpl(serverConfig);
+        ApplicationAction applicationAction = new ApplicationAction(application, metadata, serverConfig, alertMetadataService);
+        applicationAction.doInstall();
+        applicationAction.doUninstall();
+        applicationAction.doStart();
+        applicationAction.doStop();
+        Assert.assertEquals(ApplicationEntity.Status.INITIALIZED, applicationAction.getStatus());
     }
 }
