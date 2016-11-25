@@ -52,7 +52,7 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         try {
             client.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
     }
 
