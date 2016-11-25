@@ -80,12 +80,12 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         Preconditions.checkNotNull(event.getAlertId(), "alertId is not initialized before being published: " + event.toString());
         AlertEntity alertEvent = new AlertEntity();
         Map<String, String> tags = new HashMap<>();
-        alertEvent.setAlertTimestamp(event.getCreatedTime());
         if (event.getExtraData() != null && !event.getExtraData().isEmpty()) {
             tags.put(SITE_ID_KEY, event.getExtraData().get(SITE_ID_KEY).toString());
             tags.put(POLICY_VALUE_KEY, event.getExtraData().get(POLICY_VALUE_KEY).toString());
             alertEvent.setAppIds((List<String>) event.getExtraData().get(APP_IDS_KEY));
         }
+        alertEvent.setTimestamp(event.getCreatedTime());
         alertEvent.setAlertData(event.getDataMap());
         alertEvent.setTags(tags);
         return alertEvent;

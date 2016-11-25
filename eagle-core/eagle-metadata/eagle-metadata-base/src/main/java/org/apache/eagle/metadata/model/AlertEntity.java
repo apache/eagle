@@ -31,16 +31,17 @@ import java.util.Map;
 @Prefix("alert_detail")
 @Service(AlertConstants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
-@Tags({"alertId", "siteId", "policyId"})
-@Partition({"site"})
+@Tags({"siteId", "policyId"})
+@Partition({"siteId"})
+@Indexes({
+        @Index(name = "Index_1_policyId", columns = { "policyId" }, unique = true)
+})
 public class AlertEntity extends TaggedLogAPIEntity {
     @Column("a")
     private List<String> appIds;
     @Column("b")
     private String policyValue;
     @Column("c")
-    private long alertTimestamp;
-    @Column("d")
     private Map<String, Object> alertData;
 
     public List<String> getAppIds() {
@@ -59,15 +60,6 @@ public class AlertEntity extends TaggedLogAPIEntity {
     public void setPolicyValue(String policyValue) {
         this.policyValue = policyValue;
         valueChanged("policyValue");
-    }
-
-    public long getAlertTimestamp() {
-        return alertTimestamp;
-    }
-
-    public void setAlertTimestamp(long alertTimestamp) {
-        this.alertTimestamp = alertTimestamp;
-        valueChanged("alertTimestamp");
     }
 
     public Map<String, Object> getAlertData() {
