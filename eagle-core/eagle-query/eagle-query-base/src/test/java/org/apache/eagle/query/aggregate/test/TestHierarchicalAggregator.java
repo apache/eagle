@@ -30,8 +30,8 @@ import org.apache.eagle.query.aggregate.AggregateFunctionType;
 import org.junit.Assert;
 
 import org.apache.eagle.query.aggregate.timeseries.SortOption;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -25,8 +25,8 @@ import org.apache.eagle.log.entity.meta.Service;
 import org.apache.eagle.log.entity.meta.Table;
 import org.apache.eagle.log.entity.meta.Tags;
 import org.apache.eagle.log.entity.meta.TimeSeries;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_COLUMN_OPERATION;
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_COLUMN_SERVICE_NAME;

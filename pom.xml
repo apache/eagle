@@ -215,7 +215,6 @@
         <gson.version>2.2.2</gson.version>
         <guava.version>15.0</guava.version>
         <fasterxml-jackson.version>2.5.4</fasterxml-jackson.version>
-        <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
         <jsoup.version>1.7.3</jsoup.version>
         <io.netty.version>3.6.7.Final</io.netty.version>
         <org.json.version>20131018</org.json.version>

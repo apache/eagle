@@ -25,8 +25,8 @@ import org.apache.eagle.jpm.util.resourcefetch.model.SparkApplication;
 import org.apache.eagle.jpm.util.resourcefetch.url.ServiceURLBuilder;
 import org.apache.eagle.jpm.util.resourcefetch.url.SparkJobServiceURLBuilderImpl;
 import org.apache.commons.codec.binary.Base64;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

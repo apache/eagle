@@ -17,7 +17,7 @@
 package org.apache.eagle.log.entity.test;
 
 import org.apache.eagle.log.entity.meta.*;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 

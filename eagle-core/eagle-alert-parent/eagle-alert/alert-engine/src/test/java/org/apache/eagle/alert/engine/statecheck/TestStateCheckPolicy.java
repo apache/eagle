@@ -33,9 +33,9 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.router.TestAlertBolt;
 import org.apache.eagle.alert.engine.runner.AlertBolt;
 import org.apache.eagle.alert.utils.AlertConstants;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -141,7 +141,7 @@ public class TestStateCheckPolicy {
     private static ObjectMapper mapper = new ObjectMapper();
 
     static {
-        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private AlertBoltSpec createAlertSpec() throws Exception {

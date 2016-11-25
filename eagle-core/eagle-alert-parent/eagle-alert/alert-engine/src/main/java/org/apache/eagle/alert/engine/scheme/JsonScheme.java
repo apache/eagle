@@ -21,7 +21,7 @@ package org.apache.eagle.alert.engine.scheme;
 
 import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 
 import java.io.IOException;

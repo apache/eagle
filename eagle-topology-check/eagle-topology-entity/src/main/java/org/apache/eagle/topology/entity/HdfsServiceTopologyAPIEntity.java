@@ -18,9 +18,10 @@
 
 package org.apache.eagle.topology.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.topology.TopologyConstants;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")

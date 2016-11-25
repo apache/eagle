@@ -17,7 +17,7 @@
 package org.apache.eagle.server.authentication.config;
 
 import io.dropwizard.util.Duration;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LdapSettings {
 

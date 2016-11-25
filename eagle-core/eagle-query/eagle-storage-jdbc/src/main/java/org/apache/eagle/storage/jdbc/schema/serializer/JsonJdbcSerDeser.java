@@ -18,7 +18,7 @@ package org.apache.eagle.storage.jdbc.schema.serializer;
 
 import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.torque.util.JdbcTypedValue;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.sql.ResultSet;

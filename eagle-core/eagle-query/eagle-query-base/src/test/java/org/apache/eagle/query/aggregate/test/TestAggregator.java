@@ -24,9 +24,9 @@ import java.util.List;
 import org.junit.Assert;
 
 import org.apache.eagle.query.aggregate.*;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

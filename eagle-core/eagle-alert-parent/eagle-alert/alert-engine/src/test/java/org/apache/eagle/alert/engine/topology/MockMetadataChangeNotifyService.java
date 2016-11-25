@@ -28,7 +28,7 @@ import org.apache.eagle.alert.engine.coordinator.MetadataType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.impl.AbstractMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

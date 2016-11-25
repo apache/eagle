@@ -26,7 +26,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.typesafe.config.Config;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

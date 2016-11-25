@@ -19,9 +19,9 @@
 
 package org.apache.eagle.jpm.mr.historyentity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)

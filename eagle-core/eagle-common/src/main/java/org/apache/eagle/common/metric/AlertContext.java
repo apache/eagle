@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.common.metric;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 
 import java.io.Serializable;

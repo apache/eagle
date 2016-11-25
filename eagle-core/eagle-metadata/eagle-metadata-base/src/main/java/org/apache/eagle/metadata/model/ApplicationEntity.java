@@ -19,7 +19,7 @@ package org.apache.eagle.metadata.model;
 
 import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.HashMap;
 import java.util.List;

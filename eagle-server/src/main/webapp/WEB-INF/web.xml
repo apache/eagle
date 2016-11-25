@@ -30,7 +30,7 @@
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>io.swagger.jaxrs.json,io.swagger.jaxrs.listing,org.apache.eagle,org.codehaus.jackson.jaxrs
+            <param-value>io.swagger.jaxrs.json,io.swagger.jaxrs.listing,org.apache.eagle,org.fasterxml.jackson.jaxrs
             </param-value>
         </init-param>
         <init-param>

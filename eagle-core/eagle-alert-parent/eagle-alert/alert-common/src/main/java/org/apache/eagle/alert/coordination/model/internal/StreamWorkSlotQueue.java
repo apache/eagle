@@ -79,12 +79,6 @@ public class StreamWorkSlotQueue {
         return workingSlots.size();
     }
 
-    //    @org.codehaus.jackson.annotate.JsonIgnore
-    //    @JsonIgnore
-    //    public void placePolicy(PolicyDefinition pd) {
-    //        policies.add(pd.getName());
-    //    }
-
     public int getNumberOfGroupBolts() {
         return numberOfGroupBolts;
     }

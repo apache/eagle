@@ -18,6 +18,8 @@
 
 package org.apache.eagle.topology.extractor.mr;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.app.utils.PathResolverHelper;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
@@ -28,8 +30,6 @@ import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
 import org.apache.eagle.app.utils.connection.ServiceNotResponseException;
 import org.apache.eagle.app.utils.connection.URLResourceFetcher;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
