@@ -14,20 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.messaging;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.base.BaseRichBolt;
+import org.apache.eagle.app.utils.StreamConvertHelper;
+import org.apache.eagle.common.utils.Tuple2;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseRichBolt implements StreamSink<K> {
@@ -51,21 +50,8 @@ public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseRi
     @Override
     public void execute(Tuple input) {
         try {
-            Map event = null;
-            Object key = input.getValue(0);
-            if (input.size() < 2) {
-                event = tupleAsMap(input);
-            } else {
-                Object value = input.getValue(1);
-                if (value != null) {
-                    if (value instanceof Map) {
-                        event = (Map) input.getValue(1);
-                    } else {
-                        event = tupleAsMap(input);
-                    }
-                }
-            }
-            execute(key, event, collector);
+            Tuple2<Object,Map> keyValue = StreamConvertHelper.tupleToEvent(input);
+            execute(keyValue.f0(), keyValue.f1(), collector);
             collector.ack(input);
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -74,14 +60,6 @@ public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseRi
     }
 
     protected abstract void execute(Object key, Map event, OutputCollector collector) throws Exception;
-
-    private Map tupleAsMap(Tuple tuple) {
-        Map values = new HashMap<>();
-        for (String field : tuple.getFields()) {
-            values.put(field, tuple.getValueByField(field));
-        }
-        return values;
-    }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {

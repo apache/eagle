@@ -14,17 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.messaging;
 
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 import com.typesafe.config.Config;
 
 import java.lang.reflect.ParameterizedType;
 
-public interface StreamSinkProvider<S extends StreamSink<D>, D extends StreamSinkConfig> {
+/**
+ * FIXME Rename to StreamIntegrationProvider or StreamDriver.
+ *
+ * @param <S>
+ * @param <D>
+ */
+public interface StreamSinkProvider<I extends StreamSource<D>, S extends StreamSink<D>, D extends StreamSinkConfig> {
     D getSinkConfig(String streamId, Config config);
 
     S getSink();
+
+    I getSource();
+
+    default I getSource(String streamId,Config config) {
+        I i = getSource();
+        i.prepare(streamId, getSinkConfig(streamId, config));
+        return i;
+    }
 
     default S getSink(String streamId, Config config) {
         S s = getSink();

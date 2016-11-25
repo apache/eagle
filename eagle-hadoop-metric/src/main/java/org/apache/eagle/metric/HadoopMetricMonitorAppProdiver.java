@@ -16,8 +16,14 @@
  */
 package org.apache.eagle.metric;
 
-import org.apache.eagle.app.StaticApplicationProvider;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
-public class HadoopMetricMonitorAppProdiver extends StaticApplicationProvider {
-    // Metadata: META-INF/providers/org.apache.eagle.metric.HadoopMetricMonitorAppProdiver.xml
+/**
+ * Metadata: META-INF/providers/org.apache.eagle.metric.HadoopMetricMonitorAppProdiver.xml.
+ */
+public class HadoopMetricMonitorAppProdiver extends AbstractApplicationProvider<HadoopMetricMonitorApp> {
+    @Override
+    public HadoopMetricMonitorApp getApplication() {
+        return new HadoopMetricMonitorApp();
+    }
 }

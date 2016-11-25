@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.messaging;
 
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import backtype.storm.tuple.Tuple;

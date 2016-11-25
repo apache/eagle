@@ -210,7 +210,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
                 ExecutionRuntime runtime = ExecutionRuntimeManager.getInstance().getRuntime(
                     applicationProviderService.getApplicationProviderByType(entity.getDescriptor().getType()).getApplication().getEnvironmentType(), config);
                 StreamSinkConfig streamSinkConfig = runtime.environment()
-                    .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
+                    .stream().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
                 streamDesc.setSink(streamSinkConfig);

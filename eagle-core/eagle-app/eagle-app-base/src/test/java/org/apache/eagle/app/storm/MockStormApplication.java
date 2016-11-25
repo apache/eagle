@@ -54,7 +54,7 @@ public class MockStormApplication extends StormApplication {
         }
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-            outputFieldsDeclarer.declare(new Fields("metric","timestamp","source","value"));
+            outputFieldsDeclarer.declare(new Fields("metric","timestamp","fromStream","value"));
         }
     }
 }

@@ -34,6 +34,6 @@ public class StaticEnvironmentTest {
      */
     @Test
     public void testStreamSinkSupport(){
-        environment.streamSink();
+        environment.stream();
     }
 }

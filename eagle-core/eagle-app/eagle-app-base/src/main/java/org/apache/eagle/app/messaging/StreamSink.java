@@ -14,24 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment;
+package org.apache.eagle.app.messaging;
 
-import org.apache.eagle.app.messaging.StreamSinkProvider;
-import com.typesafe.config.Config;
+import org.apache.eagle.app.ApplicationLifecycle;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 
-import java.io.Serializable;
-
-/**
- * Execution Environment Context.
- */
-public interface Environment extends Serializable {
-
-    Config config();
-
-    /**
-     * TODO Only useful for Storm/Spark Exeuctable Application instead of static web application.
-     *
-     * @return StreamSinkProvider.
-     */
-    StreamSinkProvider stream();
+public interface StreamSink<T extends StreamSinkConfig> extends ApplicationLifecycle {
+    void init(String streamId,T config);
 }

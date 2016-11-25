@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.messaging;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -96,7 +96,7 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
         ensureTopicDeleted();
     }
 
-    public static class Provider implements StreamSinkProvider<KafkaStreamSink, KafkaStreamSinkConfig> {
+    public static class Provider implements StreamSinkProvider<KafkaStreamSource,KafkaStreamSink, KafkaStreamSinkConfig> {
         private static final Logger LOG = LoggerFactory.getLogger(Provider.class);
         private static final String DEAULT_SHARED_TOPIC_CONF_KEY = "dataSinkConfig.topic";
 
@@ -133,12 +133,20 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
                 ? config.getString("dataSinkConfig.maxQueueBufferMs") : "3000");
             desc.setRequestRequiredAcks(config.hasPath("dataSinkConfig.requestRequiredAcks")
                 ? config.getString("dataSinkConfig.requestRequiredAcks") : "1");
-            return desc;
+
+            // TODO: Handle Source Config
+            throw new IllegalStateException("TODO: Handle Source Config");
+            // return desc;
         }
 
         @Override
         public KafkaStreamSink getSink() {
             return new KafkaStreamSink();
+        }
+
+        @Override
+        public KafkaStreamSource getSource() {
+            return new KafkaStreamSource();
         }
     }
 }

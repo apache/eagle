@@ -29,7 +29,7 @@ import org.apache.eagle.alert.metric.MetricConfigs;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
-import org.apache.eagle.app.sink.KafkaStreamSinkConfig;
+import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.utils.StreamIdConversions;
 import org.apache.eagle.metadata.model.StreamDesc;
@@ -101,7 +101,7 @@ public class ApplicationAction implements Serializable {
             copied.setSiteId(metadata.getSite().getSiteId());
             copied.setStreamId(StreamIdConversions.formatSiteStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
             StreamSinkConfig streamSinkConfig = this.runtime.environment()
-                    .streamSink().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
+                    .stream().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
             StreamDesc streamDesc = new StreamDesc();
             streamDesc.setSchema(copied);
             streamDesc.setSink(streamSinkConfig);

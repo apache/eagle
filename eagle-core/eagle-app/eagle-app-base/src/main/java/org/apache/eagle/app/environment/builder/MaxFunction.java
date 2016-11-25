@@ -5,31 +5,39 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.environment.builder;
 
-import org.apache.eagle.alert.engine.model.StreamEvent;
-import backtype.storm.tuple.Tuple;
+import java.util.Map;
 
-import java.io.Serializable;
-import java.util.List;
+public class MaxFunction extends AggregateFunction {
+    @Override
+    public void open() {
+        throw new IllegalStateException("TODO: Not implemented yet.");
+    }
 
-@FunctionalInterface
-public interface StreamEventMapper extends Serializable {
-    /**
-     * Map from storm tuple to Stream Event.
-     *
-     * @param tuple
-     * @return
-     * @throws Exception
-     */
-    List<StreamEvent> map(Tuple tuple) throws Exception;
+    @Override
+    public void transform(Map event) {
+        throw new IllegalStateException("TODO: Not implemented yet.");
+    }
+
+    @Override
+    public void close() {
+
+        throw new IllegalStateException("TODO: Not implemented yet.");
+    }
+
+    public static MaxFunction maxOf(String aggFieldName) {
+        MaxFunction function = new MaxFunction();
+        function.setAggFieldName(aggFieldName);
+        return function;
+    }
 }

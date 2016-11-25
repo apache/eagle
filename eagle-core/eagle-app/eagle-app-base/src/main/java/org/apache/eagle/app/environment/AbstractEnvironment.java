@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.app.environment;
 
-import org.apache.eagle.app.sink.KafkaStreamSink;
-import org.apache.eagle.app.sink.StreamSinkProvider;
+import org.apache.eagle.app.messaging.*;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
@@ -60,9 +59,10 @@ public abstract class AbstractEnvironment implements Environment {
             .append(this.config()).build();
     }
 
-    public StreamSinkProvider streamSink() {
+    public StreamSinkProvider stream() {
         return sinkProvider;
     }
+
 
     @Override
     public Config config() {
