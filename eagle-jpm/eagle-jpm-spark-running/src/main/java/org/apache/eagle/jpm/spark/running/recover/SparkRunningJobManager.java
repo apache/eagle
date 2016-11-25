@@ -31,9 +31,9 @@ import java.util.Map;
 public class SparkRunningJobManager implements Serializable {
     private RunningJobManager runningJobManager;
 
-    public SparkRunningJobManager(SparkRunningJobAppConfig.ZKStateConfig config, String siteId) {
+    public SparkRunningJobManager(SparkRunningJobAppConfig.ZKStateConfig config) {
         this.runningJobManager = new RunningJobManager(config.zkQuorum,
-                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot, siteId);
+                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot, config.zkLockPath);
     }
 
     public Map<String, SparkAppEntity> recoverYarnApp(String appId) throws Exception {

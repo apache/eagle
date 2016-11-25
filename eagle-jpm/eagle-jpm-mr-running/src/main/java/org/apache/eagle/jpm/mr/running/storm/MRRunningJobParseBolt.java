@@ -69,7 +69,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(endpointConfig.parseJobThreadPoolSize);
 
-        this.runningJobManager = new MRRunningJobManager(zkStateConfig, endpointConfig.site);
+        this.runningJobManager = new MRRunningJobManager(zkStateConfig);
         this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 

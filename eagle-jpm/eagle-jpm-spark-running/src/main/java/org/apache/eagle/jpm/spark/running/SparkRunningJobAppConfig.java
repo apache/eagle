@@ -20,6 +20,7 @@ package org.apache.eagle.jpm.spark.running;
 
 import com.typesafe.config.ConfigValue;
 import com.typesafe.config.Config;
+import org.apache.eagle.jpm.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,7 @@ public class SparkRunningJobAppConfig implements Serializable {
         public int zkRetryTimes;
         public int zkRetryInterval;
         public boolean recoverEnabled;
+        public String zkLockPath;
     }
 
     public static class EagleServiceConfig implements Serializable {
@@ -119,6 +121,7 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
         this.zkStateConfig.zkRoot = DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT;
+        this.zkStateConfig.zkLockPath = Utils.makeLockPath(DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT + "/" + config.getString("siteId"));
         if (config.hasPath("zookeeper.zkRoot")) {
             this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
         }

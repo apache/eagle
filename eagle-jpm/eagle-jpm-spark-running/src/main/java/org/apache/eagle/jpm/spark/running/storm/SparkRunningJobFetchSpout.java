@@ -64,7 +64,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
         collector = spoutOutputCollector;
-        this.sparkRunningJobManager = new SparkRunningJobManager(zkStateConfig, jobExtractorConfig.site);
+        this.sparkRunningJobManager = new SparkRunningJobManager(zkStateConfig);
     }
 
     @SuppressWarnings("unchecked")

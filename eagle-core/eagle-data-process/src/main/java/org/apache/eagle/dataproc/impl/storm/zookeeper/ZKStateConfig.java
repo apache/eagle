@@ -25,4 +25,5 @@ public class ZKStateConfig implements Serializable {
     public int zkSessionTimeoutMs;
     public int zkRetryTimes;
     public int zkRetryInterval;
+    public String zkLockPath;
 }

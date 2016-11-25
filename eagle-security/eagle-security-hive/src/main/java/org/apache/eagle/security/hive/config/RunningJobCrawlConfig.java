@@ -26,13 +26,11 @@ public class RunningJobCrawlConfig implements Serializable {
     public RunningJobEndpointConfig endPointConfig;
     public ControlConfig controlConfig;
     public ZKStateConfig zkStateConfig;
-    public String siteId;
 
-    public RunningJobCrawlConfig(RunningJobEndpointConfig endPointConfig, ControlConfig controlConfig, ZKStateConfig zkStateConfig, String siteId) {
+    public RunningJobCrawlConfig(RunningJobEndpointConfig endPointConfig, ControlConfig controlConfig, ZKStateConfig zkStateConfig) {
         this.endPointConfig = endPointConfig;
         this.controlConfig = controlConfig;
         this.zkStateConfig = zkStateConfig;
-        this.siteId = siteId;
     }
 
     public static class RunningJobEndpointConfig implements Serializable {

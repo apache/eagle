@@ -95,7 +95,7 @@ public class MRRunningJobManagerTest {
         for (int i = 0; i < QTY; ++i) {
             Callable<Void> task = () -> {
                 try {
-                    MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig, endpointConfig.site);
+                    MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
                     for (int j = 0; j < REPETITIONS; ++j) {
                         mrRunningJobManager.delete("yarnAppId", "jobId");
                     }

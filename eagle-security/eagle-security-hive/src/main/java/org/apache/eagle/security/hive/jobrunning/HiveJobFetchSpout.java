@@ -110,7 +110,8 @@ public class HiveJobFetchSpout extends BaseRichSpout {
                 crawlConfig.zkStateConfig.zkSessionTimeoutMs,
                 crawlConfig.zkStateConfig.zkRetryTimes,
                 crawlConfig.zkStateConfig.zkRetryInterval,
-                crawlConfig.zkStateConfig.zkRoot, crawlConfig.siteId);
+                crawlConfig.zkStateConfig.zkRoot,
+                crawlConfig.zkStateConfig.zkLockPath);
         this.lastFinishAppTime = this.runningJobManager.recoverLastFinishedTime(partitionId);
         if (this.lastFinishAppTime == 0L) {
             this.lastFinishAppTime = Calendar.getInstance().getTimeInMillis() - 24 * 60 * 60000L;//one day ago

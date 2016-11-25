@@ -18,6 +18,7 @@ package org.apache.eagle.security.hive.jobrunning;
 
 import backtype.storm.topology.base.BaseRichSpout;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
+import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.security.hive.config.RunningJobCrawlConfig;
 import org.apache.eagle.security.hive.config.RunningJobCrawlConfig.ControlConfig;
 import org.apache.eagle.security.hive.config.RunningJobCrawlConfig.RunningJobEndpointConfig;
@@ -62,8 +63,8 @@ public class HiveJobRunningSourcedStormSpoutProvider {
         zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
         zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
         zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
-        String siteId = config.getString("siteId");
-        RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig, siteId);
+        zkStateConfig.zkLockPath = Utils.makeLockPath(zkStateConfig.zkRoot + "/" + config.getString("siteId"));
+        RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig);
 
         try {
             controlConfig.partitionerCls = (Class<? extends DefaultJobIdPartitioner>) Class.forName(config.getString("dataSourceConfig.partitionerCls"));

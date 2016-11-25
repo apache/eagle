@@ -62,7 +62,7 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
         collector = spoutOutputCollector;
-        this.runningJobManager = new MRRunningJobManager(zkStateConfig, endpointConfig.site);
+        this.runningJobManager = new MRRunningJobManager(zkStateConfig);
     }
 
     @Override

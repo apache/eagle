@@ -90,7 +90,7 @@ public class MRRunningJobApplicationTest {
                 confKeyKeys,
                 config);
         MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
-        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig(), siteId).thenReturn(mrRunningJobManager);
+        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig()).thenReturn(mrRunningJobManager);
         mrRunningJobParseBolt.prepare(null, null, null);
         InputStream previousmrrunningapp = this.getClass().getResourceAsStream("/previousmrrunningapp.json");
         AppsWrapper appsWrapper = OBJ_MAPPER.readValue(previousmrrunningapp, AppsWrapper.class);
@@ -238,7 +238,7 @@ public class MRRunningJobApplicationTest {
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(ConfigFactory.load());
         mrRunningJobConfig.getEndpointConfig().fetchRunningJobInterval = 1;
         MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
-        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig(), siteId).thenReturn(mrRunningJobManager);
+        PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig()).thenReturn(mrRunningJobManager);
 
         InputStream app35341 = this.getClass().getResourceAsStream("/application_1479206441898_35341.json");
         AppsWrapper appWrapper = OBJ_MAPPER.readValue(app35341, AppsWrapper.class);

@@ -130,7 +130,7 @@ public class MRJobParserTest {
         AppInfo app1 = appInfos.get(0);
         Map<String, JobExecutionAPIEntity> mrJobs = null;
 
-        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig(), siteId);
+        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig());
         RMResourceFetcher resourceFetcher = new RMResourceFetcher(mrRunningJobConfig.getEndpointConfig().rmUrls);
         MRJobParser mrJobParser = new MRJobParser(mrRunningJobConfig.getEndpointConfig(), mrRunningJobConfig.getEagleServiceConfig(),
                 app1, mrJobs, runningJobManager, resourceFetcher, confKeyKeys, config);
@@ -185,7 +185,7 @@ public class MRJobParserTest {
         AppInfo app1 = appInfos.get(0);
         Map<String, JobExecutionAPIEntity> mrJobs = null;
 
-        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig(), siteId);
+        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig());
         RMResourceFetcher resourceFetcher = new RMResourceFetcher(mrRunningJobConfig.getEndpointConfig().rmUrls);
         MRJobParser mrJobParser = new MRJobParser(mrRunningJobConfig.getEndpointConfig(), mrRunningJobConfig.getEagleServiceConfig(),
                 app1, mrJobs, runningJobManager, resourceFetcher, confKeyKeys, config);
@@ -227,7 +227,7 @@ public class MRJobParserTest {
         AppInfo app1 = appInfos.get(0);
         Map<String, JobExecutionAPIEntity> mrJobs = null;
 
-        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig(), siteId);
+        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig());
         RMResourceFetcher resourceFetcher = new RMResourceFetcher(mrRunningJobConfig.getEndpointConfig().rmUrls);
         MRJobParser mrJobParser = new MRJobParser(mrRunningJobConfig.getEndpointConfig(), mrRunningJobConfig.getEagleServiceConfig(),
                 app1, mrJobs, runningJobManager, resourceFetcher, confKeyKeys, config);
@@ -271,7 +271,7 @@ public class MRJobParserTest {
         AppInfo app1 = appInfos.get(0);
         Map<String, JobExecutionAPIEntity> mrJobs = null;
 
-        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig(), siteId);
+        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig());
         RMResourceFetcher resourceFetcher = new RMResourceFetcher(mrRunningJobConfig.getEndpointConfig().rmUrls);
         MRJobParser mrJobParser = new MRJobParser(mrRunningJobConfig.getEndpointConfig(), mrRunningJobConfig.getEagleServiceConfig(),
                 app1, mrJobs, runningJobManager, resourceFetcher, confKeyKeys, config);
@@ -316,7 +316,7 @@ public class MRJobParserTest {
         AppInfo app1 = appInfos.get(0);
         Map<String, JobExecutionAPIEntity> mrJobs = null;
 
-        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig(), siteId);
+        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig());
         RMResourceFetcher resourceFetcher = mock(RMResourceFetcher.class);
         when(resourceFetcher.getResource(any())).thenReturn(Collections.emptyList());
         MRJobParser mrJobParser = new MRJobParser(mrRunningJobConfig.getEndpointConfig(), mrRunningJobConfig.getEagleServiceConfig(),
@@ -365,7 +365,7 @@ public class MRJobParserTest {
         AppInfo app1 = appInfos.get(0);
         Map<String, JobExecutionAPIEntity> mrJobs = null;
 
-        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig(), siteId);
+        MRRunningJobManager runningJobManager = new MRRunningJobManager(mrRunningJobConfig.getZkStateConfig());
         RMResourceFetcher resourceFetcher = mock(RMResourceFetcher.class);
         when(resourceFetcher.getResource(any())).thenReturn(Collections.emptyList());
         MRJobParser mrJobParser = new MRJobParser(mrRunningJobConfig.getEndpointConfig(), mrRunningJobConfig.getEagleServiceConfig(),

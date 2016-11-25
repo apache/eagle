@@ -86,7 +86,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
                     jobExtractorConfig,
                     appInfo,
                     sparkApp,
-                    new SparkRunningJobManager(zkStateConfig, jobExtractorConfig.site),
+                    new SparkRunningJobManager(zkStateConfig),
                     resourceFetcher);
             runningSparkParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());

@@ -41,7 +41,6 @@ public class RunningJobManager implements Serializable {
     private static final String ENTITY_TAGS_KEY = "entityTags";
     private static final String APP_INFO_KEY = "appInfo";
     private static final String ZNODE_LAST_FINISH_TIME = "lastFinishTime";
-    public static final String LOCK_PATH = "/locks";
     private final InterProcessMutex lock;
 
     private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) {
@@ -53,20 +52,13 @@ public class RunningJobManager implements Serializable {
         );
     }
 
-    public RunningJobManager(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval, String zkRoot, String siteId) {
+    public RunningJobManager(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval, String zkRoot, String lockPath) {
         this.zkRoot = zkRoot;
         curator = newCurator(zkQuorum, zkSessionTimeoutMs, zkRetryTimes, zkRetryInterval);
         curator.start();
-        String lockPath;
-        if (StringUtils.isNotBlank(siteId)) {
-            lockPath = "/" + siteId + LOCK_PATH;
-        } else {
-            lockPath = LOCK_PATH;
-        }
-        lock = new InterProcessMutex(curator, lockPath);
 
         LOG.info("InterProcessMutex lock path is " + lockPath);
-
+        lock = new InterProcessMutex(curator, lockPath);
         try {
             if (curator.checkExists().forPath(this.zkRoot) == null) {
                 curator.create()
