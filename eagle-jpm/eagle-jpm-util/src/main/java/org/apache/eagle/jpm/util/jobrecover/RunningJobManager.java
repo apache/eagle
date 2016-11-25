@@ -55,8 +55,11 @@ public class RunningJobManager implements Serializable {
     public RunningJobManager(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval, String zkRoot, String lockPath) {
         this.zkRoot = zkRoot;
         curator = newCurator(zkQuorum, zkSessionTimeoutMs, zkRetryTimes, zkRetryInterval);
-        curator.start();
-
+        try {
+            curator.start();
+        } catch (Exception e) {
+            LOG.error("curator start error {}", e);
+        }
         LOG.info("InterProcessMutex lock path is " + lockPath);
         lock = new InterProcessMutex(curator, lockPath);
         try {
