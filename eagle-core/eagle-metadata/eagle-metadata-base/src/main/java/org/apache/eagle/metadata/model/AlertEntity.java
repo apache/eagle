@@ -31,7 +31,7 @@ import java.util.Map;
 @Prefix("alert_detail")
 @Service(AlertConstants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
-@Tags({"siteId", "policyId"})
+@Tags({"alertId", "siteId", "policyId"})
 @Partition({"siteId"})
 @Indexes({
         @Index(name = "Index_1_policyId", columns = { "policyId" }, unique = true)

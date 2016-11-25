@@ -34,9 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.eagle.alert.engine.model.AlertPublishEvent.APP_IDS_KEY;
-import static org.apache.eagle.alert.engine.model.AlertPublishEvent.POLICY_VALUE_KEY;
-import static org.apache.eagle.alert.engine.model.AlertPublishEvent.SITE_ID_KEY;
+import static org.apache.eagle.alert.engine.model.AlertPublishEvent.*;
 
 public class AlertEagleStorePlugin extends AbstractPublishPlugin {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
@@ -80,9 +78,11 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         Preconditions.checkNotNull(event.getAlertId(), "alertId is not initialized before being published: " + event.toString());
         AlertEntity alertEvent = new AlertEntity();
         Map<String, String> tags = new HashMap<>();
+        tags.put(POLICY_ID_KEY, event.getPolicyId());
+        tags.put(ALERT_ID_KEY, event.getAlertId());
         if (event.getExtraData() != null && !event.getExtraData().isEmpty()) {
             tags.put(SITE_ID_KEY, event.getExtraData().get(SITE_ID_KEY).toString());
-            tags.put(POLICY_VALUE_KEY, event.getExtraData().get(POLICY_VALUE_KEY).toString());
+            alertEvent.setPolicyValue(event.getExtraData().get(POLICY_VALUE_KEY).toString());
             alertEvent.setAppIds((List<String>) event.getExtraData().get(APP_IDS_KEY));
         }
         alertEvent.setTimestamp(event.getCreatedTime());
