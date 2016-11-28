@@ -21,20 +21,23 @@ import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
+import com.google.common.base.Preconditions;
+import org.apache.eagle.alert.engine.spout.SchemeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.kafka.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class KafkaStreamSource extends StormStreamSource<KafkaStreamSinkConfig> {
+public class KafkaStreamSource extends StormStreamSource<KafkaStreamSourceConfig> {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamSource.class);
     private KafkaSpout spout;
 
     @Override
-    public void prepare(String streamId, KafkaStreamSinkConfig config) {
+    public void prepare(String streamId, KafkaStreamSourceConfig config) {
         this.spout = createKafkaSpout(config);
     }
 
@@ -87,7 +90,7 @@ public class KafkaStreamSource extends StormStreamSource<KafkaStreamSinkConfig> 
     //  Helper Methods
     // ----------------
 
-    private static KafkaSpout createKafkaSpout(KafkaStreamSinkConfig config) {
+    private static KafkaSpout createKafkaSpout(KafkaStreamSourceConfig config) {
 
         // the following is for fetching data from one topic
         // Kafka topic
@@ -146,20 +149,14 @@ public class KafkaStreamSource extends StormStreamSource<KafkaStreamSinkConfig> 
             spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
         }
 
-        if (config.getSchemaClass() != null ) {
-            try {
-                Scheme s = config.getSchemaClass().newInstance();
-                spoutConfig.scheme = new SchemeAsMultiScheme(s);
-            } catch (Exception ex) {
-                LOG.error("Error instantiating scheme object");
-                throw new IllegalStateException(ex);
-            }
-        } else {
-            String err = "schemaClass is null";
-            LOG.error(err);
-            throw new IllegalStateException(err);
+        Preconditions.checkNotNull(config.getSchemaClass(), "schemaClass is null");
+        try {
+            Scheme s = config.getSchemaClass().newInstance();
+            spoutConfig.scheme = new SchemeAsMultiScheme(s);
+        } catch (Exception ex) {
+            LOG.error("Error instantiating scheme object");
+            throw new IllegalStateException(ex);
         }
-
         return new KafkaSpout(spoutConfig);
     }
 }

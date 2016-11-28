@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.builder;
+package org.apache.eagle.metric;
 
-import java.io.Serializable;
-import java.util.Map;
-
-public interface TransformFunction extends Serializable {
-    void open();
-
-    void transform(Map event);
-
-    void close();
+public class HadoopMetricMonitorAppDebug {
+    public static void main(String[] args) {
+        new HadoopMetricMonitorApp().run(args);
+    }
 }

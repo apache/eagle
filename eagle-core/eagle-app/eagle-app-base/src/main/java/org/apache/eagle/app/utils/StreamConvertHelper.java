@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StreamConvertHelper {
-    public static Map tupleToMap(Tuple tuple) {
+    private static Map tupleToMap(Tuple tuple) {
         Map values = new HashMap<>();
         for (String field : tuple.getFields()) {
             values.put(field, tuple.getValueByField(field));

@@ -17,20 +17,22 @@
 package org.apache.eagle.app.environment.builder;
 
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class MetricDefinition {
-
-    private NameFormat nameFormat;
-
-    private String nameField = "metric";
+public class MetricDefinition implements Serializable {
 
     /**
-     * Timestamp field name.
+     * Support simple and complex name format, by default using "metric" field.
      */
-    private String timestampField = "timestamp";
+    private NameSelector nameSelector = new FieldNameSelector("metric");
+
+    /**
+     * Support event/system time, by default using system time.
+     */
+    private TimestampSelector timestampSelector = new SystemTimestampSelector();
 
     /**
      * Metric dimension field name.
@@ -42,20 +44,12 @@ public class MetricDefinition {
      */
     private String valueField = "value";
 
-    public NameFormat getNameFormat() {
-        return nameFormat;
+    public NameSelector getNameSelector() {
+        return nameSelector;
     }
 
-    public void setNameFormat(NameFormat nameFormat) {
-        this.nameFormat = nameFormat;
-    }
-
-    public String getTimestampField() {
-        return timestampField;
-    }
-
-    public void setTimestampField(String timestampField) {
-        this.timestampField = timestampField;
+    public void setNameSelector(NameSelector nameSelector) {
+        this.nameSelector = nameSelector;
     }
 
     public String getValueField() {
@@ -66,14 +60,6 @@ public class MetricDefinition {
         this.valueField = valueField;
     }
 
-    public String getNameField() {
-        return nameField;
-    }
-
-    public void setNameField(String nameField) {
-        this.nameField = nameField;
-    }
-
     public List<String> getDimensionFields() {
         return dimensionFields;
     }
@@ -82,28 +68,43 @@ public class MetricDefinition {
         this.dimensionFields = dimensionFields;
     }
 
+    public TimestampSelector getTimestampSelector() {
+        return timestampSelector;
+    }
+
+    public void setTimestampSelector(TimestampSelector timestampSelector) {
+        this.timestampSelector = timestampSelector;
+    }
+
 
     @FunctionalInterface
-    public interface NameFormat {
+    public interface NameSelector extends Serializable {
         String getMetricName(Map event);
     }
 
-    public static MetricDefinition namedBy(NameFormat nameFormat) {
+    @FunctionalInterface
+    public interface TimestampSelector extends Serializable {
+        Long getTimestamp(Map event);
+    }
+
+    public static MetricDefinition namedBy(NameSelector nameSelector) {
         MetricDefinition metricDefinition = new MetricDefinition();
-        metricDefinition.nameFormat = nameFormat;
+        metricDefinition.setNameSelector(nameSelector);
         return metricDefinition;
     }
 
     public static MetricDefinition namedByField(String nameField) {
-        throw new IllegalStateException("TODO: Not implemented yet");
+        MetricDefinition metricDefinition = new MetricDefinition();
+        metricDefinition.setNameSelector(new FieldNameSelector(nameField));
+        return metricDefinition;
     }
 
-    public MetricDefinition timestampField(String timestampField) {
-        this.setTimestampField(timestampField);
+    public MetricDefinition eventTimeByField(String timestampField) {
+        this.setTimestampSelector(new EventTimestampSelector(timestampField));
         return this;
     }
 
-    public MetricDefinition dimensionFields(String ... dimensionFields) {
+    public MetricDefinition dimensionFields(String... dimensionFields) {
         this.setDimensionFields(Arrays.asList(dimensionFields));
         return this;
     }
@@ -111,5 +112,54 @@ public class MetricDefinition {
     public MetricDefinition valueField(String valueField) {
         this.setValueField(valueField);
         return this;
+    }
+
+    public class EventTimestampSelector implements TimestampSelector {
+        private final String timestampField;
+
+        EventTimestampSelector(String timestampField) {
+            this.timestampField = timestampField;
+        }
+
+        @Override
+        public Long getTimestamp(Map event) {
+            if (event.containsKey(timestampField)) {
+                Object timestampValue = event.get(timestampField);
+                if (timestampValue instanceof Integer) {
+                    return Long.valueOf((Integer) timestampValue);
+                }
+                if (timestampValue instanceof String) {
+                    return Long.valueOf((String) timestampValue);
+                } else {
+                    return (Long) timestampValue;
+                }
+            } else {
+                throw new IllegalArgumentException("Timestamp field '" + timestampField + "' not exists");
+            }
+        }
+    }
+
+    public static class SystemTimestampSelector implements TimestampSelector {
+        @Override
+        public Long getTimestamp(Map event) {
+            return System.currentTimeMillis();
+        }
+    }
+
+    public static class FieldNameSelector implements NameSelector {
+        private final String fieldName;
+
+        FieldNameSelector(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        @Override
+        public String getMetricName(Map event) {
+            if (event.containsKey(fieldName)) {
+                return (String) event.get(fieldName);
+            } else {
+                throw new IllegalArgumentException("Metric name field '" + fieldName + "' not exists: " + event);
+            }
+        }
     }
 }

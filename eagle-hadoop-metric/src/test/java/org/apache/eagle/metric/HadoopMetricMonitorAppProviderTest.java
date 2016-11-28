@@ -32,7 +32,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HadoopMetricMonitorAppProdiverTest extends ApplicationTestBase {
+public class HadoopMetricMonitorAppProviderTest extends ApplicationTestBase {
 
     @Inject
     private SiteResource siteResource;

@@ -16,41 +16,52 @@
  */
 package org.apache.eagle.app.messaging;
 
-import org.apache.eagle.metadata.model.StreamSinkConfig;
 import com.typesafe.config.Config;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
+import org.apache.eagle.metadata.model.StreamSourceConfig;
 
 import java.lang.reflect.ParameterizedType;
 
 /**
  * FIXME Rename to StreamIntegrationProvider or StreamDriver.
- *
- * @param <S>
- * @param <D>
  */
-public interface StreamSinkProvider<I extends StreamSource<D>, S extends StreamSink<D>, D extends StreamSinkConfig> {
-    D getSinkConfig(String streamId, Config config);
+public interface StreamSinkProvider<
+    W extends StreamSink<C>, C extends StreamSinkConfig,
+    R extends StreamSource<F>, F extends StreamSourceConfig> {
 
-    S getSink();
+    C getSinkConfig(String streamId, Config config);
 
-    I getSource();
+    W getSink();
 
-    default I getSource(String streamId,Config config) {
-        I i = getSource();
-        i.prepare(streamId, getSinkConfig(streamId, config));
-        return i;
-    }
-
-    default S getSink(String streamId, Config config) {
-        S s = getSink();
+    default W getSink(String streamId, Config config) {
+        W s = getSink();
         s.init(streamId, getSinkConfig(streamId, config));
         return s;
     }
 
-    default Class<? extends S> getSinkType() {
-        return (Class<S>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    default Class<? extends W> getSinkType() {
+        return (Class<W>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
-    default Class<? extends D> getSinkConfigType() {
-        return (Class<D>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    default Class<? extends C> getSinkConfigType() {
+        return (Class<C>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    }
+
+    F getSourceConfig(String streamId, Config config);
+
+    R getSource();
+
+    default R getSource(String streamId, Config config) {
+        R i = getSource();
+        i.prepare(streamId, getSourceConfig(streamId, config));
+        return i;
+    }
+
+    default Class<? extends R> getSourceType() {
+        return (Class<R>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    default Class<? extends F> getSourceConfigType() {
+        return (Class<F>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
 }

@@ -16,18 +16,12 @@
  */
 package org.apache.eagle.app.messaging;
 
-import backtype.storm.spout.Scheme;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 /**
  * FIXME Rename to KafkaStreamMessagingConfig.
  */
 public class KafkaStreamSinkConfig implements StreamSinkConfig {
-
-    private static final String DEFAULT_CONFIG_PREFIX = "dataSourceConfig";
-    private static final String DEFAULT_CONSUMER_GROUP_ID = "eagleKafkaSource";
-    private static final String DEFAULT_TRANSACTION_ZK_ROOT = "/consumers";
-
     // Write Config
     private String topicId;
     private String brokerList;
@@ -37,19 +31,6 @@ public class KafkaStreamSinkConfig implements StreamSinkConfig {
     private String maxQueueBufferMs;
     private String producerType;
     private String requestRequiredAcks;
-
-    // Read Config
-    private String brokerZkQuorum;
-    private String brokerZkBasePath;
-    private int fetchSize = 1048576;
-    private String transactionZKRoot = DEFAULT_TRANSACTION_ZK_ROOT;
-    private String consumerGroupId = DEFAULT_CONSUMER_GROUP_ID;
-    private String brokerZkPath = null;
-    private String transactionZkServers;
-    private int transactionStateUpdateMS = 2000;
-    private int startOffsetTime = -1;
-    private boolean forceFromStart;
-    private Class<backtype.storm.spout.Scheme> schemaClass;
 
     public String getTopicId() {
         return topicId;
@@ -130,91 +111,5 @@ public class KafkaStreamSinkConfig implements StreamSinkConfig {
         return KafkaStreamSinkConfig.class;
     }
 
-    public String getBrokerZkQuorum() {
-        return brokerZkQuorum;
-    }
 
-    public void setBrokerZkQuorum(String brokerZkQuorum) {
-        this.brokerZkQuorum = brokerZkQuorum;
-    }
-
-    public String getBrokerZkBasePath() {
-        return brokerZkBasePath;
-    }
-
-    public void setBrokerZkBasePath(String brokerZkBasePath) {
-        this.brokerZkBasePath = brokerZkBasePath;
-    }
-
-    public int getFetchSize() {
-        return fetchSize;
-    }
-
-    public void setFetchSize(int fetchSize) {
-        this.fetchSize = fetchSize;
-    }
-
-    public String getTransactionZKRoot() {
-        return transactionZKRoot;
-    }
-
-    public void setTransactionZKRoot(String transactionZKRoot) {
-        this.transactionZKRoot = transactionZKRoot;
-    }
-
-    public String getConsumerGroupId() {
-        return consumerGroupId;
-    }
-
-    public void setConsumerGroupId(String consumerGroupId) {
-        this.consumerGroupId = consumerGroupId;
-    }
-
-    public String getBrokerZkPath() {
-        return brokerZkPath;
-    }
-
-    public void setBrokerZkPath(String brokerZkPath) {
-        this.brokerZkPath = brokerZkPath;
-    }
-
-    public String getTransactionZkServers() {
-        return transactionZkServers;
-    }
-
-    public void setTransactionZkServers(String transactionZkServers) {
-        this.transactionZkServers = transactionZkServers;
-    }
-
-    public int getTransactionStateUpdateMS() {
-        return transactionStateUpdateMS;
-    }
-
-    public void setTransactionStateUpdateMS(int transactionStateUpdateMS) {
-        this.transactionStateUpdateMS = transactionStateUpdateMS;
-    }
-
-    public int getStartOffsetTime() {
-        return startOffsetTime;
-    }
-
-    public void setStartOffsetTime(int startOffsetTime) {
-        this.startOffsetTime = startOffsetTime;
-    }
-
-    public boolean isForceFromStart() {
-        return forceFromStart;
-    }
-
-    public void setForceFromStart(boolean forceFromStart) {
-        this.forceFromStart = forceFromStart;
-    }
-
-    public Class<Scheme> getSchemaClass() {
-        return schemaClass;
-    }
-
-    public void setSchemaClass(Class<Scheme> schemaClass) {
-        this.schemaClass = schemaClass;
-    }
 }

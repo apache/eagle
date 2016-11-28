@@ -18,7 +18,8 @@ package org.apache.eagle.app.messaging;
 
 import backtype.storm.topology.base.BaseRichSpout;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
+import org.apache.eagle.metadata.model.StreamSourceConfig;
 
-public abstract class StormStreamSource<T extends StreamSinkConfig> extends BaseRichSpout implements StreamSource<T> {
+public abstract class StormStreamSource<T extends StreamSourceConfig> extends BaseRichSpout implements StreamSource<T> {
 
 }

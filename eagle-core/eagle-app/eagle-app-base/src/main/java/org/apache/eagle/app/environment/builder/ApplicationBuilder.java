@@ -36,10 +36,6 @@ public class ApplicationBuilder {
     private final TopologyBuilder topologyBuilder;
     private final AtomicInteger identifier;
 
-    public StreamSource fromStream(String streamId) {
-        return new StreamSource(generateId("StreamSource:" + streamId), this.appConfig,environment.getStreamSource(streamId,this.appConfig));
-    }
-
     public ApplicationBuilder(Config appConfig, StormEnvironment environment) {
         this.appConfig = appConfig;
         this.environment = environment;
@@ -69,7 +65,7 @@ public class ApplicationBuilder {
          * Persist source data stream as metric.
          */
         public BuilderContext saveAsMetric(MetricDefinition metricDefinition) {
-            topologyBuilder.setBolt(generateId("MetricPersist"), new MetricStreamPersist(metricDefinition,appConfig));
+            topologyBuilder.setBolt(generateId("MetricPersist"), new MetricStreamPersist(metricDefinition, appConfig)).shuffleGrouping(getId());
             return this;
         }
 
@@ -82,19 +78,19 @@ public class ApplicationBuilder {
         // }
     }
 
-    public class StreamSource extends InitializedStream {
+    public class SourcedStream extends InitializedStream {
         private final Config appConfig;
         private final StormStreamSource streamSource;
 
-        private StreamSource(StreamSource withStreamSource) {
-            this(withStreamSource.getId(),withStreamSource.appConfig,withStreamSource.streamSource);
+        private SourcedStream(SourcedStream withSourcedStream) {
+            this(withSourcedStream.getId(), withSourcedStream.appConfig, withSourcedStream.streamSource);
         }
 
-        private StreamSource(String componentId, Config appConfig, StormStreamSource streamSource) {
+        private SourcedStream(String componentId, Config appConfig, StormStreamSource streamSource) {
             super(componentId);
             this.appConfig = appConfig;
             this.streamSource = streamSource;
-            topologyBuilder.setSpout(componentId,streamSource);
+            topologyBuilder.setSpout(componentId, streamSource);
         }
     }
 
@@ -115,8 +111,13 @@ public class ApplicationBuilder {
         return topologyBuilder.createTopology();
     }
 
-    public StreamSource fromStream(StreamSource streamSource) {
-        return new StreamSource(streamSource);
+
+    public SourcedStream fromStream(String streamId) {
+        return new SourcedStream(generateId("SourcedStream-" + streamId), this.appConfig, environment.getStreamSource(streamId, this.appConfig));
+    }
+
+    public SourcedStream fromStream(SourcedStream sourcedStream) {
+        return new SourcedStream(sourcedStream);
     }
 
     private int generateId() {
@@ -124,6 +125,6 @@ public class ApplicationBuilder {
     }
 
     private String generateId(String prefix) {
-        return String.format(prefix, this.identifier.getAndIncrement());
+        return String.format("%s_%s", prefix, this.identifier.getAndIncrement());
     }
 }

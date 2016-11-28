@@ -31,7 +31,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
             .fromStream(HADOOP_JMX_METRIC_STREAM_NAME)
             .saveAsMetric(MetricDefinition
                 .namedByField("metric")
-                .timestampField("timestamp")
+                .eventTimeByField("timestamp")
                 .dimensionFields("host","component","site")
                 .valueField("value"))
             .toTopology();

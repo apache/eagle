@@ -54,7 +54,8 @@ public abstract class AggregateFunction implements TransformFunction {
         this.setResultFieldName(resultFieldName);
         return this;
     }
-    public AggregateFunction groupBy(String ... groupByFieldNames) {
+
+    public AggregateFunction groupBy(String... groupByFieldNames) {
         this.setGroupByFieldNames(Arrays.asList(groupByFieldNames));
         return this;
     }

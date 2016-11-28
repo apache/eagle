@@ -18,25 +18,25 @@ package org.apache.eagle.common.utils;
 
 import java.io.Serializable;
 
-public class Tuple2<F0,F1> implements Serializable {
-    private final F0 f0;
+public class Tuple2<F1, F2> implements Serializable {
     private final F1 f1;
+    private final F2 f2;
 
-    public Tuple2(F0 f0,F1 f1) {
-        this.f0 = f0;
+    public Tuple2(F1 f1, F2 f2) {
         this.f1 = f1;
+        this.f2 = f2;
     }
 
-    public F1 f1() {
+    public F2 f1() {
+        return f2;
+    }
+
+    public F1 f0() {
         return f1;
-    }
-
-    public F0 f0() {
-        return f0;
     }
 
     @Override
     public String toString() {
-        return String.format("(%s,%s)", this.f0, this.f1);
+        return String.format("(%s,%s)", this.f1, this.f2);
     }
 }

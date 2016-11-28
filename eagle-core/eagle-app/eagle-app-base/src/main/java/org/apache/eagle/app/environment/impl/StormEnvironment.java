@@ -18,10 +18,9 @@ package org.apache.eagle.app.environment.impl;
 
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.environment.builder.ApplicationBuilder;
-import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
-import org.apache.eagle.app.messaging.StormStreamSink;
+import org.apache.eagle.app.messaging.*;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.messaging.StormStreamSource;
+import org.apache.eagle.metadata.model.StreamSourceConfig;
 
 /**
  * Storm Execution Environment Context.
@@ -35,10 +34,14 @@ public class StormEnvironment extends AbstractEnvironment {
         return ((StormStreamSink) stream().getSink(streamId,config));
     }
 
-    public StormStreamSource<KafkaStreamSinkConfig> getStreamSource(String streamId, Config config) {
-        return (StormStreamSource<KafkaStreamSinkConfig>) stream().getSource(streamId,config);
+    public StormStreamSource getStreamSource(String streamId, Config config) {
+        return (StormStreamSource) stream().getSource(streamId,config);
     }
 
+
+    /**
+     * Fluent Builder API.
+     */
     public ApplicationBuilder newApp(Config appConfig) {
         return new ApplicationBuilder(appConfig, this);
     }

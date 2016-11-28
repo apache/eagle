@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.builder;
+package org.apache.eagle.metadata.model;
 
 import java.io.Serializable;
-import java.util.Map;
 
-public interface TransformFunction extends Serializable {
-    void open();
+public interface StreamSourceConfig extends Serializable {
+    String getType();
 
-    void transform(Map event);
+    Class<?> getSourceType();
 
-    void close();
+    Class<? extends StreamSourceConfig> getConfigType();
 }
