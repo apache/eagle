@@ -19,7 +19,6 @@ package org.apache.eagle.alert.engine.evaluator;
 
 import org.apache.eagle.alert.engine.StreamCounter;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import backtype.storm.metric.api.MultiCountMetric;
 import com.typesafe.config.Config;
 
 public class PolicyHandlerContext {
