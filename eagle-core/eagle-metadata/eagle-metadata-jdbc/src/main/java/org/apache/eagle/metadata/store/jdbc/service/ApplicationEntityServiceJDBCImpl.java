@@ -213,7 +213,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
                     .stream().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);
                 StreamDesc streamDesc = new StreamDesc();
                 streamDesc.setSchema(copied);
-                streamDesc.setSink(streamSinkConfig);
+                streamDesc.setSinkConfig(streamSinkConfig);
                 streamDesc.setStreamId(copied.getStreamId());
                 streamDesc.getSchema().setDataSource(entity.getAppId());
                 return streamDesc;

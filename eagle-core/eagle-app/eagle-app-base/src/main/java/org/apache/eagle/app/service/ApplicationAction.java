@@ -31,6 +31,7 @@ import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.StreamSourceConfig;
 import org.apache.eagle.metadata.utils.StreamIdConversions;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
@@ -102,20 +103,31 @@ public class ApplicationAction implements Serializable {
             copied.setStreamId(StreamIdConversions.formatSiteStreamId(metadata.getSite().getSiteId(), copied.getStreamId()));
             StreamSinkConfig streamSinkConfig = this.runtime.environment()
                     .stream().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
+
+            StreamSourceConfig streamSourceConfig = null;
+
+            try {
+                streamSourceConfig = this.runtime.environment()
+                    .stream().getSourceConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), this.effectiveConfig);
+            } catch (Throwable throwable) {
+                // Ignore source config if not set.
+            }
+
             StreamDesc streamDesc = new StreamDesc();
             streamDesc.setSchema(copied);
-            streamDesc.setSink(streamSinkConfig);
+            streamDesc.setSinkConfig(streamSinkConfig);
+            streamDesc.setSourceConfig(streamSourceConfig);
             streamDesc.setStreamId(copied.getStreamId());
+
             return streamDesc;
         })).collect(Collectors.toList());
         metadata.setStreams(streamDescToInstall);
 
-        // TODO: Decouple converting from StreamSink to Alert DataSource
         // iterate each stream descriptor and create alert datasource for each
         for (StreamDesc streamDesc : streamDescToInstall) {
             // only take care of Kafka sink
-            if (streamDesc.getSink() instanceof KafkaStreamSinkConfig) {
-                KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSink();
+            if (streamDesc.getSinkConfig() instanceof KafkaStreamSinkConfig) {
+                KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSinkConfig();
                 Kafka2TupleMetadata datasource = new Kafka2TupleMetadata();
                 datasource.setType("KAFKA");
                 datasource.setName(metadata.getAppId());

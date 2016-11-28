@@ -21,6 +21,7 @@ import com.typesafe.config.ConfigFactory;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.apache.commons.io.IOUtils;
+import org.apache.eagle.app.messaging.KafkaStreamMessaging;
 import org.apache.eagle.app.messaging.KafkaStreamSink;
 import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
 
@@ -31,7 +32,7 @@ import java.util.Properties;
 
 public class SendSampleDataToKafka {
     public static void main(String[] args) throws URISyntaxException, IOException {
-        KafkaStreamSinkConfig config = new KafkaStreamSink.Provider().getSinkConfig("HADOOP_JMX_METRIC_STREAM",ConfigFactory.load());
+        KafkaStreamSinkConfig config = new KafkaStreamMessaging().getSinkConfig("HADOOP_JMX_METRIC_STREAM",ConfigFactory.load());
         Properties properties = new Properties();
         properties.put("metadata.broker.list", config.getBrokerList());
         properties.put("serializer.class", config.getSerializerClass());

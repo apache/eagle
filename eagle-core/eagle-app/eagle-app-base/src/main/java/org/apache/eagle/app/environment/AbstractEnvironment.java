@@ -25,25 +25,25 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractEnvironment implements Environment {
 
     private final Config config;
-    private final StreamSinkProvider sinkProvider;
-    private static final String APPLICATIONS_SINK_TYPE_PROPS_KEY = "application.sink.provider";
-    private static final String DEFAULT_APPLICATIONS_SINK_TYPE = KafkaStreamSink.Provider.class.getName();
+    private final StreamMessaging streamMessaging;
+    private static final String APPLICATIONS_MESSAGING_TYPE_PROPS_KEY = "application.messaging.type";
+    private static final String DEFAULT_APPLICATIONS_MESSAGING_TYPE = KafkaStreamMessaging.class.getName();
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEnvironment.class);
 
     public AbstractEnvironment(Config config) {
         this.config = config;
-        this.sinkProvider = loadStreamSinkProvider();
+        this.streamMessaging = loadStreamMessaging();
     }
 
-    private StreamSinkProvider loadStreamSinkProvider() {
-        String sinkProviderClassName = config.hasPath(APPLICATIONS_SINK_TYPE_PROPS_KEY)
-            ? config.getString(APPLICATIONS_SINK_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_SINK_TYPE;
+    private StreamMessaging loadStreamMessaging() {
+        String sinkProviderClassName = config.hasPath(APPLICATIONS_MESSAGING_TYPE_PROPS_KEY)
+            ? config.getString(APPLICATIONS_MESSAGING_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_MESSAGING_TYPE;
         try {
             Class<?> sinkProviderClass = Class.forName(sinkProviderClassName);
-            if (!StreamSinkProvider.class.isAssignableFrom(sinkProviderClass)) {
-                throw new IllegalStateException(sinkProviderClassName + "is not assignable from " + StreamSinkProvider.class.getCanonicalName());
+            if (!StreamMessaging.class.isAssignableFrom(sinkProviderClass)) {
+                throw new IllegalStateException(sinkProviderClassName + "is not assignable from " + StreamMessaging.class.getCanonicalName());
             }
-            StreamSinkProvider instance = (StreamSinkProvider) sinkProviderClass.newInstance();
+            StreamMessaging instance = (StreamMessaging) sinkProviderClass.newInstance();
             LOGGER.info("Loaded {}", instance);
             return instance;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
@@ -59,8 +59,8 @@ public abstract class AbstractEnvironment implements Environment {
             .append(this.config()).build();
     }
 
-    public StreamSinkProvider stream() {
-        return sinkProvider;
+    public StreamMessaging stream() {
+        return streamMessaging;
     }
 
 

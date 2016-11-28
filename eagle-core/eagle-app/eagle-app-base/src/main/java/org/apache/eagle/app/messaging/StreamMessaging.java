@@ -23,9 +23,9 @@ import org.apache.eagle.metadata.model.StreamSourceConfig;
 import java.lang.reflect.ParameterizedType;
 
 /**
- * FIXME Rename to StreamIntegrationProvider or StreamDriver.
+ * Stream Messaging Bus.
  */
-public interface StreamSinkProvider<
+public interface StreamMessaging <
     W extends StreamSink<C>, C extends StreamSinkConfig,
     R extends StreamSource<F>, F extends StreamSourceConfig> {
 
