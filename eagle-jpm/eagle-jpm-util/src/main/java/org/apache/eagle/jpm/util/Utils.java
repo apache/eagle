@@ -18,6 +18,8 @@
 
 package org.apache.eagle.jpm.util;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class Utils {
@@ -86,11 +87,11 @@ public class Utils {
             int executorPB = Integer.parseInt(memory.substring(0, memory.length() - 1));
             return 1024L * 1024 * 1024 * 1024 * 1024 * executorPB;
         }
-        LOG.warn("Cannot parse memory info " +  memory);
+        LOG.warn("Cannot parse memory info " + memory);
 
         return 0L;
     }
-    
+
     public static Constants.JobType fetchJobType(Map config) {
         if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) {
             return Constants.JobType.CASCADING;
@@ -111,5 +112,10 @@ public class Utils {
         Map<String, String> mapConfig = new HashMap<>();
         config.forEach(entry -> mapConfig.put(entry.getKey(), entry.getValue()));
         return fetchJobType(mapConfig);
+    }
+
+    public static String makeLockPath(String zkrootWithSiteId) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(zkrootWithSiteId), "zkrootWithSiteId must not be blank");
+        return zkrootWithSiteId.toLowerCase() + "/locks";
     }
 }

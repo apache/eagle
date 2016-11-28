@@ -36,11 +36,11 @@ import org.apache.eagle.security.hive.sensitivity.HiveSensitivityDataEnrichBolt;
  * Since 8/11/16.
  */
 public class HiveQueryMonitoringApplication extends StormApplication {
-    public final static String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
-    public final static String FILTER_TASK_NUM = "topology.numOfFilterTasks";
-    public final static String PARSER_TASK_NUM = "topology.numOfParserTasks";
-    public final static String JOIN_TASK_NUM = "topology.numOfJoinTasks";
-    public final static String SINK_TASK_NUM = "topology.numOfSinkTasks";
+    private static final String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
+    private static final String FILTER_TASK_NUM = "topology.numOfFilterTasks";
+    private static final String PARSER_TASK_NUM = "topology.numOfParserTasks";
+    private static final String JOIN_TASK_NUM = "topology.numOfJoinTasks";
+    private static final String SINK_TASK_NUM = "topology.numOfSinkTasks";
 
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
@@ -68,13 +68,13 @@ public class HiveQueryMonitoringApplication extends StormApplication {
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("user"));
 
-        StormStreamSink sinkBolt = environment.getStreamSink("hive_query_stream",config);
+        StormStreamSink sinkBolt = environment.getStreamSink("hive_query_stream", config);
         BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks);
         kafkaBoltDeclarer.fieldsGrouping("joinBolt", new Fields("user"));
         return builder.createTopology();
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Config config = ConfigFactory.load();
         HiveQueryMonitoringApplication app = new HiveQueryMonitoringApplication();
         app.run(config);

@@ -64,4 +64,23 @@ public class UtilsTest {
         thrown.expect(IllegalArgumentException.class);
         Utils.parseMemory("0.1g");
     }
+
+    @Test
+    public void testMakeLockPath() {
+        String lockpath = Utils.makeLockPath("/apps/mr/running/sitdId");
+        Assert.assertEquals("/apps/mr/running/sitdid/locks", lockpath);
+    }
+
+    @Test
+    public void testMakeLockPath1() {
+        thrown.expect(IllegalArgumentException.class);
+        Utils.makeLockPath("");
+    }
+
+    @Test
+    public void testMakeLockPath2() {
+        thrown.expect(IllegalArgumentException.class);
+        Utils.makeLockPath(null);
+    }
+
 }

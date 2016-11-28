@@ -43,11 +43,6 @@
 					name: "Storage",
 					displayFields: [],
 					fields: []
-				},
-				'org.apache.eagle.alert.engine.publisher.impl.AlertFilePublisher': {
-					name: "LocalFile",
-					displayFields: ["fileName"],
-					fields: ["fileName", "rotate_every_kb", "number_of_files"]
 				}
 			},
 

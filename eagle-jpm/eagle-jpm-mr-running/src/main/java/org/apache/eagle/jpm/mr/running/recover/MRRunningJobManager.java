@@ -34,7 +34,7 @@ public class MRRunningJobManager implements Serializable {
 
     public MRRunningJobManager(MRRunningJobConfig.ZKStateConfig config) {
         this.runningJobManager = new RunningJobManager(config.zkQuorum,
-                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot);
+                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot, config.zkLockPath);
     }
 
     public Map<String, JobExecutionAPIEntity> recoverYarnApp(String appId) throws Exception {
