@@ -104,7 +104,7 @@ public class MRJobEntityCreationHandler {
                 }
             }
         }
-        if(!success) {
+        if (!success) {
             LOG.warn("Fail flushing entities after tries {} times", MAX_RETRY_COUNT);
             return false;
         }
