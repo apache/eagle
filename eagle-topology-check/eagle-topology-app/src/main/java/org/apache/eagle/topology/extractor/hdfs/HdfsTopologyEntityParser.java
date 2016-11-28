@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -100,7 +99,8 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
                 result.getMasterNodes().add(namenodeEntity);
                 numNamenode++;
                 if (namenodeEntity.getStatus().equalsIgnoreCase(NAME_NODE_ACTIVE_STATUS)) {
-                    createSlaveNodeEntities(url, timestamp, result);
+                    String namenodeVersion = createSlaveNodeEntities(url, timestamp, result);
+                    namenodeEntity.setVersion(namenodeVersion);
                 }
             } catch (RuntimeException ex) {
                 ex.printStackTrace();
@@ -118,15 +118,8 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
         final JMXBean bean = jmxBeanMap.get(JMX_FS_NAME_SYSTEM_BEAN_NAME);
 
-        final String nameNodeUrlString = buildNamenodeInfo(url);
-        final Map<String, JMXBean> nameNodeMap = JMXQueryHelper.query(nameNodeUrlString);
-        final JMXBean nameNodeBean = nameNodeMap.get(JMX_NAMENODE_INFO);
-
         if (bean == null || bean.getPropertyMap() == null) {
             throw new ServiceNotResponseException("Invalid JMX format, FSNamesystem bean is null!");
-        }
-        if (nameNodeBean == null || nameNodeBean.getPropertyMap() == null) {
-            throw new ServiceNotResponseException("Invalid JMX format, NameNode bean is null!");
         }
 
         final String hostname = (String) bean.getPropertyMap().get(HA_NAME);
@@ -139,11 +132,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         result.setUsedCapacityTB(Double.toString(capacityUsedGB / 1024));
         final Integer blocksTotal = (Integer) bean.getPropertyMap().get(BLOCKS_TOTAL);
         result.setNumBlocks(Integer.toString(blocksTotal));
-        result.setVersion((String) nameNodeBean.getPropertyMap().get(NAME_NODE_VERSION));
         return result;
     }
 
-    private void createSlaveNodeEntities(String url, long updateTime, TopologyEntityParserResult result) throws IOException {
+    private String createSlaveNodeEntities(String url, long updateTime, TopologyEntityParserResult result) throws IOException {
         final String urlString = buildNamenodeInfo(url);
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
         final JMXBean bean = jmxBeanMap.get(JMX_NAMENODE_INFO);
@@ -152,6 +144,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         }
         createAllDataNodeEntities(bean, updateTime, result);
         createAllJournalNodeEntities(bean, updateTime, result);
+        return (String) bean.getPropertyMap().get(NAME_NODE_VERSION);
     }
 
     private void createAllJournalNodeEntities(JMXBean bean, long updateTime, TopologyEntityParserResult result) throws UnknownHostException {

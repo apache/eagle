@@ -14,16 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.storm.zookeeper;
+package org.apache.eagle.common.config;
 
-import java.io.Serializable;
+import com.typesafe.config.Config;
+import junit.framework.Assert;
+import org.apache.commons.cli.ParseException;
+import org.junit.Test;
 
-public class ZKStateConfig implements Serializable {
-    private static final long serialVersionUID = 1L;
-    public String zkQuorum;
-    public String zkRoot;
-    public int zkSessionTimeoutMs;
-    public int zkRetryTimes;
-    public int zkRetryInterval;
-    public String zkLockPath;
+/**
+ * @Since 11/22/16.
+ */
+public class TestConfigParser {
+
+    @Test
+    public void testLoadNullArgs() throws ParseException {
+        System.setProperty("config.resource", "application-test.conf");
+        ConfigOptionParser configOptionParser = new ConfigOptionParser();
+        Config config = configOptionParser.load(null);
+        Assert.assertEquals("UTC", config.getString("service.timezone"));
+    }
 }

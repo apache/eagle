@@ -24,4 +24,6 @@ public class AlertConstants {
 
     public static final String DEFAULT_SPOUT_NAME = "alertEngineSpout";
     public static final String DEFAULT_ROUTERBOLT_NAME = "streamRouterBolt";
+
+    public static final String ALERT_SERVICE_ENDPOINT_NAME = "AlertService";
 }

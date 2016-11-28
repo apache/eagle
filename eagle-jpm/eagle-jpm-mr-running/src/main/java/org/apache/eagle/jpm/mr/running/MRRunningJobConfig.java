@@ -21,6 +21,7 @@ package org.apache.eagle.jpm.mr.running;
 import org.apache.eagle.common.config.ConfigOptionParser;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.jpm.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ public class MRRunningJobConfig implements Serializable {
         public int zkSessionTimeoutMs;
         public int zkRetryTimes;
         public int zkRetryInterval;
+        public String zkLockPath;
     }
 
     public static class EagleServiceConfig implements Serializable {
@@ -108,6 +110,7 @@ public class MRRunningJobConfig implements Serializable {
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
         this.zkStateConfig.zkRoot = ZK_ROOT_PREFIX + "/" + config.getString("siteId");
+        this.zkStateConfig.zkLockPath = Utils.makeLockPath(this.zkStateConfig.zkRoot);
 
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");

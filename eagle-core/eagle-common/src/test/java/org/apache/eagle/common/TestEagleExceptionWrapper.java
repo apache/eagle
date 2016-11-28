@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.storm.zookeeper;
+package org.apache.eagle.common;
 
-import java.io.Serializable;
+import junit.framework.Assert;
+import org.junit.Test;
 
-public class ZKStateConfig implements Serializable {
-    private static final long serialVersionUID = 1L;
-    public String zkQuorum;
-    public String zkRoot;
-    public int zkSessionTimeoutMs;
-    public int zkRetryTimes;
-    public int zkRetryInterval;
-    public String zkLockPath;
+/**
+ * @Since 11/22/16.
+ */
+public class TestEagleExceptionWrapper {
+
+    @Test
+    public void testWrap() {
+        Exception exception = new Exception();
+        Assert.assertTrue(EagleExceptionWrapper.wrap(exception).startsWith("java.lang.Exception"));
+    }
 }
