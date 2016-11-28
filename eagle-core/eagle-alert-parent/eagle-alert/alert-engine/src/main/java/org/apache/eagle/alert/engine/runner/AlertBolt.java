@@ -83,7 +83,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
 
     @Override
     public void execute(Tuple input) {
-        this.streamContext.counter().scope("execute_count").incr();
+        this.streamContext.counter().incr("execute_count");
         try {
             PartitionedEvent pe = deserialize(input.getValueByField(AlertConstants.FIELD_0));
             if (logEventEnabled) {
@@ -112,7 +112,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 LOG.warn(message);
 
                 // send out metrics for meta conflict
-                this.streamContext.counter().scope("meta_conflict").incr();
+                this.streamContext.counter().incr("meta_conflict");
 
                 ExecutorService executors = SingletonExecutor.getExecutorService();
                 executors.submit(() -> {
@@ -138,11 +138,11 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
             synchronized (outputLock) {
                 this.collector.ack(input);
             }
-            this.streamContext.counter().scope("ack_count").incr();
+            this.streamContext.counter().incr("ack_count");
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             synchronized (outputLock) {
-                this.streamContext.counter().scope("fail_count").incr();
+                this.streamContext.counter().incr("fail_count");
                 this.collector.fail(input);
             }
         } finally {

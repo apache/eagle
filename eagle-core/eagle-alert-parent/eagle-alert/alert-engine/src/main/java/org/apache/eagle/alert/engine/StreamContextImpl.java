@@ -22,15 +22,15 @@ import com.typesafe.config.Config;
 
 public class StreamContextImpl implements StreamContext {
     private final Config config;
-    private final MultiCountMetric counter;
+    private final StreamCounter counter;
 
     public StreamContextImpl(Config config, MultiCountMetric counter, TopologyContext context) {
-        this.counter = counter;
+        this.counter = new StormMultiCountMetric(counter);
         this.config = config;
     }
 
     @Override
-    public MultiCountMetric counter() {
+    public StreamCounter counter() {
         return this.counter;
     }
 

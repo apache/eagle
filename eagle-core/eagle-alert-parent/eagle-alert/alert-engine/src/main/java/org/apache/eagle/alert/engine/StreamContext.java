@@ -1,6 +1,5 @@
 package org.apache.eagle.alert.engine;
 
-import backtype.storm.metric.api.MultiCountMetric;
 import com.typesafe.config.Config;
 
 /**
@@ -20,7 +19,7 @@ import com.typesafe.config.Config;
  * limitations under the License.
  */
 public interface StreamContext {
-    MultiCountMetric counter();
+    StreamCounter counter();
 
     Config config();
 }
