@@ -1,0 +1,17 @@
+<configuration>
+    <property>
+        <name>testkey1</name>
+        <value>testvalue1</value>
+        <description>testdesc1</description>
+    </property>
+    <property>
+        <name>testkey2</name>
+        <value>testvalue2</value>
+        <description>testdesc2</description>
+    </property>
+    <property>
+        <name>testkey3</name>
+        <value>testvalue3</value>
+        <description>testdesc3</description>
+    </property>
+</configuration>
