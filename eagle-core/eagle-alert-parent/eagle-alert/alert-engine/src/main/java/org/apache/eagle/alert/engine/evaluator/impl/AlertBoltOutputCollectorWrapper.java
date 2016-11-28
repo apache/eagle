@@ -37,7 +37,7 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     @Override
     public void emit(AlertStreamEvent event) {
         synchronized (outputLock) {
-            streamContext.counter().scope("alert_count").incr();
+            streamContext.counter().incr("alert_count");
             delegate.emit(Arrays.asList(event.getStreamId(), event));
         }
     }
