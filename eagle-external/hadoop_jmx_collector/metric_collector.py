@@ -94,6 +94,7 @@ class Helper:
         result = None
         response = None
         attempts = 0
+        exception = None
         while attempts < 2:
             try:
                 if https:
@@ -109,10 +110,15 @@ class Helper:
                 break
             except Exception as e:
                 logging.warning(e)
+                exception = e
                 attempts += 1
-        if response is not None:
-            response.close()
-        return result
+        try:
+            if attempts >= 2:
+                raise exception
+        finally:
+            if response is not None:
+                response.close()
+            return result
 
 
 class JmxReader(object):
