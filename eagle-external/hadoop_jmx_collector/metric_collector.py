@@ -239,14 +239,11 @@ class MetricCollector(threading.Thread):
     def init(self, config):
         self.config = config
         self.sender = KafkaMetricSender(self.config)
+        self.sender.open()
         pass
 
     def start(self):
-        try:
-            self.sender.open()
-            self.run()
-        finally:
-            self.sender.close()
+        super(MetricCollector, self).start()
 
     def collect(self, msg):
         if not msg.has_key("timestamp"):
@@ -257,8 +254,10 @@ class MetricCollector(threading.Thread):
             msg["host"] = self.fqdn
         if not msg.has_key("site"):
             msg["site"] = self.config["env"]["site"]
-
         self.sender.send(msg)
+
+    def close(self):
+        self.sender.close()
 
     def run(self):
         raise Exception("`run` method should be overrode by sub-class before being called")
@@ -286,6 +285,14 @@ class Runner(object):
                 collector.start()
             except Exception as e:
                 logging.exception(e)
+
+        for collector in collectors:
+            try:
+                collector.join()
+            except Exception as e:
+                logging.exception(e)
+            finally:
+                collector.close()
 
 class JmxMetricCollector(MetricCollector):
     selected_domain = None
