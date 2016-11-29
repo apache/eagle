@@ -21,6 +21,8 @@ package org.apache.eagle.alert.engine.coordinator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,7 +31,8 @@ public class PublishmentType {
     private String type;
     private String className;
     private String description;
-    private String fields;
+
+    private List<Map<String, String>> fields;
 
     public String getType() {
         return type;
@@ -55,11 +58,11 @@ public class PublishmentType {
         this.description = description;
     }
 
-    public String getFields() {
+    public List<Map<String, String>> getFields() {
         return fields;
     }
 
-    public void setFields(String fields) {
+    public void setFields(List<Map<String, String>> fields) {
         this.fields = fields;
     }
 

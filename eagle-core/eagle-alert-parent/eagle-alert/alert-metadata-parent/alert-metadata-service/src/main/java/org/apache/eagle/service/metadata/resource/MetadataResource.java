@@ -31,6 +31,7 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,12 @@ public class MetadataResource {
     @POST
     public OpResult clear() {
         return dao.clear();
+    }
+
+    @Path("/clear/schedulestates")
+    @POST
+    public OpResult clearScheduleStates(int capacity) {
+        return dao.clearScheduleState(capacity);
     }
 
     @Path("/export")
@@ -291,7 +298,7 @@ public class MetadataResource {
                         }
                     }
                 } else {
-                    throw new IllegalArgumentException("Publishsment (name: " + publishmentId + ") not found");
+                    throw new IllegalArgumentException("Publishment (name: " + publishmentId + ") not found");
                 }
             }
 
@@ -534,5 +541,6 @@ public class MetadataResource {
         }
         return results;
     }
+
 
 }

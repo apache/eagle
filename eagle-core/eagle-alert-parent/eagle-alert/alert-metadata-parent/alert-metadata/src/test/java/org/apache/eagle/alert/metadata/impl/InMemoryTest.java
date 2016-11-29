@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
-import com.google.common.collect.Lists;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
@@ -25,11 +24,10 @@ import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @since May 1, 2016

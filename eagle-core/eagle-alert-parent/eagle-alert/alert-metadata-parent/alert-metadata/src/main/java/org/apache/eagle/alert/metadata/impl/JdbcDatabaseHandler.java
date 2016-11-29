@@ -19,12 +19,20 @@
 package org.apache.eagle.alert.metadata.impl;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
+import org.apache.eagle.alert.coordination.model.ScheduleState;
+import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
+import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,23 +55,39 @@ public class JdbcDatabaseHandler {
     private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
     private static final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
     private static final String QUERY_ALL_STATEMENT_WITH_SIZE = "SELECT value FROM %s limit %s";
+    private static final String CLEAR_SCHEDULESTATES_STATEMENT = "DELETE FROM schedule_state WHERE id NOT IN (SELECT id from (SELECT id FROM schedule_state ORDER BY id DESC limit ?) as states)";
 
     public enum SortType { DESC, ASC }
 
-    private Map<String, String> tblNameMap = new HashMap<>();
+    private static Map<String, String> tblNameMap = new HashMap<>();
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private DataSource dataSource;
 
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        registerTableName(StreamingCluster.class.getSimpleName(), "cluster");
+        registerTableName(StreamDefinition.class.getSimpleName(), "stream_schema");
+        registerTableName(Kafka2TupleMetadata.class.getSimpleName(), "datasource");
+        registerTableName(PolicyDefinition.class.getSimpleName(), "policy");
+        registerTableName(Publishment.class.getSimpleName(), "publishment");
+        registerTableName(PublishmentType.class.getSimpleName(), "publishment_type");
+        registerTableName(ScheduleState.class.getSimpleName(), "schedule_state");
+        registerTableName(PolicyAssignment.class.getSimpleName(), "assignment");
+        registerTableName(Topology.class.getSimpleName(), "topology");
+        registerTableName(AlertPublishEvent.class.getSimpleName(), "alert_event");
+    }
+
+    private static void registerTableName(String clzName, String tblName) {
+        tblNameMap.put(clzName, tblName);
     }
 
     public JdbcDatabaseHandler(Config config) {
         // "jdbc:mysql://dbhost/database?" + "user=sqluser&password=sqluserpw"
-        this.tblNameMap = JdbcSchemaManager.tblNameMap;
+        //this.tblNameMap = JdbcSchemaManager.tblNameMap;
         try {
-            JdbcSchemaManager.getInstance().init(config);
+            //JdbcSchemaManager.getInstance().init(config);
             BasicDataSource bDatasource = new BasicDataSource();
             bDatasource.setDriverClassName(config.getString(MetadataUtils.JDBC_DRIVER_PATH));
             if (config.hasPath(MetadataUtils.JDBC_USERNAME_PATH)) {
@@ -115,7 +139,7 @@ public class JdbcDatabaseHandler {
             connection.commit();
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e.getCause());
-            if (e.getMessage().toLowerCase().contains("duplicate") && connection != null) {
+            if (connection != null) {
                 LOG.info("Detected duplicated entity");
                 try {
                     connection.rollback(savepoint);
@@ -193,15 +217,10 @@ public class JdbcDatabaseHandler {
         return executeSelectStatement(clz, query);
     }
 
-    public <T> T listTop(Class<T> clz, String sortType) {
+    public <T> List<T> listOrderBy(Class<T> clz, String sortType) {
         String tb = getTableName(clz.getSimpleName());
         String query = String.format(QUERY_ORDERBY_STATEMENT, tb, sortType);
-        List<T> result = executeSelectStatement(clz, query);
-        if (result.isEmpty()) {
-            return null;
-        } else {
-            return result.get(0);
-        }
+        return executeSelectStatement(clz, query);
     }
 
     public <T> T listWithFilter(String key, Class<T> clz) {
@@ -287,7 +306,7 @@ public class JdbcDatabaseHandler {
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb, key));
+            PreparedStatement statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb));
             statement.setString(1, key);
             int status = statement.executeUpdate();
             String msg = String.format("delete %s entities from table %s", status, tb);
@@ -314,4 +333,67 @@ public class JdbcDatabaseHandler {
         //JdbcSchemaManager.getInstance().shutdown();
     }
 
+    public OpResult removeBatch(String clzName, List<String> keys) {
+        String tb = getTableName(clzName);
+        OpResult result = new OpResult();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+            PreparedStatement statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb));
+            for (String key : keys) {
+                statement.setString(1, key);
+                statement.addBatch();
+            }
+            int[] num = statement.executeBatch();
+            connection.commit();
+            int sum = 0;
+            for (int i : num) {
+                sum += i;
+            }
+            String msg = String.format("delete %s records from table %s", sum, tb);
+            result.code = OpResult.SUCCESS;
+            result.message = msg;
+            statement.close();
+        } catch (SQLException e) {
+            result.code = OpResult.FAILURE;
+            result.message = e.getMessage();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
+        }
+        return result;
+    }
+
+    public OpResult removeScheduleStates(int capacity) {
+        OpResult result = new OpResult();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(CLEAR_SCHEDULESTATES_STATEMENT);
+            statement.setInt(1, capacity);
+            result.message = String.format("delete %d records from schedule_state", statement.executeUpdate());
+            result.code = OpResult.SUCCESS;
+            statement.close();
+        } catch (SQLException e) {
+            result.code = OpResult.FAILURE;
+            result.message = e.getMessage();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
+        }
+        return result;
+    }
 }
