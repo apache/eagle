@@ -26,7 +26,6 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +40,7 @@ public class MRJobEntityCreationHandler {
     private JobExecutionMetricsCreationListener jobMetricsListener;
     private TaskExecutionMetricsCreationListener taskMetricsListener;
     private static final int MAX_FLUSH_NUM = 1000;
+    private static final int MAX_RETRY_COUNT = 3;
 
     public MRJobEntityCreationHandler(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig) {
         this.eagleServiceConfig = eagleServiceConfig;
@@ -79,13 +79,9 @@ public class MRJobEntityCreationHandler {
             eagleServiceConfig.password);
         client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         try {
-            LOG.info("start to flush mr job entities, size {}", entities.size());
-            client.create(entities);
-            LOG.info("finish flushing mr job entities, size {}", entities.size());
-            entities.clear();
+            return createEntities(client);
         } catch (Exception e) {
             LOG.warn("exception found when flush entities, {}", e);
-            e.printStackTrace();
             return false;
         } finally {
             client.getJerseyClient().destroy();
@@ -95,7 +91,31 @@ public class MRJobEntityCreationHandler {
                 // ignored exception
             }
         }
+    }
 
-        return true;
+    private boolean createEntities(IEagleServiceClient client) throws Exception {
+        int count = 0;
+        boolean success = false;
+        while (count++ < MAX_RETRY_COUNT && !success) {
+            try {
+                LOG.info("start to flush mr job entities, size {}", entities.size());
+                client.create(entities);
+                success = true;
+                LOG.info("finish flushing mr job entities, size {}", entities.size());
+                entities.clear();
+
+            } catch (Exception e) {
+                LOG.warn("exception found when flush entities, {}", e);
+                if (!success && count < MAX_RETRY_COUNT) {
+                    LOG.info("Sleep for a while before retrying");
+                    Thread.sleep(10 * 1000);
+                }
+            }
+
+        }
+        if (!success) {
+            LOG.warn("Fail flushing entities after tries {} times", MAX_RETRY_COUNT);
+        }
+        return success;
     }
 }
