@@ -37,7 +37,7 @@ public class KafkaStreamSource extends StormStreamSource<KafkaStreamSourceConfig
     private KafkaSpout spout;
 
     @Override
-    public void prepare(String streamId, KafkaStreamSourceConfig config) {
+    public void init(String streamId, KafkaStreamSourceConfig config) {
         this.spout = createKafkaSpout(config);
     }
 

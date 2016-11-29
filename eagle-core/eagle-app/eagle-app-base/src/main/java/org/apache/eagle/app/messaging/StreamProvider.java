@@ -38,29 +38,13 @@ public interface StreamProvider<W extends StreamSink<C>, C extends StreamSinkCon
         return s;
     }
 
-    default Class<? extends W> getSinkType() {
-        return (Class<W>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    }
-
-    default Class<? extends C> getSinkConfigType() {
-        return (Class<C>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
-    }
-
     F getSourceConfig(String streamId, Config config);
 
     R getSource();
 
     default R getSource(String streamId, Config config) {
         R i = getSource();
-        i.prepare(streamId, getSourceConfig(streamId, config));
+        i.init(streamId, getSourceConfig(streamId, config));
         return i;
-    }
-
-    default Class<? extends R> getSourceType() {
-        return (Class<R>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    }
-
-    default Class<? extends F> getSourceConfigType() {
-        return (Class<F>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
 }

@@ -19,5 +19,5 @@ package org.apache.eagle.app.messaging;
 import org.apache.eagle.metadata.model.StreamSourceConfig;
 
 public interface StreamSource<T extends StreamSourceConfig> {
-    void prepare(String streamId, T config);
+    void init(String streamId, T config);
 }
