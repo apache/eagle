@@ -109,10 +109,9 @@ class Helper:
             except Exception as e:
                 logging.warning(e)
                 attempts += 1
-            finally:
-                if response is not None:
-                    response.close()
-                return result
+        if response is not None:
+            response.close()
+        return result
 
 
 class JmxReader(object):
