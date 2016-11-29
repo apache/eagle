@@ -26,10 +26,14 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +41,7 @@ import java.util.stream.Collectors;
  * @since May 26, 2016.
  */
 public class JdbcMetadataDaoImpl implements IMetadataDao {
+    private static final Logger LOG = LoggerFactory.getLogger(JdbcMetadataDaoImpl.class);
     private JdbcDatabaseHandler handler;
 
     @Inject
@@ -101,12 +106,22 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public ScheduleState getScheduleState(String versionId) {
         return handler.listWithFilter(versionId, ScheduleState.class);
-        //return null;
     }
 
     @Override
     public ScheduleState getScheduleState() {
-        return handler.listTop(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
+        List<ScheduleState> scheduleStates =
+                handler.listOrderBy(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
+        if (scheduleStates.isEmpty()) {
+            return null;
+        } else {
+            return scheduleStates.get(0);
+        }
+    }
+
+    @Override
+    public List<ScheduleState> listScheduleStates() {
+        return handler.list(ScheduleState.class);
     }
 
     @Override
@@ -157,6 +172,24 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult addScheduleState(ScheduleState state) {
         return handler.addOrReplace(ScheduleState.class.getSimpleName(), state);
+    }
+
+    @Override
+    public OpResult clearScheduleState(int maxCapacity) {
+        List<ScheduleState> scheduleStates = handler.listOrderBy(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
+        OpResult result = new OpResult();
+        if (scheduleStates.size() <= maxCapacity) {
+            result.code = OpResult.SUCCESS;
+            result.message = "clear 0 states";
+        } else {
+            List<String> removedkeys = new ArrayList<>();
+            for (int removedInd = maxCapacity; removedInd < scheduleStates.size(); removedInd++) {
+                removedkeys.add(scheduleStates.get(removedInd).getVersion());
+            }
+            result = handler.removeBatch(ScheduleState.class.getSimpleName(), removedkeys);
+        }
+        LOG.info(result.message);
+        return result;
     }
 
     @Override

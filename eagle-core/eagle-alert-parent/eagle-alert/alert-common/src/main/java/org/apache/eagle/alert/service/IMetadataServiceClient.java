@@ -86,6 +86,8 @@ public interface IMetadataServiceClient extends Closeable, Serializable {
 
     void clear();
 
+    void clearScheduleState(int maxCapacity);
+
     // for topology mgmt
 
     // for alert event

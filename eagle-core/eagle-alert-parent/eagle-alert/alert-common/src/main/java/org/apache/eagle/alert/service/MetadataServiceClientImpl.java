@@ -69,6 +69,7 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final String METADATA_ALERTS_BATCH_PATH = "/metadata/alerts/batch";
 
     private static final String METADATA_CLEAR_PATH = "/metadata/clear";
+    private static final String METADATA_CLEAR_SCHEDULESTATES_PATH = "/metadata/clear/schedulestates";
 
     private static final String EAGLE_CORRELATION_CONTEXT = "metadataService.context";
     public static final String EAGLE_CORRELATION_SERVICE_PORT = "metadataService.port";
@@ -276,6 +277,12 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     public void clear() {
         WebResource r = client.resource(basePath + METADATA_CLEAR_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post();
+    }
+
+    @Override
+    public void clearScheduleState(int maxCapacity) {
+        WebResource r = client.resource(basePath + METADATA_CLEAR_SCHEDULESTATES_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(maxCapacity);
     }
 
     @Override

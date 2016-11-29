@@ -28,6 +28,7 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,6 +265,16 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     @Override
     public ScheduleState getScheduleState(String versionId) {
         return scheduleStates.get(versionId);
+    }
+
+    @Override
+    public List<ScheduleState> listScheduleStates() {
+        throw new UnsupportedOperationException("listScheduleStates not support!");
+    }
+
+    @Override
+    public OpResult clearScheduleState(int maxCapacity) {
+        throw new UnsupportedOperationException("clearScheduleState not support!");
     }
 
     @Override
