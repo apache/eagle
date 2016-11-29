@@ -51,13 +51,16 @@ class Helper:
         :param config_file:
         :return:
         """
-        # read the self-defined filters
-        script_dir = os.path.dirname(__file__)
-        rel_path = "./" + config_file
-        abs_file_path = os.path.join(script_dir, rel_path)
+        abs_file_path = config_file
+
         if not os.path.isfile(abs_file_path):
-            logging.error(abs_file_path + " doesn't exist, please rename config-sample.json to config.json")
-            exit(1)
+            script_dir = os.path.dirname(__file__)
+            rel_path = "./" + config_file
+            abs_file_path = os.path.join(script_dir, rel_path)
+            if not os.path.isfile(abs_file_path):
+                raise Exception(abs_file_path + " doesn't exist, please rename config-sample.json to config.json")
+
+        logging.info("Using configuration file " + abs_file_path)
         f = open(abs_file_path, 'r')
         json_file = f.read()
         f.close()
@@ -227,14 +230,15 @@ class KafkaMetricSender(MetricSender):
             self.kafka_client.close()
 
 class MetricCollector(threading.Thread):
-    def __init__(self):
+    def __init__(self,config = None):
         threading.Thread.__init__(self)
-        self.config = Helper.load_config()
-        self.sender = KafkaMetricSender(self.config)
+        self.config = None
+        self.sender = None
         self.fqdn = socket.getfqdn()
-        self.init(self.config)
 
     def init(self, config):
+        self.config = config
+        self.sender = KafkaMetricSender(self.config)
         pass
 
     def start(self):
@@ -259,19 +263,27 @@ class MetricCollector(threading.Thread):
     def run(self):
         raise Exception("`run` method should be overrode by sub-class before being called")
 
-
 class Runner(object):
     @staticmethod
-    def run(*threads):
+    def run(self, *collectors):
         """
         Execute concurrently
 
         :param threads:
         :return:
         """
-        for thread in threads:
+        argv = sys.argv
+        if len(argv) == 1:
+            self.config = Helper.load_config()
+        elif len(argv) == 2:
+            self.config = Helper.load_config(argv[1])
+        else:
+            raise Exception("Usage: "+argv[0]+" CONFIG_FILE_PATH, but given too many arguments: " + str(argv))
+
+        for collector in collectors:
             try:
-                thread.start()
+                collector.init(self.config)
+                collector.start()
             except Exception as e:
                 logging.exception(e)
 
@@ -281,6 +293,7 @@ class JmxMetricCollector(MetricCollector):
     input_components = []
 
     def init(self, config):
+        super(JmxMetricCollector, self).init(config)
         self.input_components = config["input"]
         for input in self.input_components:
             if not input.has_key("host"):
