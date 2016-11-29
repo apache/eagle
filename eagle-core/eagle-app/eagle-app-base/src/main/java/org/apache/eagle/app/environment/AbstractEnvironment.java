@@ -25,25 +25,25 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractEnvironment implements Environment {
 
     private final Config config;
-    private final StreamMessaging streamMessaging;
-    private static final String APPLICATIONS_MESSAGING_TYPE_PROPS_KEY = "application.messaging.type";
-    private static final String DEFAULT_APPLICATIONS_MESSAGING_TYPE = KafkaStreamMessaging.class.getName();
+    private final StreamProvider streamProvider;
+    private static final String APPLICATIONS_MESSAGING_TYPE_PROPS_KEY = "application.stream.provider";
+    private static final String DEFAULT_APPLICATIONS_MESSAGING_TYPE = KafkaStreamProvider.class.getName();
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEnvironment.class);
 
     public AbstractEnvironment(Config config) {
         this.config = config;
-        this.streamMessaging = loadStreamMessaging();
+        this.streamProvider = loadStreamProvider();
     }
 
-    private StreamMessaging loadStreamMessaging() {
+    private StreamProvider loadStreamProvider() {
         String sinkProviderClassName = config.hasPath(APPLICATIONS_MESSAGING_TYPE_PROPS_KEY)
             ? config.getString(APPLICATIONS_MESSAGING_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_MESSAGING_TYPE;
         try {
             Class<?> sinkProviderClass = Class.forName(sinkProviderClassName);
-            if (!StreamMessaging.class.isAssignableFrom(sinkProviderClass)) {
-                throw new IllegalStateException(sinkProviderClassName + "is not assignable from " + StreamMessaging.class.getCanonicalName());
+            if (!StreamProvider.class.isAssignableFrom(sinkProviderClass)) {
+                throw new IllegalStateException(sinkProviderClassName + "is not assignable from " + StreamProvider.class.getCanonicalName());
             }
-            StreamMessaging instance = (StreamMessaging) sinkProviderClass.newInstance();
+            StreamProvider instance = (StreamProvider) sinkProviderClass.newInstance();
             LOGGER.info("Loaded {}", instance);
             return instance;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
@@ -59,8 +59,8 @@ public abstract class AbstractEnvironment implements Environment {
             .append(this.config()).build();
     }
 
-    public StreamMessaging stream() {
-        return streamMessaging;
+    public StreamProvider stream() {
+        return streamProvider;
     }
 
 

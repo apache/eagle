@@ -22,8 +22,8 @@ import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KafkaStreamMessaging implements StreamMessaging<KafkaStreamSink, KafkaStreamSinkConfig,KafkaStreamSource,KafkaStreamSourceConfig> {
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamMessaging.class);
+public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, KafkaStreamSinkConfig,KafkaStreamSource,KafkaStreamSourceConfig> {
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamProvider.class);
     private static final String DEFAULT_SHARED_SINK_TOPIC_CONF_KEY = "dataSinkConfig.topic";
     private static final String DEFAULT_SHARED_SOURCE_TOPIC_CONF_KEY = "dataSourceConfig.topic";
 

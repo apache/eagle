@@ -25,7 +25,7 @@ import java.lang.reflect.ParameterizedType;
 /**
  * Stream Messaging Bus.
  */
-public interface StreamMessaging<W extends StreamSink<C>, C extends StreamSinkConfig,
+public interface StreamProvider<W extends StreamSink<C>, C extends StreamSinkConfig,
         R extends StreamSource<F>, F extends StreamSourceConfig> {
 
     C getSinkConfig(String streamId, Config config);

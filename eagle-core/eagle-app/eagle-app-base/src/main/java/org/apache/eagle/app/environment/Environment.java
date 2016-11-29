@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.app.environment;
 
-import org.apache.eagle.app.messaging.StreamMessaging;
+import org.apache.eagle.app.messaging.StreamProvider;
 import com.typesafe.config.Config;
 
 import java.io.Serializable;
@@ -31,7 +31,7 @@ public interface Environment extends Serializable {
     /**
      * TODO Only useful for Storm/Spark Exeuctable Application instead of static web application.
      *
-     * @return StreamMessaging.
+     * @return StreamProvider.
      */
-    StreamMessaging stream();
+    StreamProvider stream();
 }
