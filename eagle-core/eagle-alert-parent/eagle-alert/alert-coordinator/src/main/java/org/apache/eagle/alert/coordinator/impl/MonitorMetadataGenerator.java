@@ -38,7 +38,6 @@ import java.util.Map;
 
 /**
  * Given current policy placement, figure out monitor metadata
- *
  * <p>TODO: refactor to eliminate the duplicate of stupid if-notInMap-then-create....
  * FIXME: too many duplicated code logic : check null; add list to map; add to list..</p>
  *
@@ -136,6 +135,23 @@ public class MonitorMetadataGenerator {
                 for (String policyName : boltUsage.getPolicies()) {
                     PolicyDefinition definition = context.getPolicies().get(policyName);
                     alertSpec.addBoltPolicy(boltUsage.getBoltId(), definition.getName());
+
+                    for (Publishment publish : context.getPublishments().values()) {
+                        if (!publish.getPolicyIds().contains(definition.getName())) {
+                            continue;
+                        }
+
+                        List<String> streamIds = new ArrayList<>();
+                        // add the publish to the bolt
+                        if (publish.getStreamIds() == null || publish.getStreamIds().size() <= 0) {
+                            streamIds.add(Publishment.STREAM_NAME_DEFAULT);
+                        } else {
+                            streamIds.addAll(publish.getStreamIds());
+                        }
+                        for (String streamId : streamIds) {
+                            alertSpec.addPublishPartition(streamId, policyName, publish.getName(), publish.getPartitionColumns());
+                        }
+                    }
                 }
             }
         }

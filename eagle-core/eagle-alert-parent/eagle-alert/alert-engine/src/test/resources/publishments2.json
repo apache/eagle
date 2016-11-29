@@ -19,6 +19,7 @@
       "mail.connection": "tls",
       "mail.smtp.port": "587"
     },
-    "dedupIntervalMin": "PT0M"
+    "dedupIntervalMin": "PT0M",
+    "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
   }
 ]
