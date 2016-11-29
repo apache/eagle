@@ -27,19 +27,38 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
   1. Edit the configuration file (json file). For example:
   
             {
-             "env": {
-              "site": "sandbox"
-             },
-             "input": {
-              "component": "namenode",
-              "port": "50070",
-              "https": false
-             },
-             "filter": {
-              "monitoring.group.selected": ["hadoop", "java.lang"]
-             },
-             "output": {
-             }
+              "env": {
+                "site": "sandbox"
+              },
+              "input": [
+                {
+                  "component": "namenode",
+                  "host": "sandbox.hortonworks.com",
+                  "port": "50070",
+                  "https": false
+                },
+                {
+                  "component": "resourcemanager",
+                  "host": "sandbox.hortonworks.com",
+                  "port": "8088",
+                  "https": false
+                }
+              ],
+              "filter": {
+                "monitoring.group.selected": ["hadoop", "java.lang"]
+              },
+              "output": {
+                "kafka": {
+                  "default_topic": "nn_jmx_metric_sandbox",
+                  "component_topic_mapping": {
+                    "namenode": "nn_jmx_metric_sandbox",
+                    "resourcemanager": "rm_jmx_metric_sandbox"
+                  },
+                  "broker_list": [
+                    "sandbox.hortonworks.com:6667"
+                  ]
+                }
+              }
             }
 
   2. Run the scripts
@@ -47,10 +66,9 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
         # for general use
         python hadoop_jmx_kafka.py > 1.txt
 
-
 ### Edit `eagle-collector.conf`
 
-* input
+* input (monitored hosts)
 
   "port" defines the hadoop service port, such as 50070 => "namenode", 60010 => "hbase master".
 
@@ -69,7 +87,6 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
         "output": {
           "kafka": {
             "topic": "test_topic",
-            "brokerList": [ "sandbox.hortonworks.com:6667"]
+            "broker_list": [ "sandbox.hortonworks.com:6667"]
           }
         }
-      
