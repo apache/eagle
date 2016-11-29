@@ -20,6 +20,7 @@ package org.apache.eagle.alert.metadata.impl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -29,15 +30,14 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.apache.eagle.alert.metadata.MetadataUtils;
+
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class JdbcImplTest {
     private static Logger LOG = LoggerFactory.getLogger(JdbcImplTest.class);
@@ -45,10 +45,9 @@ public class JdbcImplTest {
 
     @BeforeClass
     public static void setup() {
-        System.setProperty("config.resource", "/application-mysql.conf");
         ConfigFactory.invalidateCaches();
-        Config config = ConfigFactory.load();
-        dao = new JdbcMetadataDaoImpl(config.getConfig(MetadataUtils.META_DATA));
+        Config config = ConfigFactory.load("application-jdbc.conf");
+        dao = new JdbcMetadataDaoImpl(config);
     }
 
     @AfterClass
@@ -64,7 +63,6 @@ public class JdbcImplTest {
 
     private String TOPO_NAME = "topoName";
 
-    @Ignore
     @Test
     public void test_apis() {
         // publishment
@@ -109,6 +107,8 @@ public class JdbcImplTest {
             Assert.assertEquals(200, result.code);
             List<StreamingCluster> assigns = dao.listClusters();
             Assert.assertEquals(1, assigns.size());
+            dao.removeCluster("dd");
+            Assert.assertEquals(0, dao.listClusters().size());
         }
         // data source
         {
@@ -133,10 +133,20 @@ public class JdbcImplTest {
         {
             PublishmentType publishmentType = new PublishmentType();
             publishmentType.setType("KAFKA");
+            List<Map<String, String>> fields = new ArrayList<>();
+            Map<String, String> field1 = new HashMap<>();
+            field1.put("name", "kafka_broker");
+            field1.put("value", "sandbox.hortonworks.com:6667");
+            Map<String, String> field2 = new HashMap<>();
+            field2.put("name", "topic");
+            fields.add(field1);
+            fields.add(field2);
+            publishmentType.setFields(fields);
             OpResult result = dao.addPublishmentType(publishmentType);
             Assert.assertEquals(200, result.code);
-            List<PublishmentType> assigns = dao.listPublishmentType();
-            Assert.assertEquals(1, assigns.size());
+            List<PublishmentType> types = dao.listPublishmentType();
+            Assert.assertEquals(1, types.size());
+            Assert.assertEquals(2, types.get(0).getFields().size());
         }
     }
 
@@ -151,7 +161,6 @@ public class JdbcImplTest {
         Assert.assertEquals(state.getVersion(), versionId);
     }
 
-    @Ignore
     @Test
     public void test_readCurrentState() {
         test_addstate();
@@ -160,5 +169,27 @@ public class JdbcImplTest {
 
         LOG.debug(state.getVersion());
         LOG.debug(state.getGenerateTime());
+    }
+
+    @Test
+    public void test_clearScheduleState() {
+        int maxCapacity = 4;
+        List<String> reservedOnes = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ScheduleState state = new ScheduleState();
+            String versionId = "state-" + System.currentTimeMillis();
+            state.setVersion(versionId);
+            state.setGenerateTime(String.valueOf(new Date().getTime()));
+            dao.addScheduleState(state);
+            if (i >= 10 - maxCapacity) {
+                reservedOnes.add(versionId);
+            }
+        }
+        dao.clearScheduleState(maxCapacity);
+        List<ScheduleState> scheduleStates = dao.listScheduleStates();
+        Assert.assertTrue(scheduleStates.size() == maxCapacity);
+        List<String> TargetVersions = new ArrayList<>();
+        scheduleStates.stream().forEach(state -> TargetVersions.add(state.getVersion()));
+        Assert.assertTrue(CollectionUtils.isEqualCollection(reservedOnes, TargetVersions));
     }
 }

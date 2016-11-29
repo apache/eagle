@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -62,9 +63,11 @@ public class TestAlertPublisherBolt {
         PublishSpec spec = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec.json"), PublishSpec.class);
         publisher.onPublishChange(spec.getPublishments(), null, null, null);
         AlertStreamEvent event = create("testAlertStream");
-        publisher.nextEvent(event);
+        publisher.nextEvent(new PublishPartition(event.getStreamId(), event.getPolicyId(),
+            spec.getPublishments().get(0).getName(), spec.getPublishments().get(0).getPartitionColumns()), event);
         AlertStreamEvent event1 = create("testAlertStream");
-        publisher.nextEvent(event1);
+        publisher.nextEvent(new PublishPartition(event1.getStreamId(), event1.getPolicyId(),
+            spec.getPublishments().get(0).getName(), spec.getPublishments().get(0).getPartitionColumns()), event1);
     }
 
     private AlertStreamEvent create(String streamId) {
@@ -152,9 +155,12 @@ public class TestAlertPublisherBolt {
         publisherBolt.onAlertPublishSpecChange(spec3, null);
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void testAlertPublisher() throws Exception {
         AlertPublisher alertPublisher = new AlertPublisherImpl("alert-publisher-test");
+        Config config = ConfigFactory.load("application-test.conf");
+        alertPublisher.init(config, new HashMap());
         List<Publishment> oldPubs = loadEntities("/publishments1.json", Publishment.class);
         List<Publishment> newPubs = loadEntities("/publishments2.json", Publishment.class);
         alertPublisher.onPublishChange(oldPubs, null, null, null);
@@ -286,9 +292,12 @@ public class TestAlertPublisherBolt {
         AlertStreamEvent event2 = createSeverityWithStreamDef("switch2", "testapp2", "Memory 2 inconsistency detected", "CRITICAL", "docId2", "ed02", "distribution switch", "us");
         AlertStreamEvent event3 = createSeverityWithStreamDef("switch2", "testapp2", "Memory 3 inconsistency detected", "WARNING", "docId3", "ed02", "distribution switch", "us");
 
-        publisher.nextEvent(event1);
-        publisher.nextEvent(event2);
-        publisher.nextEvent(event3);
+        publisher.nextEvent(new PublishPartition(event1.getStreamId(), event1.getPolicyId(),
+            pubs.get(0).getName(), pubs.get(0).getPartitionColumns()), event1);
+        publisher.nextEvent(new PublishPartition(event2.getStreamId(), event2.getPolicyId(),
+            pubs.get(0).getName(), pubs.get(0).getPartitionColumns()), event2);
+        publisher.nextEvent(new PublishPartition(event3.getStreamId(), event3.getPolicyId(),
+            pubs.get(0).getName(), pubs.get(0).getPartitionColumns()), event3);
 
     }
 }

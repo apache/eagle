@@ -17,14 +17,14 @@
 
 package org.apache.eagle.alert.engine.evaluator;
 
+import org.apache.eagle.alert.engine.StreamCounter;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import backtype.storm.metric.api.MultiCountMetric;
 import com.typesafe.config.Config;
 
 public class PolicyHandlerContext {
     private PolicyDefinition policyDefinition;
     private PolicyGroupEvaluator policyEvaluator;
-    private MultiCountMetric policyCounter;
+    private StreamCounter policyCounter;
     private String policyEvaluatorId;
     private Config config;
 
@@ -44,11 +44,11 @@ public class PolicyHandlerContext {
         this.policyEvaluator = policyEvaluator;
     }
 
-    public void setPolicyCounter(MultiCountMetric metric) {
+    public void setPolicyCounter(StreamCounter metric) {
         this.policyCounter = metric;
     }
 
-    public MultiCountMetric getPolicyCounter() {
+    public StreamCounter getPolicyCounter() {
         return policyCounter;
     }
 

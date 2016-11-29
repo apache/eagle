@@ -43,6 +43,7 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
 import org.bson.BsonString;
@@ -499,6 +500,16 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         }
 
         return state;
+    }
+
+    @Override
+    public List<ScheduleState> listScheduleStates() {
+        throw new UnsupportedOperationException("listScheduleStates not support!");
+    }
+
+    @Override
+    public OpResult clearScheduleState(int maxCapacity) {
+        throw new UnsupportedOperationException("clearScheduleState not support!");
     }
 
     private ScheduleState addDetailForScheduleState(ScheduleState state, String version) {

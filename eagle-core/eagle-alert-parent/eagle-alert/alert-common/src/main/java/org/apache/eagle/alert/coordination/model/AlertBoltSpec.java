@@ -17,12 +17,17 @@
 package org.apache.eagle.alert.coordination.model;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Joiner;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The alert specification for topology bolts.
@@ -39,6 +44,8 @@ public class AlertBoltSpec {
 
     // mapping from boltId to list of PolicyDefinition's Ids
     private Map<String, List<String>> boltPolicyIdsMap = new HashMap<String, List<String>>();
+
+    private Set<PublishPartition> publishPartitions = new HashSet<>();
 
     public AlertBoltSpec() {
     }
@@ -87,6 +94,18 @@ public class AlertBoltSpec {
         }
     }
 
+    public Set<PublishPartition> getPublishPartitions() {
+        return publishPartitions;
+    }
+
+    public void setPublishPartitions(Set<PublishPartition> publishPartitions) {
+        this.publishPartitions = publishPartitions;
+    }
+
+    public void addPublishPartition(String streamId, String policyId, String publishId, Set<String> columns) {
+        this.publishPartitions.add(new PublishPartition(streamId, policyId, publishId, columns));
+    }
+
     @JsonIgnore
     public Map<String, List<PolicyDefinition>> getBoltPoliciesMap() {
         return boltPoliciesMap;
@@ -107,7 +126,8 @@ public class AlertBoltSpec {
 
     @Override
     public String toString() {
-        return String.format("version:%s-topo:%s, boltPolicyIdsMap %s", version, topologyName, boltPolicyIdsMap);
+        return String.format("version:%s-topo:%s, boltPolicyIdsMap %s, publishPartitions %s",
+            version, topologyName, boltPolicyIdsMap, Joiner.on(",").join(publishPartitions));
     }
 
 }
