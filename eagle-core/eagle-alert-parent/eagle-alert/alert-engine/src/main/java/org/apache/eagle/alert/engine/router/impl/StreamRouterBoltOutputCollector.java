@@ -68,7 +68,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
 
     public void emit(PartitionedEvent event) {
         try {
-            this.streamContext.counter().scope("send_count").incr();
+            this.streamContext.counter().incr("send_count");
             StreamPartition partition = event.getPartition();
             List<StreamRouterSpec> routerSpecs = routeSpecMap.get(partition);
             if (routerSpecs == null || routerSpecs.size() <= 0) {
@@ -83,7 +83,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
             if (routePartitionerMap.get(partition) == null) {
                 LOG.error("Partitioner for " + routerSpecs.get(0) + " is null");
                 synchronized (outputLock) {
-                    this.streamContext.counter().scope("fail_count").incr();
+                    this.streamContext.counter().incr("fail_count");
                     this.outputCollector.fail(event.getAnchor());
                 }
                 return;
@@ -111,9 +111,9 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
                             } else {
                                 outputCollector.emit(targetStreamId, event.getAnchor(), Collections.singletonList(serializer.serialize(emittedEvent)));
                             }
-                            this.streamContext.counter().scope("emit_count").incr();
+                            this.streamContext.counter().incr("emit_count");
                         } catch (RuntimeException ex) {
-                            this.streamContext.counter().scope("fail_count").incr();
+                            this.streamContext.counter().incr("fail_count");
                             LOG.error("Failed to emit to {} with {}", targetStreamId, newEvent, ex);
                             throw ex;
                         }
@@ -124,7 +124,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             synchronized (outputLock) {
-                this.streamContext.counter().scope("fail_count").incr();
+                this.streamContext.counter().incr("fail_count");
                 this.outputCollector.fail(event.getAnchor());
             }
         }
@@ -217,7 +217,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
     @Override
     public void drop(PartitionedEvent event) {
         synchronized (outputLock) {
-            this.streamContext.counter().scope("drop_count").incr();
+            this.streamContext.counter().incr("drop_count");
             if (event.getAnchor() != null) {
                 this.outputCollector.ack(event.getAnchor());
             } else {

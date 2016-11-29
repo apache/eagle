@@ -57,7 +57,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     }
 
     public void nextEvent(PartitionedEvent event) {
-        this.context.counter().scope("receive_count").incr();
+        this.context.counter().incr("receive_count");
         dispatch(event);
     }
 
@@ -87,19 +87,19 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
             if (isAcceptedByPolicy(partitionedEvent, policyDefinitionMap.get(policyStreamHandler.getKey()))) {
                 try {
                     handled = true;
-                    this.context.counter().scope("eval_count").incr();
+                    this.context.counter().incr("eval_count");
                     policyStreamHandler.getValue().send(partitionedEvent.getEvent());
                 } catch (Exception e) {
-                    this.context.counter().scope("fail_count").incr();
+                    this.context.counter().incr("fail_count");
                     LOG.error("{} failed to handle {}", policyStreamHandler.getValue(), partitionedEvent.getEvent(), e);
                 }
             }
         }
         if (!handled) {
-            this.context.counter().scope("drop_count").incr();
+            this.context.counter().incr("drop_count");
             LOG.warn("Drop stream non-matched event {}, which should not be sent to evaluator", partitionedEvent);
         } else {
-            this.context.counter().scope("accept_count").incr();
+            this.context.counter().incr("accept_count");
         }
     }
 

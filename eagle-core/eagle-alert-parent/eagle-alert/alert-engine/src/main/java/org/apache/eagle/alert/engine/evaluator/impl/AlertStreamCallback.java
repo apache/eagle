@@ -90,6 +90,6 @@ public class AlertStreamCallback extends StreamCallback {
                 LOG.error(String.format("send event %s to index %d failed with exception. ", event, currentIndex), ex);
             }
         }
-        context.getPolicyCounter().scope(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "alert_count")).incrBy(events.length);
+        context.getPolicyCounter().incrBy(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "alert_count"), events.length);
     }
 }

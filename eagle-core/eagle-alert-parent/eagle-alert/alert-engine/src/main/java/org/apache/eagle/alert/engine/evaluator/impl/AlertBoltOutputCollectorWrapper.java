@@ -64,7 +64,7 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
             }
 
             synchronized (outputLock) {
-                streamContext.counter().scope("alert_count").incr();
+                streamContext.counter().incr("alert_count");
                 delegate.emit(Arrays.asList(cloned, event));
             }
         }

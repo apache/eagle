@@ -18,6 +18,7 @@ package org.apache.eagle.alert.engine.evaluator;
 
 import backtype.storm.metric.api.MultiCountMetric;
 import org.apache.eagle.alert.engine.Collector;
+import org.apache.eagle.alert.engine.StormMultiCountMetric;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
@@ -59,7 +60,7 @@ public class SiddhiCEPPolicyEventHandlerTest {
         PolicyDefinition policyDefinition = MockSampleMetadataFactory.createSingleMetricSamplePolicy();
         PolicyHandlerContext context = new PolicyHandlerContext();
         context.setPolicyDefinition(policyDefinition);
-        context.setPolicyCounter(new MultiCountMetric());
+        context.setPolicyCounter(new StormMultiCountMetric(new MultiCountMetric()));
         context.setPolicyEvaluator(new PolicyGroupEvaluatorImpl("evalutorId"));
         handler.prepare(collector, context);
         StreamEvent event = StreamEvent.builder()
@@ -104,7 +105,7 @@ public class SiddhiCEPPolicyEventHandlerTest {
         handler = new SiddhiPolicyHandler(ssd, 0);
         PolicyHandlerContext context = new PolicyHandlerContext();
         context.setPolicyDefinition(policyDefinition);
-        context.setPolicyCounter(new MultiCountMetric());
+        context.setPolicyCounter(new StormMultiCountMetric(new MultiCountMetric()));
         context.setPolicyEvaluator(new PolicyGroupEvaluatorImpl("evalutorId"));
         handler.prepare(collector, context);
 
