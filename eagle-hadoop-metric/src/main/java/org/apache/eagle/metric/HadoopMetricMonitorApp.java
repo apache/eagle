@@ -23,12 +23,10 @@ import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
 
 public class HadoopMetricMonitorApp extends StormApplication {
-    private static final String HADOOP_JMX_METRIC_STREAM_NAME = "HADOOP_JMX_METRIC_STREAM";
-
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         return environment.newApp(config)
-            .fromStream(HADOOP_JMX_METRIC_STREAM_NAME)
+            .fromStream("HADOOP_JMX_METRIC_STREAM")
             .saveAsMetric(MetricDefinition
                 .namedByField("metric")
                 .eventTimeByField("timestamp")

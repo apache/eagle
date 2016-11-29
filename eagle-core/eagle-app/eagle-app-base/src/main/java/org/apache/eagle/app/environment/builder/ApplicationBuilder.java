@@ -69,12 +69,8 @@ public class ApplicationBuilder {
             return this;
         }
 
-        // /**
-        //  * @deprecated TODO: Not implemented yet.
-        //  */
-        // @Deprecated
         // public InitializedStream aggregateBy(AggregateFunction function) {
-        //   return new TransformedStream(generateId(function.toString()),function);
+        //    return new TransformedStream(generateId(function.toString()),function);
         // }
     }
 
