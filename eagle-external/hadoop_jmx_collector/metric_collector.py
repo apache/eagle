@@ -265,7 +265,7 @@ class MetricCollector(threading.Thread):
 
 class Runner(object):
     @staticmethod
-    def run(self, *collectors):
+    def run(*collectors):
         """
         Execute concurrently
 
@@ -274,15 +274,15 @@ class Runner(object):
         """
         argv = sys.argv
         if len(argv) == 1:
-            self.config = Helper.load_config()
+            config = Helper.load_config()
         elif len(argv) == 2:
-            self.config = Helper.load_config(argv[1])
+            config = Helper.load_config(argv[1])
         else:
             raise Exception("Usage: "+argv[0]+" CONFIG_FILE_PATH, but given too many arguments: " + str(argv))
 
         for collector in collectors:
             try:
-                collector.init(self.config)
+                collector.init(config)
                 collector.start()
             except Exception as e:
                 logging.exception(e)
