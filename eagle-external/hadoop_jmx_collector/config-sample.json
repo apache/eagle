@@ -1,54 +1,45 @@
 {
   "env": {
-    "site": "sandbox",
-    "name_node": {
-      "hosts": [
-        "sandbox.hortonworks.com"
-      ],
-      "port": 50070,
-      "https": false
-    },
-    "resource_manager": {
-      "hosts": [
-        "sandbox.hortonworks.com"
-      ],
-      "port": 50030,
-      "https": false
-    }
+    "site": "sandbox"
   },
-  "inputs": [
+  "input": [
     {
       "component": "namenode",
-      "host": "server.eagle.apache.org",
+      "host": "sandbox.hortonworks.com",
       "port": "50070",
-      "https": false,
-      "kafka_topic": "nn_jmx_metric_sandbox"
+      "https": false
+    },
+    {
+      "component": "namenode",
+      "host": "sandbox.hortonworks.com",
+      "port": "50070",
+      "https": false
     },
     {
       "component": "resourcemanager",
-      "host": "server.eagle.apache.org",
+      "host": "sandbox.hortonworks.com",
       "port": "8088",
-      "https": false,
-      "kafka_topic": "rm_jmx_metric_sandbox"
+      "https": false
     },
     {
-      "component": "datanode",
-      "host": "server.eagle.apache.org",
-      "port": "50075",
-      "https": false,
-      "kafka_topic": "dn_jmx_metric_sandbox"
+      "component": "resourcemanager",
+      "host": "sandbox.hortonworks.com",
+      "port": "8088",
+      "https": false
     }
   ],
   "filter": {
-    "monitoring.group.selected": [
-      "hadoop",
-      "java.lang"
-    ]
+    "monitoring.group.selected": ["hadoop", "java.lang"]
   },
   "output": {
     "kafka": {
-      "brokerList": [
-        "localhost:9092"
+      "default_topic": "nn_jmx_metric_sandbox",
+      "component_topic_mapping": {
+        "namenode": "nn_jmx_metric_sandbox",
+        "resourcemanager": "rm_jmx_metric_sandbox"
+      },
+      "broker_list": [
+        "sandbox.hortonworks.com:6667"
       ]
     }
   }
