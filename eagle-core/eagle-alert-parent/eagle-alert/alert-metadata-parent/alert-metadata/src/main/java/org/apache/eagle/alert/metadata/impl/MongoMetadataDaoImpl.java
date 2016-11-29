@@ -375,7 +375,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public List<AlertPublishEvent> getAlertPublishEventByPolicyId(String policyId, int size) {
+    public List<AlertPublishEvent> getAlertPublishEventsByPolicyId(String policyId, int size) {
         List<AlertPublishEvent> events = list(alerts, AlertPublishEvent.class);
         List<AlertPublishEvent> result = events.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
         if (size < 0 || size > result.size()) {

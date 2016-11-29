@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -32,12 +30,12 @@ import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.ws.rs.*;
 
 /**
@@ -253,86 +251,26 @@ public class MetadataResource {
     @GET
     public List<AlertPublishEvent> getAlertPublishEventByPolicyId(@PathParam("policyId") String policyId,
                                                                   @QueryParam("size") int size) {
-        return dao.getAlertPublishEventByPolicyId(policyId, size);
+        return dao.getAlertPublishEventsByPolicyId(policyId, size);
     }
 
     @Path("/policies/{policyId}/publishments")
     @GET
     public List<Publishment> getPolicyPublishments(@PathParam("policyId") String policyId) {
-        return dao.listPublishment().stream().filter(ps ->
-            ps.getPolicyIds() != null && ps.getPolicyIds().contains(policyId)
-        ).collect(Collectors.toList());
+        return dao.getPublishmentsByPolicyId(policyId);
     }
 
     @Path("/policies/{policyId}/publishments")
     @POST
     public OpResult addPublishmentsToPolicy(@PathParam("policyId") String policyId, List<String> publishmentIds) {
-        OpResult result = new OpResult();
-        if (publishmentIds == null || publishmentIds.size() == 0) {
-            result.code = OpResult.FAILURE;
-            result.message = "Failed to add policy, there is no publisher in it";
-            return result;
-        }
-        try {
-            getPolicyByID(policyId);
-            Map<String,Publishment> publishmentMap = new HashMap<>();
-            listPublishment().forEach((pub) -> publishmentMap.put(pub.getName(),pub));
-            for (String publishmentId : publishmentIds) {
-                if (publishmentMap.containsKey(publishmentId)) {
-                    Publishment publishment = publishmentMap.get(publishmentId);
-                    if (publishment.getPolicyIds() == null) {
-                        publishment.setPolicyIds(new ArrayList<>());
-                    }
-                    if (publishment.getPolicyIds().contains(policyId)) {
-                        LOG.warn("Policy {} was already bound with publisher {}",policyId, publishmentId);
-                    } else {
-                        publishment.getPolicyIds().add(policyId);
-                    }
-                    OpResult opResult = addPublishment(publishment);
-                    if (opResult.code == OpResult.FAILURE) {
-                        LOG.error("Failed to add publisher {} to policy {}: {}", publishmentId, policyId, opResult.message);
-                        return opResult;
-                    } else {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug(opResult.message);
-                        }
-                    }
-                } else {
-                    throw new IllegalArgumentException("Publishment (name: " + publishmentId + ") not found");
-                }
-            }
-
-            //for other publishments, remove policyId from them, work around, we should refactor
-            for (String publishmentId : publishmentMap.keySet()) {
-                if (publishmentIds.contains(publishmentId)) {
-                    continue;
-                }
-                Publishment publishment = publishmentMap.get(publishmentId);
-                if (publishment.getPolicyIds() != null && publishment.getPolicyIds().contains(policyId)) {
-                    publishment.getPolicyIds().remove(policyId);
-                    OpResult opResult = addPublishment(publishment);
-                    if (opResult.code == OpResult.FAILURE) {
-                        LOG.error("Failed to delete policy {}, from publisher {}, {} ", policyId, publishmentId, opResult.message);
-                        return opResult;
-                    }
-                }
-            }
-            result.code = OpResult.SUCCESS;
-            result.message = "Successfully add " + publishmentIds.size() + " publishments: [" + StringUtils.join(publishmentIds,",") + "] to policy: " + policyId;
-            LOG.info(result.message);
-        } catch (Exception ex) {
-            result.code = OpResult.FAILURE;
-            result.message = "Failed to add publishments: [" + StringUtils.join(publishmentIds,",") + "] to policy: " + policyId + ", cause: " + ex.getMessage();
-            LOG.error(result.message,ex);
-        }
-        return result;
+        return dao.addPublishmentsToPolicy(policyId, publishmentIds);
     }
 
     @Path("/policies/{policyId}")
     @GET
-    public List<PolicyDefinition> getPolicyByID(@PathParam("policyId") String policyId) {
+    public PolicyDefinition getPolicyById(@PathParam("policyId") String policyId) {
         Preconditions.checkNotNull(policyId, "policyId");
-        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).collect(Collectors.toList());
+        return dao.getPolicyById(policyId);
     }
 
     @Path("/policies/{policyId}/status/{status}")
@@ -340,7 +278,7 @@ public class MetadataResource {
     public OpResult updatePolicyStatusByID(@PathParam("policyId") String policyId, @PathParam("status") PolicyDefinition.PolicyStatus status) {
         OpResult result = new OpResult();
         try {
-            PolicyDefinition policyDefinition = getPolicyByID(policyId).get(0);
+            PolicyDefinition policyDefinition = getPolicyById(policyId);
             policyDefinition.setPolicyStatus(status);
             OpResult updateResult  = addPolicy(policyDefinition);
             result.code = updateResult.code;
