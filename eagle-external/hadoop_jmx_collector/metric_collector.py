@@ -270,7 +270,10 @@ class Runner(object):
         :return:
         """
         for thread in threads:
-            thread.start()
+            try:
+                thread.start()
+            except Exception as e:
+                logging.exception(e)
 
 class JmxMetricCollector(MetricCollector):
     selected_domain = None
