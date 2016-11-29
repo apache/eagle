@@ -18,6 +18,7 @@ package org.apache.eagle.app.environment.impl;
 
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.environment.builder.ApplicationBuilder;
+import org.apache.eagle.app.environment.builder.MetricDefinition;
 import org.apache.eagle.app.messaging.*;
 import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.StreamSourceConfig;
@@ -38,6 +39,9 @@ public class StormEnvironment extends AbstractEnvironment {
         return (StormStreamSource) stream().getSource(streamId,config);
     }
 
+    public MetricStreamPersist getMetricPersist(MetricDefinition metricDefinition, Config config) {
+        return new MetricStreamPersist(metricDefinition, config);
+    }
 
     /**
      * Fluent Builder API.
