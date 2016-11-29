@@ -176,18 +176,10 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult clearScheduleState(int maxCapacity) {
-        List<ScheduleState> scheduleStates = handler.listOrderBy(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
-        OpResult result = new OpResult();
-        if (scheduleStates.size() <= maxCapacity) {
-            result.code = OpResult.SUCCESS;
-            result.message = "clear 0 states";
-        } else {
-            List<String> removedkeys = new ArrayList<>();
-            for (int removedInd = maxCapacity; removedInd < scheduleStates.size(); removedInd++) {
-                removedkeys.add(scheduleStates.get(removedInd).getVersion());
-            }
-            result = handler.removeBatch(ScheduleState.class.getSimpleName(), removedkeys);
+        if (maxCapacity <= 0) {
+            maxCapacity = 10;
         }
+        OpResult result = handler.removeScheduleStates(maxCapacity);
         LOG.info(result.message);
         return result;
     }

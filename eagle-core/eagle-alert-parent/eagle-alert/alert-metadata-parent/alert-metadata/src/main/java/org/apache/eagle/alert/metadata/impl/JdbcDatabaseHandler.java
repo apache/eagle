@@ -55,6 +55,7 @@ public class JdbcDatabaseHandler {
     private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
     private static final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
     private static final String QUERY_ALL_STATEMENT_WITH_SIZE = "SELECT value FROM %s limit %s";
+    private static final String CLEAR_SCHEDULESTATES_STATEMENT = "DELETE FROM schedule_state WHERE id NOT IN (SELECT id from (SELECT id FROM schedule_state ORDER BY id DESC limit ?) as states)";
 
     public enum SortType { DESC, ASC }
 
@@ -353,6 +354,32 @@ public class JdbcDatabaseHandler {
             String msg = String.format("delete %s records from table %s", sum, tb);
             result.code = OpResult.SUCCESS;
             result.message = msg;
+            statement.close();
+        } catch (SQLException e) {
+            result.code = OpResult.FAILURE;
+            result.message = e.getMessage();
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
+                }
+            }
+        }
+        return result;
+    }
+
+    public OpResult removeScheduleStates(int capacity) {
+        OpResult result = new OpResult();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(CLEAR_SCHEDULESTATES_STATEMENT);
+            statement.setInt(1, capacity);
+            result.message = String.format("delete %d records from schedule_state", statement.executeUpdate());
+            result.code = OpResult.SUCCESS;
             statement.close();
         } catch (SQLException e) {
             result.code = OpResult.FAILURE;
