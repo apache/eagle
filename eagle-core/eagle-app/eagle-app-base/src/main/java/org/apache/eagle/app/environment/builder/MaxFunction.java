@@ -20,7 +20,12 @@ import java.util.Map;
 
 public class MaxFunction extends AggregateFunction {
     @Override
-    public void open() {
+    public String getName() {
+        return "MAX";
+    }
+
+    @Override
+    public void open(Collector collector) {
         throw new IllegalStateException("TODO: Not implemented yet.");
     }
 

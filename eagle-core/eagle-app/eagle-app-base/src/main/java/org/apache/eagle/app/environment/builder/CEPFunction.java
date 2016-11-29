@@ -23,15 +23,15 @@ import java.util.Map;
  */
 public class CEPFunction implements TransformFunction {
 
-    private final CEPDefinition CEPDefinition;
+    private final CEPDefinition cepDefinition;
     private Collector collector;
 
-    public CEPFunction(CEPDefinition CEPDefinition) {
-        this.CEPDefinition = CEPDefinition;
+    public CEPFunction(CEPDefinition cepDefinition) {
+        this.cepDefinition = cepDefinition;
     }
 
     public CEPFunction(String siddhiQuery, String inputStreamId, String outputStreamId) {
-        this.CEPDefinition = new CEPDefinition(siddhiQuery,inputStreamId, outputStreamId);
+        this.cepDefinition = new CEPDefinition(siddhiQuery,inputStreamId, outputStreamId);
     }
 
     @Override
