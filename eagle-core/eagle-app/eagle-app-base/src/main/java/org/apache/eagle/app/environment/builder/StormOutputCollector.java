@@ -16,15 +16,21 @@
  */
 package org.apache.eagle.app.environment.builder;
 
-import java.io.Serializable;
+import backtype.storm.task.OutputCollector;
+
+import java.util.Arrays;
+
 import java.util.Map;
 
-public interface TransformFunction extends Serializable {
-    String getName();
+public class StormOutputCollector implements Collector {
+    private final OutputCollector delegate;
 
-    void open(Collector collector);
+    StormOutputCollector(OutputCollector delegate) {
+        this.delegate = delegate;
+    }
 
-    void transform(Map event);
-
-    void close();
+    @Override
+    public void collect(Object key, Map event) {
+        delegate.emit(Arrays.asList(key, event));
+    }
 }

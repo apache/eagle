@@ -16,15 +16,8 @@
  */
 package org.apache.eagle.app.environment.builder;
 
-import java.io.Serializable;
 import java.util.Map;
 
-public interface TransformFunction extends Serializable {
-    String getName();
-
-    void open(Collector collector);
-
-    void transform(Map event);
-
-    void close();
+public interface Collector {
+    void collect(Object key, Map event);
 }

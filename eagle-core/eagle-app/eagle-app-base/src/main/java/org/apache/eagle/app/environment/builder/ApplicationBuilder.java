@@ -69,9 +69,11 @@ public class ApplicationBuilder {
             return this;
         }
 
-        // public InitializedStream aggregateBy(AggregateFunction function) {
-        //    return new TransformedStream(generateId(function.toString()),function);
-        // }
+        public TransformedStream transformBy(TransformFunction function) {
+            String componentId = generateId(function.getName());
+            topologyBuilder.setBolt(componentId, new TransformFunctionBolt(function)).shuffleGrouping(getId());
+            return new TransformedStream(componentId);
+        }
     }
 
     public class SourcedStream extends InitializedStream {
@@ -91,11 +93,9 @@ public class ApplicationBuilder {
     }
 
     public class TransformedStream extends InitializedStream {
-        private final TransformFunction transform;
-
-        public TransformedStream(String id, TransformFunction function) {
+        public TransformedStream(String id) {
             super(id);
-            this.transform = function;
+            throw new IllegalStateException("TODO: Not implemented yet");
         }
     }
 
@@ -114,10 +114,6 @@ public class ApplicationBuilder {
 
     public SourcedStream fromStream(SourcedStream sourcedStream) {
         return new SourcedStream(sourcedStream);
-    }
-
-    private int generateId() {
-        return this.identifier.getAndIncrement();
     }
 
     private String generateId(String prefix) {

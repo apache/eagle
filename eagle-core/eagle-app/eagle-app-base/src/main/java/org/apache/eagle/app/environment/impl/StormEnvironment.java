@@ -19,6 +19,8 @@ package org.apache.eagle.app.environment.impl;
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.environment.builder.ApplicationBuilder;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
+import org.apache.eagle.app.environment.builder.TransformFunction;
+import org.apache.eagle.app.environment.builder.TransformFunctionBolt;
 import org.apache.eagle.app.messaging.*;
 import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.StreamSourceConfig;
@@ -31,6 +33,9 @@ public class StormEnvironment extends AbstractEnvironment {
         super(envConfig);
     }
 
+    // ----------------------------------
+    // Classic Storm Topology Builder API
+    // ----------------------------------
     public StormStreamSink getStreamSink(String streamId, Config config) {
         return ((StormStreamSink) stream().getSink(streamId,config));
     }
@@ -43,9 +48,14 @@ public class StormEnvironment extends AbstractEnvironment {
         return new MetricStreamPersist(metricDefinition, config);
     }
 
-    /**
-     * Fluent Builder API.
-     */
+    public TransformFunctionBolt getTransformer(TransformFunction function) {
+        return new TransformFunctionBolt(function);
+    }
+
+    // ----------------------------------
+    // Fluent Storm App Builder API
+    // ----------------------------------
+
     public ApplicationBuilder newApp(Config appConfig) {
         return new ApplicationBuilder(appConfig, this);
     }
