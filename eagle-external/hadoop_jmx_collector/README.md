@@ -18,81 +18,58 @@ limitations under the License.
 -->
 
 
-# Hadoop JMX Collector to Kafka
+# Hadoop Jmx Collector
 
-Python script to collect JMX metrics for any Hadoop component, and send it to Kafka topic
+These scripts help to collect Hadoop jmx and evently sent the metrics to stdout or Kafka. Tested with Python 2.7.
 
 ### How to use it
 
-  1. Edit the configuration file config.json. For example:
-            ```
+  1. Edit the configuration file (json file). For example:
+  
             {
              "env": {
               "site": "sandbox"
              },
-             "inputs": [
-                {
-                  "component": "namenode",
-                  "host": "127.0.0.1",
-                  "port": "50070",
-                  "https": false,
-                  "kafka_topic": "nn_jmx_metric_sandbox"
-                },
-                {
-                  "component": "resourcemanager",
-                  "host": "127.0.0.1",
-                  "port": "8088",
-                  "https": false,
-                  "kafka_topic": "rm_jmx_metric_sandbox"
-                },
-                {
-                  "component": "datanode",
-                  "host": "127.0.0.1",
-                  "port": "50075",
-                  "https": false,
-                  "kafka_topic": "dn_jmx_metric_sandbox"
-                }
-             ],
+             "input": {
+              "component": "namenode",
+              "port": "50070",
+              "https": false
+             },
              "filter": {
               "monitoring.group.selected": ["hadoop", "java.lang"]
              },
              "output": {
              }
             }
-            ```
+
   2. Run the scripts
+  
+        # for general use
+        python hadoop_jmx_kafka.py > 1.txt
 
-        ```
-        python hadoop_jmx_kafka.py
-        ```
 
-### Editing config.json
+### Edit `eagle-collector.conf`
 
-* inputs
+* input
 
-  "port" defines the hadoop service port, such as 50070 => "namenode", 16010 => "hbasemaster".
-  Like the example above, you can specify multiple hadoop components to collect
-
-  "https" is whether or not you want to use SSL protocol in your connection to the host+port
-
-  "kafka_topic" is the kafka topic that you want to populate with the jmx data from the respective component
+  "port" defines the hadoop service port, such as 50070 => "namenode", 60010 => "hbase master".
 
 * filter
 
   "monitoring.group.selected" can filter out beans which we care about.
 
-* output
+* output 
+  
+  if we left it empty, then the output is stdout by default. 
 
-  You can specify the kafka broker list
-        ```
+        "output": {}
+        
+  It also supports Kafka as its output. 
+
         "output": {
           "kafka": {
-            "brokerList": [ "localhost:9092"]
+            "topic": "test_topic",
+            "brokerList": [ "sandbox.hortonworks.com:6667"]
           }
         }
-        ```
-
-  To check that the a desired kafka topic is being populated:
-    ```
-    kafka-console-consumer --zookeeper localhost:2181 --topic nn_jmx_metric_sandbox
-    ```
+      

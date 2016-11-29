@@ -40,7 +40,6 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M')
 
-
 class Helper:
     def __init__(self):
         pass
@@ -186,7 +185,7 @@ class KafkaMetricSender(MetricSender):
         super(KafkaMetricSender, self).__init__(config)
         kafka_config = config["output"]["kafka"]
         # default topic
-        # self.topic = kafka_config["topic"].encode('utf-8')
+        self.topic = kafka_config["topic"].encode('utf-8')
         # producer
         self.broker_list = kafka_config["brokerList"]
         self.kafka_client = None
@@ -197,8 +196,8 @@ class KafkaMetricSender(MetricSender):
         self.kafka_producer = SimpleProducer(self.kafka_client, batch_send=True, batch_send_every_n=500,
                                              batch_send_every_t=30)
 
-    def send(self, msg, topic):
-        self.kafka_producer.send_messages(topic, json.dumps(msg))
+    def send(self, msg):
+        self.kafka_producer.send_messages(self.topic, json.dumps(msg))
 
     def close(self):
         if self.kafka_producer is not None:
@@ -208,21 +207,14 @@ class KafkaMetricSender(MetricSender):
 
 
 class MetricCollector(threading.Thread):
-    def __init__(self, comp, host, port, https, topic):
+    def __init__(self):
         threading.Thread.__init__(self)
-
-        self.comp = comp
-        self.host = host
-        self.port = port
-        self.https = https
-        self.topic = topic
-
         self.config = Helper.load_config()
         self.sender = KafkaMetricSender(self.config)
         self.fqdn = socket.getfqdn()
-        self.init(self.config, self.comp, self.host, self.port, self.https, self.topic)
+        self.init(self.config)
 
-    def init(self, config, comp, host, port, https, topic):
+    def init(self, config):
         pass
 
     def start(self):
@@ -242,7 +234,7 @@ class MetricCollector(threading.Thread):
         if not msg.has_key("site"):
             msg["site"] = self.config["env"]["site"]
 
-        self.sender.send(msg, self.topic)
+        self.sender.send(msg)
 
     def run(self):
         raise Exception("`run` method should be overrode by sub-class before being called")
@@ -267,12 +259,14 @@ class JmxMetricCollector(MetricCollector):
     port = None
     listeners = []
 
-    def init(self, config, comp, host, port, https, topic):
-        self.host = host
-        self.port = port
-        self.https = https
-        self.component = comp
-        self.topic = topic
+    def init(self, config):
+        if config["input"].has_key("host"):
+            self.host = config["input"]["host"]
+        else:
+            self.host = self.fqdn
+        self.port = config["input"]["port"]
+        self.https = config["input"]["https"]
+        self.component = config["input"]["component"]
         self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
         self.listeners = []
 

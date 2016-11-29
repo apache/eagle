@@ -86,7 +86,7 @@ class HadoopRMHAChecker(MetricCollector):
         total_count = len(hosts)
 
         self.collect({
-            "component": "resourcemanager",
+            "component": "namenode",
             "metric": "hadoop.resourcemanager.hastate.total.count",
             "value": total_count
         })

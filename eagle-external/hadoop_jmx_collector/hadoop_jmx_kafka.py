@@ -16,11 +16,8 @@
 # limitations under the License.
 #
 
-from metric_collector import JmxMetricCollector,JmxMetricListener,Runner,MetricCollector,Helper
+from metric_collector import JmxMetricCollector,JmxMetricListener,Runner
 import json
-import logging
-
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(name)-12s %(levelname)-6s %(message)s',datefmt='%m-%d %H:%M')
 
 class NNSafeModeMetric(JmxMetricListener):
     def on_metric(self, metric):
@@ -50,21 +47,14 @@ class MemortUsageMetric(JmxMetricListener):
         if bean["name"] == "Hadoop:service=NameNode,name=JvmMetrics":
             memnonheapusedusage = round(float(bean['MemNonHeapUsedM']) / float(bean['MemNonHeapMaxM']) * 100.0, 2)
             self.collector.on_bean_kv(self.PREFIX, "memnonheapusedusage", memnonheapusedusage)
-            memnonheapcommittedusage = round(float(bean['MemNonHeapCommittedM']) / float(bean['MemNonHeapMaxM']) * 100, 2)
+            memnonheapcommittedusage = round(float(bean['MemNonHeapCommittedM']) / float(bean['MemNonHeapMaxM']) * 100,
+                                             2)
             self.collector.on_bean_kv(self.PREFIX, "memnonheapcommittedusage", memnonheapcommittedusage)
             memheapusedusage = round(float(bean['MemHeapUsedM']) / float(bean['MemHeapMaxM']) * 100, 2)
             self.collector.on_bean_kv(self.PREFIX, "memheapusedusage", memheapusedusage)
             memheapcommittedusage = round(float(bean['MemHeapCommittedM']) / float(bean['MemHeapMaxM']) * 100, 2)
             self.collector.on_bean_kv(self.PREFIX, "memheapcommittedusage", memheapcommittedusage)
 
-
-class NNCapacityUsageMetric(JmxMetricListener):
-    PREFIX = "hadoop.namenode.fsnamesystemstate"
-
-    def on_bean(self, bean):
-        if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystemState":
-            capacityusage = round(float(bean['CapacityUsed']) / float(bean['CapacityTotal']) * 100, 2)
-            self.collector.on_bean_kv(self.PREFIX, "capacityusage", capacityusage)
 
 class JournalTransactionInfoMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.journaltransaction"
@@ -79,9 +69,11 @@ class JournalTransactionInfoMetric(JmxMetricListener):
 
 
 if __name__ == '__main__':
-    config = Helper.load_config()
-
-    for ip in config['inputs']:
-        collector = JmxMetricCollector(ip['component'], ip['host'], ip['port'], ip['https'], ip['kafka_topic'])
-        collector.register(NNSafeModeMetric(), NNHAMetric(), MemortUsageMetric(), JournalTransactionInfoMetric(), NNCapacityUsageMetric())
-        Runner.run(collector)
+    collector = JmxMetricCollector()
+    collector.register(
+            NNSafeModeMetric(),
+            NNHAMetric(),
+            MemortUsageMetric(),
+            JournalTransactionInfoMetric()
+    )
+    Runner.run(collector)
