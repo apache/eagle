@@ -106,6 +106,7 @@ class Helper:
                     response = urllib2.urlopen("http://" + str(url) + path, timeout=28)
                 logging.debug("Got response")
                 result = response.read()
+                break
             except Exception as e:
                 logging.warning(e)
                 attempts += 1
