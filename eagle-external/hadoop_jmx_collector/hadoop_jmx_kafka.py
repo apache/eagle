@@ -32,41 +32,40 @@ class NNSafeModeMetric(JmxMetricListener):
 class NNHAMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.fsnamesystem"
 
-    def on_bean(self, bean):
+    def on_bean(self, component, bean):
         if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystem":
             if bean[u"tag.HAState"] == "active":
-                self.collector.on_bean_kv(self.PREFIX, "hastate", 0)
+                self.collector.on_bean_kv(self.PREFIX, component, "hastate", 0)
             else:
-                self.collector.on_bean_kv(self.PREFIX, "hastate", 1)
+                self.collector.on_bean_kv(self.PREFIX, component, "hastate", 1)
 
 
 class MemortUsageMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.jvm"
 
-    def on_bean(self, bean):
+    def on_bean(self, component, bean):
         if bean["name"] == "Hadoop:service=NameNode,name=JvmMetrics":
             memnonheapusedusage = round(float(bean['MemNonHeapUsedM']) / float(bean['MemNonHeapMaxM']) * 100.0, 2)
-            self.collector.on_bean_kv(self.PREFIX, "memnonheapusedusage", memnonheapusedusage)
+            self.collector.on_bean_kv(self.PREFIX, component, "memnonheapusedusage", memnonheapusedusage)
             memnonheapcommittedusage = round(float(bean['MemNonHeapCommittedM']) / float(bean['MemNonHeapMaxM']) * 100,
                                              2)
-            self.collector.on_bean_kv(self.PREFIX, "memnonheapcommittedusage", memnonheapcommittedusage)
+            self.collector.on_bean_kv(self.PREFIX, component, "memnonheapcommittedusage", memnonheapcommittedusage)
             memheapusedusage = round(float(bean['MemHeapUsedM']) / float(bean['MemHeapMaxM']) * 100, 2)
-            self.collector.on_bean_kv(self.PREFIX, "memheapusedusage", memheapusedusage)
+            self.collector.on_bean_kv(self.PREFIX, component,"memheapusedusage", memheapusedusage)
             memheapcommittedusage = round(float(bean['MemHeapCommittedM']) / float(bean['MemHeapMaxM']) * 100, 2)
-            self.collector.on_bean_kv(self.PREFIX, "memheapcommittedusage", memheapcommittedusage)
+            self.collector.on_bean_kv(self.PREFIX, component, "memheapcommittedusage", memheapcommittedusage)
 
 
 class JournalTransactionInfoMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.journaltransaction"
 
-    def on_bean(self, bean):
+    def on_bean(self, component, bean):
         if bean.has_key("JournalTransactionInfo"):
             JournalTransactionInfo = json.loads(bean.get("JournalTransactionInfo"))
             LastAppliedOrWrittenTxId = float(JournalTransactionInfo.get("LastAppliedOrWrittenTxId"))
             MostRecentCheckpointTxId = float(JournalTransactionInfo.get("MostRecentCheckpointTxId"))
-            self.collector.on_bean_kv(self.PREFIX, "LastAppliedOrWrittenTxId", LastAppliedOrWrittenTxId)
-            self.collector.on_bean_kv(self.PREFIX, "MostRecentCheckpointTxId", MostRecentCheckpointTxId)
-
+            self.collector.on_bean_kv(self.PREFIX, component, "LastAppliedOrWrittenTxId", LastAppliedOrWrittenTxId)
+            self.collector.on_bean_kv(self.PREFIX, component, "MostRecentCheckpointTxId", MostRecentCheckpointTxId)
 
 if __name__ == '__main__':
     collector = JmxMetricCollector()

@@ -185,11 +185,32 @@ class KafkaMetricSender(MetricSender):
         super(KafkaMetricSender, self).__init__(config)
         kafka_config = config["output"]["kafka"]
         # default topic
-        self.topic = kafka_config["topic"].encode('utf-8')
+        self.default_topic = None
+        if kafka_config.has_key("default_topic"):
+            self.default_topic = kafka_config["default_topic"].encode('utf-8')
+        self.component_topic_mapping = {}
+        if kafka_config.has_key("component_topic_mapping"):
+            self.component_topic_mapping = kafka_config["component_topic_mapping"]
+
+        if not self.default_topic and not bool(self.component_topic_mapping):
+            raise Exception("both kafka config 'topic' and 'component_topic_mapping' are empty")
+
         # producer
-        self.broker_list = kafka_config["brokerList"]
+        self.broker_list = kafka_config["broker_list"]
         self.kafka_client = None
         self.kafka_producer = None
+
+    def get_topic_id(self, msg):
+        if msg.has_key("component"):
+            component = msg["component"]
+            if self.component_topic_mapping.has_key(component):
+                return self.component_topic_mapping[component]
+            else:
+                return self.default_topic
+        else:
+            if not self.default_topic:
+                raise Exception("no default topic found for unknown-component msg: " + str(msg))
+            return self.default_topic
 
     def open(self):
         self.kafka_client = KafkaClient(self.broker_list, timeout=59)
@@ -197,14 +218,13 @@ class KafkaMetricSender(MetricSender):
                                              batch_send_every_t=30)
 
     def send(self, msg):
-        self.kafka_producer.send_messages(self.topic, json.dumps(msg))
+        self.kafka_producer.send_messages(self.get_topic_id(msg), json.dumps(msg))
 
     def close(self):
         if self.kafka_producer is not None:
             self.kafka_producer.stop()
         if self.kafka_client is not None:
             self.kafka_client.close()
-
 
 class MetricCollector(threading.Thread):
     def __init__(self):
@@ -254,19 +274,21 @@ class Runner(object):
 
 class JmxMetricCollector(MetricCollector):
     selected_domain = None
-    component = None
-    https = False
-    port = None
     listeners = []
+    input_components = []
 
     def init(self, config):
-        if config["input"].has_key("host"):
-            self.host = config["input"]["host"]
-        else:
-            self.host = self.fqdn
-        self.port = config["input"]["port"]
-        self.https = config["input"]["https"]
-        self.component = config["input"]["component"]
+        self.input_components = config["input"]
+        for input in self.input_components:
+            if not input.has_key("host"):
+                input["host"] = self.fqdn
+            if not input.has_key("component"):
+                raise Exception("component not defined in " + str(input))
+            if not input.has_key("port"):
+                raise Exception("port not defined in " + str(input))
+            if not input.has_key("https"):
+                input["https"] = False
+
         self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
         self.listeners = []
 
@@ -280,20 +302,21 @@ class JmxMetricCollector(MetricCollector):
             self.listeners.append(listener)
 
     def run(self):
-        try:
-            beans = JmxReader(self.host, self.port, self.https).open().get_jmx_beans()
-            self.on_beans(beans)
-        except Exception as e:
-            logging.exception("Failed to read jmx for " + self.host)
+        for input in self.input_components:
+            try:
+                beans = JmxReader(input["host"], input["port"], input["https"]).open().get_jmx_beans()
+                self.on_beans(input["component"], beans)
+            except Exception as e:
+                logging.exception("Failed to read jmx for " + str(input))
 
     def filter_bean(self, bean, mbean_domain):
         return mbean_domain in self.selected_domain
 
-    def on_beans(self, beans):
+    def on_beans(self, component, beans):
         for bean in beans:
-            self.on_bean(bean)
+            self.on_bean(component,bean)
 
-    def on_bean(self, bean):
+    def on_bean(self, component, bean):
         # mbean is of the form "domain:key=value,...,foo=bar"
         mbean = bean[u'name']
         mbean_domain, mbean_attribute = mbean.rstrip().split(":", 1)
@@ -307,24 +330,23 @@ class JmxMetricCollector(MetricCollector):
 
         # print kafka_dict
         for key, value in bean.iteritems():
-            self.on_bean_kv(metric_prefix_name, key, value)
+            self.on_bean_kv(metric_prefix_name, component,key, value)
 
         for listener in self.listeners:
-            listener.on_bean(bean.copy())
+            listener.on_bean(component, bean.copy())
 
-    def on_bean_kv(self, prefix, key, value):
+    def on_bean_kv(self, prefix,component, key, value):
         # Skip Tags
         if re.match(r'tag.*', key):
             return
         metric_name = (prefix + '.' + key).lower()
         self.on_metric({
+            "component": component,
             "metric": metric_name,
             "value": value
         })
 
     def on_metric(self, metric):
-        metric["component"] = self.component
-
         if Helper.is_number(metric["value"]):
             self.collect(metric)
 
@@ -346,7 +368,7 @@ class JmxMetricListener:
     def init(self, collector):
         self.collector = collector
 
-    def on_bean(self, bean):
+    def on_bean(self, component, bean):
         pass
 
     def on_metric(self, metric):

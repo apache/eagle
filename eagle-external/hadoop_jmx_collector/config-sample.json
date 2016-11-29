@@ -1,29 +1,46 @@
 {
   "env": {
-    "site": "sandbox",
-    "name_node": {
-      "hosts":["sandbox.hortonworks.com"],
-      "port":50070,
-      "https":false
+    "site": "sandbox"
+  },
+  "input": [
+    {
+      "component": "namenode",
+      "host": "sandbox.hortonworks.com",
+      "port": "50070",
+      "https": false
     },
-    "resource_manager":{
-      "hosts":["sandbox.hortonworks.com"],
-      "port":50030,
-      "https":false
+    {
+      "component": "namenode",
+      "host": "sandbox.hortonworks.com",
+      "port": "50070",
+      "https": false
+    },
+    {
+      "component": "resourcemanager",
+      "host": "sandbox.hortonworks.com",
+      "port": "8088",
+      "https": false
+    },
+    {
+      "component": "resourcemanager",
+      "host": "sandbox.hortonworks.com",
+      "port": "8088",
+      "https": false
     }
-  },
-  "input": {
-    "component": "namenode",
-    "port": "50070",
-    "https": false
-  },
+  ],
   "filter": {
     "monitoring.group.selected": ["hadoop", "java.lang"]
   },
   "output": {
     "kafka": {
-      "topic": "nn_jmx_metric_sandbox",
-      "brokerList": ["sandbox.hortonworks.com:6667"]
+      "default_topic": "nn_jmx_metric_sandbox",
+      "component_topic_mapping": {
+        "namenode": "nn_jmx_metric_sandbox",
+        "resourcemanager": "rm_jmx_metric_sandbox"
+      },
+      "broker_list": [
+        "sandbox.hortonworks.com:6667"
+      ]
     }
   }
 }
