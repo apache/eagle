@@ -82,6 +82,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             LOG.warn("PublishPartition {} has problems while initializing publish plugin", partition);
             return;
         }
+        event.ensureAlertId();
         try {
             LOG.debug("Execute alert publisher {}", plugin.getClass().getCanonicalName());
             plugin.onAlert(event);
