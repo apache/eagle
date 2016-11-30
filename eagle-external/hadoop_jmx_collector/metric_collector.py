@@ -164,7 +164,7 @@ class YarnWSReader:
         self.https = https
 
     def read_cluster_info(self):
-        cluster_info = Helper.http_get(self.host, self.port, self.https, "/ws/v1/cluster/info")
+        cluster_info = Helper.http_get(self.host, self.port, self.https, "/ws/v1/cluster/info?anonymous=true")
         logging.debug(cluster_info)
         return json.loads(cluster_info)
 
