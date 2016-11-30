@@ -24,6 +24,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
+import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.zookeeper.CreateMode;
 import org.junit.AfterClass;
@@ -36,6 +37,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -60,6 +66,7 @@ public class MRRunningJobManagerTest {
     private static MRRunningJobConfig.EndpointConfig endpointConfig;
     private static MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private static org.slf4j.Logger log = mock(org.slf4j.Logger.class);
+    private static final int BUFFER_SIZE = 4096;
 
     @BeforeClass
     public static void setupZookeeper() throws Exception {
@@ -115,6 +122,88 @@ public class MRRunningJobManagerTest {
         verify(log, never()).error(anyString(), anyString(), anyString());
         verify(log, never()).error(anyString(), any(Throwable.class));
 
+    }
+
+    @Test
+    public void testMRRunningJobManagerRecoverYarnAppWithLock() throws Exception {
+
+        if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
+            curator.create()
+                .creatingParentsIfNeeded()
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(SHARE_RESOURCES);
+        }
+
+        Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
+
+        curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
+
+        ExecutorService service = Executors.newFixedThreadPool(QTY);
+        for (int i = 0; i < QTY; ++i) {
+            Callable<Void> task = () -> {
+                try {
+                    MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
+                    for (int j = 0; j < REPETITIONS; ++j) {
+                        mrRunningJobManager.recoverYarnApp("yarnAppId");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // log or do something
+                }
+                return null;
+            };
+            service.submit(task);
+        }
+
+        service.shutdown();
+        service.awaitTermination(10, TimeUnit.MINUTES);
+        verify(log, never()).error(anyString(), any(Throwable.class));
+    }
+
+    @Test
+    public void testMRRunningJobManagerRecoverWithLock() throws Exception {
+
+        if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
+            curator.create()
+                .creatingParentsIfNeeded()
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(SHARE_RESOURCES);
+        }
+
+        Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
+        curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
+        ExecutorService service = Executors.newFixedThreadPool(QTY);
+        for (int i = 0; i < QTY; ++i) {
+            Callable<Void> task = () -> {
+                try {
+                    MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
+                    for (int j = 0; j < REPETITIONS; ++j) {
+                        mrRunningJobManager.recover();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // log or do something
+                }
+                return null;
+            };
+            service.submit(task);
+        }
+
+        service.shutdown();
+        service.awaitTermination(10, TimeUnit.MINUTES);
+        verify(log, never()).error(anyString(), any(Throwable.class));
+    }
+
+    private byte[] generateZkSetData() throws IOException {
+        InputStream jsonstream = this.getClass().getResourceAsStream("/jobInfo_805.json");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] data = new byte[BUFFER_SIZE];
+        int count = -1;
+        while((count = jsonstream.read(data, 0, BUFFER_SIZE)) != -1) {
+            outputStream.write(data, 0, count);
+        }
+        data = null;
+        return outputStream.toByteArray();
     }
 
 }

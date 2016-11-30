@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.util.jobrecover;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,7 +29,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.*;
 
@@ -77,50 +75,66 @@ public class RunningJobManager implements Serializable {
     public Map<String, Pair<Map<String, String>, AppInfo>> recoverYarnApp(String yarnAppId) throws Exception {
         Map<String, Pair<Map<String, String>, AppInfo>> result = new HashMap<>();
         String path = this.zkRoot + "/" + yarnAppId;
-        List<String> jobIds = curator.getChildren().forPath(path);
-        if (jobIds.size() == 0) {
-            LOG.info("delete empty path {}", path);
-            delete(yarnAppId);
-        }
-
-        for (String jobId : jobIds) {
-            String jobPath = path + "/" + jobId;
-            LOG.info("recover path {}", jobPath);
-            String fields = new String(curator.getData().forPath(jobPath), "UTF-8");
-            if (fields.length() == 0) {
-                //LOG.info("delete empty path {}", jobPath);
-                //delete(yarnAppId, jobId);
-                continue;
+        try {
+            lock.acquire();
+            if (curator.checkExists().forPath(path) == null) {
+                return result;
             }
-            JSONObject object = new JSONObject(fields);
-            Map<String, Map<String, String>> parseResult = parse(object);
+            List<String> jobIds = curator.getChildren().forPath(path);
+            if (jobIds.size() == 0) {
+                LOG.info("delete empty path {}", path);
+                delete(yarnAppId);
+            }
 
-            Map<String, String> appInfoMap = parseResult.get(APP_INFO_KEY);
-            AppInfo appInfo = new AppInfo();
-            appInfo.setId(appInfoMap.get("id"));
-            appInfo.setUser(appInfoMap.get("user"));
-            appInfo.setName(appInfoMap.get("name"));
-            appInfo.setQueue(appInfoMap.get("queue"));
-            appInfo.setState(appInfoMap.get("state"));
-            appInfo.setFinalStatus(appInfoMap.get("finalStatus"));
-            appInfo.setProgress(Double.parseDouble(appInfoMap.get("progress")));
-            appInfo.setTrackingUI(appInfoMap.get("trackingUI"));
-            appInfo.setDiagnostics(appInfoMap.get("diagnostics"));
-            appInfo.setTrackingUrl(appInfoMap.get("trackingUrl"));
-            appInfo.setClusterId(appInfoMap.get("clusterId"));
-            appInfo.setApplicationType(appInfoMap.get("applicationType"));
-            appInfo.setStartedTime(Long.parseLong(appInfoMap.get("startedTime")));
-            appInfo.setFinishedTime(Long.parseLong(appInfoMap.get("finishedTime")));
-            appInfo.setElapsedTime(Long.parseLong(appInfoMap.get("elapsedTime")));
-            appInfo.setAmContainerLogs(appInfoMap.get("amContainerLogs") == null ? "" : appInfoMap.get("amContainerLogs"));
-            appInfo.setAmHostHttpAddress(appInfoMap.get("amHostHttpAddress") == null ? "" : appInfoMap.get("amHostHttpAddress"));
-            appInfo.setAllocatedMB(Long.parseLong(appInfoMap.get("allocatedMB")));
-            appInfo.setAllocatedVCores(Integer.parseInt(appInfoMap.get("allocatedVCores")));
-            appInfo.setRunningContainers(Integer.parseInt(appInfoMap.get("runningContainers")));
+            for (String jobId : jobIds) {
+                String jobPath = path + "/" + jobId;
+                LOG.info("recover path {}", jobPath);
+                String fields = new String(curator.getData().forPath(jobPath), "UTF-8");
+                if (fields.length() == 0) {
+                    //LOG.info("delete empty path {}", jobPath);
+                    //delete(yarnAppId, jobId);
+                    continue;
+                }
+                JSONObject object = new JSONObject(fields);
+                Map<String, Map<String, String>> parseResult = parse(object);
 
-            Map<String, String> tags = parseResult.get(ENTITY_TAGS_KEY);
-            result.put(jobId, Pair.of(tags, appInfo));
+                Map<String, String> appInfoMap = parseResult.get(APP_INFO_KEY);
+                AppInfo appInfo = new AppInfo();
+                appInfo.setId(appInfoMap.get("id"));
+                appInfo.setUser(appInfoMap.get("user"));
+                appInfo.setName(appInfoMap.get("name"));
+                appInfo.setQueue(appInfoMap.get("queue"));
+                appInfo.setState(appInfoMap.get("state"));
+                appInfo.setFinalStatus(appInfoMap.get("finalStatus"));
+                appInfo.setProgress(Double.parseDouble(appInfoMap.get("progress")));
+                appInfo.setTrackingUI(appInfoMap.get("trackingUI"));
+                appInfo.setDiagnostics(appInfoMap.get("diagnostics"));
+                appInfo.setTrackingUrl(appInfoMap.get("trackingUrl"));
+                appInfo.setClusterId(appInfoMap.get("clusterId"));
+                appInfo.setApplicationType(appInfoMap.get("applicationType"));
+                appInfo.setStartedTime(Long.parseLong(appInfoMap.get("startedTime")));
+                appInfo.setFinishedTime(Long.parseLong(appInfoMap.get("finishedTime")));
+                appInfo.setElapsedTime(Long.parseLong(appInfoMap.get("elapsedTime")));
+                appInfo.setAmContainerLogs(appInfoMap.get("amContainerLogs") == null ? "" : appInfoMap.get("amContainerLogs"));
+                appInfo.setAmHostHttpAddress(appInfoMap.get("amHostHttpAddress") == null ? "" : appInfoMap.get("amHostHttpAddress"));
+                appInfo.setAllocatedMB(Long.parseLong(appInfoMap.get("allocatedMB")));
+                appInfo.setAllocatedVCores(Integer.parseInt(appInfoMap.get("allocatedVCores")));
+                appInfo.setRunningContainers(Integer.parseInt(appInfoMap.get("runningContainers")));
+
+                Map<String, String> tags = parseResult.get(ENTITY_TAGS_KEY);
+                result.put(jobId, Pair.of(tags, appInfo));
+            }
+        } catch (Exception e) {
+            LOG.error("fail to recoverYarnApp", e);
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                lock.release();
+            } catch (Exception e) {
+                LOG.error("fail releasing lock", e);
+            }
         }
+
         return result;
     }
 
@@ -133,6 +147,7 @@ public class RunningJobManager implements Serializable {
         //<yarnAppId, <jobId, Pair<<Map<String, String>, AppInfo>>>
         Map<String, Map<String, Pair<Map<String, String>, AppInfo>>> result = new HashMap<>();
         try {
+            lock.acquire();
             List<String> yarnAppIds = curator.getChildren().forPath(this.zkRoot);
             for (String yarnAppId : yarnAppIds) {
                 if (!result.containsKey(yarnAppId)) {
@@ -144,6 +159,12 @@ public class RunningJobManager implements Serializable {
         } catch (Exception e) {
             LOG.error("fail to recover", e);
             throw new RuntimeException(e);
+        } finally {
+            try {
+                lock.release();
+            } catch (Exception e) {
+                LOG.error("fail releasing lock", e);
+            }
         }
         return result;
     }
