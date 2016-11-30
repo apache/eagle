@@ -30,7 +30,6 @@ import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.PathParam;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.HashMap;

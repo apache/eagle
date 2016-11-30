@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,11 +41,11 @@ import java.util.stream.Collectors;
  */
 public class JdbcMetadataDaoImpl implements IMetadataDao {
     private static final Logger LOG = LoggerFactory.getLogger(JdbcMetadataDaoImpl.class);
-    private JdbcDatabaseHandler handler;
+    private JdbcMetadataHandler handler;
 
     @Inject
     public JdbcMetadataDaoImpl(Config config) {
-        handler = new JdbcDatabaseHandler(config.getConfig(MetadataUtils.META_DATA));
+        handler = new JdbcMetadataHandler(config.getConfig(MetadataUtils.META_DATA));
     }
 
     @Override
@@ -76,7 +75,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<Publishment> listPublishment() {
-        return handler.list(Publishment.class);
+        return handler.listPublishments();
     }
 
     @Override
@@ -88,9 +87,17 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
         return result.subList(result.size() - size, result.size());
     }
 
+    public PolicyDefinition getPolicyById(String policyId) {
+        return handler.queryById(PolicyDefinition.class, policyId);
+    }
+
+    public List<Publishment> getPublishmentsByPolicyId(String policyId) {
+        return handler.getPublishmentsByPolicyId(policyId);
+    }
+
     @Override
     public AlertPublishEvent getAlertPublishEvent(String alertId) {
-        return handler.listWithFilter(alertId, AlertPublishEvent.class);
+        return handler.getAlertEventById(alertId);
     }
 
     @Override
@@ -105,13 +112,13 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public ScheduleState getScheduleState(String versionId) {
-        return handler.listWithFilter(versionId, ScheduleState.class);
+        return handler.queryById(ScheduleState.class, versionId);
     }
 
     @Override
     public ScheduleState getScheduleState() {
         List<ScheduleState> scheduleStates =
-                handler.listOrderBy(ScheduleState.class, JdbcDatabaseHandler.SortType.DESC.toString());
+                handler.listOrderBy(ScheduleState.class, JdbcMetadataHandler.SortType.DESC.toString());
         if (scheduleStates.isEmpty()) {
             return null;
         } else {
@@ -146,7 +153,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult addAlertPublishEvent(AlertPublishEvent event) {
-        return handler.addOrReplace(AlertPublishEvent.class.getSimpleName(), event);
+        return handler.addAlertEvent(event);
     }
 
     @Override
@@ -167,6 +174,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public OpResult addPublishment(Publishment publishment) {
         return handler.addOrReplace(Publishment.class.getSimpleName(), publishment);
+    }
+
+    @Override
+    public OpResult addPublishmentsToPolicy(String policyId, List<String> publishmentIds) {
+        return handler.addPublishmentsToPolicy(policyId, publishmentIds);
     }
 
     @Override
@@ -196,37 +208,37 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult removeTopology(String topologyName) {
-        return handler.remove(Topology.class.getSimpleName(), topologyName);
+        return handler.removeById(Topology.class.getSimpleName(), topologyName);
     }
 
     @Override
     public OpResult removeCluster(String clusterId) {
-        return handler.remove(StreamingCluster.class.getSimpleName(), clusterId);
+        return handler.removeById(StreamingCluster.class.getSimpleName(), clusterId);
     }
 
     @Override
     public OpResult removeStream(String streamId) {
-        return handler.remove(StreamDefinition.class.getSimpleName(), streamId);
+        return handler.removeById(StreamDefinition.class.getSimpleName(), streamId);
     }
 
     @Override
     public OpResult removeDataSource(String datasourceId) {
-        return handler.remove(Kafka2TupleMetadata.class.getSimpleName(), datasourceId);
+        return handler.removeById(Kafka2TupleMetadata.class.getSimpleName(), datasourceId);
     }
 
     @Override
     public OpResult removePolicy(String policyId) {
-        return handler.remove(PolicyDefinition.class.getSimpleName(), policyId);
+        return handler.removeById(PolicyDefinition.class.getSimpleName(), policyId);
     }
 
     @Override
     public OpResult removePublishment(String pubId) {
-        return handler.remove(Publishment.class.getSimpleName(), pubId);
+        return handler.removeById(Publishment.class.getSimpleName(), pubId);
     }
 
     @Override
     public OpResult removePublishmentType(String pubType) {
-        return handler.remove(PublishmentType.class.getSimpleName(), pubType);
+        return handler.removeById(PublishmentType.class.getSimpleName(), pubType);
     }
 
     @Override
