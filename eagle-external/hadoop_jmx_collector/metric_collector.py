@@ -313,7 +313,6 @@ class JmxMetricCollector(MetricCollector):
                 input["https"] = False
 
         self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
-        self.listeners = []
 
     def register(self, *listeners):
         """
@@ -351,7 +350,6 @@ class JmxMetricCollector(MetricCollector):
         context = bean.get("tag.Context", "")
         metric_prefix_name = self.__build_metric_prefix(mbean_attribute, context)
 
-        # print kafka_dict
         for key, value in bean.iteritems():
             self.on_bean_kv(metric_prefix_name, component,key, value)
 
