@@ -161,7 +161,7 @@ public class TestStreamRouterBoltOutputCollector {
         TopologyContext context = Mockito.mock(TopologyContext.class);
         when(context.registerMetric(any(String.class), any(MultiCountMetric.class), any(int.class))).thenReturn(new MultiCountMetric());
         StreamContext streamContext = new StreamContextImpl(null, context.registerMetric("eagle.router", new MultiCountMetric(), 60), context);
-        StreamRouterBoltOutputCollector collector = new StreamRouterBoltOutputCollector("test", new StormOutputCollector(delegate, null), null, streamContext);
+        StreamRouterBoltOutputCollector collector = new StreamRouterBoltOutputCollector("test", new StormOutputCollector(new OutputCollector(delegate), null), null, streamContext);
 
         // add a StreamRouterSpec which has one worker
         collector.onStreamRouterSpecChange(list1, new ArrayList<>(), new ArrayList<>(), sds);

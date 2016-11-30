@@ -38,6 +38,7 @@ import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorWrap
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
+import org.apache.eagle.alert.engine.router.impl.StormOutputCollector;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.engine.utils.SingletonExecutor;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
@@ -102,7 +103,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 pe.getEvent().setMetaVersion(specVersion);
             } else if (streamEventVersion != null && !streamEventVersion.equals(specVersion)) {
                 if (specVersion != null && streamEventVersion != null
-                    && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
+                        && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
                     // check if specVersion is older than stream_event_version
                     // Long timestamp_of_specVersion = Long.valueOf(specVersion.split("spec_version_")[1]);
                     // Long timestamp_of_streamEventVersion = Long.valueOf(stream_event_version.split("spec_version_")[1]);
@@ -161,7 +162,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // instantiate output lock object
         outputLock = new Object();
         streamContext = new StreamContextImpl(config, context.registerMetric("eagle.evaluator", new MultiCountMetric(), 60), context);
-        alertOutputCollector = new AlertBoltOutputCollectorWrapper(collector, outputLock, streamContext);
+        alertOutputCollector = new AlertBoltOutputCollectorWrapper(new StormOutputCollector(collector), outputLock, streamContext);
         policyGroupEvaluator.init(streamContext, alertOutputCollector);
         metadataChangeNotifyService.registerListener(this);
         metadataChangeNotifyService.init(config, MetadataType.ALERT_BOLT);

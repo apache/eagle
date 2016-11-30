@@ -17,21 +17,26 @@
 
 package org.apache.eagle.alert.engine.router.impl;
 
-import backtype.storm.task.IOutputCollector;
+import backtype.storm.task.OutputCollector;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.StreamOutputCollector;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 
 import java.util.Collections;
+import java.util.List;
 
 public class StormOutputCollector implements StreamOutputCollector {
 
-    private final IOutputCollector outputCollector;
+    private final OutputCollector outputCollector;
     private final PartitionedEventSerializer serializer;
 
-    public StormOutputCollector(IOutputCollector outputCollector, PartitionedEventSerializer serializer) {
+    public StormOutputCollector(OutputCollector outputCollector, PartitionedEventSerializer serializer) {
         this.outputCollector = outputCollector;
         this.serializer = serializer;
+    }
+
+    public StormOutputCollector(OutputCollector outputCollector) {
+        this(outputCollector, null);
     }
 
     @Override
@@ -41,6 +46,11 @@ public class StormOutputCollector implements StreamOutputCollector {
         } else {
             outputCollector.emit(streamId, Collections.singletonList(partitionedEvent.getAnchor()), Collections.singletonList(serializer.serialize(partitionedEvent)));
         }
+    }
+
+    @Override
+    public void emit(List<Object> tuple) {
+        outputCollector.emit(tuple);
     }
 
     @Override

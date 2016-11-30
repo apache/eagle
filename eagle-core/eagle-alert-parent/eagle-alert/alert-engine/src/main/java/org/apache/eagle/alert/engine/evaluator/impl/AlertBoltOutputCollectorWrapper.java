@@ -25,22 +25,22 @@ import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.router.StreamOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.task.OutputCollector;
 
 public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertBoltOutputCollectorWrapper.class);
 
-    private final OutputCollector delegate;
+    private final StreamOutputCollector delegate;
     private final Object outputLock;
     private final StreamContext streamContext;
 
     private volatile Set<PublishPartition> publishPartitions;
 
-    public AlertBoltOutputCollectorWrapper(OutputCollector outputCollector, Object outputLock,
+    public AlertBoltOutputCollectorWrapper(StreamOutputCollector outputCollector, Object outputLock,
                                            StreamContext streamContext) {
         this.delegate = outputCollector;
         this.outputLock = outputLock;

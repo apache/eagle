@@ -18,7 +18,7 @@ package org.apache.eagle.alert.engine.evaluator.impl;
 
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import backtype.storm.task.OutputCollector;
+import org.apache.eagle.alert.engine.router.StreamOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +40,14 @@ import java.util.concurrent.atomic.AtomicLong;
  * </ul>
  */
 public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCollector {
-    private final OutputCollector delegate;
+    private final StreamOutputCollector delegate;
     private final LinkedBlockingQueue<AlertStreamEvent> queue;
     private static final Logger LOG = LoggerFactory.getLogger(AlertBoltOutputCollectorThreadSafeWrapper.class);
     private final AtomicLong lastFlushTime = new AtomicLong(System.currentTimeMillis());
     private final AutoAlertFlusher flusher;
     private static final int MAX_ALERT_DELAY_SECS = 10;
 
-    public AlertBoltOutputCollectorThreadSafeWrapper(OutputCollector outputCollector) {
+    public AlertBoltOutputCollectorThreadSafeWrapper(StreamOutputCollector outputCollector) {
         this.delegate = outputCollector;
         this.queue = new LinkedBlockingQueue<>();
         this.flusher = new AutoAlertFlusher(this);

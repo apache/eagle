@@ -19,9 +19,13 @@ package org.apache.eagle.alert.engine.router;
 
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 
+import java.util.List;
+
 
 public interface StreamOutputCollector {
     void emit(String streamId, PartitionedEvent partitionedEvent) throws Exception;
+
+    void emit(List<Object> tuple);
 
     void ack(PartitionedEvent partitionedEvent);
 
