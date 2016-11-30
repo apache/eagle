@@ -39,6 +39,7 @@ public class PolicyDefinition implements Serializable {
     private Definition definition;
     private Definition stateDefinition;
     private PolicyStatus policyStatus = PolicyStatus.ENABLED;
+    private AlertTemplateDefinition alertTemplate;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -168,6 +169,14 @@ public class PolicyDefinition implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public AlertTemplateDefinition getAlertTemplate() {
+        return alertTemplate;
+    }
+
+    public void setAlertTemplate(AlertTemplateDefinition alertTemplate) {
+        this.alertTemplate = alertTemplate;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

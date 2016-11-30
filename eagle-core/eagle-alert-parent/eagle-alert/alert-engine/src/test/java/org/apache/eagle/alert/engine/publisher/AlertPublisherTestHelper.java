@@ -30,7 +30,7 @@ public class AlertPublisherTestHelper {
 
     public static AlertStreamEvent mockEvent(String policyId){
         StreamDefinition stream = createStream();
-        PolicyDefinition policy = createPolicy(stream.getStreamId(), policyId);
+        PolicyDefinition policy = createPolicyGroupByStreamId(stream.getStreamId(), policyId);
         return  createEvent(stream, policy,
             new Object[] {System.currentTimeMillis(), "host1", "testPolicy-host1-01", "open", 0, 0});
     }
@@ -84,7 +84,7 @@ public class AlertPublisherTestHelper {
         return sd;
     }
 
-    public static  PolicyDefinition createPolicy(String streamName, String policyName) {
+    public static  PolicyDefinition createPolicyGroupByStreamId(String streamName, String policyName) {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         // expression, something like "PT5S,dynamic,1,host"
@@ -103,4 +103,5 @@ public class AlertPublisherTestHelper {
         pd.addPartition(sp);
         return pd;
     }
+
 }
