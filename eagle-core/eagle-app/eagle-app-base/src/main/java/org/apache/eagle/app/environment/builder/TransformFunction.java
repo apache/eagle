@@ -5,20 +5,26 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.environment.builder;
 
-import org.apache.eagle.app.ApplicationLifecycle;
-import org.apache.eagle.metadata.model.StreamSinkConfig;
+import java.io.Serializable;
+import java.util.Map;
 
-public interface StreamSink<T extends StreamSinkConfig> extends ApplicationLifecycle {
-    void init(String streamId,T config);
+public interface TransformFunction extends Serializable {
+    String getName();
+
+    void open(Collector collector);
+
+    void transform(Map event);
+
+    void close();
 }

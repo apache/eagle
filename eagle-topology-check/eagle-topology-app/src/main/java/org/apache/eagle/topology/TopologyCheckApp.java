@@ -23,7 +23,7 @@ import backtype.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.sink.StormStreamSink;
+import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.topology.storm.HealthCheckParseBolt;
 import org.apache.eagle.topology.storm.TopologyCheckAppSpout;
 import org.apache.eagle.topology.storm.TopologyDataPersistBolt;

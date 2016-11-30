@@ -45,7 +45,7 @@ public class JDBCDataSourceProvider implements Provider<DataSource> {
             @Override
             public void run() {
                 try {
-                    LOGGER.info("Shutting down data source");
+                    LOGGER.info("Shutting down data fromStream");
                     datasource.close();
                 } catch (SQLException e) {
                     LOGGER.error("SQLException: {}", e.getMessage(), e);

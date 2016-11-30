@@ -28,7 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
 
 /**
- * Application Service Provider Interface.
+ * Application Service KafkaStreamMessaging Interface.
  *
  * @param <T> Application Type.
  */

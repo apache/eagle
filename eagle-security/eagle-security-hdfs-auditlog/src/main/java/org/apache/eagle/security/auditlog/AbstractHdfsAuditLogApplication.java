@@ -24,18 +24,16 @@ import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.sink.StormStreamSink;
+import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.partition.*;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
-import storm.kafka.StringScheme;
 
 /**
  * Since 8/10/16.

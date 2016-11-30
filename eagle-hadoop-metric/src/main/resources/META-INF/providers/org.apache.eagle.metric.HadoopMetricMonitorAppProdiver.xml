@@ -21,7 +21,7 @@
     <name>Hadoop JMX Metric Monitor</name>
     <version>0.5.0-incubating</version>
     <configuration>
-        <!-- data source configurations -->
+        <!-- data fromStream configurations -->
         <property>
             <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
             <displayName>JMX Metric Kafka Topic</displayName>
@@ -41,8 +41,6 @@
         <stream>
             <streamId>HADOOP_JMX_METRIC_STREAM</streamId>
             <description>Hadoop JMX Metric Stream including name node, resource manager, etc.</description>
-            <validate>true</validate>
-            <timeseries>true</timeseries>
             <columns>
                 <column>
                     <name>host</name>

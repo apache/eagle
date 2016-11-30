@@ -25,7 +25,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.sink.StormStreamSink;
+import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
 import storm.kafka.StringScheme;
 

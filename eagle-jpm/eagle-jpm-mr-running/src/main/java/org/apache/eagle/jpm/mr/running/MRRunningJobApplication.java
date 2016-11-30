@@ -32,7 +32,7 @@ import java.util.List;
 public class MRRunningJobApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        //1. trigger init conf
+        //1. trigger prepare conf
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
 
         String[] confKeyPatternsSplit = mrRunningJobConfig.getConfig().getString("MRConfigureKeys.jobConfigKey").split(",");
@@ -46,7 +46,7 @@ public class MRRunningJobApplication extends StormApplication {
         confKeyKeys.add(Constants.JobConfiguration.SCOOBI_JOB);
         confKeyKeys.add(0, mrRunningJobConfig.getConfig().getString("MRConfigureKeys.jobNameKey"));
 
-        //2. init topology
+        //2. prepare topology
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrRunningJobFetchSpout";
         String boltName = "mrRunningJobParseBolt";

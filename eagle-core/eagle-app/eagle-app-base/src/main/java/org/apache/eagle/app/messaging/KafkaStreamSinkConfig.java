@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.messaging;
 
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
+/**
+ * FIXME Rename to KafkaStreamMessagingConfig.
+ */
 public class KafkaStreamSinkConfig implements StreamSinkConfig {
+    // Write Config
     private String topicId;
     private String brokerList;
     private String serializerClass;
@@ -106,4 +110,6 @@ public class KafkaStreamSinkConfig implements StreamSinkConfig {
     public Class<? extends StreamSinkConfig> getConfigType() {
         return KafkaStreamSinkConfig.class;
     }
+
+
 }

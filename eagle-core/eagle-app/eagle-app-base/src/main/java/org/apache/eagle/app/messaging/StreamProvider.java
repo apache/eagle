@@ -14,29 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app.messaging;
 
-import org.apache.eagle.metadata.model.StreamSinkConfig;
 import com.typesafe.config.Config;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
+import org.apache.eagle.metadata.model.StreamSourceConfig;
 
 import java.lang.reflect.ParameterizedType;
 
-public interface StreamSinkProvider<S extends StreamSink<D>, D extends StreamSinkConfig> {
-    D getSinkConfig(String streamId, Config config);
+/**
+ * Stream Messaging Bus.
+ */
+public interface StreamProvider<W extends StreamSink<C>, C extends StreamSinkConfig,
+        R extends StreamSource<F>, F extends StreamSourceConfig> {
 
-    S getSink();
+    C getSinkConfig(String streamId, Config config);
 
-    default S getSink(String streamId, Config config) {
-        S s = getSink();
+    W getSink();
+
+    default W getSink(String streamId, Config config) {
+        W s = getSink();
         s.init(streamId, getSinkConfig(streamId, config));
         return s;
     }
 
-    default Class<? extends S> getSinkType() {
-        return (Class<S>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    }
+    F getSourceConfig(String streamId, Config config);
 
-    default Class<? extends D> getSinkConfigType() {
-        return (Class<D>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    R getSource();
+
+    default R getSource(String streamId, Config config) {
+        R i = getSource();
+        i.init(streamId, getSourceConfig(streamId, config));
+        return i;
     }
 }
