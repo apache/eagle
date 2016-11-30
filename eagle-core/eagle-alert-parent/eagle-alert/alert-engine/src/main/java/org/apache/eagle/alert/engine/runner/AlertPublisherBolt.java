@@ -25,6 +25,8 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngineFactory;
 import org.apache.eagle.alert.utils.AlertConstants;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -49,6 +51,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private volatile Map<String, Publishment> cachedPublishments = new HashMap<>();
     private volatile Map<String, PolicyDefinition> policyDefinitionMap;
     private volatile Map<String, StreamDefinition> streamDefinitionMap;
+    private AlertTemplateEngine alertTemplateEngine;
 
     private boolean logEventEnabled;
     private TopologyContext context;
@@ -64,6 +67,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
 
     @Override
     public void internalPrepare(OutputCollector collector, IMetadataChangeNotifyService coordinatorService, Config config, TopologyContext context) {
+        alertTemplateEngine = AlertTemplateEngineFactory.createAlertTemplateEngine();
         coordinatorService.registerListener(this);
         coordinatorService.init(config, MetadataType.ALERT_PUBLISH_BOLT);
         this.alertPublisher.init(config, stormConf);
@@ -74,18 +78,18 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     @Override
     public void execute(Tuple input) {
         try {
-            streamContext.counter().scope("receive_count");
+            streamContext.counter().incr("receive_count");
             PublishPartition partition = (PublishPartition) input.getValueByField(AlertConstants.FIELD_0);
             AlertStreamEvent event = (AlertStreamEvent) input.getValueByField(AlertConstants.FIELD_1);
             if (logEventEnabled) {
                 LOG.info("Alert publish bolt {}/{} with partition {} received event: {}", this.getBoltId(), this.context.getThisTaskId(), partition, event);
             }
-            wrapAlertPublishEvent(event);
+            wrapAlertEvent(event);
             alertPublisher.nextEvent(partition, event);
             this.collector.ack(input);
-            streamContext.counter().scope("ack_count");
+            streamContext.counter().incr("ack_count");
         } catch (Exception ex) {
-            streamContext.counter().scope("fail_count");
+            streamContext.counter().incr("fail_count");
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         }
@@ -131,30 +135,61 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
 
     @Override
     public void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
+        List<String> policyToRemove = new ArrayList<>();
+        for (String policyId: this.policyDefinitionMap.keySet()) {
+            if (!pds.containsKey(policyId)) {
+                policyToRemove.add(policyId);
+            }
+        }
+
         this.policyDefinitionMap = pds;
         this.streamDefinitionMap = sds;
+
+        for (Map.Entry<String, PolicyDefinition> entry : pds.entrySet()) {
+            try {
+                this.alertTemplateEngine.register(entry.getValue());
+            } catch (Throwable throwable) {
+                LOG.error("Failed to register policy {} in template engine", entry.getKey(), throwable);
+            }
+        }
+
+        for (String policyId : policyToRemove) {
+            try {
+                this.alertTemplateEngine.unregister(policyId);
+            } catch (Throwable throwable) {
+                LOG.error("Failed to unregister policy {} from template engine", policyId, throwable);
+            }
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    private void wrapAlertPublishEvent(AlertStreamEvent event) {
-        Map<String, Object> extraData = new HashedMap();
+    private void wrapAlertEvent(AlertStreamEvent event) {
+        Map<String, Object> extraData = new HashMap<>();
         List<String> appIds = new ArrayList<>();
         if (policyDefinitionMap == null || streamDefinitionMap == null) {
             LOG.warn("policyDefinitions or streamDefinitions in publisher bolt have not been initialized");
-            return;
-        }
-        PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
-        if (this.policyDefinitionMap != null && policyDefinition != null) {
-            for (String inputStreamId : policyDefinition.getInputStreams()) {
-                StreamDefinition sd = this.streamDefinitionMap.get(inputStreamId);
-                if (sd != null) {
-                    extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());
-                    appIds.add(sd.getDataSource());
+        } else {
+            PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
+            if (this.policyDefinitionMap != null && policyDefinition != null) {
+                for (String inputStreamId : policyDefinition.getInputStreams()) {
+                    StreamDefinition sd = this.streamDefinitionMap.get(inputStreamId);
+                    if (sd != null) {
+                        extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());
+                        appIds.add(sd.getDataSource());
+                    }
                 }
+                extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);
+                extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, policyDefinition.getDefinition().getValue());
             }
-            extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);
-            extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, policyDefinition.getDefinition().getValue());
+            event.setExtraData(extraData);
         }
-        event.setExtraData(extraData);
+    }
+
+    /**
+     * TODO: Refactor wrapAlertPublishEvent into alertTemplateEngine and remove extraData from AlertStreamEvent.
+     */
+    @SuppressWarnings("unchecked")
+    private AlertPublishEvent renderAlertPublishEvent(AlertStreamEvent event) {
+        wrapAlertEvent(event);
+        return this.alertTemplateEngine.renderAlert(event);
     }
 }

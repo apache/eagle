@@ -21,6 +21,8 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
+import java.util.Collection;
+
 /**
  * Alert Message Template Engine.
  */
@@ -32,4 +34,6 @@ public interface AlertTemplateEngine {
     void unregister(String policyId);
 
     AlertPublishEvent renderAlert(AlertStreamEvent event);
+
+    Collection<PolicyDefinition> getPolicies();
 }

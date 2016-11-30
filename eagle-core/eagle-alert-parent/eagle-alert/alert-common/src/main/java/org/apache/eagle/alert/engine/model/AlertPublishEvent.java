@@ -37,6 +37,9 @@ public class AlertPublishEvent {
     private Map<String, Object> alertData;
     private String alertSubject;
     private String alertBody;
+    private String streamId;
+    private String createdBy;
+    private long createdTime;
 
     public static final String ALERT_ID_KEY = "alertId";
     public static final String SITE_ID_KEY = "siteId";
@@ -107,6 +110,9 @@ public class AlertPublishEvent {
         alertEvent.setAlertId(event.getAlertId());
         alertEvent.setPolicyId(event.getPolicyId());
         alertEvent.setAlertTimestamp(event.getCreatedTime());
+        alertEvent.setStreamId(event.getStreamId());
+        alertEvent.setCreatedBy(event.getCreatedBy());
+        alertEvent.setCreatedTime(event.getCreatedTime());
         if (event.getExtraData() != null && !event.getExtraData().isEmpty()) {
             alertEvent.setSiteId(event.getExtraData().get(SITE_ID_KEY).toString());
             alertEvent.setPolicyValue(event.getExtraData().get(POLICY_VALUE_KEY).toString());
@@ -140,5 +146,29 @@ public class AlertPublishEvent {
 
     public void setAlertBody(String alertBody) {
         this.alertBody = alertBody;
+    }
+
+    public String getStreamId() {
+        return streamId;
+    }
+
+    public void setStreamId(String streamId) {
+        this.streamId = streamId;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
     }
 }

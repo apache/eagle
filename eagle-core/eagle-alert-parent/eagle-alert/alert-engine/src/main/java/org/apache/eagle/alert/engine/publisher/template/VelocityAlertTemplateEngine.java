@@ -23,7 +23,6 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.common.metric.AlertContext;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +70,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
 
     @Override
     public synchronized void register(PolicyDefinition policyDefinition) {
+        LOG.info("Registering {}", policyDefinition.getName());
         Preconditions.checkNotNull(policyDefinition.getName(), "policyId is null");
         AlertTemplateDefinition alertTemplateDefinition = policyDefinition.getAlertTemplate();
         if (alertTemplateDefinition == null) {
@@ -99,8 +100,10 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
 
     @Override
     public synchronized void unregister(String policyId) {
+        LOG.info("Unregistering {}", policyId);
         stringResourceRepository.removeStringResource(getAlertBodyTemplateName(policyId));
         stringResourceRepository.removeStringResource(getAlertSubjectTemplateName(policyId));
+        policyDefinitionRepository.remove(policyId);
     }
 
     @Override
@@ -132,6 +135,11 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             }
         }
         return publishEvent;
+    }
+
+    @Override
+    public synchronized Collection<PolicyDefinition> getPolicies() {
+        return policyDefinitionRepository.values();
     }
 
     private static VelocityContext buildAlertContext(PolicyDefinition policyDefinition, AlertStreamEvent event) {
