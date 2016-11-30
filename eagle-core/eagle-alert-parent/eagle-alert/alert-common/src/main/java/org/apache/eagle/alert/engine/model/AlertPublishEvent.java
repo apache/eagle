@@ -24,6 +24,9 @@ import org.apache.eagle.common.DateTimeUtil;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Use as final rich alert event.
+ */
 public class AlertPublishEvent {
     private String alertId;
     private String siteId;
@@ -32,6 +35,8 @@ public class AlertPublishEvent {
     private String policyValue;
     private long alertTimestamp;
     private Map<String, Object> alertData;
+    private String alertSubject;
+    private String alertBody;
 
     public static final String ALERT_ID_KEY = "alertId";
     public static final String SITE_ID_KEY = "siteId";
@@ -119,5 +124,21 @@ public class AlertPublishEvent {
             siteId,
             policyId,
             alertData.toString());
+    }
+
+    public String getAlertSubject() {
+        return alertSubject;
+    }
+
+    public void setAlertSubject(String alertSubject) {
+        this.alertSubject = alertSubject;
+    }
+
+    public String getAlertBody() {
+        return alertBody;
+    }
+
+    public void setAlertBody(String alertBody) {
+        this.alertBody = alertBody;
     }
 }

@@ -26,6 +26,7 @@ public class AlertContextFields {
     public static final String ALERT_TIMESTAMP = "ALERT_TIMESTAMP";
     public static final String ALERT_TIME = "ALERT_TIME";
     public static final String ALERT_SCHEMA = "ALERT_SCHEMA";
+    public static final String ALERT_STRING = "ALERT_STRING";
     public static final String POLICY_DESC = "POLICY_DESC";
     public static final String POLICY_TYPE = "POLICY_TYPE";
     public static final String POLICY_DEFINITION = "POLICY_DEFINITION";

@@ -18,15 +18,15 @@ package org.apache.eagle.alert.engine.coordinator;
 
 public class AlertTemplateDefinition {
     private TemplateType type = TemplateType.TEXT;
+    private String subjectTemplate;
+    private String bodyTemplate;
 
-    private String resource;
-
-    public String getResource() {
-        return resource;
+    public String getBodyTemplate() {
+        return bodyTemplate;
     }
 
-    public void setResource(String templateResource) {
-        this.resource = templateResource;
+    public void setBodyTemplate(String templateResource) {
+        this.bodyTemplate = templateResource;
     }
 
     public TemplateType getType() {
@@ -35,6 +35,14 @@ public class AlertTemplateDefinition {
 
     public void setType(TemplateType type) {
         this.type = type;
+    }
+
+    public String getSubjectTemplate() {
+        return subjectTemplate;
+    }
+
+    public void setSubjectTemplate(String subjectTemplate) {
+        this.subjectTemplate = subjectTemplate;
     }
 
     public enum TemplateType {

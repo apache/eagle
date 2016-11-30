@@ -18,6 +18,7 @@ package org.apache.eagle.alert.engine.publisher.template;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
 /**
@@ -30,5 +31,5 @@ public interface AlertTemplateEngine {
 
     void unregister(String policyId);
 
-    String renderAlert(AlertStreamEvent event);
+    AlertPublishEvent renderAlert(AlertStreamEvent event);
 }

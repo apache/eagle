@@ -21,6 +21,7 @@ import org.apache.eagle.alert.engine.coordinator.AlertTemplateDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,11 +36,12 @@ public class VelocityAlertTemplateEngineTest {
         AlertTemplateEngine templateEngine = new VelocityAlertTemplateEngine();
         templateEngine.init(ConfigFactory.load());
         templateEngine.register(mockPolicy("testPolicy"));
-        String alertMessage = templateEngine.renderAlert(mockAlertEvent("testPolicy"));
+        AlertPublishEvent publishEvent = templateEngine.renderAlert(mockAlertEvent("testPolicy"));
         Assert.assertEquals("Alert (2016-11-30 07:31:15): cpu usage on hadoop of cluster test_cluster at localhost is 0.98, " +
             "exceeding thread hold: 90%. (policy: testPolicy, description: Policy for monitoring cpu usage > 90%), " +
             "definition: from HADOOP_JMX_METRIC_STREAM[site == \"test_cluster\" and metric == \"cpu.usage\" and value > 0.9] " +
-            "select site, metric, host, role, value insert into capacityUsageAlert", alertMessage);
+            "select site, metric, host, role, value insert into capacityUsageAlert", publishEvent.getAlertBody());
+        Assert.assertEquals("Name Node Usage Exceed 90%, reach 98.0% now", publishEvent.getAlertSubject());
     }
 
     private static PolicyDefinition mockPolicy (String policyId) {
@@ -54,7 +56,8 @@ public class VelocityAlertTemplateEngineTest {
         pd.setName(policyId);
         pd.setDescription("Policy for monitoring cpu usage > 90%");
         AlertTemplateDefinition alertTemplateDefinition = new AlertTemplateDefinition();
-        alertTemplateDefinition.setResource("Alert ($CREATED_TIME): cpu usage on $role of cluster $site at $host is $value, exceeding thread hold: 90%. "
+        alertTemplateDefinition.setSubjectTemplate("Name Node Usage Exceed 90%, reach #set($usage_per = $value * 100)$usage_per% now");
+        alertTemplateDefinition.setBodyTemplate("Alert ($CREATED_TIME): cpu usage on $role of cluster $site at $host is $value, exceeding thread hold: 90%. "
                 + "(policy: $POLICY_ID, description: $POLICY_DESC), definition: $POLICY_DEFINITION");
         pd.setAlertTemplate(alertTemplateDefinition);
         return pd;
@@ -70,6 +73,7 @@ public class VelocityAlertTemplateEngineTest {
         event.setMetaVersion("SAMPLE_META_VERSION");
         event.setTimestamp(1480491075923L);
         event.setData(new Object[]{"test_cluster", "cpu.usage", "localhost", "hadoop", 0.98});
+        event.ensureAlertId();
         return event;
     }
 

@@ -20,8 +20,10 @@ import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.AlertTemplateDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.metric.AlertContext;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -38,6 +40,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
+    private static final String ALERT_BODY_TPL_PREFIX = "AlertBodyTemplate";
+    private static final String ALERT_SUBJECT_TPL_PREFIX = "AlertSubjectTemplate";
     private static final Logger LOG = LoggerFactory.getLogger(VelocityAlertTemplateEngine.class);
     private StringResourceRepository stringResourceRepository;
     private Map<String, PolicyDefinition> policyDefinitionRepository;
@@ -57,14 +61,36 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
         policyDefinitionRepository = new HashMap<>();
     }
 
+    private String getAlertBodyTemplateName(String policyId) {
+        return String.format("%s:%s", ALERT_BODY_TPL_PREFIX, policyId);
+    }
+    private String getAlertSubjectTemplateName(String policyId) {
+        return String.format("%s:%s", ALERT_SUBJECT_TPL_PREFIX, policyId);
+    }
+
     @Override
     public synchronized void register(PolicyDefinition policyDefinition) {
         Preconditions.checkNotNull(policyDefinition.getName(), "policyId is null");
         AlertTemplateDefinition alertTemplateDefinition = policyDefinition.getAlertTemplate();
-        Preconditions.checkNotNull(alertTemplateDefinition, "Alert template of policy of policy " + policyDefinition.getName() + "is null");
-        Preconditions.checkNotNull(alertTemplateDefinition.getResource(), "alertTemplateDefinition.resource is null");
-        if (alertTemplateDefinition.getType().equals(AlertTemplateDefinition.TemplateType.TEXT)) {
-            stringResourceRepository.putStringResource(policyDefinition.getName(), alertTemplateDefinition.getResource());
+        if (alertTemplateDefinition == null) {
+            LOG.warn("Subject template of policy {} is null, using policy name by default");
+            stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), policyDefinition.getName());
+
+            LOG.warn("Body template of policy {} is null, using $ALERT_STRING by default");
+            stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_STRING);
+        } else if (alertTemplateDefinition.getType().equals(AlertTemplateDefinition.TemplateType.TEXT)) {
+            if (alertTemplateDefinition.getSubjectTemplate() != null) {
+                stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), alertTemplateDefinition.getSubjectTemplate());
+            } else {
+                LOG.warn("Subject template of policy {} is null, using policy name by default");
+                stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), policyDefinition.getName());
+            }
+            if (alertTemplateDefinition.getBodyTemplate() != null) {
+                stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), alertTemplateDefinition.getBodyTemplate());
+            } else {
+                LOG.warn("Body template of policy {} is null, using ALERT_STRING by default");
+                stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_STRING);
+            }
             policyDefinitionRepository.put(policyDefinition.getName(), policyDefinition);
         } else {
             throw new IllegalArgumentException("Unsupported alert template type " + alertTemplateDefinition.getType());
@@ -73,26 +99,39 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
 
     @Override
     public synchronized void unregister(String policyId) {
-        stringResourceRepository.removeStringResource(policyId);
+        stringResourceRepository.removeStringResource(getAlertBodyTemplateName(policyId));
+        stringResourceRepository.removeStringResource(getAlertSubjectTemplateName(policyId));
     }
 
     @Override
-    public synchronized String renderAlert(AlertStreamEvent event) {
+    public synchronized AlertPublishEvent renderAlert(AlertStreamEvent event) {
+        AlertPublishEvent publishEvent = AlertPublishEvent.createAlertPublishEvent(event);
         Preconditions.checkArgument(this.policyDefinitionRepository.containsKey(event.getPolicyId()), "Unknown policyId " + event.getPolicyId());
         PolicyDefinition policyDefinition = this.policyDefinitionRepository.get(event.getPolicyId());
-        StringWriter writer = new StringWriter();
+        StringWriter bodyWriter = new StringWriter();
+        StringWriter subjectWriter = new StringWriter();
         try {
-            Template template = engine.getTemplate(event.getPolicyId());
-            Preconditions.checkNotNull(template, "Not template found for policy " + event.getPolicyId());
-            template.merge(buildAlertContext(policyDefinition, event), writer);
-            return writer.toString();
+            VelocityContext alertContext = buildAlertContext(policyDefinition, event);
+            Template template = engine.getTemplate(getAlertBodyTemplateName(event.getPolicyId()));
+            template.merge(alertContext, bodyWriter);
+            publishEvent.setAlertBody(bodyWriter.toString());
+
+            template = engine.getTemplate(getAlertSubjectTemplateName(event.getPolicyId()));
+            template.merge(alertContext, subjectWriter);
+            publishEvent.setAlertSubject(subjectWriter.toString());
         } finally {
             try {
-                writer.close();
+                bodyWriter.close();
+            } catch (IOException e) {
+                LOG.warn(e.getMessage(),e);
+            }
+            try {
+                subjectWriter.close();
             } catch (IOException e) {
                 LOG.warn(e.getMessage(),e);
             }
         }
+        return publishEvent;
     }
 
     private static VelocityContext buildAlertContext(PolicyDefinition policyDefinition, AlertStreamEvent event) {
@@ -105,6 +144,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
         context.put(AlertContextFields.ALERT_TIMESTAMP, event.getTimestamp());
         context.put(AlertContextFields.ALERT_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getTimestamp()));
         context.put(AlertContextFields.ALERT_SCHEMA, event.getSchema());
+        context.put(AlertContextFields.ALERT_STRING, event.getSchema());
 
         context.put(AlertContextFields.POLICY_ID, policyDefinition.getName());
         context.put(AlertContextFields.POLICY_DESC, policyDefinition.getDescription());
