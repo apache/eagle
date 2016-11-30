@@ -251,7 +251,7 @@ class MetricCollector(threading.Thread):
         if msg.has_key("value"):
             msg["value"] = float(str(msg["value"]))
         if not msg.has_key("host") or len(msg["host"]) == 0:
-            msg["host"] = self.fqdn
+            raise Exception("host is null: " + str(msg))
         if not msg.has_key("site"):
             msg["site"] = self.config["env"]["site"]
         self.sender.send(msg)
@@ -327,18 +327,18 @@ class JmxMetricCollector(MetricCollector):
         for input in self.input_components:
             try:
                 beans = JmxReader(input["host"], input["port"], input["https"]).open().get_jmx_beans()
-                self.on_beans(input["component"], beans)
+                self.on_beans(input, beans)
             except Exception as e:
                 logging.exception("Failed to read jmx for " + str(input))
 
     def filter_bean(self, bean, mbean_domain):
         return mbean_domain in self.selected_domain
 
-    def on_beans(self, component, beans):
+    def on_beans(self, source, beans):
         for bean in beans:
-            self.on_bean(component,bean)
+            self.on_bean(source,bean)
 
-    def on_bean(self, component, bean):
+    def on_bean(self, source, bean):
         # mbean is of the form "domain:key=value,...,foo=bar"
         mbean = bean[u'name']
         mbean_domain, mbean_attribute = mbean.rstrip().split(":", 1)
@@ -351,18 +351,19 @@ class JmxMetricCollector(MetricCollector):
         metric_prefix_name = self.__build_metric_prefix(mbean_attribute, context)
 
         for key, value in bean.iteritems():
-            self.on_bean_kv(metric_prefix_name, component,key, value)
+            self.on_bean_kv(metric_prefix_name, source, key, value)
 
         for listener in self.listeners:
-            listener.on_bean(component, bean.copy())
+            listener.on_bean(source, bean.copy())
 
-    def on_bean_kv(self, prefix,component, key, value):
+    def on_bean_kv(self, prefix,source, key, value):
         # Skip Tags
         if re.match(r'tag.*', key):
             return
         metric_name = (prefix + '.' + key).lower()
         self.on_metric({
-            "component": component,
+            "component": source["component"],
+            "host": source["host"],
             "metric": metric_name,
             "value": value
         })
@@ -383,7 +384,6 @@ class JmxMetricCollector(MetricCollector):
             mbean_list[name_index][1] = context
             metric_prefix_name = '.'.join([i[1] for i in mbean_list])
         return ("hadoop." + metric_prefix_name).replace(" ", "").lower()
-
 
 class JmxMetricListener:
     def init(self, collector):

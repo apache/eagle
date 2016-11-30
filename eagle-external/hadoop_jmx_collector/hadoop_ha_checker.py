@@ -17,17 +17,19 @@
 #
 
 from metric_collector import MetricCollector, JmxReader, YarnWSReader, Runner
-import logging,socket
+import logging,socket,string
 
 class HadoopNNHAChecker(MetricCollector):
     def run(self):
         hosts = []
-
+        host_name_list = []
         for input in self.config["input"]:
             if not input.has_key("host"):
                 input["host"] = socket.getfqdn()
             if input.has_key("component") and input["component"] == "namenode":
                 hosts.append(input)
+                host_name_list.append(input["host"])
+
         if not bool(hosts):
             logging.warn("non hosts are configured as 'namenode' in 'input' config, exit")
             return
@@ -35,7 +37,10 @@ class HadoopNNHAChecker(MetricCollector):
         logging.info("Checking namenode HA: " + str(hosts))
         total_count = len(hosts)
 
+        all_hosts_name = string.join(host_name_list,",")
+
         self.collect({
+            "host": all_hosts_name,
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.total.count",
             "value": total_count
@@ -63,18 +68,21 @@ class HadoopNNHAChecker(MetricCollector):
                 logging.exception("failed to read jmx from " + host["host"] + ":" + host["port"])
                 failed_count += 1
         self.collect({
+            "host": all_hosts_name,
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.active.count",
             "value": active_count
         })
 
         self.collect({
+            "host": all_hosts_name,
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.standby.count",
             "value": standby_count
         })
 
         self.collect({
+            "host": all_hosts_name,
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.failed.count",
             "value": failed_count
@@ -83,19 +91,23 @@ class HadoopNNHAChecker(MetricCollector):
 class HadoopRMHAChecker(MetricCollector):
     def run(self):
         hosts = []
+        all_hosts = []
         for input in self.config["input"]:
             if not input.has_key("host"):
                 input["host"] = socket.getfqdn()
             if input.has_key("component") and input["component"] == "resourcemanager":
                 hosts.append(input)
+                all_hosts.append(input["host"])
         if not bool(hosts):
             logging.warn("Non hosts are configured as 'resourcemanager' in 'input' config, exit")
             return
 
         logging.info("Checking resource manager HA: " + str(hosts))
         total_count = len(hosts)
+        all_hosts_name = string.join(all_hosts,",")
 
         self.collect({
+            "host": all_hosts_name,
             "component": "resourcemanager",
             "metric": "hadoop.resourcemanager.hastate.total.count",
             "value": total_count
@@ -120,18 +132,21 @@ class HadoopRMHAChecker(MetricCollector):
                 failed_count += 1
 
         self.collect({
+            "host": all_hosts_name,
             "component": "resourcemanager",
             "metric": "hadoop.resourcemanager.hastate.active.count",
             "value": active_count
         })
 
         self.collect({
+            "host": all_hosts_name,
             "component": "resourcemanager",
             "metric": "hadoop.resourcemanager.hastate.standby.count",
             "value": standby_count
         })
 
         self.collect({
+            "host": all_hosts_name,
             "component": "resourcemanager",
             "metric": "hadoop.resourcemanager.hastate.failed.count",
             "value": failed_count
