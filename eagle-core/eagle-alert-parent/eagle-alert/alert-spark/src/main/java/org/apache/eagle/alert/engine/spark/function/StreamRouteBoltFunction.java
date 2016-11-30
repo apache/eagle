@@ -23,6 +23,7 @@ import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
+import org.apache.eagle.alert.engine.StreamSparkContextImpl;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
@@ -101,7 +102,7 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
                 Map<StreamTimeClockListener, String> streamWindowMap = winstate.getStreamWindowsByPartition(partitionNum);
                 Map<StreamPartition, StreamSortHandler> streamSortHandlerMap = winstate.getStreamSortHandlerByPartition(partitionNum);
 
-                router.prepare(new StreamContextImpl(null, new MultiCountMetric(), null), routeCollector, streamWindowMap, streamTimeClockMap, streamSortHandlerMap);
+                router.prepare(new StreamSparkContextImpl(null), routeCollector, streamWindowMap, streamTimeClockMap, streamSortHandlerMap);
                 onStreamRouteBoltSpecChange(spec, sdf, router, routeCollector, cachedSSS, cachedSRS);
             }
 

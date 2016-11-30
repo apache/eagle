@@ -20,6 +20,7 @@ package org.apache.eagle.alert.engine.spark.function;
 import backtype.storm.metric.api.MultiCountMetric;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
+import org.apache.eagle.alert.engine.StreamSparkContextImpl;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.CompositePolicyHandler;
@@ -80,7 +81,7 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
                 Map<String, PolicyDefinition> policyDefinitionMap = policyState.getPolicyDefinitionByBoltId(boltId);
                 Map<String, CompositePolicyHandler> policyStreamHandlerMap = policyState.getPolicyStreamHandlerByBoltId(boltId);
                 byte[] siddhiSnapShot = siddhiState.getSiddhiSnapShotByBoltIdAndPartitionNum(boltId, partitionNum);
-                policyGroupEvaluator.init(new StreamContextImpl(null, new MultiCountMetric(), null), alertOutputCollector, policyDefinitionMap, policyStreamHandlerMap, siddhiSnapShot);
+                policyGroupEvaluator.init(new StreamSparkContextImpl(null), alertOutputCollector, policyDefinitionMap, policyStreamHandlerMap, siddhiSnapShot);
                 onAlertBoltSpecChange(boltId, spec, sds, policyGroupEvaluator, policyState);
             }
             PartitionedEvent event = tuple2._2;
