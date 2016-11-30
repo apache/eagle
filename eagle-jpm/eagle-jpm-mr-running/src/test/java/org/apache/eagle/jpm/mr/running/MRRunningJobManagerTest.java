@@ -144,7 +144,11 @@ public class MRRunningJobManagerTest {
                 try {
                     MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
                     for (int j = 0; j < REPETITIONS; ++j) {
-                        mrRunningJobManager.recoverYarnApp("yarnAppId");
+                        if(j % 3 == 0) {
+                            mrRunningJobManager.delete("yarnAppId", "jobId");
+                        } else {
+                            mrRunningJobManager.recoverYarnApp("yarnAppId");
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -178,7 +182,11 @@ public class MRRunningJobManagerTest {
                 try {
                     MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
                     for (int j = 0; j < REPETITIONS; ++j) {
-                        mrRunningJobManager.recover();
+                        if(j % 3 == 0) {
+                            mrRunningJobManager.delete("yarnAppId", "jobId");
+                        } else {
+                            mrRunningJobManager.recover();
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
