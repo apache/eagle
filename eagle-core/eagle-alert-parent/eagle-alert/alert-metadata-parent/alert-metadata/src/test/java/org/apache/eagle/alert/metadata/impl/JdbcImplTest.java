@@ -184,6 +184,11 @@ public class JdbcImplTest {
             if (i >= 10 - maxCapacity) {
                 reservedOnes.add(versionId);
             }
+            try {
+                Thread.sleep(1);
+            } catch (Exception e) {
+
+            }
         }
         dao.clearScheduleState(maxCapacity);
         List<ScheduleState> scheduleStates = dao.listScheduleStates();
