@@ -20,11 +20,13 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.junit.Assert;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class AlertPublisherTestHelper {
 
@@ -46,6 +48,9 @@ public class AlertPublisherTestHelper {
         event.setBody("Disk Usage of Test cluster's name node (<a href=\"#\">namenode.hostname.domain</a>) is <strong style=\"color: red\">98%</strong> at <strong>2016-11-30 12:30:45</strong>, exceeding alert threshold <strong>90</strong>%");
         event.setData(data);
         event.ensureAlertId();
+        event.setContext(new HashMap<String,Object>(){{
+            put(AlertPublishEvent.SITE_ID_KEY,"TestCluster");
+        }});
         Assert.assertNotNull(event.getAlertId());
         return event;
     }

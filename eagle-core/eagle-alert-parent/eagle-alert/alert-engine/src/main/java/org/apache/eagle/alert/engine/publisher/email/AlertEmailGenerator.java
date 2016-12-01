@@ -22,10 +22,9 @@ package org.apache.eagle.alert.engine.publisher.email;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
-
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.common.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class AlertEmailGenerator {
             return "N/A";
         }
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String,Object> entry : event.getDataMap().entrySet()) {
+        for (Map.Entry<String, Object> entry : event.getDataMap().entrySet()) {
             sb.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
         }
         return sb.toString();
@@ -117,32 +116,44 @@ public class AlertEmailGenerator {
 
     private Map<String, String> buildAlertContext(AlertStreamEvent event) {
         Map<String, String> alertContext = new HashMap<>();
+
+        if (event.getContext() != null) {
+            for (Map.Entry<String, Object> entry : event.getContext().entrySet()) {
+                if (entry.getValue() == null) {
+                    alertContext.put(entry.getKey(), "N/A");
+                } else {
+                    alertContext.put(entry.getKey(), entry.getValue().toString());
+                }
+            }
+        }
+
         alertContext.put(PublishConstants.ALERT_EMAIL_SUBJECT, event.getSubject());
         alertContext.put(PublishConstants.ALERT_EMAIL_BODY, getAlertBody(event));
         alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_ID, event.getPolicyId());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_ID, event.getAlertId());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA, event.getDataMap().toString());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA_DESC, generateAlertDataDesc(event));
-        alertContext.put(PublishConstants.ALERT_EMAIL_TIMESTAMP, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()));
+        alertContext.put(PublishConstants.ALERT_EMAIL_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()));
         alertContext.put(PublishConstants.ALERT_EMAIL_STREAM_ID, event.getStreamId());
         alertContext.put(PublishConstants.ALERT_EMAIL_CREATOR, event.getCreatedBy());
         alertContext.put(PublishConstants.ALERT_EMAIL_VERSION, Version.version);
 
-        String rootUrl = this.getServerPort() == 80 ? String.format("http://%s",this.getServerHost())
-            : String.format("http://%s:%s",this.getServerHost(), this.getServerPort());
+
+        String rootUrl = this.getServerPort() == 80 ? String.format("http://%s", this.getServerHost())
+            : String.format("http://%s:%s", this.getServerHost(), this.getServerPort());
         try {
             alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DETAIL_URL,
-                String.format("%s/#/alert/detail/%s", rootUrl, URIUtil.encodeQuery(event.getAlertId(),"UTF-8")));
+                String.format("%s/#/alert/detail/%s", rootUrl, URIUtil.encodeQuery(event.getAlertId(), "UTF-8")));
             alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_DETAIL_URL,
-                String.format("%s/#/policy/detail/%s",rootUrl, URIUtil.encodeQuery(event.getPolicyId(),"UTF-8")));
+                String.format("%s/#/policy/detail/%s", rootUrl, URIUtil.encodeQuery(event.getPolicyId(), "UTF-8")));
         } catch (URIException e) {
-            LOG.warn(e.getMessage(),e);
+            LOG.warn(e.getMessage(), e);
             alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DETAIL_URL,
                 String.format("%s/#/alert/detail/%s", rootUrl, event.getAlertId()));
             alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_DETAIL_URL,
-                String.format("%s/#/policy/detail/%s",rootUrl, event.getPolicyId()));
+                String.format("%s/#/policy/detail/%s", rootUrl, event.getPolicyId()));
         }
-        alertContext.put(PublishConstants.ALERT_EMAIL_HOME_URL,rootUrl);
+        alertContext.put(PublishConstants.ALERT_EMAIL_HOME_URL, rootUrl);
         return alertContext;
     }
 

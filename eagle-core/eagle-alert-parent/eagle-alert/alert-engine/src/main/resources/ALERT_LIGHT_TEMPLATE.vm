@@ -346,7 +346,7 @@
                                             <tbody>
                                                 <tr>
                                                     <td>Cluster Name</td>
-                                                    <td>Apollo</td>
+                                                    <td>$alert["siteId"]</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Policy Name</td>
