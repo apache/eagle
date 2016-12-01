@@ -114,7 +114,8 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     private AlertEmailGenerator createEmailGenerator(Map<String, Object> notificationConfig) {
         String tplFileName = (String) notificationConfig.get(PublishConstants.TEMPLATE);
         if (tplFileName == null || tplFileName.equals("")) {
-            tplFileName = "ALERT_DEFAULT.vm";
+            // tplFileName = "ALERT_DEFAULT_TEMPLATE.vm";
+            tplFileName = "ALERT_LIGHT_TEMPLATE.vm";
         }
         String subject = (String) notificationConfig.get(PublishConstants.SUBJECT);
         if (subject == null) {

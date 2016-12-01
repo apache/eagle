@@ -16,10 +16,12 @@
   -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+
+    #set ( $alert = $alertList[0] )
 <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>[Eagle Alert][Warning] CPU Usage Exceed 90%</title>
+    <title>[Eagle Alert][Warning] $alert["alertSubject"]</title>
     <style type="text/css">
         /* -------------------------------------
             GLOBAL
@@ -315,38 +317,57 @@
             <div class="content">
                 <table class="main" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                        <td class="alert alert-warning">
-                            Warning: CPU Usage of Apollo Name Node Exceed 90%
-                        </td>
+                        #if ($alert["severity"] == "CRITICAL")
+                            <td class="alert alert-bad">
+                                Critical: $alert["alertSubject"]
+                            </td>
+                        #else
+                            <td class="alert alert-warning">
+                                Warning: $alert["alertSubject"]
+                            </td>
+                        #end
                     </tr>
                     <tr>
                         <td class="content-wrap">
                             <table width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td class="content-block">
-                                        You receive a <strong>warning</strong> alert at <strong>2016-11-30 12:00 AM</strong>
+                                        You receive a <strong>warning</strong> alert at <strong>$alert["alertTime"]</strong>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="content-block">
-                                        CPU usage on hadoop of cluster test_cluster at localhost is: <strong>98%</strong>, exceeding thread hold: <strong>90%</strong>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="content-block">
-                                        <a href="http://www.mailgun.com" class="btn-primary">View Alert Details</a>
+                                        $alert["alertBody"]
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="content-block">
-                                        Thanks for using Eagle.
+                                    <td class="content-block invoice">
+                                        <table class="invoice-items" cellpadding="0" cellspacing="0" style="font-size:8px">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Cluster Name</td>
+                                                    <td>Apollo</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Policy Name</td>
+                                                    <td><a href="$alert["policyDetailUrl"]">$alert["policyId"]</a></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Detected Time</td>
+                                                    <td>$alert["alertTime"]</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
-
                                 <tr>
                                     <td class="content-block">
-                                        <i>Note: The alert was automatically detected by policy <a href="#">Sample Policy</a> from <a href="#">Eagle</a>.</small>
+                                        <a href="$alert["alertDetailUrl"]" class="btn-primary">View Alert Details</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        <i>Note: The alert was automatically detected by <a href="#">Eagle</a>.</i>
                                     </td>
                                 </tr>
                             </table>
@@ -356,7 +377,7 @@
                 <div class="footer">
                     <table width="100%">
                         <tr>
-                            <td class="aligncenter content-block">Powered by Apache Eagle (Version: 0.5.0-SNAPSHOT-build-50)</td>
+                            <td class="aligncenter content-block">Powered by <a href="http://eagle.incubator.apache.org">Apache Eagle</a> (version: $alert["version"])</td>
                         </tr>
                     </table>
                 </div>

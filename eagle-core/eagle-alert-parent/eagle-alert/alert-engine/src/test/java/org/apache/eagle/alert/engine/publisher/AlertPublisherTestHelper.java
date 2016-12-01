@@ -43,7 +43,7 @@ public class AlertPublisherTestHelper {
         event.setTimestamp(System.currentTimeMillis());
         event.setCreatedTime(System.currentTimeMillis());
         event.setSubject("Namenode Disk Used 98%");
-        event.setBody("Disk Usage of Test cluster's name node (namenode.hostname.domain) is 98% at 2016-11-30 12:30:45, exceeding alert threshold 90%");
+        event.setBody("Disk Usage of Test cluster's name node (<a href=\"#\">namenode.hostname.domain</a>) is <strong style=\"color: red\">98%</strong> at <strong>2016-11-30 12:30:45</strong>, exceeding alert threshold <strong>90</strong>%");
         event.setData(data);
         event.ensureAlertId();
         Assert.assertNotNull(event.getAlertId());
