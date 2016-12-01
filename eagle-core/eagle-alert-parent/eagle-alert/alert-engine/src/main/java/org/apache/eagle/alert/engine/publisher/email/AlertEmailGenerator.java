@@ -96,8 +96,12 @@ public class AlertEmailGenerator {
     /**
      * TODO Support template-based alert message.
      */
-    private String renderAlertMessage(AlertStreamEvent event) {
-        return String.format("Alert policy \"%s\" was triggered: %s",event.getPolicyId(), generateAlertDataDesc(event));
+    private String getAlertBody(AlertStreamEvent event) {
+        if (event.getBody() == null) {
+            return String.format("Alert policy \"%s\" was triggered: %s", event.getPolicyId(), generateAlertDataDesc(event));
+        } else {
+            return event.getBody();
+        }
     }
 
     private String generateAlertDataDesc(AlertStreamEvent event) {
@@ -113,7 +117,8 @@ public class AlertEmailGenerator {
 
     private Map<String, String> buildAlertContext(AlertStreamEvent event) {
         Map<String, String> alertContext = new HashMap<>();
-        alertContext.put(PublishConstants.ALERT_EMAIL_MESSAGE, renderAlertMessage(event));
+        alertContext.put(PublishConstants.ALERT_EMAIL_SUBJECT, event.getSubject());
+        alertContext.put(PublishConstants.ALERT_EMAIL_BODY, getAlertBody(event));
         alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_ID, event.getPolicyId());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_ID, event.getAlertId());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA, event.getDataMap().toString());
