@@ -17,12 +17,9 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
-import backtype.storm.metric.api.MultiCountMetric;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
-import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.StreamSparkContextImpl;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
@@ -37,7 +34,6 @@ import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 import org.apache.eagle.alert.engine.spark.model.RouteState;
 import org.apache.eagle.alert.engine.spark.model.WindowState;
-import org.apache.eagle.alert.engine.utils.Constants;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +42,7 @@ import scala.Tuple2;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, PartitionedEvent>>, Integer, PartitionedEvent> {
+public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, Iterable<PartitionedEvent>>>, Integer, PartitionedEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouteBoltFunction.class);
     private static final long serialVersionUID = -7211470889316430372L;
@@ -71,23 +67,20 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
     }
 
     @Override
-    public Iterator<Tuple2<Integer, PartitionedEvent>> call(Iterator<Tuple2<Integer, PartitionedEvent>> tuple2Iterator) throws Exception {
+    public Iterator<Tuple2<Integer, PartitionedEvent>> call(Iterator<Tuple2<Integer, Iterable<PartitionedEvent>>> tuple2Iterator) throws Exception {
 
+        if (!tuple2Iterator.hasNext()) {
+            return Collections.emptyIterator();
+        }
 
         Map<String, StreamDefinition> sdf;
         RouterSpec spec;
         SparkStreamRouterBoltOutputCollector routeCollector = null;
         StreamRouterImpl router = null;
-
-        int partitionNum = Constants.UNKNOW_PARTITION;
-
-        while (tuple2Iterator.hasNext()) {
-
-            Tuple2<Integer, PartitionedEvent> tuple2 = tuple2Iterator.next();
-            if (partitionNum == Constants.UNKNOW_PARTITION) {
-                partitionNum = tuple2._1;
-            }
-
+        Tuple2<Integer, Iterable<PartitionedEvent>> tuple2 = tuple2Iterator.next();
+        Iterator<PartitionedEvent> events = tuple2._2.iterator();
+        int partitionNum = tuple2._1;
+        while (events.hasNext()) {
             if (router == null) {
                 sdf = sdsRef.get();
                 spec = routerSpecRef.get();
@@ -104,19 +97,14 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
 
                 router.prepare(new StreamSparkContextImpl(null), routeCollector, streamWindowMap, streamTimeClockMap, streamSortHandlerMap);
                 onStreamRouteBoltSpecChange(spec, sdf, router, routeCollector, cachedSSS, cachedSRS);
+
             }
 
-            PartitionedEvent partitionedEvent = tuple2._2;
+            PartitionedEvent partitionedEvent = events.next();
             router.nextEvent(partitionedEvent);
         }
         cleanup(router);
-        if (partitionNum != Constants.UNKNOW_PARTITION) {
-            winstate.store(router, partitionNum);
-            routeState.store(routeCollector, cachedSSS, cachedSRS, partitionNum);
-        }
-        if (routeCollector == null) {
-            return Collections.emptyIterator();
-        }
+
         return routeCollector.emitResult().iterator();
     }
 

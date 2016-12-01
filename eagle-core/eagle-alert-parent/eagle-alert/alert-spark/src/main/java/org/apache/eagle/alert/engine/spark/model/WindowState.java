@@ -22,7 +22,7 @@ import org.apache.eagle.alert.engine.router.StreamSortHandler;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
-import org.apache.eagle.alert.engine.spark.accumulator.MapAccum;
+import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
@@ -45,9 +45,9 @@ public class WindowState implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(WindowState.class);
 
     public WindowState(JavaStreamingContext jssc) {
-        Accumulator<Map<Integer, Map<String, StreamTimeClock>>> streamIdClockAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamIdClock", new MapAccum());
-        Accumulator<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamWindow", new MapAccum());
-        Accumulator<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamSortHandlers", new MapAccum());
+        Accumulator<Map<Integer, Map<String, StreamTimeClock>>> streamIdClockAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamIdClock", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamWindow", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamSortHandlers", new MapToMapAccum());
         this.streamIdClockAccum = streamIdClockAccum;
         this.streamWindowAccum = streamWindowAccum;
         this.streamSortHandlersAccum = streamSortHandlersAccum;

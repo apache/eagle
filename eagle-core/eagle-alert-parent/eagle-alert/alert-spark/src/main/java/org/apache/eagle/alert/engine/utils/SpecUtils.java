@@ -91,13 +91,33 @@ public class SpecUtils {
         Map<String, List<PolicyDefinition>> boltPoliciesMap = new HashMap<>();
         List<PolicyDefinition> policyDefinitions = mtadataServiceClient.listPolicies();
         List<String> alertBolts = generateAlertBolt(numOfAlertBolts);
+        List<Publishment> publishments = mtadataServiceClient.listPublishment();
+
         for (String alertBolt : alertBolts) {
-            boltPoliciesMap.put(alertBolt, policyDefinitions);
+            for (PolicyDefinition policy : policyDefinitions) {
+                String policyName = policy.getName();
+                alertSpec.addBoltPolicy(alertBolt, policyName);
+
+                for (Publishment publish : publishments) {
+                    if (!publish.getPolicyIds().contains(policyName)) {
+                        continue;
+                    }
+
+                    List<String> streamIds = new ArrayList<>();
+                    // add the publish to the bolt
+                    if (publish.getStreamIds() == null || publish.getStreamIds().size() <= 0) {
+                        streamIds.add(Publishment.STREAM_NAME_DEFAULT);
+                    } else {
+                        streamIds.addAll(publish.getStreamIds());
+                    }
+                    for (String streamId : streamIds) {
+                        alertSpec.addPublishPartition(streamId, policyName, publish.getName(), publish.getPartitionColumns());
+                    }
+                }
+            }
         }
-        alertSpec.setBoltPoliciesMap(boltPoliciesMap);
         return alertSpec;
     }
-
 
     public static RouterSpec generateRouterSpec(IMetadataServiceClient mtadataServiceClient, int numOfAlertBolts) {
         List<StreamWorkSlotQueue> queues = new ArrayList<>();

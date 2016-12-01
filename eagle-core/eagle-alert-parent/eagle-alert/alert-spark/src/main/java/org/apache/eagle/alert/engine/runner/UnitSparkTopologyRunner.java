@@ -29,6 +29,7 @@ import kafka.common.TopicAndPartition;
 import com.typesafe.config.Config;
 import kafka.message.MessageAndMetadata;
 import kafka.serializer.StringDecoder;
+import org.apache.eagle.alert.engine.spark.partition.StreamRoutePartitioner;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
@@ -164,11 +165,11 @@ public class UnitSparkTopologyRunner implements Serializable {
         pairDStream
                 .window(Durations.seconds(windowDurations), Durations.seconds(slideDurations))
                 .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter, spoutSpecRef, sdsRef))
-                .transformToPair(new ChangePartitionTo(numOfRouter))
+                .groupByKey(new StreamRoutePartitioner(numOfRouter))
                 .mapPartitionsToPair(new StreamRouteBoltFunction("streamBolt", sdsRef, routerSpecRef, winstate, routeState))
-                .transformToPair(new ChangePartitionTo(numOfAlertBolts))
-                .mapPartitionsToPair(new AlertBoltFunction(sdsRef, alertBoltSpecRef, policyState, siddhiState))
-                .repartition(numOfPublishTasks)
+                .groupByKey(new StreamRoutePartitioner(numOfAlertBolts))
+                .mapPartitionsToPair(new AlertBoltFunction(sdsRef, alertBoltSpecRef, policyState, siddhiState, publishState))
+                .groupByKey(numOfPublishTasks)
                 .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges, publishState, publishSpecRef));
     }
 

@@ -17,21 +17,20 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
-import backtype.storm.metric.api.MultiCountMetric;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.StreamSparkContextImpl;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.CompositePolicyHandler;
-import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
-import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorSparkWrapper;
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.spark.model.PolicyState;
+import org.apache.eagle.alert.engine.spark.model.PublishState;
 import org.apache.eagle.alert.engine.spark.model.SiddhiState;
 import org.apache.eagle.alert.engine.utils.Constants;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
@@ -42,60 +41,62 @@ import scala.Tuple2;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, PartitionedEvent>>, String, AlertStreamEvent> {
+public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, Iterable<PartitionedEvent>>>, PublishPartition, AlertStreamEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertBoltFunction.class);
     private AtomicReference<Map<String, StreamDefinition>> sdsRef;
     private AtomicReference<AlertBoltSpec> alertBoltSpecRef;
     private PolicyState policyState;
     private SiddhiState siddhiState;
+    private PublishState publishState;
 
-    public AlertBoltFunction(AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef, PolicyState policyState, SiddhiState siddhiState) {
+    public AlertBoltFunction(AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef, PolicyState policyState, SiddhiState siddhiState, PublishState publishState) {
         this.sdsRef = sdsRef;
         this.alertBoltSpecRef = alertBoltSpecRef;
         this.policyState = policyState;
         this.siddhiState = siddhiState;
+        this.publishState = publishState;
     }
 
+
     @Override
-    public Iterator<Tuple2<String, AlertStreamEvent>> call(Iterator<Tuple2<Integer, PartitionedEvent>> tuple2Iterator) throws Exception {
+    public Iterator<Tuple2<PublishPartition, AlertStreamEvent>> call(Iterator<Tuple2<Integer, Iterable<PartitionedEvent>>> tuple2Iterator) throws Exception {
+        if (!tuple2Iterator.hasNext()) {
+            return Collections.emptyIterator();
+        }
 
         PolicyGroupEvaluatorImpl policyGroupEvaluator = null;
         AlertBoltOutputCollectorSparkWrapper alertOutputCollector = null;
         AlertBoltSpec spec;
         Map<String, StreamDefinition> sds;
-        int partitionNum = Constants.UNKNOW_PARTITION;
+        Tuple2<Integer, Iterable<PartitionedEvent>> tuple2 = tuple2Iterator.next();
+        Iterator<PartitionedEvent> events = tuple2._2.iterator();
+        int partitionNum = tuple2._1;
         String boltId = Constants.ALERTBOLTNAME_PREFIX + partitionNum;
-        while (tuple2Iterator.hasNext()) {
-            Tuple2<Integer, PartitionedEvent> tuple2 = tuple2Iterator.next();
-            if (partitionNum == Constants.UNKNOW_PARTITION) {
-                partitionNum = tuple2._1;
-            }
+        while (events.hasNext()) {
             if (policyGroupEvaluator == null) {
                 spec = alertBoltSpecRef.get();
                 sds = sdsRef.get();
                 boltId = Constants.ALERTBOLTNAME_PREFIX + partitionNum;
                 policyGroupEvaluator = new PolicyGroupEvaluatorImpl(boltId + "-evaluator_stage1");
-                alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper();
-                //TODO StreamContext need to be more abstract
+                Set<PublishPartition> cachedPublishPartitions = publishState.getCachedPublishPartitionsByBoltId(boltId);
+                alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper(cachedPublishPartitions);
                 Map<String, PolicyDefinition> policyDefinitionMap = policyState.getPolicyDefinitionByBoltId(boltId);
                 Map<String, CompositePolicyHandler> policyStreamHandlerMap = policyState.getPolicyStreamHandlerByBoltId(boltId);
                 byte[] siddhiSnapShot = siddhiState.getSiddhiSnapShotByBoltIdAndPartitionNum(boltId, partitionNum);
                 policyGroupEvaluator.init(new StreamSparkContextImpl(null), alertOutputCollector, policyDefinitionMap, policyStreamHandlerMap, siddhiSnapShot);
-                onAlertBoltSpecChange(boltId, spec, sds, policyGroupEvaluator, policyState);
+                onAlertBoltSpecChange(boltId, spec, sds, policyGroupEvaluator, alertOutputCollector, policyState, publishState);
             }
-            PartitionedEvent event = tuple2._2;
+            PartitionedEvent event = events.next();
             policyGroupEvaluator.nextEvent(event);
         }
 
         cleanup(policyGroupEvaluator, alertOutputCollector, boltId, partitionNum);
-        if (alertOutputCollector == null) {
-            return Collections.emptyIterator();
-        }
+
         return alertOutputCollector.emitResult().iterator();
     }
 
-    private void onAlertBoltSpecChange(String boltId, AlertBoltSpec spec, Map<String, StreamDefinition> sds, PolicyGroupEvaluatorImpl policyGroupEvaluator, PolicyState policyState) {
+    private void onAlertBoltSpecChange(String boltId, AlertBoltSpec spec, Map<String, StreamDefinition> sds, PolicyGroupEvaluatorImpl policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector, PolicyState policyState, PublishState publishState) {
         List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
         LOG.debug("newPolicies {}", newPolicies);
         if (newPolicies == null) {
@@ -108,13 +109,35 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
         LOG.debug("newPoliciesMap {}", newPoliciesMap);
         MapComparator<String, PolicyDefinition> comparator = new MapComparator<>(newPoliciesMap, policyState.getCachedPolicyByBoltId(boltId));
         comparator.compare();
-        LOG.debug("cachedPolicies {}", policyState.getCachedPolicyByBoltId(boltId));
         LOG.debug("getAdded {}", comparator.getAdded());
         LOG.debug("getRemoved {}", comparator.getRemoved());
         LOG.debug("getModified {}", comparator.getModified());
         policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
 
         policyState.store(boltId, newPoliciesMap, policyGroupEvaluator.getPolicyDefinitionMap(), policyGroupEvaluator.getPolicyStreamHandlerMap());
+
+
+        // update alert output collector
+        Set<PublishPartition> tempPublishPartitions = new HashSet<>();
+        spec.getPublishPartitions().forEach(p -> {
+            if (newPolicies.stream().filter(o -> o.getName().equals(p.getPolicyId())).count() > 0) {
+                tempPublishPartitions.add(p);
+            }
+        });
+
+        Set<PublishPartition> cachedPublishPartitions = publishState.getCachedPublishPartitionsByBoltId(boltId);
+        Collection<PublishPartition> addedPublishPartitions = CollectionUtils.subtract(tempPublishPartitions, cachedPublishPartitions);
+        Collection<PublishPartition> removedPublishPartitions = CollectionUtils.subtract(cachedPublishPartitions, tempPublishPartitions);
+        Collection<PublishPartition> modifiedPublishPartitions = CollectionUtils.intersection(tempPublishPartitions, cachedPublishPartitions);
+
+        LOG.debug("added PublishPartition " + addedPublishPartitions);
+        LOG.debug("removed PublishPartition " + removedPublishPartitions);
+        LOG.debug("modified PublishPartition " + modifiedPublishPartitions);
+
+        alertOutputCollector.onAlertBoltSpecChange(addedPublishPartitions, removedPublishPartitions, modifiedPublishPartitions);
+
+        publishState.storePublishPartitions(boltId, alertOutputCollector.getPublishPartitions());
+
     }
 
     public void cleanup(PolicyGroupEvaluatorImpl policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector, String boltId, int partitionNum) {
@@ -126,4 +149,6 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
             alertOutputCollector.close();
         }
     }
+
+
 }

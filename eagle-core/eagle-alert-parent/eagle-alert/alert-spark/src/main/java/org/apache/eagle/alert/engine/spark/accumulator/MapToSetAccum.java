@@ -15,9 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.alert.engine.utils;
+package org.apache.eagle.alert.engine.spark.accumulator;
 
-public class Constants {
-    public static final String ALERTBOLTNAME_PREFIX = "alertBolt";
-    public static final String TOPOLOGY_ID = "topologyId";
+import org.apache.spark.AccumulatorParam;
+
+import java.util.*;
+
+
+public class MapToSetAccum<T, V> implements AccumulatorParam<Map<T, Set<V>>> {
+
+    @Override
+    public Map<T, Set<V>> addAccumulator(Map<T, Set<V>> t1, Map<T, Set<V>> t2) {
+        return mergeMap(t1, t2);
+    }
+
+    @Override
+    public Map<T, Set<V>> addInPlace(Map<T, Set<V>> r1, Map<T, Set<V>> r2) {
+        return mergeMap(r1, r2);
+    }
+
+    @Override
+    public Map<T, Set<V>> zero(Map<T, Set<V>> initialValue) {
+        return new HashMap<>();
+    }
+
+    private Map<T, Set<V>> mergeMap(Map<T, Set<V>> map1, Map<T, Set<V>> map2) {
+        Map<T, Set<V>> result = new HashMap<>(map1);
+        map2.forEach((k, v) -> result.merge(k, v, (a, b) -> b));
+        return result;
+    }
 }

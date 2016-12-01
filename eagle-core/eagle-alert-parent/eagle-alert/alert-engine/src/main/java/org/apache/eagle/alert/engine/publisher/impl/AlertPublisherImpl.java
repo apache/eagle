@@ -51,17 +51,9 @@ public class AlertPublisherImpl implements AlertPublisher {
         this.name = name;
     }
 
-    public AlertPublisherImpl(String name, List<Publishment> publishments) {
+    public AlertPublisherImpl(String name, Map<PublishPartition, AlertPublishPlugin> publishPluginMapping) {
         this.name = name;
-        for (Publishment publishment : publishments) {
-            AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
-            if (plugin != null) {
-                publishPluginMapping.put(publishment.getName(), plugin);
-                addPublishmentPoliciesStreams(psPublishPluginMapping, publishment.getPolicyIds(), new ArrayList<>(), publishment.getName());
-            } else {
-                LOG.error("Initialized alertPublisher {} failed due to invalid format", publishment);
-            }
-        }
+        this.publishPluginMapping = publishPluginMapping;
     }
 
     @Override
@@ -217,4 +209,7 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
     }
 
+    public Map<PublishPartition, AlertPublishPlugin> getPublishPluginMapping() {
+        return this.publishPluginMapping;
+    }
 }

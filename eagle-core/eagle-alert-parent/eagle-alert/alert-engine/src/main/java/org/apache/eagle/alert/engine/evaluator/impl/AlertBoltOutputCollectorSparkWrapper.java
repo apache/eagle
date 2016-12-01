@@ -18,30 +18,45 @@
 package org.apache.eagle.alert.engine.evaluator.impl;
 
 import org.apache.eagle.alert.engine.AlertStreamCollector;
+import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import scala.Tuple2;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class AlertBoltOutputCollectorSparkWrapper implements AlertStreamCollector, Serializable {
-    private final LinkedList<Tuple2<String, AlertStreamEvent>> collector = new LinkedList<>();
+    private final LinkedList<Tuple2<PublishPartition, AlertStreamEvent>> collector = new LinkedList<>();
 
-    public AlertBoltOutputCollectorSparkWrapper() {
+    private Set<PublishPartition> publishPartitions;
+
+    public AlertBoltOutputCollectorSparkWrapper(Set<PublishPartition> publishPartitions) {
+        this.publishPartitions = publishPartitions;
     }
 
     @Override
     public void emit(AlertStreamEvent event) {
-        collector.add(new Tuple2(event.getStreamId(), event));
+
+        Set<PublishPartition> clonedPublishPartitions = new HashSet<>(publishPartitions);
+        for (PublishPartition publishPartition : clonedPublishPartitions) {
+            PublishPartition cloned = publishPartition.clone();
+            for (String column : cloned.getColumns()) {
+                int columnIndex = event.getSchema().getColumnIndex(column);
+                if (columnIndex < 0) {
+                    continue;
+                }
+                cloned.getColumnValues().add(event.getData()[columnIndex]);
+            }
+
+            collector.add(new Tuple2(cloned, event));
+        }
     }
 
-    public List<Tuple2<String, AlertStreamEvent>> emitResult() {
+    public List<Tuple2<PublishPartition, AlertStreamEvent>> emitResult() {
         if (collector.isEmpty()) {
             return Collections.emptyList();
         }
-        LinkedList<Tuple2<String, AlertStreamEvent>> result = new LinkedList<>();
+        LinkedList<Tuple2<PublishPartition, AlertStreamEvent>> result = new LinkedList<>();
         result.addAll(collector);
         return result;
     }
@@ -53,5 +68,20 @@ public class AlertBoltOutputCollectorSparkWrapper implements AlertStreamCollecto
     @Override
     public void close() {
 
+    }
+
+
+    public void onAlertBoltSpecChange(Collection<PublishPartition> addedPublishPartitions,
+                                      Collection<PublishPartition> removedPublishPartitions,
+                                      Collection<PublishPartition> modifiedPublishPartitions) {
+        Set<PublishPartition> clonedPublishPartitions = new HashSet<>(publishPartitions);
+        clonedPublishPartitions.addAll(addedPublishPartitions);
+        clonedPublishPartitions.removeAll(removedPublishPartitions);
+        clonedPublishPartitions.addAll(modifiedPublishPartitions);
+        publishPartitions = clonedPublishPartitions;
+    }
+
+    public Set<PublishPartition> getPublishPartitions() {
+        return this.publishPartitions;
     }
 }

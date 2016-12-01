@@ -17,7 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.model;
 
-import org.apache.eagle.alert.engine.spark.accumulator.MapAccum;
+import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class SiddhiState implements Serializable {
     private Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum;
 
     public SiddhiState(JavaStreamingContext jssc) {
-        Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum = jssc.sparkContext().accumulator(new HashMap<>(), "siddhiSnapShotState", new MapAccum());
+        Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum = jssc.sparkContext().accumulator(new HashMap<>(), "siddhiSnapShotState", new MapToMapAccum());
         this.siddhiSnapShotAccum = siddhiSnapShotAccum;
     }
 

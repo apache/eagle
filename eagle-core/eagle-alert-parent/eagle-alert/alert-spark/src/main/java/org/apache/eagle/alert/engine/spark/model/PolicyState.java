@@ -19,8 +19,7 @@ package org.apache.eagle.alert.engine.spark.model;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.evaluator.CompositePolicyHandler;
-import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
-import org.apache.eagle.alert.engine.spark.accumulator.MapAccum;
+import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
@@ -47,9 +46,9 @@ public class PolicyState implements Serializable {
     private Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler;
 
     public PolicyState(JavaStreamingContext jssc) {
-        Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies = jssc.sparkContext().accumulator(new HashMap<>(), "policyAccum", new MapAccum());
-        Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition = jssc.sparkContext().accumulator(new HashMap<>(), "policyDefinitionAccum", new MapAccum());
-        Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler = jssc.sparkContext().accumulator(new HashMap<>(), "policyStreamHandlerAccum", new MapAccum());
+        Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies = jssc.sparkContext().accumulator(new HashMap<>(), "policyAccum", new MapToMapAccum());
+        Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition = jssc.sparkContext().accumulator(new HashMap<>(), "policyDefinitionAccum", new MapToMapAccum());
+        Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler = jssc.sparkContext().accumulator(new HashMap<>(), "policyStreamHandlerAccum", new MapToMapAccum());
         this.cachedPolicies = cachedPolicies;
         this.policyDefinition = policyDefinition;
         this.policyStreamHandler = policyStreamHandler;

@@ -22,24 +22,25 @@ import org.apache.spark.AccumulatorParam;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapAccum<K, V> implements AccumulatorParam<Map<K, V>> {
+public class MapToMapAccum<T, K, V> implements AccumulatorParam<Map<T, Map<K, V>>> {
     @Override
-    public Map<K, V> addAccumulator(Map<K, V> t1, Map<K, V> t2) {
+    public Map<T, Map<K, V>> addAccumulator(Map<T, Map<K, V>> t1, Map<T, Map<K, V>> t2) {
         return mergeMap(t1, t2);
     }
 
     @Override
-    public Map<K, V> addInPlace(Map<K, V> r1, Map<K, V> r2) {
+    public Map<T, Map<K, V>> addInPlace(Map<T, Map<K, V>> r1, Map<T, Map<K, V>> r2) {
         return mergeMap(r1, r2);
+
     }
 
     @Override
-    public Map<K, V> zero(Map<K, V> initialValue) {
+    public Map<T, Map<K, V>> zero(final Map<T, Map<K, V>> initialValue) {
         return new HashMap<>();
     }
 
-    private Map<K, V> mergeMap(Map<K, V> map1, Map<K, V> map2) {
-        Map<K, V> result = new HashMap<>(map1);
+    private Map<T, Map<K, V>> mergeMap(Map<T, Map<K, V>> map1, Map<T, Map<K, V>> map2) {
+        Map<T, Map<K, V>> result = new HashMap<>(map1);
         map2.forEach((k, v) -> result.merge(k, v, (a, b) -> b));
         return result;
     }
