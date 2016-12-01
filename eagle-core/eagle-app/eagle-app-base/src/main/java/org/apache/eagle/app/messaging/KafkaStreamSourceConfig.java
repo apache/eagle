@@ -19,8 +19,6 @@ package org.apache.eagle.app.messaging;
 import org.apache.eagle.metadata.model.StreamSourceConfig;
 
 public class KafkaStreamSourceConfig implements StreamSourceConfig {
-
-    private static final String DEFAULT_CONFIG_PREFIX = "dataSourceConfig";
     private static final String DEFAULT_CONSUMER_GROUP_ID = "eagleKafkaSource";
     private static final String DEFAULT_TRANSACTION_ZK_ROOT = "/consumers";
     private static final Class<? extends backtype.storm.spout.Scheme> DEFAULT_KAFKA_SCHEMA = JsonSchema.class;
@@ -34,7 +32,7 @@ public class KafkaStreamSourceConfig implements StreamSourceConfig {
     private int fetchSize = 1048576;
     private String transactionZKRoot = DEFAULT_TRANSACTION_ZK_ROOT;
     private String consumerGroupId = DEFAULT_CONSUMER_GROUP_ID;
-    private String brokerZkPath = null;
+    private String brokerZkPath = "/brokers";
     private long transactionStateUpdateMS = 2000;
     private int startOffsetTime = -1;
     private boolean forceFromStart = false;

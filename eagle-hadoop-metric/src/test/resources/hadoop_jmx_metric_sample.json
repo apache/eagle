@@ -1,6 +1,6 @@
 {
   "host":"localhost",
-  "timestamp": 1480319107,
+  "timestamp": 1480319107000,
   "metric": "hadoop.cpu.usage",
   "component": "namenode",
   "site": "test",

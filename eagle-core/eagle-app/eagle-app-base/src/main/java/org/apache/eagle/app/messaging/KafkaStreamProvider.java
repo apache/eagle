@@ -19,6 +19,7 @@ package org.apache.eagle.app.messaging;
 
 import backtype.storm.spout.Scheme;
 import com.typesafe.config.Config;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,19 +60,19 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
         KafkaStreamSinkConfig sinkConfig = new KafkaStreamSinkConfig();
         sinkConfig.setTopicId(getSinkTopicName(streamId,config));
         sinkConfig.setBrokerList(config.getString("dataSinkConfig.brokerList"));
-        sinkConfig.setSerializerClass(config.hasPath("dataSinkConfig.serializerClass")
+        sinkConfig.setSerializerClass(hasNonBlankConfigPath(config, "dataSinkConfig.serializerClass")
             ? config.getString("dataSinkConfig.serializerClass") : "kafka.serializer.StringEncoder");
-        sinkConfig.setKeySerializerClass(config.hasPath("dataSinkConfig.keySerializerClass")
+        sinkConfig.setKeySerializerClass(hasNonBlankConfigPath(config, "dataSinkConfig.keySerializerClass")
             ? config.getString("dataSinkConfig.keySerializerClass") : "kafka.serializer.StringEncoder");
 
         // new added properties for async producer
-        sinkConfig.setNumBatchMessages(config.hasPath("dataSinkConfig.numBatchMessages")
+        sinkConfig.setNumBatchMessages(hasNonBlankConfigPath(config, "dataSinkConfig.numBatchMessages")
             ? config.getString("dataSinkConfig.numBatchMessages") : "1024");
-        sinkConfig.setProducerType(config.hasPath("dataSinkConfig.producerType")
+        sinkConfig.setProducerType(hasNonBlankConfigPath(config, "dataSinkConfig.producerType")
             ? config.getString("dataSinkConfig.producerType") : "async");
-        sinkConfig.setMaxQueueBufferMs(config.hasPath("dataSinkConfig.maxQueueBufferMs")
+        sinkConfig.setMaxQueueBufferMs(hasNonBlankConfigPath(config, "dataSinkConfig.maxQueueBufferMs")
             ? config.getString("dataSinkConfig.maxQueueBufferMs") : "3000");
-        sinkConfig.setRequestRequiredAcks(config.hasPath("dataSinkConfig.requestRequiredAcks")
+        sinkConfig.setRequestRequiredAcks(hasNonBlankConfigPath(config, "dataSinkConfig.requestRequiredAcks")
             ? config.getString("dataSinkConfig.requestRequiredAcks") : "1");
 
         return sinkConfig;
@@ -82,6 +83,10 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
         return new KafkaStreamSink();
     }
 
+    private boolean hasNonBlankConfigPath(Config config, String configName) {
+        return config.hasPath(configName) && StringUtils.isNotBlank(config.getString(configName));
+    }
+
     @Override
     public KafkaStreamSourceConfig getSourceConfig(String streamId, Config config) {
         KafkaStreamSourceConfig sourceConfig = new KafkaStreamSourceConfig();
@@ -89,31 +94,31 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
         sourceConfig.setTopicId(getSourceTopicName(streamId,config));
         sourceConfig.setBrokerZkQuorum(config.getString("dataSourceConfig.zkConnection"));
 
-        if (config.hasPath("dataSourceConfig.fetchSize")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.fetchSize")) {
             sourceConfig.setFetchSize(config.getInt("dataSourceConfig.fetchSize"));
         }
-        if (config.hasPath("dataSourceConfig.transactionZKRoot")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.transactionZKRoot")) {
             sourceConfig.setTransactionZKRoot(config.getString("dataSourceConfig.transactionZKRoot"));
         }
-        if (config.hasPath("dataSourceConfig.consumerGroupId")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.consumerGroupId")) {
             sourceConfig.setConsumerGroupId(config.getString("dataSourceConfig.consumerGroupId"));
         }
-        if (config.hasPath("dataSourceConfig.brokerZkPath")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.brokerZkPath")) {
             sourceConfig.setBrokerZkPath(config.getString("dataSourceConfig.brokerZkPath"));
         }
-        if (config.hasPath("dataSourceConfig.txZkServers")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.txZkServers")) {
             sourceConfig.setTransactionZkServers(config.getString("dataSourceConfig.txZkServers"));
         }
-        if (config.hasPath("dataSourceConfig.transactionStateUpdateMS")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.transactionStateUpdateMS")) {
             sourceConfig.setTransactionStateUpdateMS(config.getLong("dataSourceConfig.transactionStateUpdateMS"));
         }
-        if (config.hasPath("dataSourceConfig.startOffsetTime")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.startOffsetTime")) {
             sourceConfig.setStartOffsetTime(config.getInt("dataSourceConfig.startOffsetTime"));
         }
-        if (config.hasPath("dataSourceConfig.forceFromStart")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.forceFromStart")) {
             sourceConfig.setForceFromStart(config.getBoolean("dataSourceConfig.forceFromStart"));
         }
-        if (config.hasPath("dataSourceConfig.schemeCls")) {
+        if (hasNonBlankConfigPath(config, "dataSourceConfig.schemeCls")) {
             try {
                 sourceConfig.setSchemaClass((Class<? extends Scheme>) Class.forName(config.getString("dataSourceConfig.schemeCls")));
             } catch (ClassNotFoundException e) {

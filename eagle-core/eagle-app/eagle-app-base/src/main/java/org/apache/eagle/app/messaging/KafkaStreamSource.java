@@ -116,7 +116,7 @@ public class KafkaStreamSource extends StormStreamSource<KafkaStreamSourceConfig
         String brokerZkPath = config.getBrokerZkPath();
 
         BrokerHosts hosts;
-        if (brokerZkPath == null) {
+        if (StringUtils.isNotBlank(brokerZkPath)) {
             hosts = new ZkHosts(zkConnString);
         } else {
             hosts = new ZkHosts(zkConnString, brokerZkPath);

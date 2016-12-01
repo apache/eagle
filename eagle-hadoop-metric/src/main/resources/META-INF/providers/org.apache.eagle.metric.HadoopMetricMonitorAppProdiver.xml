@@ -25,7 +25,7 @@
         <property>
             <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
             <displayName>JMX Metric Kafka Topic</displayName>
-            <value>hadoop_jmx_metric_{SITE_ID}</value>
+            <value>hadoop_jmx_metric</value>
             <description>Hadoop JMX metric kafka topic name for stream: HADOOP_JMX_METRIC_STREAM</description>
             <required>true</required>
         </property>
@@ -74,7 +74,8 @@
             <name>dataSourceConfig.txZkServers</name>
             <displayName>Kafka Transaction Zookeeper Servers</displayName>
             <description>Kafka Transaction Zookeeper Servers</description>
-            <required>false</required>
+            <value>localhost:2181</value>
+            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.transactionStateUpdateMS</name>
