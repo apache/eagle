@@ -54,7 +54,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
 
     public StormExecutionRuntime() {
         this.killOptions = new KillOptions();
-        killOptions.set_wait_secs(0);
+        this.killOptions.set_wait_secs(0);
     }
 
     @Override
@@ -160,9 +160,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
                 throw new RuntimeException(e.getMessage(),e);
             }
         } else {
-            KillOptions killOptions = new KillOptions();
-            killOptions.set_wait_secs(0);
-            getLocalCluster().killTopologyWithOpts(appId,killOptions);
+            getLocalCluster().killTopologyWithOpts(appId, this.killOptions);
         }
         LOG.info("Stopped topology {}", appId);
     }
