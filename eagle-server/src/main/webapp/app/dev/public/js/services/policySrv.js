@@ -27,12 +27,12 @@
 				'org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher': {
 					name: "Email",
 					displayFields: ["recipients"],
-					fields: ["subject", "template", "sender", "recipients", "mail.smtp.host", "connection", "mail.smtp.port"]
+					fields: ["subject", "template", "sender", "recipients"]
 				},
 				'org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher': {
 					name: "Kafka",
 					displayFields: ["topic"],
-					fields: ["topic", "kafka_broker", "rawAlertNamespaceLabel", "rawAlertNamespaceValue"]
+					fields: ["topic", "kafka_broker"]
 				},
 				'org.apache.eagle.alert.engine.publisher.impl.AlertSlackPublisher': {
 					name: "Slack",

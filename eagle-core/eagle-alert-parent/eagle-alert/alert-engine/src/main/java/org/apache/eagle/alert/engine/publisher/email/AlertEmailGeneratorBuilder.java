@@ -17,7 +17,7 @@
  */
 package org.apache.eagle.alert.engine.publisher.email;
 
-import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class AlertEmailGeneratorBuilder {
@@ -51,7 +51,7 @@ public class AlertEmailGeneratorBuilder {
         return this;
     }
 
-    public AlertEmailGeneratorBuilder withMailProps(Map<String, Object> mailProps) {
+    public AlertEmailGeneratorBuilder withMailProps(Properties mailProps) {
         generator.setProperties(mailProps);
         return this;
     }

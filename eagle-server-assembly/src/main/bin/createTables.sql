@@ -16,6 +16,9 @@
 --  *
 --  */
 
+
+--- application framework metadata ---
+
 CREATE TABLE IF NOT EXISTS applications (
   uuid varchar(50) PRIMARY KEY,
   appid varchar(100) DEFAULT NULL,
@@ -40,6 +43,8 @@ CREATE TABLE IF NOT EXISTS sites (
   UNIQUE (siteid)
 );
 
+--- eagle security module metadata ---
+
 CREATE TABLE IF NOT EXISTS hdfs_sensitivity_entity (
   site varchar(20) DEFAULT NULL,
   filedir varchar(100) DEFAULT NULL,
@@ -59,3 +64,74 @@ CREATE TABLE IF NOT EXISTS hbase_sensitivity_entity (
   sensitivity_type varchar(20) DEFAULT NULL,
   primary key (site, hbase_resource)
 );
+
+--- alert engine metadata ---
+
+CREATE TABLE IF NOT EXISTS stream_cluster (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS stream_definition (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Kafka_tuple_metadata (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS policy_definition (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS publishment (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS schedule_state (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS policy_assignment (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS topology (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS publishment_type (
+  id VARCHAR (50) PRIMARY KEY,
+  content longtext DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS policy_publishment (
+  policyId VARCHAR(50),
+  publishmentName VARCHAR(50),
+  PRIMARY KEY(policyId, publishmentName),
+  CONSTRAINT `policy_id_fk` FOREIGN KEY (`policyId`) REFERENCES `policy_definition` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `publishment_id_fk` FOREIGN KEY (`publishmentName`) REFERENCES `publishment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS alert_event (
+  alertId VARCHAR (50) PRIMARY KEY,
+  siteId VARCHAR (50) DEFAULT NULL,
+  appIds VARCHAR (255) DEFAULT NULL,
+  policyId VARCHAR (50) DEFAULT NULL,
+  alertTimestamp bigint(20) DEFAULT NULL,
+  policyValue mediumtext DEFAULT NULL,
+  alertData mediumtext DEFAULT NULL
+);
+
+INSERT INTO publishment_type(id, content) VALUES
+('Kafka', '{"type":"Kafka","className":"org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher","description":null,"fields":[{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]}'),
+('Email', '{"type":"Email","className":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher","description":null,"fields":[{"name":"subject"},{"name":"sender"}, {"name":"recipients"}]}'),
+('Slack', '{"type":"Slack","className":"org.apache.eagle.alert.engine.publisher.impl.AlertSlackPublisher","description":null,"fields":[{"name":"token"},{"name":"channels"}, {"name":"severitys"}, {"name":"urltemplate"}]}'),
+('Storage', '{"type":"Storage","className":"org.apache.eagle.alert.app.AlertEagleStorePlugin","description":null,"fields":[]}');

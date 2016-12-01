@@ -33,8 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @since May 26, 2016.
@@ -80,11 +80,11 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public List<AlertPublishEvent> listAlertPublishEvent(int size) {
-        List<AlertPublishEvent> result = handler.list(AlertPublishEvent.class);
-        if (size < 0 || size > result.size()) {
-            size = result.size();
+        if (size <= 0) {
+            LOG.info("Invalid parameter size <= 0");
+            return new ArrayList<>();
         }
-        return result.subList(result.size() - size, result.size());
+        return handler.listAlertEvents(null, null, size);
     }
 
     public PolicyDefinition getPolicyById(String policyId) {
@@ -97,17 +97,16 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public AlertPublishEvent getAlertPublishEvent(String alertId) {
-        return handler.getAlertEventById(alertId);
+        return handler.getAlertEventById(alertId, 1);
     }
 
     @Override
     public List<AlertPublishEvent> getAlertPublishEventsByPolicyId(String policyId, int size) {
-        List<AlertPublishEvent> alerts = handler.list(AlertPublishEvent.class);
-        List<AlertPublishEvent> result = alerts.stream().filter(alert -> alert.getPolicyId().equals(policyId)).collect(Collectors.toList());
-        if (size < 0 || size > result.size()) {
-            size = result.size();
+        if (size <= 0) {
+            LOG.info("Invalid parameter size <= 0");
+            return new ArrayList<>();
         }
-        return result.subList(result.size() - size, result.size());
+        return handler.getAlertEventByPolicyId(policyId, size);
     }
 
     @Override

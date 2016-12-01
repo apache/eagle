@@ -135,6 +135,7 @@ public class JdbcImplTest {
         {
             PublishmentType publishmentType = new PublishmentType();
             publishmentType.setType("KAFKA");
+            publishmentType.setClassName("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
             List<Map<String, String>> fields = new ArrayList<>();
             Map<String, String> field1 = new HashMap<>();
             field1.put("name", "kafka_broker");
@@ -147,8 +148,11 @@ public class JdbcImplTest {
             OpResult result = dao.addPublishmentType(publishmentType);
             Assert.assertEquals(200, result.code);
             List<PublishmentType> types = dao.listPublishmentType();
-            Assert.assertEquals(1, types.size());
-            Assert.assertEquals(2, types.get(0).getFields().size());
+            Assert.assertEquals(5, types.size());
+
+            dao.removePublishmentType("KAFKA");
+            types = dao.listPublishmentType();
+            Assert.assertTrue(types.size() == 4);
         }
     }
 

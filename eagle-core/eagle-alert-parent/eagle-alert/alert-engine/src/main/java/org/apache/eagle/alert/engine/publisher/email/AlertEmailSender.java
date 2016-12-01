@@ -43,10 +43,7 @@ public class AlertEmailSender implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEmailSender.class);
     private static final int MAX_RETRY_COUNT = 3;
 
-
-    private Map<String, Object> mailProps;
-
-
+    private Properties mailProps;
     private String threadName;
 
     /**
@@ -73,43 +70,9 @@ public class AlertEmailSender implements Runnable {
         LOG.info("Initialized " + threadName + ": origin is : " + this.origin + ", recipient of the email: " + this.recipients + ", velocity TPL file: " + this.configFileName);
     }
 
-    public AlertEmailSender(AlertEmailContext alertEmail, Map<String, Object> mailProps) {
+    public AlertEmailSender(AlertEmailContext alertEmail, Properties mailProps) {
         this(alertEmail);
         this.mailProps = mailProps;
-    }
-
-    private Properties parseMailClientConfig(Map<String, Object> mailProps) {
-        if (mailProps == null) {
-            return null;
-        }
-        Properties props = new Properties();
-        String mailHost = (String) mailProps.get(AlertEmailConstants.CONF_MAIL_HOST);
-        String mailPort = (String) mailProps.get(AlertEmailConstants.CONF_MAIL_PORT);
-        if (mailHost == null || mailPort == null || mailHost.isEmpty()) {
-            LOG.warn("SMTP server is unset, will exit");
-            return null;
-        }
-        props.put(AlertEmailConstants.CONF_MAIL_HOST, mailHost);
-        props.put(AlertEmailConstants.CONF_MAIL_PORT, mailPort);
-
-        String smtpAuth = (String) mailProps.getOrDefault(AlertEmailConstants.CONF_MAIL_AUTH, "false");
-        props.put(AlertEmailConstants.CONF_MAIL_AUTH, smtpAuth);
-        if (Boolean.parseBoolean(smtpAuth)) {
-            props.put(AlertEmailConstants.CONF_AUTH_USER, mailProps.get(AlertEmailConstants.CONF_AUTH_USER));
-            props.put(AlertEmailConstants.CONF_AUTH_PASSWORD, mailProps.get(AlertEmailConstants.CONF_AUTH_PASSWORD));
-        }
-
-        String smtpConn = (String) mailProps.getOrDefault(AlertEmailConstants.CONF_MAIL_CONN, AlertEmailConstants.CONN_PLAINTEXT);
-        if (smtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_TLS)) {
-            props.put("mail.smtp.starttls.enable", "true");
-        }
-        if (smtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_SSL)) {
-            props.put("mail.smtp.socketFactory.port", "465");
-            props.put("mail.smtp.socketFactory.class",
-                "javax.net.ssl.SSLSocketFactory");
-        }
-        props.put(AlertEmailConstants.CONF_MAIL_DEBUG, mailProps.getOrDefault(AlertEmailConstants.CONF_MAIL_DEBUG, "false"));
-        return props;
     }
 
     @Override
@@ -121,8 +84,7 @@ public class AlertEmailSender implements Runnable {
             try {
                 final EagleMailClient client;
                 if (mailProps != null) {
-                    Properties props = parseMailClientConfig(mailProps);
-                    client = new EagleMailClient(props);
+                    client = new EagleMailClient(mailProps);
                 } else {
                     client = new EagleMailClient();
                 }

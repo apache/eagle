@@ -84,7 +84,8 @@ public class ApplicationAction implements Serializable {
         executionConfig.put("jarPath", metadata.getJarPath());
         executionConfig.put("mode", metadata.getMode().name());
         executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF, APP_METRIC_PREFIX);
-        this.effectiveConfig = ConfigFactory.parseMap(executionConfig).withFallback(serverConfig).withFallback(ConfigFactory.parseMap(metadata.getContext()));
+
+        this.effectiveConfig = ConfigFactory.parseMap(executionConfig).withFallback(serverConfig).withFallback(ConfigFactory.parseMap(metadata.getContext())).withFallback(serverConfig.getConfig("coordinator"));
         this.alertMetadataService = alertMetadataService;
     }
 

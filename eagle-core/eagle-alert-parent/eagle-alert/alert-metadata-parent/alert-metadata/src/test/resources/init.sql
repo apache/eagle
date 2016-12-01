@@ -78,3 +78,10 @@ CREATE TABLE IF NOT EXISTS alert_event (
   policyValue mediumtext DEFAULT NULL,
   alertData mediumtext DEFAULT NULL
 );
+
+INSERT INTO publishment_type(id, content) VALUES
+('Kafka', '{"type":"Kafka","className":"org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher","description":null,"fields":[{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]}'),
+('Email', '{"type":"Email","className":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher","description":null,"fields":[{"name":"subject"},{"name":"sender"}, {"name":"recipients"}]}'),
+('Slack', '{"type":"Slack","className":"org.apache.eagle.alert.engine.publisher.impl.AlertSlackPublisher","description":null,"fields":[{"name":"token"},{"name":"channels"}, {"name":"severitys"}, {"name":"urltemplate"}]}'),
+('Storage', '{"type":"Storage","className":"org.apache.eagle.alert.app.AlertEagleStorePlugin","description":null,"fields":[]}');
+

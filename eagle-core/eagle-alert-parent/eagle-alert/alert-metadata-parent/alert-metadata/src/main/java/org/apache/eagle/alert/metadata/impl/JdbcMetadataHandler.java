@@ -57,7 +57,9 @@ public class JdbcMetadataHandler {
     // customized model
     private static final String CLEAR_SCHEDULESTATES_STATEMENT = "DELETE FROM schedule_state WHERE id NOT IN (SELECT id from (SELECT id FROM schedule_state ORDER BY id DESC limit ?) as states)";
     private static final String INSERT_ALERT_STATEMENT = "INSERT INTO alert_event(alertId, siteId, appIds, policyId, alertTimestamp, policyValue, alertData) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String QUERY_ALERT_STATEMENT = "SELECT * FROM alert_event WHERE alertId=?";
+    private static final String QUERY_ALERT_STATEMENT = "SELECT * FROM alert_event order by alertTimestamp DESC limit ?";
+    private static final String QUERY_ALERT_BY_ID_STATEMENT = "SELECT * FROM alert_event WHERE alertId=? order by alertTimestamp DESC limit ?";
+    private static final String QUERY_ALERT_BY_POLICY_STATEMENT = "SELECT * FROM alert_event WHERE policyId=? order by alertTimestamp DESC limit ?";
     private static final String INSERT_POLICYPUBLISHMENT_STATEMENT = "INSERT INTO policy_publishment(policyId, publishmentName) VALUES (?, ?)";
     private static final String DELETE_PUBLISHMENT_STATEMENT = "DELETE FROM policy_publishment WHERE policyId=?";
     private static final String QUERY_PUBLISHMENT_BY_POLICY_STATEMENT = "SELECT content FROM publishment a INNER JOIN policy_publishment b ON a.id=b.publishmentName and b.policyId=?";
@@ -181,7 +183,7 @@ public class JdbcMetadataHandler {
             result = executeUpdate(connection, String.format(INSERT_STATEMENT, tb), key, value);
             connection.commit();
         } catch (SQLException e) {
-            LOG.warn(e.getMessage(), e.getCause());
+            LOG.warn("fail to insert entity due to {}, and try to updated instead", e.getMessage());
             if (connection != null) {
                 LOG.info("Detected duplicated entity");
                 try {
@@ -299,12 +301,33 @@ public class JdbcMetadataHandler {
         }
     }
 
-    public AlertPublishEvent getAlertEventById(String alertId) {
+    public AlertPublishEvent getAlertEventById(String alertId, int size) {
+        List<AlertPublishEvent> alerts = listAlertEvents(QUERY_ALERT_BY_ID_STATEMENT, alertId, size);
+        if (alerts.isEmpty()) {
+            return null;
+        } else {
+            return alerts.get(0);
+        }
+    }
+
+    public List<AlertPublishEvent> getAlertEventByPolicyId(String policyId, int size) {
+        return listAlertEvents(QUERY_ALERT_BY_POLICY_STATEMENT, policyId, size);
+    }
+
+    public List<AlertPublishEvent> listAlertEvents(String query, String filter, int size) {
         List<AlertPublishEvent> alerts = new LinkedList<>();
         try {
             Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(QUERY_ALERT_STATEMENT);
-            statement.setString(1, alertId);
+            PreparedStatement statement = null;
+            if (query == null) {
+                query = QUERY_ALERT_STATEMENT;
+                statement = connection.prepareStatement(query);
+                statement.setInt(1, size);
+            } else {
+                statement = connection.prepareStatement(query);
+                statement.setString(1, filter);
+                statement.setInt(2, size);
+            }
             alerts = executeList(connection, statement, rs -> {
                 try {
                     AlertPublishEvent event = new AlertPublishEvent();
@@ -323,11 +346,7 @@ public class JdbcMetadataHandler {
         } catch (SQLException ex) {
             LOG.error(ex.getMessage(), ex);
         }
-        if (alerts.isEmpty()) {
-            return null;
-        } else {
-            return alerts.get(0);
-        }
+        return alerts;
     }
 
     public List<Publishment> listPublishments() {
@@ -433,6 +452,7 @@ public class JdbcMetadataHandler {
         PreparedStatement statement = null;
         try {
             connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_PUBLISHMENT_STATEMENT);
             statement.setString(1, policyId);
             int status = statement.executeUpdate();
@@ -446,6 +466,7 @@ public class JdbcMetadataHandler {
             }
             int[] num = statement.executeBatch();
             connection.commit();
+            connection.setAutoCommit(true);
             int sum = 0;
             for (int i : num) {
                 sum += i;

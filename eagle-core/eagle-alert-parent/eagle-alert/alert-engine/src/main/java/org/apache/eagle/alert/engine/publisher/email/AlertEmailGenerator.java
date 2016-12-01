@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.*;
 
 public class AlertEmailGenerator {
@@ -43,7 +44,7 @@ public class AlertEmailGenerator {
     private String serverHost = "localhost";
     private int serverPort = 80;
 
-    private Map<String, Object> properties;
+    private Properties properties;
 
     private ThreadPoolExecutor executorPool;
 
@@ -173,11 +174,11 @@ public class AlertEmailGenerator {
         this.subject = subject;
     }
 
-    public Map<String, Object> getProperties() {
+    public Properties getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, Object> properties) {
+    public void setProperties(Properties properties) {
         this.properties = properties;
     }
 
