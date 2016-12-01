@@ -87,13 +87,14 @@ public class ApplicationActionTest {
         metadata.setMode(ApplicationEntity.Mode.LOCAL);
         metadata.setJarPath(applicationDesc.getJarPath());
         Map<String, Object> configure = new HashedMap();
-        configure.put("a", "b");
+        configure.put("dataSinkConfig.topic", "test_topic");
+        configure.put("dataSinkConfig.brokerList", "sandbox.hortonworks.com:6667");
+        configure.put(MetricConfigs.METRIC_PREFIX_CONF, "eagle.");
         metadata.setConfiguration(configure);
         metadata.setContext(configure);
         Config serverConfig = ConfigFactory.parseMap(new HashMap<String,String>(){{
-            put("dataSinkConfig.topic", "test_topic");
-            put("dataSinkConfig.brokerList", "sandbox.hortonworks.com:6667");
-            put(MetricConfigs.METRIC_PREFIX_CONF, "eagle.");
+            put("coordinator.metadataService.host", "localhost");
+            put("coordinator.metadataService.context", "/rest");
         }});
         IMetadataDao alertMetadataService = new InMemMetadataDaoImpl(serverConfig);
         ApplicationAction applicationAction = new ApplicationAction(application, metadata, serverConfig, alertMetadataService);

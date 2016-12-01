@@ -26,6 +26,7 @@ import org.apache.eagle.alert.engine.scheme.JsonScheme;
 import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metric.MetricConfigs;
+import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
@@ -85,10 +86,16 @@ public class ApplicationAction implements Serializable {
         executionConfig.put("mode", metadata.getMode().name());
         executionConfig.put(MetricConfigs.METRIC_PREFIX_CONF, APP_METRIC_PREFIX);
 
-        this.effectiveConfig = ConfigFactory.parseMap(executionConfig)
-                .withFallback(serverConfig)
-                .withFallback(ConfigFactory.parseMap(metadata.getContext()))
-                .withFallback(serverConfig.getConfig("coordinator"));
+        if (serverConfig.hasPath(AlertConstants.COORDINATOR)) {
+            this.effectiveConfig = ConfigFactory.parseMap(executionConfig)
+                    .withFallback(serverConfig)
+                    .withFallback(ConfigFactory.parseMap(metadata.getContext()))
+                    .withFallback(serverConfig.getConfig(AlertConstants.COORDINATOR));
+        } else {
+            this.effectiveConfig = ConfigFactory.parseMap(executionConfig)
+                    .withFallback(serverConfig)
+                    .withFallback(ConfigFactory.parseMap(metadata.getContext()));
+        }
         this.alertMetadataService = alertMetadataService;
     }
 
