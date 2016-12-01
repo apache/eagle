@@ -107,7 +107,6 @@ public class MRRunningJobManagerTest {
                         mrRunningJobManager.delete("yarnAppId", "jobId");
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     // log or do something
                 }
                 return null;
@@ -151,7 +150,6 @@ public class MRRunningJobManagerTest {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     // log or do something
                 }
                 return null;
@@ -189,7 +187,6 @@ public class MRRunningJobManagerTest {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     // log or do something
                 }
                 return null;
