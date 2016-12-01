@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPublishSpecListener {
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherBolt.class);
@@ -73,6 +74,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         streamContext = new StreamContextImpl(config, context.registerMetric("eagle.publisher", new MultiCountMetric(), 60), context);
         this.context = context;
         this.alertTemplateEngine = AlertTemplateEngineFactory.createAlertTemplateEngine();
+        this.alertTemplateEngine.init(config);
         this.alertFilter = new PipeStreamFilter(new AlertContextEnrichFilter(this), new AlertTemplateFilter(alertTemplateEngine));
     }
 
@@ -91,7 +93,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             }
             this.collector.ack(input);
             streamContext.counter().incr("ack_count");
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             streamContext.counter().incr("fail_count");
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
@@ -139,10 +141,8 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     @Override
     public void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
         List<String> policyToRemove = new ArrayList<>();
-        for (String policyId : this.policyDefinitionMap.keySet()) {
-            if (!pds.containsKey(policyId)) {
-                policyToRemove.add(policyId);
-            }
+        if (this.policyDefinitionMap != null) {
+            policyToRemove.addAll(this.policyDefinitionMap.keySet().stream().filter(policyId -> !pds.containsKey(policyId)).collect(Collectors.toList()));
         }
 
         this.policyDefinitionMap = pds;
@@ -177,6 +177,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
          */
         @Override
         public AlertStreamEvent filter(AlertStreamEvent event) {
+            event.ensureAlertId();
             Map<String, Object> extraData = new HashMap<>();
             List<String> appIds = new ArrayList<>();
             if (alertPublisherBolt.policyDefinitionMap == null || alertPublisherBolt.streamDefinitionMap == null) {

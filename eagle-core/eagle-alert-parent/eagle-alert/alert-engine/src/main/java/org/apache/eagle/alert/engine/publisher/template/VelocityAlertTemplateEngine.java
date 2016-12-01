@@ -92,10 +92,10 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
                 LOG.warn("Body template of policy {} is null, using ALERT_STRING by default");
                 stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_STRING);
             }
-            policyDefinitionRepository.put(policyDefinition.getName(), policyDefinition);
         } else {
             throw new IllegalArgumentException("Unsupported alert template type " + alertTemplateDefinition.getType());
         }
+        policyDefinitionRepository.put(policyDefinition.getName(), policyDefinition);
     }
 
     @Override
