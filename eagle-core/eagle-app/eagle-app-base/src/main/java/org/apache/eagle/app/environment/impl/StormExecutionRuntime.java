@@ -43,12 +43,18 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     private static LocalCluster _localCluster;
 
     private StormEnvironment environment;
+    private KillOptions killOptions;
 
     private static LocalCluster getLocalCluster() {
         if (_localCluster == null) {
             _localCluster = new LocalCluster();
         }
         return _localCluster;
+    }
+
+    public StormExecutionRuntime() {
+        this.killOptions = new KillOptions();
+        killOptions.set_wait_secs(0);
     }
 
     @Override
@@ -148,7 +154,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
             try {
-                stormClient.killTopology(appId);
+                stormClient.killTopologyWithOpts(appId, this.killOptions);
             } catch (NotAliveException | TException e) {
                 LOG.error("Failed to kill topology named {}, due to: {}",appId,e.getMessage(),e.getCause());
                 throw new RuntimeException(e.getMessage(),e);
