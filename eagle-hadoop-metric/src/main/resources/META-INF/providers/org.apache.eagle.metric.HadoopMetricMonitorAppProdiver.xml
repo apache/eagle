@@ -36,6 +36,53 @@
             <description>Sourced Kafka Brokers like broker1,broker2,...</description>
             <required>true</required>
         </property>
+        <property>
+            <name>dataSourceConfig.zkConnection</name>
+            <displayName>Zookeeper Quorum</displayName>
+            <value>localhost:2181</value>
+            <description>Kafka Zookeeper Quorum</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.fetchSize</name>
+            <displayName>Kafka Fetch Size</displayName>
+            <value>1048576</value>
+            <description>Kafka Fetch Size</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.transactionZKRoot</name>
+            <displayName>Kafka Transaction Root Path</displayName>
+            <value>/consumers</value>
+            <description>Kafka Transaction Root Path</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.consumerGroupId</name>
+            <displayName>Kafka Consumer Group ID</displayName>
+            <value>eagleConsumer</value>
+            <description>Kafka Consumer Group ID</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.brokerZkPath</name>
+            <displayName>Kafka Broker ZkPath</displayName>
+            <description>Kafka Broker ZkPath</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.txZkServers</name>
+            <displayName>Kafka Transaction Zookeeper Servers</displayName>
+            <description>Kafka Transaction Zookeeper Servers</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.transactionStateUpdateMS</name>
+            <value>2000</value>
+            <displayName>Kafka Transaction Status Update MS</displayName>
+            <description>Kafka Transaction Status Update MS</description>
+            <required>false</required>
+        </property>
     </configuration>
     <streams>
         <stream>

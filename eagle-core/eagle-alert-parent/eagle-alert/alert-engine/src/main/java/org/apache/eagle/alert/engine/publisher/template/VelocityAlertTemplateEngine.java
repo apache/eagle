@@ -63,6 +63,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
     private String getAlertBodyTemplateName(String policyId) {
         return String.format("%s:%s", ALERT_BODY_TPL_PREFIX, policyId);
     }
+
     private String getAlertSubjectTemplateName(String policyId) {
         return String.format("%s:%s", ALERT_SUBJECT_TPL_PREFIX, policyId);
     }
@@ -124,12 +125,12 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             try {
                 bodyWriter.close();
             } catch (IOException e) {
-                LOG.warn(e.getMessage(),e);
+                LOG.warn(e.getMessage(), e);
             }
             try {
                 subjectWriter.close();
             } catch (IOException e) {
-                LOG.warn(e.getMessage(),e);
+                LOG.warn(e.getMessage(), e);
             }
         }
         return event;
@@ -158,7 +159,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
         context.put(AlertContextFields.POLICY_DEFINITION, policyDefinition.getDefinition().getValue());
         context.put(AlertContextFields.POLICY_HANDLER, policyDefinition.getDefinition().getHandlerClass());
 
-        for (Map.Entry<String,Object> entry : event.getDataMap().entrySet()) {
+        for (Map.Entry<String, Object> entry : event.getDataMap().entrySet()) {
             context.put(entry.getKey(), entry.getValue());
         }
         return context;
