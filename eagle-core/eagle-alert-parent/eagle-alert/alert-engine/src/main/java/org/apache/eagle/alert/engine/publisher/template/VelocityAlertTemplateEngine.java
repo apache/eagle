@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.AlertTemplateDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.velocity.Template;
@@ -107,8 +106,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
     }
 
     @Override
-    public synchronized AlertPublishEvent renderAlert(AlertStreamEvent event) {
-        AlertPublishEvent publishEvent = AlertPublishEvent.createAlertPublishEvent(event);
+    public synchronized AlertStreamEvent filter(AlertStreamEvent event) {
         Preconditions.checkArgument(this.policyDefinitionRepository.containsKey(event.getPolicyId()), "Unknown policyId " + event.getPolicyId());
         PolicyDefinition policyDefinition = this.policyDefinitionRepository.get(event.getPolicyId());
         StringWriter bodyWriter = new StringWriter();
@@ -117,11 +115,11 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             VelocityContext alertContext = buildAlertContext(policyDefinition, event);
             Template template = engine.getTemplate(getAlertBodyTemplateName(event.getPolicyId()));
             template.merge(alertContext, bodyWriter);
-            publishEvent.setAlertBody(bodyWriter.toString());
+            event.setBody(bodyWriter.toString());
 
             template = engine.getTemplate(getAlertSubjectTemplateName(event.getPolicyId()));
             template.merge(alertContext, subjectWriter);
-            publishEvent.setAlertSubject(subjectWriter.toString());
+            event.setSubject(subjectWriter.toString());
         } finally {
             try {
                 bodyWriter.close();
@@ -134,7 +132,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
                 LOG.warn(e.getMessage(),e);
             }
         }
-        return publishEvent;
+        return event;
     }
 
     @Override

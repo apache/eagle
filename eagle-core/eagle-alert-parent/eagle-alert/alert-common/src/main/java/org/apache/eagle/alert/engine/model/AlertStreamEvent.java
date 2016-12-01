@@ -35,8 +35,16 @@ public class AlertStreamEvent extends StreamEvent {
     private StreamDefinition schema;
     private String createdBy;
     private long createdTime;
-    // app related fields
-    private Map<String, Object> extraData;
+
+    // ----------------------
+    // Lazy Alert Fields
+    // ----------------------
+
+    // Dynamical context like app related fields
+    private Map<String, Object> context;
+    // Alert content like subject and body
+    private String subject;
+    private String body;
 
     public AlertStreamEvent() {
     }
@@ -114,12 +122,12 @@ public class AlertStreamEvent extends StreamEvent {
         return event;
     }
 
-    public Map<String, Object> getExtraData() {
-        return extraData;
+    public Map<String, Object> getContext() {
+        return context;
     }
 
-    public void setExtraData(Map<String, Object> extraData) {
-        this.extraData = extraData;
+    public void setContext(Map<String, Object> context) {
+        this.context = context;
     }
 
     public String getAlertId() {
@@ -130,5 +138,21 @@ public class AlertStreamEvent extends StreamEvent {
         if (this.alertId == null) {
             this.alertId = UUID.randomUUID().toString();
         }
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

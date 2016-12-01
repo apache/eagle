@@ -14,35 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.publisher.template;
+package org.apache.eagle.alert.engine.publisher;
 
-import com.typesafe.config.Config;
-import org.apache.eagle.alert.engine.publisher.AlertStreamFilter;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
-import java.util.Collection;
-
-/**
- * Alert Template Engine.
- */
-public interface AlertTemplateEngine extends AlertStreamFilter {
+public interface AlertStreamFilter {
     /**
-     * Initialize AlertTemplateEngine with Config.
+     * Filter Stream Event, if skipped, return null.
      */
-    void init(Config config);
-
-    /**
-     * Register policy with definition.
-     */
-    void register(PolicyDefinition policyDefinition);
-
-    /**
-     * Register policy by policyId.
-     */
-    void unregister(String policyId);
-
-    /**
-     * @return registered policy definitions.
-     */
-    Collection<PolicyDefinition> getPolicies();
+    AlertStreamEvent filter(AlertStreamEvent event);
 }

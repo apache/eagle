@@ -113,10 +113,12 @@ public class AlertPublishEvent {
         alertEvent.setStreamId(event.getStreamId());
         alertEvent.setCreatedBy(event.getCreatedBy());
         alertEvent.setCreatedTime(event.getCreatedTime());
-        if (event.getExtraData() != null && !event.getExtraData().isEmpty()) {
-            alertEvent.setSiteId(event.getExtraData().get(SITE_ID_KEY).toString());
-            alertEvent.setPolicyValue(event.getExtraData().get(POLICY_VALUE_KEY).toString());
-            alertEvent.setAppIds((List<String>) event.getExtraData().get(APP_IDS_KEY));
+        alertEvent.setAlertSubject(event.getSubject());
+        alertEvent.setAlertBody(event.getBody());
+        if (event.getContext() != null && !event.getContext().isEmpty()) {
+            alertEvent.setSiteId(event.getContext().get(SITE_ID_KEY).toString());
+            alertEvent.setPolicyValue(event.getContext().get(POLICY_VALUE_KEY).toString());
+            alertEvent.setAppIds((List<String>) event.getContext().get(APP_IDS_KEY));
         }
         alertEvent.setAlertData(event.getDataMap());
         return alertEvent;

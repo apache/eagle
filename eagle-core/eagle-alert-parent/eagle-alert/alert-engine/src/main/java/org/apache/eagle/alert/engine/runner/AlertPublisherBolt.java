@@ -16,18 +16,6 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.engine.StreamContextImpl;
-import org.apache.eagle.alert.engine.coordinator.*;
-import org.apache.eagle.alert.engine.model.AlertPublishEvent;
-import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
-import org.apache.eagle.alert.engine.publisher.AlertPublisher;
-import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
-import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
-import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngineFactory;
-import org.apache.eagle.alert.utils.AlertConstants;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -35,7 +23,19 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-
+import org.apache.eagle.alert.coordination.model.PublishSpec;
+import org.apache.eagle.alert.engine.StreamContextImpl;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
+import org.apache.eagle.alert.engine.publisher.AlertPublisher;
+import org.apache.eagle.alert.engine.publisher.AlertStreamFilter;
+import org.apache.eagle.alert.engine.publisher.PipeStreamFilter;
+import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngineFactory;
+import org.apache.eagle.alert.utils.AlertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("serial")
 public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPublishSpecListener {
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherBolt.class);
     private final AlertPublisher alertPublisher;
@@ -55,11 +54,12 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
 
     private boolean logEventEnabled;
     private TopologyContext context;
-    
+    private AlertStreamFilter alertFilter;
+
     public AlertPublisherBolt(String alertPublisherName, Config config, IMetadataChangeNotifyService coordinatorService) {
         super(alertPublisherName, coordinatorService, config);
         this.alertPublisher = new AlertPublisherImpl(alertPublisherName);
-        
+
         if (config != null && config.hasPath("topology.logEventEnabled")) {
             logEventEnabled = config.getBoolean("topology.logEventEnabled");
         }
@@ -67,12 +67,13 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
 
     @Override
     public void internalPrepare(OutputCollector collector, IMetadataChangeNotifyService coordinatorService, Config config, TopologyContext context) {
-        alertTemplateEngine = AlertTemplateEngineFactory.createAlertTemplateEngine();
         coordinatorService.registerListener(this);
         coordinatorService.init(config, MetadataType.ALERT_PUBLISH_BOLT);
         this.alertPublisher.init(config, stormConf);
         streamContext = new StreamContextImpl(config, context.registerMetric("eagle.publisher", new MultiCountMetric(), 60), context);
         this.context = context;
+        this.alertTemplateEngine = AlertTemplateEngineFactory.createAlertTemplateEngine();
+        this.alertFilter = new PipeStreamFilter(new AlertContextEnrichFilter(this), new AlertTemplateFilter(alertTemplateEngine));
     }
 
     @Override
@@ -84,8 +85,10 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             if (logEventEnabled) {
                 LOG.info("Alert publish bolt {}/{} with partition {} received event: {}", this.getBoltId(), this.context.getThisTaskId(), partition, event);
             }
-            wrapAlertEvent(event);
-            alertPublisher.nextEvent(partition, event);
+            AlertStreamEvent filteredEvent = alertFilter.filter(event);
+            if (filteredEvent != null) {
+                alertPublisher.nextEvent(partition, filteredEvent);
+            }
             this.collector.ack(input);
             streamContext.counter().incr("ack_count");
         } catch (Exception ex) {
@@ -136,7 +139,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     @Override
     public void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
         List<String> policyToRemove = new ArrayList<>();
-        for (String policyId: this.policyDefinitionMap.keySet()) {
+        for (String policyId : this.policyDefinitionMap.keySet()) {
             if (!pds.containsKey(policyId)) {
                 policyToRemove.add(policyId);
             }
@@ -162,34 +165,51 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         }
     }
 
-    private void wrapAlertEvent(AlertStreamEvent event) {
-        Map<String, Object> extraData = new HashMap<>();
-        List<String> appIds = new ArrayList<>();
-        if (policyDefinitionMap == null || streamDefinitionMap == null) {
-            LOG.warn("policyDefinitions or streamDefinitions in publisher bolt have not been initialized");
-        } else {
-            PolicyDefinition policyDefinition = policyDefinitionMap.get(event.getPolicyId());
-            if (this.policyDefinitionMap != null && policyDefinition != null) {
-                for (String inputStreamId : policyDefinition.getInputStreams()) {
-                    StreamDefinition sd = this.streamDefinitionMap.get(inputStreamId);
-                    if (sd != null) {
-                        extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());
-                        appIds.add(sd.getDataSource());
+    private class AlertContextEnrichFilter implements AlertStreamFilter {
+        private final AlertPublisherBolt alertPublisherBolt;
+
+        private AlertContextEnrichFilter(AlertPublisherBolt alertPublisherBolt) {
+            this.alertPublisherBolt = alertPublisherBolt;
+        }
+
+        /**
+         * TODO: Refactor wrapAlertPublishEvent into alertTemplateEngine and remove extraData from AlertStreamEvent.
+         */
+        @Override
+        public AlertStreamEvent filter(AlertStreamEvent event) {
+            Map<String, Object> extraData = new HashMap<>();
+            List<String> appIds = new ArrayList<>();
+            if (alertPublisherBolt.policyDefinitionMap == null || alertPublisherBolt.streamDefinitionMap == null) {
+                LOG.warn("policyDefinitions or streamDefinitions in publisher bolt have not been initialized");
+            } else {
+                PolicyDefinition policyDefinition = alertPublisherBolt.policyDefinitionMap.get(event.getPolicyId());
+                if (alertPublisherBolt.policyDefinitionMap != null && policyDefinition != null) {
+                    for (String inputStreamId : policyDefinition.getInputStreams()) {
+                        StreamDefinition sd = alertPublisherBolt.streamDefinitionMap.get(inputStreamId);
+                        if (sd != null) {
+                            extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());
+                            appIds.add(sd.getDataSource());
+                        }
                     }
+                    extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);
+                    extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, policyDefinition.getDefinition().getValue());
                 }
-                extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);
-                extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, policyDefinition.getDefinition().getValue());
+                event.setContext(extraData);
             }
-            event.setExtraData(extraData);
+            return event;
         }
     }
 
-    /**
-     * TODO: Refactor wrapAlertPublishEvent into alertTemplateEngine and remove extraData from AlertStreamEvent.
-     */
-    @SuppressWarnings("unchecked")
-    private AlertPublishEvent renderAlertPublishEvent(AlertStreamEvent event) {
-        wrapAlertEvent(event);
-        return this.alertTemplateEngine.renderAlert(event);
+    private class AlertTemplateFilter implements AlertStreamFilter {
+        private final AlertTemplateEngine alertTemplateEngine;
+
+        private AlertTemplateFilter(AlertTemplateEngine alertTemplateEngine) {
+            this.alertTemplateEngine = alertTemplateEngine;
+        }
+
+        @Override
+        public AlertStreamEvent filter(AlertStreamEvent event) {
+            return this.alertTemplateEngine.filter(event);
+        }
     }
 }

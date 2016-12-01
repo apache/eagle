@@ -36,12 +36,12 @@ public class VelocityAlertTemplateEngineTest {
         AlertTemplateEngine templateEngine = new VelocityAlertTemplateEngine();
         templateEngine.init(ConfigFactory.load());
         templateEngine.register(mockPolicy("testPolicy"));
-        AlertPublishEvent publishEvent = templateEngine.renderAlert(mockAlertEvent("testPolicy"));
+        AlertStreamEvent event = templateEngine.filter(mockAlertEvent("testPolicy"));
         Assert.assertEquals("Alert (2016-11-30 07:31:15): cpu usage on hadoop of cluster test_cluster at localhost is 0.98, " +
             "exceeding thread hold: 90%. (policy: testPolicy, description: Policy for monitoring cpu usage > 90%), " +
             "definition: from HADOOP_JMX_METRIC_STREAM[site == \"test_cluster\" and metric == \"cpu.usage\" and value > 0.9] " +
-            "select site, metric, host, role, value insert into capacityUsageAlert", publishEvent.getAlertBody());
-        Assert.assertEquals("Name Node Usage Exceed 90%, reach 98.0% now", publishEvent.getAlertSubject());
+            "select site, metric, host, role, value insert into capacityUsageAlert", event.getBody());
+        Assert.assertEquals("Name Node Usage Exceed 90%, reach 98.0% now", event.getSubject());
     }
 
     private static PolicyDefinition mockPolicy (String policyId) {
