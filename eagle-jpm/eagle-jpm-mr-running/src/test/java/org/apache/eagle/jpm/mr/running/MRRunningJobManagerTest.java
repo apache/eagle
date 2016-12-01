@@ -27,10 +27,7 @@ import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.zookeeper.CreateMode;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -67,6 +64,7 @@ public class MRRunningJobManagerTest {
     private static MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private static org.slf4j.Logger log = mock(org.slf4j.Logger.class);
     private static final int BUFFER_SIZE = 4096;
+    private static final String LOCKS_BASE_PATH = "/locks";
 
     @BeforeClass
     public static void setupZookeeper() throws Exception {
@@ -87,12 +85,20 @@ public class MRRunningJobManagerTest {
 
     @AfterClass
     public static void teardownZookeeper() throws Exception {
-        if (curator.checkExists().forPath(SHARE_RESOURCES) != null) {
-            curator.delete().deletingChildrenIfNeeded().forPath(SHARE_RESOURCES);
-        }
         CloseableUtils.closeQuietly(curator);
         CloseableUtils.closeQuietly(zk);
     }
+
+    @After
+    public void cleanPath() throws Exception {
+        if (curator.checkExists().forPath(SHARE_RESOURCES) != null) {
+            curator.delete().deletingChildrenIfNeeded().forPath(SHARE_RESOURCES);
+        }
+        if (curator.checkExists().forPath(LOCKS_BASE_PATH) != null) {
+            curator.delete().guaranteed().deletingChildrenIfNeeded().forPath(LOCKS_BASE_PATH);
+        }
+    }
+
 
     @Test
     public void testMRRunningJobManagerDelWithLock() throws Exception {
