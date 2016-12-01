@@ -71,10 +71,6 @@ public class MRRunningJobManagerTest {
         zk = new TestingServer();
         curator = CuratorFrameworkFactory.newClient(zk.getConnectString(), new ExponentialBackoffRetry(1000, 3));
         curator.start();
-        curator.create()
-                .creatingParentsIfNeeded()
-                .withMode(CreateMode.PERSISTENT)
-                .forPath(SHARE_RESOURCES);
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
         zkStateConfig = mrRunningJobConfig.getZkStateConfig();
         zkStateConfig.zkQuorum = zk.getConnectString();
@@ -87,6 +83,16 @@ public class MRRunningJobManagerTest {
     public static void teardownZookeeper() throws Exception {
         CloseableUtils.closeQuietly(curator);
         CloseableUtils.closeQuietly(zk);
+    }
+
+    @Before
+    public void createPath() throws Exception {
+        if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
+            curator.create()
+                .creatingParentsIfNeeded()
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(SHARE_RESOURCES);
+        }
     }
 
     @After
@@ -131,18 +137,8 @@ public class MRRunningJobManagerTest {
 
     @Test
     public void testMRRunningJobManagerRecoverYarnAppWithLock() throws Exception {
-
-        if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
-            curator.create()
-                .creatingParentsIfNeeded()
-                .withMode(CreateMode.PERSISTENT)
-                .forPath(SHARE_RESOURCES);
-        }
-
         Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
-
         curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
-
         ExecutorService service = Executors.newFixedThreadPool(QTY);
         for (int i = 0; i < QTY; ++i) {
             Callable<Void> task = () -> {
@@ -170,14 +166,6 @@ public class MRRunningJobManagerTest {
 
     @Test
     public void testMRRunningJobManagerRecoverWithLock() throws Exception {
-
-        if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
-            curator.create()
-                .creatingParentsIfNeeded()
-                .withMode(CreateMode.PERSISTENT)
-                .forPath(SHARE_RESOURCES);
-        }
-
         Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
         curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
         ExecutorService service = Executors.newFixedThreadPool(QTY);
