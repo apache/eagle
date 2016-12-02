@@ -99,7 +99,6 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
                     policy.getDefinition().setInputStreams(policy.getInputStreams());
                     policy.getDefinition().setOutputStreams(policy.getOutputStreams());
                 }
-
                 )
         );
         sdsRef.set(SpecUtils.generateSds(client));

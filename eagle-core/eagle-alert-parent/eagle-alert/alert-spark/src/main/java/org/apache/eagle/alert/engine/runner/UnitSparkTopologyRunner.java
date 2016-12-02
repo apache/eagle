@@ -20,6 +20,7 @@ package org.apache.eagle.alert.engine.runner;
 import static org.apache.eagle.alert.engine.utils.SpecUtils.getTopicsByConfig;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.spark.function.*;
@@ -31,6 +32,7 @@ import kafka.message.MessageAndMetadata;
 import kafka.serializer.StringDecoder;
 import org.apache.eagle.alert.engine.spark.partition.StreamRoutePartitioner;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.Function0;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -48,7 +50,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class UnitSparkTopologyRunner implements Serializable {
+public class UnitSparkTopologyRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkTopologyRunner.class);
     //kafka config
@@ -100,17 +102,23 @@ public class UnitSparkTopologyRunner implements Serializable {
     }
 
     public void run() throws InterruptedException {
-        long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
-        JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchDuration));
-        jssc.checkpoint(config.getString(CHECKPOINT_PATH));
-        buildTopology(jssc, config);
+
+        final String checkpointDirectory = config.getString(CHECKPOINT_PATH);
+        JavaStreamingContext jssc;
+        if (!StringUtils.isEmpty(checkpointDirectory)) {
+            Function0<JavaStreamingContext> createContextFunc = (Function0<JavaStreamingContext>) () -> buildTopology(config, checkpointDirectory);
+            jssc = JavaStreamingContext.getOrCreate(checkpointDirectory, createContextFunc);
+        } else {
+            jssc = buildTopology(config, checkpointDirectory);
+        }
+
         LOG.info("Starting Spark Streaming");
         jssc.start();
         LOG.info("Spark Streaming is running");
         jssc.awaitTermination();
     }
 
-    private void buildTopology(JavaStreamingContext jssc, Config config) {
+    private JavaStreamingContext buildTopology(Config config, String checkpointDirectory) {
 
         Set<String> topics = getTopicsByConfig(config);
         EagleKafkaUtils.fillInLatestOffsets(topics,
@@ -124,11 +132,15 @@ public class UnitSparkTopologyRunner implements Serializable {
         int numOfRouter = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
+        long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
 
         @SuppressWarnings("unchecked")
         Class<MessageAndMetadata<String, String>> streamClass =
                 (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;
-
+        JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchDuration));
+        if (!StringUtils.isEmpty(checkpointDirectory)) {
+            jssc.checkpoint(checkpointDirectory);
+        }
         JavaInputDStream<MessageAndMetadata<String, String>> messages = EagleKafkaUtils.createDirectStream(jssc,
                 String.class,
                 String.class,
@@ -144,6 +156,7 @@ public class UnitSparkTopologyRunner implements Serializable {
         PolicyState policyState = new PolicyState(jssc);
         PublishState publishState = new PublishState(jssc);
         SiddhiState siddhiState = new SiddhiState(jssc);
+
 
         JavaPairDStream<String, String> pairDStream = messages
                 .transform(new ProcessSpecFunction(offsetRanges,
@@ -171,6 +184,7 @@ public class UnitSparkTopologyRunner implements Serializable {
                 .mapPartitionsToPair(new AlertBoltFunction(sdsRef, alertBoltSpecRef, policyState, siddhiState, publishState))
                 .groupByKey(numOfPublishTasks)
                 .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges, publishState, publishSpecRef));
+        return jssc;
     }
 
     private void prepareKafkaConfig(Config config) {

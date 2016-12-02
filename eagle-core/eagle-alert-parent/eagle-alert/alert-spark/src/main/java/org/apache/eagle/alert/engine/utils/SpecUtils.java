@@ -94,6 +94,7 @@ public class SpecUtils {
         List<Publishment> publishments = mtadataServiceClient.listPublishment();
 
         for (String alertBolt : alertBolts) {
+            boltPoliciesMap.put(alertBolt, policyDefinitions);
             for (PolicyDefinition policy : policyDefinitions) {
                 String policyName = policy.getName();
                 alertSpec.addBoltPolicy(alertBolt, policyName);
@@ -116,6 +117,7 @@ public class SpecUtils {
                 }
             }
         }
+        alertSpec.setBoltPoliciesMap(boltPoliciesMap);
         return alertSpec;
     }
 

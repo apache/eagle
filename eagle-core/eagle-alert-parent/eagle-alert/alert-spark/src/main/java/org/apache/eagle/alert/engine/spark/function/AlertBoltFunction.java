@@ -50,7 +50,11 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
     private SiddhiState siddhiState;
     private PublishState publishState;
 
-    public AlertBoltFunction(AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef, PolicyState policyState, SiddhiState siddhiState, PublishState publishState) {
+    public AlertBoltFunction(AtomicReference<Map<String, StreamDefinition>> sdsRef,
+                             AtomicReference<AlertBoltSpec> alertBoltSpecRef,
+                             PolicyState policyState,
+                             SiddhiState siddhiState,
+                             PublishState publishState) {
         this.sdsRef = sdsRef;
         this.alertBoltSpecRef = alertBoltSpecRef;
         this.policyState = policyState;
@@ -91,12 +95,17 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
             policyGroupEvaluator.nextEvent(event);
         }
 
-        cleanup(policyGroupEvaluator, alertOutputCollector, boltId, partitionNum);
+        cleanUpAndStoreSiddhiState(policyGroupEvaluator, alertOutputCollector, boltId, partitionNum);
 
         return alertOutputCollector.emitResult().iterator();
     }
 
-    private void onAlertBoltSpecChange(String boltId, AlertBoltSpec spec, Map<String, StreamDefinition> sds, PolicyGroupEvaluatorImpl policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector, PolicyState policyState, PublishState publishState) {
+    private void onAlertBoltSpecChange(String boltId,
+                                       AlertBoltSpec spec,
+                                       Map<String, StreamDefinition> sds,
+                                       PolicyGroupEvaluatorImpl policyGroupEvaluator,
+                                       AlertBoltOutputCollectorSparkWrapper alertOutputCollector,
+                                       PolicyState policyState, PublishState publishState) {
         List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
         LOG.debug("newPolicies {}", newPolicies);
         if (newPolicies == null) {
@@ -140,7 +149,7 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
 
     }
 
-    public void cleanup(PolicyGroupEvaluatorImpl policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector, String boltId, int partitionNum) {
+    public void cleanUpAndStoreSiddhiState(PolicyGroupEvaluatorImpl policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector, String boltId, int partitionNum) {
         if (policyGroupEvaluator != null) {
             siddhiState.store(policyGroupEvaluator.closeAndSnapShot(), boltId, partitionNum);
         }

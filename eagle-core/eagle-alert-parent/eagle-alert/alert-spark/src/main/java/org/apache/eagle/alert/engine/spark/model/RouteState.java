@@ -48,13 +48,17 @@ public class RouteState implements Serializable {
     private Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapAccum;
 
     public RouteState(JavaStreamingContext jssc) {
-        Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum = jssc.sparkContext().accumulator(new HashMap<>(), "routePartitionerAccum", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum
+                = jssc.sparkContext().accumulator(new HashMap<>(), "routePartitionerAccum", new MapToMapAccum());
         this.routePartitionerAccum = routePartitionerAccum;
-        Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapAccum = jssc.sparkContext().accumulator(new HashMap<>(), "routeSpecAccum", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapAccum
+                = jssc.sparkContext().accumulator(new HashMap<>(), "routeSpecAccum", new MapToMapAccum());
         this.routeSpecMapAccum = routeSpecMapAccum;
-        Accumulator<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSAccm = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSSSAccm", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSAccm
+                = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSSSAccm", new MapToMapAccum());
         this.cachedSSSAccm = cachedSSSAccm;
-        Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> cachedSRSAccm = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSRSAccm", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> cachedSRSAccm
+                = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSRSAccm", new MapToMapAccum());
         this.cachedSRSAccm = cachedSRSAccm;
 
     }

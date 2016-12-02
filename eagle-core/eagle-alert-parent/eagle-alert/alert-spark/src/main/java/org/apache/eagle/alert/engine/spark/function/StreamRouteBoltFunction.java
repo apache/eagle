@@ -96,27 +96,27 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
                 Map<StreamPartition, StreamSortHandler> streamSortHandlerMap = winstate.getStreamSortHandlerByPartition(partitionNum);
 
                 router.prepare(new StreamSparkContextImpl(null), routeCollector, streamWindowMap, streamTimeClockMap, streamSortHandlerMap);
-                onStreamRouteBoltSpecChange(spec, sdf, router, routeCollector, cachedSSS, cachedSRS);
+                onStreamRouteBoltSpecChange(spec, sdf, router, routeCollector, cachedSSS, cachedSRS, partitionNum);
 
             }
 
             PartitionedEvent partitionedEvent = events.next();
             router.nextEvent(partitionedEvent);
         }
-        cleanup(router);
+        cleanUpAndStoreWinstate(router, partitionNum);
 
         return routeCollector.emitResult().iterator();
     }
 
-    public void cleanup(StreamRouter router) {
+    public void cleanUpAndStoreWinstate(StreamRouterImpl router, int partitionNum) {
+        winstate.store(router, partitionNum);
         if (router != null) {
-            StreamRouterImpl routerImpl = (StreamRouterImpl) router;
-            routerImpl.closeClock();
+            router.closeClock();
         }
     }
 
     public void onStreamRouteBoltSpecChange(RouterSpec spec, Map<String, StreamDefinition> sds, StreamRouterImpl router, SparkStreamRouterBoltOutputCollector routeCollector,
-                                            final Map<StreamPartition, StreamSortSpec> cachedSSS, final Map<StreamPartition, StreamRouterSpec> cachedSRS) {
+                                            final Map<StreamPartition, StreamSortSpec> cachedSSS, final Map<StreamPartition, StreamRouterSpec> cachedSRS, int partitionNum) {
         //sanityCheck(spec);
 
         // figure out added, removed, modified StreamSortSpec
@@ -183,6 +183,7 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
         routeCollector.onStreamRouterSpecChange(addedRouterSpecs, removedRouterSpecs, modifiedRouterSpecs, sds);
         // switch cache
         this.cachedSRS = newSRS;
+        routeState.store(routeCollector, cachedSSS, cachedSRS, partitionNum);
     }
 
 }
