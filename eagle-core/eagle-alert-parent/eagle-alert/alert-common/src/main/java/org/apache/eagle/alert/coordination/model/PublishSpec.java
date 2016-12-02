@@ -17,6 +17,9 @@
 package org.apache.eagle.alert.coordination.model;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +40,11 @@ public class PublishSpec {
         this.boltId = boltId;
     }
 
+    @JsonIgnore
     public void addPublishment(Publishment p) {
-        this.publishments.add(p);
+        if (!this.publishments.contains(p)) {
+            this.publishments.add(p);
+        }
     }
 
     public String getTopologyName() {
