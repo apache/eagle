@@ -80,6 +80,8 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         Map<String, String> tags = new HashMap<>();
         tags.put(POLICY_ID_KEY, event.getPolicyId());
         tags.put(ALERT_ID_KEY, event.getAlertId());
+        tags.put(ALERT_CATEGORY, event.getCategory());
+        tags.put(ALERT_SEVERITY, event.getSeverity().toString());
         if (event.getContext() != null && !event.getContext().isEmpty()) {
             tags.put(SITE_ID_KEY, event.getContext().get(SITE_ID_KEY).toString());
             alertEvent.setPolicyValue(event.getContext().get(POLICY_VALUE_KEY).toString());

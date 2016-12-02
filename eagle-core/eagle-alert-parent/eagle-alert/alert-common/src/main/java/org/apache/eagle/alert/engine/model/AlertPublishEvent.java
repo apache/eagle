@@ -46,6 +46,8 @@ public class AlertPublishEvent {
     public static final String APP_IDS_KEY = "appIds";
     public static final String POLICY_ID_KEY = "policyId";
     public static final String POLICY_VALUE_KEY = "policyValue";
+    public static final String ALERT_CATEGORY = "category";
+    public static final String ALERT_SEVERITY = "severity";
 
     public String getAlertId() {
         return alertId;

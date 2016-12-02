@@ -41,6 +41,7 @@ public class PolicyDefinition implements Serializable {
     private PolicyStatus policyStatus = PolicyStatus.ENABLED;
     private AlertTemplateDefinition alertTemplate;
     private AlertSeverity severity;
+    private String category;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -186,6 +187,14 @@ public class PolicyDefinition implements Serializable {
 
     public void setSeverity(AlertSeverity severity) {
         this.severity = severity;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
