@@ -33,12 +33,15 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.*;
+import static org.powermock.api.mockito.PowerMockito.*;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.*;
 
+@RunWith(PowerMockRunner.class)
 public class JdbcImplTest {
     private static Logger LOG = LoggerFactory.getLogger(JdbcImplTest.class);
     static IMetadataDao dao;
@@ -173,6 +176,9 @@ public class JdbcImplTest {
 
     @Test
     public void test_clearScheduleState() {
+        mockStatic(System.class);
+        when(System.currentTimeMillis()).thenReturn(1480502564800L, 1480502564801L, 1480502564802L, 1480502564803L, 1480502564804L,
+            1480502564805L, 1480502564806L, 1480502564807L, 1480502564808L, 1480502564809L);
         int maxCapacity = 4;
         List<String> reservedOnes = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -183,11 +189,6 @@ public class JdbcImplTest {
             dao.addScheduleState(state);
             if (i >= 10 - maxCapacity) {
                 reservedOnes.add(versionId);
-            }
-            try {
-                Thread.sleep(1);
-            } catch (Exception e) {
-
             }
         }
         dao.clearScheduleState(maxCapacity);
