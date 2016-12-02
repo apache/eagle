@@ -21,7 +21,6 @@ import org.apache.eagle.alert.engine.coordinator.AlertTemplateDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,6 +43,20 @@ public class VelocityAlertTemplateEngineTest {
         Assert.assertEquals("Name Node Usage Exceed 90%, reach 98.0% now", event.getSubject());
     }
 
+    @Test
+    public void testVelocityAlertTemplateWithoutTemplate () {
+        AlertTemplateEngine templateEngine = new VelocityAlertTemplateEngine();
+        templateEngine.init(ConfigFactory.load());
+        templateEngine.register(mockPolicyWithoutTemplate("testPolicyName"));
+        AlertStreamEvent event = templateEngine.filter(mockAlertEvent("testPolicyName"));
+        System.out.print(event.getBody());
+        Assert.assertEquals("Alert Information: {stream=ALERT_STREAM,timestamp=2016-11-30 07:31:15,923," +
+            "data={site=test_cluster, role=hadoop, metric=cpu.usage, host=localhost, value=0.98}, " +
+            "policyId=testPolicyName, createdBy=junit, metaVersion=SAMPLE_META_VERSION} " +
+            "(Auto-generated alert message as template not defined in policy testPolicyName)", event.getBody());
+        Assert.assertEquals("testPolicyName", event.getSubject());
+    }
+
     private static PolicyDefinition mockPolicy (String policyId) {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
@@ -60,6 +73,19 @@ public class VelocityAlertTemplateEngineTest {
         alertTemplateDefinition.setBodyTemplate("Alert ($CREATED_TIME): cpu usage on $role of cluster $site at $host is $value, exceeding thread hold: 90%. "
                 + "(policy: $POLICY_ID, description: $POLICY_DESC), definition: $POLICY_DEFINITION");
         pd.setAlertTemplate(alertTemplateDefinition);
+        return pd;
+    }
+    private static PolicyDefinition mockPolicyWithoutTemplate (String policyId) {
+        PolicyDefinition pd = new PolicyDefinition();
+        PolicyDefinition.Definition def = new PolicyDefinition.Definition();
+        def.setValue("from HADOOP_JMX_METRIC_STREAM[site == \"test_cluster\" and metric == \"cpu.usage\" and value > 0.9] " +
+            "select site, metric, host, role, value insert into capacityUsageAlert");
+        def.setType("siddhi");
+        pd.setDefinition(def);
+        pd.setInputStreams(Collections.singletonList("HADOOP_JMX_METRIC_STREAM"));
+        pd.setOutputStreams(Collections.singletonList("capacityUsageAlert"));
+        pd.setName(policyId);
+        pd.setDescription("Policy for monitoring cpu usage > 90%");
         return pd;
     }
 

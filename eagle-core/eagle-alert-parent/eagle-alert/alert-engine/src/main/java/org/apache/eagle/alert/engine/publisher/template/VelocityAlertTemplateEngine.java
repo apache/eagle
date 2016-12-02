@@ -46,6 +46,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
     private Map<String, PolicyDefinition> policyDefinitionRepository;
     private VelocityEngine engine;
 
+
     @Override
     public void init(Config config) {
         engine = new VelocityEngine();
@@ -77,8 +78,10 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             LOG.warn("Subject template of policy {} is null, using policy name by default");
             stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), policyDefinition.getName());
 
-            LOG.warn("Body template of policy {} is null, using $ALERT_STRING by default");
-            stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_STRING);
+            LOG.warn("Body template of policy {} is null, using $ALERT_EVENT by default");
+            String defaultAlertBodyTmpl = String.format("Alert Information: $%s (Auto-generated alert message as template not defined in policy %s)",
+                AlertContextFields.ALERT_EVENT, policyDefinition.getName());
+            stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), defaultAlertBodyTmpl);
         } else if (alertTemplateDefinition.getType().equals(AlertTemplateDefinition.TemplateType.TEXT)) {
             if (alertTemplateDefinition.getSubjectTemplate() != null) {
                 stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), alertTemplateDefinition.getSubjectTemplate());
@@ -89,8 +92,8 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             if (alertTemplateDefinition.getBodyTemplate() != null) {
                 stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), alertTemplateDefinition.getBodyTemplate());
             } else {
-                LOG.warn("Body template of policy {} is null, using ALERT_STRING by default");
-                stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_STRING);
+                LOG.warn("Body template of policy {} is null, using ALERT_EVENT by default");
+                stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_EVENT);
             }
         } else {
             throw new IllegalArgumentException("Unsupported alert template type " + alertTemplateDefinition.getType());
@@ -151,7 +154,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
         context.put(AlertContextFields.ALERT_TIMESTAMP, event.getTimestamp());
         context.put(AlertContextFields.ALERT_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getTimestamp()));
         context.put(AlertContextFields.ALERT_SCHEMA, event.getSchema());
-        context.put(AlertContextFields.ALERT_STRING, event.getSchema());
+        context.put(AlertContextFields.ALERT_EVENT, event);
 
         context.put(AlertContextFields.POLICY_ID, policyDefinition.getName());
         context.put(AlertContextFields.POLICY_DESC, policyDefinition.getDescription());
