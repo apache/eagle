@@ -29,6 +29,7 @@ import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
 import org.apache.eagle.alert.coordinator.trigger.CoordinatorTrigger;
 import org.apache.eagle.alert.coordinator.trigger.DynamicPolicyLoader;
 import org.apache.eagle.alert.coordinator.trigger.PolicyChangeListener;
+import org.apache.eagle.alert.coordinator.trigger.ScheduleStateCleaner;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
@@ -73,6 +74,10 @@ public class Coordinator {
     private static final String METADATA_SERVICE_CONTEXT = "metadataService.context";
     private static final String DYNAMIC_POLICY_LOADER_INIT_MILLS = "metadataDynamicCheck.initDelayMillis";
     private static final String DYNAMIC_POLICY_LOADER_DELAY_MILLS = "metadataDynamicCheck.delayMillis";
+    private static final String DYNAMIC_SCHEDULE_STATE_CLEAR_MIN = "metadataDynamicCheck.stateClearPeriodMin";
+    private static final String DYNAMIC_SCHEDULE_STATE_RESERVE_CAPACITY = "metadataDynamicCheck.stateReservedCapacity";
+
+    private static final int DEFAULT_STATE_RESERVE_CAPACITY = 1000;
 
     public static final String GREEDY_SCHEDULER_ZK_PATH = "/alert/greedy/leader";
 
@@ -240,6 +245,13 @@ public class Coordinator {
         DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
         loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
         scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+
+        if (config.hasPath(DYNAMIC_SCHEDULE_STATE_CLEAR_MIN) && config.hasPath(DYNAMIC_SCHEDULE_STATE_RESERVE_CAPACITY)) {
+            int period = config.getInt(DYNAMIC_SCHEDULE_STATE_CLEAR_MIN);
+            int capacity = config.getInt(DYNAMIC_SCHEDULE_STATE_RESERVE_CAPACITY);
+            ScheduleStateCleaner cleaner = new ScheduleStateCleaner(client, capacity);
+            scheduleSrv.scheduleAtFixedRate(cleaner, period, period, TimeUnit.MINUTES);
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
         LOG.info("Eagle Coordinator started ...");

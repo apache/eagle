@@ -184,6 +184,11 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void clearScheduleState(int maxCapacity) {
+
+    }
+
+    @Override
     public List<AlertPublishEvent> listAlertPublishEvent() {
         return this.alerts;
     }

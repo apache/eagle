@@ -20,19 +20,18 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class PublishmentTypeTest {
+
     @Test
     public void testPublishmentType() {
         PublishmentType publishmentType = new PublishmentType();
         publishmentType.setType("KAFKA");
         publishmentType.setClassName("setClassName");
         publishmentType.setDescription("setDescription");
-        publishmentType.setFields("setFields");
 
         PublishmentType publishmentType1 = new PublishmentType();
         publishmentType1.setType("KAFKA");
         publishmentType1.setClassName("setClassName");
         publishmentType1.setDescription("setDescription");
-        publishmentType1.setFields("setFields");
 
         Assert.assertFalse(publishmentType.equals(new String("")));
         Assert.assertFalse(publishmentType == publishmentType1);

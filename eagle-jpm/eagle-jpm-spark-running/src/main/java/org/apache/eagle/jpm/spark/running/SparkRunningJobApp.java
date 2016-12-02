@@ -29,10 +29,10 @@ import com.typesafe.config.Config;
 public class SparkRunningJobApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        //1. trigger init conf
+        //1. trigger prepare conf
         SparkRunningJobAppConfig sparkRunningJobAppConfig = SparkRunningJobAppConfig.newInstance(config);
 
-        //2. init topology
+        //2. prepare topology
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         final String spoutName = SparkRunningJobAppConfig.JOB_FETCH_SPOUT_NAME;
         final String boltName = SparkRunningJobAppConfig.JOB_PARSE_BOLT_NAME;

@@ -26,7 +26,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.sink.StormStreamSink;
+import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.security.hive.jobrunning.HiveJobRunningSourcedStormSpoutProvider;
 import org.apache.eagle.security.hive.jobrunning.HiveQueryParserBolt;
 import org.apache.eagle.security.hive.jobrunning.JobFilterBolt;

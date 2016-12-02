@@ -72,13 +72,13 @@ public class StreamRouterImpl implements StreamRouter {
      * @param event StreamEvent
      */
     public void nextEvent(PartitionedEvent event) {
-        this.context.counter().scope("receive_count").incr();
+        this.context.counter().incr("receive_count");
         if (!dispatchToSortHandler(event)) {
-            this.context.counter().scope("direct_count").incr();
+            this.context.counter().incr("direct_count");
             // Pass through directly if no need to sort
             outputCollector.emit(event);
         }
-        this.context.counter().scope("sort_count").incr();
+        this.context.counter().incr("sort_count");
         // Update stream clock time if moving forward and trigger all tick listeners
         streamTimeClockManager.onTimeUpdate(event.getStreamId(), event.getTimestamp());
     }
@@ -96,7 +96,7 @@ public class StreamRouterImpl implements StreamRouter {
         if (sortHandler == null) {
             if (event.isSortRequired()) {
                 LOG.warn("Stream sort handler required has not been loaded so emmit directly: {}", event);
-                this.context.counter().scope("miss_sort_count").incr();
+                this.context.counter().incr("miss_sort_count");
             }
             return false;
         } else {

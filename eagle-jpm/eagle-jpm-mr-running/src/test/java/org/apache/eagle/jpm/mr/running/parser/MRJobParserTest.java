@@ -61,7 +61,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InputStreamUtils.class, MRJobParser.class, URLConnectionUtils.class, Math.class, MRJobEntityCreationHandler.class})
-@PowerMockIgnore({"javax.*", "org.w3c.*", "com.sun.org.apache.xerces.*"})
+@PowerMockIgnore({"javax.*", "org.w3c.*", "com.sun.org.apache.xerces.*","org.apache.xerces.*"})
 public class MRJobParserTest {
     private static final String ZK_JOB_PATH = "/apps/mr/running/sandbox/application_1479206441898_30784/job_1479206441898_30784";
     private static final String ZK_APP_PATH = "/apps/mr/running/sandbox/application_1479206441898_30784";
@@ -72,7 +72,6 @@ public class MRJobParserTest {
     private static final String DATA_FROM_ZK = "{\"entityTags\":\"{\\\"jobName\\\":\\\"oozie:launcher:T=shell:W=wf_co_xxx_xxx_v3:A=extract_org_data:ID=0002383-161115184801730-oozie-oozi-W\\\",\\\"jobId\\\":\\\"job_1479206441898_30784\\\",\\\"site\\\":\\\"sandbox\\\",\\\"jobDefId\\\":\\\"eagletest\\\",\\\"jobType\\\":\\\"HIVE\\\",\\\"user\\\":\\\"xxx\\\",\\\"queue\\\":\\\"xxx\\\"}\",\"appInfo\":\"{\\\"applicationType\\\":\\\"MAPREDUCE\\\",\\\"startedTime\\\":\\\"1479328221694\\\",\\\"finalStatus\\\":\\\"UNDEFINED\\\",\\\"trackingUrl\\\":\\\"http:\\\\\\/\\\\\\/host.domain.com:8088\\\\\\/proxy\\\\\\/application_1479206441898_30784\\\\\\/\\\",\\\"runningContainers\\\":\\\"2\\\",\\\"trackingUI\\\":\\\"ApplicationMaster\\\",\\\"clusterId\\\":\\\"1479206441898\\\",\\\"amContainerLogs\\\":\\\"http:\\\\\\/\\\\\\/host.domain.com:8088\\\\\\/node\\\\\\/containerlogs\\\\\\/container_e11_1479206441898_30784_01_000001\\\\\\/xxx\\\",\\\"allocatedVCores\\\":\\\"2\\\",\\\"diagnostics\\\":\\\"\\\",\\\"name\\\":\\\"oozie:launcher:T=shell:W=wf_co_xxx_xxx_v3:A=extract_org_data:ID=0002383-161115184801730-oozie-oozi-W\\\",\\\"progress\\\":\\\"95.0\\\",\\\"finishedTime\\\":\\\"0\\\",\\\"allocatedMB\\\":\\\"3072\\\",\\\"id\\\":\\\"application_1479206441898_30784\\\",\\\"state\\\":\\\"RUNNING\\\",\\\"amHostHttpAddress\\\":\\\"host.domain.com:8088\\\",\\\"user\\\":\\\"xxx\\\",\\\"queue\\\":\\\"xxx\\\",\\\"elapsedTime\\\":\\\"13367402\\\"}\"}";
     private static TestingServer zk;
     private static String ZKROOT;
-    private static String siteId;
     private static MRRunningJobConfig mrRunningJobConfig;
     private static Config config = ConfigFactory.load();
     private static CuratorFramework curator;
@@ -84,7 +83,6 @@ public class MRJobParserTest {
         zk = new TestingServer();
         curator = CuratorFrameworkFactory.newClient(zk.getConnectString(), new RetryOneTime(1));
         mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
-        siteId = mrRunningJobConfig.getEndpointConfig().site;
         mrRunningJobConfig.getZkStateConfig().zkQuorum = zk.getConnectString();
         ZKROOT = mrRunningJobConfig.getZkStateConfig().zkRoot;
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -348,8 +346,18 @@ public class MRJobParserTest {
 
 
     @Test
-    public void testMRJobParserFetchJobCountFailButRMalive() throws Exception {
+    public void testMRJobParserFetchJobCountFailButRMaliveRetry() throws Exception {
         setupMock();
+        reset(client);
+        client = mock(EagleServiceClientImpl.class);
+        MRRunningJobConfig.EagleServiceConfig eagleServiceConfig = mrRunningJobConfig.getEagleServiceConfig();
+        PowerMockito.whenNew(EagleServiceClientImpl.class).withArguments(
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password).thenReturn(client);
+        when(client.create(any())).thenThrow(Exception.class).thenReturn(null);
+        when(client.getJerseyClient()).thenReturn(new Client());
         mockInputJobSteam("/mrjob_30784.json", JOB_URL);
         mockInputJobSteamWithException(JOB_COUNT_URL);
         mockGetConnection("/mrconf_30784.xml");
@@ -392,7 +400,9 @@ public class MRJobParserTest {
         Assert.assertTrue(curator.checkExists().forPath(ZK_JOB_PATH) == null);
         Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
         Assert.assertTrue(entities.isEmpty());
-        verify(client, times(1)).create(any());
+        verify(client, times(2)).create(any());
+        verify(client, times(2)).getJerseyClient();
+        verify(client, times(1)).close();
 
     }
 

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,9 +50,16 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private volatile Map<String, PolicyDefinition> policyDefinitionMap;
     private volatile Map<String, StreamDefinition> streamDefinitionMap;
 
+    private boolean logEventEnabled;
+    private TopologyContext context;
+    
     public AlertPublisherBolt(String alertPublisherName, Config config, IMetadataChangeNotifyService coordinatorService) {
         super(alertPublisherName, coordinatorService, config);
         this.alertPublisher = new AlertPublisherImpl(alertPublisherName);
+        
+        if (config != null && config.hasPath("topology.logEventEnabled")) {
+            logEventEnabled = config.getBoolean("topology.logEventEnabled");
+        }
     }
 
     @Override
@@ -61,15 +68,20 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         coordinatorService.init(config, MetadataType.ALERT_PUBLISH_BOLT);
         this.alertPublisher.init(config, stormConf);
         streamContext = new StreamContextImpl(config, context.registerMetric("eagle.publisher", new MultiCountMetric(), 60), context);
+        this.context = context;
     }
 
     @Override
     public void execute(Tuple input) {
         try {
             streamContext.counter().scope("receive_count");
+            PublishPartition partition = (PublishPartition) input.getValueByField(AlertConstants.FIELD_0);
             AlertStreamEvent event = (AlertStreamEvent) input.getValueByField(AlertConstants.FIELD_1);
+            if (logEventEnabled) {
+                LOG.info("Alert publish bolt {}/{} with partition {} received event: {}", this.getBoltId(), this.context.getThisTaskId(), partition, event);
+            }
             wrapAlertPublishEvent(event);
-            alertPublisher.nextEvent(event);
+            alertPublisher.nextEvent(partition, event);
             this.collector.ack(input);
             streamContext.counter().scope("ack_count");
         } catch (Exception ex) {
@@ -123,6 +135,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         this.streamDefinitionMap = sds;
     }
 
+    @SuppressWarnings("unchecked")
     private void wrapAlertPublishEvent(AlertStreamEvent event) {
         Map<String, Object> extraData = new HashedMap();
         List<String> appIds = new ArrayList<>();

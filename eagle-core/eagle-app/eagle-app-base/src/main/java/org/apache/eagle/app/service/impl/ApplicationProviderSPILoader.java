@@ -31,7 +31,7 @@ import java.util.ServiceLoader;
 import java.util.function.Function;
 
 /**
- * Load Application Provider with SPI, by default from current class loader.
+ * Load Application KafkaStreamMessaging with SPI, by default from current class loader.
  */
 public class ApplicationProviderSPILoader extends ApplicationProviderLoader {
     private final String appProviderExtDir;

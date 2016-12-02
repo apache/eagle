@@ -78,10 +78,10 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
     @Override
     public void execute(Tuple input) {
         try {
-            this.streamContext.counter().scope("execute_count").incr();
+            this.streamContext.counter().incr("execute_count");
             this.router.nextEvent(deserialize(input.getValueByField(AlertConstants.FIELD_0)).withAnchor(input));
         } catch (Exception ex) {
-            this.streamContext.counter().scope("fail_count").incr();
+            this.streamContext.counter().incr("fail_count");
             LOG.error(ex.getMessage(), ex);
             this.collector.fail(input);
         }

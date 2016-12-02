@@ -76,7 +76,7 @@ public class AggregationSpout extends BaseRichSpout {
             //1, get last updateTime;
             lastUpdateTime = AggregationTimeManager.instance().readLastFinishTime();
             if (lastUpdateTime == 0L) {
-                //init state, just set to currentTime - 18 hours
+                //prepare state, just set to currentTime - 18 hours
                 lastUpdateTime = (currentJobTime - (MAX_SAFE_TIME + MAX_WAIT_TIME)) / 3600000 * 3600000;
             }
 

@@ -19,10 +19,13 @@ package org.apache.eagle.metadata.model;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.metadata.utils.StreamIdConversions;
 
+import javax.xml.transform.stream.StreamSource;
+
 public class StreamDesc {
     private String streamId;
     private StreamDefinition schema;
-    private StreamSinkConfig sink;
+    private StreamSinkConfig sinkConfig;
+    private StreamSourceConfig sourceConfig;
 
     public String getStreamId() {
         return streamId;
@@ -40,11 +43,19 @@ public class StreamDesc {
         this.schema = streamSchema;
     }
 
-    public StreamSinkConfig getSink() {
-        return sink;
+    public StreamSinkConfig getSinkConfig() {
+        return sinkConfig;
     }
 
-    public void setSink(StreamSinkConfig sinkDesc) {
-        this.sink = sinkDesc;
+    public void setSinkConfig(StreamSinkConfig sinkDesc) {
+        this.sinkConfig = sinkDesc;
+    }
+
+    public StreamSourceConfig getSourceConfig() {
+        return sourceConfig;
+    }
+
+    public void setSourceConfig(StreamSourceConfig sourceConfig) {
+        this.sourceConfig = sourceConfig;
     }
 }

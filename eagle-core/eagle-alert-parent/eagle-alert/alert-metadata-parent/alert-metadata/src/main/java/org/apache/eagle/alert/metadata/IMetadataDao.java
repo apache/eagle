@@ -25,13 +25,12 @@ import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public interface IMetadataDao extends Closeable {
 
@@ -90,7 +89,11 @@ public interface IMetadataDao extends Closeable {
 
     ScheduleState getScheduleState();
 
+    List<ScheduleState> listScheduleStates();
+
     OpResult addScheduleState(ScheduleState state);
+
+    OpResult clearScheduleState(int maxCapacity);
 
     List<PolicyAssignment> listAssignments();
 

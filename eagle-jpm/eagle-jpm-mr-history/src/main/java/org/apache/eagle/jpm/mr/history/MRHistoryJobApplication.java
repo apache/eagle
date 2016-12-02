@@ -17,10 +17,9 @@
 package org.apache.eagle.jpm.mr.history;
 
 import backtype.storm.topology.BoltDeclarer;
-import com.codahale.metrics.health.HealthCheck;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.sink.StormStreamSink;
+import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
@@ -37,11 +36,11 @@ import java.util.regex.Pattern;
 public class MRHistoryJobApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        //1. trigger init conf
+        //1. trigger prepare conf
         MRHistoryJobConfig appConfig = MRHistoryJobConfig.newInstance(config);
         com.typesafe.config.Config jhfAppConf = appConfig.getConfig();
 
-        //2. init JobHistoryContentFilter
+        //2. prepare JobHistoryContentFilter
         final JobHistoryContentFilterBuilder builder = JobHistoryContentFilterBuilder.newBuilder().acceptJobFile().acceptJobConfFile();
         String[] confKeyPatternsSplit = jhfAppConf.getString("MRConfigureKeys.jobConfigKey").split(",");
         List<String> confKeyPatterns = new ArrayList<>(confKeyPatternsSplit.length);
@@ -60,7 +59,7 @@ public class MRHistoryJobApplication extends StormApplication {
             builder.includeJobKeyPatterns(Pattern.compile(key));
         }
         JobHistoryContentFilter filter = builder.build();
-        //3. init topology
+        //3. prepare topology
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrHistoryJobSpout";
         int tasks = jhfAppConf.getInt("stormConfig.mrHistoryJobSpoutTasks");

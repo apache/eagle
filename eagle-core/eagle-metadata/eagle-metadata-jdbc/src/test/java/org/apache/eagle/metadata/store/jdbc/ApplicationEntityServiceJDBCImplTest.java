@@ -18,6 +18,7 @@
 package org.apache.eagle.metadata.store.jdbc;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.ApplicationDesc;
@@ -30,7 +31,9 @@ import org.junit.Test;
 
 import javax.inject.Inject;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
@@ -160,4 +163,67 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Assert.assertEquals(0, results.size());
     }
 
+    @Test
+    public void testUpdateApplicationEntity() {
+        SiteEntity siteEntity = new SiteEntity();
+        siteEntity.setSiteId("testsiteid");
+        siteEntity.setSiteName("testsitename");
+        siteEntity.setDescription("testdesc");
+        siteEntityService.create(siteEntity);
+        ApplicationDesc applicationDesc = applicationProviderService.getApplicationDescByType("TEST_APP");
+        ApplicationEntity applicationEntity = new ApplicationEntity();
+        applicationEntity.setSite(siteEntity);
+        applicationEntity.setDescriptor(applicationDesc);
+        applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
+        Map<String, Object> configure = new HashedMap();
+        configure.put("a", "b");
+        applicationEntity.setConfiguration(configure);
+        applicationEntity.setContext(configure);
+        applicationEntityService.create(applicationEntity);
+        ApplicationEntity applicationEntity2 = applicationEntity;
+        configure.put("c", "d");
+        applicationEntity2.setContext(configure);
+        Collection<ApplicationEntity> results = applicationEntityService.findAll();
+        Assert.assertEquals(1, results.size());
+        applicationEntity = applicationEntityService.update(applicationEntity2);
+        Assert.assertEquals(2, applicationEntity.getContext().size());
+        results = applicationEntityService.findAll();
+        Assert.assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testGetByUUID() throws EntityNotFoundException {
+        SiteEntity siteEntity = new SiteEntity();
+        siteEntity.setSiteId("testsiteid");
+        siteEntity.setSiteName("testsitename");
+        siteEntity.setDescription("testdesc");
+        siteEntityService.create(siteEntity);
+        ApplicationDesc applicationDesc = applicationProviderService.getApplicationDescByType("TEST_APP");
+        List<StreamDefinition> streamDefinitions = new ArrayList<>();
+        StreamDefinition sd = new StreamDefinition();
+        sd.setStreamId("streamId");
+        sd.setDescription("desc");
+        sd.setValidate(true);
+        sd.setTimeseries(false);
+        sd.setDataSource("ds1");
+        sd.setSiteId("siteId");
+        streamDefinitions.add(sd);
+        applicationDesc.setStreams(streamDefinitions);
+
+        ApplicationEntity applicationEntity = new ApplicationEntity();
+        applicationEntity.setSite(siteEntity);
+        applicationEntity.setDescriptor(applicationDesc);
+        applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
+        Map<String, Object> configure = new HashedMap();
+        configure.put("a", "b");
+        applicationEntity.setConfiguration(configure);
+        applicationEntity.setContext(configure);
+        applicationEntityService.create(applicationEntity);
+        String appuuid = applicationEntity.getUuid();
+
+        ApplicationEntity applicationEntityFromDB = applicationEntityService.getByUUID(appuuid);
+        Assert.assertTrue(applicationEntityFromDB != null);
+    }
 }
