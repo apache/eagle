@@ -35,6 +35,7 @@ import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.*;
 import static org.powermock.api.mockito.PowerMockito.*;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.util.*;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest({System.class})
 public class JdbcImplTest {
     private static Logger LOG = LoggerFactory.getLogger(JdbcImplTest.class);
     static IMetadataDao dao;
@@ -154,6 +156,8 @@ public class JdbcImplTest {
     }
 
     private void test_addstate() {
+        mockStatic(System.class);
+        when(System.currentTimeMillis()).thenReturn(1480502564700L);
         ScheduleState state = new ScheduleState();
         String versionId = "state-" + System.currentTimeMillis();
         state.setVersion(versionId);
@@ -184,6 +188,7 @@ public class JdbcImplTest {
         for (int i = 0; i < 10; i++) {
             ScheduleState state = new ScheduleState();
             String versionId = "state-" + System.currentTimeMillis();
+            System.out.println(versionId);
             state.setVersion(versionId);
             state.setGenerateTime(String.valueOf(new Date().getTime()));
             dao.addScheduleState(state);
@@ -196,6 +201,10 @@ public class JdbcImplTest {
         Assert.assertTrue(scheduleStates.size() == maxCapacity);
         List<String> TargetVersions = new ArrayList<>();
         scheduleStates.stream().forEach(state -> TargetVersions.add(state.getVersion()));
+
+        System.out.println(reservedOnes);
+        System.out.println(TargetVersions);
+
         Assert.assertTrue(CollectionUtils.isEqualCollection(reservedOnes, TargetVersions));
     }
 }
