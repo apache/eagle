@@ -411,4 +411,35 @@ public class PolicyInterpreterTest {
         streamDefinition.setColumns(columns);
         return streamDefinition;
     }
+
+    @Test
+    public void testValidPolicyWithPattern() {
+        PolicyDefinition policyDefinition = new PolicyDefinition();
+        policyDefinition.setName("test_policy");
+        policyDefinition.setInputStreams(Collections.singletonList("HADOOP_JMX_METRIC_STREAM_ARES"));
+        policyDefinition.setOutputStreams(Collections.singletonList("HADOOP_JMX_METRIC_STREAM_ARES_MISS_BLOCKS_OUT"));
+
+        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
+        definition.setType("siddhi");
+        String policy =
+                "from every a = HADOOP_JMX_METRIC_STREAM_ARES[component==\"namenode\" and metric == \"hadoop.namenode.dfs.missingblocks\"] " +
+                        "-> b = HADOOP_JMX_METRIC_STREAM_ARES[b.component==a.component and b.metric==a.metric and b.host==a.host and convert(b.value, \"long\") > convert(a.value, \"long\") ] " +
+                        "select b.metric, b.host as host, convert(b.value, \"long\") as newNumOfMissingBlocks, convert(a.value, \"long\") as oldNumOfMissingBlocks, b.timestamp as timestamp, b.component as component, b.site as site " +
+                        "group by b.metric insert into HADOOP_JMX_METRIC_STREAM_ARES_MISS_BLOCKS_OUT;";
+        definition.setValue(policy);
+        definition.setInputStreams(policyDefinition.getInputStreams());
+        definition.setOutputStreams(policyDefinition.getOutputStreams());
+        policyDefinition.setDefinition(definition);
+
+        PolicyValidationResult validation = PolicyInterpreter.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+            {
+                put("HADOOP_JMX_METRIC_STREAM_ARES", mockStreamDefinition("HADOOP_JMX_METRIC_STREAM_ARES"));
+            }
+        });
+        Assert.assertTrue(validation.isSuccess());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getInputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getOutputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getStreamPartitions().size());
+        Assert.assertNull(validation.getPolicyExecutionPlan().getStreamPartitions().get(0).getSortSpec());
+    }
 }
