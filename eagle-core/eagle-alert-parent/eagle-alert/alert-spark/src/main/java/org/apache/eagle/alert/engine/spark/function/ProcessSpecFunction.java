@@ -24,10 +24,8 @@ import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.spark.manager.SpecManager;
 import org.apache.eagle.alert.engine.spark.model.*;
-import org.apache.eagle.alert.engine.utils.SpecUtils;
-import org.apache.eagle.alert.service.IMetadataServiceClient;
-import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.streaming.kafka.HasOffsetRanges;
@@ -35,18 +33,17 @@ import org.apache.spark.streaming.kafka.OffsetRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.apache.eagle.alert.engine.utils.SpecUtils.getTopicsBySpoutSpec;
 
 public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<String, String>>, JavaRDD<MessageAndMetadata<String, String>>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessSpecFunction.class);
 
-    private IMetadataServiceClient client;
     private AtomicReference<OffsetRange[]> offsetRanges;
     private AtomicReference<SpoutSpec> spoutSpecRef;
     private AtomicReference<PublishSpec> publishSpecRef;
@@ -63,12 +60,13 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
     private SiddhiState siddhiState;
 
     private int numOfAlertBolts;
+    private Config config;
 
     public ProcessSpecFunction(AtomicReference<OffsetRange[]> offsetRanges, AtomicReference<SpoutSpec> spoutSpecRef,
                                AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef,
-                               AtomicReference<HashSet<String>> topicsRef, AtomicReference<RouterSpec> routerSpecRef,
-                               Config config, WindowState windowState, RouteState routeState, PolicyState policyState,
-                               PublishState publishState, SiddhiState siddhiState, AtomicReference<PublishSpec> publishSpecRef,
+                               AtomicReference<PublishSpec> publishSpecRef, AtomicReference<HashSet<String>> topicsRef,
+                               AtomicReference<RouterSpec> routerSpecRef, Config config, WindowState windowState,
+                               RouteState routeState, PolicyState policyState, PublishState publishState, SiddhiState siddhiState,
                                int numOfAlertBolts
     ) {
         this.offsetRanges = offsetRanges;
@@ -77,22 +75,22 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
         this.routerSpecRef = routerSpecRef;
         this.publishSpecRef = publishSpecRef;
         this.topicsRef = topicsRef;
-        this.client = new MetadataServiceClientImpl(config);
         this.sdsRef = sdsRef;
         this.winstate = windowState;
         this.routeState = routeState;
         this.policyState = policyState;
         this.publishState = publishState;
         this.siddhiState = siddhiState;
+        this.config = config;
         this.numOfAlertBolts = numOfAlertBolts;
     }
 
     @Override
     public JavaRDD<MessageAndMetadata<String, String>> call(JavaRDD<MessageAndMetadata<String, String>> rdd) throws Exception {
-
-        SpoutSpec spoutSpec = SpecUtils.generateSpout(client, numOfAlertBolts);
+        SpecManager specManager = new SpecManager(config, numOfAlertBolts);
+        SpoutSpec spoutSpec = specManager.generateSpout();
         spoutSpecRef.set(spoutSpec);
-        AlertBoltSpec alertBoltSpec = SpecUtils.generateAlertBoltSpec(client, numOfAlertBolts);
+        AlertBoltSpec alertBoltSpec = specManager.generateAlertBoltSpec();
         alertBoltSpecRef.set(alertBoltSpec);
         //Fix always get getModified policy
         alertBoltSpec.getBoltPoliciesMap().values().forEach((policyDefinitions) -> policyDefinitions.forEach(policy -> {
@@ -101,9 +99,9 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
                 }
                 )
         );
-        sdsRef.set(SpecUtils.generateSds(client));
-        publishSpecRef.set(SpecUtils.generatePublishSpec(client));
-        routerSpecRef.set(SpecUtils.generateRouterSpec(client, numOfAlertBolts));
+        sdsRef.set(specManager.generateSds());
+        publishSpecRef.set(specManager.generatePublishSpec());
+        routerSpecRef.set(specManager.generateRouterSpec());
 
         loadTopics(spoutSpec);
         updateOffsetRanges(rdd);
@@ -131,6 +129,14 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
         Set<String> oldTopics = topicsRef.get();
         LOG.info("Topics were old={}, new={}", oldTopics, newTopics);
         topicsRef.set(new HashSet<>(newTopics));
+    }
+
+
+    private Set<String> getTopicsBySpoutSpec(SpoutSpec spoutSpec) {
+        if (spoutSpec == null) {
+            return Collections.emptySet();
+        }
+        return spoutSpec.getKafka2TupleMetadataMap().keySet();
     }
 
 }

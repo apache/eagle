@@ -17,8 +17,6 @@
 
 package org.apache.eagle.alert.engine.runner;
 
-import static org.apache.eagle.alert.engine.utils.SpecUtils.getTopicsByConfig;
-
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.*;
@@ -31,6 +29,8 @@ import com.typesafe.config.Config;
 import kafka.message.MessageAndMetadata;
 import kafka.serializer.StringDecoder;
 import org.apache.eagle.alert.engine.spark.partition.StreamRoutePartitioner;
+import org.apache.eagle.alert.service.IMetadataServiceClient;
+import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function0;
 import org.apache.spark.streaming.Durations;
@@ -46,7 +46,6 @@ import scala.Predef;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -163,6 +162,7 @@ public class UnitSparkTopologyRunner {
                         spoutSpecRef,
                         sdsRef,
                         alertBoltSpecRef,
+                        publishSpecRef,
                         topicsRef,
                         routerSpecRef,
                         config,
@@ -171,7 +171,6 @@ public class UnitSparkTopologyRunner {
                         policyState,
                         publishState,
                         siddhiState,
-                        publishSpecRef,
                         numOfAlertBolts))
                 .mapToPair(km -> new Tuple2<>(km.topic(), km.message()));
 
@@ -231,5 +230,21 @@ public class UnitSparkTopologyRunner {
         sparkConf.set("spark.streaming.dynamicAllocation.enable", "true");
 
         this.sparkConf = sparkConf;
+    }
+
+    private Set<String> getTopicsByConfig(Config config) {
+        Set<String> topics = new HashSet<>();
+        List<Kafka2TupleMetadata> kafka2TupleMetadata = new ArrayList<>();
+        try {
+            IMetadataServiceClient client = new MetadataServiceClientImpl(config);
+            kafka2TupleMetadata = client.listDataSources();
+        } catch (Exception e) {
+            LOG.error("getTopicsByConfig error :" + e.getMessage(), e);
+        }
+
+        for (Kafka2TupleMetadata eachKafka2TupleMetadata : kafka2TupleMetadata) {
+            topics.add(eachKafka2TupleMetadata.getTopic());
+        }
+        return topics;
     }
 }
