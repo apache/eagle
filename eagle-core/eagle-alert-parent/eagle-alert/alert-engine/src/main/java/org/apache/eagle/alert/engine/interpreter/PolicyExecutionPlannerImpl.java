@@ -59,6 +59,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
 
     private final String executionPlan;
     private final Map<String,List<StreamColumn>> effectiveInputStreams;
+    private final Map<String, String> effectiveInputStreamsAlias;
     private final Map<String,List<StreamColumn>> effectiveOutputStreams;
     private final Map<String,StreamPartition> effectivePartitions;
     private final PolicyExecutionPlan policyExecutionPlan;
@@ -66,6 +67,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
     public PolicyExecutionPlannerImpl(String executionPlan) throws Exception {
         this.executionPlan = executionPlan;
         this.effectiveInputStreams = new HashMap<>();
+        this.effectiveInputStreamsAlias = new HashMap<>();
         this.effectiveOutputStreams = new HashMap<>();
         this.effectivePartitions = new HashMap<>();
         this.policyExecutionPlan = doParse();
@@ -172,9 +174,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                                     streamGroupBy.put(streamId, new ArrayList<>());
                                 }
 
-                                //streamReferenceId, streamId
-                                Map<String, String> streamReferenceIdsMapping = new HashMap<>();
-                                collectStreamReferenceIdMapping(((StateInputStream)inputStream).getStateElement(), streamReferenceIdsMapping);
+                                collectStreamReferenceIdMapping(((StateInputStream)inputStream).getStateElement());
 
                                 for (Variable variable : groupBy) {
                                     // Not stream not set, then should be all streams' same field
@@ -184,10 +184,10 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                                         }
                                     } else {
                                         String streamId = variable.getStreamId();
-                                        if (!streamReferenceIdsMapping.containsKey(streamId)) {
+                                        if (!this.effectiveInputStreamsAlias.containsKey(streamId)) {
                                             streamId = retrieveStreamId(variable, effectiveInputStreams,queryLevelAliasToStreamMapping);
                                         } else {
-                                            streamId = streamReferenceIdsMapping.get(streamId);
+                                            streamId = this.effectiveInputStreamsAlias.get(streamId);
                                         }
                                         if (streamGroupBy.containsKey(streamId)) {
                                             streamGroupBy.get(streamId).add(variable);
@@ -215,6 +215,9 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
             // Set effective input streams
             policyExecutionPlan.setInputStreams(effectiveInputStreams);
 
+            // Set effective input streams alias
+            policyExecutionPlan.setInputStreamAlias(effectiveInputStreamsAlias);
+
             // Set effective output streams
             policyExecutionPlan.setOutputStreams(effectiveOutputStreams);
 
@@ -236,22 +239,21 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
         return policyExecutionPlan;
     }
 
-    private Map<String, String> collectStreamReferenceIdMapping(StateElement stateElement, Map<String, String> streamRefIdsMapping) {
+    private void collectStreamReferenceIdMapping(StateElement stateElement) {
         if (stateElement instanceof LogicalStateElement) {
-            collectStreamReferenceIdMapping(((LogicalStateElement) stateElement).getStreamStateElement1(), streamRefIdsMapping);
-            collectStreamReferenceIdMapping(((LogicalStateElement) stateElement).getStreamStateElement2(), streamRefIdsMapping);
+            collectStreamReferenceIdMapping(((LogicalStateElement) stateElement).getStreamStateElement1());
+            collectStreamReferenceIdMapping(((LogicalStateElement) stateElement).getStreamStateElement2());
         } else if (stateElement instanceof CountStateElement) {
-            collectStreamReferenceIdMapping(((CountStateElement) stateElement).getStreamStateElement(), streamRefIdsMapping);
+            collectStreamReferenceIdMapping(((CountStateElement) stateElement).getStreamStateElement());
         } else if (stateElement instanceof EveryStateElement) {
-            collectStreamReferenceIdMapping(((EveryStateElement) stateElement).getStateElement(), streamRefIdsMapping);
+            collectStreamReferenceIdMapping(((EveryStateElement) stateElement).getStateElement());
         } else if (stateElement instanceof NextStateElement) {
-            collectStreamReferenceIdMapping(((NextStateElement) stateElement).getStateElement(), streamRefIdsMapping);
-            collectStreamReferenceIdMapping(((NextStateElement) stateElement).getNextStateElement(), streamRefIdsMapping);
+            collectStreamReferenceIdMapping(((NextStateElement) stateElement).getStateElement());
+            collectStreamReferenceIdMapping(((NextStateElement) stateElement).getNextStateElement());
         } else if (stateElement instanceof StreamStateElement) {
             BasicSingleInputStream basicSingleInputStream = ((StreamStateElement) stateElement).getBasicSingleInputStream();
-            streamRefIdsMapping.put(basicSingleInputStream.getStreamReferenceId(), basicSingleInputStream.getStreamId());
+            this.effectiveInputStreamsAlias.put(basicSingleInputStream.getStreamReferenceId(), basicSingleInputStream.getStreamId());
         }
-        return streamRefIdsMapping;
     }
 
     private String retrieveStreamId(Variable variable, Map<String, List<StreamColumn>> streamMap, Map<String, SingleInputStream> aliasMap) {

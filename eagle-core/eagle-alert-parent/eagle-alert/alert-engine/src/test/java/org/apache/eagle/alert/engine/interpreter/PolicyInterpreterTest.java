@@ -441,5 +441,9 @@ public class PolicyInterpreterTest {
         Assert.assertEquals(1, validation.getPolicyExecutionPlan().getOutputStreams().size());
         Assert.assertEquals(1, validation.getPolicyExecutionPlan().getStreamPartitions().size());
         Assert.assertNull(validation.getPolicyExecutionPlan().getStreamPartitions().get(0).getSortSpec());
+        Assert.assertEquals(StreamPartition.Type.GROUPBY, validation.getPolicyExecutionPlan().getStreamPartitions().get(0).getType());
+        Assert.assertArrayEquals(new String[]{"metric"}, validation.getPolicyExecutionPlan().getStreamPartitions().get(0).getColumns().toArray());
+        Assert.assertTrue(validation.getPolicyExecutionPlan().getInputStreamAlias().containsKey("b"));
+        Assert.assertEquals("HADOOP_JMX_METRIC_STREAM_1", validation.getPolicyExecutionPlan().getInputStreamAlias().get("b"));
     }
 }
