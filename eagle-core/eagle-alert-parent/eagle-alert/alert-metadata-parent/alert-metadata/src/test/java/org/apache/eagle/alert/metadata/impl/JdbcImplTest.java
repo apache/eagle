@@ -177,7 +177,7 @@ public class JdbcImplTest {
         List<String> reservedOnes = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             ScheduleState state = new ScheduleState();
-            String versionId = "state-" + System.currentTimeMillis();
+            String versionId = "state-" + (System.currentTimeMillis() + i);
             state.setVersion(versionId);
             state.setGenerateTime(String.valueOf(new Date().getTime()));
             dao.addScheduleState(state);
@@ -190,6 +190,8 @@ public class JdbcImplTest {
         Assert.assertTrue(scheduleStates.size() == maxCapacity);
         List<String> TargetVersions = new ArrayList<>();
         scheduleStates.stream().forEach(state -> TargetVersions.add(state.getVersion()));
+        LOG.debug(reservedOnes.toString());
+        LOG.debug(TargetVersions.toString());
         Assert.assertTrue(CollectionUtils.isEqualCollection(reservedOnes, TargetVersions));
     }
 }
