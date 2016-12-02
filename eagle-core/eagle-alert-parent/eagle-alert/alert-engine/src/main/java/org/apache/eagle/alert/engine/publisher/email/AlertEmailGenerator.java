@@ -63,7 +63,13 @@ public class AlertEmailGenerator {
         Map<String, String> alertContext = buildAlertContext(event);
         email.setAlertContext(alertContext);
         email.setVelocityTplFile(tplFile);
-        email.setSubject(subject);
+        if (event.getCategory() != null) {
+            email.setSubject(String.format("[Eagle Alert][%s][%s] %s",
+                event.getSeverity(), event.getCategory(), event.getSubject() != null ? event.getSubject() : subject));
+        } else {
+            email.setSubject(String.format("[Eagle Alert][%s] %s",
+                event.getSeverity(), event.getSubject() != null ? event.getSubject() : subject));
+        }
         email.setSender(sender);
         email.setRecipients(recipients);
         email.setCc(cc);
@@ -92,9 +98,6 @@ public class AlertEmailGenerator {
         return status;
     }
 
-    /**
-     * TODO Support template-based alert message.
-     */
     private String getAlertBody(AlertStreamEvent event) {
         if (event.getBody() == null) {
             return String.format("Alert policy \"%s\" was triggered: %s", event.getPolicyId(), generateAlertDataDesc(event));
@@ -133,11 +136,12 @@ public class AlertEmailGenerator {
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_ID, event.getAlertId());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA, event.getDataMap().toString());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA_DESC, generateAlertDataDesc(event));
+        alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_CATEGORY, event.getCategory() != null ? event.getCategory() : "N/A" );
+        alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, event.getSeverity().toString());
         alertContext.put(PublishConstants.ALERT_EMAIL_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()));
         alertContext.put(PublishConstants.ALERT_EMAIL_STREAM_ID, event.getStreamId());
         alertContext.put(PublishConstants.ALERT_EMAIL_CREATOR, event.getCreatedBy());
         alertContext.put(PublishConstants.ALERT_EMAIL_VERSION, Version.version);
-
 
         String rootUrl = this.getServerPort() == 80 ? String.format("http://%s", this.getServerHost())
             : String.format("http://%s:%s", this.getServerHost(), this.getServerPort());

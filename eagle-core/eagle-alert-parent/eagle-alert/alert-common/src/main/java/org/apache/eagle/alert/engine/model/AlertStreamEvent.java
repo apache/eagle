@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.model;
 
+import org.apache.eagle.alert.engine.coordinator.AlertSeverity;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -35,6 +36,8 @@ public class AlertStreamEvent extends StreamEvent {
     private StreamDefinition schema;
     private String createdBy;
     private long createdTime;
+    private String category;
+    private AlertSeverity severity = AlertSeverity.WARNING;
 
     // ----------------------
     // Lazy Alert Fields
@@ -155,5 +158,21 @@ public class AlertStreamEvent extends StreamEvent {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public AlertSeverity getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(AlertSeverity severity) {
+        this.severity = severity;
     }
 }

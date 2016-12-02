@@ -21,8 +21,8 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>[Eagle Alert][Warning] $alert["alertSubject"]</title>
-    <style type="text/css">
+    <title>[$alert["alertSeverity"]$alert["alertSubject"]</title>
+    <style rel="stylesheet" type="text/css">
         /* -------------------------------------
             GLOBAL
             A very basic CSS reset
@@ -157,6 +157,7 @@
             list-style-position: inside;
         }
 
+
         /* -------------------------------------
             LINKS & BUTTONS
         ------------------------------------- */
@@ -180,6 +181,90 @@
             display: inline-block;
             border-radius: 5px;
             text-transform: capitalize;
+        }
+
+        .btn-warning {
+            text-decoration: none;
+            color: #FFF;
+            background-color: #f0ad4e;
+            border-color: solid #eea236;
+            /*background-color: #348eda;*/
+            /*border: solid #348eda;*/
+            border-width: 10px 20px;
+            line-height: 2em;
+            /* 2em * 14px = 28px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+            /*line-height: 28px;*/
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 5px;
+            text-transform: capitalize;
+        }
+
+        .btn-danger {
+            text-decoration: none;
+            color: #fff;
+            background-color: #d9534f;
+            border-color: solid #d43f3a;
+            /*color: #FFF;*/
+            /*background-color: #348eda;*/
+            /*border: solid #348eda;*/
+            border-width: 10px 20px;
+            line-height: 2em;
+            /* 2em * 14px = 28px, use px to get airier line-height also in Thunderbird, and Yahoo!, Outlook.com, AOL webmail clients */
+            /*line-height: 28px;*/
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 5px;
+            text-transform: capitalize;
+        }
+
+        .text-light {
+            color: #eee;
+        }
+
+        .text-primary {
+            color: #348eda;
+        }
+
+        .text-warning {
+            color: #eea236
+        }
+
+        .text-danger {
+            color: #d43f3a;
+        }
+
+        .label {
+            display: inline;
+            padding: .2em .6em .3em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .25em;
+        }
+
+        .label-ok {
+            background-color: #777;
+        }
+        .label-default {
+            background-color: #777;
+        }
+        .label-primary {
+            background-color: #337ab7;
+        }
+        .label-critical {
+            background-color: #d9534f;
+        }
+        .label-warning {
+            background-color: #f0ad4e;
         }
 
         /* -------------------------------------
@@ -233,10 +318,37 @@
         .alert.alert-bad {
             background-color: #D0021B;
         }
-        .alert.alert-good {
+        .alert.alert-critical {
+            background-color: #D0021B;
+        }
+        .alert.alert-fetal {
+            background-color: #D0021B;
+        }
+        .alert.alert-ok {
             background-color: #68B90F;
         }
 
+        .alert-body {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #fff;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+            box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        }
+        .alert-body-default {
+            border-color: #eee;
+        }
+        .alert-body-primary {
+            border-color: #337ab7;
+        }
+        .alert-body-warning {
+            border-color: #faebcc;
+        }
+        .alert-body-danger {
+            border-color: #ebccd1;
+        }
         /* -------------------------------------
             INVOICE
             Styles for the billing table
@@ -253,7 +365,7 @@
             width: 100%;
         }
         .invoice .invoice-items td {
-            border-top: #eee 1px solid;
+            border-bottom: #eee 1px solid;
         }
         .invoice .invoice-items .total td {
             border-top: 2px solid #333;
@@ -268,12 +380,10 @@
             body {
                 padding: 0 !important;
             }
-
             h1, h2, h3, h4 {
                 font-weight: 800 !important;
                 margin: 20px 0 5px !important;
             }
-
             h1 {
                 font-size: 22px !important;
             }
@@ -281,29 +391,23 @@
             h2 {
                 font-size: 18px !important;
             }
-
             h3 {
                 font-size: 16px !important;
             }
-
             .container {
                 padding: 0 !important;
                 width: 100% !important;
             }
-
             .content {
                 padding: 0 !important;
             }
-
             .content-wrap {
                 padding: 10px !important;
             }
-
             .invoice {
                 width: 100% !important;
             }
         }
-
         /*# sourceMappingURL=styles.css.map */
     </style>
 </head>
@@ -317,27 +421,32 @@
             <div class="content">
                 <table class="main" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                        #if ($alert["severity"] == "CRITICAL")
-                            <td class="alert alert-bad">
-                                Critical: $alert["alertSubject"]
-                            </td>
-                        #else
-                            <td class="alert alert-warning">
-                                Warning: $alert["alertSubject"]
-                            </td>
-                        #end
+                        <td class="alert alert-$alert["alertSeverity"].toLowerCase()">
+                            <strong>$alert["alertSeverity"]</strong> $alert["alertSubject"]
+                        </td>
                     </tr>
                     <tr>
                         <td class="content-wrap">
                             <table width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td class="content-block">
-                                        You receive a <strong>warning</strong> alert at <strong>$alert["alertTime"]</strong>
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Category:</td>
+                                                    <td><strong>$alert["alertCategory"]</strong></td>
+                                                    <td>Time:</td>
+                                                    <td><strong>$alert["alertTime"]</strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="content-block">
+                                        <div class="alert-body alert-body-default">
                                         $alert["alertBody"]
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -345,16 +454,12 @@
                                         <table class="invoice-items" cellpadding="0" cellspacing="0">
                                             <tbody>
                                                 <tr>
-                                                    <td>Cluster Name</td>
+                                                    <td>Cluster</td>
                                                     <td>$alert["siteId"]</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Policy Name</td>
+                                                    <td>Policy</td>
                                                     <td><a href="$alert["policyDetailUrl"]">$alert["policyId"]</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Detected Time</td>
-                                                    <td>$alert["alertTime"]</td>
                                                 </tr>
                                             </tbody>
                                         </table>
