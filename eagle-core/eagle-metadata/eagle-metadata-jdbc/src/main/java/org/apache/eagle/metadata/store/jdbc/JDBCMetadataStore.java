@@ -34,7 +34,6 @@ import javax.sql.DataSource;
 public class JDBCMetadataStore extends MetadataStore {
     @Override
     protected void configure() {
-        System.setProperty(MetadataUtils.META_DATA + "." + MetadataUtils.ALERT_META_DATA_DAO, JdbcMetadataDaoImpl.class.getCanonicalName());
         bind(IMetadataDao.class).to(JdbcMetadataDaoImpl.class).in(Singleton.class);
         bind(DataSource.class).toProvider(JDBCDataSourceProvider.class).in(Singleton.class);
         bind(JDBCDataSourceConfig.class).toProvider(JDBCMetadataStoreConfigProvider.class).in(Singleton.class);
