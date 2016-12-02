@@ -143,7 +143,6 @@
 					<p class="text-danger">{{definitionMessage}}</p>
 				</div>
 
-
 				<ul class="sm-padding">
 					<li class="text-danger" ng-if="policy.outputStreams.length === 0"><i class="fa fa-fw fa-warning"></i> No alert stream defined</li>
 					<li ng-repeat="stream in outputStreams track by $index">
@@ -153,6 +152,23 @@
 						</label>
 					</li>
 				</ul>
+
+				<div class="form-group">
+					<label>Alert Definition*</label><br/>
+					<strong>Category</strong>
+					<input class="form-control" type="text" ng-model="policy.alertDefinition.category" ng-disabled="policyLock" />
+					<strong>Severity</strong>
+					<select class="form-control" ng-model="policy.alertDefinition.severity" ng-disabled="policyLock" >
+						<option value="WARNING">WARNING</option>
+						<option value="CRITICAL">CRITICAL</option>
+						<option value="FATAL">FATAL</option>
+						<option value="OK">OK</option>
+					</select>
+					<strong>Subject</strong>
+					<input type="text" class="form-control" placeholder="Alert Subject Template" ng-model="policy.alertDefinition.subject" ng-disabled="policyLock"/>
+					<strong>Body</strong>
+					<textarea class="form-control" rows="2" placeholder="Alert Body Template" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></textarea>
+				</div>
 
 				<label>
 					Publish Alerts

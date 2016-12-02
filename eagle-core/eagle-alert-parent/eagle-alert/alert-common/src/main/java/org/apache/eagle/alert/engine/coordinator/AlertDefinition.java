@@ -16,33 +16,52 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-public class AlertTemplateDefinition {
-    private TemplateType type = TemplateType.TEXT;
-    private String subjectTemplate;
-    private String bodyTemplate;
+public class AlertDefinition {
+    private TemplateType templateType = TemplateType.TEXT;
+    private String subject;
+    private String body;
 
-    public String getBodyTemplate() {
-        return bodyTemplate;
+    private AlertSeverity severity;
+    private String category;
+
+    public String getBody() {
+        return body;
     }
 
-    public void setBodyTemplate(String templateResource) {
-        this.bodyTemplate = templateResource;
+    public void setBody(String templateResource) {
+        this.body = templateResource;
     }
 
-    public TemplateType getType() {
-        return type;
+    public TemplateType getTemplateType() {
+        return templateType;
     }
 
-    public void setType(TemplateType type) {
-        this.type = type;
+    public void setTemplateType(TemplateType type) {
+        this.templateType = type;
     }
 
-    public String getSubjectTemplate() {
-        return subjectTemplate;
+    public String getSubject() {
+        return subject;
     }
 
-    public void setSubjectTemplate(String subjectTemplate) {
-        this.subjectTemplate = subjectTemplate;
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public AlertSeverity getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(AlertSeverity severity) {
+        this.severity = severity;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public enum TemplateType {

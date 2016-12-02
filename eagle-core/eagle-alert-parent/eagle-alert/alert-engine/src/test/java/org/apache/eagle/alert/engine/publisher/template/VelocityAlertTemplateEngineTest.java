@@ -17,7 +17,7 @@
 package org.apache.eagle.alert.engine.publisher.template;
 
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.alert.engine.coordinator.AlertTemplateDefinition;
+import org.apache.eagle.alert.engine.coordinator.AlertDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -68,11 +68,11 @@ public class VelocityAlertTemplateEngineTest {
         pd.setOutputStreams(Collections.singletonList("capacityUsageAlert"));
         pd.setName(policyId);
         pd.setDescription("Policy for monitoring cpu usage > 90%");
-        AlertTemplateDefinition alertTemplateDefinition = new AlertTemplateDefinition();
-        alertTemplateDefinition.setSubjectTemplate("Name Node Usage Exceed 90%, reach #set($usage_per = $value * 100)$usage_per% now");
-        alertTemplateDefinition.setBodyTemplate("Alert ($CREATED_TIME): cpu usage on $role of cluster $site at $host is $value, exceeding thread hold: 90%. "
+        AlertDefinition alertDefinition = new AlertDefinition();
+        alertDefinition.setSubject("Name Node Usage Exceed 90%, reach #set($usage_per = $value * 100)$usage_per% now");
+        alertDefinition.setBody("Alert ($CREATED_TIME): cpu usage on $role of cluster $site at $host is $value, exceeding thread hold: 90%. "
                 + "(policy: $POLICY_ID, description: $POLICY_DESC), definition: $POLICY_DEFINITION");
-        pd.setAlertTemplate(alertTemplateDefinition);
+        pd.setAlertDefinition(alertDefinition);
         return pd;
     }
     private static PolicyDefinition mockPolicyWithoutTemplate (String policyId) {

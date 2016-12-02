@@ -194,8 +194,8 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
                     }
                     extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);
                     extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, policyDefinition.getDefinition().getValue());
-                    event.setSeverity(policyDefinition.getSeverity());
-                    event.setCategory(policyDefinition.getCategory());
+                    event.setSeverity(policyDefinition.getAlertSeverity());
+                    event.setCategory(policyDefinition.getAlertCategory());
                 }
                 event.setContext(extraData);
             }

@@ -155,17 +155,17 @@
                                 <td>
                                     <p><b>Detected Time: $alert["alertTime"]</b></p>
                                 </td>
-                                #set ( $severity = $alert["severity"] )
-                                #if (!$severity || ("$severity" == ""))
-                                    #set ( $alert["severity"] = "WARNING")
+                                #set ( $alertSeverity = $alert["alertSeverity"] )
+                                #if (!$alertSeverity || ("$alertSeverity" == ""))
+                                    #set ( $alert["alertSeverity"] = "WARNING")
                                 #end
                                 <td align="right">
                                     <p><b>
                                         Severity:
-                                        #if ($alert["severity"] == "WARNING")
-                                            <span>$alert["severity"]</span>
+                                        #if ($alert["alertSeverity"] == "WARNING")
+                                            <span>$alert["alertSeverity"]</span>
                                         #else
-                                            <span style="color: #FF0000;">$alert["severity"]</span>
+                                            <span style="color: #FF0000;">$alert["alertSeverity"]</span>
                                         #end
                                     </b></p>
                                 </td>
@@ -210,7 +210,7 @@
                                     <p>Severity Level</p>
                                 </th>
                                 <td>
-                                    <p>$alert["severity"]</p>
+                                    <p>$alert["alertSeverity"]</p>
                                 </td>
                             </tr>
                             <tr>

@@ -39,9 +39,7 @@ public class PolicyDefinition implements Serializable {
     private Definition definition;
     private Definition stateDefinition;
     private PolicyStatus policyStatus = PolicyStatus.ENABLED;
-    private AlertTemplateDefinition alertTemplate;
-    private AlertSeverity severity;
-    private String category;
+    private AlertDefinition alertDefinition;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -173,28 +171,20 @@ public class PolicyDefinition implements Serializable {
         return false;
     }
 
-    public AlertTemplateDefinition getAlertTemplate() {
-        return alertTemplate;
+    public AlertDefinition getAlertDefinition() {
+        return alertDefinition;
     }
 
-    public void setAlertTemplate(AlertTemplateDefinition alertTemplate) {
-        this.alertTemplate = alertTemplate;
+    public void setAlertDefinition(AlertDefinition alertDefinition) {
+        this.alertDefinition = alertDefinition;
     }
 
-    public AlertSeverity getSeverity() {
-        return severity;
+    public AlertSeverity getAlertSeverity() {
+        return alertDefinition == null? null: alertDefinition.getSeverity();
     }
 
-    public void setSeverity(AlertSeverity severity) {
-        this.severity = severity;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
+    public String getAlertCategory() {
+        return alertDefinition == null? null: alertDefinition.getCategory();
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

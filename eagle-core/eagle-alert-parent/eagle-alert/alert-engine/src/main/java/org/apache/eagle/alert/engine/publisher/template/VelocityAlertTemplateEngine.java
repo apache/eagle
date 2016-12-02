@@ -18,7 +18,7 @@ package org.apache.eagle.alert.engine.publisher.template;
 
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.engine.coordinator.AlertTemplateDefinition;
+import org.apache.eagle.alert.engine.coordinator.AlertDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.common.DateTimeUtil;
@@ -73,8 +73,8 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
     public synchronized void register(PolicyDefinition policyDefinition) {
         LOG.info("Registering {}", policyDefinition.getName());
         Preconditions.checkNotNull(policyDefinition.getName(), "policyId is null");
-        AlertTemplateDefinition alertTemplateDefinition = policyDefinition.getAlertTemplate();
-        if (alertTemplateDefinition == null) {
+        AlertDefinition alertDefinition = policyDefinition.getAlertDefinition();
+        if (alertDefinition == null) {
             LOG.warn("Subject template of policy {} is null, using policy name by default");
             stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), policyDefinition.getName());
 
@@ -82,21 +82,21 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             String defaultAlertBodyTmpl = String.format("Alert Information: $%s (Auto-generated alert message as template not defined in policy %s)",
                 AlertContextFields.ALERT_EVENT, policyDefinition.getName());
             stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), defaultAlertBodyTmpl);
-        } else if (alertTemplateDefinition.getType().equals(AlertTemplateDefinition.TemplateType.TEXT)) {
-            if (alertTemplateDefinition.getSubjectTemplate() != null) {
-                stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), alertTemplateDefinition.getSubjectTemplate());
+        } else if (alertDefinition.getTemplateType().equals(AlertDefinition.TemplateType.TEXT)) {
+            if (alertDefinition.getSubject() != null) {
+                stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), alertDefinition.getSubject());
             } else {
                 LOG.warn("Subject template of policy {} is null, using policy name by default");
                 stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), policyDefinition.getName());
             }
-            if (alertTemplateDefinition.getBodyTemplate() != null) {
-                stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), alertTemplateDefinition.getBodyTemplate());
+            if (alertDefinition.getBody() != null) {
+                stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), alertDefinition.getBody());
             } else {
                 LOG.warn("Body template of policy {} is null, using ALERT_EVENT by default");
                 stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), "$" + AlertContextFields.ALERT_EVENT);
             }
         } else {
-            throw new IllegalArgumentException("Unsupported alert template type " + alertTemplateDefinition.getType());
+            throw new IllegalArgumentException("Unsupported alert template type " + alertDefinition.getTemplateType());
         }
         policyDefinitionRepository.put(policyDefinition.getName(), policyDefinition);
     }
