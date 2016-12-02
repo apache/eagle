@@ -117,7 +117,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     @Override
     public ScheduleState getScheduleState() {
         List<ScheduleState> scheduleStates =
-                handler.listOrderBy(ScheduleState.class, JdbcMetadataHandler.SortType.DESC.toString());
+                handler.list(ScheduleState.class, JdbcMetadataHandler.SortType.DESC);
         if (scheduleStates.isEmpty()) {
             return null;
         } else {

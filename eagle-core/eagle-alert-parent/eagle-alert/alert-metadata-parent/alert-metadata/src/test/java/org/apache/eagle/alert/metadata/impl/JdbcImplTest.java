@@ -195,11 +195,11 @@ public class JdbcImplTest {
         dao.clearScheduleState(maxCapacity);
         List<ScheduleState> scheduleStates = dao.listScheduleStates();
         Assert.assertTrue(scheduleStates.size() == maxCapacity);
-        List<String> TargetVersions = new ArrayList<>();
-        scheduleStates.stream().forEach(state -> TargetVersions.add(state.getVersion()));
-        LOG.debug(reservedOnes.toString());
-        LOG.debug(TargetVersions.toString());
-        Assert.assertTrue(CollectionUtils.isEqualCollection(reservedOnes, TargetVersions));
+        List<String> targetOnes = new ArrayList<>();
+        scheduleStates.stream().forEach(state -> targetOnes.add(state.getVersion()));
+        LOG.info("reservedOne={}",reservedOnes);
+        LOG.info("targetOne={}", targetOnes);
+        Assert.assertTrue(CollectionUtils.isEqualCollection(reservedOnes, targetOnes));
     }
 
     @Test

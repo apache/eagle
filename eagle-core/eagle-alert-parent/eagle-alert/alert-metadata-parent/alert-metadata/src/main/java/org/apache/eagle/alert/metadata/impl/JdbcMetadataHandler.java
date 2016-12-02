@@ -118,6 +118,30 @@ public class JdbcMetadataHandler {
         }
     }
 
+    private void closeResource(ResultSet rs, PreparedStatement statement, Connection connection) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                LOG.info(e.getMessage(), e);
+            }
+        }
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (SQLException e) {
+                LOG.info("Failed to close statement: {}", e.getMessage(), e);
+            }
+        }
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                LOG.error("Failed to close connection: {}", e.getMessage(), e.getCause());
+            }
+        }
+    }
+
     private OpResult executeUpdate(Connection connection, String query, String key, String value) throws SQLException {
         OpResult result = new OpResult();
         PreparedStatement statement = null;
@@ -137,35 +161,6 @@ public class JdbcMetadataHandler {
         return result;
     }
 
-    private OpResult executeUpdate(Connection connection, PreparedStatement statement) {
-        OpResult result = new OpResult();
-        try {
-            int status = statement.executeUpdate();
-            result.code = OpResult.SUCCESS;
-            result.message = String.format("updated %d records successfully", status);
-            LOG.info(result.message);
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            result.code = OpResult.FAILURE;
-            result.message = e.getMessage();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
-                }
-            }
-        }
-        return result;
-    }
 
     public <T> OpResult addOrReplace(String clzName, T t) {
         String tb = getTableName(clzName);
@@ -200,47 +195,59 @@ public class JdbcMetadataHandler {
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
         } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
-                }
-            }
+            closeResource(null, null, connection);
         }
         return result;
     }
 
 
     public <T> List<T> list(Class<T> clz) {
-        return listOrderBy(clz, null);
+        return list(clz, null);
     }
 
-    public <T> List<T> listOrderBy(Class<T> clz, String sortType) {
+    public <T> List<T> list(Class<T> clz,  SortType sortType) {
         List<T> result = new LinkedList<T>();
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
             String tb = getTableName(clz.getSimpleName());
             String query = String.format(QUERY_ALL_STATEMENT, tb);
             if (sortType != null) {
-                query = String.format(QUERY_ORDERBY_STATEMENT, tb, sortType);
+                query = String.format(QUERY_ORDERBY_STATEMENT, tb, sortType.toString());
             }
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
-            return executeList(connection, statement, rs -> {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
+            return executeList(statement, clz);
+        } catch (SQLException ex) {
+            LOG.error(ex.getMessage(), ex);
+        } finally {
+            closeResource(null, statement, connection);
+        }
+        return result;
+    }
+
+    private <T> List<T> executeList(PreparedStatement statement, Class<T> clz) throws SQLException {
+        List<T> result = new LinkedList<>();
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery();
+            while (rs.next()) {
                 try {
                     String content = rs.getString(1);
-                    return mapper.readValue(content, clz);
+                    result.add(mapper.readValue(content, clz)) ;
                 } catch (Exception e) {
                     throw new IllegalStateException(e);
                 }
-            });
-        } catch (SQLException ex) {
-            LOG.error(ex.getMessage(), ex);
-            return result;
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
         }
+        return result;
     }
 
-    private <T> List<T> executeList(Connection connection, PreparedStatement statement, Function<ResultSet, T> selectFun) {
+    private <T> List<T> executeList(PreparedStatement statement, Function<ResultSet, T> selectFun) throws SQLException {
         List<T> result = new LinkedList<>();
         ResultSet rs = null;
         try {
@@ -248,29 +255,9 @@ public class JdbcMetadataHandler {
             while (rs.next()) {
                 result.add(selectFun.apply(rs));
             }
-        } catch (SQLException e) {
-            LOG.error(e.getMessage(), e);
         } finally {
             if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
-                }
+                rs.close();
             }
         }
         return result;
@@ -278,21 +265,18 @@ public class JdbcMetadataHandler {
 
     public <T> T queryById(Class<T> clz, String id) {
         List<T> result = new LinkedList<T>();
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
             String tb = getTableName(clz.getSimpleName());
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(String.format(QUERY_CONDITION_STATEMENT, tb));
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(String.format(QUERY_CONDITION_STATEMENT, tb));
             statement.setString(1, id);
-            result = executeList(connection, statement, rs -> {
-                try {
-                    String content = rs.getString(1);
-                    return mapper.readValue(content, clz);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            });
+            result = executeList(statement, clz);
         } catch (SQLException ex) {
             LOG.error(ex.getMessage(), ex);
+        } finally {
+            closeResource(null, statement, connection);
         }
         if (result.isEmpty()) {
             return null;
@@ -316,9 +300,10 @@ public class JdbcMetadataHandler {
 
     public List<AlertPublishEvent> listAlertEvents(String query, String filter, int size) {
         List<AlertPublishEvent> alerts = new LinkedList<>();
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = null;
+            connection = dataSource.getConnection();
             if (query == null) {
                 query = QUERY_ALERT_STATEMENT;
                 statement = connection.prepareStatement(query);
@@ -328,7 +313,7 @@ public class JdbcMetadataHandler {
                 statement.setString(1, filter);
                 statement.setInt(2, size);
             }
-            alerts = executeList(connection, statement, rs -> {
+            alerts = executeList(statement, rs -> {
                 try {
                     AlertPublishEvent event = new AlertPublishEvent();
                     event.setAlertId(rs.getString(1));
@@ -345,6 +330,8 @@ public class JdbcMetadataHandler {
             });
         } catch (SQLException ex) {
             LOG.error(ex.getMessage(), ex);
+        } finally {
+            closeResource(null, statement, connection);
         }
         return alerts;
     }
@@ -376,59 +363,38 @@ public class JdbcMetadataHandler {
                 publishment.setPolicyIds(entry.getValue());
                 result.add(publishment);
             }
-            return result;
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
-            return result;
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
-                }
-            }
+            closeResource(rs, statement, connection);
         }
+        return result;
     }
 
     public List<Publishment> getPublishmentsByPolicyId(String policyId) {
         List<Publishment> result = new LinkedList<>();
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(QUERY_PUBLISHMENT_BY_POLICY_STATEMENT);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(QUERY_PUBLISHMENT_BY_POLICY_STATEMENT);
             statement.setString(1, policyId);
-            result = executeList(connection, statement, rs -> {
-                try {
-                    String content = rs.getString(1);
-                    return mapper.readValue(content, Publishment.class);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            });
+            result = executeList(statement, Publishment.class);
         } catch (SQLException ex) {
             LOG.error(ex.getMessage(), ex);
+        } finally {
+            closeResource(null, statement, connection);
         }
         return result;
     }
 
     public OpResult addAlertEvent(AlertPublishEvent event) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        OpResult result = new OpResult();
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(INSERT_ALERT_STATEMENT);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(INSERT_ALERT_STATEMENT);
             statement.setString(1, event.getAlertId());
             statement.setString(2, event.getSiteId());
             statement.setString(3, mapper.writeValueAsString(event.getAppIds()));
@@ -437,13 +403,17 @@ public class JdbcMetadataHandler {
             statement.setString(6, event.getPolicyValue());
             statement.setString(7, mapper.writeValueAsString(event.getAlertData()));
             LOG.info("start to add alert event");
-            return executeUpdate(connection, statement);
+            int status = statement.executeUpdate();
+            result.code = OpResult.SUCCESS;
+            result.message = String.format("add %d records into alert_event successfully", status);
         } catch (Exception ex) {
-            OpResult result = new OpResult();
             result.code = OpResult.FAILURE;
             result.message = ex.getMessage();
-            return result;
+        } finally {
+            closeResource(null, statement, connection);
         }
+        LOG.info(result.message);
+        return result;
     }
 
     public OpResult addPublishmentsToPolicy(String policyId, List<String> publishmentIds) {
@@ -457,6 +427,7 @@ public class JdbcMetadataHandler {
             statement.setString(1, policyId);
             int status = statement.executeUpdate();
             LOG.info("delete {} records from policy_publishment", status);
+            closeResource(null, statement, null);
 
             statement = connection.prepareStatement(INSERT_POLICYPUBLISHMENT_STATEMENT);
             for (String pub : publishmentIds) {
@@ -471,45 +442,40 @@ public class JdbcMetadataHandler {
             for (int i : num) {
                 sum += i;
             }
-            LOG.info("Add {} records into policy_publishment", sum);
             result.code = OpResult.SUCCESS;
+            result.message = String.format("Add %d records into policy_publishment", sum);
         } catch (SQLException ex) {
             LOG.error("Error to add publishments to policy {}", policyId, ex);
             result.code = OpResult.FAILURE;
             result.message = ex.getMessage();
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    LOG.error(e.getMessage(), e);
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    LOG.error(e.getMessage(), e);
-                }
-            }
+            closeResource(null, statement, connection);
         }
+        LOG.info(result.message);
         return result;
     }
 
     public OpResult removeById(String clzName, String key) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        OpResult result = new OpResult();
         try {
             String tb = getTableName(clzName);
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb));
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb));
             statement.setString(1, key);
             LOG.info("start to delete records from {} with id={}", tb, key);
-            return executeUpdate(connection, statement);
+            int status = statement.executeUpdate();
+            result.code = OpResult.SUCCESS;
+            result.message = String.format("removed %d records from %s successfully", status, tb);
         } catch (SQLException ex) {
-            OpResult result = new OpResult();
             result.code = OpResult.FAILURE;
             result.message = ex.getMessage();
-            return result;
+        } finally {
+            closeResource(null, statement, connection);
         }
+        LOG.info(result.message);
+        return result;
     }
 
     public void close() throws IOException {
@@ -517,17 +483,24 @@ public class JdbcMetadataHandler {
     }
 
     public OpResult removeScheduleStates(int capacity) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        OpResult result = new OpResult();
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(CLEAR_SCHEDULESTATES_STATEMENT);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(CLEAR_SCHEDULESTATES_STATEMENT);
             statement.setInt(1, capacity);
             LOG.info("start to delete schedule states");
-            return executeUpdate(connection, statement);
+            int status = statement.executeUpdate();
+            result.code = OpResult.SUCCESS;
+            result.message = String.format("removed %d records from schedule_state successfully", status);
         } catch (SQLException ex) {
-            OpResult result = new OpResult();
             result.code = OpResult.FAILURE;
             result.message = ex.getMessage();
-            return result;
+        } finally {
+            closeResource(null, statement, connection);
         }
+        LOG.info(result.message);
+        return result;
     }
 }
