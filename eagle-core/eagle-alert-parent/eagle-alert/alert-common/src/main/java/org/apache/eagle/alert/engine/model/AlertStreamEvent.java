@@ -123,6 +123,7 @@ public class AlertStreamEvent extends StreamEvent {
     }
 
     public String getAlertId() {
+        ensureAlertId();
         return alertId;
     }
 

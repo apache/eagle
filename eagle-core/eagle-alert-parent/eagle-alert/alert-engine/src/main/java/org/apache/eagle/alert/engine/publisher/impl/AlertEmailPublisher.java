@@ -21,6 +21,7 @@ package org.apache.eagle.alert.engine.publisher.impl;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
+import org.apache.eagle.alert.engine.publisher.email.AlertEmailConstants;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailGenerator;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailGeneratorBuilder;
 import com.typesafe.config.Config;
@@ -32,9 +33,12 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import static org.apache.eagle.alert.service.MetadataServiceClientImpl.*;
 
 public class AlertEmailPublisher extends AbstractPublishPlugin {
 
@@ -43,12 +47,21 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     private static final int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
     private static final long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
 
+    private static final String EAGLE_CORRELATION_SMTP_SERVER = "metadataService.mailSmtpServer";
+    private static final String EAGLE_CORRELATION_SMTP_PORT = "metadataService.mailSmtpPort";
+    private static final String EAGLE_CORRELATION_SMTP_CONN = "metadataService.mailSmtpConn";
+    private static final String EAGLE_CORRELATION_SMTP_AUTH = "metadataService.mailSmtpAuth";
+    private static final String EAGLE_CORRELATION_SMTP_USERNAME = "metadataService.mailSmtpUsername";
+    private static final String EAGLE_CORRELATION_SMTP_PASSWORD = "metadataService.mailSmtpPassword";
+    private static final String EAGLE_CORRELATION_SMTP_DEBUG = "metadataService.mailSmtpDebug";
+
     private AlertEmailGenerator emailGenerator;
     private Map<String, Object> emailConfig;
 
     private transient ThreadPoolExecutor executorPool;
     private String serverHost;
     private int serverPort;
+    private Properties mailClientProperties;
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -58,6 +71,7 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             ? config.getString(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_HOST) : "localhost";
         this.serverPort = config.hasPath(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_PORT)
             ? config.getInt(MetadataServiceClientImpl.EAGLE_CORRELATION_SERVICE_PORT) : 80;
+        this.mailClientProperties = parseMailClientConfig(config);
 
         executorPool = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_CORE_SIZE, DEFAULT_THREAD_POOL_MAX_SIZE, DEFAULT_THREAD_POOL_SHRINK_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         LOG.info(" Creating Email Generator... ");
@@ -65,7 +79,37 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             emailConfig = new HashMap<>(publishment.getProperties());
             emailGenerator = createEmailGenerator(emailConfig);
         }
+    }
 
+    private Properties parseMailClientConfig(Config config) {
+        Properties props = new Properties();
+        String mailSmtpServer = config.getString(EAGLE_CORRELATION_SMTP_SERVER);
+        String mailSmtpPort = config.getString(EAGLE_CORRELATION_SMTP_PORT);
+        String mailSmtpAuth =  config.getString(EAGLE_CORRELATION_SMTP_AUTH);
+
+        props.put(AlertEmailConstants.CONF_MAIL_HOST, mailSmtpServer);
+        props.put(AlertEmailConstants.CONF_MAIL_PORT, mailSmtpPort);
+        props.put(AlertEmailConstants.CONF_MAIL_AUTH, mailSmtpAuth);
+
+        if (Boolean.parseBoolean(mailSmtpAuth)) {
+            String mailSmtpUsername = config.getString(EAGLE_CORRELATION_SMTP_USERNAME);
+            String mailSmtpPassword = config.getString(EAGLE_CORRELATION_SMTP_PASSWORD);
+            props.put(AlertEmailConstants.CONF_AUTH_USER, mailSmtpUsername);
+            props.put(AlertEmailConstants.CONF_AUTH_PASSWORD, mailSmtpPassword);
+        }
+
+        String mailSmtpConn = config.hasPath(EAGLE_CORRELATION_SMTP_CONN) ? config.getString(EAGLE_CORRELATION_SMTP_CONN) : AlertEmailConstants.CONN_PLAINTEXT;
+        String mailSmtpDebug = config.hasPath(EAGLE_CORRELATION_SMTP_DEBUG) ? config.getString(EAGLE_CORRELATION_SMTP_DEBUG) : "false";
+        if (mailSmtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_TLS)) {
+            props.put("mail.smtp.starttls.enable", "true");
+        }
+        if (mailSmtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_SSL)) {
+            props.put("mail.smtp.socketFactory.port", "465");
+            props.put("mail.smtp.socketFactory.class",
+                    "javax.net.ssl.SSLSocketFactory");
+        }
+        props.put(AlertEmailConstants.CONF_MAIL_DEBUG, mailSmtpDebug);
+        return props;
     }
 
     @Override
@@ -126,8 +170,9 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             LOG.warn("email sender or recipients is null");
             return null;
         }
+
         AlertEmailGenerator gen = AlertEmailGeneratorBuilder.newBuilder()
-            .withMailProps(notificationConfig)
+            .withMailProps(this.mailClientProperties)
             .withSubject(subject)
             .withSender(sender)
             .withRecipients(recipients)

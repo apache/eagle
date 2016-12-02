@@ -102,7 +102,7 @@ public class InMemoryTest {
         dao.addAlertPublishEvent(alert1);
         dao.addAlertPublishEvent(alert2);
         Assert.assertNotNull(dao.getAlertPublishEvent("1"));
-        Assert.assertEquals(2, dao.getAlertPublishEventByPolicyId("1", 2).size());
+        Assert.assertEquals(2, dao.getAlertPublishEventsByPolicyId("1", 2).size());
     }
 
     @Test

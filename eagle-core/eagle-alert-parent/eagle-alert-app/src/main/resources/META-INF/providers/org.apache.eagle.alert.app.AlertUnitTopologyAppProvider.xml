@@ -76,74 +76,37 @@
         <!-- alert spout configuration -->
         <property>
             <name>spout.kafkaBrokerZkQuorum</name>
-            <displayName>Kafka Zookeeper Quorum</displayName>
+            <displayName>Kafka Spout Broker Zookeeper Quorum</displayName>
             <value>localhost:2181</value>
             <description>Zookeeper quorum of kafka broker for spout to consume data</description>
             <required>true</required>
         </property>
         <property>
             <name>spout.kafkaBrokerZkBasePath</name>
-            <displayName>Kafka Zookeeper Root</displayName>
+            <displayName>Kafka Spout Broker Zookeeper Root</displayName>
             <value>/brokers</value>
             <description>Zookeeper znode path for kafka brokers</description>
             <required>false</required>
         </property>
         <property>
             <name>spout.stormKafkaUseSameZkQuorumWithKafkaBroker</name>
-            <displayName>Reuse Kafka Zookeeper</displayName>
+            <displayName>Spout Transaction Zookeeper to Reuse Broker Zookeeper</displayName>
             <value>true</value>
             <description>Use same zookeeper for kafka server and kafka consumer(Storm-Kafka)</description>
             <required>false</required>
         </property>
         <property>
             <name>spout.stormKafkaTransactionZkPath</name>
-            <displayName>Kafka Transaction ZkPath</displayName>
+            <displayName>Spout Transaction Zookeeper Path</displayName>
             <value>/consumers</value>
             <description>Zookeeper path for storm kafka transaction</description>
             <required>false</required>
         </property>
         <property>
             <name>spout.stormKafkaEagleConsumer</name>
-            <displayName>Kafka Consumer ID</displayName>
+            <displayName>Spout Consumer ID</displayName>
             <value>eagle_consumer</value>
             <description>Zookeeper quorum for spout to consume data</description>
-            <required>true</required>
-        </property>
-
-        <!-- zk config for alert engine -->
-        <property>
-            <name>zkConfig.zkQuorum</name>
-            <displayName>Coordinator Zookeeper Quorum</displayName>
-            <value>localhost:2181</value>
-            <description>Zookeeper quorum for alert engine</description>
-            <required>true</required>
-        </property>
-        <property>
-            <name>zkConfig.zkRoot</name>
-            <displayName>Coordinator Zookeeper Root</displayName>
-            <value>/alert</value>
-            <description>Zookeeper znode path for alert engine</description>
-            <required>false</required>
-        </property>
-        <property>
-            <name>metadataService.context</name>
-            <displayName>Metadata Service Context Path</displayName>
-            <value>/rest</value>
-            <description>Metadata service context path</description>
-            <required>false</required>
-        </property>
-        <property>
-            <name>metadataService.host</name>
-            <displayName>Metadata Service Host</displayName>
-            <value>localhost</value>
-            <description>Metadata service host</description>
-            <required>true</required>
-        </property>
-        <property>
-            <name>metadataService.port</name>
-            <displayName>Metadata Service Port</displayName>
-            <value>9090</value>
-            <description>Metadata service port</description>
             <required>true</required>
         </property>
     </configuration>

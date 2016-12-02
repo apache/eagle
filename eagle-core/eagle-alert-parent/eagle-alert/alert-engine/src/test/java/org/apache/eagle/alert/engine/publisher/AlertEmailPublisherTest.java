@@ -39,7 +39,7 @@ public class AlertEmailPublisherTest {
 
     @Before
     public void setUp(){
-        config = ConfigFactory.load();
+        config = ConfigFactory.load("application-test.conf");
         server = SimpleSmtpServer.start(SMTP_PORT);
     }
 
@@ -57,8 +57,6 @@ public class AlertEmailPublisherTest {
         properties.put(PublishConstants.SUBJECT,EMAIL_PUBLISHER_TEST_POLICY);
         properties.put(PublishConstants.SENDER,"eagle@localhost");
         properties.put(PublishConstants.RECIPIENTS,"somebody@localhost");
-        properties.put(AlertEmailConstants.CONF_MAIL_HOST,"localhost");
-        properties.put(AlertEmailConstants.CONF_MAIL_PORT,String.valueOf(SMTP_PORT));
         Publishment publishment = new Publishment();
         publishment.setName("testEmailPublishment");
         publishment.setType(org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher.class.getName());
