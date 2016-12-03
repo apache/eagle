@@ -47,14 +47,21 @@ public class AlertStreamEventTest {
         AlertStreamEvent alertStreamEvent = new AlertStreamEvent();
         alertStreamEvent.setSchema(streamDefinition);
         alertStreamEvent.setData(new Object[]{"namevalue", "hostvalue", "1", 10, 0.1, -0.2, "{\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}", 1});
-        Assert.assertEquals("AlertStreamEvent[stream=NULL,timestamp=1970-01-01 00:00:00,000,data=[namevalue,hostvalue,1,10,0.1,-0.2,{\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"},1], policyId=null, createdBy=null, metaVersion=null]", alertStreamEvent.toString());
-        Assert.assertEquals("{flag=1, data=0.1, name=namevalue, host=hostvalue, salary=-0.2, value=10, int=1, object={\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}}", alertStreamEvent.getDataMap().toString());
+        Assert.assertEquals(
+                "Alert {stream=NULL,timestamp=1970-01-01 00:00:00,000,data={flag=1, data=0.1, name=namevalue, host=hostvalue, salary=-0.2, value=10, int=1, object={\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}}, policyId=null, createdBy=null, metaVersion=null}",
+                alertStreamEvent.toString());
+        Assert.assertEquals(
+                "{flag=1, data=0.1, name=namevalue, host=hostvalue, salary=-0.2, value=10, int=1, object={\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}}",
+                alertStreamEvent.getDataMap().toString());
 
         AlertStreamEvent alertStreamEvent1 = new AlertStreamEvent(alertStreamEvent);
 
-        Assert.assertEquals("AlertStreamEvent[stream=NULL,timestamp=1970-01-01 00:00:00,000,data=[namevalue,hostvalue,1,10,0.1,-0.2,{\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"},1], policyId=null, createdBy=null, metaVersion=null]", alertStreamEvent1.toString());
-        Assert.assertEquals("{flag=1, data=0.1, name=namevalue, host=hostvalue, salary=-0.2, value=10, int=1, object={\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}}", alertStreamEvent1.getDataMap().toString());
-
+        Assert.assertEquals(
+                "Alert {stream=NULL,timestamp=1970-01-01 00:00:00,000,data={flag=1, data=0.1, name=namevalue, host=hostvalue, salary=-0.2, value=10, int=1, object={\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}}, policyId=null, createdBy=null, metaVersion=null}",
+                alertStreamEvent1.toString());
+        Assert.assertEquals(
+                "{flag=1, data=0.1, name=namevalue, host=hostvalue, salary=-0.2, value=10, int=1, object={\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}}",
+                alertStreamEvent1.getDataMap().toString());
 
         Assert.assertFalse(alertStreamEvent1 == alertStreamEvent);
         Assert.assertTrue(alertStreamEvent1.equals(alertStreamEvent));
