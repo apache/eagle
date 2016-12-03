@@ -53,7 +53,7 @@ public class VelocityTemplateParser {
         engine.addProperty("runtime.references.strict", "true");
         engine.init();
         StringResourceRepository resourceRepository = (StringResourceRepository) engine.getApplicationAttribute(StringResourceLoader.REPOSITORY_NAME_DEFAULT);
-        resourceRepository.putStringResource(TEMPLATE_NAME,templateString);
+        resourceRepository.putStringResource(TEMPLATE_NAME, templateString);
         template = engine.getTemplate(TEMPLATE_NAME);
         ASTprocess data = (ASTprocess) template.getData();
         visitor = new ParserNodeVisitor();
@@ -71,12 +71,12 @@ public class VelocityTemplateParser {
     /**
      * @throws MethodInvocationException if required variable is missing in context.
      */
-    public void validateContext(Map<String,Object> context) throws MethodInvocationException  {
+    public void validateContext(Map<String, Object> context) throws MethodInvocationException {
         VelocityContext velocityContext = new VelocityContext();
-        for(Map.Entry<String,Object> entry: context.entrySet()) {
+        for (Map.Entry<String, Object> entry : context.entrySet()) {
             velocityContext.put(entry.getKey(), entry.getValue());
         }
-        template.merge(velocityContext,new StringWriter());
+        template.merge(velocityContext, new StringWriter());
     }
 
     private class ParserNodeVisitor extends NodeViewMode {
