@@ -85,7 +85,7 @@ public class TopologyCheckAppConfig implements Serializable {
             //e.printStackTrace();
         }
 
-        if (config.getBoolean("dataSourceConfig.hbase.enabled")) {
+        if (config.hasPath("dataSourceConfig.hbase") && config.getBoolean("dataSourceConfig.hbase.enabled")) {
             topologyTypes.add(TopologyConstants.TopologyType.HBASE);
             hBaseConfig = new HBaseConfig();
 

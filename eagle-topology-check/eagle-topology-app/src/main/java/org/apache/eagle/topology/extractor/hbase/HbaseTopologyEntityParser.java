@@ -32,6 +32,7 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.ServerLoad;
 import org.apache.hadoop.hbase.ServerName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import static org.apache.eagle.topology.TopologyConstants.*;
 
 public class HbaseTopologyEntityParser implements TopologyEntityParser {
 
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(HbaseTopologyEntityParser.class);
     private Configuration hBaseConfiguration;
     private String site;
     private Boolean kerberosEnable = false;
@@ -72,18 +74,31 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
         return new HBaseAdmin(this.hBaseConfiguration);
     }
 
+
     @Override
-    public TopologyEntityParserResult parse(long timestamp) throws IOException {
+    public TopologyEntityParserResult parse(long timestamp) {
+        final TopologyEntityParserResult result = new TopologyEntityParserResult();
+        int activeRatio = 0;
+        try {
+            doParse(timestamp, result);
+            activeRatio++;
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HMASTER_ROLE, activeRatio, site, timestamp));
+        return result;
+    }
+
+    private void doParse(long timestamp, TopologyEntityParserResult result) throws IOException {
         long deadServers = 0;
         long liveServers = 0;
-        TopologyEntityParserResult result = new TopologyEntityParserResult();
         HBaseAdmin admin = null;
         try {
             admin = getHBaseAdmin();
             ClusterStatus status = admin.getClusterStatus();
             deadServers = status.getDeadServers();
             liveServers = status.getServersSize();
-            result.setVersion(HadoopVersion.V2);
+
             for (ServerName liveServer : status.getServers()) {
                 ServerLoad load = status.getLoad(liveServer);
                 result.getSlaveNodes().add(parseServer(liveServer, load, TopologyConstants.REGIONSERVER_ROLE, TopologyConstants.REGIONSERVER_LIVE_STATUS, timestamp));
@@ -103,20 +118,15 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
             }
             double liveRatio = liveServers * 1d / (liveServers + deadServers);
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.REGIONSERVER_ROLE, liveRatio, site, timestamp));
-            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HMASTER_ROLE, 1d, site, timestamp));
-            return result;
-        } catch (RuntimeException e) {
-            e.printStackTrace();
         } finally {
             if (admin != null) {
                 try {
                     admin.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
-        return result;
     }
 
     private HBaseServiceTopologyAPIEntity parseServer(ServerName serverName, ServerLoad serverLoad, String role, String status, long timestamp) {

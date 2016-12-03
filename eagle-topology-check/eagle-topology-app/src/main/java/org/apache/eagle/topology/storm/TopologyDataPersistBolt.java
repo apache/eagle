@@ -155,13 +155,9 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
     }
 
     private void emitToKafkaBolt(TopologyEntityParserResult result) {
-
         List<HealthCheckParseAPIEntity> healthCheckParseAPIList = new ArrayList<HealthCheckParseAPIEntity>();
-
         setNodeInfo(result.getMasterNodes(), healthCheckParseAPIList);
-
         setNodeInfo(result.getSlaveNodes(), healthCheckParseAPIList);
-
         for (HealthCheckParseAPIEntity healthCheckAPIEntity : healthCheckParseAPIList) {
             this.collector.emit(new Values(healthCheckAPIEntity));
         }
@@ -176,17 +172,12 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             TopologyBaseAPIEntity topologyBaseAPIEntity = iterator.next();
 
             if (topologyBaseAPIEntity instanceof HBaseServiceTopologyAPIEntity) {
-
                 healthCheckAPIEntity.setStatus(((HBaseServiceTopologyAPIEntity) topologyBaseAPIEntity).getStatus());
-
             }
             if (topologyBaseAPIEntity instanceof HdfsServiceTopologyAPIEntity) {
-
                 healthCheckAPIEntity.setStatus(((HdfsServiceTopologyAPIEntity) topologyBaseAPIEntity).getStatus());
             }
-
             if (topologyBaseAPIEntity instanceof MRServiceTopologyAPIEntity) {
-
                 healthCheckAPIEntity.setStatus(((MRServiceTopologyAPIEntity) topologyBaseAPIEntity).getStatus());
             }
 

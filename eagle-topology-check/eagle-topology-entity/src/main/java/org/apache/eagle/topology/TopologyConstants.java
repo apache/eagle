@@ -61,6 +61,7 @@ public class TopologyConstants {
 
     // Status definitions for resource manager
     public static final String RESOURCE_MANAGER_ACTIVE_STATUS = "active";
+    public static final String RESOURCE_MANAGER_INACTIVE_STATUS = "inactive";
 
     // Status definitions for node manager
     public static final String NODE_MANAGER_RUNNING_STATUS = "running";

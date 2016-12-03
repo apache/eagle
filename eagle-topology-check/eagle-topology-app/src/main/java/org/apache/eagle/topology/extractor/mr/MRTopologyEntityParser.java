@@ -18,9 +18,7 @@
 
 package org.apache.eagle.topology.extractor.mr;
 
-import org.apache.eagle.app.utils.AppConstants;
 import org.apache.eagle.app.utils.PathResolverHelper;
-import org.apache.eagle.app.utils.connection.InputStreamUtils;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
@@ -28,7 +26,8 @@ import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
-import org.apache.eagle.topology.utils.ServiceNotResponseException;
+import org.apache.eagle.app.utils.connection.ServiceNotResponseException;
+import org.apache.eagle.app.utils.connection.URLResourceFetcher;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,18 +79,32 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
     @Override
     public TopologyEntityParserResult parse(long timestamp) {
         final TopologyEntityParserResult result = new TopologyEntityParserResult();
-        result.setVersion(TopologyConstants.HadoopVersion.V2);
 
+        String rmStatus;
+        int inActiveHosts = 0;
+        boolean isSuccess = false;
         for (String url : rmUrls) {
+            MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE,
+                    extractMasterHost(url), timestamp);
             try {
-                doParse(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL), timestamp, result);
-            } catch (ServiceNotResponseException ex) {
-                LOGGER.warn("Catch a ServiceNotResponseException with url: {}", url);
-                // reSelect url
+                InputStream is = URLResourceFetcher.openURLStream(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL));
+                rmStatus = RESOURCE_MANAGER_ACTIVE_STATUS;
+                if (!isSuccess) {
+                    isSuccess = doParse(timestamp, is, result);
+                }
+            } catch (IOException e) {
+                inActiveHosts++;
+                LOGGER.warn(e.getMessage(), e);
+                rmStatus = RESOURCE_MANAGER_INACTIVE_STATUS;
+            } catch (RuntimeException ex) {
+                LOGGER.error("fail to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
+                result.getSlaveNodes().clear();
+                rmStatus = RESOURCE_MANAGER_INACTIVE_STATUS;
             }
+            resourceManagerEntity.setStatus(rmStatus);
+            result.getMasterNodes().add(resourceManagerEntity);
         }
-
-        double value = result.getMasterNodes().isEmpty() ? 0 : result.getMasterNodes().size() * 1d / rmUrls.length;
+        double value = (rmUrls.length - inActiveHosts) * 1.0 / rmUrls.length;
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.RESOURCE_MANAGER_ROLE, value, site, timestamp));
 
         doCheckHistoryServer(timestamp, result);
@@ -103,41 +115,24 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         if (historyServerUrl == null || historyServerUrl.isEmpty()) {
             return;
         }
-        String hsUrl = PathResolverHelper.buildUrlPath(historyServerUrl, YARN_HISTORY_SERVER_URL);
-        double liveCount = 1;
-        try {
-            InputStreamUtils.getInputStream(hsUrl, null, AppConstants.CompressionType.NONE);
-        } catch (ConnectException e) {
-            liveCount = 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HISTORY_SERVER_ROLE, liveCount, site, updateTime));
-    }
-
-    private InputStream getInputStream(String url, AppConstants.CompressionType type) throws ServiceNotResponseException {
+        String url = PathResolverHelper.buildUrlPath(historyServerUrl, YARN_HISTORY_SERVER_URL);
+        double activeHosts = 0;
         InputStream is = null;
         try {
-            is = InputStreamUtils.getInputStream(url, null, type);
-        } catch (ConnectException e) {
-            throw new ServiceNotResponseException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
+            is = URLResourceFetcher.openURLStream(url);
+            activeHosts++;
+        } catch (ServiceNotResponseException e) {
+            LOGGER.error(e.getMessage(), e);
+        } finally {
+            URLResourceFetcher.closeInputStream(is);
         }
-        return is;
+        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HISTORY_SERVER_ROLE, activeHosts, site, updateTime));
     }
 
-    private void doParse(String url, long timestamp, TopologyEntityParserResult result) throws ServiceNotResponseException {
-
-        InputStream is = null;
+    private boolean doParse(long timestamp, InputStream is, TopologyEntityParserResult result) throws ServiceNotResponseException {
+        boolean isSuccess = false;
         try {
-            LOGGER.info("Going to query URL: " + url);
-            is = InputStreamUtils.getInputStream(url, null, AppConstants.CompressionType.NONE);
             YarnNodeInfoWrapper nodeWrapper = OBJ_MAPPER.readValue(is, YarnNodeInfoWrapper.class);
-            if (nodeWrapper.getNodes() == null || nodeWrapper.getNodes().getNode() == null) {
-                throw new ServiceNotResponseException("Invalid result of URL: " + url);
-            }
             int runningNodeCount = 0;
             int lostNodeCount = 0;
             int unhealthyNodeCount = 0;
@@ -161,28 +156,18 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 }
                 result.getSlaveNodes().add(nodeManagerEntity);
             }
-            LOGGER.info("Running NMs: " + runningNodeCount + ", lost NMs: " + lostNodeCount + ", unhealthy NMs: " + unhealthyNodeCount);
-            final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), timestamp);
-            resourceManagerEntity.setStatus(TopologyConstants.RESOURCE_MANAGER_ACTIVE_STATUS);
-            result.getMasterNodes().add(resourceManagerEntity);
+            LOGGER.info(String.format("Total NMs: %d, Running NMs: %d, lost NMs: %d, unhealthy NMs: %d", result.getSlaveNodes().size(), runningNodeCount, lostNodeCount, unhealthyNodeCount));
+
             double value = runningNodeCount * 1d / list.size();
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, value, site, timestamp));
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new ServiceNotResponseException(e);
+            isSuccess = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+            isSuccess = false;
         } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // Do nothing
-                }
-            }
+            URLResourceFetcher.closeInputStream(is);
         }
+        return isSuccess;
     }
 
     private String extractMasterHost(String url) {

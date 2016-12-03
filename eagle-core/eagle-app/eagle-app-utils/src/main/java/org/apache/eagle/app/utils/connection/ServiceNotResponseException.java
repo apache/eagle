@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.topology.utils;
+package org.apache.eagle.app.utils.connection;
 
 import java.io.IOException;
 

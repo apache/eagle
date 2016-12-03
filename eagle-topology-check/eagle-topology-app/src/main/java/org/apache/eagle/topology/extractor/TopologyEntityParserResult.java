@@ -30,6 +30,10 @@ public class TopologyEntityParserResult {
     private List<TopologyBaseAPIEntity> slaveNodes = new ArrayList<>();
     private List<GenericMetricEntity> metrics = new ArrayList<>();
 
+    public TopologyEntityParserResult() {
+        version = TopologyConstants.HadoopVersion.V2;
+    }
+
     public List<TopologyBaseAPIEntity> getSlaveNodes() {
         return slaveNodes;
     }
