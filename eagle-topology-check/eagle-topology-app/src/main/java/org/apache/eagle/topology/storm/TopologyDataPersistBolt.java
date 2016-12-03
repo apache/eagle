@@ -32,7 +32,9 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceConnector;
@@ -66,8 +68,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.client = new EagleServiceClientImpl(new EagleServiceConnector(this.config.getConfig().getString("service.host"), this.config.getConfig().getInt("service.port"),
-            this.config.getConfig().getString("service.username"), this.config.getConfig().getString("service.password")));
+        this.client = new EagleServiceClientImpl(config.getConfig());
         this.collector = collector;
     }
 
@@ -82,8 +83,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         List<TopologyBaseAPIEntity> entitiesForDeletion = new ArrayList<>();
         List<TopologyBaseAPIEntity> entitiesToWrite = new ArrayList<>();
 
-        filterEntitiesToWrite(entitiesToWrite, availableHostnames, result.getMasterNodes());
-        filterEntitiesToWrite(entitiesToWrite, availableHostnames, result.getSlaveNodes());
+        filterEntitiesToWrite(result, availableHostnames, entitiesToWrite);
 
         String query = String.format("%s[@site=\"%s\"]{*}", serviceName, this.config.dataExtractorConfig.site);
         try {
@@ -96,8 +96,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
                 }
             }
             deleteEntities(entitiesForDeletion, serviceName);
-            writeEntities(entitiesToWrite, serviceName);
-            writeEntities(result.getMetrics(), serviceName);
+            writeEntities(entitiesToWrite, result.getMetrics(), serviceName);
             emitToKafkaBolt(result);
             this.collector.ack(input);
         } catch (Exception e) {
@@ -106,8 +105,12 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         }
     }
 
-    private void filterEntitiesToWrite(List<TopologyBaseAPIEntity> entitiesToWrite, Set<String> availableHostnames, List<TopologyBaseAPIEntity> entities) {
-        for (TopologyBaseAPIEntity entity : entities) {
+    private void filterEntitiesToWrite(TopologyEntityParserResult result, Set<String> availableHostnames, List<TopologyBaseAPIEntity> entitiesToWrite) {
+        for (TopologyBaseAPIEntity entity : result.getMasterNodes()) {
+            availableHostnames.add(generateKey(entity));
+            entitiesToWrite.add(entity);
+        }
+        for (TopologyBaseAPIEntity entity : result.getSlaveNodes()) {
             availableHostnames.add(generateKey(entity));
             entitiesToWrite.add(entity);
         }
@@ -126,21 +129,25 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             } else {
                 LOG.info("Successfully delete {} entities for {}", entities.size(), serviceName);
             }
-        } catch (EagleServiceClientException e) {
-            LOG.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
         entities.clear();
     }
 
-    private void writeEntities(List<? extends TaggedLogAPIEntity> entities, String serviceName) {
+    private void writeEntities(List<? extends TaggedLogAPIEntity> entities, List<GenericMetricEntity> metrics, String serviceName) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
             if (!response.isSuccess()) {
                 LOG.error("Got exception from eagle service: " + response.getException());
             } else {
                 LOG.info("Successfully wrote {} entities for {}", entities.size(), serviceName);
+            }
+            response = client.create(metrics);
+            if (!response.isSuccess()) {
+                LOG.error("Got exception from eagle service: " + response.getException());
+            } else {
+                LOG.info("Successfully wrote {} metrics for {}", entities.size(), serviceName);
             }
         } catch (Exception e) {
             LOG.error("cannot create entities successfully", e);
@@ -149,9 +156,10 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
     }
 
     private String generateKey(TopologyBaseAPIEntity entity) {
-        return String.format("%s-%s-%s-%s", entity.getTags().get(TopologyConstants.SITE_TAG),
-            entity.getTags().get(TopologyConstants.RACK_TAG), entity.getTags().get(TopologyConstants.HOSTNAME_TAG),
-            entity.getTags().get(TopologyConstants.ROLE_TAG));
+        return new HashCodeBuilder().append(entity.getTags().get(TopologyConstants.SITE_TAG))
+                .append(entity.getTags().get(TopologyConstants.HOSTNAME_TAG))
+                .append(entity.getTags().get(TopologyConstants.ROLE_TAG))
+                .build().toString();
     }
 
     private void emitToKafkaBolt(TopologyEntityParserResult result) {
@@ -161,7 +169,6 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         for (HealthCheckParseAPIEntity healthCheckAPIEntity : healthCheckParseAPIList) {
             this.collector.emit(new Values(healthCheckAPIEntity));
         }
-
     }
 
     private void setNodeInfo(List<TopologyBaseAPIEntity> topologyBaseAPIList, List<HealthCheckParseAPIEntity> healthCheckParseAPIList) {

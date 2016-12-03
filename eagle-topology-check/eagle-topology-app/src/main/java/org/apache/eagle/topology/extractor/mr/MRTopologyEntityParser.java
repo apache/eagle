@@ -156,7 +156,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 }
                 result.getSlaveNodes().add(nodeManagerEntity);
             }
-            LOGGER.info(String.format("Total NMs: %d, Running NMs: %d, lost NMs: %d, unhealthy NMs: %d", result.getSlaveNodes().size(), runningNodeCount, lostNodeCount, unhealthyNodeCount));
+            LOGGER.info("Total NMs: {}, Running NMs: {}, lost NMs: {}, unhealthy NMs: {}", result.getSlaveNodes().size(), runningNodeCount, lostNodeCount, unhealthyNodeCount);
 
             double value = runningNodeCount * 1d / list.size();
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, value, site, timestamp));

@@ -118,6 +118,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
             }
             double liveRatio = liveServers * 1d / (liveServers + deadServers);
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.REGIONSERVER_ROLE, liveRatio, site, timestamp));
+            LOG.info("live servers: {}, dead servers: {}", liveServers, deadServers);
         } finally {
             if (admin != null) {
                 try {

@@ -24,7 +24,7 @@ import java.io.IOException;
 
 public interface TopologyEntityParser {
     /**
-     * Parse hadoop topology and return the topology entity results. 
+     * Parse hadoop topology and return the topology entity results.
      * @return the topology entity result
      */
     public TopologyEntityParserResult parse(long timestamp);
