@@ -32,11 +32,6 @@ public class PolicyExecutionPlan {
     private Map<String, List<StreamColumn>> inputStreams;
 
     /**
-     * Actual input streams alias.
-     */
-    private Map<String, String> inputStreamAlias;
-
-    /**
      * Actual output streams.
      */
     private Map<String, List<StreamColumn>> outputStreams;
@@ -101,14 +96,5 @@ public class PolicyExecutionPlan {
 
     public void setOutputStreams(Map<String, List<StreamColumn>> outputStreams) {
         this.outputStreams = outputStreams;
-    }
-
-
-    public Map<String, String> getInputStreamAlias() {
-        return inputStreamAlias;
-    }
-
-    public void setInputStreamAlias(Map<String, String> inputStreamAlias) {
-        this.inputStreamAlias = inputStreamAlias;
     }
 }

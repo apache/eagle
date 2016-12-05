@@ -215,9 +215,6 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
             // Set effective input streams
             policyExecutionPlan.setInputStreams(effectiveInputStreams);
 
-            // Set effective input streams alias
-            policyExecutionPlan.setInputStreamAlias(effectiveInputStreamsAlias);
-
             // Set effective output streams
             policyExecutionPlan.setOutputStreams(effectiveOutputStreams);
 
