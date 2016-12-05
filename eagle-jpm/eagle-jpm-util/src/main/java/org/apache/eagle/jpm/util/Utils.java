@@ -33,6 +33,7 @@ import java.util.Map;
 
 public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+    private static final String JOB_SYMBOL = "/jobs";
 
     public static void closeInputStream(InputStream is) {
         if (is != null) {
@@ -116,6 +117,8 @@ public class Utils {
 
     public static String makeLockPath(String zkrootWithSiteId) {
         Preconditions.checkArgument(StringUtils.isNotBlank(zkrootWithSiteId), "zkrootWithSiteId must not be blank");
-        return "/locks" + zkrootWithSiteId.toLowerCase();
+        return StringUtils.endsWith(zkrootWithSiteId.toLowerCase(), JOB_SYMBOL)
+            ? StringUtils.substring(zkrootWithSiteId.toLowerCase(), 0, StringUtils.lastIndexOf(zkrootWithSiteId.toLowerCase(), JOB_SYMBOL)) + "/locks" :
+            zkrootWithSiteId.toLowerCase() + "/locks";
     }
 }
