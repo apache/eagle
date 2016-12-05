@@ -98,12 +98,12 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
                     namenodeEntity.setVersion(namenodeVersion);
                 }
                 result.getMasterNodes().add(namenodeEntity);
-            } catch (RuntimeException ex) {
-                LOG.error("fail to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
-                result.getSlaveNodes().clear();
             } catch (ServiceNotResponseException e) {
                 inActiveHosts++;
                 LOG.error(e.getMessage(), e);
+            } catch (Exception ex) {
+                LOG.error("fail to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
+                result.getSlaveNodes().clear();
             }
         }
         double value = (namenodeUrls.length - inActiveHosts) * 1d / namenodeUrls.length;

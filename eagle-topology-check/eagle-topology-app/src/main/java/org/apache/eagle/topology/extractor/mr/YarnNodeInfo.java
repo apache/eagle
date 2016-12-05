@@ -30,7 +30,7 @@ public class YarnNodeInfo {
     private String id;
     private String nodeHostName;
     private String nodeHTTPAddress;
-    private String lastHealthUpdate;
+    private long lastHealthUpdate;
     private String healthReport;
     private String numContainers;
     private String usedMemoryMB;
@@ -77,11 +77,11 @@ public class YarnNodeInfo {
         this.nodeHTTPAddress = nodeHTTPAddress;
     }
 
-    public String getLastHealthUpdate() {
+    public long getLastHealthUpdate() {
         return lastHealthUpdate;
     }
 
-    public void setLastHealthUpdate(String lastHealthUpdate) {
+    public void setLastHealthUpdate(long lastHealthUpdate) {
         this.lastHealthUpdate = lastHealthUpdate;
     }
 

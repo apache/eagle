@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static org.apache.eagle.topology.TopologyConstants.*;
+import static org.apache.eagle.topology.utils.EntityBuilderHelper.generateKey;
 
 public class MRTopologyEntityParser implements TopologyEntityParser {
 
@@ -86,9 +87,9 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         for (String url : rmUrls) {
             MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE,
                     extractMasterHost(url), timestamp);
+            rmStatus = RESOURCE_MANAGER_ACTIVE_STATUS;
             try {
                 InputStream is = URLResourceFetcher.openURLStream(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL));
-                rmStatus = RESOURCE_MANAGER_ACTIVE_STATUS;
                 if (!isSuccess) {
                     isSuccess = doParse(timestamp, is, result);
                 }
@@ -96,10 +97,9 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 inActiveHosts++;
                 LOGGER.warn(e.getMessage(), e);
                 rmStatus = RESOURCE_MANAGER_INACTIVE_STATUS;
-            } catch (RuntimeException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("fail to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
                 result.getSlaveNodes().clear();
-                rmStatus = RESOURCE_MANAGER_INACTIVE_STATUS;
             }
             resourceManagerEntity.setStatus(rmStatus);
             result.getMasterNodes().add(resourceManagerEntity);
@@ -129,20 +129,27 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HISTORY_SERVER_ROLE, activeHosts, site, updateTime));
     }
 
-    private boolean doParse(long timestamp, InputStream is, TopologyEntityParserResult result) throws ServiceNotResponseException {
+    private boolean doParse(long timestamp, InputStream is, TopologyEntityParserResult result) throws IOException {
         boolean isSuccess = false;
+        String nodeKey;
+        Map<String, MRServiceTopologyAPIEntity> nmMap = new HashMap<>();
         try {
             YarnNodeInfoWrapper nodeWrapper = OBJ_MAPPER.readValue(is, YarnNodeInfoWrapper.class);
             int runningNodeCount = 0;
             int lostNodeCount = 0;
             int unhealthyNodeCount = 0;
+            int rackWarningCount = 0;
             final List<YarnNodeInfo> list = nodeWrapper.getNodes().getNode();
             for (YarnNodeInfo info : list) {
                 final MRServiceTopologyAPIEntity nodeManagerEntity = createEntity(NODE_MANAGER_ROLE, info.getNodeHostName(), timestamp);
+                if (!extractRack(info).equalsIgnoreCase(nodeManagerEntity.getTags().get(RACK_TAG)) && rackWarningCount < 10) {
+                    LOGGER.warn("rack info is inconsistent, please configure the right rack resolver class");
+                    rackWarningCount++;
+                }
+                nodeManagerEntity.setLastHealthUpdate(info.getLastHealthUpdate());
                 if (info.getHealthReport() != null && (!info.getHealthReport().isEmpty())) {
                     nodeManagerEntity.setHealthReport(info.getHealthReport());
                 }
-                // TODO: Need to remove the manually mapping RUNNING -> running, LOST - > lost, UNHEALTHY -> unhealthy
                 if (info.getState() != null) {
                     final String state = info.getState().toLowerCase();
                     nodeManagerEntity.setStatus(state);
@@ -154,16 +161,19 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                         ++unhealthyNodeCount;
                     }
                 }
-                result.getSlaveNodes().add(nodeManagerEntity);
+                nodeKey = generateKey(nodeManagerEntity);
+                if (nmMap.containsKey(nodeKey) && nmMap.get(nodeKey).getLastUpdateTime() < nodeManagerEntity.getLastHealthUpdate()) {
+                    nmMap.put(nodeKey, nodeManagerEntity);
+                } else {
+                    nmMap.put(nodeKey, nodeManagerEntity);
+                }
             }
-            LOGGER.info("Total NMs: {}, Running NMs: {}, lost NMs: {}, unhealthy NMs: {}", result.getSlaveNodes().size(), runningNodeCount, lostNodeCount, unhealthyNodeCount);
+            LOGGER.info("Total NMs: {}, Actual NMs: {}, Running NMs: {}, lost NMs: {}, unhealthy NMs: {}", list.size(), nmMap.size(), runningNodeCount, lostNodeCount, unhealthyNodeCount);
 
-            double value = runningNodeCount * 1d / list.size();
+            double value = runningNodeCount * 1d / nmMap.size();
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, value, site, timestamp));
+            result.getSlaveNodes().addAll(nmMap.values());
             isSuccess = true;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            isSuccess = false;
         } finally {
             URLResourceFetcher.closeInputStream(is);
         }
@@ -179,13 +189,14 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
     }
 
     private String extractRack(YarnNodeInfo info) {
-        if (info.getRack() == null) {
-            return null;
+        if (info.getRack() == null) {  // if a host is DECOMMISSIONED, then no rack info
+            return rackResolver.resolve(info.getNodeHostName());
         }
         String value = info.getRack();
         value = value.substring(value.lastIndexOf('/') + 1);
         return value;
     }
+
 
     private MRServiceTopologyAPIEntity createEntity(String roleType, String hostname, long updateTime) {
         MRServiceTopologyAPIEntity entity = new MRServiceTopologyAPIEntity();
@@ -196,8 +207,8 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         tags.put(SITE_TAG, site);
         tags.put(ROLE_TAG, roleType);
         tags.put(HOSTNAME_TAG, hostname);
-        String rack = rackResolver.resolve(hostname);
-        tags.put(RACK_TAG, rack);
+        String resolvedRack = rackResolver.resolve(hostname);
+        tags.put(RACK_TAG, resolvedRack);
         return entity;
     }
 

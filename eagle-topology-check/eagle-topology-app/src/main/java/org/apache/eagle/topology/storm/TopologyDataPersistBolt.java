@@ -36,8 +36,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.client.EagleServiceClientException;
-import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
@@ -51,7 +49,6 @@ import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TopologyDataPersistBolt extends BaseRichBolt {
@@ -90,7 +87,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             GenericServiceAPIResponseEntity<TopologyBaseAPIEntity> response = client.search().query(query).pageSize(Integer.MAX_VALUE).send();
             if (response.isSuccess() && response.getObj() != null) {
                 for (TopologyBaseAPIEntity entity : response.getObj()) {
-                    if (availableHostnames != null && availableHostnames.size() > 0 && !availableHostnames.contains(generateKey(entity))) {
+                    if (result.getSlaveNodes().size() > 0 && !availableHostnames.contains(generateKey(entity))) {
                         entitiesForDeletion.add(entity);
                     }
                 }
