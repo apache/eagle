@@ -19,18 +19,20 @@ package org.apache.eagle.app.stream;
 import org.apache.eagle.app.environment.builder.CEPFunction;
 import org.apache.eagle.app.environment.builder.Collector;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class CEPFunctionTest {
-    @Test @Ignore("TODO: Not implement yet")
-    public void testSiddhiFunction() {
+    @Test
+    public void testSiddhiFunction() throws InterruptedException {
+        Semaphore semaphore = new Semaphore(0);
         CEPFunction function = new CEPFunction(
             "define stream inputStream (name string, value double);\n "
-                + "from inputStream#window.timeBatch( 10 sec ) \n" +
+                + "from inputStream#window.timeBatch( 5 sec ) \n" +
                 "select name, avg(value) as avgValue\n" +
                 "group by name \n" +
                 "insert into outputStream ",
@@ -38,7 +40,9 @@ public class CEPFunctionTest {
         Collector collector = new Collector() {
             @Override
             public void collect(Object key, Map event) {
+                Assert.assertTrue(event.get("avgValue") instanceof Double);
                 Assert.assertTrue(Double.valueOf(event.get("avgValue").toString()) == 0.97);
+                semaphore.release();
             }
         };
         function.open(collector);
@@ -50,11 +54,7 @@ public class CEPFunctionTest {
             put("name","cpu.usage");
             put("value", 0.96);
         }});
-        try {
-            Thread.sleep(60000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Assert.assertTrue("Should get result in 5 s", semaphore.tryAcquire(5, TimeUnit.SECONDS));
         function.close();
     }
 }
