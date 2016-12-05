@@ -16,13 +16,27 @@
  */
 package org.apache.eagle.app.environment.builder;
 
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.stream.output.StreamCallback;
+
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- * TODO: Not implemented yet.
- */
+import static org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter.convertFromSiddiDefinition;
+
 public class CEPFunction implements TransformFunction {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CEPFunction.class);
+
+    private ExecutionPlanRuntime runtime;
+    private SiddhiManager siddhiManager;
     private final CEPDefinition cepDefinition;
     private Collector collector;
 
@@ -41,17 +55,60 @@ public class CEPFunction implements TransformFunction {
 
     @Override
     public void open(Collector collector) {
-        throw new IllegalStateException("TODO: Not implemented yet");
+        this.collector = collector;
+        this.siddhiManager = new SiddhiManager();
+        this.runtime = siddhiManager.createExecutionPlanRuntime(cepDefinition.getSiddhiQuery());
+        if (runtime.getStreamDefinitionMap().containsKey(cepDefinition.outputStreamId)) {
+            runtime.addCallback(cepDefinition.outputStreamId, new StreamCallback() {
+                @Override
+                public void receive(Event[] events) {
+                    for (Event e : events) {
+                        StreamDefinition schema = convertFromSiddiDefinition(runtime.getStreamDefinitionMap().get(cepDefinition.outputStreamId));
+                        Map<String, Object> event = new HashMap<>();
+                        for (StreamColumn column : schema.getColumns()) {
+                            Object obj = e.getData()[schema.getColumnIndex(column.getName())];
+                            if (obj == null) {
+                                event.put(column.getName(), null);
+                                continue;
+                            }
+                            event.put(column.getName(), obj);
+                        }
+                        collector.collect(event.toString(), event);
+                    }
+                }
+            });
+        } else {
+            throw new IllegalStateException("Undefined output stream " + cepDefinition.outputStreamId);
+        }
+        runtime.start();
     }
 
     @Override
     public void transform(Map event) {
-        throw new IllegalStateException("TODO: Not implemented yet");
+        String streamId = cepDefinition.getInputStreamId();
+        InputHandler inputHandler = runtime.getInputHandler(streamId);
+
+        if (inputHandler != null) {
+            try {
+                inputHandler.send(event.values().toArray());
+            } catch (InterruptedException e) {
+                LOG.error(e.getMessage(), e);
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("sent event to siddhi stream {} ", streamId);
+            }
+        } else {
+            LOG.warn("No input handler found for stream {}", streamId);
+        }
     }
 
     @Override
     public void close() {
-        throw new IllegalStateException("TODO: Not implemented yet");
+        LOG.info("Closing handler for query {}", this.cepDefinition.getSiddhiQuery());
+        this.runtime.shutdown();
+        LOG.info("Shutdown siddhi runtime {}", this.runtime.getName());
+        this.siddhiManager.shutdown();
+        LOG.info("Shutdown siddhi manager {}", this.siddhiManager);
     }
 
     public static class CEPDefinition {
