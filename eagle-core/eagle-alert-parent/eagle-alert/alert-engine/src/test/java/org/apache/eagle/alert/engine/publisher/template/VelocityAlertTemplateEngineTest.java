@@ -50,7 +50,7 @@ public class VelocityAlertTemplateEngineTest {
         templateEngine.register(mockPolicyWithoutTemplate("testPolicyName"));
         AlertStreamEvent event = templateEngine.filter(mockAlertEvent("testPolicyName"));
         System.out.print(event.getBody());
-        Assert.assertEquals("Alert Information: {stream=ALERT_STREAM,timestamp=2016-11-30 07:31:15,923," +
+        Assert.assertEquals("Message: Alert {stream=ALERT_STREAM,timestamp=2016-11-30 07:31:15,923," +
             "data={site=test_cluster, role=hadoop, metric=cpu.usage, host=localhost, value=0.98}, " +
             "policyId=testPolicyName, createdBy=junit, metaVersion=SAMPLE_META_VERSION} " +
             "(Auto-generated alert message as template not defined in policy testPolicyName)", event.getBody());

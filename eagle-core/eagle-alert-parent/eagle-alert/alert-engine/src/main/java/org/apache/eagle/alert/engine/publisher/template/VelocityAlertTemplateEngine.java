@@ -79,7 +79,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
             stringResourceRepository.putStringResource(getAlertSubjectTemplateName(policyDefinition.getName()), policyDefinition.getName());
 
             LOG.warn("Body template of policy {} is null, using $ALERT_EVENT by default");
-            String defaultAlertBodyTmpl = String.format("Alert Information: $%s (Auto-generated alert message as template not defined in policy %s)",
+            String defaultAlertBodyTmpl = String.format("Message: $%s (Auto-generated alert message as template not defined in policy %s)",
                 AlertContextFields.ALERT_EVENT, policyDefinition.getName());
             stringResourceRepository.putStringResource(getAlertBodyTemplateName(policyDefinition.getName()), defaultAlertBodyTmpl);
         } else if (alertDefinition.getTemplateType().equals(AlertDefinition.TemplateType.TEXT)) {

@@ -118,9 +118,15 @@ public class AlertPublishEvent {
         alertEvent.setAlertSubject(event.getSubject());
         alertEvent.setAlertBody(event.getBody());
         if (event.getContext() != null && !event.getContext().isEmpty()) {
-            alertEvent.setSiteId(event.getContext().get(SITE_ID_KEY).toString());
-            alertEvent.setPolicyValue(event.getContext().get(POLICY_VALUE_KEY).toString());
-            alertEvent.setAppIds((List<String>) event.getContext().get(APP_IDS_KEY));
+            if (event.getContext().containsKey(SITE_ID_KEY)) {
+                alertEvent.setSiteId(event.getContext().get(SITE_ID_KEY).toString());
+            }
+            if (event.getContext().containsKey(POLICY_VALUE_KEY)) {
+                alertEvent.setPolicyValue(event.getContext().get(POLICY_VALUE_KEY).toString());
+            }
+            if (event.getContext().containsKey(APP_IDS_KEY)) {
+                alertEvent.setAppIds((List<String>) event.getContext().get(APP_IDS_KEY));
+            }
         }
         alertEvent.setAlertData(event.getDataMap());
         return alertEvent;
@@ -128,12 +134,12 @@ public class AlertPublishEvent {
 
     public String toString() {
         return String.format("%s %s alertId=%s, siteId=%s, policyId=%s, alertData=%s",
-            DateTimeUtil.millisecondsToHumanDateWithSeconds(alertTimestamp),
-            DateTimeUtil.CURRENT_TIME_ZONE.getID(),
-            alertId,
-            siteId,
-            policyId,
-            alertData.toString());
+                DateTimeUtil.millisecondsToHumanDateWithSeconds(alertTimestamp),
+                DateTimeUtil.CURRENT_TIME_ZONE.getID(),
+                alertId,
+                siteId,
+                policyId,
+                alertData.toString());
     }
 
     public String getAlertSubject() {
