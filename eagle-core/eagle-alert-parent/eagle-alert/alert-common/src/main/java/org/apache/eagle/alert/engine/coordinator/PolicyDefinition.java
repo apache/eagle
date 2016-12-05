@@ -180,11 +180,11 @@ public class PolicyDefinition implements Serializable {
     }
 
     public AlertSeverity getAlertSeverity() {
-        return alertDefinition == null? null: alertDefinition.getSeverity();
+        return alertDefinition == null ? null : alertDefinition.getSeverity();
     }
 
     public String getAlertCategory() {
-        return alertDefinition == null? null: alertDefinition.getCategory();
+        return alertDefinition == null ? null : alertDefinition.getCategory();
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
