@@ -34,7 +34,7 @@ import org.apache.eagle.alert.engine.publisher.AlertStreamFilter;
 import org.apache.eagle.alert.engine.publisher.PipeStreamFilter;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
 import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
-import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngineFactory;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateProvider;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         this.alertPublisher.init(config, stormConf);
         streamContext = new StreamContextImpl(config, context.registerMetric("eagle.publisher", new MultiCountMetric(), 60), context);
         this.context = context;
-        this.alertTemplateEngine = AlertTemplateEngineFactory.createAlertTemplateEngine();
+        this.alertTemplateEngine = AlertTemplateProvider.createAlertTemplateEngine();
         this.alertTemplateEngine.init(config);
         this.alertFilter = new PipeStreamFilter(new AlertContextEnrichFilter(this), new AlertTemplateFilter(alertTemplateEngine));
     }

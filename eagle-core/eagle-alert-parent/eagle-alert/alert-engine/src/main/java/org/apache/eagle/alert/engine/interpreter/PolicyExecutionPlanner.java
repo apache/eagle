@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.alert.engine.interpreter;
 
+/**
+ * Keep PolicyExecutionPlanner as simple and fast as possible (avoid any backend data exchanging).
+ */
 interface PolicyExecutionPlanner {
     /**
      * @return PolicyExecutionPlan.

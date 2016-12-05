@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.engine.publisher.template;
 
-public class AlertTemplateEngineFactory {
+public class AlertTemplateProvider {
     public static AlertTemplateEngine createAlertTemplateEngine() {
         return new VelocityAlertTemplateEngine();
     }
