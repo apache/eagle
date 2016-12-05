@@ -95,17 +95,28 @@ class Helper:
         url = ":".join([host, str(port)])
         result = None
         response = None
+        attempts = 0
+        exception = None
+        while attempts < 2:
+            try:
+                if https:
+                    logging.info("Reading https://" + str(url) + path)
+                    c = httplib.HTTPSConnection(url, timeout=28)
+                    c.request("GET", path)
+                    response = c.getresponse()
+                else:
+                    logging.info("Reading http://" + str(url) + path)
+                    response = urllib2.urlopen("http://" + str(url) + path, timeout=28)
+                logging.debug("Got response")
+                result = response.read()
+                break
+            except Exception as e:
+                logging.warning(e)
+                exception = e
+                attempts += 1
         try:
-            if https:
-                logging.info("Reading https://" + str(url) + path)
-                c = httplib.HTTPSConnection(url, timeout=57)
-                c.request("GET", path)
-                response = c.getresponse()
-            else:
-                logging.info("Reading http://" + str(url) + path)
-                response = urllib2.urlopen("http://" + str(url) + path, timeout=57)
-            logging.debug("Got response")
-            result = response.read()
+            if attempts >= 2:
+                raise exception
         finally:
             if response is not None:
                 response.close()
