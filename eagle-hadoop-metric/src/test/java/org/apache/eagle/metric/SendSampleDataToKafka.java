@@ -16,21 +16,25 @@
  */
 package org.apache.eagle.metric;
 
-import com.google.common.base.Preconditions;
 import com.typesafe.config.ConfigFactory;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-import org.apache.commons.io.IOUtils;
 import org.apache.eagle.app.messaging.KafkaStreamProvider;
 import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
 public class SendSampleDataToKafka {
     public static void main(String[] args) throws URISyntaxException, IOException {
+        String data = "{" +
+            "\"host\":\"localhost\", " +
+            "\"timestamp\": 1480319109000, " +
+            "\"metric\": \"hadoop.cpu.usage\", " +
+            "\"component\": \"namenode\", " +
+            "\"site\": \"test\", " +
+            "\"value\": 0.98}";
         KafkaStreamSinkConfig config = new KafkaStreamProvider().getSinkConfig("HADOOP_JMX_METRIC_STREAM",ConfigFactory.load());
         Properties properties = new Properties();
         properties.put("metadata.broker.list", config.getBrokerList());
@@ -44,10 +48,7 @@ public class SendSampleDataToKafka {
         ProducerConfig producerConfig = new ProducerConfig(properties);
         kafka.javaapi.producer.Producer producer = new kafka.javaapi.producer.Producer(producerConfig);
         try {
-            InputStream is = SendSampleDataToKafka.class.getResourceAsStream("hadoop_jmx_metric_sample.json");
-            Preconditions.checkNotNull(is, "hadoop_jmx_metric_sample.json");
-            String value = IOUtils.toString(is);
-            producer.send(new KeyedMessage(config.getTopicId(), value));
+            producer.send(new KeyedMessage(config.getTopicId(), data));
         } finally {
             producer.close();
         }

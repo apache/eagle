@@ -1,0 +1,37 @@
+{
+  "name": "TEST_POLICY",
+  "description": "from HADOOP_JMX_METRIC_STREAM_SANDBOX[site==\"test\"] insert into ALERT_STREAM;",
+  "inputStreams": [
+    "HADOOP_JMX_METRIC_STREAM_SANDBOX"
+  ],
+  "outputStreams": [
+    "ALERT_STREAM"
+  ],
+  "definition": {
+    "type": "siddhi",
+    "value": "from HADOOP_JMX_METRIC_STREAM_SANDBOX[site==\"test\"] select component,value, name insert into ALERT_STREAM;",
+    "handlerClass": null,
+    "properties": {},
+    "inputStreams": [],
+    "outputStreams": []
+  },
+  "stateDefinition": null,
+  "policyStatus": "ENABLED",
+  "alertDefinition": {
+    "templateType": "TEXT",
+    "subject": "$component Disk Usage $value",
+    "body": "#set($usage_percentage = $value * 100)\r\n\r\nDisk Usage (<strong>$metric<strong>) reached <span style=\"color:red\">$usage_percentage %</span> (Threshold: 90%) on <strong>$component</strong> of cluster: <strong>$site</strong> on:\r\n<ul>\r\n    <li><strong>Hostname</strong>: $host</li>\r\n    <li><strong>When</strong>: $ALERT_TIME</li>\r\n    <li><strong>Root Cause</strong>: UNKNOWN</li>\r\n    <li><strong>Action Required</strong>: N/A</li>\r\n</ul>",
+    "severity": "CRITICAL",
+    "category": "HDFS"
+  },
+  "partitionSpec": [
+    {
+      "streamId": "HADOOP_JMX_METRIC_STREAM_SANDBOX",
+      "type": "SHUFFLE",
+      "columns": [],
+      "sortSpec": null
+    }
+  ],
+  "dedicated": false,
+  "parallelismHint": 5
+}

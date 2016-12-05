@@ -16,21 +16,20 @@
  */
 package org.apache.eagle.alert.engine.publisher;
 
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.junit.Assert;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class AlertPublisherTestHelper {
 
     public static AlertStreamEvent mockEvent(String policyId){
         StreamDefinition stream = createStream();
-        PolicyDefinition policy = createPolicy(stream.getStreamId(), policyId);
+        PolicyDefinition policy = createPolicyGroupByStreamId(stream.getStreamId(), policyId);
         return  createEvent(stream, policy,
             new Object[] {System.currentTimeMillis(), "host1", "testPolicy-host1-01", "open", 0, 0});
     }
@@ -42,8 +41,15 @@ public class AlertPublisherTestHelper {
         event.setStreamId(stream.getStreamId());
         event.setTimestamp(System.currentTimeMillis());
         event.setCreatedTime(System.currentTimeMillis());
+        event.setSubject("Namenode Disk Used 98%");
+        event.setBody("Disk Usage of Test cluster's name node (<a href=\"#\">namenode.hostname.domain</a>) is <strong style=\"color: red\">98%</strong> at <strong>2016-11-30 12:30:45</strong>, exceeding alert threshold <strong>90</strong>%");
         event.setData(data);
         event.ensureAlertId();
+        event.setSeverity(AlertSeverity.CRITICAL);
+        event.setCategory("HDFS");
+        event.setContext(new HashMap<String,Object>(){{
+            put(AlertPublishEvent.SITE_ID_KEY,"TestCluster");
+        }});
         Assert.assertNotNull(event.getAlertId());
         return event;
     }
@@ -84,7 +90,7 @@ public class AlertPublisherTestHelper {
         return sd;
     }
 
-    public static  PolicyDefinition createPolicy(String streamName, String policyName) {
+    public static  PolicyDefinition createPolicyGroupByStreamId(String streamName, String policyName) {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         // expression, something like "PT5S,dynamic,1,host"
@@ -103,4 +109,5 @@ public class AlertPublisherTestHelper {
         pd.addPartition(sp);
         return pd;
     }
+
 }

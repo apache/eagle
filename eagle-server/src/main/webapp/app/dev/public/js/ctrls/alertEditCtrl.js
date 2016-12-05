@@ -69,6 +69,12 @@
 				type: "siddhi",
 				value: ""
 			},
+			alertDefinition: {
+				subject: "",
+				body: "",
+				severity: "WARNING",
+				category: "DEFAULT"
+			},
 			partitionSpec: [],
 			parallelismHint: 5
 		}, $scope.policy);

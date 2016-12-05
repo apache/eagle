@@ -14,18 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.interpreter;
+package org.apache.eagle.alert.engine.coordinator;
 
-/**
- * Keep PolicyExecutionPlanner as simple and fast as possible (avoid any backend data exchanging).
- */
-interface PolicyExecutionPlanner {
-    /**
-     * @return PolicyExecutionPlan.
-     */
-    PolicyExecutionPlan getExecutionPlan();
-
-    static PolicyExecutionPlan parseExecutionPlan(String executionPlan) throws Exception {
-        return new PolicyExecutionPlannerImpl(executionPlan).getExecutionPlan();
-    }
+public enum AlertSeverity {
+    UNKNOWN, OK, WARNING, CRITICAL, FATAL
 }

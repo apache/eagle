@@ -22,6 +22,7 @@ import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.spout.SchemeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,7 @@ public class KafkaStreamSource extends StormStreamSource<KafkaStreamSourceConfig
         String brokerZkPath = config.getBrokerZkPath();
 
         BrokerHosts hosts;
-        if (brokerZkPath == null) {
+        if (StringUtils.isNotBlank(brokerZkPath)) {
             hosts = new ZkHosts(zkConnString);
         } else {
             hosts = new ZkHosts(zkConnString, brokerZkPath);
@@ -127,9 +128,9 @@ public class KafkaStreamSource extends StormStreamSource<KafkaStreamSourceConfig
             groupId);
 
         // transaction zkServers to store kafka consumer offset. Default to use storm zookeeper
-        if (config.getTransactionZkServers() != null) {
+        if (StringUtils.isNotBlank(config.getTransactionZkServers())) {
             String[] txZkServers = config.getTransactionZkServers().split(",");
-            spoutConfig.zkServers = Arrays.asList(txZkServers).stream().map(server -> server.split(":")[0]).collect(Collectors.toList());
+            spoutConfig.zkServers = Arrays.stream(txZkServers).map(server -> server.split(":")[0]).collect(Collectors.toList());
             spoutConfig.zkPort = Integer.parseInt(txZkServers[0].split(":")[1]);
             LOG.info("txZkServers:" + spoutConfig.zkServers + ", zkPort:" + spoutConfig.zkPort);
         }

@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.model;
 
+import org.apache.eagle.alert.engine.coordinator.AlertSeverity;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -35,8 +36,18 @@ public class AlertStreamEvent extends StreamEvent {
     private StreamDefinition schema;
     private String createdBy;
     private long createdTime;
-    // app related fields
-    private Map<String, Object> extraData;
+    private String category;
+    private AlertSeverity severity = AlertSeverity.WARNING;
+
+    // ----------------------
+    // Lazy Alert Fields
+    // ----------------------
+
+    // Dynamical context like app related fields
+    private Map<String, Object> context;
+    // Alert content like subject and body
+    private String subject;
+    private String body;
 
     public AlertStreamEvent() {
     }
@@ -72,9 +83,10 @@ public class AlertStreamEvent extends StreamEvent {
                 dataStrings.add(null);
             }
         }
-        return String.format("AlertStreamEvent[stream=%S,timestamp=%s,data=[%s], policyId=%s, createdBy=%s, metaVersion=%s]",
+
+        return String.format("Alert {stream=%S,timestamp=%s,data=%s, policyId=%s, createdBy=%s, metaVersion=%s}",
                 this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
-                StringUtils.join(dataStrings, ","), this.getPolicyId(), this.getCreatedBy(), this.getMetaVersion());
+                this.getDataMap(), this.getPolicyId(), this.getCreatedBy(), this.getMetaVersion());
     }
 
     public String getCreatedBy() {
@@ -114,12 +126,12 @@ public class AlertStreamEvent extends StreamEvent {
         return event;
     }
 
-    public Map<String, Object> getExtraData() {
-        return extraData;
+    public Map<String, Object> getContext() {
+        return context;
     }
 
-    public void setExtraData(Map<String, Object> extraData) {
-        this.extraData = extraData;
+    public void setContext(Map<String, Object> context) {
+        this.context = context;
     }
 
     public String getAlertId() {
@@ -131,5 +143,37 @@ public class AlertStreamEvent extends StreamEvent {
         if (this.alertId == null) {
             this.alertId = UUID.randomUUID().toString();
         }
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public AlertSeverity getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(AlertSeverity severity) {
+        this.severity = severity;
     }
 }

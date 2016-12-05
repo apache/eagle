@@ -45,7 +45,7 @@ public class DefaultDeduplicatorTest {
             "PT1M", Arrays.asList(new String[] {"alertKey"}), "state", "close", dedupCache);
 
         StreamDefinition stream = createStream();
-        PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
+        PolicyDefinition policy = createPolicyGroupByStreamId(stream.getStreamId(), "testPolicy");
 
         AlertStreamEvent e1 = createEvent(stream, policy, new Object[] {
             System.currentTimeMillis(), "host1", "testPolicy-host1-01", "OPEN", 0, 0

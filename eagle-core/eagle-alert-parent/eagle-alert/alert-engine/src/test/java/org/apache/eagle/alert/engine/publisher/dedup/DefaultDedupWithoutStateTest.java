@@ -46,7 +46,7 @@ public class DefaultDedupWithoutStateTest {
             "PT10S", Arrays.asList(new String[] {"alertKey"}), null, null, dedupCache);
 
         StreamDefinition stream = createStream();
-        PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
+        PolicyDefinition policy = createPolicyGroupByStreamId(stream.getStreamId(), "testPolicy");
 
         int[] hostIndex = new int[] {1, 2, 3};
         String[] states = new String[] {"OPEN", "WARN", "CLOSE"};

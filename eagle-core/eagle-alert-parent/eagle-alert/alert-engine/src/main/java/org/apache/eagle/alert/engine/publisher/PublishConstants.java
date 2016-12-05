@@ -51,11 +51,14 @@ public class PublishConstants {
     public static final String ALERT_EMAIL_ALERTLIST_PROPERTY = "alertList";
     public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
 
-    public static final String ALERT_EMAIL_MESSAGE = "alertMessage";
+    public static final String ALERT_EMAIL_SUBJECT = "alertSubject";
+    public static final String ALERT_EMAIL_BODY = "alertBody";
     public static final String ALERT_EMAIL_STREAM_ID = "streamId";
-    public static final String ALERT_EMAIL_TIMESTAMP = "alertTime";
+    public static final String ALERT_EMAIL_TIME = "alertTime";
     public static final String ALERT_EMAIL_POLICY_ID = "policyId";
     public static final String ALERT_EMAIL_ALERT_ID = "alertId";
+    public static final String ALERT_EMAIL_ALERT_CATEGORY = "alertCategory";
+    public static final String ALERT_EMAIL_ALERT_SEVERITY = "alertSeverity";
     public static final String ALERT_EMAIL_ALERT_DATA = "alertData";
     public static final String ALERT_EMAIL_ALERT_DATA_DESC = "alertDataDesc";
     public static final String ALERT_EMAIL_CREATOR = "creator";

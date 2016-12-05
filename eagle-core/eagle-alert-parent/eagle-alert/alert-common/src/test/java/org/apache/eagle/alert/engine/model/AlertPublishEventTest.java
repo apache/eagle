@@ -95,7 +95,7 @@ public class AlertPublishEventTest {
         extraData.put(AlertPublishEvent.SITE_ID_KEY, "SITE_ID_KEY");
         extraData.put(AlertPublishEvent.POLICY_VALUE_KEY, "POLICY_VALUE_KEY");
         extraData.put(AlertPublishEvent.APP_IDS_KEY, Arrays.asList("appId1", "appId2"));
-        alertStreamEvent.setExtraData(extraData);
+        alertStreamEvent.setContext(extraData);
 
         alertPublishEvent = AlertPublishEvent.createAlertPublishEvent(alertStreamEvent);
         Assert.assertEquals("SITE_ID_KEY", alertPublishEvent.getSiteId());

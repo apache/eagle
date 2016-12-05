@@ -16,9 +16,11 @@
   -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+    #set ( $alert = $alertList[0] )
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width"/>
+    <title>$alert["alertSubject"]</title>
     <style>
         body {
             width: 100% !important;
@@ -122,7 +124,6 @@
     </style>
 </head>
 <body>
-    #set ( $elem = $alertList[0] )
 <table class="body">
     <tr>
         <td align="center" valign="top" style="background: #999999; padding: 0 0 0 0;">
@@ -136,7 +137,6 @@
             </table>
         </td>
     </tr>
-
     <tr>
         <td align="center" valign="top">
             <!-- Eagle Body -->
@@ -144,7 +144,7 @@
                 <tr>
                     <!-- Title -->
                     <td align="center">
-                        <h2>[Alert] $elem["policyId"]</h2>
+                        <h2>Warning: $alert["alertSubject"]</h2>
                     </td>
                 </tr>
                 <tr>
@@ -153,19 +153,19 @@
                         <table width="580">
                             <tr>
                                 <td>
-                                    <p><b>Detected Time: $elem["alertTime"]</b></p>
+                                    <p><b>Detected Time: $alert["alertTime"]</b></p>
                                 </td>
-                                #set ( $severity = $elem["severity"] )
-                                #if (!$severity || ("$severity" == ""))
-                                    #set ( $elem["severity"] = "WARNING")
+                                #set ( $alertSeverity = $alert["alertSeverity"] )
+                                #if (!$alertSeverity || ("$alertSeverity" == ""))
+                                    #set ( $alert["alertSeverity"] = "WARNING")
                                 #end
                                 <td align="right">
                                     <p><b>
                                         Severity:
-                                        #if ($elem["severity"] == "WARNING")
-                                            <span>$elem["severity"]</span>
+                                        #if ($alert["alertSeverity"] == "WARNING")
+                                            <span>$alert["alertSeverity"]</span>
                                         #else
-                                            <span style="color: #FF0000;">$elem["severity"]</span>
+                                            <span style="color: #FF0000;">$alert["alertSeverity"]</span>
                                         #end
                                     </b></p>
                                 </td>
@@ -184,7 +184,7 @@
                     <!-- Description -->
                     <td valign="top"
                         style="background: #ECF8FF; border: 1px solid #b9e5ff; padding: 10px 10px 12px 20px;">
-                        <p>$elem["alertMessage"]</p>
+                        <p>$alert["alertBody"]</p>
                     </td>
                 </tr>
                 <tr>
@@ -202,7 +202,7 @@
                                     <p>Policy Name</p>
                                 </th>
                                 <td>
-                                    <p><a href="$elem["policyDetailUrl"]">$elem["policyId"]</a></p>
+                                    <p><a href="$alert["policyDetailUrl"]">$alert["policyId"]</a></p>
                                 </td>
                             </tr>
                             <tr>
@@ -210,7 +210,7 @@
                                     <p>Severity Level</p>
                                 </th>
                                 <td>
-                                    <p>$elem["severity"]</p>
+                                    <p>$alert["alertSeverity"]</p>
                                 </td>
                             </tr>
                             <tr>
@@ -218,7 +218,7 @@
                                     <p>Alert Stream</p>
                                 </th>
                                 <td>
-                                    <p>$elem["streamId"]</p>
+                                    <p>$alert["streamId"]</p>
                                 </td>
                             </tr>
                             <tr>
@@ -226,7 +226,7 @@
                                     <p>Created Time</p>
                                 </th>
                                 <td>
-                                    <p>$elem["alertTime"]</p>
+                                    <p>$alert["alertTime"]</p>
                                 </td>
                             </tr>
                             <tr>
@@ -234,7 +234,7 @@
                                     <p>Created By</p>
                                 </th>
                                 <td>
-                                    <p>$elem["creator"]</p>
+                                    <p>$alert["creator"]</p>
                                 </td>
                             </tr>
                         </table>
@@ -246,7 +246,7 @@
 ##                        <table width="580">
 ##                            <tr>
 ##                                <td class="btn">
-##                                    <a href="$elem["policyDetailUrl"]">View Policy Details</a>
+##                                    <a href="$alert["policyDetailUrl"]">View Policy Details</a>
 ##                                </td>
 ##                            </tr>
 ##                        </table>
@@ -259,7 +259,7 @@
                         <table width="580">
                             <tr>
                                 <td class="btn">
-                                    <a href="$elem["alertDetailUrl"]">View Alert on Eagle</a>
+                                    <a href="$alert["alertDetailUrl"]">View Alert on Eagle</a>
                                 </td>
                             </tr>
                         </table>
@@ -276,21 +276,21 @@
                     <td class="panel" valign="top"
                         style="background: #F4F4F4; border: 1px solid #AAAAAA; padding: 10px 10px 12px 10px;">
                         <p>
-                            The alert notification was automatically detected and sent by Eagle according to policy: $elem["policyId"].
+                            The alert notification was automatically detected and sent by Eagle according to policy: $alert["policyId"].
                             To follow-up on this, please verify the alert and diagnose the root cause with Eagle:
                         </p>
                         <p></p>
                         <ul>
-                            <li><p><a href="$elem["alertDetailUrl"]">View alert detail</a></p></li>
-                            <li><p><a href="$elem["policyDetailUrl"]">View policy detail</a></p></li>
-                            <li><p><a href="$elem["homeUrl"]">View eagle home</a></p></li>
+                            <li><p><a href="$alert["alertDetailUrl"]">View alert detail</a></p></li>
+                            <li><p><a href="$alert["policyDetailUrl"]">View policy detail</a></p></li>
+                            <li><p><a href="$alert["homeUrl"]">View eagle home</a></p></li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <!-- Copyright -->
                     <td align="center">
-                        <p><i>Powered by <a href="http://eagle.incubator.apache.org">Apache Eagle</a> (version: $elem["version"])</i></p>
+                        <p><i>Powered by <a href="http://eagle.incubator.apache.org">Apache Eagle</a> (version: $alert["version"])</i></p>
                     </td>
                 </tr>
             </table>

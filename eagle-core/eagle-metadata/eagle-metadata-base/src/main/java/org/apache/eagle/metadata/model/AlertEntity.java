@@ -42,6 +42,10 @@ public class AlertEntity extends TaggedLogAPIEntity {
     private String policyValue;
     @Column("c")
     private Map<String, Object> alertData;
+    @Column("d")
+    private String alertSubject;
+    @Column("e")
+    private String alertBody;
 
     public List<String> getAppIds() {
         return appIds;
@@ -70,4 +74,21 @@ public class AlertEntity extends TaggedLogAPIEntity {
         valueChanged("alertData");
     }
 
+    public String getAlertBody() {
+        return alertBody;
+    }
+
+    public void setAlertBody(String alertBody) {
+        this.alertBody = alertBody;
+        valueChanged("alertBody");
+    }
+
+    public String getAlertSubject() {
+        return alertSubject;
+    }
+
+    public void setAlertSubject(String alertSubject) {
+        this.alertSubject = alertSubject;
+        valueChanged("alertSubject");
+    }
 }

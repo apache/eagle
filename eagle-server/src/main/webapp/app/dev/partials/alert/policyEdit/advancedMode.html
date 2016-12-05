@@ -143,7 +143,6 @@
 					<p class="text-danger">{{definitionMessage}}</p>
 				</div>
 
-
 				<ul class="sm-padding">
 					<li class="text-danger" ng-if="policy.outputStreams.length === 0"><i class="fa fa-fw fa-warning"></i> No alert stream defined</li>
 					<li ng-repeat="stream in outputStreams track by $index">
@@ -153,6 +152,30 @@
 						</label>
 					</li>
 				</ul>
+
+				<div class="form-group">
+					<label>Alert Definition*</label><br/>
+					<span class="text-muted">Category</span>
+					<input class="form-control" type="text" ng-model="policy.alertDefinition.category" ng-disabled="policyLock" />
+					<span class="text-muted">Severity</span>
+					<select class="form-control" ng-model="policy.alertDefinition.severity" ng-disabled="policyLock" >
+						<option value="WARNING" class="text-warning">WARNING</option>
+						<option value="CRITICAL" class="text-danger">CRITICAL</option>
+						<option value="FATAL" class="text-danger">FATAL</option>
+						<option value="OK" class="text-success">OK</option>
+					</select>
+					<span class="text-muted">Alert Subject</span>
+					<span class="fa fa-question-circle ng-scope"
+						  uib-tooltip="Alert subject, support template with alert stream fields and built-in context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
+					</span>
+					<input type="text" class="form-control" placeholder="Please input alert subject (support template)" ng-model="policy.alertDefinition.subject" ng-disabled="policyLock"/>
+					<span class="text-muted">Alert Body</span>
+					<span class="fa fa-question-circle ng-scope"
+						  uib-tooltip="Alert body, support template with alert stream fields and built-in  context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
+					</span>
+					<!--<textarea class="form-control" rows="3" placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></textarea>-->
+					<div editor placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></div>
+				</div>
 
 				<label>
 					Publish Alerts

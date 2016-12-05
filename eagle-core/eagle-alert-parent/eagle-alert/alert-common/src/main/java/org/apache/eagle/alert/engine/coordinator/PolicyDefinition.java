@@ -39,6 +39,7 @@ public class PolicyDefinition implements Serializable {
     private Definition definition;
     private Definition stateDefinition;
     private PolicyStatus policyStatus = PolicyStatus.ENABLED;
+    private AlertDefinition alertDefinition;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -170,6 +171,22 @@ public class PolicyDefinition implements Serializable {
         return false;
     }
 
+    public AlertDefinition getAlertDefinition() {
+        return alertDefinition;
+    }
+
+    public void setAlertDefinition(AlertDefinition alertDefinition) {
+        this.alertDefinition = alertDefinition;
+    }
+
+    public AlertSeverity getAlertSeverity() {
+        return alertDefinition == null ? null : alertDefinition.getSeverity();
+    }
+
+    public String getAlertCategory() {
+        return alertDefinition == null ? null : alertDefinition.getCategory();
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Definition implements Serializable {
         private static final long serialVersionUID = -622366527887848346L;
@@ -272,6 +289,7 @@ public class PolicyDefinition implements Serializable {
     public static enum PolicyStatus {
         ENABLED, DISABLED
     }
+
 
     @Override
     public String toString() {
