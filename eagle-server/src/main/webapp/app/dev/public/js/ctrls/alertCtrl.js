@@ -24,11 +24,17 @@
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity) {
+	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity, CompatibleEntity, Time) {
 		PageConfig.title = "Alerts";
 
 		$scope.displayType = "raw";
-		$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
+		//$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
+		$scope.alertList = CompatibleEntity.query("LIST", {
+			query: "AlertService",
+			condition: {siteId: ''},
+			startTime: Time().subtract(7, 'day'),
+			endTime: Time()
+		});
 
 		// ================================================================
 		// =                             Sync                             =
