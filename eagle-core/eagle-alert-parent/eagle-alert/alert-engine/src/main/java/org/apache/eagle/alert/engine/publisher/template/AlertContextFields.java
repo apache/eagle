@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.alert.engine.publisher.template;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class AlertContextFields {
     public static final String STREAM_ID = "STREAM_ID";
     public static final String ALERT_ID = "ALERT_ID";
@@ -31,4 +34,10 @@ public class AlertContextFields {
     public static final String POLICY_TYPE = "POLICY_TYPE";
     public static final String POLICY_DEFINITION = "POLICY_DEFINITION";
     public static final String POLICY_HANDLER = "POLICY_HANDLER";
+
+    public static List<String> getAllContextFields() {
+        return Arrays.asList(
+            STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER
+        );
+    }
 }

@@ -155,19 +155,26 @@
 
 				<div class="form-group">
 					<label>Alert Definition*</label><br/>
-					<strong>Category</strong>
+					<span class="text-muted">Category</span>
 					<input class="form-control" type="text" ng-model="policy.alertDefinition.category" ng-disabled="policyLock" />
-					<strong>Severity</strong>
+					<span class="text-muted">Severity</span>
 					<select class="form-control" ng-model="policy.alertDefinition.severity" ng-disabled="policyLock" >
-						<option value="WARNING">WARNING</option>
-						<option value="CRITICAL">CRITICAL</option>
-						<option value="FATAL">FATAL</option>
-						<option value="OK">OK</option>
+						<option value="WARNING" class="text-warning">WARNING</option>
+						<option value="CRITICAL" class="text-danger">CRITICAL</option>
+						<option value="FATAL" class="text-danger">FATAL</option>
+						<option value="OK" class="text-success">OK</option>
 					</select>
-					<strong>Subject</strong>
-					<input type="text" class="form-control" placeholder="Alert Subject Template" ng-model="policy.alertDefinition.subject" ng-disabled="policyLock"/>
-					<strong>Body</strong>
-					<textarea class="form-control" rows="2" placeholder="Alert Body Template" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></textarea>
+					<span class="text-muted">Alert Subject</span>
+					<span class="fa fa-question-circle ng-scope"
+						  uib-tooltip="Alert subject, support template with alert stream fields and built-in context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
+					</span>
+					<input type="text" class="form-control" placeholder="Please input alert subject (support template)" ng-model="policy.alertDefinition.subject" ng-disabled="policyLock"/>
+					<span class="text-muted">Alert Body</span>
+					<span class="fa fa-question-circle ng-scope"
+						  uib-tooltip="Alert body, support template with alert stream fields and built-in  context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
+					</span>
+					<!--<textarea class="form-control" rows="3" placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></textarea>-->
+					<div editor placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></div>
 				</div>
 
 				<label>
