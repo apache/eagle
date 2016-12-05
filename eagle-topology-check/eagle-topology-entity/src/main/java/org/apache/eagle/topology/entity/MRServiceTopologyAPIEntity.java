@@ -38,7 +38,18 @@ public class MRServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("d")
     private String healthReport;
     @Column("e")
+    private long lastHealthUpdate;
+    @Column("f")
     private long lastUpdateTime;
+
+    public long getLastHealthUpdate() {
+        return lastHealthUpdate;
+    }
+
+    public void setLastHealthUpdate(long lastHealthUpdate) {
+        this.lastHealthUpdate = lastHealthUpdate;
+        valueChanged("lastHealthUpdate");
+    }
 
     public long getLastUpdateTime() {
         return lastUpdateTime;

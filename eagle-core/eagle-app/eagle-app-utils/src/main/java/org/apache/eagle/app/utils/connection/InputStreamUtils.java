@@ -27,8 +27,8 @@ import java.util.zip.GZIPInputStream;
 
 public class InputStreamUtils {
 
-    private static final int CONNECTION_TIMEOUT = 10 * 1000;
-    private static final int READ_TIMEOUT = 5 * 60 * 1000;
+    private static final int CONNECTION_TIMEOUT = 1 * 30 * 1000;
+    private static final int READ_TIMEOUT = 1 * 60 * 1000;
     private static final String GZIP_HTTP_HEADER = "Accept-Encoding";
     private static final String GZIP_COMPRESSION = "gzip";
 
@@ -49,7 +49,6 @@ public class InputStreamUtils {
         if (null != auth) {
             connection.setRequestProperty("Authorization", auth);
         }
-
         return connection.getInputStream();
     }
 

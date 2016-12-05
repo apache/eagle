@@ -49,18 +49,11 @@ public class HbaseTopologyCrawler implements TopologyCrawler {
     @Override
     public void extract() {
         long updateTimestamp = System.currentTimeMillis();
-        TopologyEntityParserResult result = null;
-        try {
-            result = parser.parse(updateTimestamp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (result == null) {
+        TopologyEntityParserResult result = parser.parse(updateTimestamp);;
+
+        if (result == null || result.getMetrics().isEmpty()) {
             LOG.warn("No data fetched");
             result = new TopologyEntityParserResult();
-        }
-        if (result.getMasterNodes().isEmpty()) {
-            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HMASTER_ROLE, 0, site, updateTimestamp));
         }
         TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.HBASE, updateTimestamp);
         this.collector.emit(new Values(TopologyConstants.HBASE_INSTANCE_SERVICE_NAME, result), messageId);

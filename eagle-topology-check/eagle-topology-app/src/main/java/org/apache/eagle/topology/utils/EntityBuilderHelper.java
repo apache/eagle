@@ -19,8 +19,10 @@
 package org.apache.eagle.topology.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyConstants;
+import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -39,7 +41,7 @@ public class EntityBuilderHelper {
         return addr.getHostName();
     }
 
-    public static GenericMetricEntity metricWrapper(Long timestamp, String metricName, double value, Map<String, String> tags) {
+    private static GenericMetricEntity metricWrapper(Long timestamp, String metricName, double value, Map<String, String> tags) {
         GenericMetricEntity metricEntity = new GenericMetricEntity();
         metricEntity.setTimestamp(timestamp);
         metricEntity.setTags(tags);
@@ -61,6 +63,13 @@ public class EntityBuilderHelper {
             throw new IllegalArgumentException("key can not be empty");
         }
         return key.indexOf(TopologyConstants.COLON) > 0 ? key.substring(0, key.indexOf(TopologyConstants.COLON)) : key;
+    }
+
+    public static String generateKey(TopologyBaseAPIEntity entity) {
+        return new HashCodeBuilder().append(entity.getTags().get(TopologyConstants.SITE_TAG))
+                .append(entity.getTags().get(TopologyConstants.HOSTNAME_TAG))
+                .append(entity.getTags().get(TopologyConstants.ROLE_TAG))
+                .build().toString();
     }
 
 }

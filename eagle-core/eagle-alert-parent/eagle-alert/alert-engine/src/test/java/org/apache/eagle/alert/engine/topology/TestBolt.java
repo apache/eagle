@@ -19,7 +19,6 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -31,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * Created by yonzhang on 4/7/16.
- */
 @Ignore
 @SuppressWarnings( {"rawtypes", "serial"})
 public class TestBolt extends BaseRichBolt {

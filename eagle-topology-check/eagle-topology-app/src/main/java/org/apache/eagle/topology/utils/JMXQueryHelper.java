@@ -18,8 +18,10 @@
 
 package org.apache.eagle.topology.utils;
 
+import org.apache.eagle.app.utils.connection.ServiceNotResponseException;
 import org.apache.eagle.app.utils.connection.URLConnectionUtils;
 
+import org.apache.eagle.app.utils.connection.URLResourceFetcher;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,28 +40,19 @@ import java.util.Map;
  */
 public final class JMXQueryHelper {
 
-    private static final int DEFAULT_QUERY_TIMEOUT = 30 * 60 * 1000;
-    private static final Logger LOG = LoggerFactory.getLogger(JMXQueryHelper.class);
-
-    public static Map<String, JMXBean> query(String jmxQueryUrl) throws JSONException, IOException {
-        LOG.info("Going to query JMX url: " + jmxQueryUrl);
+    public static Map<String, JMXBean> query(String jmxQueryUrl) throws ServiceNotResponseException {
         InputStream is = null;
         try {
-            final URLConnection connection = URLConnectionUtils.getConnection(jmxQueryUrl);
-            connection.setReadTimeout(DEFAULT_QUERY_TIMEOUT);
-            is = connection.getInputStream();
+            is = URLResourceFetcher.openURLStream(jmxQueryUrl);
             return parseStream(is);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new ServiceNotResponseException(e);
         } finally {
-            if (is != null) {
-                is.close();
-            }
+            URLResourceFetcher.closeInputStream(is);
         }
     }
 
-    public static Map<String, JMXBean> parseStream(InputStream is) {
+    private static Map<String, JMXBean> parseStream(InputStream is) {
         final Map<String, JMXBean> resultMap = new HashMap<String, JMXBean>();
         final JSONTokener tokener = new JSONTokener(is);
         final JSONObject jsonBeansObject = new JSONObject(tokener);

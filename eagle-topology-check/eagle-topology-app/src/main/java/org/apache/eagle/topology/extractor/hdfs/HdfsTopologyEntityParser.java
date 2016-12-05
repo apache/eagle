@@ -19,6 +19,7 @@
 package org.apache.eagle.topology.extractor.hdfs;
 
 import org.apache.eagle.app.utils.PathResolverHelper;
+import org.apache.eagle.app.utils.connection.ServiceNotResponseException;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
@@ -26,6 +27,7 @@ import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.utils.*;
+import org.apache.commons.io.FileUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,8 +35,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -80,8 +80,6 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private static final String STATUS_PATTERN = "([\\d\\.]+):\\d+\\s+\\([\\D]+(\\d+)\\)";
     private static final String QJM_PATTERN = "([\\d\\.]+):\\d+";
 
-    private static final double TB = 1024 * 1024 * 1024 * 1024;
-
     public HdfsTopologyEntityParser(String site, TopologyCheckAppConfig.HdfsConfig hdfsConfig, TopologyRackResolver rackResolver) {
         this.namenodeUrls = hdfsConfig.namenodeUrls;
         this.site = site;
@@ -89,31 +87,31 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     }
 
     @Override
-    public TopologyEntityParserResult parse(long timestamp) throws IOException {
+    public TopologyEntityParserResult parse(long timestamp) {
         final TopologyEntityParserResult result = new TopologyEntityParserResult();
-        result.setVersion(TopologyConstants.HadoopVersion.V2);
-        int numNamenode = 0;
+        int inActiveHosts = 0;
         for (String url : namenodeUrls) {
             try {
                 final HdfsServiceTopologyAPIEntity namenodeEntity = createNamenodeEntity(url, timestamp);
-                result.getMasterNodes().add(namenodeEntity);
-                numNamenode++;
                 if (namenodeEntity.getStatus().equalsIgnoreCase(NAME_NODE_ACTIVE_STATUS)) {
                     String namenodeVersion = createSlaveNodeEntities(url, timestamp, result);
                     namenodeEntity.setVersion(namenodeVersion);
                 }
-            } catch (RuntimeException ex) {
-                ex.printStackTrace();
-            } catch (IOException e) {
-                LOG.warn("Catch an IOException with url: {}", url);
+                result.getMasterNodes().add(namenodeEntity);
+            } catch (ServiceNotResponseException e) {
+                inActiveHosts++;
+                LOG.error(e.getMessage(), e);
+            } catch (Exception ex) {
+                LOG.error("fail to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
+                result.getSlaveNodes().clear();
             }
         }
-        double value = numNamenode * 1d / namenodeUrls.length;
+        double value = (namenodeUrls.length - inActiveHosts) * 1d / namenodeUrls.length;
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NAME_NODE_ROLE, value, site, timestamp));
         return result;
     }
 
-    private HdfsServiceTopologyAPIEntity createNamenodeEntity(String url, long updateTime) throws JSONException, IOException {
+    private HdfsServiceTopologyAPIEntity createNamenodeEntity(String url, long updateTime) throws ServiceNotResponseException {
         final String urlString = buildFSNamesystemURL(url);
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
         final JMXBean bean = jmxBeanMap.get(JMX_FS_NAME_SYSTEM_BEAN_NAME);
@@ -121,21 +119,25 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         if (bean == null || bean.getPropertyMap() == null) {
             throw new ServiceNotResponseException("Invalid JMX format, FSNamesystem bean is null!");
         }
-
         final String hostname = (String) bean.getPropertyMap().get(HA_NAME);
-        HdfsServiceTopologyAPIEntity result = createHdfsServiceEntity(TopologyConstants.NAME_NODE_ROLE, hostname, updateTime);
-        final String state = (String) bean.getPropertyMap().get(HA_STATE);
-        result.setStatus(state);
-        final Double configuredCapacityGB = (Double) bean.getPropertyMap().get(CAPACITY_TOTAL_GB);
-        result.setConfiguredCapacityTB(Double.toString(configuredCapacityGB / 1024));
-        final Double capacityUsedGB = (Double) bean.getPropertyMap().get(CAPACITY_USED_GB);
-        result.setUsedCapacityTB(Double.toString(capacityUsedGB / 1024));
-        final Integer blocksTotal = (Integer) bean.getPropertyMap().get(BLOCKS_TOTAL);
-        result.setNumBlocks(Integer.toString(blocksTotal));
-        return result;
+        HdfsServiceTopologyAPIEntity namenode = createHdfsServiceEntity(TopologyConstants.NAME_NODE_ROLE, hostname, updateTime);
+        try {
+            final String state = (String) bean.getPropertyMap().get(HA_STATE);
+            namenode.setStatus(state);
+            final Double configuredCapacityGB = (Double) bean.getPropertyMap().get(CAPACITY_TOTAL_GB);
+            namenode.setConfiguredCapacityTB(Double.toString(configuredCapacityGB / FileUtils.ONE_KB));
+            final Double capacityUsedGB = (Double) bean.getPropertyMap().get(CAPACITY_USED_GB);
+            namenode.setUsedCapacityTB(Double.toString(capacityUsedGB / FileUtils.ONE_KB));
+            final Integer blocksTotal = (Integer) bean.getPropertyMap().get(BLOCKS_TOTAL);
+            namenode.setNumBlocks(Integer.toString(blocksTotal));
+        } catch (RuntimeException ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
+        return namenode;
+
     }
 
-    private String createSlaveNodeEntities(String url, long updateTime, TopologyEntityParserResult result) throws IOException {
+    private String createSlaveNodeEntities(String url, long updateTime, TopologyEntityParserResult result) throws ServiceNotResponseException {
         final String urlString = buildNamenodeInfo(url);
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
         final JMXBean bean = jmxBeanMap.get(JMX_NAMENODE_INFO);
@@ -147,7 +149,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         return (String) bean.getPropertyMap().get(NAME_NODE_VERSION);
     }
 
-    private void createAllJournalNodeEntities(JMXBean bean, long updateTime, TopologyEntityParserResult result) throws UnknownHostException {
+    private void createAllJournalNodeEntities(JMXBean bean, long updateTime, TopologyEntityParserResult result) {
         if (bean.getPropertyMap().get(JN_TRANSACTION_INFO) == null || bean.getPropertyMap().get(JN_STATUS) == null) {
             return;
         }
@@ -194,7 +196,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.JOURNAL_NODE_ROLE, value, site, updateTime));
     }
 
-    private void createAllDataNodeEntities(JMXBean bean, long updateTime, TopologyEntityParserResult result) throws JSONException, IOException {
+    private void createAllDataNodeEntities(JMXBean bean, long updateTime, TopologyEntityParserResult result) throws JSONException {
         int numLiveNodes = 0;
         int numLiveDecommNodes = 0;
         int numDeadNodes = 0;
@@ -229,9 +231,9 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
 
             HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, EntityBuilderHelper.getValidHostName(hostname), updateTime);
             final Number configuredCapacity = (Number) liveNode.get(DATA_NODE_CAPACITY);
-            entity.setConfiguredCapacityTB(Double.toString(configuredCapacity.doubleValue() / TB));
+            entity.setConfiguredCapacityTB(Double.toString(configuredCapacity.doubleValue() / FileUtils.ONE_TB));
             final Number capacityUsed = (Number) liveNode.get(DATA_NODE_USED_SPACE);
-            entity.setUsedCapacityTB(Double.toString(capacityUsed.doubleValue() / TB));
+            entity.setUsedCapacityTB(Double.toString(capacityUsed.doubleValue() / FileUtils.ONE_TB));
             final Number blocksTotal = (Number) liveNode.get(DATA_NODE_NUM_BLOCKS);
             entity.setNumBlocks(Double.toString(blocksTotal.doubleValue()));
             if (liveNode.has(DATA_NODE_FAILED_VOLUMN)) {

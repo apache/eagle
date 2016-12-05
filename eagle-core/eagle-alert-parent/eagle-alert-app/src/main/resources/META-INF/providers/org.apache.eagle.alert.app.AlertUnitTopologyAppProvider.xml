@@ -90,7 +90,7 @@
         </property>
         <property>
             <name>spout.stormKafkaUseSameZkQuorumWithKafkaBroker</name>
-            <displayName>Spout Transaction Zookeeper to Reuse Broker Zookeeper</displayName>
+            <displayName>Reuse Broker Zookeeper</displayName>
             <value>true</value>
             <description>Use same zookeeper for kafka server and kafka consumer(Storm-Kafka)</description>
             <required>false</required>

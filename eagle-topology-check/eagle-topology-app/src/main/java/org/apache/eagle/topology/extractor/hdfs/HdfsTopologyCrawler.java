@@ -46,14 +46,8 @@ public class HdfsTopologyCrawler implements TopologyCrawler {
     @Override
     public void extract() {
         long updateTimestamp = System.currentTimeMillis();
-        TopologyEntityParserResult result = null;
-        try {
-            result = parser.parse(updateTimestamp);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        if (result == null || result.getMasterNodes().isEmpty()) {
+        TopologyEntityParserResult result = parser.parse(updateTimestamp);
+        if (result == null || result.getMetrics().isEmpty()) {
             LOG.warn("No data fetched");
             return;
         }

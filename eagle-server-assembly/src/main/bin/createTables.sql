@@ -17,7 +17,7 @@
 --  */
 
 
---- application framework metadata ---
+-- application framework metadata
 
 CREATE TABLE IF NOT EXISTS applications (
   uuid varchar(50) PRIMARY KEY,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS sites (
   UNIQUE (siteid)
 );
 
---- eagle security module metadata ---
+-- eagle security module metadata
 
 CREATE TABLE IF NOT EXISTS hdfs_sensitivity_entity (
   site varchar(20) DEFAULT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS hbase_sensitivity_entity (
   primary key (site, hbase_resource)
 );
 
---- alert engine metadata ---
+--- alert engine metadata
 
 CREATE TABLE IF NOT EXISTS stream_cluster (
   id VARCHAR (50) PRIMARY KEY,

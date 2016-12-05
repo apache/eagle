@@ -19,6 +19,7 @@
 package org.apache.eagle.topology.resolver.impl;
 
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.slf4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -27,6 +28,8 @@ import java.net.UnknownHostException;
  * resolve rack by hostname.
  */
 public class IPMaskTopologyRackResolver implements TopologyRackResolver {
+
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(IPMaskTopologyRackResolver.class);
 
     private final int pos = 2;
     private int rackPos;
@@ -46,7 +49,7 @@ public class IPMaskTopologyRackResolver implements TopologyRackResolver {
             InetAddress address = InetAddress.getByName(hostname);
             result = "rack" + (int) (address.getAddress()[rackPos] & 0xff);
         } catch (UnknownHostException e) {
-            //e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
         return result;
     }

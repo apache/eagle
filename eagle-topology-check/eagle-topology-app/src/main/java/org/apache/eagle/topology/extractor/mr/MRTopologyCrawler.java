@@ -45,7 +45,7 @@ public class MRTopologyCrawler implements TopologyCrawler {
     public void extract() {
         long updateTimestamp = System.currentTimeMillis();
         TopologyEntityParserResult result = parser.parse(updateTimestamp);
-        if (result == null || result.getMasterNodes().isEmpty()) {
+        if (result == null || result.getMetrics().isEmpty()) {
             LOG.warn("No data fetched");
             return;
         }
