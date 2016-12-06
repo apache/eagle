@@ -17,7 +17,7 @@
 #
 
 from metric_collector import JmxMetricCollector,JmxMetricListener,Runner
-import json
+import json, logging, fnmatch
 
 class NNSafeModeMetric(JmxMetricListener):
     def on_metric(self, metric):
@@ -27,7 +27,6 @@ class NNSafeModeMetric(JmxMetricListener):
             else:
                 metric["value"] = 0
             self.collector.collect(metric)
-
 
 class NNHAMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.fsnamesystem"
@@ -74,6 +73,15 @@ class JournalTransactionInfoMetric(JmxMetricListener):
             self.collector.on_bean_kv(self.PREFIX, component, "LastAppliedOrWrittenTxId", LastAppliedOrWrittenTxId)
             self.collector.on_bean_kv(self.PREFIX, component, "MostRecentCheckpointTxId", MostRecentCheckpointTxId)
 
+class DatanodeFSDatasetState(JmxMetricListener):
+    def on_metric(self, metric):
+        if fnmatch.fnmatch(metric["metric"], "hadoop.datanode.fsdatasetstate-*.capacity"):
+            metric["metric"] = "hadoop.datanode.fsdatasetstate.capacity"
+            self.collector.collect(metric)
+        elif fnmatch.fnmatch(metric["metric"], "hadoop.datanode.fsdatasetstate-*.dfsused"):
+            metric["metric"] = "hadoop.datanode.fsdatasetstate.dfsused"
+            self.collector.collect(metric)
+
 if __name__ == '__main__':
     collector = JmxMetricCollector()
     collector.register(
@@ -81,6 +89,7 @@ if __name__ == '__main__':
         NNHAMetric(),
         MemoryUsageMetric(),
         NNCapacityUsageMetric(),
-        JournalTransactionInfoMetric()
+        JournalTransactionInfoMetric(),
+        DatanodeFSDatasetState()
     )
     Runner.run(collector)

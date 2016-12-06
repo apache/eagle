@@ -1,0 +1,94 @@
+{
+  "env": {
+    "site": "sandbox"
+  },
+  "input": [
+    {
+      "component": "hbasemaster",
+      "host": "sandbox.hortonworks.com",
+      "port": "60010",
+      "https": false
+    },
+    {
+      "component": "regionserver",
+      "host": "sandbox.hortonworks.com",
+      "port": "60030",
+      "https": false
+    }
+  ],
+  "filter": {
+    "beam_group_filter": ["hadoop","java.lang","java.nio"],
+    "metric_name_filter": [
+      "hadoop.memory.heapmemoryusage.used",
+      "hadoop.memory.nonheapmemoryusage.used",
+      "hadoop.bufferpool.direct.memoryused",
+      "hadoop.hbase.master.server.averageload",
+      "hadoop.hbase.master.assignmentmanger.ritcount",
+      "hadoop.hbase.master.assignmentmanger.ritcountoverthreshold",
+      "hadoop.hbase.master.assignmentmanger.assign_num_ops",
+      "hadoop.hbase.master.assignmentmanger.assign_min",
+      "hadoop.hbase.master.assignmentmanger.assign_max",
+      "hadoop.hbase.master.assignmentmanger.assign_75th_percentile",
+      "hadoop.hbase.master.assignmentmanger.assign_95th_percentile",
+      "hadoop.hbase.master.assignmentmanger.assign_99th_percentile",
+      "hadoop.hbase.master.assignmentmanger.bulkassign_num_ops",
+      "hadoop.hbase.master.assignmentmanger.bulkassign_min",
+      "hadoop.hbase.master.assignmentmanger.bulkassign_max",
+      "hadoop.hbase.master.assignmentmanger.bulkassign_75th_percentile",
+      "hadoop.hbase.master.assignmentmanger.bulkassign_95th_percentile",
+      "hadoop.hbase.master.assignmentmanger.bulkassign_99th_percentile",
+      "hadoop.hbase.master.balancer.balancercluster_num_ops",
+      "hadoop.hbase.master.balancer.balancercluster_min",
+      "hadoop.hbase.master.balancer.balancercluster_max",
+      "hadoop.hbase.master.balancer.balancercluster_75th_percentile",
+      "hadoop.hbase.master.balancer.balancercluster_95th_percentile",
+      "hadoop.hbase.master.balancer.balancercluster_99th_percentile",
+      "hadoop.hbase.master.filesystem.hlogsplittime_min",
+      "hadoop.hbase.master.filesystem.hlogsplittime_max",
+      "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile",
+      "hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile",
+      "hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile",
+      "hadoop.hbase.master.filesystem.hlogsplitsize_min",
+      "hadoop.hbase.master.filesystem.hlogsplitsize_max",
+      "hadoop.hbase.master.filesystem.metahlogsplittime_min",
+      "hadoop.hbase.master.filesystem.metahlogsplittime_max",
+      "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile",
+      "hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile",
+      "hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile",
+      "hadoop.hbase.master.filesystem.metahlogsplitsize_min",
+      "hadoop.hbase.master.filesystem.metahlogsplitsize_max",
+
+      "hadoop.hbase.jvm.gccount",
+      "hadoop.hbase.jvm.gctimemillis",
+      "hadoop.hbase.ipc.ipc.queuesize",
+      "hadoop.hbase.ipc.ipc.numcallsingeneralqueue",
+      "hadoop.hbase.ipc.ipc.numactivehandler",
+      "hadoop.hbase.ipc.ipc.queuecalltime_99th_percentile",
+      "hadoop.hbase.ipc.ipc.processcalltime_99th_percentile",
+      "hadoop.hbase.ipc.ipc.queuecalltime_num_ops",
+      "hadoop.hbase.ipc.ipc.processcalltime_num_ops",
+      "hadoop.hbase.regionserver.server.regioncount",
+      "hadoop.hbase.regionserver.server.storecount",
+      "hadoop.hbase.regionserver.server.memstoresize",
+      "hadoop.hbase.regionserver.server.storefilesize",
+      "hadoop.hbase.regionserver.server.totalrequestcount",
+      "hadoop.hbase.regionserver.server.readrequestcount",
+      "hadoop.hbase.regionserver.server.writerequestcount",
+      "hadoop.hbase.regionserver.server.splitqueuelength",
+      "hadoop.hbase.regionserver.server.compactionqueuelength",
+      "hadoop.hbase.regionserver.server.flushqueuelength",
+      "hadoop.hbase.regionserver.server.blockcachesize",
+      "hadoop.hbase.regionserver.server.blockcachehitcount",
+      "hadoop.hbase.regionserver.server.blockcounthitpercent"
+    ]
+  },
+  "output": {
+    "kafka": {
+      "debug": false,
+      "default_topic": "hadoop_jmx_metric_sandbox",
+      "broker_list": [
+        "sandbox.hortonworks.com:6667"
+      ]
+    }
+  }
+}
