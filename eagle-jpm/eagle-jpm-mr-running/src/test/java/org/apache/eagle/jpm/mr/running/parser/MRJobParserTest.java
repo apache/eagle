@@ -63,8 +63,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @PrepareForTest({InputStreamUtils.class, MRJobParser.class, URLConnectionUtils.class, Math.class, MRJobEntityCreationHandler.class})
 @PowerMockIgnore({"javax.*", "org.w3c.*", "com.sun.org.apache.xerces.*","org.apache.xerces.*"})
 public class MRJobParserTest {
-    private static final String ZK_JOB_PATH = "/apps/mr/running/sandbox/application_1479206441898_30784/job_1479206441898_30784";
-    private static final String ZK_APP_PATH = "/apps/mr/running/sandbox/application_1479206441898_30784";
+    private static final String ZK_JOB_PATH = "/apps/mr/running/sandbox/jobs/application_1479206441898_30784/job_1479206441898_30784";
+    private static final String ZK_APP_PATH = "/apps/mr/running/sandbox/jobs/application_1479206441898_30784";
     private static final String JOB_CONF_URL = "http://host.domain.com:8088/proxy/application_1479206441898_30784/ws/v1/mapreduce/jobs/job_1479206441898_30784/conf?anonymous=true";
     private static final String JOB_COUNT_URL = "http://host.domain.com:8088/proxy/application_1479206441898_30784/ws/v1/mapreduce/jobs/job_1479206441898_30784/counters?anonymous=true";
     private static final String JOB_ID = "job_1479206441898_30784";

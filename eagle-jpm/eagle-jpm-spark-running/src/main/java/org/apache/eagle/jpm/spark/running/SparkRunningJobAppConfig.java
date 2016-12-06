@@ -34,6 +34,7 @@ public class SparkRunningJobAppConfig implements Serializable {
     static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
 
     static final String DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT = "/apps/spark/running";
+    static final String JOB_SYMBOL = "/jobs";
 
     ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
@@ -120,8 +121,8 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRoot = DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT;
         this.zkStateConfig.zkLockPath = Utils.makeLockPath(DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT + "/" + config.getString("siteId"));
+        this.zkStateConfig.zkRoot = DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT + "/" + config.getString("siteId") + JOB_SYMBOL;
         if (config.hasPath("zookeeper.zkRoot")) {
             this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
         }

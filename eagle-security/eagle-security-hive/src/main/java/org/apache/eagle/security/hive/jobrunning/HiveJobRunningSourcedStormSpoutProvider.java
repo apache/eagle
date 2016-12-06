@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class HiveJobRunningSourcedStormSpoutProvider {
     private static final Logger LOG = LoggerFactory.getLogger(HiveJobRunningSourcedStormSpoutProvider.class);
+    private static final String JOB_SYMBOL = "/jobs";
 
     public BaseRichSpout getSpout(Config config, int parallelism) {
         RunningJobEndpointConfig endPointConfig = new RunningJobEndpointConfig();
@@ -59,11 +60,11 @@ public class HiveJobRunningSourcedStormSpoutProvider {
         //controlConfig.numTotalPartitions = parallelism == null ? 1 : parallelism;
         ZKStateConfig zkStateConfig = new ZKStateConfig();
         zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
-        zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot");
+        zkStateConfig.zkLockPath = Utils.makeLockPath(config.getString("dataSourceConfig.zkRoot") + "/" + config.getString("siteId"));
+        zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot") + "/" + config.getString("siteId") + JOB_SYMBOL;
         zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
         zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
         zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
-        zkStateConfig.zkLockPath = Utils.makeLockPath(zkStateConfig.zkRoot + "/" + config.getString("siteId"));
         RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig);
 
         try {

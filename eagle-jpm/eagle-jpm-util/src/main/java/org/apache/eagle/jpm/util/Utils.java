@@ -116,6 +116,6 @@ public class Utils {
 
     public static String makeLockPath(String zkrootWithSiteId) {
         Preconditions.checkArgument(StringUtils.isNotBlank(zkrootWithSiteId), "zkrootWithSiteId must not be blank");
-        return "/locks" + zkrootWithSiteId.toLowerCase();
+        return zkrootWithSiteId.toLowerCase() + "/locks";
     }
 }
