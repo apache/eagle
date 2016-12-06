@@ -105,12 +105,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         sanityCheck(spec);
 
         // figure out added, removed, modified StreamSortSpec
-        Map<StreamPartition, StreamSortSpec> newSSS = new HashMap<>();
-        spec.getRouterSpecs().forEach(t -> {
-            if (t.getPartition().getSortSpec() != null) {
-                newSSS.put(t.getPartition(), t.getPartition().getSortSpec());
-            }
-        });
+        Map<StreamPartition, StreamSortSpec> newSSS = spec.makeSSS();
 
         Set<StreamPartition> newStreamIds = newSSS.keySet();
         Set<StreamPartition> cachedStreamIds = cachedSSS.keySet();
@@ -138,13 +133,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         cachedSSS = newSSS;
 
         // figure out added, removed, modified StreamRouterSpec
-        Map<StreamPartition, List<StreamRouterSpec>> newSRS = new HashMap<>();
-        spec.getRouterSpecs().forEach(t -> {
-            if (!newSRS.containsKey(t.getPartition())) {
-                newSRS.put(t.getPartition(), new ArrayList<StreamRouterSpec>());
-            }
-            newSRS.get(t.getPartition()).add(t);
-        });
+        Map<StreamPartition, List<StreamRouterSpec>> newSRS = spec.makeSRS();
 
         Set<StreamPartition> newStreamPartitions = newSRS.keySet();
         Set<StreamPartition> cachedStreamPartitions = cachedSRS.keySet();

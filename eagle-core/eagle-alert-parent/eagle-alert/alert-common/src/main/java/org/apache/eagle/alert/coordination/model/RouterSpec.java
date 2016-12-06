@@ -17,9 +17,13 @@
 package org.apache.eagle.alert.coordination.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class RouterSpec {
@@ -64,6 +68,27 @@ public class RouterSpec {
 
     public void setRouterSpecs(List<StreamRouterSpec> routerSpecs) {
         this.routerSpecs = routerSpecs;
+    }
+
+    public Map<StreamPartition, List<StreamRouterSpec>> makeSRS() {
+        Map<StreamPartition, List<StreamRouterSpec>> newSRS = new HashMap<>();
+        this.getRouterSpecs().forEach(t -> {
+            if (!newSRS.containsKey(t.getPartition())) {
+                newSRS.put(t.getPartition(), new ArrayList<>());
+            }
+            newSRS.get(t.getPartition()).add(t);
+        });
+        return newSRS;
+    }
+
+    public Map<StreamPartition, StreamSortSpec> makeSSS() {
+        Map<StreamPartition, StreamSortSpec> newSSS = new HashMap<>();
+        this.getRouterSpecs().forEach(t -> {
+            if (t.getPartition().getSortSpec() != null) {
+                newSSS.put(t.getPartition(), t.getPartition().getSortSpec());
+            }
+        });
+        return newSSS;
     }
 
     @Override
