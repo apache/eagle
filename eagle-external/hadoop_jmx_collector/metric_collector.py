@@ -27,6 +27,7 @@ import types
 import httplib
 import logging
 import threading
+import fnmatch
 
 # load six
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '', 'lib/six'))
@@ -39,6 +40,7 @@ from kafka import KafkaClient, SimpleProducer, SimpleConsumer
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M')
+
 
 class Helper:
     def __init__(self):
@@ -213,6 +215,11 @@ class KafkaMetricSender(MetricSender):
         self.broker_list = kafka_config["broker_list"]
         self.kafka_client = None
         self.kafka_producer = None
+        self.debug_enabled = False
+        self.sent_count = 0
+        if kafka_config.has_key("debug"):
+            self.debug_enabled = bool(kafka_config["debug"])
+            logging.info("Overrode output.kafka.debug: " + str(self.debug_enabled))
 
     def get_topic_id(self, msg):
         if msg.has_key("component"):
@@ -232,16 +239,23 @@ class KafkaMetricSender(MetricSender):
                                              batch_send_every_t=30)
 
     def send(self, msg):
+        if self.debug_enabled:
+            logging.info("Send message: " + str(msg))
+        self.sent_count += 1
         self.kafka_producer.send_messages(self.get_topic_id(msg), json.dumps(msg))
 
     def close(self):
+        logging.info("Totally sent " + str(self.sent_count) + " metric events")
         if self.kafka_producer is not None:
             self.kafka_producer.stop()
         if self.kafka_client is not None:
             self.kafka_client.close()
 
 class MetricCollector(threading.Thread):
-    def __init__(self,config = None):
+    filters = []
+    config = None
+
+    def __init__(self, config=None):
         threading.Thread.__init__(self)
         self.config = None
         self.sender = None
@@ -251,7 +265,19 @@ class MetricCollector(threading.Thread):
         self.config = config
         self.sender = KafkaMetricSender(self.config)
         self.sender.open()
-        pass
+        self.filter(MetricNameFilter())
+
+        for filter in self.filters:
+            filter.init(self.config)
+
+    def filter(self, *filters):
+        """
+        :param filters: MetricFilters to register
+        :return: None
+        """
+        logging.debug("Register filters: " + str(filters))
+        for filter in filters:
+            self.filters.append(filter)
 
     def start(self):
         super(MetricCollector, self).start()
@@ -265,13 +291,22 @@ class MetricCollector(threading.Thread):
             raise Exception("host is null: " + str(msg))
         if not msg.has_key("site"):
             msg["site"] = self.config["env"]["site"]
-        self.sender.send(msg)
+        if len(self.filters) == 0:
+            self.sender.send(msg)
+            return
+        else:
+            for filter in self.filters:
+                if filter.filter_metric(msg):
+                    self.sender.send(msg)
+                    return
+        # logging.info("Drop metric: " + str(msg))
 
     def close(self):
         self.sender.close()
 
     def run(self):
         raise Exception("`run` method should be overrode by sub-class before being called")
+
 
 class Runner(object):
     @staticmethod
@@ -288,7 +323,7 @@ class Runner(object):
         elif len(argv) == 2:
             config = Helper.load_config(argv[1])
         else:
-            raise Exception("Usage: "+argv[0]+" CONFIG_FILE_PATH, but given too many arguments: " + str(argv))
+            raise Exception("Usage: " + argv[0] + " CONFIG_FILE_PATH, but given too many arguments: " + str(argv))
 
         for collector in collectors:
             try:
@@ -305,10 +340,12 @@ class Runner(object):
             finally:
                 collector.close()
 
+
 class JmxMetricCollector(MetricCollector):
     selected_domain = None
     listeners = []
     input_components = []
+    metric_prefix = "hadoop."
 
     def init(self, config):
         super(JmxMetricCollector, self).init(config)
@@ -322,8 +359,10 @@ class JmxMetricCollector(MetricCollector):
                 raise Exception("port not defined in " + str(input))
             if not input.has_key("https"):
                 input["https"] = False
-
-        self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
+        self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('beam_group_filter')]
+        if config["env"].has_key("metric_prefix"):
+            self.metric_prefix = config["env"]["metric_prefix"]
+            logging.info("Override env.metric_prefix: " + self.metric_prefix + ", default: hadoop.")
 
     def register(self, *listeners):
         """
@@ -347,7 +386,7 @@ class JmxMetricCollector(MetricCollector):
 
     def on_beans(self, source, beans):
         for bean in beans:
-            self.on_bean(source,bean)
+            self.on_bean(source, bean)
 
     def on_bean(self, source, bean):
         # mbean is of the form "domain:key=value,...,foo=bar"
@@ -357,7 +396,6 @@ class JmxMetricCollector(MetricCollector):
 
         if not self.filter_bean(bean, mbean_domain):
             return
-
         context = bean.get("tag.Context", "")
         metric_prefix_name = self.__build_metric_prefix(mbean_attribute, context)
 
@@ -367,7 +405,7 @@ class JmxMetricCollector(MetricCollector):
         for listener in self.listeners:
             listener.on_bean(source, bean.copy())
 
-    def on_bean_kv(self, prefix,source, key, value):
+    def on_bean_kv(self, prefix, source, key, value):
         # Skip Tags
         if re.match(r'tag.*', key):
             return
@@ -382,7 +420,9 @@ class JmxMetricCollector(MetricCollector):
     def on_metric(self, metric):
         if Helper.is_number(metric["value"]):
             self.collect(metric)
-
+        elif isinstance(metric["value"], dict):
+            for key, value in metric["value"].iteritems():
+                self.on_bean_kv(metric["metric"], metric, key, value)
         for listener in self.listeners:
             listener.on_metric(metric.copy())
 
@@ -394,14 +434,51 @@ class JmxMetricCollector(MetricCollector):
             name_index = [i[0] for i in mbean_list].index('name')
             mbean_list[name_index][1] = context
             metric_prefix_name = '.'.join([i[1] for i in mbean_list])
-        return ("hadoop." + metric_prefix_name).replace(" ", "").lower()
+        return (self.metric_prefix + metric_prefix_name).replace(" ", "").lower()
 
+# ========================
+#  Metric Listeners
+# ========================
 class JmxMetricListener:
     def init(self, collector):
         self.collector = collector
+        self.metric_prefix = self.collector.metric_prefix
 
     def on_bean(self, component, bean):
         pass
 
     def on_metric(self, metric):
         pass
+
+
+# ========================
+#  Metric Filters
+# ========================
+class MetricFilter:
+    def init(self, config={}):
+        raise Exception("init() method is called before being overrode in sub-class")
+        pass
+
+    def filter_metric(self, metric):
+        """
+        Filter metric to keep by return True, otherwise throw metric by returning False.
+        """
+        return True
+
+class MetricNameFilter(MetricFilter):
+    metric_name_filter = []
+
+    def init(self, config={}):
+        if config.has_key("filter") and config["filter"].has_key("metric_name_filter"):
+            self.metric_name_filter = config["filter"]["metric_name_filter"]
+
+        logging.debug("Override filter.metric_name_filter: " + str(self.metric_name_filter))
+
+    def filter_metric(self, metric):
+        if len(self.metric_name_filter) == 0:
+            return True
+        else:
+            for name_filter in self.metric_name_filter:
+                if fnmatch.fnmatch(metric["metric"], name_filter):
+                    return True
+        return False
