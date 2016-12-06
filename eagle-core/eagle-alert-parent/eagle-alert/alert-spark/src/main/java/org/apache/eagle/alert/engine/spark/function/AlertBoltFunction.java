@@ -89,7 +89,6 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
                 Set<PublishPartition> cachedPublishPartitions = publishState.getCachedPublishPartitionsByBoltId(boltId);
                 streamContext = new StreamSparkContextImpl(null);
                 alertOutputCollector = new AlertBoltOutputCollectorWrapper(new SparkOutputCollector(), streamContext, cachedPublishPartitions);
-                // alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper(cachedPublishPartitions);
                 Map<String, PolicyDefinition> policyDefinitionMap = policyState.getPolicyDefinitionByBoltId(boltId);
                 Map<String, CompositePolicyHandler> policyStreamHandlerMap = policyState.getPolicyStreamHandlerByBoltId(boltId);
                 byte[] siddhiSnapShot = siddhiState.getSiddhiSnapShotByBoltIdAndPartitionNum(boltId, partitionNum);
