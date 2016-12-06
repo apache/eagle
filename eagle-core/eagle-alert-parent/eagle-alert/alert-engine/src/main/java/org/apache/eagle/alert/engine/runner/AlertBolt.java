@@ -197,16 +197,16 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
 
         // update alert output collector
-        Set<PublishPartition> tempPublishPartitions = new HashSet<>();
+        Set<PublishPartition> newPublishPartitions = new HashSet<>();
         spec.getPublishPartitions().forEach(p -> {
             if (newPolicies.stream().filter(o -> o.getName().equals(p.getPolicyId())).count() > 0) {
-                tempPublishPartitions.add(p);
+                newPublishPartitions.add(p);
             }
         });
 
-        Collection<PublishPartition> addedPublishPartitions = CollectionUtils.subtract(tempPublishPartitions, cachedPublishPartitions);
-        Collection<PublishPartition> removedPublishPartitions = CollectionUtils.subtract(cachedPublishPartitions, tempPublishPartitions);
-        Collection<PublishPartition> modifiedPublishPartitions = CollectionUtils.intersection(tempPublishPartitions, cachedPublishPartitions);
+        Collection<PublishPartition> addedPublishPartitions = CollectionUtils.subtract(newPublishPartitions, cachedPublishPartitions);
+        Collection<PublishPartition> removedPublishPartitions = CollectionUtils.subtract(cachedPublishPartitions, newPublishPartitions);
+        Collection<PublishPartition> modifiedPublishPartitions = CollectionUtils.intersection(newPublishPartitions, cachedPublishPartitions);
 
         LOG.debug("added PublishPartition " + addedPublishPartitions);
         LOG.debug("removed PublishPartition " + removedPublishPartitions);
@@ -216,6 +216,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
 
         // switch
         cachedPolicies = newPoliciesMap;
+        cachedPublishPartitions = newPublishPartitions;
         sdf = sds;
         specVersion = spec.getVersion();
         this.spec = spec;

@@ -53,7 +53,11 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     public void emit(AlertStreamEvent event) {
         Set<PublishPartition> clonedPublishPartitions = new HashSet<>(publishPartitions);
         for (PublishPartition publishPartition : clonedPublishPartitions) {
+            // skip the publish partition which is not belong to this policy
             PublishPartition cloned = publishPartition.clone();
+            if (!cloned.getPolicyId().equalsIgnoreCase(event.getPolicyId())) {
+                continue;
+            }
             for (String column : cloned.getColumns()) {
                 int columnIndex = event.getSchema().getColumnIndex(column);
                 if (columnIndex < 0) {
