@@ -30,6 +30,7 @@ import java.util.Map;
  */
 public class CustomizedHandler implements PolicyStreamHandler {
     private Collector<AlertStreamEvent> collector;
+    private PolicyHandlerContext context;
 
     public CustomizedHandler(Map<String, StreamDefinition> sds) {
     }
@@ -37,11 +38,14 @@ public class CustomizedHandler implements PolicyStreamHandler {
     @Override
     public void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception {
         this.collector = collector;
+        this.context = context;
     }
 
     @Override
     public void send(StreamEvent event) throws Exception {
-        this.collector.emit(new AlertStreamEvent());
+	AlertStreamEvent alert = new AlertStreamEvent();
+	alert.setPolicyId(context.getPolicyDefinition().getName());
+        this.collector.emit(alert);
     }
 
     @Override

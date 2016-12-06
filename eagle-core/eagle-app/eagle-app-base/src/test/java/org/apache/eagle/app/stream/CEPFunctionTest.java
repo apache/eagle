@@ -54,7 +54,7 @@ public class CEPFunctionTest {
             put("name","cpu.usage");
             put("value", 0.96);
         }});
-        Assert.assertTrue("Should get result in 5 s", semaphore.tryAcquire(5, TimeUnit.SECONDS));
+        Assert.assertTrue("Should get result in 5 s", semaphore.tryAcquire(15, TimeUnit.SECONDS));
         function.close();
     }
 }
