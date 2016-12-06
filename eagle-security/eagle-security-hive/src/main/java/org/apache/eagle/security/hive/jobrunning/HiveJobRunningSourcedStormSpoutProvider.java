@@ -60,11 +60,11 @@ public class HiveJobRunningSourcedStormSpoutProvider {
         //controlConfig.numTotalPartitions = parallelism == null ? 1 : parallelism;
         ZKStateConfig zkStateConfig = new ZKStateConfig();
         zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
+        zkStateConfig.zkLockPath = Utils.makeLockPath(config.getString("dataSourceConfig.zkRoot") + "/" + config.getString("siteId"));
         zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot") + "/" + config.getString("siteId") + JOB_SYMBOL;
         zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
         zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
         zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
-        zkStateConfig.zkLockPath = Utils.makeLockPath(zkStateConfig.zkRoot);
         RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig);
 
         try {

@@ -121,8 +121,8 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
+        this.zkStateConfig.zkLockPath = Utils.makeLockPath(DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT + "/" + config.getString("siteId"));
         this.zkStateConfig.zkRoot = DEFAULT_SPARK_JOB_RUNNING_ZOOKEEPER_ROOT + "/" + config.getString("siteId") + JOB_SYMBOL;
-        this.zkStateConfig.zkLockPath = Utils.makeLockPath(this.zkStateConfig.zkRoot);
         if (config.hasPath("zookeeper.zkRoot")) {
             this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
         }

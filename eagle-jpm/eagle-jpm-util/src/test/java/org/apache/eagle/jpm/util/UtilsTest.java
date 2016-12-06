@@ -67,7 +67,7 @@ public class UtilsTest {
 
     @Test
     public void testMakeLockPath() {
-        String lockpath = Utils.makeLockPath("/apps/mr/jobs/sitdId/jobs");
+        String lockpath = Utils.makeLockPath("/apps/mr/jobs/sitdId");
         Assert.assertEquals("/apps/mr/jobs/sitdid/locks", lockpath);
     }
 

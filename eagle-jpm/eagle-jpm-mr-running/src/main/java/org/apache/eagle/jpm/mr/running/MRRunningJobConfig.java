@@ -111,8 +111,8 @@ public class MRRunningJobConfig implements Serializable {
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
+        this.zkStateConfig.zkLockPath = Utils.makeLockPath(ZK_ROOT_PREFIX + "/" + config.getString("siteId"));
         this.zkStateConfig.zkRoot = ZK_ROOT_PREFIX + "/" + config.getString("siteId") + JOB_SYMBOL;
-        this.zkStateConfig.zkLockPath = Utils.makeLockPath(this.zkStateConfig.zkRoot);
 
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");
