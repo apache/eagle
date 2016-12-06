@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS hbase_sensitivity_entity (
   primary key (site, hbase_resource)
 );
 
---- alert engine metadata
+-- alert engine metadata
 
 CREATE TABLE IF NOT EXISTS stream_cluster (
   id VARCHAR (50) PRIMARY KEY,
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS stream_definition (
   content longtext DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Kafka_tuple_metadata (
+CREATE TABLE IF NOT EXISTS kafka_tuple_metadata (
   id VARCHAR (50) PRIMARY KEY,
   content longtext DEFAULT NULL
 );
