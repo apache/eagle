@@ -20,6 +20,7 @@ import backtype.storm.task.IOutputCollector;
 import backtype.storm.task.OutputCollector;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorThreadSafeWrapper;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.router.impl.StormOutputCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapperTest {
     @Test
     public void testThreadSafeAlertBoltOutputCollector() {
         MockedStormAlertOutputCollector stormOutputCollector = new MockedStormAlertOutputCollector(null);
-        AlertBoltOutputCollectorThreadSafeWrapper alertBoltOutputCollectorWrapper = new AlertBoltOutputCollectorThreadSafeWrapper(stormOutputCollector);
+        AlertBoltOutputCollectorThreadSafeWrapper alertBoltOutputCollectorWrapper = new AlertBoltOutputCollectorThreadSafeWrapper(new StormOutputCollector(stormOutputCollector));
         alertBoltOutputCollectorWrapper.emit(create("mockAlert_1"));
         alertBoltOutputCollectorWrapper.emit(create("mockAlert_2"));
         Assert.assertEquals(0, stormOutputCollector.getCollected().size());

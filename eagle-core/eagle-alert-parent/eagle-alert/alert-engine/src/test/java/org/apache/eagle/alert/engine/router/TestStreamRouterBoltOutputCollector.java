@@ -34,6 +34,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
+import org.apache.eagle.alert.engine.router.impl.StormOutputCollector;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterBoltOutputCollector;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class TestStreamRouterBoltOutputCollector {
         StreamPartition partition = new StreamPartition();
         partition.setStreamId(streamId);
         partition.setType(StreamPartition.Type.GROUPBY);
-        partition.setColumns(new ArrayList<String>(){{
+        partition.setColumns(new ArrayList<String>() {{
             add("col1");
         }});
 
@@ -63,22 +64,26 @@ public class TestStreamRouterBoltOutputCollector {
 
         PolicyWorkerQueue queue1 = new PolicyWorkerQueue();
         queue1.setPartition(partition);
-        queue1.setWorkers(new ArrayList<WorkSlot>(){ {
-            add(worker1);
-        }} );
+        queue1.setWorkers(new ArrayList<WorkSlot>() {
+            {
+                add(worker1);
+            }
+        });
 
         PolicyWorkerQueue queue2 = new PolicyWorkerQueue();
         queue2.setPartition(partition);
-        queue2.setWorkers(new ArrayList<WorkSlot>(){ {
-            add(worker1);
-            add(worker2);
-        }} );
+        queue2.setWorkers(new ArrayList<WorkSlot>() {
+            {
+                add(worker1);
+                add(worker2);
+            }
+        });
 
         StreamRouterSpec spec1 = new StreamRouterSpec();
         spec1.setStreamId(streamId);
         spec1.setPartition(partition);
 
-        spec1.setTargetQueue(new ArrayList<PolicyWorkerQueue>(){{
+        spec1.setTargetQueue(new ArrayList<PolicyWorkerQueue>() {{
             add(queue1);
         }});
 
@@ -86,7 +91,7 @@ public class TestStreamRouterBoltOutputCollector {
         spec2.setStreamId(streamId);
         spec2.setPartition(partition);
 
-        spec2.setTargetQueue(new ArrayList<PolicyWorkerQueue>(){{
+        spec2.setTargetQueue(new ArrayList<PolicyWorkerQueue>() {{
             add(queue2);
         }});
 
@@ -138,7 +143,7 @@ public class TestStreamRouterBoltOutputCollector {
 
         // create two events
         StreamEvent event1 = new StreamEvent();
-        Object[] data = new Object[] {"value1"};
+        Object[] data = new Object[]{"value1"};
         event1.setData(data);
         event1.setStreamId(streamId);
         PartitionedEvent pEvent1 = new PartitionedEvent();
@@ -146,7 +151,7 @@ public class TestStreamRouterBoltOutputCollector {
         pEvent1.setPartition(partition);
 
         StreamEvent event2 = new StreamEvent();
-        Object[] data2 = new Object[] {"value3"};
+        Object[] data2 = new Object[]{"value3"};
         event2.setData(data2);
         event2.setStreamId(streamId);
         PartitionedEvent pEvent2 = new PartitionedEvent();
@@ -156,7 +161,7 @@ public class TestStreamRouterBoltOutputCollector {
         TopologyContext context = Mockito.mock(TopologyContext.class);
         when(context.registerMetric(any(String.class), any(MultiCountMetric.class), any(int.class))).thenReturn(new MultiCountMetric());
         StreamContext streamContext = new StreamContextImpl(null, context.registerMetric("eagle.router", new MultiCountMetric(), 60), context);
-        StreamRouterBoltOutputCollector collector = new StreamRouterBoltOutputCollector("test", new OutputCollector(delegate), null, streamContext, null);
+        StreamRouterBoltOutputCollector collector = new StreamRouterBoltOutputCollector("test", new StormOutputCollector(new OutputCollector(delegate), null), null, streamContext);
 
         // add a StreamRouterSpec which has one worker
         collector.onStreamRouterSpecChange(list1, new ArrayList<>(), new ArrayList<>(), sds);
