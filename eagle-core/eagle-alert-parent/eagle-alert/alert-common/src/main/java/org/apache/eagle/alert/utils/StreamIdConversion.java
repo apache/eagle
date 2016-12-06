@@ -16,9 +16,13 @@
  */
 package org.apache.eagle.alert.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StreamIdConversion {
     public static final String STREAM_ID_TEMPLATE = "stream_%s_to_%s";
     public static final String STREAM_ID_NUM_TEMPLATE = "stream_%s";
+    private static final Pattern lastIntPattern = Pattern.compile("[^0-9]+([0-9]+)$");
 
     public static String generateStreamIdBetween(String sourceId, String targetId) {
         return String.format(STREAM_ID_TEMPLATE, sourceId, targetId);
@@ -30,4 +34,14 @@ public class StreamIdConversion {
     public static String generateStreamIdByPartition(int partitionNum) {
         return String.format(STREAM_ID_NUM_TEMPLATE, partitionNum);
     }
+
+    public static int getPartitionNumByTargetId(String sourceIdTotargetId) {
+        Matcher matcher = lastIntPattern.matcher(sourceIdTotargetId);
+        if (matcher.find()) {
+            String someNumberStr = matcher.group(1);
+            return Integer.parseInt(someNumberStr);
+        }
+        return -1;
+    }
+
 }

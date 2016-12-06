@@ -1,6 +1,8 @@
 package org.apache.eagle.alert.engine;
 
-public class SparkCountMetric implements StreamCounter {
+import java.io.Serializable;
+
+public class SparkCountMetric implements StreamCounter, Serializable {
     @Override
     public void incr(String scopeName) {
         // TODO: 11/30/16  use accumulator

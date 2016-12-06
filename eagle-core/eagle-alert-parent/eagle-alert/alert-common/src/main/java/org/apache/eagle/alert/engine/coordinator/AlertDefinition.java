@@ -16,11 +16,14 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import java.io.Serializable;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Objects;
 
-public class AlertDefinition {
+public class AlertDefinition implements Serializable {
+    private static final long serialVersionUID = -5913754026164532497L;
+
     private TemplateType templateType = TemplateType.TEXT;
     private String subject;
     private String body;
@@ -77,12 +80,12 @@ public class AlertDefinition {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(templateType)
-                .append(this.body)
-                .append(this.category)
-                .append(this.severity)
-                .append(this.subject)
-                .build();
+            .append(templateType)
+            .append(this.body)
+            .append(this.category)
+            .append(this.severity)
+            .append(this.subject)
+            .build();
     }
 
     @Override
@@ -95,10 +98,10 @@ public class AlertDefinition {
         }
         AlertDefinition another = (AlertDefinition) that;
         if (Objects.equals(another.templateType, this.templateType)
-                && Objects.equals(another.body, this.body)
-                && Objects.equals(another.category, this.category)
-                && Objects.equals(another.severity, this.severity)
-                && Objects.equals(another.subject, this.subject)) {
+            && Objects.equals(another.body, this.body)
+            && Objects.equals(another.category, this.category)
+            && Objects.equals(another.severity, this.severity)
+            && Objects.equals(another.subject, this.subject)) {
             return true;
         }
         return false;

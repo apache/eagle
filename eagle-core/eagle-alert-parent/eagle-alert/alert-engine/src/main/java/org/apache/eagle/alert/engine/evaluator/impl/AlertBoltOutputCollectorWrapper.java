@@ -16,24 +16,26 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
+import java.io.Serializable;
+import java.util.*;
+
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.router.StreamOutputCollector;
+import org.apache.eagle.alert.engine.router.impl.SparkOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 
-
-public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
+public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertBoltOutputCollectorWrapper.class);
 
     private final StreamOutputCollector delegate;
-    private final Object outputLock;
+    private final transient Object outputLock;
     private final StreamContext streamContext;
 
     private volatile Set<PublishPartition> publishPartitions;
@@ -45,6 +47,14 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
         this.streamContext = streamContext;
 
         this.publishPartitions = new HashSet<>();
+    }
+
+    public AlertBoltOutputCollectorWrapper(StreamOutputCollector outputCollector, StreamContext streamContext, Set<PublishPartition> publishPartitions) {
+        this.delegate = outputCollector;
+        this.outputLock = new Object();
+        this.streamContext = streamContext;
+
+        this.publishPartitions = publishPartitions;
     }
 
     @Override
@@ -83,6 +93,15 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     public void close() {
     }
 
+    public List emitAll() {
+        if (this.delegate instanceof SparkOutputCollector) {
+            SparkOutputCollector sparkOutputCollector = (SparkOutputCollector) delegate;
+            return sparkOutputCollector.flushAlertStreamEvent();
+        }
+        return Collections.emptyList();
+    }
+
+
     public synchronized void onAlertBoltSpecChange(Collection<PublishPartition> addedPublishPartitions,
                                                    Collection<PublishPartition> removedPublishPartitions,
                                                    Collection<PublishPartition> modifiedPublishPartitions) {
@@ -93,4 +112,7 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
         publishPartitions = clonedPublishPartitions;
     }
 
+    public Set<PublishPartition> getPublishPartitions() {
+        return this.publishPartitions;
+    }
 }

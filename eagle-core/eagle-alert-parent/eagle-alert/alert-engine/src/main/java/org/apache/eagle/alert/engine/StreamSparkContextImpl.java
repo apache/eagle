@@ -2,7 +2,9 @@ package org.apache.eagle.alert.engine;
 
 import com.typesafe.config.Config;
 
-public class StreamSparkContextImpl implements StreamContext {
+import java.io.Serializable;
+
+public class StreamSparkContextImpl implements StreamContext, Serializable {
 
     private final Config config;
     private final StreamCounter counter;

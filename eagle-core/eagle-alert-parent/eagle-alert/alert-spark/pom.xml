@@ -26,6 +26,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>alert-spark</artifactId>
+    <name>Eagle::Core::Alert::Engine::Spark</name>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
