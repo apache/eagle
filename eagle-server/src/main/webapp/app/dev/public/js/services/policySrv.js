@@ -74,7 +74,8 @@
 
 		Policy.publisherTypeList._then(function () {
 			$.each(Policy.publisherTypeList, function (i, type) {
-				Policy.publisherTypes[type.className] = type;
+				type.displayFields = type.displayFields || type.fields;
+				Policy.publisherTypes[type.type] = type;
 			});
 		});
 

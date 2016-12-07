@@ -128,10 +128,12 @@
 											{{publisher.name}}
 										</strong>
 									</span>
-									<p class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
-										<span>{{field}}:</span>
-										<span>{{publisher.properties[field]}}</span>
-									</p>
+									<ul>
+										<li class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
+											<span>{{field.name}}:</span>
+											<span>{{publisher.properties[field.name]}}</span>
+										</li>
+									</ul>
 								</li>
 							</ul>
 						</td>

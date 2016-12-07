@@ -284,6 +284,12 @@
 				$scope.addPublisherType = "new";
 			}
 
+			$.each(Policy.publisherTypeList, function (i, publisherType) {
+				$.each(publisherType.fields, function (j, field) {
+					if(field.value) $scope.publisher.properties[field.name] = field.value;
+				});
+			});
+
 			$(".modal[data-id='publisherMDL']").modal();
 		};
 
@@ -306,7 +312,7 @@
 			}
 			var properties = {};
 			$.each(Policy.publisherTypes[$scope.publisher.type].fields, function (i, field) {
-				properties[field] = $scope.publisher.properties[field] || "";
+				properties[field.name] = $scope.publisher.properties[field.name] || "";
 			});
 			$scope.policyPublisherList.push($.extend({}, $scope.publisher, {properties: properties}));
 		};

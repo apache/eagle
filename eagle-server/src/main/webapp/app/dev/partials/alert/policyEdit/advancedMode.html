@@ -203,10 +203,13 @@
 								{{publisher.name}}
 							</strong>
 						</span>
-						<p class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
-							<span>{{field}}:</span>
-							<span>{{publisher.properties[field]}}</span>
-						</p>
+
+						<ul>
+							<li class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
+								<span>{{field.name}}:</span>
+								<span>{{publisher.properties[field.name]}}</span>
+							</li>
+						</ul>
 					</li>
 					<li>
 						<a ng-click="addPublisher()">+ Add Publisher</a>
@@ -331,8 +334,8 @@
 						</select>
 					</div>
 					<div class="form-group" ng-repeat="field in Policy.publisherTypes[publisher.type].fields track by $index">
-						<label>{{field}}</label>
-						<input class="form-control" ng-model="publisher.properties[field]" />
+						<label>{{field.name}}</label>
+						<input class="form-control" ng-model="publisher.properties[field.name]" />
 					</div>
 				</div>
 			</div>
