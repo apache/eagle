@@ -134,8 +134,8 @@ public class JdbcImplTest {
         // publishmentType
         {
             PublishmentType publishmentType = new PublishmentType();
-            publishmentType.setType("KAFKA");
-            publishmentType.setClassName("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
+            publishmentType.setName("KAFKA");
+            publishmentType.setType("org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher");
             List<Map<String, String>> fields = new ArrayList<>();
             Map<String, String> field1 = new HashMap<>();
             field1.put("name", "kafka_broker");

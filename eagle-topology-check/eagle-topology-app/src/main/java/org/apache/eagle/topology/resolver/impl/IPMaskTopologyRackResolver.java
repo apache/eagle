@@ -44,12 +44,12 @@ public class IPMaskTopologyRackResolver implements TopologyRackResolver {
 
     @Override
     public String resolve(String hostname) {
-        String result = null;
+        String result = "null";
         try {
             InetAddress address = InetAddress.getByName(hostname);
             result = "rack" + (int) (address.getAddress()[rackPos] & 0xff);
         } catch (UnknownHostException e) {
-            LOG.error(e.getMessage(), e);
+            //LOG.warn("UnknownHostException: {}", hostname);
         }
         return result;
     }

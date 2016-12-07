@@ -50,9 +50,6 @@ public class MetadataUtils {
         if (t instanceof StreamDefinition) {
             return ((StreamDefinition) t).getStreamId();
         }
-        if (t instanceof PublishmentType) {
-            return ((PublishmentType) t).getType();
-        }
         if (t instanceof PolicyAssignment) {
             return ((PolicyAssignment) t).getPolicyName();
         }

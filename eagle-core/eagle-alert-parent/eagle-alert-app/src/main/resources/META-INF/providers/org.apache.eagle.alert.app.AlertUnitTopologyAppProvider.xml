@@ -96,6 +96,12 @@
             <required>false</required>
         </property>
         <property>
+            <name>spout.stormKafkaTransactionZkQuorum</name>
+            <displayName>Spout Transaction Zookeeper Quorum</displayName>
+            <description>Required if reuse broker zookeeper is false</description>
+            <required>false</required>
+        </property>
+        <property>
             <name>spout.stormKafkaTransactionZkPath</name>
             <displayName>Spout Transaction Zookeeper Path</displayName>
             <value>/consumers</value>
