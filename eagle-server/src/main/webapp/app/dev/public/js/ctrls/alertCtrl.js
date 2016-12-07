@@ -128,7 +128,7 @@
 		};
 	});
 
-	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity, Policy) {
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, $interval, PageConfig, Time, Entity, CompatibleEntity, Policy) {
 		PageConfig.title = "Policy";
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
@@ -180,7 +180,6 @@
 		}
 		updatePolicy();
 
-		// $scope.alertList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name) + "/alerts", {size: 1000});
 		$scope.alertList = CompatibleEntity.query("LIST", {
 			query: "AlertService",
 			condition: {policyId: $wrapState.param.name},
