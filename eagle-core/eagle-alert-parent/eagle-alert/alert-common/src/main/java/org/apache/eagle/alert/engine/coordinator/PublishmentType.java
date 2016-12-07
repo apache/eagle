@@ -27,12 +27,18 @@ import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublishmentType {
-
+    private String name;
     private String type;
-    private String className;
     private String description;
-
     private List<Map<String, String>> fields;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getType() {
         return type;
@@ -40,14 +46,6 @@ public class PublishmentType {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
     }
 
     public String getDescription() {
@@ -70,7 +68,7 @@ public class PublishmentType {
     public boolean equals(Object obj) {
         if (obj instanceof PublishmentType) {
             PublishmentType p = (PublishmentType) obj;
-            return (Objects.equals(className, p.getClassName())
+            return (Objects.equals(name, p.name)
                 && Objects.equals(type, p.type)
                 && Objects.equals(description, p.getDescription())
                 && Objects.equals(fields, p.getFields()));
@@ -81,7 +79,7 @@ public class PublishmentType {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(className)
+            .append(name)
             .append(type)
             .append(description)
             .append(fields)

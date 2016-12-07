@@ -167,7 +167,7 @@ public class MongoImplTest {
         // publishmentType
         {
             PublishmentType publishmentType = new PublishmentType();
-            publishmentType.setType("KAFKA");
+            publishmentType.setName("KAFKA");
             OpResult result = dao.addPublishmentType(publishmentType);
             Assert.assertEquals(200, result.code);
             List<PublishmentType> assigns = dao.listPublishmentType();

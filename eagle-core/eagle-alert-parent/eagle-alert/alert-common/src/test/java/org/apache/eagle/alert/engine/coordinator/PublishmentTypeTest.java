@@ -24,13 +24,13 @@ public class PublishmentTypeTest {
     @Test
     public void testPublishmentType() {
         PublishmentType publishmentType = new PublishmentType();
-        publishmentType.setType("KAFKA");
-        publishmentType.setClassName("setClassName");
+        publishmentType.setName("KAFKA");
+        publishmentType.setType("setClassName");
         publishmentType.setDescription("setDescription");
 
         PublishmentType publishmentType1 = new PublishmentType();
-        publishmentType1.setType("KAFKA");
-        publishmentType1.setClassName("setClassName");
+        publishmentType1.setName("KAFKA");
+        publishmentType1.setType("setClassName");
         publishmentType1.setDescription("setDescription");
 
         Assert.assertFalse(publishmentType.equals(new String("")));

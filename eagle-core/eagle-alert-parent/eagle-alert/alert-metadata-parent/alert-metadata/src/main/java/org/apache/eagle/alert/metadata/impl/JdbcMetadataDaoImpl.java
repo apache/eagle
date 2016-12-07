@@ -236,8 +236,8 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public OpResult removePublishmentType(String pubType) {
-        return handler.removeById(PublishmentType.class.getSimpleName(), pubType);
+    public OpResult removePublishmentType(String name) {
+        return handler.removeById(PublishmentType.class.getSimpleName(), name);
     }
 
     @Override

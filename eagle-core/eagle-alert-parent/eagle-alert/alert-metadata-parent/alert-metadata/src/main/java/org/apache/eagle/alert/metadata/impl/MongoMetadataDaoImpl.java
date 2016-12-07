@@ -155,14 +155,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         publishment.createIndex(doc, io);
         topologies = db.getCollection("topologies");
         topologies.createIndex(doc, io);
-
         publishmentType = db.getCollection("publishmentTypes");
-        {
-            IndexOptions io1 = new IndexOptions().background(true).unique(true).name("pubTypeIndex");
-            BsonDocument doc1 = new BsonDocument();
-            doc1.append("type", new BsonInt32(1));
-            publishmentType.createIndex(doc1, io1);
-        }
+        publishmentType.createIndex(doc, io);
 
         alerts = db.getCollection("alerts");
         {
@@ -225,8 +219,6 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         BsonDocument filter = new BsonDocument();
         if (t instanceof StreamDefinition) {
             filter.append("streamId", new BsonString(MetadataUtils.getKey(t)));
-        } else if (t instanceof PublishmentType) {
-            filter.append("type", new BsonString(MetadataUtils.getKey(t)));
         } else if (t instanceof AlertPublishEvent) {
             filter.append("alertId", new BsonString(MetadataUtils.getKey(t)));
         } else {

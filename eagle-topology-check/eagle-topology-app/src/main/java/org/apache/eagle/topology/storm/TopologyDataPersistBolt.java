@@ -87,7 +87,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             GenericServiceAPIResponseEntity<TopologyBaseAPIEntity> response = client.search().query(query).pageSize(Integer.MAX_VALUE).send();
             if (response.isSuccess() && response.getObj() != null) {
                 for (TopologyBaseAPIEntity entity : response.getObj()) {
-                    if (result.getSlaveNodes().size() > 0 && !availableHostnames.contains(generateKey(entity))) {
+                    if (!availableHostnames.isEmpty() && !availableHostnames.contains(generateKey(entity))) {
                         entitiesForDeletion.add(entity);
                     }
                 }
@@ -103,13 +103,17 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
     }
 
     private void filterEntitiesToWrite(TopologyEntityParserResult result, Set<String> availableHostnames, List<TopologyBaseAPIEntity> entitiesToWrite) {
-        for (TopologyBaseAPIEntity entity : result.getMasterNodes()) {
-            availableHostnames.add(generateKey(entity));
-            entitiesToWrite.add(entity);
-        }
-        for (TopologyBaseAPIEntity entity : result.getSlaveNodes()) {
-            availableHostnames.add(generateKey(entity));
-            entitiesToWrite.add(entity);
+        if (!result.getSlaveNodes().isEmpty()) {
+            for (TopologyBaseAPIEntity entity : result.getMasterNodes()) {
+                availableHostnames.add(generateKey(entity));
+                entitiesToWrite.add(entity);
+            }
+            for (TopologyBaseAPIEntity entity : result.getSlaveNodes()) {
+                availableHostnames.add(generateKey(entity));
+                entitiesToWrite.add(entity);
+            }
+        } else {
+            LOG.warn("Data is in an inconsistent state");
         }
     }
 
