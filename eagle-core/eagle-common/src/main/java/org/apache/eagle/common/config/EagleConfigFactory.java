@@ -43,6 +43,7 @@ public class EagleConfigFactory implements EagleConfig {
     private String storageType;
     private Config config;
     private TimeZone timeZone;
+    private boolean autoCreateTable = true;
 
     public boolean isCoprocessorEnabled() {
         return isCoprocessorEnabled;
@@ -102,6 +103,7 @@ public class EagleConfigFactory implements EagleConfig {
         final String zkZnodeParent = config.hasPath(EagleConfigConstants.SERVICE_ZOOKEEPER_ZNODE_PARENT)
             ? config.getString(EagleConfigConstants.SERVICE_ZOOKEEPER_ZNODE_PARENT) : EagleConfigConstants.DEFAULT_ZOOKEEPER_ZNODE_PARENT;
         String clientIPCPoolSize = getString(config, EagleConfigConstants.SERVICE_HBASE_CLIENT_IPC_POOL_SIZE, "10");
+        this.autoCreateTable = !config.hasPath(EagleConfigConstants.AUTO_CREATE_TABLE) || config.getBoolean(EagleConfigConstants.AUTO_CREATE_TABLE);
         this.hbaseConf = HBaseConfiguration.create();
         this.hbaseConf.set("hbase.client.ipc.pool.size", clientIPCPoolSize);
 
@@ -206,5 +208,14 @@ public class EagleConfigFactory implements EagleConfig {
     @Override
     public boolean isServiceAuditingEnabled() {
         return isServiceAuditingEnabled;
+    }
+
+    @Override
+    public boolean isAutoCreateTable() {
+        return autoCreateTable;
+    }
+
+    public void setAutoCreateTable(boolean autoCreateTable) {
+        this.autoCreateTable = autoCreateTable;
     }
 }

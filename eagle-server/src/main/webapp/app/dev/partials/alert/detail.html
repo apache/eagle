@@ -20,7 +20,7 @@
 	<div class="box-header with-border">
 		<span class="fa fa-bell"></span>
 		<h3 class="box-title">
-			ID: {{alert.tags.alertId}}
+			<strong>[{{alert.tags.category}}]</strong> {{alert.alertSubject}}
 			<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done"></span>
 		</h3>
 	</div>
@@ -28,53 +28,43 @@
 		<table class="table">
 			<tbody>
 				<tr>
-					<th width="15%">severity</th>
-					<td width="35%">
-						<span class="label label-{{Policy.getSeverityClass(alert.tags.severity)}}">
-							{{alert.tags.severity}}
-						</span>
-					</td>
+					<th>Severity</th>
+					<td><span class="label label-{{Policy.getSeverityClass(alert.tags.severity)}}">{{alert.tags.severity}}</span></td>
 					<th width="15%">Time</th>
 					<td width="35%">{{Time.format(alert.timestamp)}}</td>
 				</tr>
 				<tr>
-					<th>Policy</th>
-					<td><a ui-sref="policyDetail({name: item.policyId})">{{alert.tags.policyId}}</a></td>
 					<th>Category</th>
 					<td>{{alert.tags.category}}</td>
-				</tr>
-				<tr>
 					<th>Site</th>
 					<td>{{alert.tags.siteId}}</td>
-					<th>Applications</th>
-					<td>
-						<ul class="list-unstyled">
-							<li ng-repeat="app in alert.appIds track by $index" class="label label-sm label-primary">
-								{{Application.findProvider(app).type || app}}
-							</li>
-						</ul>
-					</td>
 				</tr>
 				<tr>
-					<th>Policy</th>
+					<th>Message</th>
 					<td colspan="3">
-						<pre class="inline">{{alert.policyValue}}</pre>
+						<div ng-bind-html="alertBody"></div>
 					</td>
 				</tr>
 				<tr>
-					<th>Alert Data</th>
+					<th>Alert Policy</th>
+					<td colspan="3"><a ui-sref="policyDetail({name: item.policyId})">{{alert.tags.policyId}}</a></td>
+				</tr>
+				<tr>
+					<th>Alert Event</th>
 					<td colspan="3">
 						<pre>{{alert.alertData | json}}</pre>
 					</td>
 				</tr>
 				<tr>
-					<th>Alert Subject</th>
-					<td colspan="3">{{alert.alertSubject}}</td>
-				</tr>
-				<tr>
-					<th>Alert Body</th>
+					<th>Related Apps</th>
 					<td colspan="3">
-						<div ng-bind-html="alertBody"></div>
+						<ul>
+							<ul class="list-unstyled">
+								<li ng-repeat="app in alert.appIds track by $index" class="label label-sm label-default">
+									{{Application.findProvider(app).type || app}}
+								</li>
+							</ul>
+						</ul>
 					</td>
 				</tr>
 			</tbody>
