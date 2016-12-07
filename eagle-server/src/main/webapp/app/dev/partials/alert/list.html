@@ -70,7 +70,7 @@
 							<!--</ul>-->
 						<!--</td>-->
 						<td>{{item.tags.category || "N/A"}}</td>
-						<td>{{item.alertSubject}}</td>
+						<td><a ui-sref="alertDetail({alertId: item.tags.alertId})" title="{{item.alertBody}}">{{item.alertSubject}}</a></td>
 						<!--td>{{item.streamId}}</td-->
 						<!--td class="text-break">
 							<span ng-if="displayType === 'raw'" na-block="item.alertData"></span>
@@ -87,7 +87,7 @@
 							<a ui-sref="policyDetail({name: item.tags.policyId})">{{item.tags.policyId}}</a>
 						</td>
 						<td>
-							<a ui-sref="alertDetail({alertId: item.tags.alertId})">Detail</a>
+							<a ui-sref="alertDetail({alertId: item.tags.alertId})">detail</a>
 						</td>
 					</tr>
 				</tbody>
