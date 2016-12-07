@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
@@ -42,12 +43,13 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
     private AtomicReference<PublishSpec> publishSpecRef;
     private PublishState publishState;
     private Map<String, Publishment> cachedPublishments = new HashMap<>();
-    private Map<PublishPartition, AlertPublishPlugin> publishPluginMapping = new HashMap<>();
+    private Config config;
 
-    public AlertPublisherBoltFunction(AtomicReference<PublishSpec> publishSpecRef, String alertPublishBoltName, PublishState publishState) {
+    public AlertPublisherBoltFunction(AtomicReference<PublishSpec> publishSpecRef, String alertPublishBoltName, PublishState publishState, Config config) {
         this.alertPublishBoltName = alertPublishBoltName;
         this.publishSpecRef = publishSpecRef;
         this.publishState = publishState;
+        this.config = config;
     }
 
     @Override
@@ -64,15 +66,13 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
         while (alertEvents.hasNext()) {
             if (alertPublisher == null) {
                 cachedPublishments = publishState.getCachedPublishmentsByPublishPartition(publishPartition);
-                publishPluginMapping = publishState.getPublishPluginMappingByPublishPartition(publishPartition);
 
-                alertPublisher = new AlertPublisherImpl(alertPublishBoltName, publishPluginMapping);
-                alertPublisher.init(null, new HashMap<>());
+                alertPublisher = new AlertPublisherImpl(alertPublishBoltName, cachedPublishments);
+                alertPublisher.init(config, new HashMap<>());
                 publishSpec = publishSpecRef.get();
 
                 onAlertPublishSpecChange(alertPublisher, publishSpec, cachedPublishments);
                 publishState.store(publishPartition, cachedPublishments);
-                publishState.storePublishPluginMapping(alertPublisher.getPublishPluginMapping());
             }
             AlertStreamEvent alertEvent = alertEvents.next();
             //TODO wrapAlertPublishEvent
@@ -93,10 +93,12 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
             LOG.info("no publishments with PublishSpec {} for this topology", pubSpec);
             return;
         }
+
         Map<String, Publishment> newPublishmentsMap = new HashMap<>();
         newPublishments.forEach(p -> newPublishmentsMap.put(p.getName(), p));
         MapComparator<String, Publishment> comparator = new MapComparator<>(newPublishmentsMap, cachedPublishments);
         comparator.compare();
+
         List<Publishment> beforeModified = new ArrayList<>();
         comparator.getModified().forEach(p -> beforeModified.add(cachedPublishments.get(p.getName())));
         alertPublisher.onPublishChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), beforeModified);

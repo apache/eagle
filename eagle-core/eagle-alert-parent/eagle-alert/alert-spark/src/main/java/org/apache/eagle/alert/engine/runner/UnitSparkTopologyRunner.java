@@ -182,7 +182,7 @@ public class UnitSparkTopologyRunner {
                 .groupByKey(new StreamRoutePartitioner(numOfAlertBolts))
                 .mapPartitionsToPair(new AlertBoltFunction(sdsRef, alertBoltSpecRef, policyState, siddhiState, publishState))
                 .groupByKey(numOfPublishTasks)
-                .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges, publishState, publishSpecRef));
+                .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges, publishState, publishSpecRef, config));
         return jssc;
     }
 

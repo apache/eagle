@@ -20,8 +20,6 @@ package org.apache.eagle.alert.engine.spark.model;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 
-import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
-import org.apache.eagle.alert.engine.spark.accumulator.MapAccum;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToSetAccum;
 import org.apache.spark.Accumulator;
@@ -40,23 +38,19 @@ public class PublishState implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(PublishState.class);
     private AtomicReference<Map<PublishPartition, Map<String, Publishment>>> cachedPublishmentsRef = new AtomicReference<>();
     private AtomicReference<Map<String, Set<PublishPartition>>> cachedPublishPartitionsRef = new AtomicReference<>();
-    private AtomicReference<Map<PublishPartition, AlertPublishPlugin>> publishPluginMappingRef = new AtomicReference<>();
 
 
     private Accumulator<Map<PublishPartition, Map<String, Publishment>>> cachedPublishmentsAccum;
 
     private Accumulator<Map<String, Set<PublishPartition>>> cachedPublishPartitionsAccum;
 
-    private Accumulator<Map<PublishPartition, AlertPublishPlugin>> publishPluginMappingAccum;
 
     public PublishState(JavaStreamingContext jssc) {
         Accumulator<Map<PublishPartition, Map<String, Publishment>>> cachedPublishmentsAccum = jssc.sparkContext().accumulator(new HashMap<>(), "cachedPublishmentsAccum", new MapToMapAccum());
         Accumulator<Map<String, Set<PublishPartition>>> cachedPublishPartitionsAccum = jssc.sparkContext().accumulator(new HashMap<>(), "cachedPublishPartitionsAccum", new MapToSetAccum());
-        Accumulator<Map<PublishPartition, AlertPublishPlugin>> publishPluginMappingAccum = jssc.sparkContext().accumulator(new HashMap<>(), "publishPluginMappingAccum", new MapAccum());
 
         this.cachedPublishmentsAccum = cachedPublishmentsAccum;
         this.cachedPublishPartitionsAccum = cachedPublishPartitionsAccum;
-        this.publishPluginMappingAccum = publishPluginMappingAccum;
     }
 
     public void recover() {
@@ -66,15 +60,8 @@ public class PublishState implements Serializable {
         cachedPublishPartitionsRef.set(cachedPublishPartitionsAccum.value());
         LOG.debug("---------cachedPublishPartitionsRef----------" + cachedPublishPartitionsRef.get());
 
-        publishPluginMappingRef.set(publishPluginMappingAccum.value());
-        LOG.debug("---------publishPluginMappingRef----------" + publishPluginMappingRef.get());
     }
 
-    public void storePublishPluginMapping(Map<PublishPartition, AlertPublishPlugin> publishPluginMapping) {
-        if (!publishPluginMapping.isEmpty()) {
-            publishPluginMappingAccum.add(publishPluginMapping);
-        }
-    }
 
     public void store(PublishPartition publishPartition, Map<String, Publishment> cachedPublishments) {
 
@@ -115,10 +102,6 @@ public class PublishState implements Serializable {
             cachedPublishPartitions = new HashSet<>();
         }
         return cachedPublishPartitions;
-    }
-
-    public Map<PublishPartition, AlertPublishPlugin> getPublishPluginMappingByPublishPartition(PublishPartition publishPartition) {
-        return publishPluginMappingRef.get();
     }
 
 }

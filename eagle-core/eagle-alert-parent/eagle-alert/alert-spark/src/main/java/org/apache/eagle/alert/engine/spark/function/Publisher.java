@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
+import com.typesafe.config.Config;
 import kafka.common.TopicAndPartition;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
@@ -44,21 +45,23 @@ public class Publisher implements VoidFunction<JavaPairRDD<PublishPartition, Ite
     private AtomicReference<OffsetRange[]> offsetRanges;
     private AtomicReference<PublishSpec> publishSpecRef;
     private PublishState publishState;
+    private Config config;
     private static final Logger LOG = LoggerFactory.getLogger(Publisher.class);
 
     public Publisher(String alertPublishBoltName, KafkaCluster kafkaCluster, String groupId, AtomicReference<OffsetRange[]> offsetRanges,
-                     PublishState publishState, AtomicReference<PublishSpec> publishSpecRef) {
+                     PublishState publishState, AtomicReference<PublishSpec> publishSpecRef, Config config) {
         this.alertPublishBoltName = alertPublishBoltName;
         this.kafkaCluster = kafkaCluster;
         this.groupId = groupId;
         this.offsetRanges = offsetRanges;
         this.publishSpecRef = publishSpecRef;
         this.publishState = publishState;
+        this.config = config;
     }
 
     @Override
     public void call(JavaPairRDD<PublishPartition, Iterable<AlertStreamEvent>> rdd) throws Exception {
-        rdd.foreachPartition(new AlertPublisherBoltFunction(publishSpecRef, alertPublishBoltName, publishState));
+        rdd.foreachPartition(new AlertPublisherBoltFunction(publishSpecRef, alertPublishBoltName, publishState, config));
         updateOffset();
     }
 

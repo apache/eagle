@@ -131,17 +131,17 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
 
 
         // update alert output collector
-        Set<PublishPartition> tempPublishPartitions = new HashSet<>();
+        Set<PublishPartition> newPublishPartitions = new HashSet<>();
         spec.getPublishPartitions().forEach(p -> {
             if (newPolicies.stream().filter(o -> o.getName().equals(p.getPolicyId())).count() > 0) {
-                tempPublishPartitions.add(p);
+                newPublishPartitions.add(p);
             }
         });
 
         Set<PublishPartition> cachedPublishPartitions = publishState.getCachedPublishPartitionsByBoltId(boltId);
-        Collection<PublishPartition> addedPublishPartitions = CollectionUtils.subtract(tempPublishPartitions, cachedPublishPartitions);
-        Collection<PublishPartition> removedPublishPartitions = CollectionUtils.subtract(cachedPublishPartitions, tempPublishPartitions);
-        Collection<PublishPartition> modifiedPublishPartitions = CollectionUtils.intersection(tempPublishPartitions, cachedPublishPartitions);
+        Collection<PublishPartition> addedPublishPartitions = CollectionUtils.subtract(newPublishPartitions, cachedPublishPartitions);
+        Collection<PublishPartition> removedPublishPartitions = CollectionUtils.subtract(cachedPublishPartitions, newPublishPartitions);
+        Collection<PublishPartition> modifiedPublishPartitions = CollectionUtils.intersection(newPublishPartitions, cachedPublishPartitions);
 
         LOG.debug("added PublishPartition " + addedPublishPartitions);
         LOG.debug("removed PublishPartition " + removedPublishPartitions);

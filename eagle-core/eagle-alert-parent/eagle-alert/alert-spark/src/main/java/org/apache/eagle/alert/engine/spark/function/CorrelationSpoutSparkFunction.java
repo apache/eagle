@@ -97,6 +97,9 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
         StreamEvent event = convertToStreamEventByStreamDefinition(timestamp, messageContent, sds.get(streamId));
 
         for (StreamRepartitionMetadata md : streamRepartitionMetadataList) {
+            if (!event.getStreamId().equals(md.getStreamId())) {
+                continue;
+            }
             // one stream may have multiple group-by strategies, each strategy is for a specific group-by
             for (StreamRepartitionStrategy groupingStrategy : md.groupingStrategies) {
                 int hash = 0;
@@ -110,6 +113,11 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
                     outputTuple2s.add(new Tuple2<>(mod, pEvent));
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Message filtered with mod {} not within range {} and {} for message {}", mod, groupingStrategy.startSequence,
+                                groupingStrategy.startSequence + numOfRouterBolts, tuple);
+                    }
                 }
             }
         }
