@@ -29,7 +29,8 @@
 				<thead>
 					<tr>
 						<th sortpath="policyStatus" width="10"></th>
-						<th sortpath="name" width="20%">Name</th>
+						<th sortpath="name" width="10%">Name</th>
+						<th width="150">Input Streams</th>
 						<th>Description</th>
 						<th width="85">Action</th>
 					</tr>
@@ -41,6 +42,13 @@
 						</td>
 						<td>
 							<a ui-sref="policyDetail({name: item.name})">{{item.name}}</a>
+						</td>
+						<td>
+							<ul class="no-margin list-unstyled">
+								<li ng-repeat="stream in item.inputStreams track by $index">
+									{{stream}}
+								</li>
+							</ul>
 						</td>
 						<td>{{item.description}}</td>
 						<td class="text-center">

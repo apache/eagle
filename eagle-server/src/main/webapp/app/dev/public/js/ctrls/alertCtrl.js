@@ -180,6 +180,47 @@
 		}
 		updatePolicy();
 
+		/*
+		 $scope.streamList = [];
+		 Entity.queryMetadata("streams")._then(function (res) {
+		 $scope.streamList = $.map(res.data, function (stream) {
+		 var application = Application.findProvider(stream.dataSource);
+		 return $.extend({application: application}, stream);
+		 });
+		 });
+
+		 $scope.dataSources = {};
+		 Entity.queryMetadata("datasources")._then(function(res) {
+		 $.each(res.data, function (i, dataSource) {
+		 $scope.dataSources[dataSource.name] = dataSource;
+		 });
+		 });
+		*/
+
+		var streams = {};
+		Entity.queryMetadata("datasources")._then(function(res) {
+			var dataSources = {};
+			$.each(res.data, function (i, dataSource) {
+				dataSources[dataSource.name] = dataSource;
+			});
+
+			Entity.queryMetadata("streams")._then(function (res) {
+				$.each(res.data, function (i, stream) {
+					streams[stream.streamId] = stream;
+					stream.dataSource = dataSources[stream.dataSource];
+				});
+			});
+		});
+
+		$scope.showDataSource = function (stream) {
+			var dataSource = streams[stream].dataSource;
+			$.dialog({
+				title: dataSource.name,
+				content: $("<pre class='text-break'>").html(JSON.stringify(dataSource, null, "\t")),
+				size: "large"
+			});
+		};
+
 		$scope.alertList = CompatibleEntity.query("LIST", {
 			query: "AlertService",
 			condition: {policyId: $wrapState.param.name},

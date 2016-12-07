@@ -100,6 +100,7 @@
 							<ul class="no-margin">
 								<li ng-repeat="stream in policy.inputStreams track by $index">
 									{{stream}}
+									<a class="fa fa-plug" uib-tooltip="Click to view data source" ng-click="showDataSource(stream)"></a>
 								</li>
 							</ul>
 						</td>
