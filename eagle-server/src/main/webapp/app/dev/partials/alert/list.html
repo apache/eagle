@@ -44,35 +44,34 @@
 							Time
 							<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done || isSorting"></span>
 						</th>
-						<th sortpath="tags.siteId" width="75">Site</th>
-						<th sortpath="tags.policyId" width="75">Policy</th>
 						<th sortpath="tags.severity" width="85">Severity</th>
+						<th sortpath="tags.siteId" width="75">Site</th>
 						<!--th sortpath="streamId" width="75">Stream</th-->
-						<th width="100">Application</th>
-						<th>Alert Subject</th>
+						<th width="100" sortpath="tags.category" >Category</th>
+						<th>Subject</th>
+						<th sortpath="tags.policyId" width="75">Policy</th>
 						<th width="10"></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td>{{Time.format(item.timestamp)}}</td>
-						<td>{{item.tags.siteId}}</td>
-						<td>
-							<a ui-sref="policyDetail({name: item.tags.policyId})">{{item.tags.policyId}}</a>
-						</td>
 						<td>
 							<span class="label label-{{Policy.getSeverityClass(item.tags.severity)}}">
 								{{item.tags.severity}}
 							</span>
 						</td>
+						<td>{{item.tags.siteId}}</td>
+						<!--<td>-->
+							<!--<ul class="list-unstyled">-->
+								<!--<li ng-repeat="app in item.appIds track by $index" class="label label-sm label-primary">-->
+									<!--{{Application.findProvider(app).type || app}}-->
+								<!--</li>-->
+							<!--</ul>-->
+						<!--</td>-->
+						<td>{{item.tags.category || "N/A"}}</td>
+						<td>{{item.alertSubject}}</td>
 						<!--td>{{item.streamId}}</td-->
-						<td>
-							<ul class="list-unstyled">
-								<li ng-repeat="app in item.appIds track by $index" class="label label-sm label-primary">
-									{{Application.findProvider(app).type || app}}
-								</li>
-							</ul>
-						</td>
 						<!--td class="text-break">
 							<span ng-if="displayType === 'raw'" na-block="item.alertData"></span>
 							<div ng-if="displayType === 'format'" na-block="!!item.alertData">
@@ -84,7 +83,9 @@
 								</ul>
 							</div>
 						</td-->
-						<td>{{item.alertSubject}}</td>
+						<td>
+							<a ui-sref="policyDetail({name: item.tags.policyId})">{{item.tags.policyId}}</a>
+						</td>
 						<td>
 							<a ui-sref="alertDetail({alertId: item.tags.alertId})">Detail</a>
 						</td>

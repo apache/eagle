@@ -57,4 +57,6 @@ public interface EagleConfig {
      * @return root config.
      */
     Config getConfig();
+
+    boolean isAutoCreateTable();
 }

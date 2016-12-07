@@ -32,6 +32,7 @@ public final class EagleConfigConstants {
     public static final String SERVICE_THREADPOOL_MAX_SIZE = "storage.hbase.threadpoolMaxSize";
     public static final String SERVICE_THREADPOOL_SHRINK_SIZE = "storage.hbase.threadpoolShrinkSize";
     public static final String SERVICE_AUDITING_ENABLED = "storage.hbase.auditEnabled";
+    public static final String AUTO_CREATE_TABLE = "storage.hbase.autoCreateTable";
 
     public static final String EAGLE_TIME_ZONE = "service.timezone";
     public static final String DEFAULT_EAGLE_TIME_ZONE = "UTC";
