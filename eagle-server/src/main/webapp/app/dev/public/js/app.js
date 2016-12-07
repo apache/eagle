@@ -256,12 +256,13 @@ var app = {};
 		// ======================================================================================
 		// =                                   Main Controller                                  =
 		// ======================================================================================
-		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Widget, Entity, Site, Application, UI, Time, Policy) {
+		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Widget, Entity, CompatibleEntity, Site, Application, UI, Time, Policy) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._PageConfig = $scope.PageConfig = PageConfig;
 			window._Portal = $scope.Portal = Portal;
 			window._Widget = $scope.Widget = Widget;
 			window._Entity = $scope.Entity = Entity;
+			window._CompatibleEntity = $scope.CompatibleEntity = CompatibleEntity;
 			window._Site = $scope.Site = Site;
 			window._Application = $scope.Application = Application;
 			window._UI = $scope.UI = UI;

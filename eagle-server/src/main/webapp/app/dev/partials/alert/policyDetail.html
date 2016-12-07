@@ -128,10 +128,12 @@
 											{{publisher.name}}
 										</strong>
 									</span>
-									<p class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
-										<span>{{field}}:</span>
-										<span>{{publisher.properties[field]}}</span>
-									</p>
+									<ul>
+										<li class="offset" ng-repeat="field in Policy.publisherTypes[publisher.type].displayFields track by $index">
+											<span>{{field.name}}:</span>
+											<span>{{publisher.properties[field.name]}}</span>
+										</li>
+									</ul>
 								</li>
 							</ul>
 						</td>
@@ -177,30 +179,22 @@
 				<table class="table table-bordered">
 					<thead>
 					<tr>
-						<th sortpath="alertTimestamp" width="135">
+						<th sortpath="timestamp" width="135">
 							Alert Time
 							<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done || isSorting"></span>
 						</th>
-						<th>Alert Data</th>
+						<th>Alert Subject</th>
 						<th width="10"></th>
 					</tr>
 					</thead>
 					<tbody>
 					<tr>
-						<td>{{Time.format(item.alertTimestamp)}}</td>
+						<td>{{Time.format(item.timestamp)}}</td>
 						<td class="text-break">
-							<span ng-if="displayType === 'raw'" na-block="item.alertData"></span>
-							<div ng-if="displayType === 'format'" na-block="!!item.alertData">
-								<ul>
-									<li ng-repeat="(key, value) in item.alertData track by $index">
-										<strong>{{key}}:</strong>
-										{{value}}
-									</li>
-								</ul>
-							</div>
+							{{item.alertSubject}}
 						</td>
 						<td>
-							<a ui-sref="alertDetail({alertId: item.alertId})">Detail</a>
+							<a ui-sref="alertDetail({alertId: item.tags.alertId})">Detail</a>
 						</td>
 					</tr>
 					</tbody>

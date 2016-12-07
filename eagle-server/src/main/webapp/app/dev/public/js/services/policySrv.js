@@ -22,8 +22,10 @@
 	var serviceModule = angular.module('eagle.service');
 
 	serviceModule.service('Policy', function($q, UI, Entity) {
-		return {
-			publisherTypes: {
+		var Policy = {
+			publisherTypes: {},
+			publisherTypeList: Entity.queryMetadata('publishmentTypes'),
+			/* publisherTypes: {
 				'org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher': {
 					name: "Email",
 					displayFields: ["recipients"],
@@ -44,7 +46,7 @@
 					displayFields: [],
 					fields: []
 				}
-			},
+			}, */
 
 			delete: function (policy) {
 				var deferred = $q.defer();
@@ -69,5 +71,27 @@
 				return Entity.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})._promise;
 			}
 		};
+
+		Policy.publisherTypeList._then(function () {
+			$.each(Policy.publisherTypeList, function (i, type) {
+				type.displayFields = type.displayFields || type.fields;
+				Policy.publisherTypes[type.type] = type;
+			});
+		});
+
+		Policy.getSeverityClass = function (severity) {
+			switch ((severity || "").toUpperCase()) {
+				case "WARNING":
+					return "warning";
+				case "CRITICAL":
+				case "FATAL":
+					return "danger";
+				case "OK":
+					return "success";
+			}
+			return "default";
+		};
+
+		return Policy;
 	});
 })();
