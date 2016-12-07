@@ -18,19 +18,23 @@
 
 package org.apache.eagle.jpm.util.jobrecover;
 
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
-import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.RetryNTimes;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.zookeeper.CreateMode;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class RunningJobManager implements Serializable {
     public static final Logger LOG = LoggerFactory.getLogger(RunningJobManager.class);
@@ -43,10 +47,10 @@ public class RunningJobManager implements Serializable {
 
     private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) {
         return CuratorFrameworkFactory.newClient(
-                zkQuorum,
-                zkSessionTimeoutMs,
-                15000,
-                new RetryNTimes(zkRetryTimes, zkRetryInterval)
+            zkQuorum,
+            zkSessionTimeoutMs,
+            15000,
+            new RetryNTimes(zkRetryTimes, zkRetryInterval)
         );
     }
 
@@ -63,9 +67,9 @@ public class RunningJobManager implements Serializable {
         try {
             if (curator.checkExists().forPath(this.zkRoot) == null) {
                 curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(this.zkRoot);
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(this.zkRoot);
             }
         } catch (Exception e) {
             LOG.warn("{}", e);
@@ -201,9 +205,9 @@ public class RunningJobManager implements Serializable {
             JSONObject object = new JSONObject(fields);
             if (curator.checkExists().forPath(path) == null) {
                 curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(path);
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path);
             }
             curator.setData().forPath(path, object.toString().getBytes("UTF-8"));
 
@@ -298,13 +302,19 @@ public class RunningJobManager implements Serializable {
         try {
             if (curator.checkExists().forPath(path) == null) {
                 curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(path);
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path);
             }
             curator.setData().forPath(path, lastFinishTime.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             LOG.error("failed to update last finish time {}", e);
+        }
+    }
+
+    public void close() {
+        if (curator != null) {
+            curator.close();
         }
     }
 }

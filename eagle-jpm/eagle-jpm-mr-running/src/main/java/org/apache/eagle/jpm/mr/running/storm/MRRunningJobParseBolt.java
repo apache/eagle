@@ -113,5 +113,6 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     @Override
     public void cleanup() {
         super.cleanup();
+        runningJobManager.close();
     }
 }

@@ -78,4 +78,8 @@ public class SparkRunningJobManager implements Serializable {
     public void delete(String yarnAppId, String jobId) {
         this.runningJobManager.delete(yarnAppId, jobId);
     }
+
+    public void close() {
+        this.runningJobManager.close();
+    }
 }

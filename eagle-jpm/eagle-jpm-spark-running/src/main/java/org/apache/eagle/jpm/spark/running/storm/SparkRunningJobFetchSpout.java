@@ -175,6 +175,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
 
     @Override
     public void close() {
+        this.sparkRunningJobManager.close();
 
     }
 }

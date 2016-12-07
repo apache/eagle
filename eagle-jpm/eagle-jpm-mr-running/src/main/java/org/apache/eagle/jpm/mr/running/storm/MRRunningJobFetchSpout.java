@@ -174,5 +174,6 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
 
     @Override
     public void close() {
+        this.runningJobManager.close();
     }
 }
