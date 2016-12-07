@@ -17,7 +17,7 @@
     }
   ],
   "filter": {
-    "beam_group_filter": ["hadoop","java.lang","java.nio"],
+    "bean_group_filter": ["hadoop","java.lang","java.nio"],
     "metric_name_filter": [
       "hadoop.memory.heapmemoryusage.used",
       "hadoop.memory.nonheapmemoryusage.used",

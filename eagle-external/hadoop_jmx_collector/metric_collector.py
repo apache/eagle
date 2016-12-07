@@ -359,7 +359,7 @@ class JmxMetricCollector(MetricCollector):
                 raise Exception("port not defined in " + str(input))
             if not input.has_key("https"):
                 input["https"] = False
-        self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('beam_group_filter')]
+        self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('bean_group_filter')]
         if config["env"].has_key("metric_prefix"):
             self.metric_prefix = config["env"]["metric_prefix"]
             logging.info("Override env.metric_prefix: " + self.metric_prefix + ", default: hadoop.")
