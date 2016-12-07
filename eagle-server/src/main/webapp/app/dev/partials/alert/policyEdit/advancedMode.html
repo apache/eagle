@@ -153,27 +153,39 @@
 					</li>
 				</ul>
 
+				<label>Alert Definition*</label><br/>
 				<div class="form-group">
-					<label>Alert Definition*</label><br/>
-					<span class="text-muted">Category</span>
+					<p class="text-muted">Category</p>
 					<input class="form-control" type="text" ng-model="policy.alertDefinition.category" ng-disabled="policyLock" />
-					<span class="text-muted">Severity</span>
+				</div>
+
+				<div class="form-group">
+					<p class="text-muted">Severity</p>
 					<select class="form-control" ng-model="policy.alertDefinition.severity" ng-disabled="policyLock" >
-						<option value="WARNING" class="text-warning">WARNING</option>
-						<option value="CRITICAL" class="text-danger">CRITICAL</option>
-						<option value="FATAL" class="text-danger">FATAL</option>
-						<option value="OK" class="text-success">OK</option>
+						<option value="WARNING" class="text-{{Policy.getSeverityClass('WARNING')}}">WARNING</option>
+						<option value="CRITICAL" class="text-{{Policy.getSeverityClass('CRITICAL')}}">CRITICAL</option>
+						<option value="FATAL" class="text-{{Policy.getSeverityClass('FATAL')}}">FATAL</option>
+						<option value="OK" class="text-{{Policy.getSeverityClass('OK')}}">OK</option>
 					</select>
-					<span class="text-muted">Alert Subject</span>
-					<span class="fa fa-question-circle ng-scope"
-						  uib-tooltip="Alert subject, support template with alert stream fields and built-in context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
-					</span>
+				</div>
+
+				<div class="form-group">
+					<p class="text-muted">
+						Alert Subject
+						<span class="fa fa-question-circle ng-scope"
+							  uib-tooltip="Alert subject, support template with alert stream fields and built-in context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
+						</span>
+					</p>
 					<input type="text" class="form-control" placeholder="Please input alert subject (support template)" ng-model="policy.alertDefinition.subject" ng-disabled="policyLock"/>
-					<span class="text-muted">Alert Body</span>
-					<span class="fa fa-question-circle ng-scope"
-						  uib-tooltip="Alert body, support template with alert stream fields and built-in  context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
-					</span>
-					<!--<textarea class="form-control" rows="3" placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></textarea>-->
+				</div>
+
+				<div class="form-group">
+					<p class="text-muted">
+						Alert Body
+						<span class="fa fa-question-circle ng-scope"
+							  uib-tooltip="Alert body, support template with alert stream fields and built-in  context like: STREAM_ID, ALERT_ID, CREATED_BY, POLICY_ID, CREATED_TIMESTAMP, CREATED_TIME, ALERT_TIMESTAMP, ALERT_TIME, ALERT_SCHEMA, POLICY_DESC, POLICY_TYPE, POLICY_DEFINITION, POLICY_HANDLER">
+						</span>
+					</p>
 					<div editor placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></div>
 				</div>
 

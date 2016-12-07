@@ -57,8 +57,6 @@
 	});
 
 	function policyEditController(policy, $scope, $q, $wrapState, $timeout, PageConfig, Entity, Policy) {
-		$scope.publisherTypes = Policy.publisherTypes;
-
 		$scope.policy = policy;
 		$scope.policy = common.merge({
 			name: "",

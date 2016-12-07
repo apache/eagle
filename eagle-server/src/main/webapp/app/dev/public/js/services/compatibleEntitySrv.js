@@ -63,7 +63,7 @@
 			}).join(',');
 		}
 
-		CompatibleEntity.QUERY_LIST = '/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${size}&startTime=${startTime}&endTime=${endTime}';
+		CompatibleEntity.QUERY_LIST = '/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${size}';
 
 		CompatibleEntity.query = function (queryName, param) {
 			var list = [];
@@ -79,7 +79,12 @@
 					endTime: Time.format(param.endTime)
 				});
 
-				var url = common.template(CompatibleEntity["QUERY_" + queryName], myParam);
+				var url_tpl = CompatibleEntity["QUERY_" + queryName];
+				if(param.startTime || param.endTime) {
+					url_tpl += '&startTime=${startTime}&endTime=${endTime}';
+				}
+
+				var url = common.template(url_tpl, myParam);
 				return wrapList(list, $http.get(_host + url));
 			};
 

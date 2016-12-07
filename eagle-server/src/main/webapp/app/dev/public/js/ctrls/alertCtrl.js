@@ -24,16 +24,14 @@
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, Entity, CompatibleEntity, Time) {
+	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, CompatibleEntity, Time) {
 		PageConfig.title = "Alerts";
 
 		$scope.displayType = "raw";
-		//$scope.alertList = Entity.queryMetadata("alerts", {size: 10000});
 		$scope.alertList = CompatibleEntity.query("LIST", {
 			query: "AlertService",
-			condition: {siteId: ''},
-			startTime: Time().subtract(7, 'day'),
-			endTime: Time()
+			startTime: new Time().subtract(7, 'day'),
+			endTime: new Time()
 		});
 
 		// ================================================================
@@ -45,18 +43,28 @@
 		});
 	});
 
-	eagleControllers.controller('alertDetailCtrl', function ($scope, $wrapState, PageConfig, Entity) {
+	eagleControllers.controller('alertDetailCtrl', function ($sce, $scope, $wrapState, PageConfig, CompatibleEntity) {
 		PageConfig.title = "Alert Detail";
 
-		$scope.alertList = Entity.queryMetadata("alerts/" + encodeURIComponent($wrapState.param.alertId));
+		$scope.alertList = CompatibleEntity.query("LIST", {
+			query: "AlertService",
+			condition: { alertId: $wrapState.param.alertId }
+		});
 		$scope.alertList._then(function () {
 			$scope.alert = $scope.alertList[0];
+
 			if(!$scope.alert) {
 				$.dialog({
 					title: "OPS",
 					content: "Alert '" + $wrapState.param.alertId + "' not found!"
 				});
+				return;
 			}
+
+			$scope.alertBody = $sce.trustAsHtml(($scope.alert.alertBody + "")
+				.replace(/\\r/g, '\r')
+				.replace(/\\n/g, '\n')
+			);
 		});
 	});
 
@@ -172,7 +180,13 @@
 		}
 		updatePolicy();
 
-		$scope.alertList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name) + "/alerts", {size: 1000});
+		// $scope.alertList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name) + "/alerts", {size: 1000});
+		$scope.alertList = CompatibleEntity.query("LIST", {
+			query: "AlertService",
+			condition: {policyId: $wrapState.param.name},
+			startTime: new Time().subtract(7, 'day'),
+			endTime: new Time()
+		});
 
 		$scope.deletePolicy = function() {
 			Policy.delete($scope.policy).then(function () {

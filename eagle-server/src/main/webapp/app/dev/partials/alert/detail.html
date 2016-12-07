@@ -20,7 +20,7 @@
 	<div class="box-header with-border">
 		<span class="fa fa-bell"></span>
 		<h3 class="box-title">
-			ID: {{alert.alertId}}
+			ID: {{alert.tags.alertId}}
 			<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done"></span>
 		</h3>
 	</div>
@@ -28,20 +28,24 @@
 		<table class="table">
 			<tbody>
 				<tr>
-					<th width="15%">Policy</th>
-					<td width="35%"><a ui-sref="policyDetail({name: item.policyId})">{{alert.policyId}}</a></td>
-					<th width="15%">Id</th>
-					<td width="35%">{{alert.alertId}}</td>
+					<th width="15%">severity</th>
+					<td width="35%">
+						<span class="label label-{{Policy.getSeverityClass(alert.tags.severity)}}">
+							{{alert.tags.severity}}
+						</span>
+					</td>
+					<th width="15%">Time</th>
+					<td width="35%">{{Time.format(alert.timestamp)}}</td>
+				</tr>
+				<tr>
+					<th>Policy</th>
+					<td><a ui-sref="policyDetail({name: item.policyId})">{{alert.tags.policyId}}</a></td>
+					<th>Category</th>
+					<td>{{alert.tags.category}}</td>
 				</tr>
 				<tr>
 					<th>Site</th>
-					<td>{{alert.siteId}}</td>
-					<th>Time</th>
-					<td>{{Time.format(alert.alertTimestamp)}}</td>
-				</tr>
-				<tr>
-					<th>Stream</th>
-					<td>{{alert.streamId}}</td>
+					<td>{{alert.tags.siteId}}</td>
 					<th>Applications</th>
 					<td>
 						<ul class="list-unstyled">
@@ -52,9 +56,25 @@
 					</td>
 				</tr>
 				<tr>
-					<th>Alert Content</th>
+					<th>Policy</th>
+					<td colspan="3">
+						<pre class="inline">{{alert.policyValue}}</pre>
+					</td>
+				</tr>
+				<tr>
+					<th>Alert Data</th>
 					<td colspan="3">
 						<pre>{{alert.alertData | json}}</pre>
+					</td>
+				</tr>
+				<tr>
+					<th>Alert Subject</th>
+					<td colspan="3">{{alert.alertSubject}}</td>
+				</tr>
+				<tr>
+					<th>Alert Body</th>
+					<td colspan="3">
+						<div ng-bind-html="alertBody"></div>
 					</td>
 				</tr>
 			</tbody>
