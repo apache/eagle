@@ -29,18 +29,16 @@ import java.util.List;
 @Service(MetricSchemaEntity.METRIC_SCHEMA_SERVICE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"name","group"})
+@Tags({"metricName","metricType"})
 public class MetricSchemaEntity extends TaggedLogAPIEntity {
     static final String METRIC_SCHEMA_SERVICE = "MetricSchemaService";
-    public static final String METRIC_NAME_TAG = "name";
-    public static final String METRIC_GROUP_TAG = "group";
-
-    public static final String GENERIC_METRIC_VALUE_NAME = "value";
+    public static final String METRIC_NAME_TAG = "metricName";
+    public static final String METRIC_TYPE_TAG = "metricType";
 
     @Column("a")
-    private List<String> dimensions;
+    private List<String> dimensionFields;
     @Column("b")
-    private List<String> metrics;
+    private List<String> metricFields;
     @Column("c")
     private String description;
     @Column("d")
@@ -48,22 +46,22 @@ public class MetricSchemaEntity extends TaggedLogAPIEntity {
     @Column("e")
     private Long modifiedTimestamp;
 
-    public List<String> getDimensions() {
-        return dimensions;
+    public List<String> getDimensionFields() {
+        return dimensionFields;
     }
 
-    public void setDimensions(List<String> dimensions) {
-        this.dimensions = dimensions;
-        this.valueChanged("dimensions");
+    public void setDimensionFields(List<String> dimensionFields) {
+        this.dimensionFields = dimensionFields;
+        this.valueChanged("dimensionFields");
     }
 
-    public List<String> getMetrics() {
-        return metrics;
+    public List<String> getMetricFields() {
+        return metricFields;
     }
 
-    public void setMetrics(List<String> metrics) {
-        this.metrics = metrics;
-        this.valueChanged("metrics");
+    public void setMetricFields(List<String> metricFields) {
+        this.metricFields = metricFields;
+        this.valueChanged("metricFields");
     }
 
     public String getDescription() {

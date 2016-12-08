@@ -30,7 +30,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
         return environment.newApp(config)
             .fromStream("HADOOP_JMX_METRIC_STREAM")
             .saveAsMetric(MetricDefinition
-                .metricGroup("HADOOP_JMX_METRICS")
+                .metricType("HADOOP_JMX_METRICS")
                 .namedByField("metric")
                 .description("Hadoop JMX Metrics for monitoring services like HDFS (Namenode/DataNode), YARN, etc.")
                 .eventTimeByField("timestamp")

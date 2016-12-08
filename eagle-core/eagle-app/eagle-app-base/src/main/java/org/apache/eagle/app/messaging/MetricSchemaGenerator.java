@@ -36,6 +36,7 @@ import java.util.*;
 public class MetricSchemaGenerator extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MetricSchemaGenerator.class);
     private static int MAX_CACHE_LENGTH = 1000;
+    public static final String GENERIC_METRIC_VALUE_NAME = "value";
 
     private final HashSet<String> metricNameCache = new HashSet<>(MAX_CACHE_LENGTH);
     private final MetricDefinition metricDefinition;
@@ -95,12 +96,12 @@ public class MetricSchemaGenerator extends BaseRichBolt {
         MetricSchemaEntity schemaEntity = new MetricSchemaEntity();
         schemaEntity.setTags(new HashMap<String, String>() {{
             put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
-            put(MetricSchemaEntity.METRIC_GROUP_TAG, metricDefinition.getMetricGroup());
+            put(MetricSchemaEntity.METRIC_TYPE_TAG, metricDefinition.getMetricType());
         }});
         schemaEntity.setDescription(metricDefinition.getMetricDescription());
         schemaEntity.setGranularityByField(metricDefinition.getGranularity());
-        schemaEntity.setDimensions(metricDefinition.getDimensionFields());
-        schemaEntity.setMetrics(Arrays.asList(MetricSchemaEntity.GENERIC_METRIC_VALUE_NAME));
+        schemaEntity.setDimensionFields(metricDefinition.getDimensionFields());
+        schemaEntity.setMetricFields(Collections.singletonList(GENERIC_METRIC_VALUE_NAME));
         schemaEntity.setModifiedTimestamp(System.currentTimeMillis());
         this.client.send(Collections.singletonList(schemaEntity));
     }
