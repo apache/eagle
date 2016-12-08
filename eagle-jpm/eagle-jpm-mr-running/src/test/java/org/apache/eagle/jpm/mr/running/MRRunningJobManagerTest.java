@@ -26,7 +26,10 @@ import org.apache.curator.utils.CloseableUtils;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.zookeeper.CreateMode;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -66,6 +69,12 @@ public class MRRunningJobManagerTest {
     @BeforeClass
     public static void setupZookeeper() throws Exception {
         zk = new TestingServer();
+        curator = CuratorFrameworkFactory.newClient(zk.getConnectString(), new ExponentialBackoffRetry(1000, 3));
+        curator.start();
+        curator.create()
+            .creatingParentsIfNeeded()
+            .withMode(CreateMode.PERSISTENT)
+            .forPath(SHARE_RESOURCES);
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
         zkStateConfig = mrRunningJobConfig.getZkStateConfig();
         zkStateConfig.zkQuorum = zk.getConnectString();
@@ -76,23 +85,6 @@ public class MRRunningJobManagerTest {
 
     @AfterClass
     public static void teardownZookeeper() throws Exception {
-        CloseableUtils.closeQuietly(zk);
-    }
-
-    @Before
-    public void createPath() throws Exception {
-        curator = CuratorFrameworkFactory.newClient(zk.getConnectString(), new ExponentialBackoffRetry(1000, 3));
-        curator.start();
-        if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
-            curator.create()
-                .creatingParentsIfNeeded()
-                .withMode(CreateMode.PERSISTENT)
-                .forPath(SHARE_RESOURCES);
-        }
-    }
-
-    @After
-    public void cleanPath() throws Exception {
         if (curator.checkExists().forPath(SHARE_RESOURCES) != null) {
             curator.delete().deletingChildrenIfNeeded().forPath(SHARE_RESOURCES);
         }
@@ -100,19 +92,24 @@ public class MRRunningJobManagerTest {
             curator.delete().deletingChildrenIfNeeded().forPath(LOCKS_BASE_PATH);
         }
         CloseableUtils.closeQuietly(curator);
+        CloseableUtils.closeQuietly(zk);
     }
 
     @Test
     public void testMRRunningJobManagerDelWithLock() throws Exception {
         Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
-
+        curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
         ExecutorService service = Executors.newFixedThreadPool(QTY);
         for (int i = 0; i < QTY; ++i) {
             Callable<Void> task = () -> {
                 try {
                     MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
                     for (int j = 0; j < REPETITIONS; ++j) {
-                        mrRunningJobManager.delete("yarnAppId", "jobId");
+                        if(j % 3 == 0) {
+                            mrRunningJobManager.recoverYarnApp("yarnAppId");
+                        } else {
+                            mrRunningJobManager.delete("yarnAppId", "jobId");
+                        }
                     }
                 } catch (Exception e) {
                     // log or do something
@@ -129,65 +126,6 @@ public class MRRunningJobManagerTest {
         verify(log, never()).error(anyString(), anyString(), anyString());
         verify(log, never()).error(anyString(), any(Throwable.class));
 
-    }
-
-    @Test
-    public void testMRRunningJobManagerRecoverYarnAppWithLock() throws Exception {
-        Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
-        curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
-        ExecutorService service = Executors.newFixedThreadPool(QTY);
-        for (int i = 0; i < QTY; ++i) {
-            Callable<Void> task = () -> {
-                try {
-                    MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
-                    for (int j = 0; j < REPETITIONS; ++j) {
-                        if(j % 3 == 0) {
-                            mrRunningJobManager.delete("yarnAppId", "jobId");
-                        } else {
-                            mrRunningJobManager.recoverYarnApp("yarnAppId");
-                        }
-                    }
-                } catch (Exception e) {
-                    // log or do something
-                }
-                return null;
-            };
-            service.submit(task);
-        }
-
-        service.shutdown();
-        service.awaitTermination(10, TimeUnit.MINUTES);
-        verify(log, never()).error(anyString(), any(Throwable.class));
-    }
-
-    @Test
-    @Ignore
-    public void testMRRunningJobManagerRecoverWithLock() throws Exception {
-        Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
-        curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
-        ExecutorService service = Executors.newFixedThreadPool(QTY);
-        for (int i = 0; i < QTY; ++i) {
-            Callable<Void> task = () -> {
-                try {
-                    MRRunningJobManager mrRunningJobManager = new MRRunningJobManager(zkStateConfig);
-                    for (int j = 0; j < REPETITIONS; ++j) {
-                        if(j % 3 == 0) {
-                            mrRunningJobManager.delete("yarnAppId", "jobId");
-                        } else {
-                            mrRunningJobManager.recover();
-                        }
-                    }
-                } catch (Exception e) {
-                    // log or do something
-                }
-                return null;
-            };
-            service.submit(task);
-        }
-
-        service.shutdown();
-        service.awaitTermination(10, TimeUnit.MINUTES);
-        verify(log, never()).error(anyString(), any(Throwable.class));
     }
 
     private byte[] generateZkSetData() throws IOException {
