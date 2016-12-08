@@ -135,14 +135,15 @@ public class PolicyDefinition implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(name)
-            .append(inputStreams)
-            .append(outputStreams)
-            .append(definition)
-            .append(partitionSpec)
-            .append(policyStatus)
-            .append(parallelismHint)
-            .build();
+                .append(name)
+                .append(inputStreams)
+                .append(outputStreams)
+                .append(definition)
+                .append(partitionSpec)
+                .append(policyStatus)
+                .append(parallelismHint)
+                .append(alertDefinition)
+                .build();
     }
 
     @Override
@@ -158,14 +159,15 @@ public class PolicyDefinition implements Serializable {
         PolicyDefinition another = (PolicyDefinition) that;
 
         if (Objects.equals(another.name, this.name)
-            && Objects.equals(another.description, this.description)
-            && CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams)
-            && CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams)
-            && (another.definition != null && another.definition.equals(this.definition))
-            && Objects.equals(this.definition, another.definition)
-            && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
-            && another.policyStatus.equals(this.policyStatus)
-            && another.parallelismHint == this.parallelismHint) {
+                && Objects.equals(another.description, this.description)
+                && CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams)
+                && CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams)
+                && (another.definition != null && another.definition.equals(this.definition))
+                && Objects.equals(this.definition, another.definition)
+                && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
+                && another.policyStatus.equals(this.policyStatus)
+                && another.parallelismHint == this.parallelismHint
+                && another.alertDefinition.equals(this.alertDefinition)) {
             return true;
         }
         return false;

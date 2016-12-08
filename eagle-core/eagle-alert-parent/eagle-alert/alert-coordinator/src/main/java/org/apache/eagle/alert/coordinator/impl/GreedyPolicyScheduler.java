@@ -306,7 +306,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
     private boolean isBoltAvailable(AlertBoltUsage boltUsage, PolicyDefinition def) {
         // overload or over policy # or already contains
         if (boltUsage == null || boltUsage.getLoad() > boltLoadUpbound
-            || boltUsage.getPolicies().size() > policiesPerBolt || boltUsage.getPolicies().contains(def.getName())) {
+            || boltUsage.getPolicies().size() >= policiesPerBolt || boltUsage.getPolicies().contains(def.getName())) {
             return false;
         }
         return true;
