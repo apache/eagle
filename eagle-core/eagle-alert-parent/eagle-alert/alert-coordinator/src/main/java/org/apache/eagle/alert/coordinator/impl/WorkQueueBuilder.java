@@ -53,7 +53,7 @@ public class WorkQueueBuilder {
         IWorkSlotStrategy strategy = new SameTopologySlotStrategy(context, stream.getStreamGroup(), mgmtService);
         List<WorkSlot> slots = strategy.reserveWorkSlots(size, isDedicated, properties);
         if (slots.size() < size) {
-            LOG.error("allocat stream work queue failed, required size");
+            LOG.error("allocate stream work queue failed, required size");
             return null;
         }
         StreamWorkSlotQueue queue = new StreamWorkSlotQueue(stream.getStreamGroup(), isDedicated, properties,

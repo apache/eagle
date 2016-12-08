@@ -133,11 +133,9 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         boolean isSuccess = false;
         String nodeKey;
         Map<String, MRServiceTopologyAPIEntity> nmMap = new HashMap<>();
+        Map<String, Integer> statusCount = new HashMap<>();
         try {
             YarnNodeInfoWrapper nodeWrapper = OBJ_MAPPER.readValue(is, YarnNodeInfoWrapper.class);
-            int runningNodeCount = 0;
-            int lostNodeCount = 0;
-            int unhealthyNodeCount = 0;
             int rackWarningCount = 0;
             final List<YarnNodeInfo> list = nodeWrapper.getNodes().getNode();
             for (YarnNodeInfo info : list) {
@@ -151,26 +149,28 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                     nodeManagerEntity.setHealthReport(info.getHealthReport());
                 }
                 if (info.getState() != null) {
-                    final String state = info.getState().toLowerCase();
+                    String state = info.getState().toLowerCase();
                     nodeManagerEntity.setStatus(state);
-                    if (state.equals(TopologyConstants.NODE_MANAGER_RUNNING_STATUS)) {
-                        ++runningNodeCount;
-                    } else if (state.equals(TopologyConstants.NODE_MANAGER_LOST_STATUS)) {
-                        ++lostNodeCount;
-                    } else if (state.equals(TopologyConstants.NODE_MANAGER_UNHEALTHY_STATUS)) {
-                        ++unhealthyNodeCount;
-                    }
+                } else {
+                    String state = "null";
+                    nodeManagerEntity.setStatus(state);
                 }
+
                 nodeKey = generateKey(nodeManagerEntity);
-                if (nmMap.containsKey(nodeKey) && nmMap.get(nodeKey).getLastUpdateTime() < nodeManagerEntity.getLastHealthUpdate()) {
-                    nmMap.put(nodeKey, nodeManagerEntity);
+                if (nmMap.containsKey(nodeKey)) {
+                    if (nmMap.get(nodeKey).getLastUpdateTime() < nodeManagerEntity.getLastHealthUpdate()) {
+                        updateStatusCount(statusCount, nmMap.get(nodeKey).getStatus(), -1);
+                        nmMap.put(nodeKey, nodeManagerEntity);
+                        updateStatusCount(statusCount, nodeManagerEntity.getStatus(), 1);
+                    }
                 } else {
                     nmMap.put(nodeKey, nodeManagerEntity);
+                    updateStatusCount(statusCount, nodeManagerEntity.getStatus(), 1);
                 }
             }
-            LOGGER.info("Total NMs: {}, Actual NMs: {}, Running NMs: {}, lost NMs: {}, unhealthy NMs: {}", list.size(), nmMap.size(), runningNodeCount, lostNodeCount, unhealthyNodeCount);
+            LOGGER.info("Total NMs: {}, Actual NMs: {}, Details: {}", list.size(), nmMap.size(), statusCount);
 
-            double value = runningNodeCount * 1d / nmMap.size();
+            double value = statusCount.get(NODE_MANAGER_RUNNING_STATUS) * 1d / nmMap.size();
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, value, site, timestamp));
             result.getSlaveNodes().addAll(nmMap.values());
             isSuccess = true;
@@ -178,6 +178,13 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
             URLResourceFetcher.closeInputStream(is);
         }
         return isSuccess;
+    }
+
+    private void updateStatusCount(Map<String, Integer> statusCount, String status, int increment) {
+        if (!statusCount.containsKey(status)) {
+            statusCount.put(status, 0);
+        }
+        statusCount.put(status, statusCount.get(status) + increment);
     }
 
     private String extractMasterHost(String url) {

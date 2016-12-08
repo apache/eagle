@@ -181,7 +181,11 @@ public class ScheduleContextBuilder {
         while (it.hasNext()) {
             MonitoredStream ms = it.next();
             Iterator<StreamWorkSlotQueue> queueIt = ms.getQueues().iterator();
-            // clean queue that underly topology is changed(removed/down)
+            Set<String> usedQueueSet = new HashSet<>();
+            assignments.values().stream().forEach(assignment -> usedQueueSet.add(assignment.getQueueId()));
+
+            // clean queues that underlying topology is changed(removed/down)
+            // clear queues that are no longer used
             while (queueIt.hasNext()) {
                 StreamWorkSlotQueue queue = queueIt.next();
                 boolean deprecated = false;
@@ -193,7 +197,7 @@ public class ScheduleContextBuilder {
                         break;
                     }
                 }
-                if (deprecated) {
+                if (deprecated || !usedQueueSet.contains(queue.getQueueId())) {
                     queueIt.remove();
                 }
             }
@@ -205,7 +209,7 @@ public class ScheduleContextBuilder {
     }
 
     private List<PolicyAssignment> detectAssignmentsChange(List<PolicyAssignment> list, ScheduleState state) {
-        // FIXME: duplciated build map ?
+        // FIXME: duplicated build map ?
         Map<String, StreamWorkSlotQueue> queueMap = new HashMap<String, StreamWorkSlotQueue>();
         for (MonitoredStream ms : state.getMonitoredStreams()) {
             for (StreamWorkSlotQueue q : ms.getQueues()) {

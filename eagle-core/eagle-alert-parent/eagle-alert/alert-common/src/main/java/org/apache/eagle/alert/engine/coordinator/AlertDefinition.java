@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class AlertDefinition {
     private TemplateType templateType = TemplateType.TEXT;
     private String subject;
@@ -68,5 +70,35 @@ public class AlertDefinition {
         TEXT,
         // FILE,
         // HTTP
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(templateType)
+                .append(this.body)
+                .append(this.category)
+                .append(this.severity)
+                .append(this.subject)
+                .build();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (that == this) {
+            return true;
+        }
+        if (!(that instanceof AlertDefinition)) {
+            return false;
+        }
+        AlertDefinition another = (AlertDefinition) that;
+        if (another.templateType.equals(this.templateType)
+                && another.body.equals(this.body)
+                && another.category.equals(this.category)
+                && another.severity.equals(this.severity)
+                && another.subject.equals(this.subject)) {
+            return true;
+        }
+        return false;
     }
 }

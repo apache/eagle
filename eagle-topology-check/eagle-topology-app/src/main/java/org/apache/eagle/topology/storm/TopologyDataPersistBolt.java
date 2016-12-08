@@ -148,7 +148,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             if (!response.isSuccess()) {
                 LOG.error("Got exception from eagle service: " + response.getException());
             } else {
-                LOG.info("Successfully wrote {} metrics for {}", entities.size(), serviceName);
+                LOG.info("Successfully wrote {} metrics for {}", metrics.size(), serviceName);
             }
         } catch (Exception e) {
             LOG.error("cannot create entities successfully", e);
