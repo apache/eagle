@@ -167,7 +167,7 @@ public class PolicyDefinition implements Serializable {
                 && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
                 && another.policyStatus.equals(this.policyStatus)
                 && another.parallelismHint == this.parallelismHint
-                && another.alertDefinition.equals(this.alertDefinition)) {
+                && Objects.equals(another.alertDefinition, alertDefinition)) {
             return true;
         }
         return false;
