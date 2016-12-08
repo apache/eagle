@@ -66,7 +66,7 @@
 						<ul class="nav navbar-nav">
 							<li class="dropdown time-picker" ng-if="Time.pickerType === Time.TIME_RANGE_PICKER">
 								<a data-toggle="dropdown" aria-expanded="false">
-									<i class="fa fa-calendar"></i>
+									<span class="fa fa-{{Time.autoRefresh ? 'refresh' : 'calendar'}}"></span>
 									{{Time.format("startTime", Time.SHORT_FORMAT)}} ~ {{Time.format("endTime", Time.SHORT_FORMAT)}}
 								</a>
 								<ul class="dropdown-menu">
@@ -75,6 +75,13 @@
 									<li><a ng-click="setLastDuration(12)"><i class="fa fa-clock-o"></i>Last 12 Hours</a></li>
 									<li><a ng-click="setLastDuration(24)"><i class="fa fa-clock-o"></i>Last 24 Hours</a></li>
 									<li><a ng-click="customizeTimeRange()"><i class="fa fa-clock-o"></i>Customize</a></li>
+									<li role="separator" class="divider"></li>
+									<li uib-tooltip="Enable will keep fetching latest data. Interval: every minute" tooltip-placement="left" tooltip-append-to-body="true">
+										<a ng-click="updateTimeAutoRefresh()">
+										<span class="fa" ng-class="Time.autoRefresh ? 'fa-check-square-o' : 'fa-square-o'"></span>
+										Auto Refresh
+									</a>
+									</li>
 								</ul>
 							</li>
 							<li class="hover-dropdown">
