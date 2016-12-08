@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
 import org.apache.eagle.app.utils.StreamConvertHelper;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -143,7 +144,7 @@ public class MetricStreamPersist extends BaseRichBolt  {
 
             GenericMetricEntity entity = new GenericMetricEntity();
             entity.setPrefix(metricName);
-            entity.setTimestamp(timestamp);
+            entity.setTimestamp(DateTimeUtil.roundDown(metricDefinition.getGranularity(), timestamp));
             entity.setTags(tags);
             entity.setValue(values);
             return entity;

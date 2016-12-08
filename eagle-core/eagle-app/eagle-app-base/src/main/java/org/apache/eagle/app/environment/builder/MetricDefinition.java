@@ -19,6 +19,7 @@ package org.apache.eagle.app.environment.builder;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,11 @@ public class MetricDefinition implements Serializable {
      * Metric dimension field name.
      */
     private List<String> dimensionFields;
+
+    /**
+     * Metric granularity.
+     */
+    private int granularity = Calendar.MINUTE;
 
     /**
      * Metric value field name.
@@ -76,6 +82,13 @@ public class MetricDefinition implements Serializable {
         this.timestampSelector = timestampSelector;
     }
 
+    public int getGranularity() {
+        return granularity;
+    }
+
+    public void setGranularity(int granularity) {
+        this.granularity = granularity;
+    }
 
     @FunctionalInterface
     public interface NameSelector extends Serializable {
@@ -91,6 +104,14 @@ public class MetricDefinition implements Serializable {
         MetricDefinition metricDefinition = new MetricDefinition();
         metricDefinition.setNameSelector(nameSelector);
         return metricDefinition;
+    }
+
+    /**
+     * @see java.util.Calendar
+     */
+    public MetricDefinition granularity(int granularity) {
+        this.setGranularity(granularity);
+        return this;
     }
 
     public static MetricDefinition namedByField(String nameField) {
