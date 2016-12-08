@@ -24,22 +24,35 @@
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, CompatibleEntity, Time) {
+	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig, CompatibleEntity, Time) {
 		PageConfig.title = "Alerts";
 
-		$scope.alertList = CompatibleEntity.query("LIST", {
-			query: "AlertService",
-			startTime: new Time().subtract(7, 'day'),
-			endTime: new Time()
-		});
+		$scope.alertList = [];
+		$scope.loading = false;
+
+		function loadAlerts() {
+			$scope.loading = true;
+			var list = CompatibleEntity.query("LIST", {
+				query: "AlertService",
+				startTime: new Time('startTime'),
+				endTime: new Time('endTime')
+			});
+			list._then(function () {
+				$scope.alertList = list;
+				$scope.loading = false;
+			});
+		}
+		loadAlerts();
+
+		Time.onReload(loadAlerts, $scope);
 
 		// ================================================================
 		// =                             Sync                             =
 		// ================================================================
-		var refreshInterval = $interval($scope.alertList._refresh, 1000 * 10);
+		/* var refreshInterval = $interval($scope.alertList._refresh, 1000 * 10);
 		$scope.$on('$destroy', function() {
 			$interval.cancel(refreshInterval);
-		});
+		}); */
 	});
 
 	eagleControllers.controller('alertDetailCtrl', function ($sce, $scope, $wrapState, PageConfig, CompatibleEntity) {

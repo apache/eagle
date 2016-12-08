@@ -118,10 +118,10 @@ var app = {};
 				})
 				// ================================= Alerts =================================
 				.state('alertList', {
-					url: "/alerts",
+					url: "/alerts?startTime&endTime",
 					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
 					controller: "alertListCtrl",
-					resolve: routeResolve()
+					resolve: routeResolve({ time: { autoRefresh: true } })
 				})
 				.state('policyList', {
 					url: "/policies",
@@ -326,6 +326,10 @@ var app = {};
 				$("#eagleStartTime").val(Time.format("startTime"));
 				$("#eagleEndTime").val(Time.format("endTime"));
 				$("#eagleTimeRangeMDL").modal();
+			};
+
+			$scope.updateTimeAutoRefresh = function () {
+				Time.autoRefresh = !Time.autoRefresh;
 			};
 
 			$scope.setLastDuration = function (hours) {

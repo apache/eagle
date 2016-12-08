@@ -26,6 +26,7 @@
 		["seconds", "s", "s"]
 	];
 
+	var autoGenerateTime = false;
 	var keepTime = false;
 	var serviceModule = angular.module('eagle.service');
 
@@ -96,6 +97,7 @@
 
 		$Time.TIME_RANGE_PICKER = "timeRange";
 		$Time.pickerType = null;
+		$Time.autoRefresh = false;
 		$Time._reloadListenerList = reloadListenerList;
 
 		// TODO: time zone
@@ -236,12 +238,21 @@
 		$Time.getPromise = function (config, state, param) {
 			var deferred = $q.defer();
 
+			var timeConfig = typeof config.time === true ? {} : config.time;
+
+			// Ignore time update if customise time set.
 			if(keepTime) {
+				// Update auto refresh mark if time is generated from promise
+				if(autoGenerateTime && timeConfig) {
+					$Time.autoRefresh = timeConfig.autoRefresh;
+				}
+
+				autoGenerateTime = false;
 				keepTime = false;
 				deferred.resolve($Time);
 			} else {
-				if (config.time === true) {
-					$Time.pickerType = $Time.TIME_RANGE_PICKER;
+				if (timeConfig) {
+					$Time.pickerType = timeConfig.type || $Time.TIME_RANGE_PICKER;
 
 					startTime = $Time.verifyTime(param.startTime);
 					endTime = $Time.verifyTime(param.endTime);
@@ -250,6 +261,7 @@
 						endTime = $Time();
 						startTime = endTime.clone().subtract(2, "hour");
 
+						autoGenerateTime = true;
 						keepTime = true;
 						$Time._innerSearch = {
 							startTime: $Time.format(startTime),
@@ -259,12 +271,33 @@
 				} else {
 					$Time._innerSearch = null;
 					$Time.pickerType = null;
+					$Time.autoRefresh = false;
 				}
 				deferred.resolve($Time);
 			}
 
 			return deferred.promise;
 		};
+
+		// Interval update
+		setInterval(function () {
+			if(!$Time.autoRefresh) return;
+
+			var interval = $Time.diff($Time('startTime'), $Time('endTime'));
+			var endTime = $Time();
+			var startTime = endTime.clone().subtract(interval, "ms");
+			$Time.timeRange(startTime, endTime);
+		}, 1000 * 60);
+
+		if(window.sessionStorage) {
+			$Time.autoRefresh = sessionStorage.getItem("timeAutoRefresh") === "true";
+		}
+
+		$(window).unload(function(){
+			if(window.sessionStorage) {
+				sessionStorage.setItem("timeAutoRefresh", $Time.autoRefresh);
+			}
+		});
 
 		return $Time;
 	});
