@@ -22,18 +22,6 @@
 		<h3 class="box-title">
 			Alert List
 		</h3>
-		<div class="box-tools pull-right" >
-			<div class="btn-group">
-				<button class="btn btn-default btn-sm" ng-class="{active: displayType === 'raw'}"
-						tooltip-append-to-body="true" uib-tooltip="raw data" ng-click="displayType = 'raw'">
-					<i class="fa fa-keyboard-o"></i>
-				</button>
-				<button class="btn btn-default btn-sm" ng-class="{active: displayType === 'format'}"
-						tooltip-append-to-body="true" uib-tooltip="format data" ng-click="displayType = 'format'">
-					<i class="fa fa-list"></i>
-				</button>
-			</div>
-		</div>
 	</div>
 	<div class="box-body">
 		<div sort-table="alertList" is-sorting="isSorting">

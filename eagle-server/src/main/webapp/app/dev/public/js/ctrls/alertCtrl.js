@@ -27,7 +27,6 @@
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, $interval, PageConfig, CompatibleEntity, Time) {
 		PageConfig.title = "Alerts";
 
-		$scope.displayType = "raw";
 		$scope.alertList = CompatibleEntity.query("LIST", {
 			query: "AlertService",
 			startTime: new Time().subtract(7, 'day'),
@@ -137,7 +136,6 @@
 		];
 
 		$scope.tab = "setting";
-		$scope.displayType = "raw";
 
 		$scope.setTab = function (tab) {
 			$scope.tab = tab;
@@ -179,23 +177,6 @@
 			});
 		}
 		updatePolicy();
-
-		/*
-		 $scope.streamList = [];
-		 Entity.queryMetadata("streams")._then(function (res) {
-		 $scope.streamList = $.map(res.data, function (stream) {
-		 var application = Application.findProvider(stream.dataSource);
-		 return $.extend({application: application}, stream);
-		 });
-		 });
-
-		 $scope.dataSources = {};
-		 Entity.queryMetadata("datasources")._then(function(res) {
-		 $.each(res.data, function (i, dataSource) {
-		 $scope.dataSources[dataSource.name] = dataSource;
-		 });
-		 });
-		*/
 
 		var streams = {};
 		Entity.queryMetadata("datasources")._then(function(res) {
