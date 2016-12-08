@@ -23,6 +23,8 @@ import org.apache.eagle.app.environment.builder.CEPFunction;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
 
+import java.util.Calendar;
+
 public class HadoopMetricMonitorApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
@@ -32,6 +34,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
                 .namedByField("metric")
                 .eventTimeByField("timestamp")
                 .dimensionFields("host","component","site")
+                .granularity(Calendar.MINUTE)
                 .valueField("value"))
             .toTopology();
     }
