@@ -91,5 +91,11 @@
                 <include>eagle-storage-hbase-*.jar</include>
             </includes>
         </fileSet>
+
+        <!-- copy collector scripts into /lib/scripts -->
+        <fileSet>
+            <directory>${project.basedir}/../eagle-external/hadoop_jmx_collector</directory>
+            <outputDirectory>lib/scripts/hadoop_jmx_collector</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
