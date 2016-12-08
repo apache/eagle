@@ -137,7 +137,6 @@ public class MRRunningJobManagerTest {
     }
 
     @Test
-    @Ignore
     public void testMRRunningJobManagerRecoverYarnAppWithLock() throws Exception {
         Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
         curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
@@ -167,6 +166,7 @@ public class MRRunningJobManagerTest {
     }
 
     @Test
+    @Ignore
     public void testMRRunningJobManagerRecoverWithLock() throws Exception {
         Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
         curator.setData().forPath(SHARE_RESOURCES, generateZkSetData());
