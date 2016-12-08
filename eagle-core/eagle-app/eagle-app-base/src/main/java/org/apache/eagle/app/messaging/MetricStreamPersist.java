@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +82,7 @@ public class MetricStreamPersist extends BaseRichBolt  {
                     LOG.error("Service side error: {}", response.getException());
                     collector.reportError(new IllegalStateException(response.getException()));
                 } else {
+                    collector.emit(Collections.singletonList(metricEntity.getPrefix()));
                     collector.ack(input);
                 }
             } else {
