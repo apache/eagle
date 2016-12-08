@@ -16,17 +16,16 @@
  */
 package org.apache.eagle.app.messaging;
 
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.entities.MetricSchemaEntity;
+import org.apache.eagle.metadata.model.MetricSchemaEntity;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
+import org.apache.eagle.service.client.impl.BatchSender;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +37,12 @@ public class MetricSchemaGenerator extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MetricSchemaGenerator.class);
     private static int MAX_CACHE_LENGTH = 1000;
 
+    private final HashSet<String> metricNameCache = new HashSet<>(MAX_CACHE_LENGTH);
     private final MetricDefinition metricDefinition;
     private final Config config;
+
     private OutputCollector collector;
-    private final HashSet<String> metricNameCache = new HashSet<>(MAX_CACHE_LENGTH);
-    private EagleServiceClientImpl client;
-    private static final HashMap<String, Class<?>> GENERIC_METRIC_VALUE_TYPES = new HashMap<String, Class<?>>() {{
-        put(MetricSchemaEntity.GENERIC_METRIC_VALUE_NAME, double.class);
-    }};
+    private BatchSender client;
 
     public MetricSchemaGenerator(MetricDefinition metricDefinition, Config config) {
         this.metricDefinition = metricDefinition;
@@ -55,13 +52,13 @@ public class MetricSchemaGenerator extends BaseRichBolt {
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
-        this.client = new EagleServiceClientImpl(config);
+        this.client = new EagleServiceClientImpl(config).batch(100);
     }
 
     @Override
     public void execute(Tuple input) {
         try {
-            String metricName = input.getString(0);
+            String metricName = input.getStringByField(MetricStreamPersist.METRIC_NAME_FIELD);
             synchronized (metricNameCache) {
                 if (!metricNameCache.contains(metricName)) {
                     createMetricSchemaEntity(metricName, this.metricDefinition);
@@ -83,18 +80,28 @@ public class MetricSchemaGenerator extends BaseRichBolt {
 
     }
 
+    @Override
+    public void cleanup() {
+        if(this.client != null) {
+            try {
+                this.client.close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage(),e );
+            }
+        }
+    }
+
     private void createMetricSchemaEntity(String metricName, MetricDefinition metricDefinition) throws IOException, EagleServiceClientException {
         MetricSchemaEntity schemaEntity = new MetricSchemaEntity();
         schemaEntity.setTags(new HashMap<String, String>() {{
-            put(MetricSchemaEntity.METRIC_NAME, metricName);
+            put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
+            put(MetricSchemaEntity.METRIC_GROUP_TAG, metricDefinition.getMetricGroup());
         }});
+        schemaEntity.setDescription(metricDefinition.getMetricDescription());
+        schemaEntity.setGranularityByField(metricDefinition.getGranularity());
         schemaEntity.setDimensions(metricDefinition.getDimensionFields());
-        schemaEntity.setMetrics(GENERIC_METRIC_VALUE_TYPES);
-        GenericServiceAPIResponseEntity<String> response = this.client.create(Collections.singletonList(schemaEntity));
-        if (response.isSuccess()) {
-            LOG.info("Successfully updated metric schema {}: {}", metricName, schemaEntity);
-        } else {
-            LOG.error("Server error: {}", response.getException());
-        }
+        schemaEntity.setMetrics(Arrays.asList(MetricSchemaEntity.GENERIC_METRIC_VALUE_NAME));
+        schemaEntity.setModifiedTimestamp(System.currentTimeMillis());
+        this.client.send(Collections.singletonList(schemaEntity));
     }
 }

@@ -37,13 +37,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MetricStreamPersist extends BaseRichBolt  {
     private static final Logger LOG = LoggerFactory.getLogger(MetricStreamPersist.class);
+    public static final String METRIC_NAME_FIELD = "metricName";
 
     private final Config config;
     private final MetricMapper mapper;
@@ -98,7 +98,7 @@ public class MetricStreamPersist extends BaseRichBolt  {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("f1"));
+        declarer.declare(new Fields(METRIC_NAME_FIELD));
     }
 
     @Override

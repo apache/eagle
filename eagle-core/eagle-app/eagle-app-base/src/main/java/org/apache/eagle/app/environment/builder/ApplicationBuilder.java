@@ -19,9 +19,11 @@ package org.apache.eagle.app.environment.builder;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.messaging.MetricSchemaGenerator;
 import org.apache.eagle.app.messaging.MetricStreamPersist;
 import org.apache.eagle.app.messaging.StormStreamSource;
 
@@ -65,7 +67,10 @@ public class ApplicationBuilder {
          * Persist source data stream as metric.
          */
         public BuilderContext saveAsMetric(MetricDefinition metricDefinition) {
-            topologyBuilder.setBolt(generateId("MetricPersist"), new MetricStreamPersist(metricDefinition, appConfig)).shuffleGrouping(getId());
+            String metricDataID = generateId("MetricDataSink");
+            String metricSchemaID = generateId("MetricSchemaGenerator");
+            topologyBuilder.setBolt(metricDataID, new MetricStreamPersist(metricDefinition, appConfig)).shuffleGrouping(getId());
+            topologyBuilder.setBolt(metricSchemaID, new MetricSchemaGenerator(metricDefinition,appConfig)).fieldsGrouping(metricDataID,new Fields(MetricStreamPersist.METRIC_NAME_FIELD));
             return this;
         }
 

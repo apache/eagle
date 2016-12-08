@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.entities;
+package org.apache.eagle.metadata.model;
 
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.util.List;
-import java.util.Map;
 
 @Table("eagle_metric")
 @ColumnFamily("f")
@@ -32,17 +32,21 @@ import java.util.Map;
 @Tags({"name","group"})
 public class MetricSchemaEntity extends TaggedLogAPIEntity {
     static final String METRIC_SCHEMA_SERVICE = "MetricSchemaService";
-    public static final String METRIC_NAME = "name";
-    public static final String METRIC_GROUP = "group";
+    public static final String METRIC_NAME_TAG = "name";
+    public static final String METRIC_GROUP_TAG = "group";
 
-    public static final String GENERIC_METRIC_VALUE_NAME = "name";
+    public static final String GENERIC_METRIC_VALUE_NAME = "value";
 
     @Column("a")
     private List<String> dimensions;
     @Column("b")
-    private Map<String,Class<?>> metrics;
+    private List<String> metrics;
     @Column("c")
     private String description;
+    @Column("d")
+    private String granularity;
+    @Column("e")
+    private Long modifiedTimestamp;
 
     public List<String> getDimensions() {
         return dimensions;
@@ -50,14 +54,16 @@ public class MetricSchemaEntity extends TaggedLogAPIEntity {
 
     public void setDimensions(List<String> dimensions) {
         this.dimensions = dimensions;
+        this.valueChanged("dimensions");
     }
 
-    public Map<String, Class<?>> getMetrics() {
+    public List<String> getMetrics() {
         return metrics;
     }
 
-    public void setMetrics(Map<String, Class<?>> metrics) {
+    public void setMetrics(List<String> metrics) {
         this.metrics = metrics;
+        this.valueChanged("metrics");
     }
 
     public String getDescription() {
@@ -66,5 +72,28 @@ public class MetricSchemaEntity extends TaggedLogAPIEntity {
 
     public void setDescription(String description) {
         this.description = description;
+        this.valueChanged("description");
+    }
+
+    public String getGranularity() {
+        return granularity;
+    }
+
+    public void setGranularity(String granularity) {
+        this.granularity = granularity;
+        this.valueChanged("granularity");
+    }
+
+    public void setGranularityByField(int granularity) {
+        setGranularity(DateTimeUtil.getCalendarFieldName(granularity));
+    }
+
+    public Long getModifiedTimestamp() {
+        return modifiedTimestamp;
+    }
+
+    public void setModifiedTimestamp(Long modifiedTimestamp) {
+        this.modifiedTimestamp = modifiedTimestamp;
+        this.valueChanged("modifiedTimestamp");
     }
 }

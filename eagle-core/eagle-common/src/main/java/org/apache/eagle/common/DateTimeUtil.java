@@ -142,6 +142,25 @@ public class DateTimeUtil {
         }
     }
 
+    public static String getCalendarFieldName(int field) {
+        switch (field) {
+            case Calendar.DAY_OF_MONTH:
+                return "DAY_OF_MONTH";
+            case Calendar.DAY_OF_WEEK:
+                return "DAY_OF_WEEK";
+            case Calendar.DAY_OF_YEAR:
+                return "DAY_OF_YEAR";
+            case Calendar.HOUR:
+                return "HOUR";
+            case Calendar.MINUTE:
+                return "MINUTE";
+            case Calendar.SECOND:
+                return "SECOND";
+            default:
+                throw new IllegalArgumentException("Unknown field code: " + field);
+        }
+    }
+
     public static String format(long milliseconds, String format) {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         sdf.setTimeZone(CURRENT_TIME_ZONE);

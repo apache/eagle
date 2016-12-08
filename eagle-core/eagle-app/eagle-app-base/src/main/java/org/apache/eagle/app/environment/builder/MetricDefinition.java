@@ -45,6 +45,9 @@ public class MetricDefinition implements Serializable {
      */
     private int granularity = Calendar.MINUTE;
 
+    private String metricDescription;
+    private String metricGroup = "DEFAULT";
+
     /**
      * Metric value field name.
      */
@@ -90,6 +93,23 @@ public class MetricDefinition implements Serializable {
         this.granularity = granularity;
     }
 
+    public String getMetricDescription() {
+        return metricDescription;
+    }
+
+    public void setMetricDescription(String metricDescription) {
+        this.metricDescription = metricDescription;
+    }
+
+    public String getMetricGroup() {
+        return metricGroup;
+    }
+
+    public void setMetricGroup(String metricGroup) {
+        this.metricGroup = metricGroup;
+    }
+
+
     @FunctionalInterface
     public interface NameSelector extends Serializable {
         String getMetricName(Map event);
@@ -100,10 +120,9 @@ public class MetricDefinition implements Serializable {
         Long getTimestamp(Map event);
     }
 
-    public static MetricDefinition namedBy(NameSelector nameSelector) {
-        MetricDefinition metricDefinition = new MetricDefinition();
-        metricDefinition.setNameSelector(nameSelector);
-        return metricDefinition;
+    public MetricDefinition namedBy(NameSelector nameSelector) {
+        this.setNameSelector(nameSelector);
+        return this;
     }
 
     /**
@@ -114,9 +133,14 @@ public class MetricDefinition implements Serializable {
         return this;
     }
 
-    public static MetricDefinition namedByField(String nameField) {
+    public MetricDefinition namedByField(String nameField) {
+        this.setNameSelector(new FieldNameSelector(nameField));
+        return this;
+    }
+
+    public static MetricDefinition metricGroup(String metricGroup) {
         MetricDefinition metricDefinition = new MetricDefinition();
-        metricDefinition.setNameSelector(new FieldNameSelector(nameField));
+        metricDefinition.setMetricGroup(metricGroup);
         return metricDefinition;
     }
 
@@ -127,6 +151,11 @@ public class MetricDefinition implements Serializable {
 
     public MetricDefinition dimensionFields(String... dimensionFields) {
         this.setDimensionFields(Arrays.asList(dimensionFields));
+        return this;
+    }
+
+    public MetricDefinition description(String metricDescription) {
+        this.setMetricDescription(metricDescription);
         return this;
     }
 
