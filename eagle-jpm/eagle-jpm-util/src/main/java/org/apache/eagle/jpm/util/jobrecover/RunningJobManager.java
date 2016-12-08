@@ -65,6 +65,7 @@ public class RunningJobManager implements Serializable {
         LOG.info("InterProcessMutex lock path is " + lockPath);
         lock = new InterProcessMutex(curator, lockPath);
         try {
+            lock.acquire();
             if (curator.checkExists().forPath(this.zkRoot) == null) {
                 curator.create()
                     .creatingParentsIfNeeded()
@@ -73,6 +74,12 @@ public class RunningJobManager implements Serializable {
             }
         } catch (Exception e) {
             LOG.warn("{}", e);
+        } finally {
+            try {
+                lock.release();
+            } catch (Exception e) {
+                LOG.error("fail releasing lock", e);
+            }
         }
     }
 

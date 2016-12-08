@@ -24,7 +24,6 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
-import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.zookeeper.CreateMode;
 import org.junit.*;
@@ -37,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,20 +54,18 @@ public class MRRunningJobManagerTest {
     private static TestingServer zk;
     private static com.typesafe.config.Config config = ConfigFactory.load();
     private static CuratorFramework curator;
-    private static final String SHARE_RESOURCES = "/apps/mr/running/sandbox/yarnAppId/jobId";
+    private static final String SHARE_RESOURCES = "/apps/mr/running/sandbox/jobs/yarnAppId/jobId";
     private static final int QTY = 5;
     private static final int REPETITIONS = QTY * 10;
     private static MRRunningJobConfig.EndpointConfig endpointConfig;
     private static MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private static org.slf4j.Logger log = mock(org.slf4j.Logger.class);
     private static final int BUFFER_SIZE = 4096;
-    private static final String LOCKS_BASE_PATH = "/locks";
+    private static final String LOCKS_BASE_PATH = "/apps/mr/running/sandbox/locks";
 
     @BeforeClass
     public static void setupZookeeper() throws Exception {
         zk = new TestingServer();
-        curator = CuratorFrameworkFactory.newClient(zk.getConnectString(), new ExponentialBackoffRetry(1000, 3));
-        curator.start();
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.newInstance(config);
         zkStateConfig = mrRunningJobConfig.getZkStateConfig();
         zkStateConfig.zkQuorum = zk.getConnectString();
@@ -81,12 +76,13 @@ public class MRRunningJobManagerTest {
 
     @AfterClass
     public static void teardownZookeeper() throws Exception {
-        CloseableUtils.closeQuietly(curator);
         CloseableUtils.closeQuietly(zk);
     }
 
     @Before
     public void createPath() throws Exception {
+        curator = CuratorFrameworkFactory.newClient(zk.getConnectString(), new ExponentialBackoffRetry(1000, 3));
+        curator.start();
         if(curator.checkExists().forPath(SHARE_RESOURCES) == null) {
             curator.create()
                 .creatingParentsIfNeeded()
@@ -101,13 +97,12 @@ public class MRRunningJobManagerTest {
             curator.delete().deletingChildrenIfNeeded().forPath(SHARE_RESOURCES);
         }
         if (curator.checkExists().forPath(LOCKS_BASE_PATH) != null) {
-            curator.delete().guaranteed().deletingChildrenIfNeeded().forPath(LOCKS_BASE_PATH);
+            curator.delete().deletingChildrenIfNeeded().forPath(LOCKS_BASE_PATH);
         }
+        CloseableUtils.closeQuietly(curator);
     }
 
-
     @Test
-    @Ignore
     public void testMRRunningJobManagerDelWithLock() throws Exception {
         Assert.assertTrue(curator.checkExists().forPath(SHARE_RESOURCES) != null);
 
