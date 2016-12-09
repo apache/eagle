@@ -59,13 +59,17 @@ PROGRAM="java $JVM_OPTS -cp $EAGLE_CLASSPATH org.apache.eagle.server.ServerMain 
 cd $DIR/../
 
 if [ ! -e ${DIR}/../run ]; then
-    mkdir ${DIR}/../run;
+    mkdir ${DIR}/../run
+fi
+
+if [ ! -e ${DIR}/../log ]; then
+    mkdir ${DIR}/../log
 fi
 
 start() {
     echo "Starting eagle service ..."
 	echo ${PROGRAM}
-	nohup ${PROGRAM} 1> ${DIR}/eagle-server.out & echo $! > $PIDFILE
+	nohup ${PROGRAM} 1> ${DIR}/../log/eagle-server.out 2>&1 & echo $! > $PIDFILE
 	if [ $? != 0 ];then
 		echo "Error: failed starting"
 		exit 1
