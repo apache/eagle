@@ -98,7 +98,6 @@ public class MetricSchemaGenerator extends BaseRichBolt {
         schemaEntity.setTags(schemaTags);
         schemaTags.put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
         schemaTags.put(MetricSchemaEntity.METRIC_TYPE_TAG, metricDefinition.getMetricType());
-        schemaEntity.setDescription(metricDefinition.getMetricDescription());
         schemaEntity.setGranularityByField(metricDefinition.getGranularity());
         schemaEntity.setDimensionFields(metricDefinition.getDimensionFields());
         schemaEntity.setMetricFields(Collections.singletonList(GENERIC_METRIC_VALUE_NAME));

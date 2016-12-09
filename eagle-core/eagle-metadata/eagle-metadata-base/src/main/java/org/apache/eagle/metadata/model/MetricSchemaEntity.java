@@ -40,10 +40,8 @@ public class MetricSchemaEntity extends TaggedLogAPIEntity {
     @Column("b")
     private List<String> metricFields;
     @Column("c")
-    private String description;
-    @Column("d")
     private String granularity;
-    @Column("e")
+    @Column("d")
     private Long modifiedTimestamp;
 
     public List<String> getDimensionFields() {
@@ -62,15 +60,6 @@ public class MetricSchemaEntity extends TaggedLogAPIEntity {
     public void setMetricFields(List<String> metricFields) {
         this.metricFields = metricFields;
         this.valueChanged("metricFields");
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-        this.valueChanged("description");
     }
 
     public String getGranularity() {

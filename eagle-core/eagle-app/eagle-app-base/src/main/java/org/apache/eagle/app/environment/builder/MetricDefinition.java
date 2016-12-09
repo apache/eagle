@@ -45,8 +45,6 @@ public class MetricDefinition implements Serializable {
      */
     private int granularity = Calendar.MINUTE;
 
-    private String metricDescription;
-
     private String metricType = "DEFAULT";
 
     /**
@@ -92,14 +90,6 @@ public class MetricDefinition implements Serializable {
 
     public void setGranularity(int granularity) {
         this.granularity = granularity;
-    }
-
-    public String getMetricDescription() {
-        return metricDescription;
-    }
-
-    public void setMetricDescription(String metricDescription) {
-        this.metricDescription = metricDescription;
     }
 
     public String getMetricType() {
@@ -152,11 +142,6 @@ public class MetricDefinition implements Serializable {
 
     public MetricDefinition dimensionFields(String... dimensionFields) {
         this.setDimensionFields(Arrays.asList(dimensionFields));
-        return this;
-    }
-
-    public MetricDefinition description(String metricDescription) {
-        this.setMetricDescription(metricDescription);
         return this;
     }
 
