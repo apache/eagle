@@ -94,10 +94,10 @@ public class MetricSchemaGenerator extends BaseRichBolt {
 
     private void createMetricSchemaEntity(String metricName, MetricDefinition metricDefinition) throws IOException, EagleServiceClientException {
         MetricSchemaEntity schemaEntity = new MetricSchemaEntity();
-        schemaEntity.setTags(new HashMap<String, String>() {{
-            put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
-            put(MetricSchemaEntity.METRIC_TYPE_TAG, metricDefinition.getMetricType());
-        }});
+        Map<String,String> schemaTags = new HashMap<>();
+        schemaEntity.setTags(schemaTags);
+        schemaTags.put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
+        schemaTags.put(MetricSchemaEntity.METRIC_TYPE_TAG, metricDefinition.getMetricType());
         schemaEntity.setDescription(metricDefinition.getMetricDescription());
         schemaEntity.setGranularityByField(metricDefinition.getGranularity());
         schemaEntity.setDimensionFields(metricDefinition.getDimensionFields());
