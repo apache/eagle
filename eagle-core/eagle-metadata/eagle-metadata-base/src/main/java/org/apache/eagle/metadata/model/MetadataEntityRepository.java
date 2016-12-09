@@ -19,9 +19,9 @@ package org.apache.eagle.metadata.model;
 
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public class AlertEntityRepository extends EntityRepository {
-
-    public AlertEntityRepository() {
+public class MetadataEntityRepository extends EntityRepository {
+    public MetadataEntityRepository() {
         registerEntity(AlertEntity.class);
+        registerEntity(MetricSchemaEntity.class);
     }
 }

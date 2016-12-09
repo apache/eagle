@@ -43,6 +43,7 @@ import java.util.Map;
 
 public class MetricStreamPersist extends BaseRichBolt  {
     private static final Logger LOG = LoggerFactory.getLogger(MetricStreamPersist.class);
+    public static final String METRIC_NAME_FIELD = "metricName";
 
     private final Config config;
     private final MetricMapper mapper;
@@ -82,6 +83,7 @@ public class MetricStreamPersist extends BaseRichBolt  {
                     LOG.error("Service side error: {}", response.getException());
                     collector.reportError(new IllegalStateException(response.getException()));
                 } else {
+                    collector.emit(Collections.singletonList(metricEntity.getPrefix()));
                     collector.ack(input);
                 }
             } else {
@@ -96,7 +98,7 @@ public class MetricStreamPersist extends BaseRichBolt  {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("f1"));
+        declarer.declare(new Fields(METRIC_NAME_FIELD));
     }
 
     @Override

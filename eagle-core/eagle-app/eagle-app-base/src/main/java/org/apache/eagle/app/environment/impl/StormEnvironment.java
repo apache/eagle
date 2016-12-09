@@ -48,6 +48,10 @@ public class StormEnvironment extends AbstractEnvironment {
         return new MetricStreamPersist(metricDefinition, config);
     }
 
+    public MetricSchemaGenerator getMetricSchemaGenerator(MetricDefinition metricDefinition, Config config) {
+        return new MetricSchemaGenerator(metricDefinition, config);
+    }
+
     public TransformFunctionBolt getTransformer(TransformFunction function) {
         return new TransformFunctionBolt(function);
     }

@@ -45,6 +45,8 @@ public class MetricDefinition implements Serializable {
      */
     private int granularity = Calendar.MINUTE;
 
+    private String metricType = "DEFAULT";
+
     /**
      * Metric value field name.
      */
@@ -90,6 +92,15 @@ public class MetricDefinition implements Serializable {
         this.granularity = granularity;
     }
 
+    public String getMetricType() {
+        return metricType;
+    }
+
+    public void setMetricType(String metricType) {
+        this.metricType = metricType;
+    }
+
+
     @FunctionalInterface
     public interface NameSelector extends Serializable {
         String getMetricName(Map event);
@@ -100,10 +111,9 @@ public class MetricDefinition implements Serializable {
         Long getTimestamp(Map event);
     }
 
-    public static MetricDefinition namedBy(NameSelector nameSelector) {
-        MetricDefinition metricDefinition = new MetricDefinition();
-        metricDefinition.setNameSelector(nameSelector);
-        return metricDefinition;
+    public MetricDefinition namedBy(NameSelector nameSelector) {
+        this.setNameSelector(nameSelector);
+        return this;
     }
 
     /**
@@ -114,9 +124,14 @@ public class MetricDefinition implements Serializable {
         return this;
     }
 
-    public static MetricDefinition namedByField(String nameField) {
+    public MetricDefinition namedByField(String nameField) {
+        this.setNameSelector(new FieldNameSelector(nameField));
+        return this;
+    }
+
+    public static MetricDefinition metricType(String metricType) {
         MetricDefinition metricDefinition = new MetricDefinition();
-        metricDefinition.setNameSelector(new FieldNameSelector(nameField));
+        metricDefinition.setMetricType(metricType);
         return metricDefinition;
     }
 
