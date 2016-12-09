@@ -198,7 +198,14 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                                 }
                                 for (Map.Entry<String, List<Variable>> entry : streamGroupBy.entrySet()) {
                                     if (entry.getValue().size() > 0) {
-                                        retrievePartition(generatePartition(entry.getKey(), null, Arrays.asList(entry.getValue().toArray(new Variable[entry.getValue().size()]))));
+                                        StreamPartition partition = generatePartition(entry.getKey(), null, Arrays.asList(entry.getValue().toArray(new Variable[entry.getValue().size()])));
+                                        if (((StateInputStream) inputStream).getStateType().equals(StateInputStream.Type.PATTERN)) {
+                                            if (effectivePartitions.containsKey(partition.getStreamId()) &&
+                                                    !effectivePartitions.get(partition.getStreamId()).equals(partition)) {
+                                                partition.setSortSpec(effectivePartitions.get(partition.getStreamId()).getSortSpec());
+                                            }
+                                        }
+                                        retrievePartition(partition);
                                     }
                                 }
                             }
@@ -295,10 +302,6 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
             StreamPartition existingPartition = effectivePartitions.get(partition.getStreamId());
             // If same Type & Columns but different sort spec, then use larger
             if (existingPartition.getType().equals(partition.getType())
-                    && ListUtils.isEqualList(existingPartition.getColumns(), partition.getColumns())
-                    && partition.getSortSpec() == null) {
-                LOG.info("use exist StreamPartition {}", existingPartition);
-            } else if (existingPartition.getType().equals(partition.getType())
                 && ListUtils.isEqualList(existingPartition.getColumns(), partition.getColumns())
                 && partition.getSortSpec().getWindowPeriodMillis() > existingPartition.getSortSpec().getWindowPeriodMillis()
                 || existingPartition.getType().equals(StreamPartition.Type.SHUFFLE)) {
