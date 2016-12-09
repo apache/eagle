@@ -83,11 +83,11 @@ public class MetricSchemaGenerator extends BaseRichBolt {
 
     @Override
     public void cleanup() {
-        if(this.client != null) {
+        if (this.client != null) {
             try {
                 this.client.close();
             } catch (IOException e) {
-                LOG.error(e.getMessage(),e );
+                LOG.error(e.getMessage(), e);
             }
         }
     }
