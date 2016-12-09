@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertBoltOutputCollectorWrapper.class);
+    private static final long serialVersionUID = -6208313761267299408L;
 
     private final StreamOutputCollector delegate;
     private final transient Object outputLock;

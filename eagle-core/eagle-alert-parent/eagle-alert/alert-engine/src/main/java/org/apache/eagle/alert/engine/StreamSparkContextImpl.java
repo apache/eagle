@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public class StreamSparkContextImpl implements StreamContext, Serializable {
 
+    private static final long serialVersionUID = -2769182688128199150L;
     private final Config config;
     private final StreamCounter counter;
 

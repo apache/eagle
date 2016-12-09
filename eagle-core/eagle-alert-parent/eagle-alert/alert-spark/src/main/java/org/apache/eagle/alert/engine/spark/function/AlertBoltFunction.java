@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, Iterable<PartitionedEvent>>>, PublishPartition, AlertStreamEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertBoltFunction.class);
+    private static final long serialVersionUID = -7876789777660951749L;
     private AtomicReference<Map<String, StreamDefinition>> sdsRef;
     private AtomicReference<AlertBoltSpec> alertBoltSpecRef;
     private PolicyState policyState;

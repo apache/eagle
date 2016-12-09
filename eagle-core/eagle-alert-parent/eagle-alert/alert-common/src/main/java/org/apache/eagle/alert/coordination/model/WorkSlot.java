@@ -26,6 +26,7 @@ import java.util.Objects;
  * A slot is simply a bolt.
  */
 public class WorkSlot implements Serializable {
+    private static final long serialVersionUID = 4095731835754790120L;
     public String topologyName;
     public String boltId;
 

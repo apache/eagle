@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * TODO: maybe need to synchronize time clock globally, how to?
  */
 public class StreamTimeClockInLocalMemory implements StreamTimeClock {
+    private static final long serialVersionUID = 4426801755375289391L;
     private final AtomicLong currentTime;
     private final String streamId;
 

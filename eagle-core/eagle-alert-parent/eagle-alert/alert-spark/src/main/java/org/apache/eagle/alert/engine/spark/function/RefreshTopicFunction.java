@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class RefreshTopicFunction implements Function<scala.collection.immutable.Map<TopicAndPartition, Object>, scala.collection.immutable.Map<TopicAndPartition, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RefreshTopicFunction.class);
+    private static final long serialVersionUID = 4839504785426527602L;
     private AtomicReference<HashSet<String>> topicsRef = new AtomicReference<>();
     private String groupId;
     private KafkaCluster kafkaCluster;

@@ -32,18 +32,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class PolicyState implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(PolicyState.class);
+    private static final long serialVersionUID = 5566434575066996563L;
 
     private AtomicReference<Map<String, Map<String, PolicyDefinition>>> cachedPoliciesRef = new AtomicReference<>();
 
-    private Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies;
+    private static volatile Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies;
 
     private AtomicReference<Map<String, Map<String, PolicyDefinition>>> policyDefinitionRef = new AtomicReference<>();
 
-    private Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition;
+    private static volatile  Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition;
 
     private AtomicReference<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandlerRef = new AtomicReference<>();
 
-    private Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler;
+    private static volatile  Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler;
 
     public PolicyState(JavaStreamingContext jssc) {
         Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies = jssc.sparkContext().accumulator(new HashMap<>(), "policyAccum", new MapToMapAccum());
@@ -54,12 +55,7 @@ public class PolicyState implements Serializable {
         this.policyStreamHandler = policyStreamHandler;
     }
 
-    public PolicyState(Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies, Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition,
-                       Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler) {
-        this.cachedPolicies = cachedPolicies;
-        this.policyDefinition = policyDefinition;
-        this.policyStreamHandler = policyStreamHandler;
-    }
+//TODO https://github.com/apache/spark/blob/branch-1.6/examples/src/main/java/org/apache/spark/examples/streaming/JavaRecoverableNetworkWordCount.java
 
     public void recover() {
         cachedPoliciesRef.set(cachedPolicies.value());

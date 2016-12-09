@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class RouteState implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RouteState.class);
+    private static final long serialVersionUID = -7072626425549872840L;
     private AtomicReference<Map<Integer, Map<StreamPartition, List<StreamRouterSpec>>>> routeSpecMapRef = new AtomicReference<>();
     private AtomicReference<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerMapRef = new AtomicReference<>();
     private AtomicReference<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSRef = new AtomicReference<>();

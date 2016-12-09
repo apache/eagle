@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<PublishPartition, Iterable<AlertStreamEvent>>>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherBoltFunction.class);
+    private static final long serialVersionUID = -7511209354198119133L;
     private String alertPublishBoltName = "alertPublishBolt";
     private AtomicReference<PublishSpec> publishSpecRef;
     private PublishState publishState;

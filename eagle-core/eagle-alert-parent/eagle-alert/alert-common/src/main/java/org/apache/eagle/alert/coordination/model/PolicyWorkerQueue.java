@@ -28,6 +28,7 @@ import java.util.Objects;
 
 public class PolicyWorkerQueue implements Serializable {
 
+    private static final long serialVersionUID = 7131985778900576114L;
     private StreamPartition partition;
     private List<WorkSlot> workers;
 

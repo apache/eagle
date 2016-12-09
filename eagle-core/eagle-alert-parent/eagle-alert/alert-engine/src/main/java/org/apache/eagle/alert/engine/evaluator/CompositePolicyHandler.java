@@ -34,6 +34,7 @@ import java.util.Map;
  */
 public class CompositePolicyHandler implements PolicyStreamHandler, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(CompositePolicyHandler.class);
+    private static final long serialVersionUID = 1675264959401583336L;
 
     private PolicyStreamHandler policyHandler;
     private PolicyStreamHandler stateHandler;

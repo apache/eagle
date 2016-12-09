@@ -36,6 +36,7 @@ import java.util.Set;
  * @since 4/25/16
  */
 public class Tuple2StreamMetadata implements Serializable {
+    private static final long serialVersionUID = -7297382393695816423L;
     /**
      * only messages belonging to activeStreamNames will be kept while
      * transforming tuple into stream.

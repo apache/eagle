@@ -37,6 +37,7 @@ import java.util.Set;
  * @since Apr 29, 2016
  */
 public class AlertBoltSpec implements Serializable {
+    private static final long serialVersionUID = 2162340930668474337L;
     private String version;
     private String topologyName;
 

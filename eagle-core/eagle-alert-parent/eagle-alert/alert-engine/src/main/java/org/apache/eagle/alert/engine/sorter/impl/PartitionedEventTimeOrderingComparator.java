@@ -27,6 +27,7 @@ import java.util.Objects;
  */
 public class PartitionedEventTimeOrderingComparator implements Comparator<PartitionedEvent>, Serializable {
     public static final PartitionedEventTimeOrderingComparator INSTANCE = new PartitionedEventTimeOrderingComparator();
+    private static final long serialVersionUID = 7692921764576899926L;
 
     @Override
     public int compare(PartitionedEvent o1, PartitionedEvent o2) {

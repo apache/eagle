@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StreamRepartitionStrategy implements Serializable {
+    private static final long serialVersionUID = -4144935009986769011L;
     public StreamPartition partition;
 
     public int numTotalParticipatingRouterBolts = 0;      // how many group-by bolts participate policy evaluation

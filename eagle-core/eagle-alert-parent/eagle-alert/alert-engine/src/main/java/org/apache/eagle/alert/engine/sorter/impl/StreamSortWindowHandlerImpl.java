@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 public class StreamSortWindowHandlerImpl implements StreamSortHandler, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
+    private static final long serialVersionUID = -1693911221403633869L;
     private StreamWindowManager windowManager;
     private StreamSortSpec streamSortSpecSpec;
     private transient PartitionedEventCollector outputCollector;

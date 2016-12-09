@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<String, String>>, JavaRDD<MessageAndMetadata<String, String>>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessSpecFunction.class);
+    private static final long serialVersionUID = 381513979960046346L;
 
     private AtomicReference<OffsetRange[]> offsetRanges;
     private AtomicReference<SpoutSpec> spoutSpecRef;

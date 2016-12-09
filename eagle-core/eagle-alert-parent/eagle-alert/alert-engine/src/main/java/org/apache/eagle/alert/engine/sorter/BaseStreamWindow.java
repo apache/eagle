@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * TODO: Leverage Off-Heap Memory to persist append-only events collection.
  */
 public abstract class BaseStreamWindow implements StreamWindow, Serializable {
+    private static final long serialVersionUID = -1282561522817906460L;
     private final long endTime;
     private final long startTime;
     private final long margin;

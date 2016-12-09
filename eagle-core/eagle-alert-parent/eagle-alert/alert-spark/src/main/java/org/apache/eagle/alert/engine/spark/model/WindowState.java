@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class WindowState implements Serializable {
 
+    private static final long serialVersionUID = 73740991245712886L;
     private AtomicReference<Map<Integer, Map<String, StreamTimeClock>>> streamTimeClockRef = new AtomicReference<>();
     private AtomicReference<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowRef = new AtomicReference<>();
     private AtomicReference<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersRef = new AtomicReference<>();

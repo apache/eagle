@@ -27,6 +27,7 @@ import java.util.List;
 
 public class PublishSpec implements Serializable {
 
+    private static final long serialVersionUID = -8393697498219611661L;
     private String topologyName;
     // actually only publish spec for one topology
     private String boltId;

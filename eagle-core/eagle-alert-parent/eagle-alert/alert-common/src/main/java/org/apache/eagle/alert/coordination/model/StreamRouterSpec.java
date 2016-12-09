@@ -32,6 +32,7 @@ import java.util.Objects;
  * <p>Key is StreamPartition.
  */
 public class StreamRouterSpec implements Serializable {
+    private static final long serialVersionUID = 2315916073754999809L;
     private String streamId;
     private StreamPartition partition; // The meta-data to build
     // StreamPartitioner

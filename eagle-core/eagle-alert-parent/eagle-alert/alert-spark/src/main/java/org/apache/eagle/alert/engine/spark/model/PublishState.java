@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class PublishState implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(PublishState.class);
+    private static final long serialVersionUID = 6228006353613787654L;
     private AtomicReference<Map<PublishPartition, Map<String, Publishment>>> cachedPublishmentsRef = new AtomicReference<>();
     private AtomicReference<Map<String, Set<PublishPartition>>> cachedPublishPartitionsRef = new AtomicReference<>();
 

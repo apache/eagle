@@ -39,6 +39,7 @@ import java.util.Map;
 
 public class SiddhiPolicyHandler implements PolicyStreamHandler, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SiddhiPolicyHandler.class);
+    private static final long serialVersionUID = -1776189674538990751L;
     private transient ExecutionPlanRuntime executionRuntime;
     private transient SiddhiManager siddhiManager;
     private Map<String, StreamDefinition> sds;

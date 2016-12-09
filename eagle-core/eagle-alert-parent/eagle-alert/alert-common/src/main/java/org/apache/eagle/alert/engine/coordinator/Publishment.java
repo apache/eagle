@@ -32,6 +32,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Publishment implements Serializable {
 
+    private static final long serialVersionUID = -1511651662462849661L;
     public static final String STREAM_NAME_DEFAULT = "_default";
 
     private String name;

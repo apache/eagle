@@ -28,6 +28,7 @@ import java.util.Map;
 
 
 public class RouterSpec implements Serializable {
+    private static final long serialVersionUID = 4222310571582403820L;
     private String version;
     private String topologyName;
 

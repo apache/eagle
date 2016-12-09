@@ -34,6 +34,7 @@ import java.util.List;
 public class SparkOutputCollector implements StreamOutputCollector, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkOutputCollector.class);
+    private static final long serialVersionUID = -2281194763112737786L;
 
     private final List<Tuple2<Integer, PartitionedEvent>> pevents = new LinkedList<>();
     private final List<Tuple2<PublishPartition, AlertStreamEvent>> alertEvents = new LinkedList<>();

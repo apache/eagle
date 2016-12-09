@@ -27,6 +27,7 @@ import java.util.List;
  * @since Apr 25, 2016
  */
 public class StreamRepartitionMetadata  implements Serializable {
+    private static final long serialVersionUID = 3266503520481808550L;
     private String topicName;
     private String streamId;
     /**

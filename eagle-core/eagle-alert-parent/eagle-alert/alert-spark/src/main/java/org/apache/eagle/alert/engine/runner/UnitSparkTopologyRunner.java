@@ -33,6 +33,7 @@ import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function0;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -46,10 +47,13 @@ import scala.Predef;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class UnitSparkTopologyRunner {
+public class UnitSparkTopologyRunner implements Serializable {
+
+    private static final long serialVersionUID = 381513979960046346L;
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkTopologyRunner.class);
     //kafka config
@@ -172,7 +176,7 @@ public class UnitSparkTopologyRunner {
                         publishState,
                         siddhiState,
                         numOfAlertBolts))
-                .mapToPair(km -> new Tuple2<>(km.topic(), km.message()));
+                .mapToPair((PairFunction<MessageAndMetadata<String, String>, String, String>) km -> new Tuple2<String, String>(km.topic(), km.message()));
 
         pairDStream
                 .window(Durations.seconds(windowDurations), Durations.seconds(slideDurations))

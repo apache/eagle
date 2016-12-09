@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Publisher implements VoidFunction<JavaPairRDD<PublishPartition, Iterable<AlertStreamEvent>>> {
 
+    private static final long serialVersionUID = 5514589101211710289L;
     private String alertPublishBoltName;
     private KafkaCluster kafkaCluster;
     private String groupId;

@@ -35,6 +35,7 @@ import java.util.*;
 
 public class StreamWindowManagerImpl implements StreamWindowManager, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(StreamWindowManagerImpl.class);
+    private static final long serialVersionUID = 1138105723533579373L;
     private final TreeMap<Long, StreamWindow> windowBuckets;
     private transient PartitionedEventCollector collector;
     private final Period windowPeriod;

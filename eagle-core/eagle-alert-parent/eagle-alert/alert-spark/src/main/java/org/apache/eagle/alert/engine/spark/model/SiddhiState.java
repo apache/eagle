@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class SiddhiState implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SiddhiState.class);
+    private static final long serialVersionUID = -2180409299871716057L;
     private AtomicReference<Map<Integer, Map<String, byte[]>>> siddhiSnapshot = new AtomicReference<>();
     private Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum;
 

@@ -20,6 +20,7 @@ package org.apache.eagle.alert.engine.spark.partition;
 import org.apache.spark.Partitioner;
 
 public class StreamRoutePartitioner extends Partitioner {
+    private static final long serialVersionUID = -3192081208500049000L;
     private int numParts;
 
     public StreamRoutePartitioner(int numParts) {

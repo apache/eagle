@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class BasicStreamRoutePartitioner implements StreamRoutePartitioner, Serializable {
+    private static final long serialVersionUID = 196127527722598918L;
     private final List<String> outputComponentIds;
     private final StreamDefinition streamDefinition;
     private final StreamPartition streamPartition;
