@@ -20,13 +20,15 @@ import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
+import java.util.Optional;
+
 public class HadoopQueueRunningAppProvider extends AbstractApplicationProvider<HadoopQueueRunningApp> {
     public HadoopQueueRunningApp getApplication() {
         return new HadoopQueueRunningApp();
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config) {
-        return new HadoopQueueRunningApplicationHealthCheck(config);
+    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+        return Optional.of(new HadoopQueueRunningApplicationHealthCheck(config));
     }
 }

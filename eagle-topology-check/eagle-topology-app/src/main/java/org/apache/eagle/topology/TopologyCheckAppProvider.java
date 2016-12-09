@@ -22,6 +22,8 @@ import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
+import java.util.Optional;
+
 public class TopologyCheckAppProvider extends AbstractApplicationProvider<TopologyCheckApp> {
     @Override
     public TopologyCheckApp getApplication() {
@@ -29,7 +31,7 @@ public class TopologyCheckAppProvider extends AbstractApplicationProvider<Topolo
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config) {
-        return new TopologyCheckApplicationHealthCheck(config);
+    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+        return Optional.of(new TopologyCheckApplicationHealthCheck(config));
     }
 }

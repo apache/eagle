@@ -21,6 +21,8 @@ import com.codahale.metrics.health.HealthCheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
+import java.util.Optional;
+
 public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<SparkHistoryJobApp> {
     @Override
     public SparkHistoryJobApp getApplication() {
@@ -28,7 +30,7 @@ public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<Spar
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config) {
-        return new SparkHistoryJobApplicationHealthCheck(config);
+    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+        return Optional.of(new SparkHistoryJobApplicationHealthCheck(config));
     }
 }
