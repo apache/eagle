@@ -35,7 +35,7 @@ public class MRHistoryJobApplicationProvider extends AbstractApplicationProvider
     }
 
     @Override
-    public HealthCheck getAppHealthCheck(Config config) {
-        return new MRHistoryJobApplicationHealthCheck(config);
+    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+        return Optional.of(new MRHistoryJobApplicationHealthCheck(config));
     }
 }

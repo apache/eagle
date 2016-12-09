@@ -44,7 +44,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private ApplicationHealthCheckPublisher applicationHealthCheckPublisher;
     private final Config config;
     private Environment environment;
-    private Map<String, HealthCheck> appHealthChecks = new HashMap<>();
+    private Map<String, Optional<HealthCheck>> appHealthChecks = new HashMap<>();
     private final Object lock = new Object();
     private int initialDelay = 10;
     private int period = 300;
@@ -118,12 +118,17 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
             return;
         }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
-        HealthCheck applicationHealthCheck = appProvider.getAppHealthCheck(
+        Optional<HealthCheck> applicationHealthCheck = appProvider.getAppHealthCheck(
                         ConfigFactory.parseMap(appEntity.getContext())
                         .withFallback(config)
                         .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration()))
         );
-        this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck);
+
+        if (!applicationHealthCheck.isPresent()) {
+            LOG.warn("application {} does not implement HealthCheck", appEntity.getAppId());
+            return;
+        }
+        this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck.get());
         currentInjector.injectMembers(applicationHealthCheck);
         synchronized (lock) {
             if (!appHealthChecks.containsKey(appEntity.getAppId())) {
@@ -165,7 +170,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         Map<String, HealthCheck> copyAppHealthChecks = new HashMap<>();
         synchronized (lock) {
             for (String appId : appHealthChecks.keySet()) {
-                copyAppHealthChecks.put(appId, appHealthChecks.get(appId));
+                copyAppHealthChecks.put(appId, appHealthChecks.get(appId).get());
             }
         }
 

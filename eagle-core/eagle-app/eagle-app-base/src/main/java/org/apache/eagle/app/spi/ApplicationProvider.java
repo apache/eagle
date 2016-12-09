@@ -72,12 +72,7 @@ public interface ApplicationProvider<T extends Application> {
      */
     void register(ModuleRegistry registry);
 
-    default HealthCheck getAppHealthCheck(Config config) {
-        return new HealthCheck() {
-            @Override
-            protected Result check() throws Exception {
-                return Result.healthy();
-            }
-        };
+    default Optional<HealthCheck> getAppHealthCheck(Config config) {
+        return Optional.empty();
     }
 }
