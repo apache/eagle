@@ -22,10 +22,11 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.MetricSchemaEntity;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
 import org.apache.eagle.service.client.EagleServiceClientException;
-import org.apache.eagle.service.client.impl.BatchSender;
+import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class MetricSchemaGenerator extends BaseRichBolt {
     private final Config config;
 
     private OutputCollector collector;
-    private BatchSender client;
+    private IEagleServiceClient client;
 
     public MetricSchemaGenerator(MetricDefinition metricDefinition, Config config) {
         this.metricDefinition = metricDefinition;
@@ -53,7 +54,7 @@ public class MetricSchemaGenerator extends BaseRichBolt {
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
-        this.client = new EagleServiceClientImpl(config).batch(100);
+        this.client = new EagleServiceClientImpl(config);
     }
 
     @Override
@@ -102,6 +103,12 @@ public class MetricSchemaGenerator extends BaseRichBolt {
         schemaEntity.setDimensionFields(metricDefinition.getDimensionFields());
         schemaEntity.setMetricFields(Collections.singletonList(GENERIC_METRIC_VALUE_NAME));
         schemaEntity.setModifiedTimestamp(System.currentTimeMillis());
-        this.client.send(Collections.singletonList(schemaEntity));
+        GenericServiceAPIResponseEntity<String> response = this.client.create(Collections.singletonList(schemaEntity));
+        if (response.isSuccess() && LOG.isDebugEnabled()) {
+            LOG.debug("Created {}", schemaEntity);
+        } else {
+            LOG.error("Failed to create {}", schemaEntity, response.getException());
+            throw new IOException("Service error: " + response.getException());
+        }
     }
 }
