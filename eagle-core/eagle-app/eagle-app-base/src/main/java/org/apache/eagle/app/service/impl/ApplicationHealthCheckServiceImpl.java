@@ -129,7 +129,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
             return;
         }
         this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck.get());
-        currentInjector.injectMembers(applicationHealthCheck);
+        currentInjector.injectMembers(applicationHealthCheck.get());
         synchronized (lock) {
             if (!appHealthChecks.containsKey(appEntity.getAppId())) {
                 appHealthChecks.put(appEntity.getAppId(), applicationHealthCheck);
