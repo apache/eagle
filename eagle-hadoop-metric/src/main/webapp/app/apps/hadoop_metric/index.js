@@ -1,0 +1,1 @@
+console.log("Loading HADOOP_METRIC_MONITOR: /apps/hadoop_metric");
