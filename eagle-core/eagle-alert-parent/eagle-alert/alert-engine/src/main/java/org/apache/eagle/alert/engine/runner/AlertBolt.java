@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,7 +104,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 pe.getEvent().setMetaVersion(specVersion);
             } else if (streamEventVersion != null && !streamEventVersion.equals(specVersion)) {
                 if (specVersion != null && streamEventVersion != null
-                        && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
+                    && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
                     // check if specVersion is older than stream_event_version
                     // Long timestamp_of_specVersion = Long.valueOf(specVersion.split("spec_version_")[1]);
                     // Long timestamp_of_streamEventVersion = Long.valueOf(stream_event_version.split("spec_version_")[1]);
@@ -194,6 +195,23 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         newPolicies.forEach(p -> newPoliciesMap.put(p.getName(), p));
         MapComparator<String, PolicyDefinition> comparator = new MapComparator<>(newPoliciesMap, cachedPolicies);
         comparator.compare();
+
+        MapComparator<String, StreamDefinition> streamComparator = new MapComparator<>(sds, sdf);
+        streamComparator.compare();
+
+        List<StreamDefinition> addOrUpdatedStreams = streamComparator.getAdded();
+        addOrUpdatedStreams.addAll(streamComparator.getModified());
+        List<PolicyDefinition> cachedPoliciesTemp = new ArrayList<>(cachedPolicies.values());
+        addOrUpdatedStreams.forEach(s -> {
+            cachedPoliciesTemp.stream().filter(p -> p.getInputStreams().contains(s.getStreamId())
+                || p.getOutputStreams().contains(s.getStreamId())).forEach(
+                    p -> {
+                        if (!comparator.getModified().contains(p) && !comparator.getAdded().contains(p)) {
+                            comparator.getModified().add(p);
+                        }
+                    });
+            ;
+        });
 
         policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
 

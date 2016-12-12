@@ -46,6 +46,8 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -65,6 +67,8 @@ import static org.mockito.Mockito.when;
 public class TestAlertBolt {
 
     public static final String TEST_STREAM = "test-stream";
+    
+    private static final Logger LOG = LoggerFactory.getLogger(TestAlertBolt.class);
 
     /**
      * Following knowledge is guaranteed in
@@ -442,6 +446,83 @@ public class TestAlertBolt {
         bolt.execute(t);
 
         Assert.assertTrue(recieved.get());
+    }
+    
+    @Test
+    public void testStreamDefinitionChange() throws IOException {
+        PolicyDefinition def = new PolicyDefinition();
+        def.setName("policy-definition");
+        def.setInputStreams(Arrays.asList(TEST_STREAM));
+
+        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
+        definition.setType(PolicyStreamHandlers.CUSTOMIZED_ENGINE);
+        definition.setHandlerClass("org.apache.eagle.alert.engine.router.CustomizedHandler");
+        definition.setValue("PT0M,plain,1,host,host1");
+        def.setDefinition(definition);
+        def.setPartitionSpec(Arrays.asList(createPartition()));
+
+        AlertBoltSpec boltSpecs = new AlertBoltSpec();
+
+        AtomicBoolean recieved = new AtomicBoolean(false);
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
+            @Override
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                recieved.set(true);
+                return Collections.emptyList();
+            }
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+            }
+
+            @Override
+            public void ack(Tuple input) {
+            }
+
+            @Override
+            public void fail(Tuple input) {
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+            }
+        });
+        AlertBolt bolt = createAlertBolt(collector);
+
+        boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
+        boltSpecs.setVersion("spec_" + System.currentTimeMillis());
+        // stream def map
+        Map<String, StreamDefinition> sds = new HashMap();
+        StreamDefinition sdTest = new StreamDefinition();
+        sdTest.setStreamId(TEST_STREAM);
+        sds.put(sdTest.getStreamId(), sdTest);
+        
+        boltSpecs.addPublishPartition(TEST_STREAM, "policy-definition", "testAlertPublish", null);
+
+        bolt.onAlertBoltSpecChange(boltSpecs, sds);
+
+        // how to assert
+        Tuple t = createTuple(bolt, boltSpecs.getVersion());
+
+        bolt.execute(t);
+
+        Assert.assertTrue(recieved.get());
+        
+        LOG.info("Update stream");
+        sds = new HashMap();
+        sdTest = new StreamDefinition();
+        sdTest.setStreamId(TEST_STREAM);
+        sds.put(sdTest.getStreamId(), sdTest);
+        sdTest.setDescription("update the stream");
+        bolt.onAlertBoltSpecChange(boltSpecs, sds);
+        
+        LOG.info("No any change");
+        sds = new HashMap();
+        sdTest = new StreamDefinition();
+        sdTest.setStreamId(TEST_STREAM);
+        sds.put(sdTest.getStreamId(), sdTest);
+        sdTest.setDescription("update the stream");
+        bolt.onAlertBoltSpecChange(boltSpecs, sds);
     }
 
     @Test @Ignore

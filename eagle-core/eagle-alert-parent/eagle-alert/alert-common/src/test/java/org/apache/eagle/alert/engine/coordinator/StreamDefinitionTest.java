@@ -45,8 +45,8 @@ public class StreamDefinitionTest {
         StreamDefinition streamDefinition1 = streamDefinition.copy();
         Assert.assertEquals("StreamDefinition[streamId=null, dataSource=null, description=null, validate=false, timeseries=false, columns=[StreamColumn=name[name], type=[string], defaultValue=[null], required=[false], nodataExpression=[null], StreamColumn=name[host], type=[string], defaultValue=[null], required=[false], nodataExpression=[null], StreamColumn=name[flag], type=[bool], defaultValue=[null], required=[false], nodataExpression=[null], StreamColumn=name[data], type=[long], defaultValue=[null], required=[false], nodataExpression=[null], StreamColumn=name[value], type=[double], defaultValue=[null], required=[false], nodataExpression=[null]]", streamDefinition1.toString());
 
-        Assert.assertFalse(streamDefinition1.equals(streamDefinition));
+        Assert.assertTrue(streamDefinition1.equals(streamDefinition));
         Assert.assertFalse(streamDefinition1 == streamDefinition);
-        Assert.assertFalse(streamDefinition1.hashCode() == streamDefinition.hashCode());
+        Assert.assertTrue(streamDefinition1.hashCode() == streamDefinition.hashCode());
     }
 }
