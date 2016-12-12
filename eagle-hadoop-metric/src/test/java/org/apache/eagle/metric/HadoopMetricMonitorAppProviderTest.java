@@ -49,11 +49,11 @@ public class HadoopMetricMonitorAppProviderTest extends ApplicationTestBase {
         SiteEntity siteEntity = new SiteEntity();
         siteEntity.setSiteId("test_site");
         siteEntity.setSiteName("Test Site");
-        siteEntity.setDescription("Test Site for HADOOP_JMX_METRIC_MONITOR");
+        siteEntity.setDescription("Test Site for HADOOP_METRIC_MONITOR");
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
-        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "HADOOP_JMX_METRIC_MONITOR", ApplicationEntity.Mode.LOCAL);
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "HADOOP_METRIC_MONITOR", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
         // Install application
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
