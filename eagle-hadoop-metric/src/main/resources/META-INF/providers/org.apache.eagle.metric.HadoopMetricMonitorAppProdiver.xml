@@ -17,9 +17,10 @@
   -->
 
 <application>
-    <type>HADOOP_JMX_METRIC_MONITOR</type>
-    <name>Hadoop JMX Metric Monitor</name>
+    <type>HADOOP_METRIC_MONITOR</type>
+    <name>Hadoop Metrics Monitor</name>
     <version>0.5.0-incubating</version>
+    <viewPath>/apps/hadoop_metric</viewPath>
     <configuration>
         <!-- data fromStream configurations -->
         <property>

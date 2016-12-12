@@ -1,0 +1,1 @@
+console.log("Loading EXAMPLE_APPLICATION: /apps/example");
