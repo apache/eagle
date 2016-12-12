@@ -17,7 +17,7 @@
 #
 
 from metric_collector import JmxMetricCollector,JmxMetricListener,Runner
-import json, logging, fnmatch
+import json, logging, fnmatch, sys
 
 class NNSafeModeMetric(JmxMetricListener):
     def on_metric(self, metric):
