@@ -94,7 +94,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("ad")
     private String trackingUrl;
     @Column("ae")
-    private Map<String, Map<String, String>> failedTasks;
+    private String diagnostics;
 
     public String getTrackingUrl() {
         return trackingUrl;
@@ -348,12 +348,12 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
         valueChanged("failedReduceAttempts");
     }
 
-    public Map<String, Map<String, String>> getFailedTasks() {
-        return failedTasks;
+    public String getDiagnostics() {
+        return diagnostics;
     }
 
-    public void setFailedTasks(Map<String, Map<String, String>> failedTasks) {
-        this.failedTasks = failedTasks;
-        valueChanged("failedTasks");
+    public void setDiagnostics(String diagnostics) {
+        this.diagnostics = diagnostics;
+        valueChanged("diagnostics");
     }
 }
