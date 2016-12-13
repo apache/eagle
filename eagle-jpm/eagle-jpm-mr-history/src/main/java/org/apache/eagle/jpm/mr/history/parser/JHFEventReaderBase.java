@@ -62,7 +62,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     // hostname to rack mapping
     protected Map<String, String> host2RackMapping;
     // taskattempt to error msg, attemptId, taskId, error
-    protected Map<String, Pair<String, String> > attempt2ErrorMsg;
+    protected Map<String, Pair<String, String>> attempt2ErrorMsg;
 
     protected String jobId;
     protected String jobName;
