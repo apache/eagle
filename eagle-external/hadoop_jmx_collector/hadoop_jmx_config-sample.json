@@ -1,6 +1,8 @@
 {
   "env": {
-    "site": "sandbox"
+    "site": "sandbox",
+    "metric_prefix": "hadoop.",
+    "log_file": "/tmp/hadoop-jmx-collector.log"
   },
   "input": [
     {
