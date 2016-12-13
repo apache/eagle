@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.metrics.JobCounterMetricsGenerator;
@@ -60,6 +61,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     protected Map<String, String> taskRunningHosts;
     // hostname to rack mapping
     protected Map<String, String> host2RackMapping;
+    // taskattempt to error msg, attemptId, taskId, error
+    protected Map<String, Pair<String, String> > attempt2ErrorMsg;
 
     protected String jobId;
     protected String jobName;
@@ -105,11 +108,11 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         jobExecutionEntity.setTags(new HashMap<>(baseTags));
         jobExecutionEntity.setNumFailedMaps(0);
         jobExecutionEntity.setNumFailedReduces(0);
-        jobExecutionEntity.setFailedTasks(new HashMap<>());
 
         taskRunningHosts = new HashMap<>();
 
         host2RackMapping = new HashMap<>();
+        attempt2ErrorMsg = new HashMap<>();
 
         taskStartTime = new HashMap<>();
         taskAttemptStartTime = new HashMap<>();
@@ -295,8 +298,26 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 jobExecutionEntity.setAvgReduceTaskDuration(this.sumReduceTaskDuration * 1.0 / numTotalReduces);
             }
             this.jobCounterMetricsGenerator.setBaseTags(jobExecutionEntity.getTags());
+
+            formatDiagnostics(values.get(Keys.DIAGNOSTICS));
+
             entityCreated(jobExecutionEntity);
         }
+    }
+
+    private void formatDiagnostics(String diagnostics) {
+        String formatDiagnostics = "";
+        if (diagnostics != null) {
+            for (String attemptId : attempt2ErrorMsg.keySet()) {
+                String taskId = attempt2ErrorMsg.get(attemptId).getLeft();
+                String error = attempt2ErrorMsg.get(attemptId).getRight();
+                if (diagnostics.contains(taskId)) {
+                    formatDiagnostics = error;
+                    break;
+                }
+            }
+        }
+        jobExecutionEntity.setDiagnostics(formatDiagnostics);
     }
 
     private void entityCreated(JobBaseAPIEntity entity) throws Exception {
@@ -440,16 +461,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             }
 
             entityCreated(entity);
-            if (entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()) != null) {
-                jobExecutionEntity.getFailedTasks().put(taskID,
-                    new HashMap<String, String>() {
-                        {
-                            put(entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()),
-                                entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()));//decide later
-                        }
-                    }
-                );
-            }
+            attempt2ErrorMsg.put(taskAttemptID, Pair.of(taskID, entity.getError()));
             taskAttemptStartTime.remove(taskAttemptID);
         } else {
             // silently ignore
@@ -544,7 +556,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         ERROR, TASK_ATTEMPT_ID, TASK_STATUS, COPY_PHASE, SORT_PHASE, REDUCE_PHASE,
         SHUFFLE_FINISHED, SORT_FINISHED, COUNTERS, SPLITS, JOB_PRIORITY, HTTP_PORT,
         TRACKER_NAME, STATE_STRING, VERSION, MAP_COUNTERS, REDUCE_COUNTERS,
-        VIEW_JOB, MODIFY_JOB, JOB_QUEUE, RACK,
+        VIEW_JOB, MODIFY_JOB, JOB_QUEUE, RACK, DIAGNOSTICS,
 
         UBERISED, SPLIT_LOCATIONS, FAILED_DUE_TO_ATTEMPT, MAP_FINISH_TIME, PORT, RACK_NAME,
 
