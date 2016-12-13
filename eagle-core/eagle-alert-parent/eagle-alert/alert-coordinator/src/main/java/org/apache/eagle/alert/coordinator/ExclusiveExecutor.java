@@ -74,9 +74,13 @@ public class ExclusiveExecutor implements Closeable {
                 // do whatever leader work you need to and only exit
                 // this method when you want to relinquish leadership
                 LOG.info("this is leader node right now..");
-                r.run();
-                LOG.info("leader node executed done!..");
                 executed.set(true);
+                try {
+                    r.run();
+                } catch (Throwable t) {
+                    LOG.warn("failed to run exclusive executor", t);
+                }
+                LOG.info("leader node executed done!..");
             }
 
             @Override
