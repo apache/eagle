@@ -20,8 +20,10 @@ import backtype.storm.spout.ISpoutOutputCollector;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import com.google.common.collect.Lists;
+import com.sun.jersey.api.client.Client;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
@@ -29,11 +31,18 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.test.TestingServer;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
+import org.apache.eagle.jpm.mr.history.crawler.JHFCrawlerDriver;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
+import org.apache.eagle.jpm.mr.history.metrics.JobCountMetricsGenerator;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.HDFSUtil;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,8 +55,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,18 +68,22 @@ import static org.mockito.Mockito.*;
  * Created by luokun on 12/1/16.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CuratorFrameworkFactory.class, HDFSUtil.class})
-@PowerMockIgnore({"javax.*", "com.sun.org.*","org.apache.hadoop.conf.*"})
+@PrepareForTest( {CuratorFrameworkFactory.class, HDFSUtil.class, JobCountMetricsGenerator.class, JobHistorySpout.class})
+@PowerMockIgnore( {"javax.*", "com.sun.org.*", "org.apache.hadoop.conf.*"})
 public class JobHistorySpoutTest {
 
     private TestingServer server;
     private CuratorFramework zookeeper;
+    private FileSystem hdfs;
     private MRHistoryJobConfig appConfig;
+    private EagleServiceClientImpl client;
 
     @Before
     public void setUp() throws Exception {
         this.appConfig = MRHistoryJobConfig.newInstance(ConfigFactory.load());
         createZk();
+        mockHdfs();
+        setupMock();
     }
 
     @After
@@ -98,7 +111,7 @@ public class JobHistorySpoutTest {
     public void testSpout() throws Exception {
         JobHistorySpout spout = createJobHistorySpout();
         List<Object> tuples = new ArrayList<>();
-        SpoutOutputCollector collector = new SpoutOutputCollector(new ISpoutOutputCollector(){
+        SpoutOutputCollector collector = new SpoutOutputCollector(new ISpoutOutputCollector() {
             @Override
             public List<Integer> emit(String s, List<Object> list, Object o) {
                 tuples.add(list);
@@ -117,15 +130,36 @@ public class JobHistorySpoutTest {
         });
         PowerMockito.mockStatic(CuratorFrameworkFactory.class);
         when(CuratorFrameworkFactory.newClient(anyString(), anyInt(), anyInt(), any(RetryNTimes.class))).thenReturn(zookeeper);
-        PowerMockito.mockStatic(HDFSUtil.class);
-        when(HDFSUtil.getFileSystem(any(Configuration.class))).thenReturn(null);
         spout.open(null, createTopologyContext(), collector);
         Field driverField = JobHistorySpout.class.getDeclaredField("driver");
         driverField.setAccessible(true);
-        Assert.assertNotNull(driverField.get(spout));
+        JHFCrawlerDriver driver = (JHFCrawlerDriver) driverField.get(spout);
+        Assert.assertNotNull(driver);
+        spout.nextTuple();
+        Assert.assertTrue(zookeeper.checkExists().forPath("/apps/mr/history/sandbox/partitions/0/timeStamps") != null);
+        Assert.assertTrue(StringUtils.isNotEmpty((new String(zookeeper.getData().forPath("/apps/mr/history/sandbox/partitions/0/timeStamps"), "UTF-8"))));
+        verify(client, times(2)).create(any());
+
     }
 
-    private TopologyContext createTopologyContext(){
+    private void mockHdfs() throws Exception {
+        PowerMockito.mockStatic(HDFSUtil.class);
+        hdfs = mock(FileSystem.class);
+        when(HDFSUtil.getFileSystem(any(Configuration.class))).thenReturn(hdfs);
+        FileStatus fileDirStatus = new FileStatus(100l, true, 3, 1000l, new Date().getTime(), new Path("/user/history/done/2016/12/09/000508"));
+        when(hdfs.listStatus(any(Path.class))).thenReturn(new FileStatus[] {fileDirStatus});
+        FileStatus filePartitionStatus = new FileStatus(100l, false, 3, 1000l, new Date().getTime(), new Path("/user/history/done/2016/12/09/000508/job_1479206441898_508949-1481299030929-testhistory.jhist"));
+        when(hdfs.listStatus(any(Path.class), any(PathFilter.class))).thenReturn(new FileStatus[] {filePartitionStatus});
+        Path historyFilePath = mock(Path.class);
+        Path historyConfPath = mock(Path.class);
+        PowerMockito.whenNew(Path.class).withArguments("/mr-history/done/2016/12/12/000508/job_1479206441898_508949-1481299030929-testhistory.jhist").thenReturn(historyFilePath);
+        PowerMockito.whenNew(Path.class).withArguments("/mr-history/done/2016/12/12/000508/job_1479206441898_508949_conf.xml").thenReturn(historyConfPath);
+
+        when((InputStream) hdfs.open(historyFilePath)).thenReturn(this.getClass().getResourceAsStream("job_1479206441898_508949-1481299030929-testhistory.jhist"));
+        when((InputStream) hdfs.open(historyConfPath)).thenReturn(this.getClass().getResourceAsStream("job_1479206441898_508949_conf.xml"));
+    }
+
+    private TopologyContext createTopologyContext() {
         TopologyContext topologyContext = mock(TopologyContext.class);
         when(topologyContext.getThisTaskId()).thenReturn(1);
         when(topologyContext.getComponentId(1)).thenReturn("test_component");
@@ -134,7 +168,20 @@ public class JobHistorySpoutTest {
         return topologyContext;
     }
 
-    private JobHistorySpout createJobHistorySpout(){
+    private void setupMock() throws Exception {
+        client = mock(EagleServiceClientImpl.class);
+        MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
+        PowerMockito.whenNew(EagleServiceClientImpl.class).withArguments(
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password).thenReturn(client);
+        PowerMockito.whenNew(EagleServiceClientImpl.class).withAnyArguments().thenReturn(client);
+        when(client.create(any())).thenReturn(null);
+        when(client.getJerseyClient()).thenReturn(new Client());
+    }
+
+    private JobHistorySpout createJobHistorySpout() {
         //1. trigger init conf
         com.typesafe.config.Config jhfAppConf = appConfig.getConfig();
 
@@ -157,10 +204,10 @@ public class JobHistorySpoutTest {
             builder.includeJobKeyPatterns(Pattern.compile(key));
         }
         JobHistoryContentFilter filter = builder.build();
-        return new JobHistorySpout(filter,appConfig);
+        return new JobHistorySpout(filter, appConfig);
     }
 
-    private void createZk(){
+    private void createZk() {
         int port = 2111;
         File logFile = new File(System.getProperty("java.io.tmpdir"), "zk/logs/zookeeper-test-" + port);
         FileUtils.deleteQuietly(logFile);
