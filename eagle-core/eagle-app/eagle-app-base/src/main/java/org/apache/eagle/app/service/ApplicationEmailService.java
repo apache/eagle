@@ -82,7 +82,10 @@ public class ApplicationEmailService extends AbstractEmailService {
             sender = appConfig.getString(AlertEmailConstants.SENDER);
         }
         if (!appConfig.hasPath(AlertEmailConstants.RECIPIENTS)) {
-            throw new IllegalArgumentException("email sender or recipients is null");
+            throw new IllegalArgumentException("email recipients is null or unset");
+        }
+        if (appConfig.hasPath(AlertEmailConstants.CC_RECIPIENTS)) {
+            mailProps.setCc(appConfig.getString(AlertEmailConstants.CC_RECIPIENTS));
         }
         String recipients = appConfig.getString(AlertEmailConstants.RECIPIENTS);
         mailProps.setSubject(subject);

@@ -35,6 +35,7 @@ public class AlertEmailConstants {
     public static final String SENDER = "sender";
     public static final String RECIPIENTS = "recipients";
     public static final String TEMPLATE = "template";
+    public static final String CC_RECIPIENTS = "cc";
 
     public static final String ALERT_EMAIL_TIME_PROPERTY = "timestamp";
     public static final String ALERT_EMAIL_COUNT_PROPERTY = "count";

@@ -84,7 +84,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 20px 0 10px 0;">
-                        <p>View more job information on <a href="$alert["joblink"]">Eagle</a></p>
+                        <p>View more job information on <a href="$alert["eagleJobLink"]">Eagle</a></p>
                     </td>
                 </tr>
 

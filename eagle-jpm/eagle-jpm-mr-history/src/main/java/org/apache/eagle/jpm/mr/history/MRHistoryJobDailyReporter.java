@@ -127,14 +127,14 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             LOG.info("last job report time is {} %s", DateTimeUtil.millisecondsToHumanDateWithSeconds(lastSentTime), timeZone.getID());
             try {
                 Collection<String> sites = loadSites(APP_TYPE);
-                if (sites == null && sites.isEmpty()) {
+                if (sites == null || sites.isEmpty()) {
                     LOG.warn("application MR_HISTORY_JOB_APP does not run on any sites!");
                     return;
                 }
                 for (String site : sites) {
                     int reportHour = currentHour / dailySentPeriod * dailySentPeriod;
                     calendar.set(Calendar.HOUR_OF_DAY, reportHour);
-                    String subject = String.format("%s %s", site.toUpperCase(), config.getString(AlertEmailConstants.SUBJECT));
+                    String subject = String.format("%s %s", site.toUpperCase(), config.getString(SERVICE_PATH + "." + AlertEmailConstants.SUBJECT));
                     Map<String, Object> alertData = buildAlertData(site, calendar.getTimeInMillis());
                     sendByEmailWithSubject(alertData, subject);
                 }
