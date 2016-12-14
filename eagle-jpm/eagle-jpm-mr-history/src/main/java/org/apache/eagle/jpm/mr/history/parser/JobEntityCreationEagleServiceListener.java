@@ -47,6 +47,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     List<JobEventAPIEntity> jobEvents = new ArrayList<>();
     List<TaskExecutionAPIEntity> taskExecs = new ArrayList<>();
     List<TaskAttemptExecutionAPIEntity> taskAttemptExecs = new ArrayList<>();
+    List<TaskAttemptErrorCategoryEntity> taskAttemptErrors = new ArrayList<>();
     private JobExecutionMetricsCreationListener jobExecutionMetricsCreationListener = new JobExecutionMetricsCreationListener();
     private TimeZone timeZone;
     private EagleOutputCollector collector;
@@ -117,6 +118,8 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                 taskExecs.add((TaskExecutionAPIEntity) entity);
             } else if (entity instanceof TaskAttemptExecutionAPIEntity) {
                 taskAttemptExecs.add((TaskAttemptExecutionAPIEntity) entity);
+            } else if (entity instanceof TaskAttemptErrorCategoryEntity) {
+                taskAttemptErrors.add((TaskAttemptErrorCategoryEntity) entity);
             }
         }
         GenericServiceAPIResponseEntity result;
@@ -149,6 +152,12 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             result = client.create(taskAttemptExecs);
             checkResult(result);
             taskAttemptExecs.clear();
+        }
+        if (taskAttemptErrors.size() > 0) {
+            logger.info("flush TaskAttemptErrorCategoryEntity of number " + taskAttemptErrors.size());
+            result = client.create(taskAttemptErrors);
+            checkResult(result);
+            taskAttemptErrors.clear();
         }
 
         logger.info("finish flushing entities of total number " + list.size());

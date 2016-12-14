@@ -426,6 +426,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             String rack = values.get(Keys.RACK);
             taskAttemptExecutionTags.put(MRJobTagName.HOSTNAME.toString(), hostname);
             taskAttemptExecutionTags.put(MRJobTagName.RACK.toString(), rack);
+            taskAttemptExecutionTags.put(MRJobTagName.TASK_ATTEMPT_ID.toString(), taskAttemptID);
             // put last attempt's hostname to task level
             taskRunningHosts.put(taskID, hostname);
             // it is very likely that an attempt ID could be both succeeded and failed due to M/R system
@@ -444,7 +445,6 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 //entity.setJobCounters(parseCounters(values.get(Keys.COUNTERS)));
                 entity.setJobCounters(parseCounters(counters));
             }
-            entity.setTaskAttemptID(taskAttemptID);
 
             if (recType == RecordTypes.MapAttempt) {
                 jobExecutionEntity.setTotalMapAttempts(1 + jobExecutionEntity.getTotalMapAttempts());
@@ -462,6 +462,19 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
             entityCreated(entity);
             attempt2ErrorMsg.put(taskAttemptID, Pair.of(taskID, entity.getError()));
+            //generate TaskAttemptErrorCategoryEntity
+            TaskAttemptErrorCategoryEntity taskAttemptErrorCategoryEntity = new TaskAttemptErrorCategoryEntity();
+            Map<String, String> taskAttemptErrorCategoryEntityTags = new HashMap<>(entity.getTags());
+            taskAttemptErrorCategoryEntity.setTags(taskAttemptErrorCategoryEntityTags);
+            if (!taskAttemptErrorCategoryEntityTags.containsKey(MRJobTagName.ERROR_CATEGORY.toString())) {
+                taskAttemptErrorCategoryEntityTags.put(MRJobTagName.ERROR_CATEGORY.toString(), "");
+            }
+
+            taskAttemptErrorCategoryEntity.setStartTime(entity.getStartTime());
+            taskAttemptErrorCategoryEntity.setEndTime(entity.getEndTime());
+            taskAttemptErrorCategoryEntity.setTimestamp(entity.getTimestamp());
+            entityCreated(taskAttemptErrorCategoryEntity);
+
             taskAttemptStartTime.remove(taskAttemptID);
         } else {
             // silently ignore
