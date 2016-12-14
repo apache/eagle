@@ -95,7 +95,7 @@ public class MetricSchemaGenerator extends BaseRichBolt {
 
     private void createMetricSchemaEntity(String metricName, MetricDefinition metricDefinition) throws IOException, EagleServiceClientException {
         MetricSchemaEntity schemaEntity = new MetricSchemaEntity();
-        Map<String,String> schemaTags = new HashMap<>();
+        Map<String, String> schemaTags = new HashMap<>();
         schemaEntity.setTags(schemaTags);
         schemaTags.put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
         schemaTags.put(MetricSchemaEntity.METRIC_TYPE_TAG, metricDefinition.getMetricType());
@@ -104,8 +104,10 @@ public class MetricSchemaGenerator extends BaseRichBolt {
         schemaEntity.setMetricFields(Collections.singletonList(GENERIC_METRIC_VALUE_NAME));
         schemaEntity.setModifiedTimestamp(System.currentTimeMillis());
         GenericServiceAPIResponseEntity<String> response = this.client.create(Collections.singletonList(schemaEntity));
-        if (response.isSuccess() && LOG.isDebugEnabled()) {
-            LOG.debug("Created {}", schemaEntity);
+        if (response.isSuccess()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Created {}", schemaEntity);
+            }
         } else {
             LOG.error("Failed to create {}", schemaEntity, response.getException());
             throw new IOException("Service error: " + response.getException());
