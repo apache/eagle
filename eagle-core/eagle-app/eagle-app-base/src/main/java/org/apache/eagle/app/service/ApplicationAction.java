@@ -148,9 +148,11 @@ public class ApplicationAction implements Serializable {
                 datasource.setProperties(new HashMap<>());
 
                 KafkaStreamSourceConfig streamSourceConfig = (KafkaStreamSourceConfig) streamDesc.getSourceConfig();
-                Map<String, String> properties = datasource.getProperties();
-                properties.put(AlertConstants.KAFKA_BROKER_ZK_BASE_PATH, streamSourceConfig.getBrokerZkPath());
-                properties.put(AlertConstants.KAFKA_BROKER_ZK_QUORUM, streamSourceConfig.getBrokerZkQuorum());
+                if (streamSourceConfig != null) {
+                    Map<String, String> properties = datasource.getProperties();
+                    properties.put(AlertConstants.KAFKA_BROKER_ZK_BASE_PATH, streamSourceConfig.getBrokerZkPath());
+                    properties.put(AlertConstants.KAFKA_BROKER_ZK_QUORUM, streamSourceConfig.getBrokerZkQuorum());
+                }
 
                 Tuple2StreamMetadata tuple2Stream = new Tuple2StreamMetadata();
                 Properties prop = new Properties();
