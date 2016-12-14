@@ -91,7 +91,7 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
         tags.put(MRJobTagName.RACK.toString(), e.getTags().get(MRJobTagName.RACK.toString()));
         tags.put(MRJobTagName.HOSTNAME.toString(), e.getTags().get(MRJobTagName.HOSTNAME.toString()));
         tags.put(MRJobTagName.JOB_ID.toString(), e.getTags().get(MRJobTagName.JOB_ID.toString()));
-        tags.put(MRJobTagName.TASK_ATTEMPT_ID.toString(), e.getTaskAttemptID());
+        tags.put(MRJobTagName.TASK_ATTEMPT_ID.toString(), e.getTags().get(MRJobTagName.TASK_ATTEMPT_ID.toString()));
         tags.put(MRJobTagName.TASK_TYPE.toString(), e.getTags().get(MRJobTagName.TASK_TYPE.toString()));
 
         //TODO need optimize, match and then capture the data
