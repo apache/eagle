@@ -500,13 +500,6 @@ public class TestAlertBolt {
         boltSpecs.addPublishPartition(TEST_STREAM, "policy-definition", "testAlertPublish", null);
 
         bolt.onAlertBoltSpecChange(boltSpecs, sds);
-
-        // how to assert
-        Tuple t = createTuple(bolt, boltSpecs.getVersion());
-
-        bolt.execute(t);
-
-        Assert.assertTrue(recieved.get());
         
         LOG.info("Update stream");
         sds = new HashMap();
@@ -516,6 +509,27 @@ public class TestAlertBolt {
         sdTest.setDescription("update the stream");
         bolt.onAlertBoltSpecChange(boltSpecs, sds);
         
+        LOG.info("Update stream & update policy");
+        sds = new HashMap();
+        sdTest = new StreamDefinition();
+        sdTest.setStreamId(TEST_STREAM);
+        sds.put(sdTest.getStreamId(), sdTest);
+        sdTest.setDescription("update the stream & update policy");
+        
+        def = new PolicyDefinition();
+        def.setName("policy-definition");
+        def.setInputStreams(Arrays.asList(TEST_STREAM));
+
+        definition = new PolicyDefinition.Definition();
+        definition.setType(PolicyStreamHandlers.CUSTOMIZED_ENGINE);
+        definition.setHandlerClass("org.apache.eagle.alert.engine.router.CustomizedHandler");
+        definition.setValue("PT0M,plain,1,host,host2");
+        def.setDefinition(definition);
+        def.setPartitionSpec(Arrays.asList(createPartition()));
+        boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
+        
+        bolt.onAlertBoltSpecChange(boltSpecs, sds);
+        
         LOG.info("No any change");
         sds = new HashMap();
         sdTest = new StreamDefinition();
@@ -523,6 +537,13 @@ public class TestAlertBolt {
         sds.put(sdTest.getStreamId(), sdTest);
         sdTest.setDescription("update the stream");
         bolt.onAlertBoltSpecChange(boltSpecs, sds);
+        
+        // how to assert
+        Tuple t = createTuple(bolt, boltSpecs.getVersion());
+
+        bolt.execute(t);
+
+        Assert.assertTrue(recieved.get());
     }
 
     @Test @Ignore
