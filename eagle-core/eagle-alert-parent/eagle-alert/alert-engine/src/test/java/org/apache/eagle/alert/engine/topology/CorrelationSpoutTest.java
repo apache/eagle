@@ -56,7 +56,7 @@ public class CorrelationSpoutTest {
         AtomicBoolean validated = new AtomicBoolean(false);
         CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1) {
             @Override
-            protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context,
+            protected KafkaSpoutWrapper createKafkaSpout(Config config, Map conf, TopologyContext context,
                                                          SpoutOutputCollector collector, String topic, String schemeClsName, SpoutSpec streamMetadatas, Map<String, StreamDefinition> sds)
                 throws Exception {
                 validated.set(true);
@@ -94,7 +94,8 @@ public class CorrelationSpoutTest {
         final AtomicBoolean verified = new AtomicBoolean(false);
         CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1) {
             @Override
-            protected KafkaSpoutWrapper createKafkaSpout(Map conf,
+            protected KafkaSpoutWrapper createKafkaSpout(Config config,
+                                                         Map conf,
                                                          TopologyContext context,
                                                          SpoutOutputCollector collector,
                                                          String topic,
@@ -147,7 +148,8 @@ public class CorrelationSpoutTest {
         final AtomicBoolean verified = new AtomicBoolean(false);
         CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1) {
             @Override
-            protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
+            protected KafkaSpoutWrapper createKafkaSpout(Config config,
+                                                         Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
                                                          String schemeClsName, SpoutSpec streamMetadatas,
                                                          Map<String, StreamDefinition> sds) {
                 return new KafkaSpoutWrapper(null, null);

@@ -27,6 +27,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
@@ -235,8 +236,10 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
 
         // build lookup table for scheme
         Map<String, String> newSchemaName = new HashMap<String, String>();
+        Map<String, Map<String, String>> dataSourceProperties = new HashMap<>();
         for (Kafka2TupleMetadata ds : newMeta.getKafka2TupleMetadataMap().values()) {
             newSchemaName.put(ds.getTopic(), ds.getSchemeCls());
+            dataSourceProperties.put(ds.getTopic(), ds.getProperties());
         }
 
         // copy and swap
@@ -248,7 +251,8 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
                 LOG.warn(MessageFormat.format("try to create new topic {0}, but found in the active spout list, this may indicate some inconsistency", topic));
                 continue;
             }
-            KafkaSpoutWrapper newWrapper = createKafkaSpout(conf, context, collector, topic, newSchemaName.get(topic), newMeta, sds);
+            KafkaSpoutWrapper newWrapper = createKafkaSpout(ConfigFactory.parseMap(dataSourceProperties.get(topic)).withFallback(this.config),
+                    conf, context, collector, topic, newSchemaName.get(topic), newMeta, sds);
             newKafkaSpoutList.put(topic, newWrapper);
         }
         // iterate remove topics and then close KafkaSpout
@@ -297,47 +301,47 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
      * @return
      */
     @SuppressWarnings("rawtypes")
-    protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
+    protected KafkaSpoutWrapper createKafkaSpout(Config configure, Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
                                                  String schemeClsName, SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) throws Exception {
-        String kafkaBrokerZkQuorum = config.getString("spout.kafkaBrokerZkQuorum");
+        String kafkaBrokerZkQuorum = configure.getString(AlertConstants.KAFKA_BROKER_ZK_QUORUM);
         BrokerHosts hosts = null;
-        if (config.hasPath("spout.kafkaBrokerZkBasePath")) {
-            hosts = new ZkHosts(kafkaBrokerZkQuorum, config.getString("spout.kafkaBrokerZkBasePath"));
+        if (configure.hasPath("spout.kafkaBrokerZkBasePath")) {
+            hosts = new ZkHosts(kafkaBrokerZkQuorum, configure.getString(AlertConstants.KAFKA_BROKER_ZK_BASE_PATH));
         } else {
             hosts = new ZkHosts(kafkaBrokerZkQuorum);
         }
         String transactionZkRoot = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_ROOT;
-        if (config.hasPath("spout.stormKafkaTransactionZkPath")) {
-            transactionZkRoot = config.getString("spout.stormKafkaTransactionZkPath");
+        if (configure.hasPath("spout.stormKafkaTransactionZkPath")) {
+            transactionZkRoot = configure.getString("spout.stormKafkaTransactionZkPath");
         }
         boolean logEventEnabled = false;
-        if (config.hasPath("topology.logEventEnabled")) {
-            logEventEnabled = config.getBoolean("topology.logEventEnabled");
+        if (configure.hasPath("topology.logEventEnabled")) {
+            logEventEnabled = configure.getBoolean("topology.logEventEnabled");
         }
         // write partition offset etc. into zkRoot+id, see PartitionManager.committedPath
         String zkStateTransactionRelPath = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_RELATIVE_PATH;
-        if (config.hasPath("spout.stormKafkaEagleConsumer")) {
-            zkStateTransactionRelPath = config.getString("spout.stormKafkaEagleConsumer");
+        if (configure.hasPath("spout.stormKafkaEagleConsumer")) {
+            zkStateTransactionRelPath = configure.getString("spout.stormKafkaEagleConsumer");
         }
         SpoutConfig spoutConfig = new SpoutConfig(hosts, topic, transactionZkRoot, zkStateTransactionRelPath + "/" + topic + "/" + topologyId);
         // transaction zkServers
-        boolean stormKafkaUseSameZkQuorumWithKafkaBroker = config.getBoolean("spout.stormKafkaUseSameZkQuorumWithKafkaBroker");
+        boolean stormKafkaUseSameZkQuorumWithKafkaBroker = configure.getBoolean("spout.stormKafkaUseSameZkQuorumWithKafkaBroker");
         if (stormKafkaUseSameZkQuorumWithKafkaBroker) {
             ZkServerPortUtils utils = new ZkServerPortUtils(kafkaBrokerZkQuorum);
             spoutConfig.zkServers = utils.getZkHosts();
             spoutConfig.zkPort = utils.getZkPort();
         } else {
-            ZkServerPortUtils utils = new ZkServerPortUtils(config.getString("spout.stormKafkaTransactionZkQuorum"));
+            ZkServerPortUtils utils = new ZkServerPortUtils(configure.getString("spout.stormKafkaTransactionZkQuorum"));
             spoutConfig.zkServers = utils.getZkHosts();
             spoutConfig.zkPort = utils.getZkPort();
         }
         // transaction update interval
-        spoutConfig.stateUpdateIntervalMs = config.hasPath("spout.stormKafkaStateUpdateIntervalMs") ? config.getInt("spout.stormKafkaStateUpdateIntervalMs") : 2000;
+        spoutConfig.stateUpdateIntervalMs = configure.hasPath("spout.stormKafkaStateUpdateIntervalMs") ? configure.getInt("spout.stormKafkaStateUpdateIntervalMs") : 2000;
         // Kafka fetch size
-        spoutConfig.fetchSizeBytes = config.hasPath("spout.stormKafkaFetchSizeBytes") ? config.getInt("spout.stormKafkaFetchSizeBytes") : 1048586;
+        spoutConfig.fetchSizeBytes = configure.hasPath("spout.stormKafkaFetchSizeBytes") ? configure.getInt("spout.stormKafkaFetchSizeBytes") : 1048586;
         // "startOffsetTime" is for test usage, prod should not use this
-        if (config.hasPath("spout.stormKafkaStartOffsetTime")) {
-            spoutConfig.startOffsetTime = config.getInt("spout.stormKafkaStartOffsetTime");
+        if (configure.hasPath("spout.stormKafkaStartOffsetTime")) {
+            spoutConfig.startOffsetTime = configure.getInt("spout.stormKafkaStartOffsetTime");
         }
 
         spoutConfig.scheme = createMultiScheme(conf, topic, schemeClsName);
