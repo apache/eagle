@@ -462,6 +462,20 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
             entityCreated(entity);
             attempt2ErrorMsg.put(taskAttemptID, Pair.of(taskID, entity.getError()));
+            //generate TaskAttemptErrorCategoryEntity
+            if (entity.getError() != null && !entity.getError().isEmpty()) {
+                TaskAttemptErrorCategoryEntity taskAttemptErrorCategoryEntity = new TaskAttemptErrorCategoryEntity();
+                Map<String, String> taskAttemptErrorCategoryEntityTags = new HashMap<>();
+                taskAttemptErrorCategoryEntity.setTags(taskAttemptErrorCategoryEntityTags);
+                taskAttemptErrorCategoryEntityTags.put(MRJobTagName.JOB_ID.toString(), jobId);
+                taskAttemptErrorCategoryEntityTags.put(MRJobTagName.TASK_ATTEMPT_ID.toString(), taskAttemptID);
+                taskAttemptErrorCategoryEntityTags.put(MRJobTagName.ERROR_CATEGORY.toString(), entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()));
+
+                taskAttemptErrorCategoryEntity.setStartTime(entity.getStartTime());
+                taskAttemptErrorCategoryEntity.setEndTime(entity.getEndTime());
+                taskAttemptErrorCategoryEntity.setTimestamp(entity.getTimestamp());
+                entityCreated(taskAttemptErrorCategoryEntity);
+            }
             taskAttemptStartTime.remove(taskAttemptID);
         } else {
             // silently ignore
