@@ -59,7 +59,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     protected static final String JOB_OVERTIME_LIMIT_KEY = "jobOvertimeLimit";
     protected static final String ALERT_TITLE_KEY = "alertTitle";
     protected static final String REPORT_RANGE_KEY = "reportRange";
-    protected static final String SUMMERY_INFO_KEY = "summeryInfo";
+    protected static final String SUMMARY_INFO_KEY = "summaryInfo";
     protected static final String FAILED_JOB_USERS_KEY = "failedJobUsers";
     protected static final String SUCCEEDED_JOB_USERS_KEY = "succeededJobUsers";
     protected static final String FINISHED_JOB_USERS_KEY = "finishedJobUsers";
@@ -235,7 +235,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             summeryInfo.ratio = String.format("%.2f", entry.getValue() * 1d / totalJobs.get());
             statusCount.add(summeryInfo);
         }
-        data.put(SUMMERY_INFO_KEY, statusCount);
+        data.put(SUMMARY_INFO_KEY, statusCount);
         return data;
     }
 

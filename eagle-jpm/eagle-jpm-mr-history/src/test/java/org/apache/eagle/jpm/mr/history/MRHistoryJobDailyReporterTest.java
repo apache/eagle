@@ -76,7 +76,7 @@ public class MRHistoryJobDailyReporterTest {
         summeryInfo2.ratio = "0.9";
         summeryInfos.add(summeryInfo1);
         summeryInfos.add(summeryInfo2);
-        alertData.put(SUMMERY_INFO_KEY, summeryInfos);
+        alertData.put(SUMMARY_INFO_KEY, summeryInfos);
 
         Map<String,Double> failedJobUsers = new TreeMap<>();
         failedJobUsers.put("alice", 100d);

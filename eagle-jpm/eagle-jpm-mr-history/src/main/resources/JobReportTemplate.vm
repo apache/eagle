@@ -49,7 +49,7 @@
                                 <th>Number of Jobs</th>
                                 <th>Ratio</th>
                             </tr>
-                            #foreach($item in $alert["summeryInfo"])
+                            #foreach($item in $alert["summaryInfo"])
                                 <tr>
                                     <td>$item.status</td>
                                     <td>$item.numOfJobs</td>
