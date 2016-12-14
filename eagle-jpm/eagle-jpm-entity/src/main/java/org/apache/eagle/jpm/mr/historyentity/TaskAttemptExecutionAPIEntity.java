@@ -46,8 +46,6 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
     private String error;
     @Column("f")
     private JobCounters jobCounters;
-    @Column("g")
-    private String taskAttemptID;
 
     public String getTaskStatus() {
         return taskStatus;
@@ -101,14 +99,5 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
     public void setJobCounters(JobCounters jobCounters) {
         this.jobCounters = jobCounters;
         pcs.firePropertyChange("jobCounters", null, null);
-    }
-
-    public String getTaskAttemptID() {
-        return taskAttemptID;
-    }
-
-    public void setTaskAttemptID(String taskAttemptID) {
-        this.taskAttemptID = taskAttemptID;
-        pcs.firePropertyChange("taskAttemptID", null, null);
     }
 }
