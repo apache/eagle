@@ -30,6 +30,7 @@ import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.common.Version;
+import org.apache.eagle.jpm.mr.history.MRHistoryJobDailyReporter;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
@@ -48,6 +49,8 @@ class ServerApplication extends Application<ServerConfig> {
     private ApplicationStatusUpdateService applicationStatusUpdateService;
     @Inject
     private ApplicationHealthCheckService applicationHealthCheckService;
+    @Inject
+    private MRHistoryJobDailyReporter mrHistoryJobDailyReporter;
 
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
@@ -109,5 +112,8 @@ class ServerApplication extends Application<ServerConfig> {
         applicationHealthCheckService.init(environment);
         Managed appHealthCheckTask = new ApplicationTask(applicationHealthCheckService);
         environment.lifecycle().manage(appHealthCheckTask);
+
+        Managed jobReportTask = new ApplicationTask(mrHistoryJobDailyReporter);
+        environment.lifecycle().manage(jobReportTask);
     }
 }
