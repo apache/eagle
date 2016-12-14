@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.apache.eagle.jpm.mr.history.MRHistoryJobDailyReporter.*;
+
 public class MRHistoryJobDailyReporterTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobDailyReporterTest.class);
@@ -74,30 +76,30 @@ public class MRHistoryJobDailyReporterTest {
         summeryInfo2.ratio = "0.9";
         summeryInfos.add(summeryInfo1);
         summeryInfos.add(summeryInfo2);
-        alertData.put("summeryInfo", summeryInfos);
+        alertData.put(SUMMERY_INFO_KEY, summeryInfos);
 
         Map<String,Double> failedJobUsers = new TreeMap<>();
         failedJobUsers.put("alice", 100d);
         failedJobUsers.put("bob", 97d);
-        alertData.put("failedJobUsers", failedJobUsers);
+        alertData.put(FAILED_JOB_USERS_KEY, failedJobUsers);
 
 
         Map<String,Double> succeededJobUsers = new TreeMap<>();
         succeededJobUsers.put("alice1", 100d);
         succeededJobUsers.put("bob1", 97d);
-        alertData.put("succeededJobUsers", succeededJobUsers);
+        alertData.put(SUCCEEDED_JOB_USERS_KEY, succeededJobUsers);
 
 
         Map<String,Double> finishedJobUsers = new TreeMap<>();
         finishedJobUsers.put("alice2", 100d);
         finishedJobUsers.put("bob2", 97d);
-        alertData.put("finishedJobUsers", finishedJobUsers);
+        alertData.put(FINISHED_JOB_USERS_KEY, finishedJobUsers);
 
-        alertData.put("alertTitle", "Daily Job Report");
-        alertData.put("numTopUsers", 2);
-        alertData.put("jobOvertimeLimit", 6);
+        alertData.put(ALERT_TITLE_KEY, "Daily Job Report");
+        alertData.put(NUM_TOP_USERS_KEY, 2);
+        alertData.put(JOB_OVERTIME_LIMIT_KEY, 6);
         long currentTimestamp = System.currentTimeMillis();
-        alertData.put("reportRange", String.format(" %s ~ %s %s",
+        alertData.put(REPORT_RANGE_KEY, String.format(" %s ~ %s %s",
             DateTimeUtil.millisecondsToHumanDateWithSeconds(currentTimestamp - 6 * DateTimeUtil.ONEHOUR),
             DateTimeUtil.millisecondsToHumanDateWithSeconds(currentTimestamp), DateTimeUtil.CURRENT_TIME_ZONE.getID()));
         alertData.put("joblink", "http://localhost:9090");

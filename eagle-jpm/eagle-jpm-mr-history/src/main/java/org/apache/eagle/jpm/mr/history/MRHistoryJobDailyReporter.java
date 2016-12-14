@@ -32,7 +32,7 @@ import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
-import org.joda.time.DateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +46,24 @@ import static org.apache.eagle.common.config.EagleConfigConstants.SERVICE_PORT;
 public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobDailyReporter.class);
     private static final String TIMEZONE_PATH = "service.timezone";
-    public static final String SERVICE_PATH = "application.dailyJobReport";
     private static final String DAILY_SENT_HOUROFDAY = "application.dailyJobReport.reportHourTime";
     private static final String DAILY_SENT_PERIOD = "application.dailyJobReport.reportPeriodInHour";
     private static final String NUM_TOP_USERS  = "application.dailyJobReport.numTopUsers";
     private static final String JOB_OVERTIME_LIMIT_HOUR  = "application.dailyJobReport.jobOvertimeLimitInHour";
+
+    public static final String SERVICE_PATH = "application.dailyJobReport";
+    public static final String APP_TYPE = "MR_HISTORY_JOB_APP";
+
+    // alert context keys
+    protected static final String NUM_TOP_USERS_KEY = "numTopUsers";
+    protected static final String JOB_OVERTIME_LIMIT_KEY = "jobOvertimeLimit";
+    protected static final String ALERT_TITLE_KEY = "alertTitle";
+    protected static final String REPORT_RANGE_KEY = "reportRange";
+    protected static final String SUMMERY_INFO_KEY = "summeryInfo";
+    protected static final String FAILED_JOB_USERS_KEY = "failedJobUsers";
+    protected static final String SUCCEEDED_JOB_USERS_KEY = "succeededJobUsers";
+    protected static final String FINISHED_JOB_USERS_KEY = "finishedJobUsers";
+    protected static final String EAGLE_JOB_LINK_KEY = "eagleJobLink";
 
     private Config config;
     private IEagleServiceClient client;
@@ -113,7 +126,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             isDailySent = true;
             LOG.info("last job report time is {} %s", DateTimeUtil.millisecondsToHumanDateWithSeconds(lastSentTime), timeZone.getID());
             try {
-                Collection<String> sites = loadSites("MR_HISTORY_JOB_APP");
+                Collection<String> sites = loadSites(APP_TYPE);
                 if (sites == null && sites.isEmpty()) {
                     LOG.warn("application MR_HISTORY_JOB_APP does not run on any sites!");
                     return;
@@ -155,10 +168,10 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             data.putAll(buildFailedJobInfo(site, startTime, endTime));
             data.putAll(buildSucceededJobInfo(site, startTime, endTime));
             data.putAll(buildFinishedJobInfo(site, startTime, endTime));
-            data.put("numTopUsers", numTopUsers);
-            data.put("jobOvertimeLimit", jobOvertimeLimit);
-            data.put("alertTitle", String.format("%s Daily Job Report", site.toUpperCase()));
-            data.put("reportRange", String.format("%s ~ %s %s",
+            data.put(NUM_TOP_USERS_KEY, numTopUsers);
+            data.put(JOB_OVERTIME_LIMIT_KEY, jobOvertimeLimit);
+            data.put(ALERT_TITLE_KEY, String.format("%s Daily Job Report", site.toUpperCase()));
+            data.put(REPORT_RANGE_KEY, String.format("%s ~ %s %s",
                 DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
                 DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime),
                 DateTimeUtil.CURRENT_TIME_ZONE.getID()));
@@ -222,7 +235,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             summeryInfo.ratio = String.format("%.2f", entry.getValue() * 1d / totalJobs.get());
             statusCount.add(summeryInfo);
         }
-        data.put("summeryInfo", statusCount);
+        data.put(SUMMERY_INFO_KEY, statusCount);
         return data;
     }
 
@@ -236,8 +249,8 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             LOG.warn("Result set is empty for query={}", query);
             return data;
         }
-        data.put("failedJobUsers", failedJobUsers);
-        data.put("joblink", String.format("http://%s:%d/#/site/%s/jpm/list?startTime=%s&endTime=%s",
+        data.put(FAILED_JOB_USERS_KEY, failedJobUsers);
+        data.put(EAGLE_JOB_LINK_KEY, String.format("http://%s:%d/#/site/%s/jpm/list?startTime=%s&endTime=%s",
             config.getString(SERVICE_HOST),
             config.getInt(SERVICE_PORT),
             site,
@@ -256,7 +269,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             LOG.warn("Result set is empty for query={}", query);
             return data;
         }
-        data.put("succeededJobUsers", succeededJobUsers);
+        data.put(SUCCEEDED_JOB_USERS_KEY, succeededJobUsers);
         return data;
     }
 
@@ -269,7 +282,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             LOG.warn("Result set is empty for query={}", query);
             return data;
         }
-        data.put("finishedJobUsers", jobUsers);
+        data.put(FINISHED_JOB_USERS_KEY, jobUsers);
         return data;
     }
 
