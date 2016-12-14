@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Partition({"site"})
 @Indexes({
         @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
-})
+    })
 public class TaskAttemptErrorCategoryEntity extends JobBaseAPIEntity {
     @Column("a")
     private long startTime;
