@@ -59,7 +59,7 @@ public class ApplicationEmailService extends AbstractEmailService {
     }
 
     public AlertEmailContext buildEmailContext() {
-         return buildEmailContext(null);
+        return buildEmailContext(null);
     }
 
     public AlertEmailContext buildEmailContext(String mailSubject) {
