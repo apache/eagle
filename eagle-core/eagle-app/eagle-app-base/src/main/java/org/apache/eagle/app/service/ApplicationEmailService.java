@@ -21,6 +21,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.common.mail.AbstractEmailService;
 import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
+import org.apache.eagle.common.mail.AlertEmailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,19 +31,17 @@ import java.util.Map;
 
 public class ApplicationEmailService extends AbstractEmailService {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationEmailService.class);
-    private AlertEmailContext mailProps;
+    private String appConfPath;
+    private Config config;
 
     public ApplicationEmailService(Config config, String appConfPath) {
         super(config);
-        mailProps = buildEmailContext(config, appConfPath);
+        this.appConfPath = appConfPath;
+        this.config = config;
     }
 
     public boolean onAlert(Map<String, Object> alertData) {
-        if (alertData == null || alertData.isEmpty()) {
-            LOG.warn("alertData for {} is empty", ApplicationEmailService.class.getSimpleName());
-            return false;
-        }
-        return super.onAlert(mailProps, alertData);
+        return super.onAlert(buildEmailContext(), alertData);
     }
 
     private String buildDefaultSender() {
@@ -59,16 +58,22 @@ public class ApplicationEmailService extends AbstractEmailService {
         return System.getProperty("user.name") + "@" + hostname;
     }
 
-    private AlertEmailContext buildEmailContext(Config config, String appConfPath) {
+    public AlertEmailContext buildEmailContext() {
+         return buildEmailContext(null);
+    }
+
+    public AlertEmailContext buildEmailContext(String mailSubject) {
         AlertEmailContext mailProps = new AlertEmailContext();
         Config appConfig = config.getConfig(appConfPath);
         String tplFileName = appConfig.getString(AlertEmailConstants.TEMPLATE);
         if (tplFileName == null || tplFileName.equals("")) {
             tplFileName = "ALERT_INLINED_TEMPLATE.vm";
         }
-        String subject = appConfig.getString(AlertEmailConstants.SUBJECT);
-        if (subject == null) {
-            subject = "No subject";
+        String subject;
+        if (mailSubject != null) {
+            subject = mailSubject;
+        } else {
+            subject = appConfig.getString(AlertEmailConstants.SUBJECT);
         }
         String sender;
         if (!appConfig.hasPath(AlertEmailConstants.SENDER)) {
@@ -86,7 +91,7 @@ public class ApplicationEmailService extends AbstractEmailService {
         mailProps.setVelocityTplFile(tplFileName);
         return mailProps;
     }
-
+    
     @Override
     protected Logger getLogger() {
         return LOG;

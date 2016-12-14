@@ -19,6 +19,7 @@ package org.apache.eagle.server;
 import com.google.inject.Inject;
 import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.typesafe.config.Config;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.lifecycle.Managed;
@@ -51,6 +52,8 @@ class ServerApplication extends Application<ServerConfig> {
     private ApplicationHealthCheckService applicationHealthCheckService;
     @Inject
     private MRHistoryJobDailyReporter mrHistoryJobDailyReporter;
+    @Inject
+    private Config config;
 
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
@@ -113,7 +116,9 @@ class ServerApplication extends Application<ServerConfig> {
         Managed appHealthCheckTask = new ApplicationTask(applicationHealthCheckService);
         environment.lifecycle().manage(appHealthCheckTask);
 
-        Managed jobReportTask = new ApplicationTask(mrHistoryJobDailyReporter);
-        environment.lifecycle().manage(jobReportTask);
+        if (config.hasPath(MRHistoryJobDailyReporter.SERVICE_PATH)) {
+            Managed jobReportTask = new ApplicationTask(mrHistoryJobDailyReporter);
+            environment.lifecycle().manage(jobReportTask);
+        }
     }
 }

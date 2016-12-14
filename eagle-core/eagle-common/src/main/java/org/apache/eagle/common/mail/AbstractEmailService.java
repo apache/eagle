@@ -24,15 +24,9 @@ import org.slf4j.Logger;
 import java.util.Map;
 import java.util.Properties;
 
-public abstract class AbstractEmailService {
+import static org.apache.eagle.common.mail.AlertEmailConstants.*;
 
-    private static final String EAGLE_EMAIL_SMTP_SERVER = "application.mailService.mailSmtpServer";
-    private static final String EAGLE_EMAIL_SMTP_PORT = "application.mailService.mailSmtpPort";
-    private static final String EAGLE_EMAIL_SMTP_CONN = "application.mailService.mailSmtpConn";
-    private static final String EAGLE_EMAIL_SMTP_AUTH = "application.mailService.mailSmtpAuth";
-    private static final String EAGLE_EMAIL_SMTP_USERNAME = "application.mailService.mailSmtpUsername";
-    private static final String EAGLE_EMAIL_SMTP_PASSWORD = "application.mailService.mailSmtpPassword";
-    private static final String EAGLE_EMAIL_SMTP_DEBUG = "application.mailService.mailSmtpDebug";
+public abstract class AbstractEmailService {
 
     private Properties serverProps;
 
@@ -75,6 +69,10 @@ public abstract class AbstractEmailService {
 
     public boolean onAlert(AlertEmailContext mailContext, Map<String, Object> alertData) {
         /** synchronized email sending. */
+        if (alertData == null || alertData.isEmpty()) {
+            getLogger().warn("alertData for {} is empty");
+            return false;
+        }
         AlertEmailSender mailSender = new AlertEmailSender(mailContext, serverProps);
         mailSender.addAlertContext(alertData);
         getLogger().info("Sending email in synchronous mode to: {} cc: {}", mailContext.getRecipients(), mailContext.getCc());

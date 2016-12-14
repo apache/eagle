@@ -22,6 +22,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.common.DateTimeUtil;
 import org.junit.After;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,9 +52,10 @@ public class MRHistoryJobDailyReporterTest {
     }
     @Test
     public void test() throws Exception {
-        MRHistoryJobDailyReporter reporter = new MRHistoryJobDailyReporter(config);
+        MRHistoryJobDailyReporter reporter = new MRHistoryJobDailyReporter(config, null);
         reporter.sendByEmail(mockAlertData());
         Iterator it = server.getReceivedEmail();
+        Assert.assertTrue(server.getReceivedEmailSize() == 1);
         while (it.hasNext()) {
             LOG.info(it.next().toString());
         }
@@ -65,11 +67,11 @@ public class MRHistoryJobDailyReporterTest {
         MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo1 = new MRHistoryJobDailyReporter.JobSummeryInfo();
         summeryInfo1.status = "failed";
         summeryInfo1.numOfJobs = 10;
-        summeryInfo1.ratio = 0.1;
+        summeryInfo1.ratio = "0.1";
         MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo2 = new MRHistoryJobDailyReporter.JobSummeryInfo();
         summeryInfo2.status = "succeeded";
         summeryInfo2.numOfJobs = 90;
-        summeryInfo2.ratio = 0.9;
+        summeryInfo2.ratio = "0.9";
         summeryInfos.add(summeryInfo1);
         summeryInfos.add(summeryInfo2);
         alertData.put("summeryInfo", summeryInfos);
@@ -101,4 +103,5 @@ public class MRHistoryJobDailyReporterTest {
         alertData.put("joblink", "http://localhost:9090");
         return alertData;
     }
+
 }

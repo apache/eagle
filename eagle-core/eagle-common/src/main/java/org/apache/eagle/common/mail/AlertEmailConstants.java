@@ -41,5 +41,13 @@ public class AlertEmailConstants {
     public static final String ALERT_EMAIL_ALERTLIST_PROPERTY = "alertList";
     public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
 
+    public static final String EAGLE_EMAIL_SMTP_SERVER = "application.mailService.mailSmtpServer";
+    public static final String EAGLE_EMAIL_SMTP_PORT = "application.mailService.mailSmtpPort";
+    public static final String EAGLE_EMAIL_SMTP_CONN = "application.mailService.mailSmtpConn";
+    public static final String EAGLE_EMAIL_SMTP_AUTH = "application.mailService.mailSmtpAuth";
+    public static final String EAGLE_EMAIL_SMTP_USERNAME = "application.mailService.mailSmtpUsername";
+    public static final String EAGLE_EMAIL_SMTP_PASSWORD = "application.mailService.mailSmtpPassword";
+    public static final String EAGLE_EMAIL_SMTP_DEBUG = "application.mailService.mailSmtpDebug";
+
 
 }

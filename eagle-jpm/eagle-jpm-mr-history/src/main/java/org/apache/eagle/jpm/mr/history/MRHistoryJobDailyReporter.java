@@ -20,15 +20,19 @@ package org.apache.eagle.jpm.mr.history;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.resource.ApplicationResource;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.app.service.ApplicationEmailService;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.mail.AlertEmailConstants;
+import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +46,7 @@ import static org.apache.eagle.common.config.EagleConfigConstants.SERVICE_PORT;
 public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobDailyReporter.class);
     private static final String TIMEZONE_PATH = "service.timezone";
-    private static final String SERVICE_PATH = "application.dailyJobReport";
+    public static final String SERVICE_PATH = "application.dailyJobReport";
     private static final String DAILY_SENT_HOUROFDAY = "application.dailyJobReport.reportHourTime";
     private static final String DAILY_SENT_PERIOD = "application.dailyJobReport.reportPeriodInHour";
     private static final String NUM_TOP_USERS  = "application.dailyJobReport.numTopUsers";
@@ -50,7 +54,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
 
     private Config config;
     private IEagleServiceClient client;
-    @Inject private ApplicationResource applicationResource;
+    private ApplicationEntityService applicationResource;
     private ApplicationEmailService emailService;
     private boolean isDailySent = false;
     private long lastSentTime;
@@ -61,12 +65,12 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private int jobOvertimeLimit = 6;
 
     // scheduler
-    private  int initialDelayMin = 10;
-    private  int periodInMin = 60;
+    private int initialDelayMin = 10;
+    private int periodInMin = 60;
     private TimeZone timeZone;
 
     @Inject
-    public MRHistoryJobDailyReporter(Config config) {
+    public MRHistoryJobDailyReporter(Config config, ApplicationEntityService applicationEntityService) {
         this.timeZone = TimeZone.getTimeZone(config.getString(TIMEZONE_PATH));
         this.emailService = new ApplicationEmailService(config, SERVICE_PATH);
         this.dailySentHour = config.getInt(DAILY_SENT_HOUROFDAY);
@@ -79,10 +83,23 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             this.jobOvertimeLimit = config.getInt(JOB_OVERTIME_LIMIT_HOUR);
         }
         this.config = config;
+        this.applicationResource = applicationEntityService;
     }
 
     private boolean isSentHour(int currentHour) {
         return Math.abs(currentHour - dailySentHour) % dailySentPeriod == 0;
+    }
+
+    private Collection<String> loadSites(String appType) {
+        Set<String> sites = new HashSet<>();
+        Collection<ApplicationEntity> apps = applicationResource.findAll();
+        for (ApplicationEntity app : apps) {
+            if (app.getDescriptor().getType().equalsIgnoreCase(appType) && app.getStatus().equals(ApplicationEntity.Status.RUNNING)) {
+                sites.add(app.getSite().getSiteId());
+            }
+        }
+        LOG.info("Detected {} sites where MR_HISTORY_JOB_APP is Running: {}", sites.size(), sites);
+        return sites;
     }
 
     @Override
@@ -94,17 +111,19 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             isDailySent = false;
         } else if (!isDailySent) {
             isDailySent = true;
-            calendar.setTimeInMillis(lastSentTime);
-            LOG.info("last sent time = {} %s", calendar.getTime(), timeZone.getID());
+            LOG.info("last job report time is {} %s", DateTimeUtil.millisecondsToHumanDateWithSeconds(lastSentTime), timeZone.getID());
             try {
-                Collection<String> sites = loadSiteList("MR_HISTORY_JOB_APP");
+                Collection<String> sites = loadSites("MR_HISTORY_JOB_APP");
                 if (sites == null && sites.isEmpty()) {
                     LOG.warn("application MR_HISTORY_JOB_APP does not run on any sites!");
                     return;
                 }
                 for (String site : sites) {
-                    long reportTime = (currentTimestamp / DateTimeUtil.ONEHOUR + currentHour / dailySentPeriod) * DateTimeUtil.ONEHOUR;
-                    sendByEmail(buildAlertData(site, reportTime));
+                    int reportHour = currentHour / dailySentPeriod * dailySentPeriod;
+                    calendar.set(Calendar.HOUR_OF_DAY, reportHour);
+                    String subject = String.format("%s %s", site.toUpperCase(), config.getString(AlertEmailConstants.SUBJECT));
+                    Map<String, Object> alertData = buildAlertData(site, calendar.getTimeInMillis());
+                    sendByEmailWithSubject(alertData, subject);
                 }
             } catch (Exception ex) {
                 LOG.error("Fail to get job summery info due to {}", ex.getMessage(), ex);
@@ -117,18 +136,13 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         emailService.onAlert(alertData);
     }
 
-    private Collection<String> loadSiteList(String appType) {
-        Set<String> sites = new HashSet<>();
-        Collection<ApplicationEntity> apps = applicationResource.getApplicationEntities(null).getData();
-        for (ApplicationEntity app : apps) {
-            if (app.getDescriptor().getType().equalsIgnoreCase(appType) && app.getStatus().equals(ApplicationEntity.Status.RUNNING)) {
-                sites.add(app.getSite().getSiteId());
-            }
-        }
-        return sites;
+    protected void sendByEmailWithSubject(Map<String, Object> alertData, String subject) {
+        AlertEmailContext alertContext = emailService.buildEmailContext(subject);
+        emailService.onAlert(alertContext, alertData);
     }
 
     private Map<String, Object> buildAlertData(String site, long endTime) {
+        StopWatch watch = new StopWatch();
         Map<String, Object> data = new HashMap<>();
         this.client = new EagleServiceClientImpl(config);
         long startTime = endTime - DateTimeUtil.ONEHOUR * dailySentPeriod;
@@ -136,6 +150,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
             DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime));
         try {
+            watch.start();
             data.putAll(buildJobSummery(site, startTime, endTime));
             data.putAll(buildFailedJobInfo(site, startTime, endTime));
             data.putAll(buildSucceededJobInfo(site, startTime, endTime));
@@ -147,6 +162,8 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
                 DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
                 DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime),
                 DateTimeUtil.CURRENT_TIME_ZONE.getID()));
+            watch.stop();
+            LOG.info("Fetching DailyJobReport tasks {} seconds", watch.getTime() / DateTimeUtil.ONESECOND);
         } finally {
             try {
                 client.close();
@@ -157,30 +174,31 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         return data;
     }
 
-    private Map<String, Double> parseQueryResult(GenericServiceAPIResponseEntity<Map<List<String>, List<Double>>> responseEntity, int limit) {
-        Map<String, Double> stateCount = new TreeMap<>();
-        if (responseEntity.isSuccess()) {
-            responseEntity.getObj().stream().forEach(map -> {
-                for (Map.Entry<List<String>, List<Double>> entry : map.entrySet()) {
-                    if (stateCount.size() >= limit) {
-                        break;
-                    }
-                    stateCount.put(entry.getKey().get(0), entry.getValue().get(0));
-                }
-            });
+    private Map<String, Long> parseQueryResult(List<Map<List<String>, List<Double>>> result, int limit) {
+        Map<String, Long> stateCount = new LinkedHashMap<>();
+        for (Map<List<String>, List<Double>> map : result) {
+            if (stateCount.size() >= limit) {
+                break;
+            }
+            String key = String.valueOf(map.get("key").get(0));
+            Long value = map.get("value").get(0).longValue();
+            stateCount.put(key, value);
         }
         return stateCount;
     }
 
-    private Map<String, Double> queryGroupByMetrics(String condition, long startTime, long endTime, int limit) {
+    private Map<String, Long> queryGroupByMetrics(String condition, long startTime, long endTime, int limit) {
         try {
-            GenericServiceAPIResponseEntity<Map<List<String>, List<Double>>> response = client.search()
+            GenericServiceAPIResponseEntity response = client.search()
                 .pageSize(Integer.MAX_VALUE)
                 .query(condition)
                 .startTime(startTime)
                 .endTime(endTime).send();
-            Map<String, Double> userCount = parseQueryResult(response, limit);
-            return userCount;
+            if (!response.isSuccess()) {
+                return null;
+            }
+            List<Map<List<String>, List<Double>>> result = response.getObj();
+            return parseQueryResult(result, limit);
         } catch (EagleServiceClientException e) {
             LOG.error(e.getMessage(), e);
             return new HashMap<>();
@@ -192,16 +210,16 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         List<JobSummeryInfo> statusCount = new ArrayList<>();
         String query = String.format("%s[@site=\"%s\" and @endTime<=%s]<@currentState>{count}",
             Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        Map<String, Double> jobSummery = queryGroupByMetrics(query, startTime, endTime, Integer.MAX_VALUE);
+        Map<String, Long> jobSummery = queryGroupByMetrics(query, startTime, endTime, Integer.MAX_VALUE);
         if (jobSummery == null || jobSummery.isEmpty()) {
             return data;
         }
-        Optional<Double> totalJobs = jobSummery.values().stream().reduce((a, b) -> a + b);
-        for (Map.Entry<String, Double> entry : jobSummery.entrySet()) {
+        Optional<Long> totalJobs = jobSummery.values().stream().reduce((a, b) -> a + b);
+        for (Map.Entry<String, Long> entry : jobSummery.entrySet()) {
             JobSummeryInfo summeryInfo = new JobSummeryInfo();
             summeryInfo.status = entry.getKey();
             summeryInfo.numOfJobs = entry.getValue();
-            summeryInfo.ratio = entry.getValue() / totalJobs.get();
+            summeryInfo.ratio = String.format("%.2f", entry.getValue() * 1d / totalJobs.get());
             statusCount.add(summeryInfo);
         }
         data.put("summeryInfo", statusCount);
@@ -213,7 +231,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         String query = String.format("%s[@site=\"%s\" and @currentState=\"FAILED\" and @endTime<=%s]<@user>{count}.{count desc}",
             Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
 
-        Map<String, Double> failedJobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
+        Map<String, Long> failedJobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
         if (failedJobUsers == null || failedJobUsers.isEmpty()) {
             LOG.warn("Result set is empty for query={}", query);
             return data;
@@ -233,7 +251,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         long overtimeLimit = jobOvertimeLimit * DateTimeUtil.ONEHOUR;
         String query = String.format("%s[@site=\"%s\" and @currentState=\"SUCCEEDED\" and @durationTime>%s and @endTime<=%s]<@user>{count}.{count desc}",
             Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, overtimeLimit, endTime);
-        Map<String, Double> succeededJobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
+        Map<String, Long> succeededJobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
         if (succeededJobUsers == null || succeededJobUsers.isEmpty()) {
             LOG.warn("Result set is empty for query={}", query);
             return data;
@@ -246,7 +264,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         Map<String, Object> data = new HashMap<>();
         String query = String.format("%s[@site=\"%s\" and @endTime<=%s]<@user>{count}.{count desc}",
             Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        Map<String, Double> jobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
+        Map<String, Long> jobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
         if (jobUsers == null || jobUsers.isEmpty()) {
             LOG.warn("Result set is empty for query={}", query);
             return data;
@@ -262,18 +280,18 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
 
     public static class JobSummeryInfo {
         public String status;
-        public double numOfJobs;
-        public double ratio;
+        public long numOfJobs;
+        public String ratio;
 
         public String getStatus() {
             return status;
         }
 
-        public double getNumOfJobs() {
+        public long getNumOfJobs() {
             return numOfJobs;
         }
 
-        public double getRatio() {
+        public String getRatio() {
             return ratio;
         }
     }
