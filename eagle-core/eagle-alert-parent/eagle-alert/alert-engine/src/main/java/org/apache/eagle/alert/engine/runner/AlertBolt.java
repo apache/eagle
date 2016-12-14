@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -204,16 +205,16 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         List<PolicyDefinition> cachedPoliciesTemp = new ArrayList<>(cachedPolicies.values());
         addOrUpdatedStreams.forEach(s -> {
             cachedPoliciesTemp.stream().filter(p -> p.getInputStreams().contains(s.getStreamId())
-                || p.getOutputStreams().contains(s.getStreamId())).forEach(
-                    p -> {
-                        if (!comparator.getModified().contains(p) && !comparator.getAdded().contains(p)) {
-                            comparator.getModified().add(p);
-                        }
-                    });
+                || p.getOutputStreams().contains(s.getStreamId())).forEach(p -> {
+                    if (comparator.getModified().stream().filter(x -> x.getName().equals(p.getName())).count() <= 0
+                        && comparator.getAdded().stream().filter(x -> x.getName().equals(p.getName())).count() <= 0) {
+                        comparator.getModified().add(p);
+                    }
+                });
             ;
         });
 
-        policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
+        policyGroupEvaluator.onPolicyChange(spec.getVersion(), comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
 
         // update alert output collector
         Set<PublishPartition> newPublishPartitions = new HashSet<>();
