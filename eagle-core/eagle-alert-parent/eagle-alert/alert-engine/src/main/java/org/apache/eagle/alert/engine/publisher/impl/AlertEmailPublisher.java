@@ -39,6 +39,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.eagle.alert.service.MetadataServiceClientImpl.*;
+import static org.apache.eagle.common.mail.AlertEmailConstants.*;
 
 public class AlertEmailPublisher extends AbstractPublishPlugin {
 
@@ -46,14 +47,6 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     private static final int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
     private static final int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
     private static final long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
-
-    private static final String EAGLE_CORRELATION_SMTP_SERVER = "metadataService.mailSmtpServer";
-    private static final String EAGLE_CORRELATION_SMTP_PORT = "metadataService.mailSmtpPort";
-    private static final String EAGLE_CORRELATION_SMTP_CONN = "metadataService.mailSmtpConn";
-    private static final String EAGLE_CORRELATION_SMTP_AUTH = "metadataService.mailSmtpAuth";
-    private static final String EAGLE_CORRELATION_SMTP_USERNAME = "metadataService.mailSmtpUsername";
-    private static final String EAGLE_CORRELATION_SMTP_PASSWORD = "metadataService.mailSmtpPassword";
-    private static final String EAGLE_CORRELATION_SMTP_DEBUG = "metadataService.mailSmtpDebug";
 
     private AlertEmailGenerator emailGenerator;
     private Map<String, Object> emailConfig;
@@ -83,23 +76,28 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
 
     private Properties parseMailClientConfig(Config config) {
         Properties props = new Properties();
-        String mailSmtpServer = config.getString(EAGLE_CORRELATION_SMTP_SERVER);
-        String mailSmtpPort = config.getString(EAGLE_CORRELATION_SMTP_PORT);
-        String mailSmtpAuth =  config.getString(EAGLE_CORRELATION_SMTP_AUTH);
+        Config mailConfig = null;
+        if (config.hasPath(EAGLE_COORDINATOR_EMAIL_SERVICE)) {
+            mailConfig = config.getConfig(EAGLE_COORDINATOR_EMAIL_SERVICE);
+        } else if (config.hasPath(EAGLE_APPLICATION_EMAIL_SERVICE)) {
+            mailConfig = config.getConfig(EAGLE_APPLICATION_EMAIL_SERVICE);
+        }
+        String mailSmtpServer = mailConfig.getString(EAGLE_EMAIL_SMTP_SERVER);
+        String mailSmtpPort = mailConfig.getString(EAGLE_EMAIL_SMTP_PORT);
+        String mailSmtpAuth =  mailConfig.getString(EAGLE_EMAIL_SMTP_AUTH);
 
         props.put(AlertEmailConstants.CONF_MAIL_HOST, mailSmtpServer);
         props.put(AlertEmailConstants.CONF_MAIL_PORT, mailSmtpPort);
         props.put(AlertEmailConstants.CONF_MAIL_AUTH, mailSmtpAuth);
 
         if (Boolean.parseBoolean(mailSmtpAuth)) {
-            String mailSmtpUsername = config.getString(EAGLE_CORRELATION_SMTP_USERNAME);
-            String mailSmtpPassword = config.getString(EAGLE_CORRELATION_SMTP_PASSWORD);
+            String mailSmtpUsername = mailConfig.getString(EAGLE_EMAIL_SMTP_USERNAME);
+            String mailSmtpPassword = mailConfig.getString(EAGLE_EMAIL_SMTP_PASSWORD);
             props.put(AlertEmailConstants.CONF_AUTH_USER, mailSmtpUsername);
             props.put(AlertEmailConstants.CONF_AUTH_PASSWORD, mailSmtpPassword);
         }
 
-        String mailSmtpConn = config.hasPath(EAGLE_CORRELATION_SMTP_CONN) ? config.getString(EAGLE_CORRELATION_SMTP_CONN) : AlertEmailConstants.CONN_PLAINTEXT;
-        String mailSmtpDebug = config.hasPath(EAGLE_CORRELATION_SMTP_DEBUG) ? config.getString(EAGLE_CORRELATION_SMTP_DEBUG) : "false";
+        String mailSmtpConn = mailConfig.hasPath(EAGLE_EMAIL_SMTP_CONN) ? mailConfig.getString(EAGLE_EMAIL_SMTP_CONN) : AlertEmailConstants.CONN_PLAINTEXT;
         if (mailSmtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_TLS)) {
             props.put("mail.smtp.starttls.enable", "true");
         }
@@ -108,6 +106,8 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             props.put("mail.smtp.socketFactory.class",
                     "javax.net.ssl.SSLSocketFactory");
         }
+
+        String mailSmtpDebug = mailConfig.hasPath(EAGLE_EMAIL_SMTP_DEBUG) ? mailConfig.getString(EAGLE_EMAIL_SMTP_DEBUG) : "false";
         props.put(AlertEmailConstants.CONF_MAIL_DEBUG, mailSmtpDebug);
         return props;
     }
