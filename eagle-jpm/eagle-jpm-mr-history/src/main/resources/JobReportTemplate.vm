@@ -379,9 +379,9 @@
                                     <td class="content-block"
                                         style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        * Note:<br/>
+                                        * Notes:<br/>
                                         1) Finished jobs include those <i>SUCCEEDED</i>, <i>FAILED</i> and <i>KILLED</i>.<br/>
-                                        2) Note: Long running jobs mean those duration over $alert["jobOvertimeLimit"] hours.
+                                        2) Long running jobs mean those duration over $alert["jobOvertimeLimit"] hours.
                                     </td>
                                 </tr>
                             </table>
