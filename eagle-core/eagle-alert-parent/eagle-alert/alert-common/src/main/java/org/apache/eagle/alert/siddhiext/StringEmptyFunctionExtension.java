@@ -59,7 +59,7 @@ public class StringEmptyFunctionExtension extends FunctionExecutor {
 
     @Override
     protected Object execute(Object data) {
-        return data == null || ((String)data).isEmpty() ? 0 : 1;
+        return !(data == null || ((String) data).isEmpty());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class StringEmptyFunctionExtension extends FunctionExecutor {
 
     @Override
     public Attribute.Type getReturnType() {
-        return Attribute.Type.INT;
+        return Attribute.Type.BOOL;
     }
 
     @Override
