@@ -36,13 +36,13 @@
         </property>
         <property>
             <name>stormConfig.jobKafkaSinkTasks</name>
-            <displayName>Sink Task Number</displayName>
+            <displayName>Sink Task Number For Job Stream</displayName>
             <description>the number tasks of the sink bolt will be assigned</description>
             <value>1</value>
         </property>
         <property>
             <name>stormConfig.taskAttemptKafkaSinkTasks</name>
-            <displayName>Sink Task Number</displayName>
+            <displayName>Sink Task Number For Task Attempt Stream</displayName>
             <description>the number tasks of the sink bolt will be assigned</description>
             <value>1</value>
         </property>
