@@ -22,7 +22,6 @@ import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
 import org.apache.eagle.alert.engine.runner.MapComparator;
@@ -68,8 +67,7 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
             if (alertPublisher == null) {
                 cachedPublishments = publishState.getCachedPublishmentsByPublishPartition(publishPartition);
 
-                alertPublisher = new AlertPublisherImpl(alertPublishBoltName, cachedPublishments);
-                alertPublisher.init(config, new HashMap<>());
+                alertPublisher = new AlertPublisherImpl(alertPublishBoltName, cachedPublishments, config);
                 publishSpec = publishSpecRef.get();
 
                 onAlertPublishSpecChange(alertPublisher, publishSpec, cachedPublishments);

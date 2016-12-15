@@ -55,7 +55,6 @@ public class PolicyState implements Serializable {
         this.policyStreamHandler = policyStreamHandler;
     }
 
-//TODO https://github.com/apache/spark/blob/branch-1.6/examples/src/main/java/org/apache/spark/examples/streaming/JavaRecoverableNetworkWordCount.java
 
     public void recover() {
         cachedPoliciesRef.set(cachedPolicies.value());
