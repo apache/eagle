@@ -255,7 +255,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             return data;
         }
         data.put(FAILED_JOB_USERS_KEY, failedJobUsers);
-        data.put(EAGLE_JOB_LINK_KEY, String.format("http://%s:%d/#/site/%s/jpm/statistics?startTime=%s&endTime=%s",
+        data.put(EAGLE_JOB_LINK_KEY, String.format("http://%s:%d/#/site/%s/jpm/list?startTime=%s&endTime=%s",
             config.getString(SERVICE_HOST),
             config.getInt(SERVICE_PORT),
             site,
