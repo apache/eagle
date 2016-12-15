@@ -44,14 +44,15 @@ import static org.apache.eagle.common.config.EagleConfigConstants.SERVICE_PORT;
 
 public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobDailyReporter.class);
-    private static final String TIMEZONE_PATH = "service.timezone";
+
     private static final String DAILY_SENT_HOUROFDAY = "application.dailyJobReport.reportHourTime";
     private static final String DAILY_SENT_PERIOD = "application.dailyJobReport.reportPeriodInHour";
     private static final String NUM_TOP_USERS  = "application.dailyJobReport.numTopUsers";
     private static final String JOB_OVERTIME_LIMIT_HOUR  = "application.dailyJobReport.jobOvertimeLimitInHour";
 
     public static final String SERVICE_PATH = "application.dailyJobReport";
-    public static final String APP_TYPE = "MR_HISTORY_JOB_APP";
+    protected static final String APP_TYPE = "MR_HISTORY_JOB_APP";
+    protected static final String TIMEZONE_PATH = "service.timezone";
 
     // alert context keys
     protected static final String NUM_TOP_USERS_KEY = "numTopUsers";
@@ -63,6 +64,12 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     protected static final String SUCCEEDED_JOB_USERS_KEY = "succeededJobUsers";
     protected static final String FINISHED_JOB_USERS_KEY = "finishedJobUsers";
     protected static final String EAGLE_JOB_LINK_KEY = "eagleJobLink";
+
+    // queries
+    private static final String STATUS_QUERY = "%s[@site=\"%s\" and @endTime<=%s]<@currentState>{count}.{count desc}";
+    private static final String FAILED_JOBS_QUERY = "%s[@site=\"%s\" and @currentState=\"FAILED\" and @endTime<=%s]<@user>{count}.{count desc}";
+    private static final String SUCCEEDED_JOB_QUERY = "%s[@site=\"%s\" and @currentState=\"SUCCEEDED\" and @durationTime>%s and @endTime<=%s]<@user>{count}.{count desc}";
+    private static final String FINISHED_JOB_QUERY = "%s[@site=\"%s\" and @endTime<=%s]<@user>{count}.{count desc}";
 
     private Config config;
     private IEagleServiceClient client;
@@ -139,8 +146,10 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
                 for (String site : sites) {
                     int reportHour = currentHour / dailySentPeriod * dailySentPeriod;
                     calendar.set(Calendar.HOUR_OF_DAY, reportHour);
-                    String subject = String.format("%s %s", site.toUpperCase(), config.getString(SERVICE_PATH + "." + AlertEmailConstants.SUBJECT));
-                    Map<String, Object> alertData = buildAlertData(site, calendar.getTimeInMillis());
+                    long endTime = calendar.getTimeInMillis() / DateTimeUtil.ONEHOUR * DateTimeUtil.ONEHOUR;
+                    long startTime = endTime - DateTimeUtil.ONEHOUR * dailySentPeriod;
+                    String subject = buildAlertSubject(site, startTime, endTime);
+                    Map<String, Object> alertData = buildAlertData(site, startTime, endTime);
                     sendByEmailWithSubject(alertData, subject);
                 }
             } catch (Exception ex) {
@@ -159,27 +168,30 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         emailService.onAlert(alertContext, alertData);
     }
 
-    private Map<String, Object> buildAlertData(String site, long endTime) {
+    protected String buildAlertSubject(String site, long startTime, long endTime) {
+        String subjectFormat = "[%s] Job Report %s %s-%s";
+        String date = DateTimeUtil.format(startTime, "yyyyMMdd");
+        String startHour = DateTimeUtil.format(startTime, "HH:mm");
+        String endHour = DateTimeUtil.format(endTime, "kk:mm");
+        return String.format(subjectFormat, site.toUpperCase(), date, startHour, endHour);
+    }
+
+    private Map<String, Object> buildAlertData(String site, long startTime, long endTime) {
         StopWatch watch = new StopWatch();
         Map<String, Object> data = new HashMap<>();
         this.client = new EagleServiceClientImpl(config);
-        long startTime = endTime - DateTimeUtil.ONEHOUR * dailySentPeriod;
-        LOG.info("Going to report job summery info for site {} from {} to {}", site,
-            DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
-            DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime));
+        String startTimeStr = DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime);
+        String endTimeStr = DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime);
+        LOG.info("Going to report job summery info for site {} from {} to {}", site, startTimeStr, endTimeStr);
         try {
             watch.start();
             data.putAll(buildJobSummery(site, startTime, endTime));
-            data.putAll(buildFailedJobInfo(site, startTime, endTime));
-            data.putAll(buildSucceededJobInfo(site, startTime, endTime));
-            data.putAll(buildFinishedJobInfo(site, startTime, endTime));
             data.put(NUM_TOP_USERS_KEY, numTopUsers);
             data.put(JOB_OVERTIME_LIMIT_KEY, jobOvertimeLimit);
             data.put(ALERT_TITLE_KEY, String.format("[%s] Daily Job Report", site.toUpperCase()));
-            data.put(REPORT_RANGE_KEY, String.format("%s ~ %s %s",
-                DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
-                DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime),
-                DateTimeUtil.CURRENT_TIME_ZONE.getID()));
+            data.put(REPORT_RANGE_KEY, String.format("%s ~ %s %s", startTimeStr, endTimeStr, DateTimeUtil.CURRENT_TIME_ZONE.getID()));
+            data.put(EAGLE_JOB_LINK_KEY, String.format("http://%s:%d/#/site/%s/jpm/list?startTime=%s&endTime=%s",
+                    config.getString(SERVICE_HOST), config.getInt(SERVICE_PORT), site, startTimeStr, endTimeStr));
             watch.stop();
             LOG.info("Fetching DailyJobReport tasks {} seconds", watch.getTime() / DateTimeUtil.ONESECOND);
         } finally {
@@ -190,6 +202,48 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             }
         }
         return data;
+    }
+
+    private Map<String, Object> buildJobSummery(String site, long startTime, long endTime) {
+        Map<String, Object> data = new HashMap<>();
+
+        String query = String.format(STATUS_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
+        Map<String, Long> jobSummery = queryGroupByMetrics(query, startTime, endTime, Integer.MAX_VALUE);
+        if (jobSummery == null || jobSummery.isEmpty()) {
+            LOG.warn("Result set is empty for query={}", query);
+            return data;
+        }
+        Long totalJobs = jobSummery.values().stream().reduce((a, b) -> a + b).get();
+        String finishedJobQuery = String.format(FINISHED_JOB_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
+        String failedJobQuery = String.format(FAILED_JOBS_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
+        String succeededJobQuery = String.format(SUCCEEDED_JOB_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, jobOvertimeLimit * DateTimeUtil.ONEHOUR, endTime);
+        data.put(SUMMARY_INFO_KEY, processResult(jobSummery, totalJobs));
+        data.put(FAILED_JOB_USERS_KEY, buildJobSummery(failedJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.FAILED.toString())));
+        data.put(SUCCEEDED_JOB_USERS_KEY, buildJobSummery(succeededJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.SUCCEEDED.toString())));
+        data.put(FINISHED_JOB_USERS_KEY, buildJobSummery(finishedJobQuery, startTime, endTime, totalJobs));
+
+        return data;
+    }
+
+    private List<JobSummaryInfo> buildJobSummery(String query,  long startTime, long endTime, long totalJobs) {
+        Map<String, Long> jobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
+        if (jobUsers == null || jobUsers.isEmpty()) {
+            LOG.warn("Result set is empty for query={}", query);
+            return null;
+        }
+        return processResult(jobUsers, totalJobs);
+    }
+
+    private List<JobSummaryInfo> processResult(Map<String, Long> parsedResult, long totalJobs) {
+        List<JobSummaryInfo> summaryInfoList = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : parsedResult.entrySet()) {
+            JobSummaryInfo summaryInfo = new JobSummaryInfo();
+            summaryInfo.key = entry.getKey();
+            summaryInfo.numOfJobs = entry.getValue();
+            summaryInfo.ratio = Double.parseDouble(String.format("%.2f", summaryInfo.numOfJobs * 100d / totalJobs));
+            summaryInfoList.add(summaryInfo);
+        }
+        return summaryInfoList;
     }
 
     private Map<String, Long> parseQueryResult(List<Map<List<String>, List<Double>>> result, int limit) {
@@ -213,6 +267,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
                 .startTime(startTime)
                 .endTime(endTime).send();
             if (!response.isSuccess()) {
+                LOG.error(response.getException());
                 return null;
             }
             List<Map<List<String>, List<Double>>> result = response.getObj();
@@ -223,86 +278,18 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         }
     }
 
-    private Map<String, Object> buildJobSummery(String site, long startTime, long endTime) {
-        Map<String, Object> data = new HashMap<>();
-        List<JobSummeryInfo> statusCount = new ArrayList<>();
-        String query = String.format("%s[@site=\"%s\" and @endTime<=%s]<@currentState>{count}",
-            Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        Map<String, Long> jobSummery = queryGroupByMetrics(query, startTime, endTime, Integer.MAX_VALUE);
-        if (jobSummery == null || jobSummery.isEmpty()) {
-            return data;
-        }
-        Optional<Long> totalJobs = jobSummery.values().stream().reduce((a, b) -> a + b);
-        for (Map.Entry<String, Long> entry : jobSummery.entrySet()) {
-            JobSummeryInfo summeryInfo = new JobSummeryInfo();
-            summeryInfo.status = entry.getKey();
-            summeryInfo.numOfJobs = entry.getValue();
-            summeryInfo.ratio = Double.parseDouble(String.format("%.2f", entry.getValue() * 1d / totalJobs.get()));
-            statusCount.add(summeryInfo);
-        }
-        data.put(SUMMARY_INFO_KEY, statusCount);
-        return data;
-    }
-
-    private Map<String, Object> buildFailedJobInfo(String site, long startTime, long endTime) {
-        Map<String, Object> data = new HashMap<>();
-        String query = String.format("%s[@site=\"%s\" and @currentState=\"FAILED\" and @endTime<=%s]<@user>{count}.{count desc}",
-            Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-
-        Map<String, Long> failedJobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
-        if (failedJobUsers == null || failedJobUsers.isEmpty()) {
-            LOG.warn("Result set is empty for query={}", query);
-            return data;
-        }
-        data.put(FAILED_JOB_USERS_KEY, failedJobUsers);
-        data.put(EAGLE_JOB_LINK_KEY, String.format("http://%s:%d/#/site/%s/jpm/list?startTime=%s&endTime=%s",
-            config.getString(SERVICE_HOST),
-            config.getInt(SERVICE_PORT),
-            site,
-            DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
-            DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime)));
-        return data;
-    }
-
-    private Map<String, Object> buildSucceededJobInfo(String site, long startTime, long endTime) {
-        Map<String, Object> data = new HashMap<>();
-        long overtimeLimit = jobOvertimeLimit * DateTimeUtil.ONEHOUR;
-        String query = String.format("%s[@site=\"%s\" and @currentState=\"SUCCEEDED\" and @durationTime>%s and @endTime<=%s]<@user>{count}.{count desc}",
-            Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, overtimeLimit, endTime);
-        Map<String, Long> succeededJobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
-        if (succeededJobUsers == null || succeededJobUsers.isEmpty()) {
-            LOG.warn("Result set is empty for query={}", query);
-            return data;
-        }
-        data.put(SUCCEEDED_JOB_USERS_KEY, succeededJobUsers);
-        return data;
-    }
-
-    private Map<String, Object> buildFinishedJobInfo(String site, long startTime, long endTime) {
-        Map<String, Object> data = new HashMap<>();
-        String query = String.format("%s[@site=\"%s\" and @endTime<=%s]<@user>{count}.{count desc}",
-            Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        Map<String, Long> jobUsers = queryGroupByMetrics(query, startTime, endTime, numTopUsers);
-        if (jobUsers == null || jobUsers.isEmpty()) {
-            LOG.warn("Result set is empty for query={}", query);
-            return data;
-        }
-        data.put(FINISHED_JOB_USERS_KEY, jobUsers);
-        return data;
-    }
-
     @Override
     protected Scheduler scheduler() {
         return Scheduler.newFixedRateSchedule(initialDelayMin, periodInMin, TimeUnit.MINUTES);
     }
 
-    public static class JobSummeryInfo {
-        public String status;
+    public static class JobSummaryInfo {
+        public String key;
         public long numOfJobs;
         public double ratio;
 
-        public String getStatus() {
-            return status;
+        public String getKey() {
+            return key;
         }
 
         public long getNumOfJobs() {
