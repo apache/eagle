@@ -41,6 +41,7 @@ public class AlertEmailConstants {
     public static final String ALERT_EMAIL_COUNT_PROPERTY = "count";
     public static final String ALERT_EMAIL_ALERTLIST_PROPERTY = "alertList";
     public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
+    public static final String VERSION = "version";
 
     public static final String EAGLE_APPLICATION_EMAIL_SERVICE = "application.mailService";
     public static final String EAGLE_COORDINATOR_EMAIL_SERVICE = "coordinator.mailService";
