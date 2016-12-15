@@ -28,9 +28,16 @@ public abstract class StreamPublisher<T> {
     protected String stormStreamId;
     protected EagleOutputCollector collector;
 
-    public StreamPublisher(String stormStreamId, EagleOutputCollector collector) {
+    public StreamPublisher(String stormStreamId) {
         this.stormStreamId = stormStreamId;
+    }
+
+    public void setCollector(EagleOutputCollector collector) {
         this.collector = collector;
+    }
+
+    public String stormStreamId() {
+        return stormStreamId;
     }
 
     public abstract Class<?> type();

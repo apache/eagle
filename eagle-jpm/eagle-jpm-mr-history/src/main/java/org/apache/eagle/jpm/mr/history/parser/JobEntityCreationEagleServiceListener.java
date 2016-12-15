@@ -52,19 +52,17 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     List<TaskAttemptErrorCategoryEntity> taskAttemptErrors = new ArrayList<>();
     private JobExecutionMetricsCreationListener jobExecutionMetricsCreationListener = new JobExecutionMetricsCreationListener();
     private TimeZone timeZone;
-    private EagleOutputCollector collector;
     private MRHistoryJobConfig appConfig;
 
-    public JobEntityCreationEagleServiceListener(EagleOutputCollector collector, MRHistoryJobConfig appConfig) {
-        this(BATCH_SIZE, collector, appConfig);
+    public JobEntityCreationEagleServiceListener(MRHistoryJobConfig appConfig) {
+        this(BATCH_SIZE, appConfig);
     }
 
-    public JobEntityCreationEagleServiceListener(int batchSize, EagleOutputCollector collector, MRHistoryJobConfig appConfig) {
+    public JobEntityCreationEagleServiceListener(int batchSize, MRHistoryJobConfig appConfig) {
         if (batchSize <= 0) {
             throw new IllegalArgumentException("batchSize must be greater than 0 when it is provided");
         }
         this.batchSize = batchSize;
-        this.collector = collector;
         this.appConfig = appConfig;
         timeZone = TimeZone.getTimeZone(appConfig.getJobHistoryEndpointConfig().timeZone);
     }
