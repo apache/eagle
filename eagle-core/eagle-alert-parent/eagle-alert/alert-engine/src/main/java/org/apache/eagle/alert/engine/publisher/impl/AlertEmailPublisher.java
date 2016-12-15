@@ -76,23 +76,28 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
 
     private Properties parseMailClientConfig(Config config) {
         Properties props = new Properties();
-        String mailSmtpServer = config.getString(EAGLE_EMAIL_SMTP_SERVER);
-        String mailSmtpPort = config.getString(EAGLE_EMAIL_SMTP_PORT);
-        String mailSmtpAuth =  config.getString(EAGLE_EMAIL_SMTP_AUTH);
+        Config mailConfig = null;
+        if (config.hasPath(EAGLE_COORDINATOR_EMAIL_SERVICE)) {
+            mailConfig = config.getConfig(EAGLE_COORDINATOR_EMAIL_SERVICE);
+        } else if (config.hasPath(EAGLE_APPLICATION_EMAIL_SERVICE)) {
+            mailConfig = config.getConfig(EAGLE_APPLICATION_EMAIL_SERVICE);
+        }
+        String mailSmtpServer = mailConfig.getString(EAGLE_EMAIL_SMTP_SERVER);
+        String mailSmtpPort = mailConfig.getString(EAGLE_EMAIL_SMTP_PORT);
+        String mailSmtpAuth =  mailConfig.getString(EAGLE_EMAIL_SMTP_AUTH);
 
         props.put(AlertEmailConstants.CONF_MAIL_HOST, mailSmtpServer);
         props.put(AlertEmailConstants.CONF_MAIL_PORT, mailSmtpPort);
         props.put(AlertEmailConstants.CONF_MAIL_AUTH, mailSmtpAuth);
 
         if (Boolean.parseBoolean(mailSmtpAuth)) {
-            String mailSmtpUsername = config.getString(EAGLE_EMAIL_SMTP_USERNAME);
-            String mailSmtpPassword = config.getString(EAGLE_EMAIL_SMTP_PASSWORD);
+            String mailSmtpUsername = mailConfig.getString(EAGLE_EMAIL_SMTP_USERNAME);
+            String mailSmtpPassword = mailConfig.getString(EAGLE_EMAIL_SMTP_PASSWORD);
             props.put(AlertEmailConstants.CONF_AUTH_USER, mailSmtpUsername);
             props.put(AlertEmailConstants.CONF_AUTH_PASSWORD, mailSmtpPassword);
         }
 
-        String mailSmtpConn = config.hasPath(EAGLE_EMAIL_SMTP_CONN) ? config.getString(EAGLE_EMAIL_SMTP_CONN) : AlertEmailConstants.CONN_PLAINTEXT;
-        String mailSmtpDebug = config.hasPath(EAGLE_EMAIL_SMTP_DEBUG) ? config.getString(EAGLE_EMAIL_SMTP_DEBUG) : "false";
+        String mailSmtpConn = mailConfig.hasPath(EAGLE_EMAIL_SMTP_CONN) ? mailConfig.getString(EAGLE_EMAIL_SMTP_CONN) : AlertEmailConstants.CONN_PLAINTEXT;
         if (mailSmtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_TLS)) {
             props.put("mail.smtp.starttls.enable", "true");
         }
@@ -101,6 +106,8 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             props.put("mail.smtp.socketFactory.class",
                     "javax.net.ssl.SSLSocketFactory");
         }
+
+        String mailSmtpDebug = mailConfig.hasPath(EAGLE_EMAIL_SMTP_DEBUG) ? mailConfig.getString(EAGLE_EMAIL_SMTP_DEBUG) : "false";
         props.put(AlertEmailConstants.CONF_MAIL_DEBUG, mailSmtpDebug);
         return props;
     }

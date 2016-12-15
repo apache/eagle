@@ -86,7 +86,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     public MRHistoryJobDailyReporter(Config config, ApplicationEntityService applicationEntityService) {
         this.timeZone = TimeZone.getTimeZone(config.getString(TIMEZONE_PATH));
 
-        if (config.hasPath(SERVICE_PATH) && config.hasPath(AlertEmailConstants.EAGLE_EMAIL_SERVICE)) {
+        if (config.hasPath(SERVICE_PATH) && config.hasPath(AlertEmailConstants.EAGLE_APPLICATION_EMAIL_SERVICE)) {
             this.emailService = new ApplicationEmailService(config, SERVICE_PATH);
         }
         if (config.hasPath(DAILY_SENT_HOUROFDAY)) {

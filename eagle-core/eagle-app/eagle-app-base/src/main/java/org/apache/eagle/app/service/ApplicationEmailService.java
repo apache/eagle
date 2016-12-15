@@ -29,13 +29,15 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+import static org.apache.eagle.common.mail.AlertEmailConstants.EAGLE_APPLICATION_EMAIL_SERVICE;
+
 public class ApplicationEmailService extends AbstractEmailService {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationEmailService.class);
     private String appConfPath;
     private Config config;
 
     public ApplicationEmailService(Config config, String appConfPath) {
-        super(config);
+        super(config.getConfig(EAGLE_APPLICATION_EMAIL_SERVICE));
         this.appConfPath = appConfPath;
         this.config = config;
     }
