@@ -97,6 +97,7 @@ public class JobHistorySpout extends BaseRichSpout {
     private static final int MAX_RETRY_TIMES = 3;
     private MRHistoryJobConfig appConfig;
     private JobHistoryEndpointConfig jobHistoryEndpointConfig;
+    private List<String> streams;
 
     /**
      * mostly this constructor signature is for unit test purpose as you can put customized interceptor here.
@@ -174,12 +175,20 @@ public class JobHistorySpout extends BaseRichSpout {
         }
     }
 
+    public void setStreams(List<String> streams) {
+        this.streams = streams;
+    }
+
     /**
      * empty because framework will take care of output fields declaration.
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("jobId", "message"));
+        if (streams != null) {
+            for (String streamId : streams) {
+                declarer.declareStream(streamId, new Fields("f1", "message"));
+            }
+        }
     }
 
     /**

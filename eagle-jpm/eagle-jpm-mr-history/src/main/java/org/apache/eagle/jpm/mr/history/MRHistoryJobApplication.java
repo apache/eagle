@@ -68,9 +68,10 @@ public class MRHistoryJobApplication extends StormApplication {
         String spoutName = "mrHistoryJobSpout";
         int tasks = jhfAppConf.getInt("stormConfig.mrHistoryJobSpoutTasks");
         JobHistorySpoutCollectorInterceptor collectorInterceptor = new JobHistorySpoutCollectorInterceptor();
+        JobHistorySpout jobHistorySpout = new JobHistorySpout(filter, appConfig, collectorInterceptor);
         topologyBuilder.setSpout(
                 spoutName,
-                new JobHistorySpout(filter, appConfig, collectorInterceptor),
+                jobHistorySpout,
                 tasks
         ).setNumTasks(tasks);
 
@@ -87,6 +88,11 @@ public class MRHistoryJobApplication extends StormApplication {
                 .setNumTasks(jhfAppConf.getInt("stormConfig.taskAttemptKafkaSinkTasks"));
         String spoutToTaskAttemptSinkName = spoutName + "_to_" + taskAttemptSinkBoltName;
         taskAttemptKafkaBoltDeclarer.shuffleGrouping(spoutName, spoutToTaskAttemptSinkName);
+
+        List<String> streams = new ArrayList<>();
+        streams.add(spoutToJobSinkName);
+        streams.add(spoutToTaskAttemptSinkName);
+        jobHistorySpout.setStreams(streams);
 
         //4, add stream publisher
         StreamPublisherManager.getInstance().addStreamPublisher(new JobStreamPublisher(spoutToJobSinkName, collectorInterceptor));
