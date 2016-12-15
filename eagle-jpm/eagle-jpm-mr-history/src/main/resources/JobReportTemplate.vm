@@ -20,7 +20,7 @@
 #set ($alertColor = "#337ab7")
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-      style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+      style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
 <head>
     <meta name="viewport" content="width=device-width"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -76,7 +76,7 @@
             }
 
             h3 {
-                font-size: 16px !important;
+                font-size: 14px !important;
             }
 
             .container {
@@ -100,86 +100,94 @@
 </head>
 
 <body itemscope itemtype="http://schema.org/EmailMessage"
-      style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #f6f6f6; margin: 0;"
+      style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #f6f6f6; margin: 0;"
       bgcolor="#f6f6f6">
 
 <table class="body-wrap"
-       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; background-color: #f6f6f6; margin: 0;"
+       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #f6f6f6; margin: 0;"
        bgcolor="#f6f6f6">
-    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-        <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0;"
+    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+        <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
             valign="top"></td>
         <td class="container" width="600"
-            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;"
+            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;"
             valign="top">
             <div class="content"
-                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
+                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
                 <table class="main" width="100%" cellpadding="0" cellspacing="0"
-                       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px solid #e9e9e9;"
+                       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px solid #e9e9e9;"
                        bgcolor="#fff">
-                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                         <td class="alert alert-warning"
-                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #fff; font-weight: 500; text-align: center; border-radius: 3px 3px 0 0; background-color: $alertColor; margin: 0; padding: 20px;"
+                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; color: #fff; font-weight: 500; text-align: center; border-radius: 3px 3px 0 0; background-color: $alertColor; margin: 0; padding: 20px;"
                             align="center" bgcolor="" valign="top">
                             <strong>$alert["alertTitle"]</strong>
                         </td>
                     </tr>
-                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                         <td class="content-wrap"
-                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 20px;"
+                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 20px;"
                             valign="top">
                             <table width="100%" cellpadding="0" cellspacing="0"
-                                   style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                                   style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
-                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 0 0 20px;"
+                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
                                         <i><strong>Time:</strong> $alert["reportRange"]</i>
                                     </td>
                                 </tr>
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                    <th class="content-block"
-                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 0 0 20px;"
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td class="content-block"
+                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        Job Summary
-                                    </th>
+                                        <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 20px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
+                                        Summary
+                                        </h2>
+                                    </td>
                                 </tr>
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block aligncenter"
-                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
+                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
                                         align="center" valign="top">
                                         <table class="invoice"
-                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; text-align: left; width: 100%; margin: 10px auto;">
-                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 100%; margin: 10px auto;">
+                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                     valign="top">
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0"
-                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; margin: 0;">
-                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                            <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0;">
+                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                            <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 Status
                                                             </th>
-                                                            <th style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                            <th style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 Number of Jobs
                                                             </th>
-                                                            <th style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                            <th style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 Ratio
                                                             </th>
                                                         </tr>
                                                         #foreach($item in $alert["summaryInfo"])
-                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                            <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                            <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                 valign="top">
-                                                                $item.status
+                                                                #set($statusColor = "#337ab7")
+                                                                #if($item.status == "SUCCEEDED")
+                                                                    #set($statusColor = "green")
+                                                                #elseif($item.status == "FAILED" || $item.status == "KILLED")
+                                                                    #set($statusColor = "red")
+                                                                #end
+                                                                <span style="color: $statusColor">$item.status</span>
                                                             </td>
-                                                            <td style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                            <td style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 $item.numOfJobs
                                                             </td>
-                                                            <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                            <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 #set ($ratio_percentage = $item.ratio * 100)
                                                                 $ratio_percentage %
@@ -193,43 +201,52 @@
                                     </td>
                                 </tr>
 
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                    <th class="content-block"
-                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 0 0 20px;"
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td class="content-block"
+                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
 ##                                        Top $alert["numTopUsers"] Users (Order by Number of Failed Jobs)
-                                        Top $alert["numTopUsers"] Failed Job Users
-                                    </th>
+                                        <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 18px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
+                                            Top $alert["numTopUsers"] Failed Job Users
+                                        </h2>
+                                    </td>
                                 </tr>
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block aligncenter"
-                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
+                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
                                         align="center" valign="top">
                                         <table class="invoice"
-                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; text-align: left; width: 100%; margin: 10px auto;">
-                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 100%; margin: 10px auto;">
+                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                     valign="top">
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0"
-                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; margin: 0;">
-                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                            <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0;">
+                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                            <th style="text-align:left;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 User Name
                                                             </th>
-                                                            <th style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                            <th style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 Number of Failed Jobs
                                                             </th>
+                                                            <th style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                                valign="top">
+                                                                Ratio
+                                                            </th>
                                                         </tr>
                                                         #foreach($userItem in $alert["failedJobUsers"].entrySet())
-                                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                     valign="top">
                                                                     $userItem.key
                                                                 </td>
-                                                                <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                <td style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                     valign="top">$userItem.value
+                                                                </td>
+                                                                <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                    valign="top">$TODO_RATIO
                                                                 </td>
                                                             </tr>
                                                         #end
@@ -240,94 +257,59 @@
                                     </td>
                                 </tr>
 
-
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                    <th class="content-block"
-                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 0 0 20px;"
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td class="content-block"
+                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-##                                        Top $alert["numTopUsers"] Users (Order by Number of Succeeded Jobs Running over $alert["jobOvertimeLimit"] Hours)
-                                        Top $alert["numTopUsers"] Succeeded Job Users (Over $alert["jobOvertimeLimit"] Hours )
-                                    </th>
-                                </tr>
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                    <td class="content-block aligncenter"
-                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
-                                        align="center" valign="top">
-                                        <table class="invoice"
-                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; text-align: left; width: 100%; margin: 10px auto;">
-                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
-                                                    valign="top">
-                                                    <table class="invoice-items" cellpadding="0" cellspacing="0"
-                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; margin: 0;">
-                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                            <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
-                                                                valign="top">
-                                                                User Name
-                                                            </th>
-                                                            <th style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
-                                                                valign="top">
-                                                                Number of Succeeded Jobs
-##                                                                Over $alert["jobOvertimeLimit"] Hours
-                                                            </th>
-                                                        </tr>
-                                                        #foreach($userItem in $alert["succeededJobUsers"].entrySet())
-                                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
-                                                                    valign="top">
-                                                                    $userItem.key
-                                                                </td>
-                                                                <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
-                                                                    valign="top">$userItem.value
-                                                                </td>
-                                                            </tr>
-                                                        #end
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                       <a href="$alert["eagleJobLink"]" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #999; text-decoration: underline; margin: 0;">
+                                           View Jobs on Eagle
+                                       </a>
                                     </td>
                                 </tr>
-
-
-
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                    <th class="content-block"
-                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 0 0 20px;"
-                                        valign="top">
-                                        Top $alert["numTopUsers"] Finished Job Users
-                                    </th>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                                        <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 18px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
+                                            Top $alert["numTopUsers"] Finished* Job Users
+                                        </h2>
+                                    </td>
                                 </tr>
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block aligncenter"
-                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
+                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
                                         align="center" valign="top">
                                         <table class="invoice"
-                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; text-align: left; width: 100%; margin: 10px auto;">
-                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 100%; margin: 10px auto;">
+                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                     valign="top">
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0"
-                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; margin: 0;">
-                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                            <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0;">
+                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                            <th style="text-align:left;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 User Name
                                                             </th>
-                                                            <th style="text-align:right; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                            <th style="text-align:center; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
                                                                 valign="top">
                                                                 Number of Finished Jobs
                                                             </th>
+                                                            <th style="text-align:right; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                                valign="top">
+                                                                Ratio
+                                                            </th>
                                                         </tr>
                                                         #foreach($userItem in $alert["finishedJobUsers"].entrySet())
-                                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                     valign="top">
                                                                     $userItem.key
                                                                 </td>
-                                                                <td style="text-align:right; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                <td style="text-align:center; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
                                                                     valign="top">
                                                                     $userItem.value
+                                                                </td>
+                                                                <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                    valign="top">$TODO_RATIO
                                                                 </td>
                                                             </tr>
                                                         #end
@@ -338,14 +320,68 @@
                                     </td>
                                 </tr>
 
-                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block"
-                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0; padding: 0 0 20px;"
+                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                        <a href="$alert["eagleJobLink"]" class="btn-primary"
-                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: $alertColor; margin: 0; border-color: $alertColor; border-style: solid; border-width: 10px 20px;">
-                                            View job details on Eagle
-                                        </a>
+                                        <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 18px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
+                                        Top $alert["numTopUsers"] Succeeded Long Running* Job Users
+                                        </h2>
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td class="content-block aligncenter"
+                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 10px;"
+                                        align="center" valign="top">
+                                        <table class="invoice"
+                                               style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 100%; margin: 10px auto;">
+                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                    valign="top">
+                                                    <table class="invoice-items" cellpadding="0" cellspacing="0"
+                                                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0;">
+                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                            <th style="text-align:left;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                                valign="top">
+                                                                User Name
+                                                            </th>
+                                                            <th style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                                valign="top">
+                                                                Number of Succeeded Jobs
+                                                            ##                                                                Over $alert["jobOvertimeLimit"] Hours
+                                                            </th>
+                                                            <th style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;"
+                                                                valign="top">
+                                                                Ratio
+                                                            </th>
+                                                        </tr>
+                                                        #foreach($userItem in $alert["succeededJobUsers"].entrySet())
+                                                            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                    valign="top">
+                                                                    $userItem.key
+                                                                </td>
+                                                                <td style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                    valign="top">$userItem.value
+                                                                </td>
+                                                                <td style="text-align: right;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;"
+                                                                    valign="top">$TODO_RATIO
+                                                                </td>
+                                                            </tr>
+                                                        #end
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td class="content-block"
+                                        style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
+                                        valign="top">
+                                        * Note:<br/>
+                                        1) Finished jobs include those <i>SUCCEEDED</i>, <i>FAILED</i> and <i>KILLED</i>.<br/>
+                                        2) Note: Long running jobs mean those duration over $alert["jobOvertimeLimit"] hours.
                                     </td>
                                 </tr>
                             </table>
@@ -353,10 +389,10 @@
                     </tr>
                 </table>
                 <div class="footer"
-                     style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; clear: both; color: #999; margin: 0; padding: 20px;">
+                     style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; clear: both; color: #999; margin: 0; padding: 20px;">
                     <table width="100%"
-                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
+                           style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                             <td class="aligncenter content-block"
                                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; color: #999; text-align: center; margin: 0; padding: 0 0 20px;"
                                 align="center" valign="top">
@@ -369,138 +405,9 @@
                 </div>
             </div>
         </td>
-        <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; margin: 0;"
+        <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
             valign="top"></td>
     </tr>
 </table>
 </body>
 </html>
-
-##<body itemscope itemtype="http://schema.org/EmailMessage"
-##      style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #f6f6f6; margin: 0;"
-##      bgcolor="#f6f6f6">
-##<table class="body-wrap"
-##       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; background-color: #f6f6f6; margin: 0;"
-##       bgcolor="#f6f6f6">
-##    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; margin: 0;">
-##        <td class="container" width="600"
-##            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;"
-##            valign="top">
-##            <div class="content"
-##                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
-##                <!-- Eagle Body -->
-##                <table class="invoice-items" cellpadding="0" cellspacing="0"
-##                       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; width: 100%; margin: 0;">
-##                    <tr>
-##                        <!-- Title -->
-##                        <td align="center">
-##                            <h2>$alert["alertTitle"]</h2>
-##                        </td>
-##                    </tr>
-##                    <!-- Basic Information -->
-##                    <tr>
-##                        <td style="padding: 20px 0 10px 0;">
-##                            <p><b>Summery ($alert["reportRange"])</b></p>
-##                        </td>
-##                    </tr>
-##                    <tr>
-##                        <td>
-##                            <table class="tableBordered" width="580">
-##                                <tr>
-##                                    <th>Metrics</th>
-##                                    <th>Number of Jobs</th>
-##                                    <th>Ratio</th>
-##                                </tr>
-##                                #foreach($item in $alert["summaryInfo"])
-##                                    <tr>
-##                                        <td>$item.status</td>
-##                                        <td>$item.numOfJobs</td>
-##                                        <td>$item.ratio</td>
-##                                    </tr>
-##                                #end
-##                            </table>
-##                        </td>
-##                    </tr>
-##
-##                    <!-- Top Users for Failed Jobs -->
-##                    <tr>
-##                        <td style="padding: 20px 0 10px 0;">
-##                            <p><b>Top $alert["numTopUsers"] Users (Order by Number of Failed Jobs)</b></p>
-##                        </td>
-##                    </tr>
-##                    <tr>
-##                        <td>
-##                            <table class="tableBordered" width="580">
-##                                <tr>
-##                                    <th>Name</th>
-##                                    <th>Number of Failed Jobs</th>
-##                                </tr>
-##                                #foreach($userItem in $alert["failedJobUsers"].entrySet())
-##                                    <tr>
-##                                        <td>$userItem.key</td>
-##                                        <td>$userItem.value</td>
-##                                    </tr>
-##                                #end
-##                            </table>
-##                        </td>
-##                    </tr>
-##                    <tr>
-##                        <td style="padding: 20px 0 10px 0;">
-##                            <p>View more job information on <a href="$alert["eagleJobLink"]">Eagle</a></p>
-##                        </td>
-##                    </tr>
-##
-##                    <!-- Top Users for Failed Jobs -->
-##                    <tr>
-##                        <td style="padding: 20px 0 10px 0;">
-##                            <p><b>Top $alert["numTopUsers"] Users (Order by Number of Succeeded Jobs Running
-##                                over $alert[
-##                                    "jobOvertimeLimit"] Hours)</b></p>
-##                        </td>
-##                    </tr>
-##                    <tr>
-##                        <td>
-##                            <table class="tableBordered" width="580">
-##                                <tr>
-##                                    <th>Name</th>
-##                                    <th>Number of Jobs Runing over $alert["jobOvertimeLimit"] hrs</th>
-##                                </tr>
-##                                #foreach($userItem in $alert["succeededJobUsers"].entrySet())
-##                                    <tr>
-##                                        <td>$userItem.key</td>
-##                                        <td>$userItem.value</td>
-##                                    </tr>
-##                                #end
-##                            </table>
-##                        </td>
-##                    </tr>
-##
-##                    <!-- Top Users for All Jobs -->
-##                    <tr>
-##                        <td style="padding: 20px 0 10px 0;">
-##                            <p><b>Top $alert["numTopUsers"] Users (Order by Number of Finished Jobs)</b></p>
-##                        </td>
-##                    </tr>
-##                    <tr>
-##                        <td>
-##                            <table class="tableBordered" width="580">
-##                                <tr>
-##                                    <th>Name</th>
-##                                    <th>Number of Finished Jobs</th>
-##                                </tr>
-##                                #foreach($userItem in $alert["finishedJobUsers"].entrySet())
-##                                    <tr>
-##                                        <td>$userItem.key</td>
-##                                        <td>$userItem.value</td>
-##                                    </tr>
-##                                #end
-##                            </table>
-##                        </td>
-##                    </tr>
-##                </table>
-##            </div>
-##        </td>
-##    </tr>
-##</table>
-##</body>
-##</html>
