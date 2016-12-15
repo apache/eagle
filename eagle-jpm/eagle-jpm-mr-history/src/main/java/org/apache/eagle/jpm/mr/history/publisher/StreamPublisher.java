@@ -16,25 +16,24 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.crawler;
+package org.apache.eagle.jpm.mr.history.publisher;
 
-import org.apache.eagle.dataproc.impl.storm.ValuesArray;
-import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class JobHistorySpoutCollectorInterceptor implements EagleOutputCollector {
-    private SpoutOutputCollector collector;
+public abstract class StreamPublisher<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamPublisher.class);
 
-    public void setSpoutOutputCollector(SpoutOutputCollector collector) {
+    protected String stormStreamId;
+    protected EagleOutputCollector collector;
+
+    public StreamPublisher(String stormStreamId, EagleOutputCollector collector) {
+        this.stormStreamId = stormStreamId;
         this.collector = collector;
     }
 
-    @Override
-    public void collect(ValuesArray t) {
-        collector.emit(t);
-    }
+    public abstract Class<?> type();
 
-    @Override
-    public void collect(String steamId, ValuesArray t) {
-        collector.emit(steamId, t);
-    }
+    public abstract void flush(T entity);
 }

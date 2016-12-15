@@ -35,8 +35,14 @@
             <value>4</value>
         </property>
         <property>
-            <name>stormConfig.historyKafkaSinkTasks</name>
-            <displayName>Sink Task Number</displayName>
+            <name>stormConfig.jobKafkaSinkTasks</name>
+            <displayName>Sink Task Number For Job Stream</displayName>
+            <description>the number tasks of the sink bolt will be assigned</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>stormConfig.taskAttemptKafkaSinkTasks</name>
+            <displayName>Sink Task Number For Task Attempt Stream</displayName>
             <description>the number tasks of the sink bolt will be assigned</description>
             <value>1</value>
         </property>
@@ -144,8 +150,8 @@
     </configuration>
     <streams>
         <stream>
-            <streamId>map_reduce_failed_job_stream</streamId>
-            <description>Map Reduce Failed Job Stream</description>
+            <streamId>MAP_REDUCE_JOB_STREAM</streamId>
+            <description>Map Reduce Job Stream</description>
             <validate>true</validate>
             <columns>
                 <column>
@@ -166,10 +172,6 @@
                 </column>
                 <column>
                     <name>jobDefId</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>jobName</name>
                     <type>string</type>
                 </column>
                 <column>
@@ -194,6 +196,69 @@
                 </column>
                 <column>
                     <name>currentState</name>
+                    <type>string</type>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>MAP_REDUCE_TASK_ATTEMPT_STREAM</streamId>
+            <description>Map Reduce Task Attempt Stream</description>
+            <validate>true</validate>
+            <columns>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>rack</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>queue</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>user</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>jobType</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>jobDefId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>jobId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>taskId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>taskType</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>taskAttemptId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>errorCategory</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>startTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>endTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>taskStatus</name>
                     <type>string</type>
                 </column>
             </columns>
