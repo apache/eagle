@@ -69,11 +69,11 @@ public class MRHistoryJobDailyReporterTest {
         MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo1 = new MRHistoryJobDailyReporter.JobSummeryInfo();
         summeryInfo1.status = "failed";
         summeryInfo1.numOfJobs = 10;
-        summeryInfo1.ratio = "0.1";
+        summeryInfo1.ratio = 0.1;
         MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo2 = new MRHistoryJobDailyReporter.JobSummeryInfo();
         summeryInfo2.status = "succeeded";
         summeryInfo2.numOfJobs = 90;
-        summeryInfo2.ratio = "0.9";
+        summeryInfo2.ratio = 0.9;
         summeryInfos.add(summeryInfo1);
         summeryInfos.add(summeryInfo2);
         alertData.put(SUMMARY_INFO_KEY, summeryInfos);
@@ -82,7 +82,6 @@ public class MRHistoryJobDailyReporterTest {
         failedJobUsers.put("alice", 100d);
         failedJobUsers.put("bob", 97d);
         alertData.put(FAILED_JOB_USERS_KEY, failedJobUsers);
-
 
         Map<String,Double> succeededJobUsers = new TreeMap<>();
         succeededJobUsers.put("alice1", 100d);
@@ -95,15 +94,14 @@ public class MRHistoryJobDailyReporterTest {
         finishedJobUsers.put("bob2", 97d);
         alertData.put(FINISHED_JOB_USERS_KEY, finishedJobUsers);
 
-        alertData.put(ALERT_TITLE_KEY, "Daily Job Report");
+        alertData.put(ALERT_TITLE_KEY, "[TEST_CLUSTER] Daily Job Report");
         alertData.put(NUM_TOP_USERS_KEY, 2);
         alertData.put(JOB_OVERTIME_LIMIT_KEY, 6);
         long currentTimestamp = System.currentTimeMillis();
         alertData.put(REPORT_RANGE_KEY, String.format(" %s ~ %s %s",
             DateTimeUtil.millisecondsToHumanDateWithSeconds(currentTimestamp - 6 * DateTimeUtil.ONEHOUR),
             DateTimeUtil.millisecondsToHumanDateWithSeconds(currentTimestamp), DateTimeUtil.CURRENT_TIME_ZONE.getID()));
-        alertData.put("joblink", "http://localhost:9090");
+        alertData.put(EAGLE_JOB_LINK_KEY, "http://localhost:9090/#/site/sandbox/jpm/statistics");
         return alertData;
     }
-
 }

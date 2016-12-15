@@ -32,7 +32,6 @@ import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +175,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             data.putAll(buildFinishedJobInfo(site, startTime, endTime));
             data.put(NUM_TOP_USERS_KEY, numTopUsers);
             data.put(JOB_OVERTIME_LIMIT_KEY, jobOvertimeLimit);
-            data.put(ALERT_TITLE_KEY, String.format("%s Daily Job Report", site.toUpperCase()));
+            data.put(ALERT_TITLE_KEY, String.format("[%s] Daily Job Report", site.toUpperCase()));
             data.put(REPORT_RANGE_KEY, String.format("%s ~ %s %s",
                 DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime),
                 DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime),
@@ -238,7 +237,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             JobSummeryInfo summeryInfo = new JobSummeryInfo();
             summeryInfo.status = entry.getKey();
             summeryInfo.numOfJobs = entry.getValue();
-            summeryInfo.ratio = String.format("%.2f", entry.getValue() * 1d / totalJobs.get());
+            summeryInfo.ratio = Double.parseDouble(String.format("%.2f", entry.getValue() * 1d / totalJobs.get()));
             statusCount.add(summeryInfo);
         }
         data.put(SUMMARY_INFO_KEY, statusCount);
@@ -300,7 +299,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     public static class JobSummeryInfo {
         public String status;
         public long numOfJobs;
-        public String ratio;
+        public double ratio;
 
         public String getStatus() {
             return status;
@@ -310,7 +309,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             return numOfJobs;
         }
 
-        public String getRatio() {
+        public double getRatio() {
             return ratio;
         }
     }
