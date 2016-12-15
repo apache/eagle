@@ -41,7 +41,7 @@ public class MRHistoryJobDailyReporterTest {
     private SimpleSmtpServer server;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         config = ConfigFactory.load("application-test.conf");
         server = SimpleSmtpServer.start(SMTP_PORT);
     }
