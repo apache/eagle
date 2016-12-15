@@ -41,7 +41,7 @@ public class MRHistoryJobDailyReporterTest {
     private SimpleSmtpServer server;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         config = ConfigFactory.load("application-test.conf");
         server = SimpleSmtpServer.start(SMTP_PORT);
     }
@@ -67,11 +67,11 @@ public class MRHistoryJobDailyReporterTest {
         Map<String, Object> alertData = new HashMap<>();
         List<MRHistoryJobDailyReporter.JobSummeryInfo> summeryInfos = new ArrayList<>();
         MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo1 = new MRHistoryJobDailyReporter.JobSummeryInfo();
-        summeryInfo1.status = "failed";
+        summeryInfo1.status = "FAILED";
         summeryInfo1.numOfJobs = 10;
         summeryInfo1.ratio = 0.1;
         MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo2 = new MRHistoryJobDailyReporter.JobSummeryInfo();
-        summeryInfo2.status = "succeeded";
+        summeryInfo2.status = "SUCCEEDED";
         summeryInfo2.numOfJobs = 90;
         summeryInfo2.ratio = 0.9;
         summeryInfos.add(summeryInfo1);
