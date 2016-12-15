@@ -25,7 +25,7 @@ import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
 public class StringEmptyFunctionExtension extends FunctionExecutor {
     /**
-     * The initialization method for StringEmptyFunctionExtension, this method will be called before the other methods
+     * The initialization method for StringEmptyFunctionExtension, this method will be called before the other methods.
      *
      * @param attributeExpressionExecutors the executors of each function parameter
      * @param executionPlanContext         the context of the execution plan
@@ -33,20 +33,20 @@ public class StringEmptyFunctionExtension extends FunctionExecutor {
     @Override
     protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         if (attributeExpressionExecutors.length != 1) {
-            throw new ExecutionPlanValidationException("Invalid no of arguments passed to string:empty() function, " +
-                    "required 1, but found " + attributeExpressionExecutors.length);
+            throw new ExecutionPlanValidationException("Invalid no of arguments passed to string:empty() function, "
+                    + "required 1, but found " + attributeExpressionExecutors.length);
         }
 
         Attribute.Type attributeType = attributeExpressionExecutors[0].getReturnType();
         if (attributeType != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the argument of math:string() function, " +
-                    "required " + Attribute.Type.STRING +
-                    ", but found " + attributeType.toString());
+            throw new ExecutionPlanValidationException("Invalid parameter type found for the argument of math:string() function, "
+                    + "required " + Attribute.Type.STRING
+                    + ", but found " + attributeType.toString());
         }
     }
 
     /**
-     * The main execution method which will be called upon event arrival
+     * The main execution method which will be called upon event arrival.
      * when there are more than one function parameter
      *
      * @param data the runtime values of function parameters
