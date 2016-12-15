@@ -22,6 +22,10 @@ import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
+import org.apache.eagle.jpm.mr.history.crawler.JobHistorySpoutCollectorInterceptor;
+import org.apache.eagle.jpm.mr.history.publisher.JobStreamPublisher;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisherManager;
+import org.apache.eagle.jpm.mr.history.publisher.TaskAttemptStreamPublisher;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
 import org.apache.eagle.jpm.util.Constants;
 
@@ -63,17 +67,30 @@ public class MRHistoryJobApplication extends StormApplication {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrHistoryJobSpout";
         int tasks = jhfAppConf.getInt("stormConfig.mrHistoryJobSpoutTasks");
+        JobHistorySpoutCollectorInterceptor collectorInterceptor = new JobHistorySpoutCollectorInterceptor();
         topologyBuilder.setSpout(
                 spoutName,
-                new JobHistorySpout(filter, appConfig),
+                new JobHistorySpout(filter, appConfig, collectorInterceptor),
                 tasks
         ).setNumTasks(tasks);
 
-        StormStreamSink sinkBolt = environment.getStreamSink("mr_failed_job_stream", config);
-        BoltDeclarer kafkaBoltDeclarer = topologyBuilder.setBolt("HistoryKafkaSink", sinkBolt, jhfAppConf.getInt("stormConfig.historyKafkaSinkTasks"))
-                .setNumTasks(jhfAppConf.getInt("stormConfig.historyKafkaSinkTasks"));
-        kafkaBoltDeclarer.shuffleGrouping(spoutName);
+        StormStreamSink jobSinkBolt = environment.getStreamSink("MAP_REDUCE_JOB_STREAM", config);
+        String jobSinkBoltName = "JobKafkaSink";
+        BoltDeclarer jobKafkaBoltDeclarer = topologyBuilder.setBolt(jobSinkBoltName, jobSinkBolt, jhfAppConf.getInt("stormConfig.jobKafkaSinkTasks"))
+                .setNumTasks(jhfAppConf.getInt("stormConfig.jobKafkaSinkTasks"));
+        String spoutToJobSinkName = spoutName + "_to_" + jobSinkBoltName;
+        jobKafkaBoltDeclarer.shuffleGrouping(spoutName, spoutToJobSinkName);
 
+        StormStreamSink taskAttemptSinkBolt = environment.getStreamSink("MAP_REDUCE_TASK_ATTEMPT_STREAM", config);
+        String taskAttemptSinkBoltName = "TaskAttemptKafkaSink";
+        BoltDeclarer taskAttemptKafkaBoltDeclarer = topologyBuilder.setBolt(taskAttemptSinkBoltName, taskAttemptSinkBolt, jhfAppConf.getInt("stormConfig.taskAttemptKafkaSinkTasks"))
+                .setNumTasks(jhfAppConf.getInt("stormConfig.taskAttemptKafkaSinkTasks"));
+        String spoutToTaskAttemptSinkName = spoutName + "_to_" + taskAttemptSinkBoltName;
+        taskAttemptKafkaBoltDeclarer.shuffleGrouping(spoutName, spoutToTaskAttemptSinkName);
+
+        //4, add stream publisher
+        StreamPublisherManager.getInstance().addStreamPublisher(new JobStreamPublisher(spoutToJobSinkName, collectorInterceptor));
+        StreamPublisherManager.getInstance().addStreamPublisher(new TaskAttemptStreamPublisher(spoutToTaskAttemptSinkName, collectorInterceptor));
         return topologyBuilder.createTopology();
     }
 }

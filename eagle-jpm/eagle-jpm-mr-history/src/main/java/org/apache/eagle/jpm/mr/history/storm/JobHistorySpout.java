@@ -98,10 +98,6 @@ public class JobHistorySpout extends BaseRichSpout {
     private MRHistoryJobConfig appConfig;
     private JobHistoryEndpointConfig jobHistoryEndpointConfig;
 
-    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
-        this(filter, appConfig, new JobHistorySpoutCollectorInterceptor());
-    }
-
     /**
      * mostly this constructor signature is for unit test purpose as you can put customized interceptor here.
      */
