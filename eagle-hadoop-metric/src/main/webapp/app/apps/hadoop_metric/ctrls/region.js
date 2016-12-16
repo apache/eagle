@@ -29,8 +29,29 @@
 				"hadoop.memory.heapmemoryusage.used",
 				"hadoop.bufferpool.direct.memoryused",
 				"hadoop.hbase.jvm.gccount",
-				"hadoop.hbase.jvm.gctimemillis"
+				"hadoop.hbase.jvm.gctimemillis",
+				"hadoop.hbase.ipc.ipc.queuesize",
+				"hadoop.hbase.ipc.ipc.numcallsingeneralqueue",
+				"hadoop.hbase.ipc.ipc.numactivehandler",
+				"hadoop.hbase.ipc.ipc.queuecalltime_99th_percentile",
+				"hadoop.hbase.ipc.ipc.processcalltime_99th_percentile",
+				"hadoop.hbase.ipc.ipc.queuecalltime_num_ops",
+				"hadoop.hbase.ipc.ipc.processcalltime_num_ops",
+				"hadoop.hbase.regionserver.server.regioncount",
+				"hadoop.hbase.regionserver.server.storecount",
+				"hadoop.hbase.regionserver.server.memstoresize",
+				"hadoop.hbase.regionserver.server.storefilesize",
+				"hadoop.hbase.regionserver.server.totalrequestcount",
+				"hadoop.hbase.regionserver.server.readrequestcount",
+				"hadoop.hbase.regionserver.server.writerequestcount",
+				"hadoop.hbase.regionserver.server.splitqueuelength",
+				"hadoop.hbase.regionserver.server.compactionqueuelength",
+				"hadoop.hbase.regionserver.server.flushqueuelength",
+				"hadoop.hbase.regionserver.server.blockcachesize",
+				"hadoop.hbase.regionserver.server.blockcachehitcount",
+				"hadoop.hbase.regionserver.server.blockcounthitpercent"
 			];
+
 
 			$scope.metricList = [];
 
@@ -115,7 +136,27 @@
 				$scope.metricList.push(mergeSeries("Memory Usage", metric, ["nonheap", "heap"], memoption));
 				$scope.metricList.push(mergeSeries("Direct Memory Usage", [res[2]], ["directmemory"], memoption));
 				$scope.metricList.push(mergeSeries("GC count", [res[3]], ["GC count"], {}));
-				$scope.metricList.push(mergeSeries("Gc TimeMillis", [res[4]], ["Gc TimeMillis"], gctimeoption));
+				$scope.metricList.push(mergeSeries("GC TimeMillis", [res[4]], ["GC TimeMillis"], gctimeoption));
+				$scope.metricList.push(mergeSeries("QueueSize", [res[5]], ["QueueSize"], {}));
+				$scope.metricList.push(mergeSeries("NumCallsInGeneralQueue", [res[6]], ["NumCallsInGeneralQueue"], {}));
+				$scope.metricList.push(mergeSeries("NumActiveHandler", [res[7]], ["NumActiveHandler"], {}));
+				$scope.metricList.push(mergeSeries("IPC Queue Time (99th)", [res[8]], ["IPC Queue Time (99th)"], {}));
+				$scope.metricList.push(mergeSeries("IPC Process Time (99th)", [res[9]], ["IPC Process Time (99th)"], {}));
+				$scope.metricList.push(mergeSeries("QueueCallTime_num_ops", [res[10]], ["QueueCallTime_num_ops"], {}));
+				$scope.metricList.push(mergeSeries("ProcessCallTime_num_ops", [res[11]], ["ProcessCallTime_num_ops"], {}));
+				$scope.metricList.push(mergeSeries("RegionCount", [res[12]], ["RegionCount"], {}));
+				$scope.metricList.push(mergeSeries("StoreCount", [res[13]], ["StoreCount"], {}));
+				$scope.metricList.push(mergeSeries("MemStoreSize", [res[14]], ["MemStoreSize"], {}));
+				$scope.metricList.push(mergeSeries("StoreFileSize", [res[15]], ["StoreFileSize"], {}));
+				$scope.metricList.push(mergeSeries("TotalRequestCount", [res[16]], ["TotalRequestCount"], {}));
+				$scope.metricList.push(mergeSeries("ReadRequestCount", [res[17]], ["ReadRequestCount"], {}));
+				$scope.metricList.push(mergeSeries("WriteRequestCount", [res[18]], ["WriteRequestCount"], {}));
+				$scope.metricList.push(mergeSeries("SlitQueueLength", [res[19]], ["SlitQueueLength"], {}));
+				$scope.metricList.push(mergeSeries("CompactionQueueLength", [res[20]], ["CompactionQueueLength"], {}));
+				$scope.metricList.push(mergeSeries("FlushQueueLength", [res[21]], ["FlushQueueLength"], {}));
+				$scope.metricList.push(mergeSeries("BlockCacheSize", [res[22]], ["BlockCacheSize"], {}));
+				$scope.metricList.push(mergeSeries("BlockCacheHitCount", [res[23]], ["BlockCacheHitCount"], {}));
+				$scope.metricList.push(mergeSeries("BlockCacheCountHitPercent", [res[24]], ["BlockCacheCountHitPercent"], {}));
 			});
 		});
 	});
