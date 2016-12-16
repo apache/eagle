@@ -74,7 +74,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private final Config config;
 
     private IEagleServiceClient client;
-    private ApplicationEntityService applicationResource;
+
     private ApplicationEmailService emailService;
     private boolean isDailySent = false;
     private long lastSentTime;
@@ -110,7 +110,6 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         if (config.hasPath(JOB_OVERTIME_LIMIT_HOUR)) {
             this.jobOvertimeLimit = config.getInt(JOB_OVERTIME_LIMIT_HOUR);
         }
-        this.applicationResource = applicationEntityService;
     }
 
     private boolean isSentHour(int currentHour) {
@@ -119,7 +118,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
 
     private Collection<String> loadSites(String appType) {
         Set<String> sites = new HashSet<>();
-        Collection<ApplicationEntity> apps = applicationResource.findAll();
+        Collection<ApplicationEntity> apps = applicationEntityService.findAll();
         for (ApplicationEntity app : apps) {
             if (app.getDescriptor().getType().equalsIgnoreCase(appType) && app.getStatus().equals(ApplicationEntity.Status.RUNNING)) {
                 sites.add(app.getSite().getSiteId());

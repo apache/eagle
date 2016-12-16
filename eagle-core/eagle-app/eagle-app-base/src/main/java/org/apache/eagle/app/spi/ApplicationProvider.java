@@ -20,7 +20,6 @@ package org.apache.eagle.app.spi;
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.util.concurrent.Service;
 import com.typesafe.config.Config;
-import io.dropwizard.lifecycle.Managed;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.common.module.ModuleRegistry;
