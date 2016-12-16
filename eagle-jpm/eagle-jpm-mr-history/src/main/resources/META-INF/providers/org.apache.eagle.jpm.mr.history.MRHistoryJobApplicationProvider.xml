@@ -228,7 +228,7 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>queue</name>
+                    <name>hostname</name>
                     <type>string</type>
                 </column>
                 <column>
