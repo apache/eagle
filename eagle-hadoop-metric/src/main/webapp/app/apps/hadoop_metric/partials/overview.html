@@ -40,7 +40,7 @@
 			<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
 				<div class="hadoopMetric-chart">
 					<h3>{{metric.title}}</h3>
-					<div chart class="hadoopMetric-chart-container" series="metric.series" option="metric.series.option"></div>
+					<div chart class="hadoopMetric-chart-container" series="metric.series" option="commonOption"></div>
 					</div>
 				</div>
 			</div>
