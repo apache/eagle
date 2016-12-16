@@ -18,13 +18,16 @@
 package org.apache.eagle.app.spi;
 
 import com.codahale.metrics.health.HealthCheck;
+import com.google.common.util.concurrent.Service;
 import com.typesafe.config.Config;
+import io.dropwizard.lifecycle.Managed;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -72,7 +75,20 @@ public interface ApplicationProvider<T extends Application> {
      */
     void register(ModuleRegistry registry);
 
-    default Optional<HealthCheck> getAppHealthCheck(Config config) {
+    /**
+     * @param config application config.
+     * @return Application-specific managed health check.
+     */
+    default Optional<HealthCheck> getManagedHealthCheck(Config config) {
+        return Optional.empty();
+    }
+
+    /**
+     *
+     * @param envConfig server environment config.
+     * @return Server-level shared services.
+     */
+    default Optional<List<Service>> getSharedServices(Config envConfig) {
         return Optional.empty();
     }
 }

@@ -31,7 +31,7 @@ public class TopologyCheckAppProvider extends AbstractApplicationProvider<Topolo
     }
 
     @Override
-    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+    public Optional<HealthCheck> getManagedHealthCheck(Config config) {
         return Optional.of(new TopologyCheckApplicationHealthCheck(config));
     }
 }

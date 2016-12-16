@@ -71,7 +71,8 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private static final String SUCCEEDED_JOB_QUERY = "%s[@site=\"%s\" and @currentState=\"SUCCEEDED\" and @durationTime>%s and @endTime<=%s]<@user>{count}.{count desc}";
     private static final String FINISHED_JOB_QUERY = "%s[@site=\"%s\" and @endTime<=%s]<@user>{count}.{count desc}";
 
-    private Config config;
+    private final Config config;
+
     private IEagleServiceClient client;
     private ApplicationEntityService applicationResource;
     private ApplicationEmailService emailService;
@@ -89,9 +90,11 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private TimeZone timeZone;
 
     @Inject
-    public MRHistoryJobDailyReporter(Config config, ApplicationEntityService applicationEntityService) {
-        this.timeZone = TimeZone.getTimeZone(config.getString(EAGLE_TIME_ZONE));
+    private ApplicationEntityService applicationEntityService;
 
+    public MRHistoryJobDailyReporter(Config config) {
+        this.config = config;
+        this.timeZone = TimeZone.getTimeZone(config.getString(EAGLE_TIME_ZONE));
         if (config.hasPath(SERVICE_PATH) && config.hasPath(AlertEmailConstants.EAGLE_APPLICATION_EMAIL_SERVICE)) {
             this.emailService = new ApplicationEmailService(config, SERVICE_PATH);
         }
@@ -107,7 +110,6 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         if (config.hasPath(JOB_OVERTIME_LIMIT_HOUR)) {
             this.jobOvertimeLimit = config.getInt(JOB_OVERTIME_LIMIT_HOUR);
         }
-        this.config = config;
         this.applicationResource = applicationEntityService;
     }
 
