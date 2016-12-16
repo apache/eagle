@@ -22,7 +22,9 @@ import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class StreamPublisher<T> {
+import java.io.Serializable;
+
+public abstract class StreamPublisher<T> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(StreamPublisher.class);
 
     protected String stormStreamId;
