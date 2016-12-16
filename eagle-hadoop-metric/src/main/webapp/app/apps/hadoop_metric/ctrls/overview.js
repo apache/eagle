@@ -119,7 +119,7 @@
 					mockMetric('name2', {smooth: true}, 3),
 					mockMetric('name3', {areaStyle: {normal: {}}, stack: 'one'}, 3),
 					mockMetric('name4', {type: 'bar', stack: 'one'}, 3)
-				]
+				];
 			});
 		});
 	});

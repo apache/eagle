@@ -62,7 +62,7 @@
 
 			var promies = [];
 			$.each(METRIC_NAME, function (i, metric_name) {
-				promies.push(generateHbaseMetric(metric_name, 20))
+				promies.push(generateHbaseMetric(metric_name, 20));
 			});
 
 			$q.all(promies).then(function (res) {
