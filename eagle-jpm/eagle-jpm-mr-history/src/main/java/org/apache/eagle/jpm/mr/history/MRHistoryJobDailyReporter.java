@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static org.apache.eagle.common.config.EagleConfigConstants.EAGLE_TIME_ZONE;
 import static org.apache.eagle.common.config.EagleConfigConstants.SERVICE_HOST;
 import static org.apache.eagle.common.config.EagleConfigConstants.SERVICE_PORT;
 
@@ -52,7 +53,6 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
 
     public static final String SERVICE_PATH = "application.dailyJobReport";
     protected static final String APP_TYPE = "MR_HISTORY_JOB_APP";
-    protected static final String TIMEZONE_PATH = "service.timezone";
 
     // alert context keys
     protected static final String NUM_TOP_USERS_KEY = "numTopUsers";
@@ -90,7 +90,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
 
     @Inject
     public MRHistoryJobDailyReporter(Config config, ApplicationEntityService applicationEntityService) {
-        this.timeZone = TimeZone.getTimeZone(config.getString(TIMEZONE_PATH));
+        this.timeZone = TimeZone.getTimeZone(config.getString(EAGLE_TIME_ZONE));
 
         if (config.hasPath(SERVICE_PATH) && config.hasPath(AlertEmailConstants.EAGLE_APPLICATION_EMAIL_SERVICE)) {
             this.emailService = new ApplicationEmailService(config, SERVICE_PATH);
