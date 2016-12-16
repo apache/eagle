@@ -57,7 +57,7 @@
 						name: name + '_' + i,
 						type: 'line',
 						data: data,
-						showSymbol: false,
+						showSymbol: false
 					}, option));
 				}
 				return {
@@ -89,7 +89,7 @@
 						name: name,
 						type: 'line',
 						data: data,
-						showSymbol: false,
+						showSymbol: false
 					}, option));
 					return {
 						title: name,
