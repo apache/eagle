@@ -18,6 +18,8 @@ package org.apache.eagle.alert.engine.coordinator;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Objects;
+
 public class AlertDefinition {
     private TemplateType templateType = TemplateType.TEXT;
     private String subject;
@@ -92,11 +94,11 @@ public class AlertDefinition {
             return false;
         }
         AlertDefinition another = (AlertDefinition) that;
-        if (another.templateType.equals(this.templateType)
-                && another.body.equals(this.body)
-                && another.category.equals(this.category)
-                && another.severity.equals(this.severity)
-                && another.subject.equals(this.subject)) {
+        if (Objects.equals(another.templateType, this.templateType)
+                && Objects.equals(another.body, this.body)
+                && Objects.equals(another.category, this.category)
+                && Objects.equals(another.severity, this.severity)
+                && Objects.equals(another.subject, this.subject)) {
             return true;
         }
         return false;

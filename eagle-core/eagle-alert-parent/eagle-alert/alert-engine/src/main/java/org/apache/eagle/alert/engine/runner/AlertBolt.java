@@ -16,9 +16,11 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,7 +105,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 pe.getEvent().setMetaVersion(specVersion);
             } else if (streamEventVersion != null && !streamEventVersion.equals(specVersion)) {
                 if (specVersion != null && streamEventVersion != null
-                        && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
+                    && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
                     // check if specVersion is older than stream_event_version
                     // Long timestamp_of_specVersion = Long.valueOf(specVersion.split("spec_version_")[1]);
                     // Long timestamp_of_streamEventVersion = Long.valueOf(stream_event_version.split("spec_version_")[1]);
@@ -195,7 +197,24 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         MapComparator<String, PolicyDefinition> comparator = new MapComparator<>(newPoliciesMap, cachedPolicies);
         comparator.compare();
 
-        policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
+        MapComparator<String, StreamDefinition> streamComparator = new MapComparator<>(sds, sdf);
+        streamComparator.compare();
+
+        List<StreamDefinition> addOrUpdatedStreams = streamComparator.getAdded();
+        addOrUpdatedStreams.addAll(streamComparator.getModified());
+        List<PolicyDefinition> cachedPoliciesTemp = new ArrayList<>(cachedPolicies.values());
+        addOrUpdatedStreams.forEach(s -> {
+            cachedPoliciesTemp.stream().filter(p -> p.getInputStreams().contains(s.getStreamId())
+                || p.getOutputStreams().contains(s.getStreamId())).forEach(p -> {
+                    if (comparator.getModified().stream().filter(x -> x.getName().equals(p.getName())).count() <= 0
+                        && comparator.getAdded().stream().filter(x -> x.getName().equals(p.getName())).count() <= 0) {
+                        comparator.getModified().add(p);
+                    }
+                });
+            ;
+        });
+
+        policyGroupEvaluator.onPolicyChange(spec.getVersion(), comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
 
         // update alert output collector
         Set<PublishPartition> newPublishPartitions = new HashSet<>();

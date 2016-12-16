@@ -18,6 +18,8 @@ package org.apache.eagle.alert.coordination.model;
 
 import com.google.common.base.Objects;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +29,7 @@ import java.util.Map;
 public class Kafka2TupleMetadata {
     private String type;
     private String name; // data source name
-    private Map<String, String> properties;
+    private Map<String, String> properties = new HashMap<>();
     private String topic;
     private String schemeCls;
 

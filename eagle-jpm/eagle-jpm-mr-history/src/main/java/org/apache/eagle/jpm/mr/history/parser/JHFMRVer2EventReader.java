@@ -255,6 +255,9 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
         if (js.getJobStatus() != null) {
             values.put(Keys.JOB_STATUS, js.getJobStatus().toString());
         }
+        if (js.getDiagnostics() != null) {
+            values.put(Keys.DIAGNOSTICS, js.getDiagnostics().toString());
+        }
         handleJob(wrapper.getType(), values, null);
     }
 

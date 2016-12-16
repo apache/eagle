@@ -22,6 +22,8 @@ import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
 import org.apache.eagle.jpm.mr.history.metrics.JobExecutionMetricsCreationListener;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisher;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisherManager;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
@@ -47,21 +49,20 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     List<JobEventAPIEntity> jobEvents = new ArrayList<>();
     List<TaskExecutionAPIEntity> taskExecs = new ArrayList<>();
     List<TaskAttemptExecutionAPIEntity> taskAttemptExecs = new ArrayList<>();
+    List<TaskAttemptErrorCategoryEntity> taskAttemptErrors = new ArrayList<>();
     private JobExecutionMetricsCreationListener jobExecutionMetricsCreationListener = new JobExecutionMetricsCreationListener();
     private TimeZone timeZone;
-    private EagleOutputCollector collector;
     private MRHistoryJobConfig appConfig;
 
-    public JobEntityCreationEagleServiceListener(EagleOutputCollector collector, MRHistoryJobConfig appConfig) {
-        this(BATCH_SIZE, collector, appConfig);
+    public JobEntityCreationEagleServiceListener(MRHistoryJobConfig appConfig) {
+        this(BATCH_SIZE, appConfig);
     }
 
-    public JobEntityCreationEagleServiceListener(int batchSize, EagleOutputCollector collector, MRHistoryJobConfig appConfig) {
+    public JobEntityCreationEagleServiceListener(int batchSize, MRHistoryJobConfig appConfig) {
         if (batchSize <= 0) {
             throw new IllegalArgumentException("batchSize must be greater than 0 when it is provided");
         }
         this.batchSize = batchSize;
-        this.collector = collector;
         this.appConfig = appConfig;
         timeZone = TimeZone.getTimeZone(appConfig.getJobHistoryEndpointConfig().timeZone);
     }
@@ -108,8 +109,9 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                     ((JobExecutionAPIEntity) entity).getCurrentState());
 
                 metricEntities.addAll(jobExecutionMetricsCreationListener.generateMetrics((JobExecutionAPIEntity)entity));
-                if (((JobExecutionAPIEntity)entity).getCurrentState().equals(Constants.JobState.FAILED.toString())) {
-                    emitFailedJob((JobExecutionAPIEntity) entity);
+                StreamPublisher streamPublisher = StreamPublisherManager.getInstance().getStreamPublisher(JobExecutionAPIEntity.class);
+                if (streamPublisher != null) {
+                    streamPublisher.flush((JobExecutionAPIEntity) entity);
                 }
             } else if (entity instanceof JobEventAPIEntity) {
                 jobEvents.add((JobEventAPIEntity) entity);
@@ -117,6 +119,12 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                 taskExecs.add((TaskExecutionAPIEntity) entity);
             } else if (entity instanceof TaskAttemptExecutionAPIEntity) {
                 taskAttemptExecs.add((TaskAttemptExecutionAPIEntity) entity);
+                StreamPublisher streamPublisher = StreamPublisherManager.getInstance().getStreamPublisher(TaskAttemptExecutionAPIEntity.class);
+                if (streamPublisher != null) {
+                    streamPublisher.flush((TaskAttemptExecutionAPIEntity) entity);
+                }
+            } else if (entity instanceof TaskAttemptErrorCategoryEntity) {
+                taskAttemptErrors.add((TaskAttemptErrorCategoryEntity) entity);
             }
         }
         GenericServiceAPIResponseEntity result;
@@ -150,6 +158,12 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             checkResult(result);
             taskAttemptExecs.clear();
         }
+        if (taskAttemptErrors.size() > 0) {
+            logger.info("flush TaskAttemptErrorCategoryEntity of number " + taskAttemptErrors.size());
+            result = client.create(taskAttemptErrors);
+            checkResult(result);
+            taskAttemptErrors.clear();
+        }
 
         logger.info("finish flushing entities of total number " + list.size());
         list.clear();
@@ -162,16 +176,5 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             logger.error(result.getException());
             throw new Exception("Entity creation fails going to EagleService");
         }
-    }
-
-    private void emitFailedJob(JobExecutionAPIEntity entity) {
-        Map<String, Object> fields = new HashMap<>(entity.getTags());
-        fields.put("submissionTime", entity.getSubmissionTime());
-        fields.put("startTime", entity.getStartTime());
-        fields.put("endTime", entity.getEndTime());
-        fields.put("currentState", entity.getCurrentState());
-        fields.put("trackingUrl", entity.getTrackingUrl());
-
-        collector.collect(new ValuesArray(fields.get(MRJobTagName.JOB_ID.toString()), fields));
     }
 }

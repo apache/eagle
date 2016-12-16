@@ -18,9 +18,14 @@ package org.apache.eagle.alert.engine.coordinator;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This is actually a data source schema.
@@ -60,6 +65,36 @@ public class StreamDefinition implements Serializable {
             validate,
             timeseries,
             columns);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.streamId)
+            .append(this.description)
+            .append(this.validate)
+            .append(this.timeseries)
+            .append(this.dataSource)
+            .append(this.siteId)
+            .append(this.columns)
+            .build();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof StreamDefinition)) {
+            return false;
+        }
+        return Objects.equals(this.streamId, ((StreamDefinition) obj).streamId)
+            && Objects.equals(this.description, ((StreamDefinition) obj).description)
+            && Objects.equals(this.validate, ((StreamDefinition) obj).validate)
+            && Objects.equals(this.timeseries, ((StreamDefinition) obj).timeseries)
+            && Objects.equals(this.dataSource, ((StreamDefinition) obj).dataSource)
+            && Objects.equals(this.siteId, ((StreamDefinition) obj).siteId)
+            && CollectionUtils.isEqualCollection(this.columns, ((StreamDefinition) obj).columns);
     }
 
     public String getStreamId() {

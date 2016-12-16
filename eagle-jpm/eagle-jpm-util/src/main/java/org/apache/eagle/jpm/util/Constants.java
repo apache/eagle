@@ -110,6 +110,7 @@ public class Constants {
     public static final String JPA_JOB_COUNT_SERVICE_NAME = "JobCountService";
     public static final String JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME = "RunningJobExecutionService";
     public static final String JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "TaskAttemptExecutionService";
+    public static final String JPA_TASK_ATTEMPT_ERROR_SERVICE_NAME = "TaskAttemptErrorCategoryService";
     public static final String JPA_TASK_FAILURE_COUNT_SERVICE_NAME = "TaskFailureCountService";
     public static final String JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME = "TaskAttemptCounterService";
     public static final String JPA_TASK_EXECUTION_SERVICE_NAME = "TaskExecutionService";

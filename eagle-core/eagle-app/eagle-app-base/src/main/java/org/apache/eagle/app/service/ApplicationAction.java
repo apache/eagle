@@ -31,6 +31,7 @@ import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
+import org.apache.eagle.app.messaging.KafkaStreamSourceConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamSourceConfig;
 import org.apache.eagle.metadata.utils.StreamIdConversions;
@@ -144,6 +145,15 @@ public class ApplicationAction implements Serializable {
                 datasource.setName(metadata.getAppId());
                 datasource.setTopic(kafkaCfg.getTopicId());
                 datasource.setSchemeCls(JsonScheme.class.getCanonicalName());
+                datasource.setProperties(new HashMap<>());
+
+                KafkaStreamSourceConfig streamSourceConfig = (KafkaStreamSourceConfig) streamDesc.getSourceConfig();
+                if (streamSourceConfig != null) {
+                    Map<String, String> properties = datasource.getProperties();
+                    properties.put(AlertConstants.KAFKA_BROKER_ZK_BASE_PATH, streamSourceConfig.getBrokerZkPath());
+                    properties.put(AlertConstants.KAFKA_BROKER_ZK_QUORUM, streamSourceConfig.getBrokerZkQuorum());
+                }
+
                 Tuple2StreamMetadata tuple2Stream = new Tuple2StreamMetadata();
                 Properties prop = new Properties();
                 prop.put(JsonStringStreamNameSelector.USER_PROVIDED_STREAM_NAME_PROPERTY, streamDesc.getStreamId());

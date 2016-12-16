@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface PolicyChangeListener {
-    void onPolicyChange(List<PolicyDefinition> added,
+    void onPolicyChange(String version,
+                        List<PolicyDefinition> added,
                         List<PolicyDefinition> removed,
                         List<PolicyDefinition> modified, Map<String, StreamDefinition> sds);
 }

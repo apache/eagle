@@ -25,6 +25,8 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.*;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisher;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisherManager;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
@@ -97,20 +99,17 @@ public class JobHistorySpout extends BaseRichSpout {
     private static final int MAX_RETRY_TIMES = 3;
     private MRHistoryJobConfig appConfig;
     private JobHistoryEndpointConfig jobHistoryEndpointConfig;
-
-    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
-        this(filter, appConfig, new JobHistorySpoutCollectorInterceptor());
-    }
+    private List<StreamPublisher> streamPublishers;
 
     /**
      * mostly this constructor signature is for unit test purpose as you can put customized interceptor here.
      */
-    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig, JobHistorySpoutCollectorInterceptor adaptor) {
+    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
         this.contentFilter = filter;
-        this.interceptor = adaptor;
+        this.interceptor = new JobHistorySpoutCollectorInterceptor();
         this.appConfig = appConfig;
         jobHistoryEndpointConfig = appConfig.getJobHistoryEndpointConfig();
-        callback = new DefaultJHFInputStreamCallback(contentFilter, interceptor,  appConfig);
+        callback = new DefaultJHFInputStreamCallback(contentFilter, appConfig);
     }
 
     private int calculatePartitionId(TopologyContext context) {
@@ -178,12 +177,24 @@ public class JobHistorySpout extends BaseRichSpout {
         }
     }
 
+    public void setStreamPublishers(List<StreamPublisher> streamPublishers) {
+        this.streamPublishers = streamPublishers;
+    }
+
     /**
      * empty because framework will take care of output fields declaration.
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("jobId", "message"));
+        if (streamPublishers != null) {
+            for (StreamPublisher streamPublisher : streamPublishers) {
+                declarer.declareStream(streamPublisher.stormStreamId(), new Fields("f1", "message"));
+                streamPublisher.setCollector(this.interceptor);
+                StreamPublisherManager.getInstance().addStreamPublisher(streamPublisher);
+            }
+        } else {
+            declarer.declare(new Fields("f1", "message"));
+        }
     }
 
     /**

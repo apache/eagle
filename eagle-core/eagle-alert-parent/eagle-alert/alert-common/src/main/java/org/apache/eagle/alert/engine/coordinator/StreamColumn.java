@@ -21,8 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Objects;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class StreamColumn implements Serializable {
 
@@ -37,6 +41,34 @@ public class StreamColumn implements Serializable {
     public String toString() {
         return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s], nodataExpression=[%s]",
             name, type, defaultValue, required, nodataExpression);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.name)
+            .append(this.type)
+            .append(this.defaultValue)
+            .append(this.required)
+            .append(this.description)
+            .append(this.nodataExpression)
+            .build();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof StreamColumn)) {
+            return false;
+        }
+        return Objects.equals(this.name, ((StreamColumn) obj).name)
+            && Objects.equals(this.type, ((StreamColumn) obj).type)
+            && Objects.equals(this.defaultValue, ((StreamColumn) obj).defaultValue)
+            && Objects.equals(this.required, ((StreamColumn) obj).required)
+            && Objects.equals(this.description, ((StreamColumn) obj).description)
+            && Objects.equals(this.nodataExpression, ((StreamColumn) obj).nodataExpression);
     }
 
     public String getNodataExpression() {

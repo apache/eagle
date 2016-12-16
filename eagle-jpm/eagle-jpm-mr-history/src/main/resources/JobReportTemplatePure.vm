@@ -1,0 +1,141 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    #set ( $alert = $alertList[0] )
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width"/>
+    <title>$alert["alertTitle"]</title>
+</head>
+<body>
+<table class="body">
+    <tr>
+        <td align="center" valign="top">
+            <!-- Eagle Body -->
+            <table width="580">
+                <tr>
+                    <!-- Title -->
+                    <td align="center">
+                        <h2>$alert["alertTitle"]</h2>
+                    </td>
+                </tr>
+
+                <!-- Basic Information -->
+                <tr>
+                    <td style="padding: 20px 0 10px 0;">
+                        <p><b>Summery ($alert["reportRange"])</b></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="tableBordered" width="580">
+                            <tr>
+                                <th>Metrics</th>
+                                <th>Number of Jobs</th>
+                                <th>Ratio</th>
+                            </tr>
+                            #foreach($item in $alert["summaryInfo"])
+                                <tr>
+                                    <td>$item.status</td>
+                                    <td>$item.numOfJobs</td>
+                                    <td>$item.ratio</td>
+                                </tr>
+                            #end
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Top Users for Failed Jobs -->
+                <tr>
+                    <td style="padding: 20px 0 10px 0;">
+                        <p><b>Top $alert["numTopUsers"] Users (Order by Number of Failed Jobs)</b></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="tableBordered" width="580">
+                            <tr>
+                                <th>Name</th>
+                                <th>Number of Failed Jobs</th>
+                            </tr>
+                            #foreach($userItem in $alert["failedJobUsers"].entrySet())
+                                <tr>
+                                    <td>$userItem.key</td>
+                                    <td>$userItem.value</td>
+                                </tr>
+                            #end
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 20px 0 10px 0;">
+                        <p>View more job information on <a href="$alert["eagleJobLink"]">Eagle</a></p>
+                    </td>
+                </tr>
+
+                <!-- Top Users for Failed Jobs -->
+                <tr>
+                    <td style="padding: 20px 0 10px 0;">
+                        <p><b>Top $alert["numTopUsers"] Users (Order by Number of Succeeded Jobs Running over $alert["jobOvertimeLimit"] Hours)</b></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="tableBordered" width="580">
+                            <tr>
+                                <th>Name</th>
+                                <th>Number of Jobs Runing over $alert["jobOvertimeLimit"] hrs</th>
+                            </tr>
+                            #foreach($userItem in $alert["succeededJobUsers"].entrySet())
+                                <tr>
+                                    <td>$userItem.key</td>
+                                    <td>$userItem.value</td>
+                                </tr>
+                            #end
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Top Users for All Jobs -->
+                <tr>
+                    <td style="padding: 20px 0 10px 0;">
+                        <p><b>Top $alert["numTopUsers"] Users (Order by Number of Finished Jobs)</b></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="tableBordered" width="580">
+                            <tr>
+                                <th>Name</th>
+                                <th>Number of Finished Jobs</th>
+                            </tr>
+                            #foreach($userItem in $alert["finishedJobUsers"].entrySet())
+                                <tr>
+                                    <td>$userItem.key</td>
+                                    <td>$userItem.value</td>
+                                </tr>
+                            #end
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

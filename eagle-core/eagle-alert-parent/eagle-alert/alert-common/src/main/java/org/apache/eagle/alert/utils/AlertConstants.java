@@ -28,4 +28,7 @@ public class AlertConstants {
     public static final String ALERT_SERVICE_ENDPOINT_NAME = "AlertService";
 
     public static final String COORDINATOR = "coordinator";
+
+    public static final String KAFKA_BROKER_ZK_BASE_PATH = "spout.kafkaBrokerZkBasePath";
+    public static final String KAFKA_BROKER_ZK_QUORUM = "spout.kafkaBrokerZkQuorum";
 }

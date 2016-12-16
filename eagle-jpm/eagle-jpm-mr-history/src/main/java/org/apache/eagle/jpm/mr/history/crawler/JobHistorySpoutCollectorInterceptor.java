@@ -32,4 +32,9 @@ public class JobHistorySpoutCollectorInterceptor implements EagleOutputCollector
     public void collect(ValuesArray t) {
         collector.emit(t);
     }
+
+    @Override
+    public void collect(String steamId, ValuesArray t) {
+        collector.emit(steamId, t);
+    }
 }
