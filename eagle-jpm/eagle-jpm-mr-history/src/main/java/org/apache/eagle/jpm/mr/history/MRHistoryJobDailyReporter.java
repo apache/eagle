@@ -169,11 +169,11 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     }
 
     protected String buildAlertSubject(String site, long startTime, long endTime) {
-        String subjectFormat = "[%s] Job Report %s %s-%s";
-        String date = DateTimeUtil.format(startTime, "yyyyMMdd");
-        String startHour = DateTimeUtil.format(startTime, "HH:mm");
-        String endHour = DateTimeUtil.format(endTime, "kk:mm");
-        return String.format(subjectFormat, site.toUpperCase(), date, startHour, endHour);
+        String subjectFormat = "[%s] Job Report by %s";
+        String date = DateTimeUtil.format(endTime, "yyyyMMdd HH:mm");
+        //String startHour = DateTimeUtil.format(startTime, "HH:mm");
+        //String endHour = DateTimeUtil.format(endTime, "kk:mm");
+        return String.format(subjectFormat, site.toUpperCase(), date);
     }
 
     private Map<String, Object> buildAlertData(String site, long startTime, long endTime) {
@@ -188,7 +188,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             data.putAll(buildJobSummery(site, startTime, endTime));
             data.put(NUM_TOP_USERS_KEY, numTopUsers);
             data.put(JOB_OVERTIME_LIMIT_KEY, jobOvertimeLimit);
-            data.put(ALERT_TITLE_KEY, String.format("[%s] Daily Job Report", site.toUpperCase()));
+            data.put(ALERT_TITLE_KEY, String.format("[%s] Job Report for 12 Hours", site.toUpperCase()));
             data.put(REPORT_RANGE_KEY, String.format("%s ~ %s %s", startTimeStr, endTimeStr, DateTimeUtil.CURRENT_TIME_ZONE.getID()));
             data.put(EAGLE_JOB_LINK_KEY, String.format("http://%s:%d/#/site/%s/jpm/list?startTime=%s&endTime=%s",
                     config.getString(SERVICE_HOST), config.getInt(SERVICE_PORT), site, startTimeStr, endTimeStr));

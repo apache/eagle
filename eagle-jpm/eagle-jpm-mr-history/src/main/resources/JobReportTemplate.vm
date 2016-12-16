@@ -208,7 +208,7 @@
                                         valign="top">
 ##                                        Top $alert["numTopUsers"] Users (Order by Number of Failed Jobs)
                                         <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 18px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
-                                            Top $alert["numTopUsers"] Failed Job Users
+                                            Top $alert["numTopUsers"] Users by Failed Jobs
                                         </h2>
                                     </td>
                                 </tr>
@@ -264,7 +264,7 @@
                                     <td class="content-block"
                                         style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                         valign="top">
-                                       <a href="$alert["eagleJobLink"]" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #999; text-decoration: underline; margin: 0;">
+                                       <a href="$alert["eagleJobLink"]" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #337ab7; text-decoration: underline; margin: 0;">
                                            View Failed Jobs on Eagle
                                        </a>
                                     </td>
@@ -272,7 +272,7 @@
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                                     <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 0px;" valign="top">
                                         <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 18px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
-                                            Top $alert["numTopUsers"] Finished* Job Users
+                                            Top $alert["numTopUsers"] Users by Finished* Job
                                         </h2>
                                     </td>
                                 </tr>
@@ -329,7 +329,7 @@
                                         style="text-align:left; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 0px;"
                                         valign="top">
                                         <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 18px; color: #000; line-height: 1.2em; font-weight: 400; text-align: left; margin: 0 0 0;" align="center">
-                                        Top $alert["numTopUsers"] Succeeded Long Running* Job Users
+                                        Top $alert["numTopUsers"] Users by Long Running* Job
                                         </h2>
                                     </td>
                                 </tr>
@@ -387,7 +387,7 @@
                                         valign="top">
                                         * Notes:<br/>
                                         1) Finished jobs include those <i>SUCCEEDED</i>, <i>FAILED</i>, <i>KILLED</i>, etc.<br/>
-                                        2) Long running jobs mean those duration over $alert["jobOvertimeLimit"] hours.
+                                        2) Long running jobs mean those succeeded jobs with duration over $alert["jobOvertimeLimit"] hours.
                                     </td>
                                 </tr>
                             </table>
