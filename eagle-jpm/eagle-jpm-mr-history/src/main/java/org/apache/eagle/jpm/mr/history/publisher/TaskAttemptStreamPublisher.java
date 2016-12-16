@@ -31,8 +31,8 @@ import java.util.Map;
 public class TaskAttemptStreamPublisher extends StreamPublisher<TaskAttemptExecutionAPIEntity> {
     private static final Logger LOG = LoggerFactory.getLogger(TaskAttemptStreamPublisher.class);
 
-    public TaskAttemptStreamPublisher(String stormStreamId, EagleOutputCollector collector) {
-        super(stormStreamId, collector);
+    public TaskAttemptStreamPublisher(String stormStreamId) {
+        super(stormStreamId);
     }
 
     @Override

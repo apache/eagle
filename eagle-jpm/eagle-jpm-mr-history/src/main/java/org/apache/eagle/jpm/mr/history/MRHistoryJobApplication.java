@@ -24,6 +24,7 @@ import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistorySpoutCollectorInterceptor;
 import org.apache.eagle.jpm.mr.history.publisher.JobStreamPublisher;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisher;
 import org.apache.eagle.jpm.mr.history.publisher.StreamPublisherManager;
 import org.apache.eagle.jpm.mr.history.publisher.TaskAttemptStreamPublisher;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
@@ -67,8 +68,7 @@ public class MRHistoryJobApplication extends StormApplication {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrHistoryJobSpout";
         int tasks = jhfAppConf.getInt("stormConfig.mrHistoryJobSpoutTasks");
-        JobHistorySpoutCollectorInterceptor collectorInterceptor = new JobHistorySpoutCollectorInterceptor();
-        JobHistorySpout jobHistorySpout = new JobHistorySpout(filter, appConfig, collectorInterceptor);
+        JobHistorySpout jobHistorySpout = new JobHistorySpout(filter, appConfig);
         topologyBuilder.setSpout(
                 spoutName,
                 jobHistorySpout,
@@ -89,14 +89,11 @@ public class MRHistoryJobApplication extends StormApplication {
         String spoutToTaskAttemptSinkName = spoutName + "_to_" + taskAttemptSinkBoltName;
         taskAttemptKafkaBoltDeclarer.shuffleGrouping(spoutName, spoutToTaskAttemptSinkName);
 
-        List<String> streams = new ArrayList<>();
-        streams.add(spoutToJobSinkName);
-        streams.add(spoutToTaskAttemptSinkName);
-        jobHistorySpout.setStreams(streams);
+        List<StreamPublisher> streamPublishers = new ArrayList<>();
+        streamPublishers.add(new JobStreamPublisher(spoutToJobSinkName));
+        streamPublishers.add(new TaskAttemptStreamPublisher(spoutToTaskAttemptSinkName));
+        jobHistorySpout.setStreamPublishers(streamPublishers);
 
-        //4, add stream publisher
-        StreamPublisherManager.getInstance().addStreamPublisher(new JobStreamPublisher(spoutToJobSinkName, collectorInterceptor));
-        StreamPublisherManager.getInstance().addStreamPublisher(new TaskAttemptStreamPublisher(spoutToTaskAttemptSinkName, collectorInterceptor));
         return topologyBuilder.createTopology();
     }
 }

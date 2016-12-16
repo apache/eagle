@@ -34,12 +34,10 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultJHFInputStreamCallback.class);
 
     private JobHistoryContentFilter filter;
-    private EagleOutputCollector collector;
     private MRHistoryJobConfig appConfig;
 
-    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, EagleOutputCollector eagleCollector, MRHistoryJobConfig appConfig) {
+    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, MRHistoryJobConfig appConfig) {
         this.filter = filter;
-        this.collector = eagleCollector;
         this.appConfig = appConfig;
     }
 
@@ -57,7 +55,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
             jobFileInputStream.close();
         } else {
             //get parser and parse, do not need to emit data now
-            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter, this.collector, appConfig);
+            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter, appConfig);
             parser.parse(jobFileInputStream);
             jobFileInputStream.close();
         }
