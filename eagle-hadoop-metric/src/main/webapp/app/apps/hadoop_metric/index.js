@@ -32,12 +32,18 @@
 		site: true,
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
+	}).route("HadoopMetric_RegionServer", {
+		url: "/hadoopMetric/region",
+		site: true,
+		templateUrl: "partials/region/region.html",
+		controller: "regionCtrl",
 	});
 
 	hadoopMetricApp.portal({
 		name: "Services", icon: "heartbeat", list: [
 			{name: "Overview", path: "hadoopMetric/"},
 			{name: "HDFS", path: "hadoopMetric/hdfs"},
+			{name: "RegionServer", path: "hadoopMetric/region"}
 		]
 	}, true);
 
@@ -45,7 +51,8 @@
 		var METRIC = window._METRIC = {};
 
 		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
-		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';;
+		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		;
 
 
 		/**
@@ -106,7 +113,6 @@
 			}
 
 			var data = $.map(metrics, function (metric) {
-				console.log(metric);
 				return rawData ? metric.value[0] : {
 					x: metric.timestamp,
 					y: metric.value[0]
@@ -156,5 +162,6 @@
 	hadoopMetricApp.require("widgets/availabilityChart.js");
 	hadoopMetricApp.require("ctrls/overview.js");
 	hadoopMetricApp.require("ctrls/hdfs.js");
+	hadoopMetricApp.require("ctrls/region.js");
 })();
 //# sourceURL=index.js
