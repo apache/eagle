@@ -84,7 +84,7 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private int jobOvertimeLimit = 6;
 
     // scheduler
-    private int initialDelayMin = 10;
+    private int initialDelayMin = 5;
     private int periodInMin = 60;
     private TimeZone timeZone;
 
