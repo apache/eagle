@@ -27,16 +27,19 @@
 		site: true,
 		templateUrl: "partials/overview.html",
 		controller: "overviewCtrl",
+		resolve: { time: true }
 	}).route("HadoopMetric_HDFS", {
 		url: "/hadoopMetric/hdfs",
 		site: true,
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
+		resolve: { time: true }
 	}).route("HadoopMetric_RegionServer", {
 		url: "/hadoopMetric/region",
 		site: true,
 		templateUrl: "partials/region/region.html",
 		controller: "regionCtrl",
+		resolve: { time: true }
 	}).route("hbaseRs", {
 		url: "/hadoopMetric/region",
 		site: true,
@@ -55,7 +58,7 @@
 	hadoopMetricApp.service("METRIC", function ($q, $http, Time, Site, Application) {
 		var METRIC = window._METRIC = {};
 
-		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
+		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 
 
@@ -145,11 +148,13 @@
 		};
 
 
-		METRIC.hbaseMetrics = function (condition, metric, limit) {
+		METRIC.hbaseMetrics = function (condition, metric, limit, startTime, endTime) {
 			var config = {
 				condition: METRIC.condition(condition),
 				metric: metric,
-				limit: limit || 10000
+				limit: limit || 10000,
+				startTime: Number(startTime),
+				endTime: Number(endTime)
 			};
 
 			var metrics_url = common.template(getQuery("HBASE_METRICS"), config);

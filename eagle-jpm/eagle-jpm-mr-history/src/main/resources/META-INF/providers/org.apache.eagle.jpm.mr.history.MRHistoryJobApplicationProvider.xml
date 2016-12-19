@@ -75,10 +75,17 @@
             <required>true</required>
         </property>
         <property>
-            <name>dataSinkConfig.topic</name>
-            <displayName>Destination(Kafka Topic) Of Stream Data</displayName>
-            <value>sandbox_map_reduce_failed_job</value>
-            <description>application emits stream data to this kafka topic</description>
+            <name>dataSinkConfig.MAP_REDUCE_JOB_STREAM.topic</name>
+            <displayName>Destination(Kafka Topic) Of Job Stream Data</displayName>
+            <value>sandbox-map_reduce_job</value>
+            <description>application emits job stream data to this kafka topic</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.MAP_REDUCE_TASK_ATTEMPT_STREAM.topic</name>
+            <displayName>Destination(Kafka Topic) Of Task Attempt Stream Data</displayName>
+            <value>sandbox-map_reduce_task_attempt</value>
+            <description>application emits task attempt stream data to this kafka topic</description>
             <required>true</required>
         </property>
         <property>
@@ -86,6 +93,13 @@
             <displayName>Broker(Kafka) List Of Stream Data</displayName>
             <value>localhost:6667</value>
             <description>kafka broker list for stream data</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkConnection</name>
+            <displayName>Kafka Zookeeper Quorum</displayName>
+            <value>localhost:2181</value>
+            <description>kafka zookeeper connection</description>
             <required>true</required>
         </property>
         <property>
@@ -214,7 +228,7 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>queue</name>
+                    <name>hostname</name>
                     <type>string</type>
                 </column>
                 <column>

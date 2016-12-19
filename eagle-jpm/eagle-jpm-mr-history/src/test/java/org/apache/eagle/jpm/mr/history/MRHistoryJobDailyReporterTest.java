@@ -47,14 +47,15 @@ public class MRHistoryJobDailyReporterTest {
     }
 
     @After
-    public void clear(){
-        if(server!=null) {
+    public void clear() {
+        if ( server != null ) {
             server.stop();
         }
     }
+
     @Test
     public void test() throws Exception {
-        MRHistoryJobDailyReporter reporter = new MRHistoryJobDailyReporter(config, null);
+        MRHistoryJobDailyReporter reporter = new MRHistoryJobDailyReporter(config);
         reporter.sendByEmail(mockAlertData());
         Iterator it = server.getReceivedEmail();
         Assert.assertTrue(server.getReceivedEmailSize() == 1);
@@ -65,33 +66,26 @@ public class MRHistoryJobDailyReporterTest {
 
     private Map<String, Object> mockAlertData() {
         Map<String, Object> alertData = new HashMap<>();
-        List<MRHistoryJobDailyReporter.JobSummeryInfo> summeryInfos = new ArrayList<>();
-        MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo1 = new MRHistoryJobDailyReporter.JobSummeryInfo();
-        summeryInfo1.status = "FAILED";
-        summeryInfo1.numOfJobs = 10;
-        summeryInfo1.ratio = 0.1;
-        MRHistoryJobDailyReporter.JobSummeryInfo summeryInfo2 = new MRHistoryJobDailyReporter.JobSummeryInfo();
-        summeryInfo2.status = "SUCCEEDED";
-        summeryInfo2.numOfJobs = 90;
-        summeryInfo2.ratio = 0.9;
-        summeryInfos.add(summeryInfo1);
-        summeryInfos.add(summeryInfo2);
+        List<JobSummaryInfo> summeryInfos = new ArrayList<>();
+        summeryInfos.add(buildJobSummaryInfo("FAILED", 8, 8));
+        summeryInfos.add(buildJobSummaryInfo("SUCCEEDED", 90, 89.9));
+        summeryInfos.add(buildJobSummaryInfo("KILLED", 2, 2));
         alertData.put(SUMMARY_INFO_KEY, summeryInfos);
 
-        Map<String,Double> failedJobUsers = new TreeMap<>();
-        failedJobUsers.put("alice", 100d);
-        failedJobUsers.put("bob", 97d);
+        List<JobSummaryInfo> failedJobUsers = new ArrayList<>();
+        failedJobUsers.add(buildJobSummaryInfo("alice", 100L, 98d));
+        failedJobUsers.add(buildJobSummaryInfo("bob", 97L, 2));
         alertData.put(FAILED_JOB_USERS_KEY, failedJobUsers);
 
-        Map<String,Double> succeededJobUsers = new TreeMap<>();
-        succeededJobUsers.put("alice1", 100d);
-        succeededJobUsers.put("bob1", 97d);
+        List<JobSummaryInfo> succeededJobUsers = new ArrayList<>();
+        succeededJobUsers.add(buildJobSummaryInfo("alice1", 100L, 98));
+        succeededJobUsers.add(buildJobSummaryInfo("bob1", 97, 2));
         alertData.put(SUCCEEDED_JOB_USERS_KEY, succeededJobUsers);
 
 
-        Map<String,Double> finishedJobUsers = new TreeMap<>();
-        finishedJobUsers.put("alice2", 100d);
-        finishedJobUsers.put("bob2", 97d);
+        List<JobSummaryInfo> finishedJobUsers = new ArrayList<>();
+        finishedJobUsers.add(buildJobSummaryInfo("alice2", 100L, 98));
+        finishedJobUsers.add(buildJobSummaryInfo("bob2", 97, 2));
         alertData.put(FINISHED_JOB_USERS_KEY, finishedJobUsers);
 
         alertData.put(ALERT_TITLE_KEY, "[TEST_CLUSTER] Daily Job Report");
@@ -104,4 +98,13 @@ public class MRHistoryJobDailyReporterTest {
         alertData.put(EAGLE_JOB_LINK_KEY, "http://localhost:9090/#/site/sandbox/jpm/statistics");
         return alertData;
     }
+
+    private JobSummaryInfo buildJobSummaryInfo(String key, long number, double ratio) {
+        JobSummaryInfo jobSummaryInfo = new JobSummaryInfo();
+        jobSummaryInfo.numOfJobs = number;
+        jobSummaryInfo.ratio = ratio;
+        jobSummaryInfo.key = key;
+        return jobSummaryInfo;
+    }
+
 }

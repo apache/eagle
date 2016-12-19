@@ -30,7 +30,7 @@ public class SparkHistoryJobAppProvider extends AbstractApplicationProvider<Spar
     }
 
     @Override
-    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+    public Optional<HealthCheck> getManagedHealthCheck(Config config) {
         return Optional.of(new SparkHistoryJobApplicationHealthCheck(config));
     }
 }
