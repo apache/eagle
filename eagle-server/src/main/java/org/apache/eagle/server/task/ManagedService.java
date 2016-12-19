@@ -16,27 +16,28 @@
  */
 package org.apache.eagle.server.task;
 
-import com.google.common.util.concurrent.AbstractScheduledService;
+import com.google.common.util.concurrent.Service;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ApplicationTask implements Managed {
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationTask.class);
-    private final AbstractScheduledService service;
+public class ManagedService implements Managed {
+    private static final Logger LOG = LoggerFactory.getLogger(ManagedService.class);
+    private final Service service;
 
-    public ApplicationTask(AbstractScheduledService service) {
+    public ManagedService(Service service) {
         this.service = service;
     }
 
     @Override
     public void start() throws Exception {
-        LOG.info("Application update task started:");
+        LOG.info("Starting service {}", service.toString());
         service.startAsync().awaitRunning();
     }
 
     @Override
     public void stop() throws Exception {
+        LOG.info("Stopping service {}", service.toString());
         service.stopAsync().awaitTerminated();
     }
 }

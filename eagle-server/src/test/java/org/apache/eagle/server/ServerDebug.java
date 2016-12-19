@@ -34,10 +34,15 @@ public class ServerDebug {
             System.setProperty("config.resource","application.conf");
         }
 
-        //
         String userDir = System.getProperty("user.dir");
         LOGGER.info("user.dir = {}", userDir);
         serverConf = userDir + "/eagle-server/src/test/resources/configuration.yml";
+
+        try {
+            Class.forName(EmbeddedMailService.class.getName());
+        } catch (ClassNotFoundException e) {
+            // Do nothing
+        }
     }
 
     public static void main(String[] args) {

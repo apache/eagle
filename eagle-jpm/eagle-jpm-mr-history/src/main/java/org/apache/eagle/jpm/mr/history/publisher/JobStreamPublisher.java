@@ -31,8 +31,8 @@ import java.util.Map;
 public class JobStreamPublisher extends StreamPublisher<JobExecutionAPIEntity> {
     private static final Logger LOG = LoggerFactory.getLogger(JobStreamPublisher.class);
 
-    public JobStreamPublisher(String stormStreamId, EagleOutputCollector collector) {
-        super(stormStreamId, collector);
+    public JobStreamPublisher(String stormStreamId) {
+        super(stormStreamId);
     }
 
     @Override

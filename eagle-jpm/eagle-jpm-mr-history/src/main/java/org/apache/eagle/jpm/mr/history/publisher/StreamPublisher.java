@@ -22,15 +22,24 @@ import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class StreamPublisher<T> {
+import java.io.Serializable;
+
+public abstract class StreamPublisher<T> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(StreamPublisher.class);
 
     protected String stormStreamId;
     protected EagleOutputCollector collector;
 
-    public StreamPublisher(String stormStreamId, EagleOutputCollector collector) {
+    public StreamPublisher(String stormStreamId) {
         this.stormStreamId = stormStreamId;
+    }
+
+    public void setCollector(EagleOutputCollector collector) {
         this.collector = collector;
+    }
+
+    public String stormStreamId() {
+        return stormStreamId;
     }
 
     public abstract Class<?> type();
