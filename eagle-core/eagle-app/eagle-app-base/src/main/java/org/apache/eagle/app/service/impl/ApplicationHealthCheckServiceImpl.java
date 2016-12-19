@@ -118,7 +118,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
             return;
         }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
-        Optional<HealthCheck> applicationHealthCheck = appProvider.getAppHealthCheck(
+        Optional<HealthCheck> applicationHealthCheck = appProvider.getManagedHealthCheck(
                         ConfigFactory.parseMap(appEntity.getContext())
                         .withFallback(config)
                         .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration()))
