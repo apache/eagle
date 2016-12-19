@@ -58,6 +58,7 @@
 			$scope.refresh = function () {
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
+
 				var promies = [];
 				$.each(METRIC_NAME, function (i, metric_name) {
 					promies.push(generateHbaseMetric(metric_name, 20, startTime, endTime));
@@ -152,7 +153,7 @@
 					component: "regionserver",
 					host: $scope.host
 				};
-				hbaseMetric = METRIC.hbaseMetrics(jobCond, name, limit, startTime, endTime);
+				hbaseMetric = METRIC.hbaseMetrics(jobCond, name, startTime, endTime, limit);
 				return hbaseMetric._promise;
 			}
 

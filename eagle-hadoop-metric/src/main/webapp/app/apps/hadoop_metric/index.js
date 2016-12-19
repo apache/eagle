@@ -34,12 +34,6 @@
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
 		resolve: { time: true }
-	}).route("HadoopMetric_RegionServer", {
-		url: "/hadoopMetric/region",
-		site: true,
-		templateUrl: "partials/region/region.html",
-		controller: "regionCtrl",
-		resolve: { time: true }
 	}).route("hbaseRs", {
 		url: "/hadoopMetric/region",
 		site: true,

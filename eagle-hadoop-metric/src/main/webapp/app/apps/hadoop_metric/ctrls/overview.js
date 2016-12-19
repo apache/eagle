@@ -109,7 +109,7 @@
 			$scope.refresh = function () {
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
-				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
+
 
 				function generateHbaseMetric(name, option,dataOption, limit) {
 					limit = limit || 20;
