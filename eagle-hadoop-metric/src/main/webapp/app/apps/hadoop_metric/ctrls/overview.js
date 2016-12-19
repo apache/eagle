@@ -22,23 +22,84 @@
 	 */
 	register(function (hadoopMetricApp) {
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC) {
-			var startTime = Number($wrapState.param.startTime);
-			var endTime = Number($wrapState.param.endTime);
 			$scope.site = $wrapState.param.siteId;
-			var jobCond = {
-				site: $scope.site
-			};
 
-			var METRIC_NAME = [
-				"hadoop.memory.nonheapmemoryusage.used",
-				"hadoop.memory.heapmemoryusage.used",
-				"hadoop.hbase.master.server.averageload",
-				"hadoop.hbase.master.assignmentmanger.ritcount",
-				"hadoop.hbase.master.assignmentmanger.ritcountoverthreshold"
+			var METRIC_NAME_ARRAY = [
+				["MemoryUsage", ["nonheap", "hadoop.memory.nonheapmemoryusage.used"]],
+				["MemoryUsage", ["heap", "hadoop.memory.heapmemoryusage.used"]],
+				["Master Averageload", ["averageload", "hadoop.hbase.master.server.averageload"]],
+				["Ritcount", ["ritcount", "hadoop.hbase.master.assignmentmanger.ritcount"]],
+				["Ritcountoverthreshold", ["ritcountoverthreshold", "hadoop.hbase.master.assignmentmanger.ritcountoverthreshold"]],
+				["Assign", ["assignNumOps", "hadoop.hbase.master.assignmentmanger.assign_num_ops"]],
+				["Assign", ["assignMin", "hadoop.hbase.master.assignmentmanger.assign_min"]],
+				["Assign", ["assignMax", "hadoop.hbase.master.assignmentmanger.assign_max"]],
+				["Assign Percentile", ["75th", "hadoop.hbase.master.assignmentmanger.assign_75th_percentile"],
+					["95th", "hadoop.hbase.master.assignmentmanger.assign_95th_percentile"],
+					["99th", "hadoop.hbase.master.assignmentmanger.assign_99th_percentile"]
+				],
+				["BulkAssign", ["bulkAssign_num_ops", "hadoop.hbase.master.assignmentmanger.bulkassign_num_ops"]],
+				["BulkAssign", ["bulkAssign_min", "hadoop.hbase.master.assignmentmanger.bulkassign_min"]],
+				["BulkAssign", ["bulkAssign_max", "hadoop.hbase.master.assignmentmanger.bulkassign_max"]],
+				["BulkAssign Percentile", ["75th", "hadoop.hbase.master.assignmentmanger.bulkassign_75th_percentile"],
+					["95th", "hadoop.hbase.master.assignmentmanger.bulkassign_95th_percentile"],
+					["99th", "hadoop.hbase.master.assignmentmanger.bulkassign_99th_percentile"]
+				],
+				["BalancerCluster", ["balancerCluster_num_ops", "hadoop.hbase.master.balancer.balancercluster_num_ops"]],
+				["BalancerCluster", ["balancerCluster_min", "hadoop.hbase.master.balancer.balancercluster_min"]],
+				["BalancerCluster", ["balancerCluster_max", "hadoop.hbase.master.balancer.balancercluster_max"]],
+				["BalancerCluster Percentile", ["75th", "hadoop.hbase.master.balancer.balancercluster_75th_percentile"],
+					["95th", "hadoop.hbase.master.balancer.balancercluster_95th_percentile"],
+					["99th", "hadoop.hbase.master.balancer.balancercluster_99th_percentile"]
+				],
+				["HlogSplitTime", ["HlogSplitTime_min", "hadoop.hbase.master.filesystem.hlogsplittime_min"]],
+				["HlogSplitTime", ["HlogSplitTime_max", "hadoop.hbase.master.filesystem.hlogsplittime_max"]],
+				["BalancerCluster Percentile", ["75th", "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile"],
+					["95th", "hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile"],
+					["99th", "hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile"]
+				],
+				["HlogSplitSize", ["Min", "hadoop.hbase.master.filesystem.hlogsplitsize_min"],
+					["Max", "hadoop.hbase.master.filesystem.hlogsplitsize_max"]
+				],
+				["MetaHlogSplitTime", ["Min", "hadoop.hbase.master.filesystem.metahlogsplittime_min"],
+					["Max", "hadoop.hbase.master.filesystem.metahlogsplittime_max"]
+				],
+				["MetaHlogSplitTime Percentile", ["75th", "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile"],
+					["95th", "hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile"],
+					["99th", "hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile"]
+				],
+				["MetaHlogSplitSize", ["Min", "hadoop.hbase.master.filesystem.metahlogsplitsize_min"],
+					["Max", "hadoop.hbase.master.filesystem.metahlogsplitsize_max"]
+				]
 			];
 
 			PageConfig.title = 'Overview';
-			$scope.commonOption = {};
+			var storageOption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						console.log("1234");
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, true);
+							}).reverse().join("<br/>");
+					}
+				},
+				legend: {
+					formatter: function (name) {
+						return echarts.format.truncateText(name, 2, '14px Microsoft Yahei', '¡­');
+					},
+					tooltip: {
+						show: true
+					}
+				},
+				yAxis: [{
+					axisLabel: {formatter: function (value) {
+						return common.number.abbr(value, true);
+					}}
+				}]
+			};
 			$scope.metricList = {};
 
 			// Mock series data
@@ -57,7 +118,7 @@
 						name: name + '_' + i,
 						type: 'line',
 						data: data,
-						showSymbol: false
+						showSymbol: false,
 					}, option));
 				}
 				return {
@@ -66,60 +127,80 @@
 				};
 			}
 
-
-			function generateHbaseMetric(name, option, limit) {
+			function generateHbaseMetric(name, option,dataOption, limit) {
 				limit = limit || 20;
-				var hbaseMetric;
+				var count = name.length - 1 || 1;
+				var hbaseMetric = [];
 				var series = [];
 				$scope.site = $wrapState.param.siteId;
 				var jobCond = {
-					site: $scope.site
+					site: $scope.site,
+					component: "hbasemaster",
+					host: "yhd-jqhadoop182.int.yihaodian.com"
 				};
-				var data = [];
-				hbaseMetric = METRIC.hbaseMetrics(jobCond, name, limit);
-				return hbaseMetric._promise.then(function () {
-					data = $.map(hbaseMetric, function (metric) {
-						return {
-							x: metric.timestamp,
-							y: metric.value[0]
-						};
-					});
 
-					series.push($.extend({
-						name: name,
-						type: 'line',
-						data: data,
-						showSymbol: false
-					}, option));
+				for (var i = 1; i <= count; i += 1) {
+					hbaseMetric.push(METRIC.hbaseMetrics(jobCond, name[i][1], limit)._promise);
+				}
+				return $q.all(hbaseMetric).then(function (res) {
+					for (var i = 0; i < count; i += 1) {
+						var data = [];
+						data = $.map(res[i], function (metric) {
+							return  {
+								x: metric.timestamp,
+								y: metric.value[0]
+							};
+						});
+						series.push($.extend({
+							name: name[i+1][0],
+							type: 'line',
+							data: data,
+							showSymbol: false
+						}, option));
+					}
+
 					return {
-						title: name,
-						series: series
+						title: name[0],
+						series: series,
+						dataOption: dataOption || {}
 					};
 				});
 			}
 
 			$q.all([
-				generateHbaseMetric(METRIC_NAME[0], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME[1], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME[2], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME[3], {areaStyle: {normal: {}}})
+				generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
+				generateHbaseMetric(METRIC_NAME_ARRAY[1], {smooth: true}, storageOption),
+				generateHbaseMetric(METRIC_NAME_ARRAY[2], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[3], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[4], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[5], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[6], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[7], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[8], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[9], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[10], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[11], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[12], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[13], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[14], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[15], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[16], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[17], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[18], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[19], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
+				generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
 			]).then(function (res) {
-				console.log(res[0]);
 
 				$scope.metricList = [
-					res[0],
-					res[1],
-					res[2],
-					res[3],
-					mockMetric('name1', {}, 2),
-					mockMetric('name2', {smooth: true}, 2),
-					mockMetric('name3', {areaStyle: {normal: {}}, stack: 'one'}, 2),
-					mockMetric('name4', {type: 'bar', stack: 'one'}, 2),
-					mockMetric('name1', {}, 3),
-					mockMetric('name2', {smooth: true}, 3),
-					mockMetric('name3', {areaStyle: {normal: {}}, stack: 'one'}, 3),
-					mockMetric('name4', {type: 'bar', stack: 'one'}, 3)
-				];
+					res[0],res[1],res[2],res[3],res[4],
+					res[5],res[6],res[7],res[8],res[9],
+					res[10],res[11],res[12],res[13],res[14],
+					res[15],res[16],res[17],res[18],res[19],
+					res[20],res[21],res[22],res[23]
+				]
 			});
 		});
 	});
