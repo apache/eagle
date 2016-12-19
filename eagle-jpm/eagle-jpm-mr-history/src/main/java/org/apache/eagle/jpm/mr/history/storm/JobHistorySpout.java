@@ -140,7 +140,12 @@ public class JobHistorySpout extends BaseRichSpout {
         JobHistoryZKStateManager.instance().init(appConfig.getZkStateConfig());
         JobHistoryZKStateManager.instance().ensureJobPartition(partitionId, numTotalPartitions);
         interceptor.setSpoutOutputCollector(collector);
-
+        if (streamPublishers != null) {
+            for (StreamPublisher streamPublisher : streamPublishers) {
+                streamPublisher.setCollector(this.interceptor);
+                StreamPublisherManager.getInstance().addStreamPublisher(streamPublisher);
+            }
+        }
         try {
             jhfLCM = new JobHistoryDAOImpl(jobHistoryEndpointConfig);
             driver = new JHFCrawlerDriverImpl(
@@ -189,8 +194,6 @@ public class JobHistorySpout extends BaseRichSpout {
         if (streamPublishers != null) {
             for (StreamPublisher streamPublisher : streamPublishers) {
                 declarer.declareStream(streamPublisher.stormStreamId(), new Fields("f1", "message"));
-                streamPublisher.setCollector(this.interceptor);
-                StreamPublisherManager.getInstance().addStreamPublisher(streamPublisher);
             }
         } else {
             declarer.declare(new Fields("f1", "message"));
