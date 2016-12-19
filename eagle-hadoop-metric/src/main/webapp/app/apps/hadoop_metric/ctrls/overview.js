@@ -21,7 +21,8 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (hadoopMetricApp) {
-		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC) {
+		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
+			var cache = {};
 			$scope.site = $wrapState.param.siteId;
 
 			var METRIC_NAME_ARRAY = [
@@ -77,7 +78,6 @@
 				animation: false,
 				tooltip: {
 					formatter: function (points) {
-						console.log("1234");
 						return points[0].name + "<br/>" +
 							$.map(points, function (point) {
 								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
@@ -102,106 +102,103 @@
 			};
 			$scope.metricList = {};
 
-			// Mock series data
-			function mockMetric(name, option, count) {
-				count = count || 1;
-				var now = +new Date();
 
-				var series = [];
-				for (var i = 0; i < count; i += 1) {
-					var data = [];
 
-					for (var j = 0; j < 30; j += 1) {
-						data.push({x: now + j * 1000 * 60, y: Math.random() * 100});
-					}
-					series.push($.extend({
-						name: name + '_' + i,
-						type: 'line',
-						data: data,
-						showSymbol: false,
-					}, option));
-				}
-				return {
-					title: name,
-					series: series
-				};
-			}
+			// TODO: Optimize the chart count
+			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
+			$scope.refresh = function () {
+				var startTime = Time.startTime();
+				var endTime = Time.endTime();
+				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
 
-			function generateHbaseMetric(name, option,dataOption, limit) {
-				limit = limit || 20;
-				var count = name.length - 1 || 1;
-				var hbaseMetric = [];
-				var series = [];
-				$scope.site = $wrapState.param.siteId;
-				var jobCond = {
-					site: $scope.site,
-					component: "hbasemaster",
-					host: "yhd-jqhadoop182.int.yihaodian.com"
-				};
+				function generateHbaseMetric(name, option,dataOption, limit) {
+					limit = limit || 20;
+					var count = name.length - 1 || 1;
+					var hbaseMetric = [];
+					var series = [];
 
-				for (var i = 1; i <= count; i += 1) {
-					hbaseMetric.push(METRIC.hbaseMetrics(jobCond, name[i][1], limit)._promise);
-				}
-				return $q.all(hbaseMetric).then(function (res) {
-					for (var i = 0; i < count; i += 1) {
-						var data = [];
-						data = $.map(res[i], function (metric) {
-							return  {
-								x: metric.timestamp,
-								y: metric.value[0]
-							};
-						});
-						series.push($.extend({
-							name: name[i+1][0],
-							type: 'line',
-							data: data,
-							showSymbol: false
-						}, option));
-					}
+					var startTime = Time.startTime();
+					var endTime = Time.endTime();
 
-					return {
-						title: name[0],
-						series: series,
-						dataOption: dataOption || {}
+					$scope.site = $wrapState.param.siteId;
+					var jobCond = {
+						site: $scope.site,
+						component: "hbasemaster",
+						host: "yhd-jqhadoop182.int.yihaodian.com"
 					};
+
+					for (var i = 1; i <= count; i += 1) {
+						var hbaseMetricsPromise = cache[name[i][1]] = cache[name[i][1]] || METRIC.hbaseMetrics(jobCond, name[i][1], startTime, endTime, limit)._promise;
+						hbaseMetric.push(hbaseMetricsPromise);
+					}
+					return $q.all(hbaseMetric).then(function (res) {
+						for (var i = 0; i < count; i += 1) {
+							var data = [];
+							data = $.map(res[i], function (metric) {
+								return  {
+									x: metric.timestamp,
+									y: metric.value[0]
+								};
+							});
+							series.push($.extend({
+								name: name[i+1][0],
+								type: 'line',
+								data: data,
+								showSymbol: false
+							}, option));
+						}
+
+						return {
+							title: name[0],
+							series: series,
+							dataOption: dataOption || {}
+						};
+					});
+				}
+
+				$q.all([
+					generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
+					generateHbaseMetric(METRIC_NAME_ARRAY[1], {smooth: true}, storageOption),
+					generateHbaseMetric(METRIC_NAME_ARRAY[2], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[3], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[4], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[5], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[6], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[7], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[8], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[9], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[10], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[11], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[12], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[13], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[14], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[15], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[16], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[17], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[18], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[19], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
+					generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
+					generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
+				]).then(function (res) {
+					$scope.metricList = [
+						res[0],res[1],res[2],res[3],res[4],
+						res[5],res[6],res[7],res[8],res[9],
+						res[10],res[11],res[12],res[13],res[14],
+						res[15],res[16],res[17],res[18],res[19],
+						res[20],res[21],res[22],res[23]
+					]
 				});
 			}
 
-			$q.all([
-				generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
-				generateHbaseMetric(METRIC_NAME_ARRAY[1], {smooth: true}, storageOption),
-				generateHbaseMetric(METRIC_NAME_ARRAY[2], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[3], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[4], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[5], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[6], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[7], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[8], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[9], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[10], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[11], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[12], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[13], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[14], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[15], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[16], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[17], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[18], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[19], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
-				generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
-			]).then(function (res) {
 
-				$scope.metricList = [
-					res[0],res[1],res[2],res[3],res[4],
-					res[5],res[6],res[7],res[8],res[9],
-					res[10],res[11],res[12],res[13],res[14],
-					res[15],res[16],res[17],res[18],res[19],
-					res[20],res[21],res[22],res[23]
-				]
-			});
+
+			Time.onReload(function () {
+				cache = {};
+				$scope.refresh();
+			}, $scope);
+			$scope.refresh();
 		});
 	});
 })();
