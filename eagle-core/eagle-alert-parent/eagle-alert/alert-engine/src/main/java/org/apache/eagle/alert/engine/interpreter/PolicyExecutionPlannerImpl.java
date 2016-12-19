@@ -306,6 +306,10 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
             StreamPartition existingPartition = effectivePartitions.get(partition.getStreamId());
             // If same Type & Columns but different sort spec, then use larger
             if (existingPartition.getType().equals(partition.getType())
+                    && ListUtils.isEqualList(existingPartition.getColumns(), partition.getColumns())
+                    && partition.getSortSpec() == null) {
+                LOG.info("use exist StreamPartition {}", existingPartition);
+            } else if (existingPartition.getType().equals(partition.getType())
                 && ListUtils.isEqualList(existingPartition.getColumns(), partition.getColumns())
                 && partition.getSortSpec().getWindowPeriodMillis() > existingPartition.getSortSpec().getWindowPeriodMillis()
                 || existingPartition.getType().equals(StreamPartition.Type.SHUFFLE)) {
