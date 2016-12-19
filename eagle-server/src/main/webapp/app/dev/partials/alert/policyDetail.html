@@ -55,13 +55,68 @@
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
 		<!--li><a href="#statistic" data-toggle="tab">Statistic</a></li-->
-		<li class="active"><a href="#setting" data-toggle="tab" ng-click="setTab('setting')">Setting</a></li>
-		<li><a href="#assignments" data-toggle="tab" ng-click="setTab('assignments')">Assignments</a></li>
+		<li class="active"><a href="#alerts" data-toggle="tab" ng-click="setTab('alerts')">Alert List</a></li>
 		<li><a href="#definition" data-toggle="tab" ng-click="setTab('definition')">Alert Definition</a></li>
-		<li><a href="#alerts" data-toggle="tab" ng-click="setTab('alerts')">Alert List</a></li>
+		<li><a href="#setting" data-toggle="tab" ng-click="setTab('setting')">Policy Settings</a></li>
+		<li><a href="#assignments" data-toggle="tab" ng-click="setTab('assignments')">Execution Assignments</a></li>
 	</ul>
 	<div class="tab-content">
-		<div class="tab-pane active" id="setting">
+		<div class="tab-pane active" id="alerts">
+			<div sort-table="alertList">
+				<table class="table table-bordered">
+					<thead>
+					<tr>
+						<th sortpath="timestamp" width="135">
+							Alert Time
+							<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done || isSorting"></span>
+						</th>
+						<th>Alert Subject</th>
+						<th width="10"></th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>{{Time.format(item.timestamp)}}</td>
+						<td class="text-break">
+							{{item.alertSubject}}
+						</td>
+						<td>
+							<a ui-sref="alertDetail({alertId: item.tags.alertId})">Detail</a>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="tab-pane" id="definition">
+			<table class="table">
+				<tbody>
+				<tr>
+					<th width="15%">Category</th>
+					<td>{{policy.alertDefinition.category}}</td>
+				</tr>
+				<tr>
+					<th>Severity</th>
+					<td>
+							<span class="label label-{{Policy.getSeverityClass(policy.alertDefinition.severity)}}">
+								{{policy.alertDefinition.severity}}
+							</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Alert Subject</th>
+					<td><pre>{{policy.alertDefinition.subject}}</pre></td>
+				</tr>
+				<tr>
+					<th>Alert Body</th>
+					<td><pre>{{policy.alertDefinition.body}}</pre></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="tab-pane" id="setting">
 			<table class="table">
 				<tbody>
 					<tr>
@@ -128,98 +183,43 @@
 							</ul>
 						</td>
 					</tr>
-					<tr>
-						<th class="text-no-break">Execution Plan</th>
-						<td><pre>{{executionPlan.policyExecutionPlan.executionPlanDesc}}</pre></td>
-					</tr>
+					<!--<tr>-->
+						<!--<th class="text-no-break">Execution Plan</th>-->
+						<!--<td><pre>{{executionPlan.policyExecutionPlan.executionPlanDesc}}</pre></td>-->
+					<!--</tr>-->
 				</tbody>
 			</table>
 		</div>
 
-		<div class="tab-pane" id="statistic">statistic
-		</div>
 
 		<div class="tab-pane" id="assignments">
 			<table class="table">
 				<tbody>
-					<tr>
-						<th>Version</th>
-						<td>{{assignment.version}}</td>
-					</tr>
-					<tr>
-						<th>Queue Id</th>
-						<td>{{assignment.queueId}}</td>
-					</tr>
-					<tr>
-						<th class="text-no-break" width="120">working Slots</th>
-						<td>
-							<div na-block="queue.workingSlots.length > 0">
-								<ul class="no-margin">
-									<li ng-repeat="slot in queue.workingSlots track by $index">
-										<span class="text-primary">{{slot.topologyName}}</span>
-										- {{slot.boltId}}
-									</li>
-								</ul>
-							</div>
-						</td>
-					</tr>
+				<tr>
+					<th>Assigned Version</th>
+					<td>{{assignment.version}}</td>
+				</tr>
+				<tr>
+					<th>Assigned Queue</th>
+					<td>{{assignment.queueId}}</td>
+				</tr>
+				<tr>
+					<th class="text-no-break" width="120">Assigned Slots</th>
+					<td>
+						<div na-block="queue.workingSlots.length > 0">
+							<ul class="no-margin">
+								<li ng-repeat="slot in queue.workingSlots track by $index">
+									<span class="text-primary">{{slot.topologyName}}</span>
+									- {{slot.boltId}}
+								</li>
+							</ul>
+						</div>
+					</td>
+				</tr>
 				</tbody>
 			</table>
 		</div>
 
-		<div class="tab-pane" id="definition">
-			<table class="table">
-				<tbody>
-					<tr>
-						<th width="15%">Category</th>
-						<td>{{policy.alertDefinition.category}}</td>
-					</tr>
-					<tr>
-						<th>Severity</th>
-						<td>
-							<span class="label label-{{Policy.getSeverityClass(policy.alertDefinition.severity)}}">
-								{{policy.alertDefinition.severity}}
-							</span>
-						</td>
-					</tr>
-					<tr>
-						<th>Alert Subject</th>
-						<td>{{policy.alertDefinition.subject}}</td>
-					</tr>
-					<tr>
-						<th>Alert Body</th>
-						<td><pre>{{policy.alertDefinition.body}}</pre></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-		<div class="tab-pane" id="alerts">
-			<div sort-table="alertList">
-				<table class="table table-bordered">
-					<thead>
-					<tr>
-						<th sortpath="timestamp" width="135">
-							Alert Time
-							<span class="fa fa-refresh fa-spin no-animate" ng-show="!alertList._done || isSorting"></span>
-						</th>
-						<th>Alert Subject</th>
-						<th width="10"></th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td>{{Time.format(item.timestamp)}}</td>
-						<td class="text-break">
-							{{item.alertSubject}}
-						</td>
-						<td>
-							<a ui-sref="alertDetail({alertId: item.tags.alertId})">Detail</a>
-						</td>
-					</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
+		<!--<div class="tab-pane" id="statistic">statistic</div>-->
 	</div>
 </div>

@@ -55,7 +55,7 @@ public class DynamicPolicyLoader implements Runnable {
         // we should catch every exception to avoid zombile thread
         try {
             final Stopwatch watch = Stopwatch.createStarted();
-            LOG.info("policies loader start.");
+            LOG.info("Starting to load policies");
             List<PolicyDefinition> current = client.listPolicies();
             Map<String, PolicyDefinition> currPolicies = new HashMap<>();
             current.forEach(pe -> currPolicies.put(pe.getName(), pe));
@@ -80,9 +80,10 @@ public class DynamicPolicyLoader implements Runnable {
             }
 
             if (!policyChanged) {
-                LOG.info("policy is not changed since last run");
+                LOG.info("No policy (totally {}) changed since last round", current.size());
                 return;
             }
+
             synchronized (this) {
                 for (PolicyChangeListener listener : listeners) {
                     listener.onPolicyChange(current, addedPolicies, removedPolicies, reallyModifiedPolicies);
@@ -90,11 +91,13 @@ public class DynamicPolicyLoader implements Runnable {
             }
 
             watch.stop();
-            LOG.info("policies loader completed. used time milliseconds: {}", watch.elapsed(TimeUnit.MILLISECONDS));
+
+            LOG.info("Finished loading {} policies, added: {}, removed: {}, modified: {}, taken: {} ms",
+                current.size(), addedPolicies.size(), removedPolicies.size(), potentiallyModifiedPolicies.size(), watch.elapsed(TimeUnit.MILLISECONDS));
             // reset cached policies
             cachedPolicies = currPolicies;
         } catch (Throwable t) {
-            LOG.error("error loading policy, but continue to run", t);
+            LOG.warn("Error loading policy, but continue to run", t);
         }
     }
 }
