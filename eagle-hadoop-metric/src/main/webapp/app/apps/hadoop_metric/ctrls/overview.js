@@ -87,9 +87,7 @@
 					}
 				},
 				legend: {
-					data: ['1', '2'],
 					formatter: function (name) {
-						console.log("12345");
 						return echarts.format.truncateText(name, 2, '14px Microsoft Yahei', '¡­');
 					},
 					tooltip: {
@@ -136,7 +134,9 @@
 				var series = [];
 				$scope.site = $wrapState.param.siteId;
 				var jobCond = {
-					site: $scope.site
+					site: $scope.site,
+					component: "hbasemaster",
+					host: "yhd-jqhadoop182.int.yihaodian.com"
 				};
 
 				for (var i = 1; i <= count; i += 1) {
@@ -170,28 +170,28 @@
 			$q.all([
 				generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
 				generateHbaseMetric(METRIC_NAME_ARRAY[1], {smooth: true}, storageOption),
-				generateHbaseMetric(METRIC_NAME_ARRAY[2], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[3], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[4], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[5], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[6], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[7], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[8], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[9], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[10], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[11], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[12], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[13], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[14], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[15], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[16], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[17], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[18], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[19], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[20], {areaStyle: {normal: {}}}, storageOption),
-				generateHbaseMetric(METRIC_NAME_ARRAY[21], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[22], {areaStyle: {normal: {}}}),
-				generateHbaseMetric(METRIC_NAME_ARRAY[23], {areaStyle: {normal: {}}})
+				generateHbaseMetric(METRIC_NAME_ARRAY[2], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[3], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[4], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[5], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[6], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[7], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[8], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[9], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[10], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[11], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[12], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[13], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[14], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[15], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[16], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[17], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[18], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[19], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
+				generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
+				generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
 			]).then(function (res) {
 
 				$scope.metricList = [

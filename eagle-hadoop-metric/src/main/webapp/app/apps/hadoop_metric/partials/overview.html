@@ -20,11 +20,46 @@
 	<div class="box-header with-border">
 		<span class="fa fa-television"></span>
 		<h3 class="box-title">
-			Summary
+			Service Summary Information
 		</h3>
+		<div class="box-tools pull-right">
+			<button type="button" data-widget="collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
 	</div>
 	<div class="box-body">
-		TODO: Your summary
+		<!--TODO: Your summary-->
+
+		<div class="col-md-12">
+				<div class="col-lg-2 col-xs-6">
+					<!-- small box -->
+					<div class="small-box bg-light-blue">
+						<div class="inner">
+							<span>5 RegionServers</span>
+						</div>
+						<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+					</div>
+				</div>
+			<div class="col-lg-2 col-xs-6">
+				<!-- small box -->
+				<div class="small-box bg-light-blue">
+					<div class="inner">
+						<span>5 Healthy</span>
+					</div>
+					<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+				</div>
+			</div>
+			<div class="col-lg-2 col-xs-6">
+				<!-- small box -->
+				<div class="small-box bg-light-blue">
+					<div class="inner">
+						<span>0 Unhealthy</span>
+					</div>
+					<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -34,16 +69,28 @@
 		<h3 class="box-title">
 			Metrics
 		</h3>
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default">Host1</button>
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<span class="caret"></span>
+				<span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a href="#">Host1</a></li>
+				<li><a href="#">Host2</a></li>
+			</ul>
+		</div>
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">
 			<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
 				<div class="hadoopMetric-chart">
 					<h3>{{metric.title}}</h3>
-					<div chart class="hadoopMetric-chart-container" series="metric.series" option="commonOption"></div>
-					</div>
+					<div chart class="hadoopMetric-chart-container" series="metric.series"
+						 option="metric.dataOption"></div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 </div>
