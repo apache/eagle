@@ -47,15 +47,15 @@ public class MRHistoryJobDailyReporterTest {
     }
 
     @After
-    public void clear(){
-        if(server!=null) {
+    public void clear() {
+        if ( server != null ) {
             server.stop();
         }
     }
 
     @Test
     public void test() throws Exception {
-        MRHistoryJobDailyReporter reporter = new MRHistoryJobDailyReporter(config, null);
+        MRHistoryJobDailyReporter reporter = new MRHistoryJobDailyReporter(config);
         reporter.sendByEmail(mockAlertData());
         Iterator it = server.getReceivedEmail();
         Assert.assertTrue(server.getReceivedEmailSize() == 1);

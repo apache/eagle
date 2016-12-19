@@ -150,7 +150,7 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
 
     private <T> List<T> list(String path, GenericType<List<T>> type) {
         WebResource r = client.resource(basePath + path);
-        LOG.info("query URL {}", basePath + path);
+        LOG.info("Requesting {}", basePath + path);
         List<T> ret = r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).get(type);
         return ret;
     }
@@ -172,7 +172,7 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     }
 
     private <T> T listOne(String path, Class<T> tClz) {
-        LOG.info("query URL {}", basePath + path);
+        LOG.info("Requesting {}", basePath + path);
         WebResource r = client.resource(basePath + path);
 
         ClientResponse resp = r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON)
@@ -181,10 +181,10 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
             try {
                 return resp.getEntity(tClz);
             } catch (Exception e) {
-                LOG.warn(" list one entity failed, ignored and continute, path {}, message {}!", path, e.getMessage());
+                LOG.warn("List one entity failed, ignored and continue, path:{}", path, e);
             }
         } else {
-            LOG.warn("fail querying metadata service {} with http status {}", basePath + path, resp.getStatus());
+            LOG.warn("Fail querying metadata service {}, http status: {}", basePath + path, resp.getStatus());
         }
         return null;
     }
