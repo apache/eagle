@@ -113,7 +113,9 @@ public class ApplicationStatusUpdateServiceImpl extends ApplicationStatusUpdateS
                     applicationEntityService.create(applicationEntity);
                 }
             }
-            //"STOPPED" is not used in Eagle, so just do nothing.
+            // "STOPPED" is not used in Eagle, so just do nothing.
+
+            applicationEntity.setStatus(topologyStatus);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
         }
