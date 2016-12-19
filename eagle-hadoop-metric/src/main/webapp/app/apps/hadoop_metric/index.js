@@ -23,7 +23,7 @@
 	var hadoopMetricApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
 	hadoopMetricApp.route("HadoopMetric", {
-		url: "/hadoopMetric/",
+		url: "/hadoopMetric?startTime&endTime",
 		site: true,
 		templateUrl: "partials/overview.html",
 		controller: "overviewCtrl",
@@ -44,12 +44,13 @@
 		url: "/hadoopMetric/region",
 		site: true,
 		templateUrl: "partials/region/region.html",
-		controller: "regionCtrl"
+		controller: "regionCtrl",
+		resolve: { time: true }
 	});
 
 	hadoopMetricApp.portal({
 		name: "Services", icon: "heartbeat", list: [
-			{name: "Overview", path: "hadoopMetric/"},
+			{name: "Overview", path: "hadoopMetric"},
 			{name: "HDFS", path: "hadoopMetric/hdfs"},
 			{name: "RegionServer", path: "hadoopMetric/region"}
 		]
@@ -58,7 +59,7 @@
 	hadoopMetricApp.service("METRIC", function ($q, $http, Time, Site, Application) {
 		var METRIC = window._METRIC = {};
 
-		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
 		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 
 
@@ -148,16 +149,16 @@
 		};
 
 
-		METRIC.hbaseMetrics = function (condition, metric, limit, startTime, endTime) {
+		METRIC.hbaseMetrics = function (condition, metric, startTime, endTime, limit) {
 			var config = {
 				condition: METRIC.condition(condition),
+				startTime: Time.format(startTime),
+				endTime: Time.format(endTime),
 				metric: metric,
-				limit: limit || 10000,
-				startTime: Number(startTime),
-				endTime: Number(endTime)
+				limit: limit || 10000
 			};
 
-			var metrics_url = common.template(getQuery("HBASE_METRICS"), config);
+			var metrics_url = common.template(getQuery("HBASE_METRICS_WITHTIME"), config);
 			var _list = wrapList(METRIC.get(metrics_url));
 			_list._promise.then(function () {
 				_list.reverse();
