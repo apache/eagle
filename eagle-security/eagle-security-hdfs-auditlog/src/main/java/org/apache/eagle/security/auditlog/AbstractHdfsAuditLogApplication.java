@@ -105,6 +105,8 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
 
     public abstract String getSinkStreamName();
 
+    public abstract String getAppType();
+
     public static PartitionStrategy createStrategy(Config config) {
         // TODO: Refactor configuration structure to avoid repeated config processing configure ~ hao
         String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);

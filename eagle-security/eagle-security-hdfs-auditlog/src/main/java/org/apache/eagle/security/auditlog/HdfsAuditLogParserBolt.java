@@ -54,14 +54,14 @@ public class HdfsAuditLogParserBolt extends BaseRichBolt {
         try {
             entity = parser.parse(logLine);
             Map<String, Object> map = new TreeMap<>();
-            map.put("src", entity.src);
-            map.put("dst", entity.dst);
-            map.put("host", entity.host);
-            map.put("timestamp", entity.timestamp);
-            map.put("allowed", entity.allowed);
-            map.put("user", entity.user);
-            map.put("cmd", entity.cmd);
-            collector.emit(Collections.singletonList(map));
+            map.put(HDFSAuditLogObject.HDFS_SRC_KEY, entity.src);
+            map.put(HDFSAuditLogObject.HDFS_DST_KEY, entity.dst);
+            map.put(HDFSAuditLogObject.HDFS_HOST_KEY, entity.host);
+            map.put(HDFSAuditLogObject.HDFS_TIMESTAMP_KEY, entity.timestamp);
+            map.put(HDFSAuditLogObject.HDFS_ALLOWED_KEY, entity.allowed);
+            map.put(HDFSAuditLogObject.HDFS_USER_KEY, entity.user);
+            map.put(HDFSAuditLogObject.HDFS_CMD_KEY, entity.cmd);
+            collector.emit(input, Collections.singletonList(map));
         } catch (Exception ex) {
             LOG.error("Failing parse audit log message {}", logLine, ex);
         } finally {

@@ -39,6 +39,11 @@ public class HdfsAuditLogApplication extends AbstractHdfsAuditLogApplication {
         return "hdfs_audit_log_stream";
     }
 
+    @Override
+    public String getAppType() {
+        return "HDFS_AUDIT_LOG_MONITOR_APP";
+    }
+
     public static void main(String[] args) {
         Config config = ConfigFactory.load();
         HdfsAuditLogApplication app = new HdfsAuditLogApplication();
