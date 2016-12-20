@@ -25,6 +25,15 @@
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
 
+			$scope.hostSelect = {
+				hostList: [
+					{ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"},
+					{ip: "10.17.28.183", host: "yhd-jqhadoop183.int.yihaodian.com"}
+				],
+				selectedHost: {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"}
+			}
+
+
 			var METRIC_NAME_ARRAY = [
 				["MemoryUsage", ["nonheap", "hadoop.memory.nonheapmemoryusage.used"]],
 				["MemoryUsage", ["heap", "hadoop.memory.heapmemoryusage.used"]],
@@ -48,13 +57,15 @@
 				["BalancerCluster", ["balancerCluster_num_ops", "hadoop.hbase.master.balancer.balancercluster_num_ops"]],
 				["BalancerCluster", ["balancerCluster_min", "hadoop.hbase.master.balancer.balancercluster_min"]],
 				["BalancerCluster", ["balancerCluster_max", "hadoop.hbase.master.balancer.balancercluster_max"]],
-				["BalancerCluster Percentile", ["75th", "hadoop.hbase.master.balancer.balancercluster_75th_percentile"],
+				["BalancerCluster Percentile",
+					["75th", "hadoop.hbase.master.balancer.balancercluster_75th_percentile"],
 					["95th", "hadoop.hbase.master.balancer.balancercluster_95th_percentile"],
 					["99th", "hadoop.hbase.master.balancer.balancercluster_99th_percentile"]
 				],
 				["HlogSplitTime", ["HlogSplitTime_min", "hadoop.hbase.master.filesystem.hlogsplittime_min"]],
 				["HlogSplitTime", ["HlogSplitTime_max", "hadoop.hbase.master.filesystem.hlogsplittime_max"]],
-				["BalancerCluster Percentile", ["75th", "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile"],
+				["BalancerCluster Percentile",
+					["75th", "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile"],
 					["95th", "hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile"],
 					["99th", "hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile"]
 				],
@@ -64,11 +75,13 @@
 				["MetaHlogSplitTime", ["Min", "hadoop.hbase.master.filesystem.metahlogsplittime_min"],
 					["Max", "hadoop.hbase.master.filesystem.metahlogsplittime_max"]
 				],
-				["MetaHlogSplitTime Percentile", ["75th", "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile"],
+				["MetaHlogSplitTime Percentile",
+					["75th", "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile"],
 					["95th", "hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile"],
 					["99th", "hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile"]
 				],
-				["MetaHlogSplitSize", ["Min", "hadoop.hbase.master.filesystem.metahlogsplitsize_min"],
+				["MetaHlogSplitSize",
+					["Min", "hadoop.hbase.master.filesystem.metahlogsplitsize_min"],
 					["Max", "hadoop.hbase.master.filesystem.metahlogsplitsize_max"]
 				]
 			];
@@ -86,22 +99,15 @@
 							}).reverse().join("<br/>");
 					}
 				},
-				legend: {
-					formatter: function (name) {
-						return echarts.format.truncateText(name, 2, '14px Microsoft Yahei', '¡­');
-					},
-					tooltip: {
-						show: true
-					}
-				},
 				yAxis: [{
-					axisLabel: {formatter: function (value) {
-						return common.number.abbr(value, true);
-					}}
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, true);
+						}
+					}
 				}]
 			};
 			$scope.metricList = {};
-
 
 
 			// TODO: Optimize the chart count
@@ -111,7 +117,7 @@
 				var endTime = Time.endTime();
 
 
-				function generateHbaseMetric(name, option,dataOption, limit) {
+				function generateHbaseMetric(name, option, dataOption, limit) {
 					limit = limit || 20;
 					var count = name.length - 1 || 1;
 					var hbaseMetric = [];
@@ -124,7 +130,7 @@
 					var jobCond = {
 						site: $scope.site,
 						component: "hbasemaster",
-						host: "yhd-jqhadoop182.int.yihaodian.com"
+						host: "10.17.28.15"
 					};
 
 					for (var i = 1; i <= count; i += 1) {
@@ -135,13 +141,13 @@
 						for (var i = 0; i < count; i += 1) {
 							var data = [];
 							data = $.map(res[i], function (metric) {
-								return  {
+								return {
 									x: metric.timestamp,
 									y: metric.value[0]
 								};
 							});
 							series.push($.extend({
-								name: name[i+1][0],
+								name: name[i + 1][0],
 								type: 'line',
 								data: data,
 								showSymbol: false
@@ -183,15 +189,14 @@
 					generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
 				]).then(function (res) {
 					$scope.metricList = [
-						res[0],res[1],res[2],res[3],res[4],
-						res[5],res[6],res[7],res[8],res[9],
-						res[10],res[11],res[12],res[13],res[14],
-						res[15],res[16],res[17],res[18],res[19],
-						res[20],res[21],res[22],res[23]
+						res[0], res[1], res[2], res[3], res[4],
+						res[5], res[6], res[7], res[8], res[9],
+						res[10], res[11], res[12], res[13], res[14],
+						res[15], res[16], res[17], res[18], res[19],
+						res[20], res[21], res[22], res[23]
 					]
 				});
 			}
-
 
 
 			Time.onReload(function () {

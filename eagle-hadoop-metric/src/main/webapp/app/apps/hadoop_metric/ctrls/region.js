@@ -23,7 +23,7 @@
 	register(function (hadoopMetricApp) {
 		hadoopMetricApp.controller("regionCtrl", function ($q, $wrapState, $scope, PageConfig, Time, METRIC) {
 			var cache = {};
-			$scope.host = "yhd-jqhadoop184.int.yihaodian.com";
+			$scope.host = "10.17.28.18";
 			$scope.metricList = [];
 			$scope.site = $wrapState.param.siteId;
 			Time.autoRefresh = false;

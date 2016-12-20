@@ -63,15 +63,9 @@
 			Metrics
 		</h3>
 		<div class="btn-group pull-right">
-			<button type="button" class="btn btn-default">Host1</button>
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-				<span class="caret"></span>
-				<span class="sr-only">Toggle Dropdown</span>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-				<li><a href="#">Host1</a></li>
-				<li><a href="#">Host2</a></li>
-			</ul>
+			<select class="form-control" ng-model="hostSelect.selectedHost">
+				<option ng-repeat="option in hostSelect.hostList" ng-value="option.host">{{option.ip}}</option>
+			</select>
 		</div>
 	</div>
 	<div class="box-body no-padding">

@@ -101,7 +101,7 @@
 		$Time._reloadListenerList = reloadListenerList;
 
 		// TODO: time zone
-		$Time.UTC_OFFSET = 0;
+		$Time.UTC_OFFSET = 8;
 
 		$Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
 		$Time.SHORT_FORMAT = "MM-DD HH:mm";
