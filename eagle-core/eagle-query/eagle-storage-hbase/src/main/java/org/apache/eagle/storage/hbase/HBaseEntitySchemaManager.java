@@ -65,7 +65,7 @@ public class HBaseEntitySchemaManager {
         try {
             admin = new HBaseAdmin(conf);
             Map<String, EntityDefinition> entityServiceMap = EntityDefinitionManager.entities();
-            if (entityServiceMap != null || entityServiceMap.values() != null) {
+            if (entityServiceMap != null) {
                 for (EntityDefinition entityDefinition : entityServiceMap.values()) {
                     createTable(entityDefinition);
                 }
