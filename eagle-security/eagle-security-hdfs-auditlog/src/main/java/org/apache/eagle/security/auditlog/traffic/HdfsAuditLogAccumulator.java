@@ -38,26 +38,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.apache.eagle.app.utils.ApplicationExecutionConfig.APP_ID_KEY;
 import static org.apache.eagle.app.utils.ApplicationExecutionConfig.SITE_ID_KEY;
 
 public class HdfsAuditLogAccumulator extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogAccumulator.class);
 
-    private static final int DEFAULT_WINDOW_SIZE = 3;
+    private static final int DEFAULT_WINDOW_SIZE = 10;
     private static final String HDFS_AUDIT_LOG_METRIC_NAME = "hdfs.audit.log.count";
-    private static final String HDFS_COUNTER_WINDOW_SIZE = "dataSinkConfig.metric.window.size";
+    private static final String HDFS_COUNTER_WINDOW_SIZE = "dataSinkConfig.metricWindowSize";
 
     private int taskId;
     private String site;
-    private String appType;
+    private String appId;
     private OutputCollector collector;
     private SimpleWindowCounter accumulator;
     private int windowSize;
 
-    public HdfsAuditLogAccumulator(Config config, String appType) {
-        this.appType = appType;
+    public HdfsAuditLogAccumulator(Config config) {
         if (config.hasPath(SITE_ID_KEY)) {
             this.site = config.getString(SITE_ID_KEY);
+        }
+        if (config.hasPath(APP_ID_KEY)) {
+            this.appId = config.getString(APP_ID_KEY);
         }
         if (config.hasPath(HDFS_COUNTER_WINDOW_SIZE)) {
             this.windowSize = config.getInt(HDFS_COUNTER_WINDOW_SIZE);
@@ -106,7 +109,7 @@ public class HdfsAuditLogAccumulator extends BaseRichBolt {
     private GenericMetricEntity generateMetric(long timestamp, long count) {
         GenericMetricEntity metricEntity = new GenericMetricEntity();
         Map<String, String> tags = new HashMap<>();
-        tags.put("appType", appType);
+        tags.put("appId", appId);
         tags.put("site", site);
         tags.put("taskId", String.valueOf(taskId));
         metricEntity.setTimestamp(timestamp);

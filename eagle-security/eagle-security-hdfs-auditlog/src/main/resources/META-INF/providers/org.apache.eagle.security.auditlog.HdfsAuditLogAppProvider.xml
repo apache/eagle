@@ -150,6 +150,12 @@
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
         </property>
+        <property>
+            <name>dataSinkConfig.metricWindowSize</name>
+            <displayName>window size for traffic counting</displayName>
+            <value>10</value>
+            <description>window size to calculate the throughput counting</description>
+        </property>
 
         <!-- web app related configurations -->
         <property>

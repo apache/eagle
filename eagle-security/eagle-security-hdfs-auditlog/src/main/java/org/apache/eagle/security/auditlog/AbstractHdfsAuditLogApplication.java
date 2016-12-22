@@ -86,7 +86,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         sensitivityDataJoinBoltDeclarer.shuffleGrouping("parserBolt");
 
 
-        HdfsAuditLogAccumulator auditLogAccumulator = new HdfsAuditLogAccumulator(config, getAppType());
+        HdfsAuditLogAccumulator auditLogAccumulator = new HdfsAuditLogAccumulator(config);
         BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks).setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
 
         EntityStreamPersist persist = environment.getEntityPersist(config);
@@ -113,8 +113,6 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
     public abstract BaseRichBolt getParserBolt();
 
     public abstract String getSinkStreamName();
-
-    public abstract String getAppType();
 
     public static PartitionStrategy createStrategy(Config config) {
         // TODO: Refactor configuration structure to avoid repeated config processing configure ~ hao

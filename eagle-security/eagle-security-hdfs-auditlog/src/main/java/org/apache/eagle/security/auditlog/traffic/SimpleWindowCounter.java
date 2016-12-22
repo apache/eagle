@@ -20,10 +20,8 @@ package org.apache.eagle.security.auditlog.traffic;
 import org.apache.eagle.common.utils.Tuple2;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SimpleWindowCounter implements Serializable {
 
@@ -35,7 +33,7 @@ public class SimpleWindowCounter implements Serializable {
     public SimpleWindowCounter(int size) {
         this.windowSize = size;
         counter = new ConcurrentHashMap<>(windowSize);
-        timeQueue = new ConcurrentLinkedQueue<>();
+        timeQueue = new PriorityQueue<>();
     }
 
     public boolean insert(long timestamp, long countVal) {

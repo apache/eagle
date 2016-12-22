@@ -36,11 +36,6 @@ public class MapRFSAuditLogApplication extends AbstractHdfsAuditLogApplication {
         return "mapr_audit_log_stream";
     }
 
-    @Override
-    public String getAppType() {
-        return "MAPR_HDFS_AUDIT_LOG_MONITOR_APP";
-    }
-
     public static void main(String[] args){
         Config config = ConfigFactory.load();
         MapRFSAuditLogApplication app = new MapRFSAuditLogApplication();
