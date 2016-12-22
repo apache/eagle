@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EntityStreamPersist extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(EntityStreamPersist.class);
@@ -39,9 +40,17 @@ public class EntityStreamPersist extends BaseRichBolt {
     private final Config config;
     private IEagleServiceClient client;
     private OutputCollector collector;
+    private int batchSize;
+    private List<TaggedLogAPIEntity> entityBucket = new CopyOnWriteArrayList<>();
 
     public EntityStreamPersist(Config config) {
         this.config = config;
+        this.batchSize = 1;
+    }
+
+    public EntityStreamPersist(Config config, int batchSize) {
+        this.config = config;
+        this.batchSize = batchSize;
     }
 
     @Override
@@ -53,9 +62,14 @@ public class EntityStreamPersist extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         List<? extends TaggedLogAPIEntity> entities = (List<? extends TaggedLogAPIEntity>) input.getValue(0);
+        entityBucket.addAll(entities);
+
+        if (entityBucket.size() < batchSize) {
+            return;
+        }
 
         try {
-            GenericServiceAPIResponseEntity response = client.create(entities);
+            GenericServiceAPIResponseEntity response = client.create(entityBucket);
             if (response.isSuccess()) {
                 collector.ack(input);
             } else {
@@ -66,11 +80,13 @@ public class EntityStreamPersist extends BaseRichBolt {
             LOG.error(e.getMessage(), e);
             collector.fail(input);
         }
+        entityBucket.clear();
     }
 
     @Override
     public void cleanup() {
         try {
+            this.client.getJerseyClient().destroy();
             this.client.close();
         } catch (IOException e) {
             LOG.error("Close client error: {}", e.getMessage(), e);
