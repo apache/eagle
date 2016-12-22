@@ -100,7 +100,6 @@
 		$Time.autoRefresh = false;
 		$Time._reloadListenerList = reloadListenerList;
 
-		// TODO: time zone
 		$Time.UTC_OFFSET = 0;
 
 		$Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
@@ -110,9 +109,9 @@
 		Server.getPromise().then(function () {
 			var timezone = Server.config.service.timezone || "";
 			try {
-				var match = timezone.match(/^UTC([+-]\d+)?$/);
+				var match = timezone.match(/^(UTC|GMT)([+-]\d+)?$/);
 				if (match) {
-					$Time.UTC_OFFSET = Number(match[1] || 0) * 60;
+					$Time.UTC_OFFSET = Number(match[2] || 0) * 60;
 				} else {
 					console.warn('Timezone parse failed:', timezone);
 				}
