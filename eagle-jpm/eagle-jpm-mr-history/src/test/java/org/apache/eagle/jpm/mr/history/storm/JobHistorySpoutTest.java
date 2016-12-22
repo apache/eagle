@@ -52,9 +52,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -71,6 +72,8 @@ import static org.mockito.Mockito.*;
 @PrepareForTest( {CuratorFrameworkFactory.class, HDFSUtil.class, JobCountMetricsGenerator.class, JobHistorySpout.class})
 @PowerMockIgnore( {"javax.*", "com.sun.org.*", "org.apache.hadoop.conf.*"})
 public class JobHistorySpoutTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JobHistorySpoutTest.class);
 
     private TestingServer server;
     private CuratorFramework zookeeper;
@@ -94,15 +97,9 @@ public class JobHistorySpoutTest {
                     zookeeper.close();
                 }
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
         } finally {
-            try {
-                if (server != null) {
-                    server.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (server != null) {
+                server.close();
             }
         }
     }
@@ -207,17 +204,13 @@ public class JobHistorySpoutTest {
         return new JobHistorySpout(filter, appConfig);
     }
 
-    private void createZk() {
+    private void createZk() throws Exception {
         int port = 2111;
         File logFile = new File(System.getProperty("java.io.tmpdir"), "zk/logs/zookeeper-test-" + port);
         FileUtils.deleteQuietly(logFile);
-        try {
-            server = new TestingServer(port, logFile);
-            ExponentialBackoffRetry retryPolicy = new ExponentialBackoffRetry(1000, 3);
-            zookeeper = CuratorFrameworkFactory.newClient(server.getConnectString(), retryPolicy);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        server = new TestingServer(port, logFile);
+        ExponentialBackoffRetry retryPolicy = new ExponentialBackoffRetry(1000, 3);
+        zookeeper = CuratorFrameworkFactory.newClient(server.getConnectString(), retryPolicy);
     }
 
 }
