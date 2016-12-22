@@ -168,7 +168,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     @Override
     public ApplicationEntity.Status status(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
-        LOG.info("Fetching status of topology {} ...", appId);
+        LOG.info("Fetching {} status", appId);
         List<TopologySummary> topologySummaries ;
         ApplicationEntity.Status status = null;
         try {
@@ -186,7 +186,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
                     } else if (topologySummary.get_status().equalsIgnoreCase("INACTIVE")) {
                         status = ApplicationEntity.Status.STOPPED;
                     } else if (topologySummary.get_status().equalsIgnoreCase("KILLED")) {
-                        status = ApplicationEntity.Status.REMOVED;
+                        status = ApplicationEntity.Status.STOPPED;
+                    } else {
+                        LOG.error("Unknown storm topology ({}) status: {}", topologySummary.get_status(),topologySummary.get_status());
                     }
                 }
             }
@@ -198,7 +200,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             LOG.error("Got error to fetch status of {}", appId, e);
             status = ApplicationEntity.Status.UNKNOWN;
         }
-        LOG.info("Status of {}: {}", appId, status);
+        LOG.info("{} status is {}", appId, status);
         return status;
     }
 

@@ -18,8 +18,6 @@ package org.apache.eagle.app.service.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
@@ -31,14 +29,14 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
-public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdateService {
+public class ApplicationStatusUpdateServiceImpl extends ApplicationStatusUpdateService {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationStatusUpdateServiceImpl.class);
     private final ApplicationEntityService applicationEntityService;
     private final ApplicationManagementServiceImpl applicationManagementService;
 
     // default value 30, 30
-    private  int initialDelay = 30;
-    private  int period = 30;
+    private int initialDelay = 30;
+    private int period = 30;
 
 
     @Inject
@@ -49,16 +47,21 @@ public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdate
 
     @Override
     protected void runOneIteration() throws Exception {
-        LOG.info("Checking app status");
+        LOG.info("Updating application status");
         try {
             Collection<ApplicationEntity> applicationEntities = applicationEntityService.findAll();
-            for (ApplicationEntity applicationEntity: applicationEntities) {
+            if (applicationEntities.size() == 0) {
+                LOG.info("No application installed yet");
+                return;
+            }
+            for (ApplicationEntity applicationEntity : applicationEntities) {
                 if (applicationEntity.getDescriptor().isExecutable()) {
                     updateApplicationEntityStatus(applicationEntity);
                 }
             }
+            LOG.info("Updated {} application status", applicationEntities.size());
         } catch (Exception e) {
-            LOG.error("failed to update app status", e);
+            LOG.error("Failed to update application status", e);
         }
     }
 
@@ -68,7 +71,8 @@ public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdate
     }
 
     @Override
-    public void updateApplicationEntityStatus(Collection<ApplicationEntity> applicationEntities) {}
+    public void updateApplicationEntityStatus(Collection<ApplicationEntity> applicationEntities) {
+    }
 
     @Override
     public void updateApplicationEntityStatus(ApplicationEntity applicationEntity) {
@@ -109,7 +113,9 @@ public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdate
                     applicationEntityService.create(applicationEntity);
                 }
             }
-            //"STOPPED" is not used in Eagle, so just do nothing.
+            // "STOPPED" is not used in Eagle, so just do nothing.
+
+            applicationEntity.setStatus(topologyStatus);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
         }
