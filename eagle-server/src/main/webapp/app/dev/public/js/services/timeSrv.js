@@ -30,7 +30,7 @@
 	var keepTime = false;
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Time', function($q, $wrapState) {
+	serviceModule.service('Time', function($q, $wrapState, Server) {
 		var startTime, endTime;
 		var reloadListenerList = [];
 
@@ -105,6 +105,21 @@
 
 		$Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
 		$Time.SHORT_FORMAT = "MM-DD HH:mm";
+
+		// UTC sync
+		Server.getPromise().then(function () {
+			var timezone = Server.config.service.timezone || "";
+			try {
+				var match = timezone.match(/^UTC([+-]\d+)?$/);
+				if (match) {
+					$Time.UTC_OFFSET = Number(match[1] || 0) * 60;
+				} else {
+					console.warn('Timezone parse failed:', timezone);
+				}
+			} catch (err) {
+				console.error('Timezone not support:', timezone, err);
+			}
+		});
 
 		$Time.format = function (time, format) {
 			time = $Time(time);
@@ -237,44 +252,45 @@
 
 		$Time.getPromise = function (config, state, param) {
 			var deferred = $q.defer();
-
 			var timeConfig = typeof config.time === true ? {} : config.time;
 
-			// Ignore time update if customise time set.
-			if(keepTime) {
-				// Update auto refresh mark if time is generated from promise
-				if(autoGenerateTime && timeConfig) {
-					$Time.autoRefresh = timeConfig.autoRefresh;
-				}
-
-				autoGenerateTime = false;
-				keepTime = false;
-				deferred.resolve($Time);
-			} else {
-				if (timeConfig) {
-					$Time.pickerType = timeConfig.type || $Time.TIME_RANGE_PICKER;
-
-					startTime = $Time.verifyTime(param.startTime);
-					endTime = $Time.verifyTime(param.endTime);
-
-					if (!startTime || !endTime) {
-						endTime = $Time();
-						startTime = endTime.clone().subtract(2, "hour");
-
-						autoGenerateTime = true;
-						keepTime = true;
-						$Time._innerSearch = {
-							startTime: $Time.format(startTime),
-							endTime: $Time.format(endTime)
-						};
+			Server.getPromise().then(function () {
+				// Ignore time update if customise time set.
+				if(keepTime) {
+					// Update auto refresh mark if time is generated from promise
+					if(autoGenerateTime && timeConfig) {
+						$Time.autoRefresh = timeConfig.autoRefresh;
 					}
+
+					autoGenerateTime = false;
+					keepTime = false;
+					deferred.resolve($Time);
 				} else {
-					$Time._innerSearch = null;
-					$Time.pickerType = null;
-					$Time.autoRefresh = false;
+					if (timeConfig) {
+						$Time.pickerType = timeConfig.type || $Time.TIME_RANGE_PICKER;
+
+						startTime = $Time.verifyTime(param.startTime);
+						endTime = $Time.verifyTime(param.endTime);
+
+						if (!startTime || !endTime) {
+							endTime = $Time();
+							startTime = endTime.clone().subtract(2, "hour");
+
+							autoGenerateTime = true;
+							keepTime = true;
+							$Time._innerSearch = {
+								startTime: $Time.format(startTime),
+								endTime: $Time.format(endTime)
+							};
+						}
+					} else {
+						$Time._innerSearch = null;
+						$Time.pickerType = null;
+						$Time.autoRefresh = false;
+					}
+					deferred.resolve($Time);
 				}
-				deferred.resolve($Time);
-			}
+			});
 
 			return deferred.promise;
 		};
