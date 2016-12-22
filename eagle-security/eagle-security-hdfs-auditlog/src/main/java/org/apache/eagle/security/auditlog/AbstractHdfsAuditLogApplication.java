@@ -59,7 +59,6 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         int numOfSensitivityJoinTasks = config.getInt(SENSITIVITY_JOIN_TASK_NUM);
         int numOfIPZoneJoinTasks = config.getInt(IPZONE_JOIN_TASK_NUM);
         int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
-        int numOfMetricSinkTasks = config.getInt(METRIC_SINK_TASK_NUM);
 
         builder.setSpout("ingest", spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
 
@@ -87,14 +86,16 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         // sensitivityDataJoinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
         sensitivityDataJoinBoltDeclarer.shuffleGrouping("parserBolt");
 
+        if (config.hasPath(METRIC_SINK_TASK_NUM) && config.getInt(METRIC_SINK_TASK_NUM) > 0) {
+            int numOfMetricSinkTasks = config.getInt(METRIC_SINK_TASK_NUM);
+            HdfsAuditLogAccumulator auditLogAccumulator = new HdfsAuditLogAccumulator(config);
+            BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks);
+            auditLogAccumulatorDeclarer.setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
 
-        HdfsAuditLogAccumulator auditLogAccumulator = new HdfsAuditLogAccumulator(config);
-        BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks);
-        auditLogAccumulatorDeclarer.setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
-
-        EntityStreamPersist persist = environment.getEntityPersist(config);
-        BoltDeclarer auditLogAccumulatorPersist = builder.setBolt("logAccumulatorPersist", persist, numOfMetricSinkTasks);
-        auditLogAccumulatorPersist.setNumTasks(1).shuffleGrouping("logAccumulator");
+            EntityStreamPersist persist = environment.getEntityPersist(config);
+            BoltDeclarer auditLogAccumulatorPersist = builder.setBolt("logAccumulatorPersist", persist, numOfMetricSinkTasks);
+            auditLogAccumulatorPersist.setNumTasks(1).shuffleGrouping("logAccumulator");
+        }
 
         // ------------------------------
         // sensitivityJoin -> ipZoneJoin
