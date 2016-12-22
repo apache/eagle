@@ -26,11 +26,13 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.typesafe.config.Config;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.utils.Tuple2;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,28 +42,34 @@ import static org.apache.eagle.app.utils.ApplicationExecutionConfig.SITE_ID_KEY;
 
 public class HdfsAuditLogAccumulator extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogAccumulator.class);
-    private Map<Long, Long> accumulator = new ConcurrentHashMap<>(1);
-    private static final long MAX_ACCUMULATOR_SIZE = 10;
+
+    private static final int DEFAULT_WINDOW_SIZE = 3;
     private static final String HDFS_AUDIT_LOG_METRIC_NAME = "hdfs.audit.log.count";
+    private static final String HDFS_COUNTER_WINDOW_SIZE = "dataSinkConfig.metric.window.size";
+
     private int taskId;
-    private int taskIndex;
     private String site;
-    private Config config;
     private String appType;
     private OutputCollector collector;
+    private SimpleWindowCounter accumulator;
+    private int windowSize;
 
     public HdfsAuditLogAccumulator(Config config, String appType) {
-        this.config = config;
         this.appType = appType;
         if (config.hasPath(SITE_ID_KEY)) {
             this.site = config.getString(SITE_ID_KEY);
         }
+        if (config.hasPath(HDFS_COUNTER_WINDOW_SIZE)) {
+            this.windowSize = config.getInt(HDFS_COUNTER_WINDOW_SIZE);
+        } else {
+            this.windowSize = DEFAULT_WINDOW_SIZE;
+        }
+        this.accumulator = new SimpleWindowCounter(windowSize);
     }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        taskId = context.getThisTaskId();
-        taskIndex = context.getThisTaskIndex();
+        this.taskId = context.getThisTaskId();
         this.collector = collector;
     }
 
@@ -71,24 +79,31 @@ public class HdfsAuditLogAccumulator extends BaseRichBolt {
         long timeInMs = (long) toBeCopied.get(HDFSAuditLogObject.HDFS_TIMESTAMP_KEY);
         long timeInMin = DateTimeUtil.roundDown(Calendar.MINUTE, timeInMs);
         try {
-            if (accumulator.containsKey(timeInMin)) {
-                accumulator.put(timeInMin, accumulator.get(timeInMin) + 1);
-            } else {
-                if (accumulator.size() < MAX_ACCUMULATOR_SIZE) {
-                    accumulator.put(timeInMin, 1L);
-                } else {
-                    collector.emit(input, new Values(generateMetric(accumulator.get(timeInMin), timeInMin * DateTimeUtil.ONEMINUTE)));
-                    accumulator.remove(timeInMin);
-                }
-            }
             collector.ack(input);
+            if (!isOrdered(timeInMin)) {
+                LOG.warn("data is out of order, the estimated throughput may be incorrect");
+                return;
+            }
+            if (accumulator.isFull()) {
+                Tuple2<Long, Long> pair = accumulator.poll();
+                GenericMetricEntity metric = generateMetric(pair.f0(), pair.f1());
+                collector.emit(new Values(Arrays.asList(metric)));
+            } else {
+                accumulator.insert(timeInMin, 1);
+            }
         } catch (Exception ex) {
-            collector.fail(input);
             LOG.error(ex.getMessage(), ex);
         }
     }
 
-    private GenericMetricEntity generateMetric(long count, long timestamp) {
+    private boolean isOrdered(long timestamp) {
+        if (accumulator.isEmpty()) {
+            return true;
+        }
+        return accumulator.peek() <= timestamp + windowSize * DateTimeUtil.ONEMINUTE;
+    }
+
+    private GenericMetricEntity generateMetric(long timestamp, long count) {
         GenericMetricEntity metricEntity = new GenericMetricEntity();
         Map<String, String> tags = new HashMap<>();
         tags.put("appType", appType);

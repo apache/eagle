@@ -28,9 +28,11 @@ import com.typesafe.config.Config;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.messaging.EntityStreamPersist;
 import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.partition.*;
+import org.apache.eagle.security.auditlog.traffic.HdfsAuditLogAccumulator;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
@@ -82,6 +84,13 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         BoltDeclarer sensitivityDataJoinBoltDeclarer = builder.setBolt("sensitivityJoin", sensitivityDataJoinBolt, numOfSensitivityJoinTasks).setNumTasks(numOfSensitivityJoinTasks);
         // sensitivityDataJoinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
         sensitivityDataJoinBoltDeclarer.shuffleGrouping("parserBolt");
+
+
+        HdfsAuditLogAccumulator auditLogAccumulator = new HdfsAuditLogAccumulator(config, getAppType());
+        BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks).setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
+
+        EntityStreamPersist persist = environment.getEntityPersist(config);
+        BoltDeclarer auditLogAccumulatorPersist = builder.setBolt("logAccumulatorPersist", persist, 1).setNumTasks(1).shuffleGrouping("logAccumulator");
 
         // ------------------------------
         // sensitivityJoin -> ipZoneJoin
