@@ -51,6 +51,12 @@
             <value>2</value>
             <description>number of sink tasks</description>
         </property>
+        <property>
+            <name>topology.numOfMetricSinkTasks</name>
+            <displayName>Topology Metric Sink Tasks</displayName>
+            <value>1</value>
+            <description>number of metric sink tasks</description>
+        </property>
 
         <!-- data source configurations -->
         <property>

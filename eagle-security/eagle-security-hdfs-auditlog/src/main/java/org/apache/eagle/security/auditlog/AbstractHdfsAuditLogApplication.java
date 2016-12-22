@@ -46,6 +46,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
     public final static String SENSITIVITY_JOIN_TASK_NUM = "topology.numOfSensitivityJoinTasks";
     public final static String IPZONE_JOIN_TASK_NUM = "topology.numOfIPZoneJoinTasks";
     public final static String SINK_TASK_NUM = "topology.numOfSinkTasks";
+    public final static String METRIC_SINK_TASK_NUM = "topology.numOfMetricSinkTasks";
 
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
@@ -58,6 +59,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         int numOfSensitivityJoinTasks = config.getInt(SENSITIVITY_JOIN_TASK_NUM);
         int numOfIPZoneJoinTasks = config.getInt(IPZONE_JOIN_TASK_NUM);
         int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
+        int numOfMetricSinkTasks = config.getInt(METRIC_SINK_TASK_NUM);
 
         builder.setSpout("ingest", spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
 
@@ -87,10 +89,12 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
 
 
         HdfsAuditLogAccumulator auditLogAccumulator = new HdfsAuditLogAccumulator(config);
-        BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks).setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
+        BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks);
+        auditLogAccumulatorDeclarer.setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
 
         EntityStreamPersist persist = environment.getEntityPersist(config);
-        BoltDeclarer auditLogAccumulatorPersist = builder.setBolt("logAccumulatorPersist", persist, 1).setNumTasks(1).shuffleGrouping("logAccumulator");
+        BoltDeclarer auditLogAccumulatorPersist = builder.setBolt("logAccumulatorPersist", persist, numOfMetricSinkTasks);
+        auditLogAccumulatorPersist.setNumTasks(1).shuffleGrouping("logAccumulator");
 
         // ------------------------------
         // sensitivityJoin -> ipZoneJoin
