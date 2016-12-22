@@ -41,35 +41,53 @@ For more details, please visit [https://eagle.incubator.apache.org](https://eagl
 | 2016/07/21 | [[0.4.0-incubating]](https://github.com/apache/incubator-eagle/releases/tag/v0.4.0-incubating) | [[Release Notes]](https://git-wip-us.apache.org/repos/asf?p=incubator-eagle.git;a=blob_plain;f=CHANGELOG.txt;hb=refs/tags/v0.4.0-incubating) | [[Artifacts]](http://www.apache.org/dyn/closer.cgi?path=/incubator/eagle/apache-eagle-0.4.0-incubating) | [[MD5]](https://dist.apache.org/repos/dist/release/incubator/eagle/apache-eagle-0.4.0-incubating/apache-eagle-0.4.0-incubating-src.tar.gz.md5) | [[SHA1]](https://dist.apache.org/repos/dist/release/incubator/eagle/apache-eagle-0.4.0-incubating/apache-eagle-0.4.0-incubating-src.tar.gz.sha1) |
 
 [More Release Versions](http://archive.apache.org/dist/incubator/eagle/)
+  
+## Prerequisites
+* [JDK 8](https://jdk8.java.net/)
+* [NodeJS](https://nodejs.org) 
+* [Apache Maven](https://maven.apache.org/)
+* [NPM](https://www.npmjs.com/)
+
+## Building Eagle 
+
+> Since version 0.5, Eagle is only tested on JDK 8.
+
+Eagle is built using [Apache Maven](https://maven.apache.org/). NPM should be installed (On MAC OS try "brew install node"). To build Eagle, run:
+    
+    mvn -DskipTests clean package
+
+After successfully building, you will find eagle binary tarball under _eagle-server-assembly/target/_
+
+## Testing Eagle 
+
+    mvn clean test
+
+## Developing Eagle
+
+* (Optional) Install/Start [HDP Sandbox](http://hortonworks.com/products/sandbox/) which provide an all-in-one virtual machine with most dependency services like Zookeeper, Kafka, HBase, etc and monitored hadoop components.
+* Import Eagle as maven project with popular IDE like [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+* Start **Eagle Server** in `debug` mode by running (default http port: `9090`, default smpt port: `5025`)
+
+        org.apache.eagle.server.ServerDebug
+  
+  Which will start some helpful services for convenient development:
+  * Local Eagle Service on `http://localhost:9090`
+  * Local SMTP Service on `localhost:5025` with REST API at `http://localhost:9090/rest/mail`
+* Start **Eagle Apps** with Eagle Web UI in `LOCAL MODE`.
+
+## Eagle Apps
+
+Here are some typical applications eagle currently supports:
+
+  * Eagle Alert Engine App
+  * Eagle MapReduce Job Monitor App
+  * Eagle Spark Job Monitor App
+  * Eagle Hadoop Metrics Monitor App
+  * Eagle Oozie Audit Log Monitor App
+  * Eagle Hadoop Audit Log Monitor App
 
 ## Documentation
 You can find the latest Eagle documentation on [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README.md) file only contains basic setup instructions.
-
-## Build Eagle (Supports JDK-1.8)
-Eagle is built using [Apache Maven](https://maven.apache.org/). NPM should be installed (On MAC OS try "brew install node"). To build Eagle, run:
-    mvn -DskipTests clean package
-
-Note : As of version 0.5, Eagle is tested on JDK-1.8.
-
-After successfully building, you will find eagle binary tarball under _eagle-assembly/target/_
-
-## Eagle Quick Start in IDE (Intellij)
-### prepare
-Please have HDP sandbox ready, where you can have zookeeper, hadoop, hbase, hive ready.
-
-### Run Eagle Web Service
-Go to project eagle-webservice, run it as web application.
- 
-### Run Eagle Alert Engine
-Find out org.apache.eagle.alert.engine.UnitTopologyMain, run it. 
-
-Note: the config is eagle-core/eagle-alert-parent/eagle-alert/alert-engine/src/main/resources/application.conf
-
-
-### Run Eagle Ingestion Applications
-For example, find out org.apache.eagle.security.securitylog.HdfsAuthLogMonitoringMain, run it.
-
-Note: the config is eagle-security/eagle-security-hdfs-authlog/src/main/resources/application.conf
 
 ## Get Help
 The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.incubator.apache.org](mailto:dev@eagle.incubator.apache.org),
@@ -77,6 +95,10 @@ and remember to subscribe our mail list via [dev-subscribe@eagle.incubator.apach
 
 ## FAQ
 [https://cwiki.apache.org/confluence/display/EAG/FAQ](https://cwiki.apache.org/confluence/display/EAG/FAQ)
+
+## Contributing
+
+Please review the [Contribution to Eagle Guide](https://cwiki.apache.org/confluence/display/EAG/Contributing+to+Eagle) for information on how to get started contributing to the project.
 
 ## License
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0). More details, please refer to [LICENSE](LICENSE) file.
