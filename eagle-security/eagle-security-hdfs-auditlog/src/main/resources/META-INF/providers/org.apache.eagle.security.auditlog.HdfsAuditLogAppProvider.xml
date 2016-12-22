@@ -158,9 +158,15 @@
         </property>
         <property>
             <name>dataSinkConfig.metricWindowSize</name>
-            <displayName>window size for traffic counting</displayName>
+            <displayName>Window Size for Traffic Counting</displayName>
             <value>10</value>
             <description>window size to calculate the throughput counting</description>
+        </property>
+        <property>
+            <name>service.batchSize</name>
+            <displayName>Metrics Flushing Batch Size</displayName>
+            <value>1</value>
+            <description>batch size of flushing metrics </description>
         </property>
 
         <!-- web app related configurations -->

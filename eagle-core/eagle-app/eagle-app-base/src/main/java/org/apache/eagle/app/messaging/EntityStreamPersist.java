@@ -45,12 +45,7 @@ public class EntityStreamPersist extends BaseRichBolt {
 
     public EntityStreamPersist(Config config) {
         this.config = config;
-        this.batchSize = 1;
-    }
-
-    public EntityStreamPersist(Config config, int batchSize) {
-        this.config = config;
-        this.batchSize = batchSize;
+        this.batchSize = config.hasPath("service.batchSize") ? config.getInt("service.batchSize") : 1;
     }
 
     @Override
@@ -71,6 +66,7 @@ public class EntityStreamPersist extends BaseRichBolt {
         try {
             GenericServiceAPIResponseEntity response = client.create(entityBucket);
             if (response.isSuccess()) {
+                LOG.info("persist {} entities with starttime={}", entityBucket.size(), entityBucket.get(0).getTimestamp());
                 collector.ack(input);
             } else {
                 LOG.error("Service side error: {}", response.getException());
