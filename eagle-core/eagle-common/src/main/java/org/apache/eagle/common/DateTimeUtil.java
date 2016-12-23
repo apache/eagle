@@ -84,9 +84,23 @@ public class DateTimeUtil {
         return d.getTime() / 1000;
     }
 
+    public static long humanDateToSeconds(String date, TimeZone timeZone) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(timeZone);
+        Date d = sdf.parse(date);
+        return d.getTime() / 1000;
+    }
+
     public static long humanDateToMilliseconds(String date) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
         sdf.setTimeZone(CURRENT_TIME_ZONE);
+        Date d = sdf.parse(date);
+        return d.getTime();
+    }
+
+    public static long humanDateToMilliseconds(String date, TimeZone timeZone) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+        sdf.setTimeZone(timeZone);
         Date d = sdf.parse(date);
         return d.getTime();
     }

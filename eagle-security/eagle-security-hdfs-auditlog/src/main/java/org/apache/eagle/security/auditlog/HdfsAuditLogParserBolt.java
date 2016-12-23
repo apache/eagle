@@ -25,13 +25,17 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import com.typesafe.config.Config;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
 import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 /**
@@ -39,8 +43,19 @@ import java.util.TreeMap;
  */
 public class HdfsAuditLogParserBolt extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogParserBolt.class);
+    private static final String DATASOURCE_TIMEZONE_PATH = "dataSourceConfig.timeZone";
+
     private OutputCollector collector;
-    private static final HDFSAuditLogParser parser = new HDFSAuditLogParser();
+    private HDFSAuditLogParser parser;
+
+    public HdfsAuditLogParserBolt(Config config) {
+        if (config.hasPath(DATASOURCE_TIMEZONE_PATH)) {
+            TimeZone timeZone = TimeZone.getTimeZone(config.getString(DATASOURCE_TIMEZONE_PATH));
+            parser = new HDFSAuditLogParser(timeZone);
+        } else {
+            parser = new HDFSAuditLogParser();
+        }
+    }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {

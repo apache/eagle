@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.security.auditlog.traffic;
+package org.apache.eagle.security.traffic;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -36,26 +36,26 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.apache.eagle.app.utils.ApplicationExecutionConfig.APP_ID_KEY;
 import static org.apache.eagle.app.utils.ApplicationExecutionConfig.SITE_ID_KEY;
 
-public class HdfsAuditLogAccumulator extends BaseRichBolt {
-    private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogAccumulator.class);
+public class HadoopLogAccumulatorBolt extends BaseRichBolt {
+    private static Logger LOG = LoggerFactory.getLogger(HadoopLogAccumulatorBolt.class);
 
     private static final int DEFAULT_WINDOW_SIZE = 10;
-    private static final String HDFS_AUDIT_LOG_METRIC_NAME = "hdfs.audit.log.count";
+    private static final String HADOOP_LOG_METRIC_NAME = "hadoop.log.count.minute";
     private static final String HDFS_COUNTER_WINDOW_SIZE = "dataSinkConfig.metricWindowSize";
 
     private int taskId;
     private String site;
     private String appId;
-    private OutputCollector collector;
+    private HadoopLogTrafficPersist client;
     private SimpleWindowCounter accumulator;
+    private OutputCollector collector;
     private int windowSize;
 
-    public HdfsAuditLogAccumulator(Config config) {
+    public HadoopLogAccumulatorBolt(Config config) {
         if (config.hasPath(SITE_ID_KEY)) {
             this.site = config.getString(SITE_ID_KEY);
         }
@@ -68,6 +68,8 @@ public class HdfsAuditLogAccumulator extends BaseRichBolt {
             this.windowSize = DEFAULT_WINDOW_SIZE;
         }
         this.accumulator = new SimpleWindowCounter(windowSize);
+        this.client = new HadoopLogTrafficPersist(config);
+
     }
 
     @Override
@@ -90,7 +92,7 @@ public class HdfsAuditLogAccumulator extends BaseRichBolt {
             if (accumulator.isFull()) {
                 Tuple2<Long, Long> pair = accumulator.poll();
                 GenericMetricEntity metric = generateMetric(pair.f0(), pair.f1());
-                collector.emit(new Values(Arrays.asList(metric)));
+                client.emitMetric(metric);
             } else {
                 accumulator.insert(timeInMin, 1);
             }
@@ -100,7 +102,7 @@ public class HdfsAuditLogAccumulator extends BaseRichBolt {
     }
 
     private boolean isOrdered(long timestamp) {
-        if (accumulator.isEmpty()) {
+        if (accumulator.isEmpty() || !accumulator.isFull()) {
             return true;
         }
         return accumulator.peek() <= timestamp + windowSize * DateTimeUtil.ONEMINUTE;
@@ -114,13 +116,12 @@ public class HdfsAuditLogAccumulator extends BaseRichBolt {
         tags.put("taskId", String.valueOf(taskId));
         metricEntity.setTimestamp(timestamp);
         metricEntity.setTags(tags);
-        metricEntity.setPrefix(HDFS_AUDIT_LOG_METRIC_NAME);
+        metricEntity.setPrefix(HADOOP_LOG_METRIC_NAME);
         metricEntity.setValue(new double[] {count});
         return metricEntity;
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("f1"));
     }
 }

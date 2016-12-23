@@ -30,9 +30,6 @@ import org.junit.Test;
 
 import java.util.*;
 
-/**
- * Created by yonzhang on 11/24/15.
- */
 public class TestUserCommandReassembler {
     private Map parseEvent(String log) throws Exception{
         HDFSAuditLogParser deserializer = new HDFSAuditLogParser();

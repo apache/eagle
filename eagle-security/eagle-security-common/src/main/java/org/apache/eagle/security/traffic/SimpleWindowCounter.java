@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.security.auditlog.traffic;
+package org.apache.eagle.security.traffic;
 
 import org.apache.eagle.common.utils.Tuple2;
 

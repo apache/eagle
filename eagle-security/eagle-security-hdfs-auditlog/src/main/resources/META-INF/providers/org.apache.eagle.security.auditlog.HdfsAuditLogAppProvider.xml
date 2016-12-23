@@ -63,12 +63,6 @@
             <description>number of sink tasks</description>
         </property>
         <property>
-            <name>topology.numOfMetricSinkTasks</name>
-            <displayName>Topology Metric Sink Tasks</displayName>
-            <value>1</value>
-            <description>number of metric sink tasks</description>
-        </property>
-        <property>
             <name>topology.message.timeout.secs</name>
             <displayName>topology message timeout (secs)</displayName>
             <description>default timeout is 60s</description>
@@ -94,6 +88,13 @@
             <displayName>Kafka Consumer SchemeCls</displayName>
             <value>storm.kafka.StringScheme</value>
             <description>scheme class</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.timeZone</name>
+            <displayName>Log Time Zone</displayName>
+            <description>time zone of hdfs audit log </description>
+            <value>GMT</value>
             <required>true</required>
         </property>
 
@@ -157,14 +158,21 @@
             <description>value controls when a produce request is considered completed</description>
         </property>
         <property>
+            <name>dataSinkConfig.trafficMonitorEnabled</name>
+            <displayName>Log Traffic Monitor Enabled</displayName>
+            <value>false</value>
+            <description>enable the log throughput calculation</description>
+            <required>true</required>
+        </property>
+        <property>
             <name>dataSinkConfig.metricWindowSize</name>
             <displayName>Window Size for Traffic Counting</displayName>
             <value>10</value>
-            <description>window size to calculate the throughput counting</description>
+            <description>window size to calculate the throughput</description>
         </property>
         <property>
-            <name>service.batchSize</name>
-            <displayName>Metrics Flushing Batch Size</displayName>
+            <name>dataSinkConfig.metricSinkBatchSize</name>
+            <displayName>Batch Size for Flushing Traffic Metrics</displayName>
             <value>1</value>
             <description>batch size of flushing metrics </description>
         </property>
