@@ -25,13 +25,6 @@
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
 			$scope.hostname = "10.17.28.15";
-			/*$scope.hostSelect = {
-			 hostList: [
-			 {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"},
-			 {ip: "10.17.28.183", host: "yhd-jqhadoop183.int.yihaodian.com"}
-			 ],
-			 selectedHost: {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"}
-			 };*/
 
 
 			var METRIC_NAME_ARRAY = [

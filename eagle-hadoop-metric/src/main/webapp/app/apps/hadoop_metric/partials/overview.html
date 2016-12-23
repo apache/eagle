@@ -27,7 +27,7 @@
 
 		<table class="table table-striped">
 			<tbody>
-			<tr>
+			<tr ng-if="regiontotal > 0">
 				<th>RegionServer Status</th>
 				<td class="text-break">
 					<a ui-sref="regionList({siteId: site})" target="_blank">{{regiontotal}} RegionServers</a>
@@ -35,13 +35,13 @@
 					<span class="label label-danger">{{regiontotal - regionhealtynum}} UnHealthy</span>
 				</td>
 			</tr>
-			<tr ng-if="hmasteractive!== undefined">
+			<tr ng-if="hmasteractive !== undefined">
 				<th>Active Hmaster Status</th>
 				<td class="text-break">
 					<span class="label label-success">({{hmasteractive.tags.hostname}}) Healthy</span>
 				</td>
 			</tr>
-			<tr ng-if="hmasterstandby!== undefined">
+			<tr ng-if="hmasterstandby !== undefined">
 				<th>Standby Hmaster Status</th>
 				<td class="text-break">
 					<span class="label label-success">({{hmasterstandby.tags.hostname}}) Healthy</span>
@@ -58,11 +58,6 @@
 		<h3 class="box-title">
 			Metrics
 		</h3>
-		<!--<div class="btn-group pull-right">
-			<select class="form-control" ng-model="hostSelect.selectedHost">
-				<option ng-repeat="option in hostSelect.hostList" ng-value="option.host">{{option.ip}}</option>
-			</select>
-		</div>-->
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">
