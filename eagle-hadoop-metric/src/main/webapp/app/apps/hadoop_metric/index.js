@@ -61,6 +61,7 @@
 		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]{*}&pageSize=${limit}';
 
+		METRIC.QUERY_HBASE_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		/**
 		 * Fetch query content with current site application configuration
 		 * @param {string} queryName
@@ -158,6 +159,77 @@
 
 			var metrics_url = common.template(getQuery("HBASE_METRICS_WITHTIME"), config);
 			return wrapList(METRIC.get(metrics_url));
+		};
+
+		METRIC.hbaseMetricsAggregation = function (condition, metric, groups, field, intervalMin, startTime, endTime, top, limit) {
+			var fields = field.split(/\s*,\s*/);
+			var orderId = -1;
+			var fieldStr = $.map(fields, function (field, index) {
+				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
+				if (matches[2]) {
+					orderId = index;
+				}
+				return matches[1];
+			}).join(", ");
+
+
+			var config = {
+				condition: METRIC.condition(condition),
+				startTime: Time.format(startTime),
+				endTime: Time.format(endTime),
+				metric: metric,
+				groups: toFields(groups),
+				field: fieldStr,
+				order: orderId === -1 ? "" : ".{" + fields[orderId] + "}",
+				top: top ? "&top=" + top : "",
+				intervalMin: intervalMin,
+				limit: limit || 10000
+			};
+
+			var metrics_url = common.template(getQuery("HBASE_METRICS_INTERVAL"), config);
+			var _list = wrapList(METRIC.get(metrics_url));
+			_list._aggInfo = {
+				groups: groups,
+				startTime: Time(startTime).valueOf(),
+				interval: intervalMin * 60 * 1000
+			};
+			_list._promise.then(function () {
+				_list.reverse();
+			});
+			return _list;
+		};
+
+		METRIC.aggMetricsToEntities = function (list, flatten) {
+			var _list = [];
+			_list.done = false;
+			_list._promise = list._promise.then(function () {
+				var _startTime = list._aggInfo.startTime;
+				var _interval = list._aggInfo.interval;
+
+				$.each(list, function (i, obj) {
+					var tags = {};
+					$.each(list._aggInfo.groups, function (j, group) {
+						tags[group] = obj.key[j];
+					});
+
+					var _subList = $.map(obj.value[0], function (value, index) {
+						return {
+							timestamp: _startTime + index * _interval,
+							value: [value],
+							tags: tags
+						};
+					});
+
+					if (flatten) {
+						_list.push.apply(_list, _subList);
+					} else {
+						_list.push(_subList);
+					}
+				});
+				_list.done = true;
+				return _list;
+			});
+			return _list;
 		};
 
 		METRIC.hbasehostStatus = function (condition, limit) {

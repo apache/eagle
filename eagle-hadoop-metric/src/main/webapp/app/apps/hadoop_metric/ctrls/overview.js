@@ -106,12 +106,7 @@
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
-				var startTime = Time.startTime();
-				var endTime = Time.endTime();
-
-
-				function generateHbaseMetric(name, option, dataOption, limit) {
-					limit = limit || 10000;
+				function generateHbaseMetric(name, option, dataOption) {
 					var count = name.length - 1 || 1;
 					var hbaseMetric = [];
 					var startTime = Time.startTime();
@@ -129,8 +124,6 @@
 					};
 
 					for (var i = 1; i <= count; i += 1) {
-						// var hbaseMetricsPromise = cache[name[i][1]] = cache[name[i][1]] || METRIC.hbaseMetrics(jobCond, name[i][1], startTime, endTime, 24)._promise;
-						// var hbaseMetricsPromise = cache[name[i][1]] = cache[name[i][1]] || METRIC.hbaseMetricsAggregation(jobCond, name[i][1], ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime)._promise;
 						var hbaseMetricsPromise = METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name[i][1], ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime))._promise;
 						hbaseMetric.push(hbaseMetricsPromise);
 					}
