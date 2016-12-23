@@ -27,35 +27,39 @@
 		site: true,
 		templateUrl: "partials/overview.html",
 		controller: "overviewCtrl",
-		resolve: { time: true }
+		resolve: {time: true}
 	}).route("HadoopMetric_HDFS", {
 		url: "/hadoopMetric/hdfs",
 		site: true,
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
-		resolve: { time: true }
-	}).route("hbaseRs", {
-		url: "/hadoopMetric/region",
+		resolve: {time: true}
+	}).route("regionDetail", {
+		url: "/hadoopMetric/regionDetail/:hostname",
 		site: true,
-		templateUrl: "partials/region/region.html",
-		controller: "regionCtrl",
-		resolve: { time: true }
+		templateUrl: "partials/region/regionDetail.html",
+		controller: "regionDetailCtrl",
+		resolve: {time: true}
+	}).route("regionList", {
+		url: "/hadoopMetric/regionList",
+		site: true,
+		templateUrl: "partials/region/regionList.html",
+		controller: "regionListCtrl"
 	});
 
 	hadoopMetricApp.portal({
 		name: "Services", icon: "heartbeat", list: [
 			{name: "Overview", path: "hadoopMetric"},
-			{name: "HDFS", path: "hadoopMetric/hdfs"},
-			{name: "RegionServer", path: "hadoopMetric/region"}
+			{name: "HDFS", path: "hadoopMetric/hdfs"}
 		]
 	}, true);
 
 	hadoopMetricApp.service("METRIC", function ($q, $http, Time, Site, Application) {
 		var METRIC = window._METRIC = {};
 
-		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
-
+		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
+		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]{*}&pageSize=${limit}';
 
 		/**
 		 * Fetch query content with current site application configuration
@@ -152,80 +156,41 @@
 				limit: limit || 10000
 			};
 
-			var metrics_url = common.template(getQuery("HBASE_METRICS"), config);
+			var metrics_url = common.template(getQuery("HBASE_METRICS_WITHTIME"), config);
 			return wrapList(METRIC.get(metrics_url));
 		};
 
-		METRIC.hbaseMetricsAggregation = function (condition,metric, groups, field, intervalMin, startTime, endTime,top, limit) {
-			var fields = field.split(/\s*,\s*/);
-			var orderId = -1;
-			var fieldStr = $.map(fields, function (field, index) {
-				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
-				if(matches[2]) {
-					orderId = index;
-				}
-				return matches[1];
-			}).join(", ");
-
-
+		METRIC.hbasehostStatus = function (condition, limit) {
 			var config = {
 				condition: METRIC.condition(condition),
-				startTime: Time.format(startTime),
-				endTime: Time.format(endTime),
-				metric: metric,
-				groups: toFields(groups),
-				field: fieldStr,
-				order: orderId === -1 ? "" : ".{" + fields[orderId] + "}",
-				top: top ? "&top=" + top : "",
-				intervalMin: intervalMin,
 				limit: limit || 10000
 			};
 
-			var metrics_url = common.template(getQuery("HBASE_METRICS_WITHTIME"), config);
-			var _list = wrapList(METRIC.get(metrics_url));
-			_list._aggInfo = {
-				groups: groups,
-				startTime: Time(startTime).valueOf(),
-				interval: intervalMin * 60 * 1000
+			var metrics_url = common.template(getQuery("HBASE_INSTANCE"), config);
+			return wrapList(METRIC.get(metrics_url));
+		};
+
+		METRIC.regionserverStatus = function (hostname, siteid) {
+			var hoststateinfo;
+			var condition = {
+				site: siteid,
+				role: "regionserver",
+				hostname: hostname
 			};
-			_list._promise.then(function () {
-				_list.reverse();
-			});
-			return _list;
+			hoststateinfo = METRIC.hbasehostStatus(condition, 1);
+			return hoststateinfo;
 		};
 
-		METRIC.aggMetricsToEntities = function (list, flatten) {
-			var _list = [];
-			_list.done = false;
-			_list._promise = list._promise.then(function () {
-				var _startTime = list._aggInfo.startTime;
-				var _interval = list._aggInfo.interval;
-
-				$.each(list, function (i, obj) {
-					var tags = {};
-					$.each(list._aggInfo.groups, function (j, group) {
-						tags[group] = obj.key[j];
-					});
-
-					var _subList = $.map(obj.value[0], function (value, index) {
-						return {
-							timestamp: _startTime + index * _interval,
-							value: [value],
-							tags: tags
-						};
-					});
-
-					if(flatten) {
-						_list.push.apply(_list, _subList);
-					} else {
-						_list.push(_subList);
-					}
-				});
-				_list.done = true;
-				return _list;
-			});
-			return _list;
+		METRIC.regionserverList = function (siteid) {
+			var hoststateinfos;
+			var condition = {
+				site: siteid,
+				role: "regionserver"
+			};
+			hoststateinfos = METRIC.hbasehostStatus(condition);
+			return hoststateinfos;
 		};
+
 		return METRIC;
 	});
 
@@ -233,6 +198,7 @@
 	hadoopMetricApp.require("widgets/availabilityChart.js");
 	hadoopMetricApp.require("ctrls/overview.js");
 	hadoopMetricApp.require("ctrls/hdfs.js");
-	hadoopMetricApp.require("ctrls/region.js");
+	hadoopMetricApp.require("ctrls/regionDetailCtrl.js");
+	hadoopMetricApp.require("ctrls/regionListCtrl.js");
 })();
 //# sourceURL=index.js

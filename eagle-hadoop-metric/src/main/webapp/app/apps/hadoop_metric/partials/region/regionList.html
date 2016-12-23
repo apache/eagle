@@ -1,0 +1,66 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<style>
+	.box .box-header .box-title small a {
+		cursor: pointer;
+		padding: 0 5px;
+		border-right: 1px solid #999;
+	}
+
+	.box .box-header .box-title small a:last-child {
+		border-right: none;
+	}
+</style>
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			<span ng-show="!regionserverList._done || isSorting" class="fa fa-refresh fa-spin no-animate"></span>
+		</h3>
+	</div>
+	<div class="box-body">
+		<div id="regionserverList" sort-table="regionserverList" is-sorting="isSorting"
+			 search-path-list="searchPathList"
+			 scope="tableScope">
+			<table class="table table-bordered">
+				<thead>
+				<tr>
+					<th sortpath="tags.hostname">HostName</th>
+					<th sortpath="tags.rack">Rack</th>
+					<th sortpath="tags.site">SiteId</th>
+					<th sortpath="status">Status</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="item in regionserverList">
+					<td>
+						<a ui-sref="regionDetail({siteId: site, hostname: item.tags.hostname})" target="_blank">{{item.tags.hostname}}</a>
+					</td>
+					<td>{{item.tags.rack}}</td>
+					<td>{{item.tags.site}}</td>
+					<td>
+						<span ng-if="item.status==='live'" class="label label-success">Healthy</span>
+						<span ng-if="item.status==='dead'" class="label label-danger">UnHealthy</span>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

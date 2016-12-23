@@ -27,7 +27,7 @@ public class MapRFSAuditLogAppProviderTest extends ApplicationTestBase {
     ApplicationSimulator simulator;
 
     @Test
-    public void testStartAsManagedApplication(){
+    public void testStartAsManagedApplication() {
         simulator.start(MapRFSAuditLogAppProvider.class);
     }
 }

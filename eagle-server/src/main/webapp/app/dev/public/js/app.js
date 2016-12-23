@@ -57,6 +57,10 @@ var app = {};
 				// TODO: need auth module
 			}
 
+			resolve.Server = function (Server) {
+				return Server.getPromise();
+			};
+
 			resolve.Site = function (Site) {
 				return Site.getPromise(config);
 			};
@@ -256,8 +260,9 @@ var app = {};
 		// ======================================================================================
 		// =                                   Main Controller                                  =
 		// ======================================================================================
-		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Widget, Entity, CompatibleEntity, Site, Application, UI, Time, Policy) {
+		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, Server, PageConfig, Portal, Widget, Entity, CompatibleEntity, Site, Application, UI, Time, Policy) {
 			window._WrapState = $scope.$wrapState = $wrapState;
+			window._Server = $scope.Server = Server;
 			window._PageConfig = $scope.PageConfig = PageConfig;
 			window._Portal = $scope.Portal = Portal;
 			window._Widget = $scope.Widget = Widget;

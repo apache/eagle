@@ -24,6 +24,8 @@
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
+			$scope.hostname = "10.17.28.15";
+
 
 			var METRIC_NAME_ARRAY = [
 				["MemoryUsage", ["nonheap", "hadoop.memory.nonheapmemoryusage.used"]],
@@ -86,15 +88,14 @@
 							$.map(points, function (point) {
 								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
 									point.seriesName + ": " +
-									common.number.format(point.value, true);
+									common.number.abbr(point.value, true);
 							}).reverse().join("<br/>");
 					}
 				},
-
 				yAxis: [{
 					axisLabel: {
 						formatter: function (value) {
-							return common.number.abbr(value, false, 0);
+							return common.number.abbr(value, true);
 						}
 					}
 				}]
@@ -102,7 +103,13 @@
 			$scope.metricList = {};
 
 
+			// TODO: Optimize the chart count
+			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
+				var startTime = Time.startTime();
+				var endTime = Time.endTime();
+
+
 				function generateHbaseMetric(name, option, dataOption, limit) {
 					limit = limit || 10000;
 					var count = name.length - 1 || 1;
@@ -118,7 +125,7 @@
 					var jobCond = {
 						site: $scope.site,
 						component: "hbasemaster",
-						host: "10.17.28.15"
+						host: $scope.hostname
 					};
 
 					for (var i = 1; i <= count; i += 1) {
@@ -144,6 +151,7 @@
 
 				}
 
+				var hbaseservers = METRIC.hbasehostStatus({site: $scope.site});
 				$q.all([
 					generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
 					generateHbaseMetric(METRIC_NAME_ARRAY[1], {}, storageOption),
@@ -171,13 +179,38 @@
 					generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
 				]).then(function (res) {
 					$scope.metricList = [
-						res[0]
-						, res[1], res[2], res[3], res[4],
+						res[0], res[1], res[2], res[3], res[4],
 						res[5], res[6], res[7], res[8], res[9],
 						res[10], res[11], res[12], res[13], res[14],
 						res[15], res[16], res[17], res[18], res[19],
 						res[20], res[21], res[22], res[23]
-					]
+					];
+					var regionhealtynum = 0;
+					var regiontotal = 0;
+					var hmasteractive;
+					var hmasterstandby;
+					$.each(res[24], function (i, server) {
+						var role = server.tags.role;
+						var status = server.status;
+						if (role === "regionserver") {
+							regiontotal++;
+							if (status === "live") {
+								regionhealtynum++;
+							}
+						}
+						else if (role === "hmaster") {
+							if (status === "active") {
+								hmasteractive = server;
+							} else {
+								hmasterstandby = server;
+							}
+
+						}
+					});
+					$scope.regionhealtynum = regionhealtynum;
+					$scope.regiontotal = regiontotal;
+					$scope.hmasteractive = hmasteractive;
+					$scope.hmasterstandby = hmasterstandby;
 				});
 			};
 
@@ -190,4 +223,4 @@
 		});
 	});
 })();
-//@ sourceURL=overview.js
+//# sourceURL=overview.js
