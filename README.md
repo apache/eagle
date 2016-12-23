@@ -35,7 +35,7 @@ You can find the latest Eagle documentation on [https://eagle.apache.org](https:
 ## Downloads
 
 * Latest Release
-    * [eagle-0.4.0-incubating]((http://eagle.apache.org/docs/download-latest.html))
+    * [eagle-0.4.0-incubating](http://eagle.apache.org/docs/download-latest.html)
 * Archived Releases
     * [eagle-0.3.0-incubating](http://eagle.apache.org/docs/download.html#0.3.0-incubating)
     * [More releases](http://eagle.apache.org/docs/download.html)
