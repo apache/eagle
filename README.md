@@ -50,9 +50,9 @@ You can find the latest Eagle documentation on [https://eagle.incubator.apache.o
 
 ### Prerequisites
 
-* [JDK 8](https://jdk8.java.net/): Java Development Tool (`Version 1.8`)
-* [Apache Maven](https://maven.apache.org/): Project management and comprehension tool (`Version 3.x`)
-* [NPM](https://www.npmjs.com/): Javascript package management tool (`Version 3.x`)
+* [JDK 8](https://jdk8.java.net/): Java Development Tool `Version 1.8`
+* [Apache Maven](https://maven.apache.org/): Project management and comprehension tool `Version 3.x`
+* [NPM](https://www.npmjs.com/): Javascript package management tool `Version 3.x`
 
 ### Building Eagle 
 
