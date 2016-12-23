@@ -21,13 +21,14 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (hadoopMetricApp) {
-		hadoopMetricApp.controller("regionCtrl", function ($q, $wrapState, $scope, PageConfig, Time, METRIC) {
+		hadoopMetricApp.controller("regionDetailCtrl", function ($q, $wrapState, $scope, PageConfig, Time, METRIC) {
 			var cache = {};
-			$scope.host = "10.17.28.18";
-			$scope.metricList = [];
 			$scope.site = $wrapState.param.siteId;
+			$scope.hostname = $wrapState.param.hostname;
+			PageConfig.title = 'RegionServer ' + "(" + $scope.hostname + ")";
+			$scope.metricList = [];
 			Time.autoRefresh = false;
-			PageConfig.title = 'RegionServer ' + "(" + $scope.host + ")";
+
 			var METRIC_NAME = [
 				"hadoop.memory.nonheapmemoryusage.used",
 				"hadoop.memory.heapmemoryusage.used",
@@ -55,6 +56,8 @@
 				"hadoop.hbase.regionserver.server.blockcachehitcount",
 				"hadoop.hbase.regionserver.server.blockcounthitpercent"
 			];
+
+
 			$scope.refresh = function () {
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
@@ -63,6 +66,7 @@
 				$.each(METRIC_NAME, function (i, metric_name) {
 					promies.push(generateHbaseMetric(metric_name, 20, startTime, endTime));
 				});
+				promies.push(METRIC.regionserverStatus($scope.hostname, $scope.site));
 
 				$q.all(promies).then(function (res) {
 
@@ -78,9 +82,6 @@
 									}).reverse().join("<br/>");
 							}
 						},
-						grid: {
-							top: 70
-						},
 						legend: {
 							x: 'center', y: 'bottom'
 						},
@@ -95,9 +96,6 @@
 					};
 
 					var gctimeoption = {
-						grid: {
-							top: 70
-						},
 						legend: {
 							x: 'center', y: 'bottom'
 						},
@@ -109,7 +107,7 @@
 							}
 						}]
 					};
-					$scope.metricList =[];
+					$scope.metricList = [];
 					$scope.metricList.push(mergeSeries("Memory Usage", [res[0], res[1]], ["nonheap", "heap"], sizeoption));
 					$scope.metricList.push(mergeSeries("Direct Memory Usage", [res[2]], ["directmemory"], sizeoption));
 					$scope.metricList.push(mergeSeries("GC count", [res[3]], ["GC count"], {}));
@@ -134,6 +132,8 @@
 					$scope.metricList.push(mergeSeries("BlockCacheSize", [res[22]], ["BlockCacheSize"], sizeoption));
 					$scope.metricList.push(mergeSeries("BlockCacheHitCount", [res[23]], ["BlockCacheHitCount"], {}));
 					$scope.metricList.push(mergeSeries("BlockCacheCountHitPercent", [res[24]], ["BlockCacheCountHitPercent"], {}));
+
+					$scope.regionstatus = res[25];
 				});
 			};
 			Time.onReload(function () {
@@ -148,12 +148,12 @@
 				var hbaseMetric;
 
 				$scope.site = $wrapState.param.siteId;
-				var jobCond = {
+				var condition = {
 					site: $scope.site,
 					component: "regionserver",
-					host: $scope.host
+					host: $scope.hostname
 				};
-				hbaseMetric = METRIC.hbaseMetrics(jobCond, name, startTime, endTime, limit);
+				hbaseMetric = METRIC.hbaseMetrics(condition, name, startTime, endTime, limit);
 				return hbaseMetric._promise;
 			}
 
@@ -172,4 +172,4 @@
 	});
 })
 ();
-//# sourceURL=region.js
+//# sourceURL=regionDetailCtrl.js

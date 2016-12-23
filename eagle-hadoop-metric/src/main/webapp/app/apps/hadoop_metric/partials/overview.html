@@ -24,9 +24,36 @@
 		</h3>
 	</div>
 	<div class="box-body">
-		<div class="col-md-12">
+
+		<table class="table table-striped">
+			<tbody>
+			<tr>
+				<th>Status</th>
+				<td class="text-break">
+					<span class="label label-success">Healthy</span>
+				</td>
+			</tr>
+			<tr>
+				<th>MaxHeap</th>
+				<td class="text-break">MB</td>
+			</tr>
+			<tr>
+				<th>UsedHeap</th>
+				<td class="text-break">MB</td>
+			</tr>
+			<tr>
+				<th>NumRegions</th>
+				<td class="text-break">12</td>
+			</tr>
+			<tr>
+				<th>NumRequests</th>
+				<td class="text-break">13</td>
+			</tr>
+			</tbody>
+		</table>
+		<!--<div class="col-md-12">
 				<div class="col-lg-2 col-xs-6">
-					<!-- small box -->
+					&lt;!&ndash; small box &ndash;&gt;
 					<div class="small-box bg-light-blue">
 						<div class="inner">
 							<span>5 RegionServers</span>
@@ -35,7 +62,7 @@
 					</div>
 				</div>
 			<div class="col-lg-2 col-xs-6">
-				<!-- small box -->
+				&lt;!&ndash; small box &ndash;&gt;
 				<div class="small-box bg-light-blue">
 					<div class="inner">
 						<span>5 Healthy</span>
@@ -44,7 +71,7 @@
 				</div>
 			</div>
 			<div class="col-lg-2 col-xs-6">
-				<!-- small box -->
+				&lt;!&ndash; small box &ndash;&gt;
 				<div class="small-box bg-light-blue">
 					<div class="inner">
 						<span>0 Unhealthy</span>
@@ -52,7 +79,7 @@
 					<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
 				</div>
 			</div>
-		</div>
+		</div>-->
 	</div>
 </div>
 
@@ -62,11 +89,11 @@
 		<h3 class="box-title">
 			Metrics
 		</h3>
-		<div class="btn-group pull-right">
+		<!--<div class="btn-group pull-right">
 			<select class="form-control" ng-model="hostSelect.selectedHost">
 				<option ng-repeat="option in hostSelect.hostList" ng-value="option.host">{{option.ip}}</option>
 			</select>
-		</div>
+		</div>-->
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">

@@ -25,26 +25,59 @@
 	</div>
 	<div class="box-body">
 		<table class="table table-striped">
-			<tbody>
+			<tbody ng-if="(regionstatus || []).length !== 0">
 			<tr>
-				<th>Compaction Queue Size</th>
-				<td class="text-break"><span class="label label-success">Healthy</span></td>
+				<th>Status</th>
+				<td class="text-break">
+					<span ng-if="regionstatus[0].status==='live'" class="label label-success">Healthy</span>
+					<span ng-if="regionstatus[0].status!=='live'" class="label label-danger">UnHealthy</span>
+				</td>
 			</tr>
 			<tr>
-				<th>Flush Queue Size</th>
-				<td class="text-break"><span class="label label-warning">Warning</span></td>
+				<th>Rack</th>
+				<td class="text-break">{{regionstatus[0].tags.rack}}</td>
 			</tr>
 			<tr>
-				<th>Store File Index Size</th>
-				<td class="text-break"><span class="label label-danger">UnHealthy</span></td>
+				<th>MaxHeap</th>
+				<td class="text-break">{{regionstatus[0].maxHeapMB}} MB</td>
 			</tr>
 			<tr>
-				<th>Cluster Connectivity</th>
-				<td class="text-break"><span class="label label-success">Healthy</span></td>
+				<th>UsedHeap</th>
+				<td class="text-break">{{regionstatus[0].usedHeapMB}} MB</td>
 			</tr>
 			<tr>
-				<th>Memstore Size</th>
-				<td class="text-break"><span class="label label-success">Healthy</span></td>
+				<th>NumRegions</th>
+				<td class="text-break">{{regionstatus[0].numRegions}}</td>
+			</tr>
+			<tr>
+				<th>NumRequests</th>
+				<td class="text-break">{{regionstatus[0].numRequests}}</td>
+			</tr>
+			</tbody>
+			<tbody ng-if="regionstatus.length === 0">
+			<tr>
+				<th>Status</th>
+				<td class="text-break"><span class="label label-danger">Unknow</span></td>
+			</tr>
+			<tr>
+				<th>Rack</th>
+				<td class="text-break"><span class="label label-danger">Unknow</span></td>
+			</tr>
+			<tr>
+				<th>MaxHeap</th>
+				<td class="text-break"><span class="label label-danger">Unknow</span></td>
+			</tr>
+			<tr>
+				<th>UsedHeap</th>
+				<td class="text-break"><span class="label label-danger">Unknow</span></td>
+			</tr>
+			<tr>
+				<th>NumRegions</th>
+				<td class="text-break"><span class="label label-danger">Unknow</span></td>
+			</tr>
+			<tr>
+				<th>NumRequests</th>
+				<td class="text-break"><span class="label label-danger">Unknow</span></td>
 			</tr>
 			</tbody>
 		</table>
