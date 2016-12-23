@@ -16,9 +16,10 @@
  */
 package org.apache.eagle.app.environment;
 
-import org.apache.eagle.app.messaging.*;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.app.messaging.KafkaStreamProvider;
+import org.apache.eagle.app.messaging.StreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,9 @@ public abstract class AbstractEnvironment implements Environment {
                 throw new IllegalStateException(sinkProviderClassName + "is not assignable from " + StreamProvider.class.getCanonicalName());
             }
             StreamProvider instance = (StreamProvider) sinkProviderClass.newInstance();
-            LOGGER.info("Loaded {}", instance);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Loaded {}", instance);
+            }
             return instance;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             LOGGER.error(e.getMessage(), e);
