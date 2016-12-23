@@ -19,7 +19,7 @@ limitations under the License.
 
 # Apache Eagle
 
->  Secure Hadoop Data in Real Time
+>  The intelligent monitoring and alerting solution instantly analyzes big data platforms for security and performance
 
 ## Overview
 
