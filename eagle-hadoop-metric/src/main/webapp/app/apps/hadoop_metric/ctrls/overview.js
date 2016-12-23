@@ -25,15 +25,6 @@
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
 
-			$scope.hostSelect = {
-				hostList: [
-					{ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"},
-					{ip: "10.17.28.183", host: "yhd-jqhadoop183.int.yihaodian.com"}
-				],
-				selectedHost: {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"}
-			}
-
-
 			var METRIC_NAME_ARRAY = [
 				["MemoryUsage", ["nonheap", "hadoop.memory.nonheapmemoryusage.used"]],
 				["MemoryUsage", ["heap", "hadoop.memory.heapmemoryusage.used"]],
@@ -95,14 +86,15 @@
 							$.map(points, function (point) {
 								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
 									point.seriesName + ": " +
-									common.number.abbr(point.value, true);
+									common.number.format(point.value, true);
 							}).reverse().join("<br/>");
 					}
 				},
+
 				yAxis: [{
 					axisLabel: {
 						formatter: function (value) {
-							return common.number.abbr(value, true);
+							return common.number.abbr(value, false, 0);
 						}
 					}
 				}]
@@ -110,21 +102,17 @@
 			$scope.metricList = {};
 
 
-			// TODO: Optimize the chart count
-			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
-				var startTime = Time.startTime();
-				var endTime = Time.endTime();
-
-
 				function generateHbaseMetric(name, option, dataOption, limit) {
-					limit = limit || 20;
+					limit = limit || 10000;
 					var count = name.length - 1 || 1;
 					var hbaseMetric = [];
-					var series = [];
-
 					var startTime = Time.startTime();
 					var endTime = Time.endTime();
+					var interval = Time.diffInterval(startTime, endTime);
+					var intervalMin = interval / 1000 / 60;
+					var trendStartTime = Time.align(startTime, interval);
+					var trendEndTime = Time.align(endTime, interval);
 
 					$scope.site = $wrapState.param.siteId;
 					var jobCond = {
@@ -134,24 +122,17 @@
 					};
 
 					for (var i = 1; i <= count; i += 1) {
-						var hbaseMetricsPromise = cache[name[i][1]] = cache[name[i][1]] || METRIC.hbaseMetrics(jobCond, name[i][1], startTime, endTime, limit)._promise;
+						// var hbaseMetricsPromise = cache[name[i][1]] = cache[name[i][1]] || METRIC.hbaseMetrics(jobCond, name[i][1], startTime, endTime, 24)._promise;
+						// var hbaseMetricsPromise = cache[name[i][1]] = cache[name[i][1]] || METRIC.hbaseMetricsAggregation(jobCond, name[i][1], ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime)._promise;
+						var hbaseMetricsPromise = METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name[i][1], ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime))._promise;
 						hbaseMetric.push(hbaseMetricsPromise);
 					}
+
 					return $q.all(hbaseMetric).then(function (res) {
 						for (var i = 0; i < count; i += 1) {
-							var data = [];
-							data = $.map(res[i], function (metric) {
-								return {
-									x: metric.timestamp,
-									y: metric.value[0]
-								};
+							var series = $.map(res[i], function (metric) {
+								return METRIC.metricsToSeries(name[i + 1][0], metric, option);
 							});
-							series.push($.extend({
-								name: name[i + 1][0],
-								type: 'line',
-								data: data,
-								showSymbol: false
-							}, option));
 						}
 
 						return {
@@ -160,11 +141,12 @@
 							dataOption: dataOption || {}
 						};
 					});
+
 				}
 
 				$q.all([
 					generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
-					generateHbaseMetric(METRIC_NAME_ARRAY[1], {smooth: true}, storageOption),
+					generateHbaseMetric(METRIC_NAME_ARRAY[1], {}, storageOption),
 					generateHbaseMetric(METRIC_NAME_ARRAY[2], {}),
 					generateHbaseMetric(METRIC_NAME_ARRAY[3], {}),
 					generateHbaseMetric(METRIC_NAME_ARRAY[4], {}),
@@ -189,14 +171,15 @@
 					generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
 				]).then(function (res) {
 					$scope.metricList = [
-						res[0], res[1], res[2], res[3], res[4],
+						res[0]
+						, res[1], res[2], res[3], res[4],
 						res[5], res[6], res[7], res[8], res[9],
 						res[10], res[11], res[12], res[13], res[14],
 						res[15], res[16], res[17], res[18], res[19],
 						res[20], res[21], res[22], res[23]
 					]
 				});
-			}
+			};
 
 
 			Time.onReload(function () {
