@@ -24,14 +24,14 @@
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
-
-			$scope.hostSelect = {
-				hostList: [
-					{ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"},
-					{ip: "10.17.28.183", host: "yhd-jqhadoop183.int.yihaodian.com"}
-				],
-				selectedHost: {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"}
-			};
+			$scope.hostname = "10.17.28.15";
+			/*$scope.hostSelect = {
+			 hostList: [
+			 {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"},
+			 {ip: "10.17.28.183", host: "yhd-jqhadoop183.int.yihaodian.com"}
+			 ],
+			 selectedHost: {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"}
+			 };*/
 
 
 			var METRIC_NAME_ARRAY = [
@@ -130,7 +130,7 @@
 					var jobCond = {
 						site: $scope.site,
 						component: "hbasemaster",
-						host: "10.17.28.15"
+						host: $scope.hostname
 					};
 
 					for (var i = 1; i <= count; i += 1) {
@@ -162,6 +162,7 @@
 					});
 				}
 
+				var hbaseservers = METRIC.hbasehostStatus({site: $scope.site});
 				$q.all([
 					generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
 					generateHbaseMetric(METRIC_NAME_ARRAY[1], {smooth: true}, storageOption),
@@ -186,7 +187,8 @@
 					generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
 					generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
 					generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
+					generateHbaseMetric(METRIC_NAME_ARRAY[23], {}),
+					hbaseservers
 				]).then(function (res) {
 					$scope.metricList = [
 						res[0], res[1], res[2], res[3], res[4],
@@ -195,6 +197,32 @@
 						res[15], res[16], res[17], res[18], res[19],
 						res[20], res[21], res[22], res[23]
 					];
+					var regionhealtynum = 0;
+					var regiontotal = 0;
+					var hmasteractive;
+					var hmasterstandby;
+					$.each(res[24], function (i, server) {
+						var role = server.tags.role;
+						var status = server.status;
+						if (role === "regionserver") {
+							regiontotal++;
+							if (status === "live") {
+								regionhealtynum++;
+							}
+						}
+						else if (role === "hmaster") {
+							if (status === "active") {
+								hmasteractive = server;
+							} else {
+								hmasterstandby = server;
+							}
+
+						}
+					});
+					$scope.regionhealtynum = regionhealtynum;
+					$scope.regiontotal = regiontotal;
+					$scope.hmasteractive = hmasteractive;
+					$scope.hmasterstandby = hmasterstandby;
 				});
 			};
 
@@ -207,4 +235,4 @@
 		});
 	});
 })();
-//@ sourceURL=overview.js
+//# sourceURL=overview.js

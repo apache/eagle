@@ -28,58 +28,27 @@
 		<table class="table table-striped">
 			<tbody>
 			<tr>
-				<th>Status</th>
+				<th>RegionServer Status</th>
 				<td class="text-break">
-					<span class="label label-success">Healthy</span>
+					<a ui-sref="regionList({siteId: site})" target="_blank">{{regiontotal}} RegionServers</a>
+					<span class="label label-success">{{regionhealtynum}} Healthy</span>
+					<span class="label label-danger">{{regiontotal - regionhealtynum}} UnHealthy</span>
 				</td>
 			</tr>
-			<tr>
-				<th>MaxHeap</th>
-				<td class="text-break">MB</td>
+			<tr ng-if="hmasteractive!== undefined">
+				<th>Active Hmaster Status</th>
+				<td class="text-break">
+					<span class="label label-success">({{hmasteractive.tags.hostname}}) Healthy</span>
+				</td>
 			</tr>
-			<tr>
-				<th>UsedHeap</th>
-				<td class="text-break">MB</td>
-			</tr>
-			<tr>
-				<th>NumRegions</th>
-				<td class="text-break">12</td>
-			</tr>
-			<tr>
-				<th>NumRequests</th>
-				<td class="text-break">13</td>
+			<tr ng-if="hmasterstandby!== undefined">
+				<th>Standby Hmaster Status</th>
+				<td class="text-break">
+					<span class="label label-success">({{hmasterstandby.tags.hostname}}) Healthy</span>
+				</td>
 			</tr>
 			</tbody>
 		</table>
-		<!--<div class="col-md-12">
-				<div class="col-lg-2 col-xs-6">
-					&lt;!&ndash; small box &ndash;&gt;
-					<div class="small-box bg-light-blue">
-						<div class="inner">
-							<span>5 RegionServers</span>
-						</div>
-						<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-					</div>
-				</div>
-			<div class="col-lg-2 col-xs-6">
-				&lt;!&ndash; small box &ndash;&gt;
-				<div class="small-box bg-light-blue">
-					<div class="inner">
-						<span>5 Healthy</span>
-					</div>
-					<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-				</div>
-			</div>
-			<div class="col-lg-2 col-xs-6">
-				&lt;!&ndash; small box &ndash;&gt;
-				<div class="small-box bg-light-blue">
-					<div class="inner">
-						<span>0 Unhealthy</span>
-					</div>
-					<a ui-sref="hbaseRs({siteId: site})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-				</div>
-			</div>
-		</div>-->
 	</div>
 </div>
 

@@ -162,7 +162,7 @@
 			return wrapList(METRIC.get(metrics_url));
 		};
 
-		METRIC.hostStatus = function (condition, limit) {
+		METRIC.hbasehostStatus = function (condition, limit) {
 			var config = {
 				condition: METRIC.condition(condition),
 				limit: limit || 10000
@@ -179,7 +179,7 @@
 				role: "regionserver",
 				hostname: hostname
 			};
-			hoststateinfo = METRIC.hostStatus(condition, 1);
+			hoststateinfo = METRIC.hbasehostStatus(condition, 1);
 			return hoststateinfo;
 		};
 
@@ -189,7 +189,7 @@
 				site: siteid,
 				role: "regionserver"
 			};
-			hoststateinfos = METRIC.hostStatus(condition);
+			hoststateinfos = METRIC.hbasehostStatus(condition);
 			return hoststateinfos;
 		};
 

@@ -56,7 +56,7 @@
 					<td>{{item.tags.site}}</td>
 					<td>
 						<span ng-if="item.status==='live'" class="label label-success">Healthy</span>
-						<span ng-if="item.status!=='live'" class="label label-danger">UnHealthy</span>
+						<span ng-if="item.status==='dead'" class="label label-danger">UnHealthy</span>
 					</td>
 				</tr>
 				</tbody>
