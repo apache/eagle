@@ -21,18 +21,16 @@ limitations under the License.
 
 >  The intelligent monitoring and alerting solution instantly analyzes big data platforms for security and performance
 
-## Overview
-
 Apache® Eagle™ is an open source analytics solution for identifying security and performance issues instantly on big data platforms e.g. Apache Hadoop, Apache Spark, NoSQL etc. It analyzes data activities, yarn applications, jmx metrics, and daemon logs etc., provides state-of-the-art alert engine to identify security breach, performance issues and shows insights.
 
-For more details, please visit [https://eagle.apache.org](https://eagle.incubator.apache.org)
+For more details, please visit [https://eagle.apache.org](https://eagle.apache.org)
 
 [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) 
 [![Coverage Status](https://coveralls.io/repos/github/apache/incubator-eagle/badge.svg)](https://coveralls.io/github/apache/incubator-eagle)
 
 ## Documentation
 
-You can find the latest Eagle documentation on [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README.md) file only contains basic setup instructions.
+You can find the latest Eagle documentation on [https://eagle.apache.org](https://eagle.apache.org/docs). This [README](README.md) file only contains basic setup instructions.
 
 ## Downloads
 
@@ -79,8 +77,8 @@ After successfully building, you will find eagle binary tarball under _eagle-ser
 
 ## Getting Help
 
-The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.incubator.apache.org](mailto:dev@eagle.incubator.apache.org),
-and remember to subscribe our mail list via [dev-subscribe@eagle.incubator.apache.org](mailto:dev-subscribe@eagle.incubator.apache.org)
+The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.apache.org](mailto:dev@eagle.apache.org),
+and remember to subscribe our mail list via [dev-subscribe@eagle.apache.org](mailto:dev-subscribe@eagle.apache.org)
 
 ## FAQ
 
