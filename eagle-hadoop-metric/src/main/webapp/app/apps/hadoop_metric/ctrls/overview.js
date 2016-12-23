@@ -31,7 +31,7 @@
 					{ip: "10.17.28.183", host: "yhd-jqhadoop183.int.yihaodian.com"}
 				],
 				selectedHost: {ip: "10.17.28.182", host: "yhd-jqhadoop182.int.yihaodian.com"}
-			}
+			};
 
 
 			var METRIC_NAME_ARRAY = [
@@ -194,9 +194,9 @@
 						res[10], res[11], res[12], res[13], res[14],
 						res[15], res[16], res[17], res[18], res[19],
 						res[20], res[21], res[22], res[23]
-					]
+					];
 				});
-			}
+			};
 
 
 			Time.onReload(function () {
