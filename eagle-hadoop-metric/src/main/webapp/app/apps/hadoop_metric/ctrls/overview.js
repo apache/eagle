@@ -27,56 +27,44 @@
 			$scope.hostname = "10.17.28.15";
 
 
-			var METRIC_NAME_ARRAY = [
-				["MemoryUsage", ["nonheap", "hadoop.memory.nonheapmemoryusage.used"]],
-				["MemoryUsage", ["heap", "hadoop.memory.heapmemoryusage.used"]],
-				["Master Averageload", ["averageload", "hadoop.hbase.master.server.averageload"]],
-				["Ritcount", ["ritcount", "hadoop.hbase.master.assignmentmanger.ritcount"]],
-				["Ritcountoverthreshold", ["ritcountoverthreshold", "hadoop.hbase.master.assignmentmanger.ritcountoverthreshold"]],
-				["Assign", ["assignNumOps", "hadoop.hbase.master.assignmentmanger.assign_num_ops"]],
-				["Assign", ["assignMin", "hadoop.hbase.master.assignmentmanger.assign_min"]],
-				["Assign", ["assignMax", "hadoop.hbase.master.assignmentmanger.assign_max"]],
-				["Assign Percentile", ["75th", "hadoop.hbase.master.assignmentmanger.assign_75th_percentile"],
-					["95th", "hadoop.hbase.master.assignmentmanger.assign_95th_percentile"],
-					["99th", "hadoop.hbase.master.assignmentmanger.assign_99th_percentile"]
-				],
-				["BulkAssign", ["bulkAssign_num_ops", "hadoop.hbase.master.assignmentmanger.bulkassign_num_ops"]],
-				["BulkAssign", ["bulkAssign_min", "hadoop.hbase.master.assignmentmanger.bulkassign_min"]],
-				["BulkAssign", ["bulkAssign_max", "hadoop.hbase.master.assignmentmanger.bulkassign_max"]],
-				["BulkAssign Percentile", ["75th", "hadoop.hbase.master.assignmentmanger.bulkassign_75th_percentile"],
-					["95th", "hadoop.hbase.master.assignmentmanger.bulkassign_95th_percentile"],
-					["99th", "hadoop.hbase.master.assignmentmanger.bulkassign_99th_percentile"]
-				],
-				["BalancerCluster", ["balancerCluster_num_ops", "hadoop.hbase.master.balancer.balancercluster_num_ops"]],
-				["BalancerCluster", ["balancerCluster_min", "hadoop.hbase.master.balancer.balancercluster_min"]],
-				["BalancerCluster", ["balancerCluster_max", "hadoop.hbase.master.balancer.balancercluster_max"]],
-				["BalancerCluster Percentile",
-					["75th", "hadoop.hbase.master.balancer.balancercluster_75th_percentile"],
-					["95th", "hadoop.hbase.master.balancer.balancercluster_95th_percentile"],
-					["99th", "hadoop.hbase.master.balancer.balancercluster_99th_percentile"]
-				],
-				["HlogSplitTime", ["HlogSplitTime_min", "hadoop.hbase.master.filesystem.hlogsplittime_min"]],
-				["HlogSplitTime", ["HlogSplitTime_max", "hadoop.hbase.master.filesystem.hlogsplittime_max"]],
-				["BalancerCluster Percentile",
-					["75th", "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile"],
-					["95th", "hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile"],
-					["99th", "hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile"]
-				],
-				["HlogSplitSize", ["Min", "hadoop.hbase.master.filesystem.hlogsplitsize_min"],
-					["Max", "hadoop.hbase.master.filesystem.hlogsplitsize_max"]
-				],
-				["MetaHlogSplitTime", ["Min", "hadoop.hbase.master.filesystem.metahlogsplittime_min"],
-					["Max", "hadoop.hbase.master.filesystem.metahlogsplittime_max"]
-				],
-				["MetaHlogSplitTime Percentile",
-					["75th", "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile"],
-					["95th", "hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile"],
-					["99th", "hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile"]
-				],
-				["MetaHlogSplitSize",
-					["Min", "hadoop.hbase.master.filesystem.metahlogsplitsize_min"],
-					["Max", "hadoop.hbase.master.filesystem.metahlogsplitsize_max"]
-				]
+			var MASTER_METRIC_ARRAY = [
+				"hadoop.memory.nonheapmemoryusage.used",
+				"hadoop.memory.heapmemoryusage.used",
+				"hadoop.hbase.master.server.averageload",
+				"hadoop.hbase.master.assignmentmanger.ritcount",
+				"hadoop.hbase.master.assignmentmanger.ritcountoverthreshold",
+				"hadoop.hbase.master.assignmentmanger.assign_num_ops",
+				"hadoop.hbase.master.assignmentmanger.assign_min",
+				"hadoop.hbase.master.assignmentmanger.assign_max",
+				"hadoop.hbase.master.assignmentmanger.assign_75th_percentile",
+				"hadoop.hbase.master.assignmentmanger.assign_95th_percentile",
+				"hadoop.hbase.master.assignmentmanger.assign_99th_percentile",
+				"hadoop.hbase.master.assignmentmanger.bulkassign_num_ops",
+				"hadoop.hbase.master.assignmentmanger.bulkassign_min",
+				"hadoop.hbase.master.assignmentmanger.bulkassign_max",
+				"hadoop.hbase.master.assignmentmanger.bulkassign_75th_percentile",
+				"hadoop.hbase.master.assignmentmanger.bulkassign_95th_percentile",
+				"hadoop.hbase.master.assignmentmanger.bulkassign_99th_percentile",
+				"hadoop.hbase.master.balancer.balancercluster_num_ops",
+				"hadoop.hbase.master.balancer.balancercluster_min",
+				"hadoop.hbase.master.balancer.balancercluster_max",
+				"hadoop.hbase.master.balancer.balancercluster_75th_percentile",
+				"hadoop.hbase.master.balancer.balancercluster_95th_percentile",
+				"hadoop.hbase.master.balancer.balancercluster_99th_percentile",
+				"hadoop.hbase.master.filesystem.hlogsplittime_min",
+				"hadoop.hbase.master.filesystem.hlogsplittime_max",
+				"hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile",
+				"hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile",
+				"hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile",
+				"hadoop.hbase.master.filesystem.hlogsplitsize_min",
+				"hadoop.hbase.master.filesystem.hlogsplitsize_max",
+				"hadoop.hbase.master.filesystem.metahlogsplittime_min",
+				"hadoop.hbase.master.filesystem.metahlogsplittime_max",
+				"hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile",
+				"hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile",
+				"hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile",
+				"hadoop.hbase.master.filesystem.metahlogsplitsize_min",
+				"hadoop.hbase.master.filesystem.metahlogsplitsize_max"
 			];
 
 			PageConfig.title = 'Overview';
@@ -95,95 +83,75 @@
 				yAxis: [{
 					axisLabel: {
 						formatter: function (value) {
-							return common.number.abbr(value, true);
+							return common.number.abbr(value, false);
 						}
 					}
 				}]
 			};
 			$scope.metricList = {};
 
+			function generateHbaseMetric(name) {
+				var startTime = Time.startTime();
+				var endTime = Time.endTime();
+				var interval = Time.diffInterval(startTime, endTime);
+				var intervalMin = interval / 1000 / 60;
+				var trendStartTime = Time.align(startTime, interval);
+				var trendEndTime = Time.align(endTime, interval);
 
+				$scope.site = $wrapState.param.siteId;
+				var jobCond = {
+					site: $scope.site,
+					component: "hbasemaster",
+					host: $scope.hostname
+				};
+				return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime))._promise;
+			}
+
+			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
+				var series = [];
+				$.each(metrics, function (i, metricMap) {
+					$.map(metricMap, function (metric) {
+						series.push(METRIC.metricsToSeries(legendName[i], metric, option));
+					});
+				});
+				return {
+					title: metricTitle,
+					series: series,
+					option: dataOption || {}
+				};
+			}
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
-				function generateHbaseMetric(name, option, dataOption) {
-					var count = name.length - 1 || 1;
-					var hbaseMetric = [];
-					var startTime = Time.startTime();
-					var endTime = Time.endTime();
-					var interval = Time.diffInterval(startTime, endTime);
-					var intervalMin = interval / 1000 / 60;
-					var trendStartTime = Time.align(startTime, interval);
-					var trendEndTime = Time.align(endTime, interval);
-
-					$scope.site = $wrapState.param.siteId;
-					var jobCond = {
-						site: $scope.site,
-						component: "hbasemaster",
-						host: $scope.hostname
-					};
-
-					for (var i = 1; i <= count; i += 1) {
-						var hbaseMetricsPromise = METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name[i][1], ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime))._promise;
-						hbaseMetric.push(hbaseMetricsPromise);
-					}
-
-					return $q.all(hbaseMetric).then(function (res) {
-						for (var i = 0; i < count; i += 1) {
-							var series = $.map(res[i], function (metric) {
-								return METRIC.metricsToSeries(name[i + 1][0], metric, option);
-							});
-						}
-
-						return {
-							title: name[0],
-							series: series,
-							dataOption: dataOption || {}
-						};
-					});
-
-				}
-
 				var hbaseservers = METRIC.hbasehostStatus({site: $scope.site});
-				$q.all([
-					generateHbaseMetric(METRIC_NAME_ARRAY[0], {smooth: true}, storageOption),
-					generateHbaseMetric(METRIC_NAME_ARRAY[1], {}, storageOption),
-					generateHbaseMetric(METRIC_NAME_ARRAY[2], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[3], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[4], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[5], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[6], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[7], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[8], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[9], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[10], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[11], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[12], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[13], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[14], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[15], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[16], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[17], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[18], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[19], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
-					generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[23], {}),
-					hbaseservers
-				]).then(function (res) {
+				var promies = [];
+				$.each(MASTER_METRIC_ARRAY, function (i, metric_name) {
+					promies.push(generateHbaseMetric(metric_name));
+				});
+				promies.push(hbaseservers);
+				$q.all(promies).then(function (res) {
 					$scope.metricList = [
-						res[0], res[1], res[2], res[3], res[4],
-						res[5], res[6], res[7], res[8], res[9],
-						res[10], res[11], res[12], res[13], res[14],
-						res[15], res[16], res[17], res[18], res[19],
-						res[20], res[21], res[22], res[23]
+						mergeMetricToOneSeries("MemoryUsage", [res[0], res[1]], ["nonheap", "heap"], storageOption),
+						mergeMetricToOneSeries("Master Averageload", [res[2]], ["averageload"]),
+						mergeMetricToOneSeries("Ritcount", [res[3], res[4]], ["ritcount", "ritcountoverthreshold"]),
+						mergeMetricToOneSeries("Assign", [res[5], res[6], res[7]], ["assignNumOps", "assignMin", "assignMax"]),
+						mergeMetricToOneSeries("Assign Percentile", [res[8], res[9], res[10]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("BulkAssign", [res[11], res[12], res[13]], ["num_ops", "min", "max"]),
+						mergeMetricToOneSeries("BulkAssign Percentile", [res[14], res[15], res[16]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("BalancerCluster", [res[17], res[18], res[19]], ["num_ops", "min", "max"]),
+						mergeMetricToOneSeries("BalancerCluster Percentile", [res[20], res[21], res[22]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("HlogSplitTime", [res[23], res[24]], ["HlogSplitTime_min", "HlogSplitTime_max"]),
+						mergeMetricToOneSeries("HlogSplitTime Percentile", [res[25], res[26], res[27]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("HlogSplitSize", [res[28], res[29]], ["Min", "Max"]),
+						mergeMetricToOneSeries("MetaHlogSplitTime", [res[30], res[31]], ["Min", "Max"]),
+						mergeMetricToOneSeries("MetaHlogSplitTime Percentile", [res[32], res[33], res[34]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("MetaHlogSplitSize", [res[35], res[36]], ["Min", "Max"])
 					];
 					var regionhealtynum = 0;
 					var regiontotal = 0;
 					var hmasteractive;
 					var hmasterstandby;
-					$.each(res[24], function (i, server) {
+					$.each(res[37], function (i, server) {
 						var role = server.tags.role;
 						var status = server.status;
 						if (role === "regionserver") {
