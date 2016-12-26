@@ -384,6 +384,32 @@
 		return (number * sign).toFixed(digits) + unit;
 	};
 
+	common.number.sizeFormat = function (number, digits) {
+		digits = (digits==0) ? digits : (digits || 2);
+		var decPlaces = Math.pow(10, digits);
+		var abbrev = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+		var base = 1000;
+		var sign = number < 0 ? -1 : 1;
+		var unit = '';
+		number = Math.abs(number);
+		if(isNaN(number)) return "-";
+
+		for(var i = abbrev.length - 1; i >= 0; i--) {
+			var size = Math.pow(base, i + 1);
+			if(size <= number) {
+				number = Math.round(number * decPlaces / size) / decPlaces;
+				if((number === base) && (i < abbrev.length - 1)) {
+					number = 1;
+					i++;
+				}
+				unit = abbrev[i];
+				break;
+			}
+		}
+		unit = unit ? unit : "";
+		return (number * sign).toFixed(digits) + unit;
+	};
+
 	common.number.compare = function (num1, num2) {
 		if(!common.number.isNumber(num1) || !common.number.isNumber(num2)) return "-";
 		if(num1 === 0) return 'N/A';

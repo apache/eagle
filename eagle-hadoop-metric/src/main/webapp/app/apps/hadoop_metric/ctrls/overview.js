@@ -24,8 +24,7 @@
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
-			$scope.hostname = "10.17.28.15";
-
+			var activeMasterInfo = METRIC.hbaseActiveMaster($scope.site);
 
 			var MASTER_METRIC_ARRAY = [
 				"hadoop.memory.nonheapmemoryusage.used",
@@ -76,14 +75,14 @@
 							$.map(points, function (point) {
 								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
 									point.seriesName + ": " +
-									common.number.abbr(point.value, true);
+									common.number.abbr(point.value, true, 0);
 							}).reverse().join("<br/>");
 					}
 				},
 				yAxis: [{
 					axisLabel: {
 						formatter: function (value) {
-							return common.number.abbr(value, false);
+							return common.number.sizeFormat(value, 0);
 						}
 					}
 				}]
@@ -99,12 +98,20 @@
 				var trendEndTime = Time.align(endTime, interval);
 
 				$scope.site = $wrapState.param.siteId;
-				var jobCond = {
-					site: $scope.site,
-					component: "hbasemaster",
-					host: $scope.hostname
-				};
-				return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime))._promise;
+
+				var metrics = cache[name] = cache[name] || $q.all([activeMasterInfo._promise]).then(function (res) {
+					// var hostname = cache[hostname] = cache[hostname] || res[0][0].tags.hostname;
+					var hostname = "10.17.28.15";
+					$scope.defaultHostname = $wrapState.param.hostname || hostname
+
+					var jobCond = {
+						site: $scope.site,
+						component: "hbasemaster",
+						host: $scope.defaultHostname
+					};
+					return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime))._promise;
+				});
+				return metrics;
 			}
 
 			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
@@ -134,7 +141,7 @@
 						mergeMetricToOneSeries("MemoryUsage", [res[0], res[1]], ["nonheap", "heap"], storageOption),
 						mergeMetricToOneSeries("Master Averageload", [res[2]], ["averageload"]),
 						mergeMetricToOneSeries("Ritcount", [res[3], res[4]], ["ritcount", "ritcountoverthreshold"]),
-						mergeMetricToOneSeries("Assign", [res[5], res[6], res[7]], ["assignNumOps", "assignMin", "assignMax"]),
+						mergeMetricToOneSeries("Assign", [res[5], res[6], res[7]], ["numOps", "Min", "Max"]),
 						mergeMetricToOneSeries("Assign Percentile", [res[8], res[9], res[10]], ["75th", "95th", "99th"]),
 						mergeMetricToOneSeries("BulkAssign", [res[11], res[12], res[13]], ["num_ops", "min", "max"]),
 						mergeMetricToOneSeries("BulkAssign Percentile", [res[14], res[15], res[16]], ["75th", "95th", "99th"]),

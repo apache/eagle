@@ -38,13 +38,15 @@
 			<tr ng-if="hmasteractive !== undefined">
 				<th>Active Hmaster Status</th>
 				<td class="text-break">
-					<span class="label label-success">({{hmasteractive.tags.hostname}}) Healthy</span>
+					<span ng-if="defaultHostname !== hmasteractive.tags.hostname" class="label label-success">(<a class="summary-a" ui-sref="masterDetail({siteId: site, hostname: hmasteractive.tags.hostname})">{{hmasteractive.tags.hostname}}</a>) Healthy</span>
+					<span ng-if="defaultHostname === hmasteractive.tags.hostname" class="label label-success">({{hmasteractive.tags.hostname}}) Healthy</span>
 				</td>
 			</tr>
 			<tr ng-if="hmasterstandby !== undefined">
 				<th>Standby Hmaster Status</th>
 				<td class="text-break">
-					<span class="label label-success">({{hmasterstandby.tags.hostname}}) Healthy</span>
+					<span ng-if="defaultHostname !== hmasterstandby.tags.hostname" class="label label-success">(<a class="summary-a" ui-sref="masterDetail({siteId: site, hostname: hmasterstandby.tags.hostname})">{{hmasterstandby.tags.hostname}}</a>) Healthy</span>
+					<span ng-if="defaultHostname === hmasterstandby.tags.hostname" class="label label-success">({{hmasterstandby.tags.hostname}}) Healthy</span>
 				</td>
 			</tr>
 			</tbody>
@@ -57,11 +59,12 @@
 		<span class="fa fa-line-chart"></span>
 		<h3 class="box-title">
 			Metrics
+			<span>(master: {{defaultHostname}})</span>
 		</h3>
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">
-			<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
+			<div class="col-sm-6 col-md-6 col-lg-3" ng-repeat="metric in metricList track by $index">
 				<div class="hadoopMetric-chart">
 					<h3>{{metric.title}}</h3>
 					<div chart class="hadoopMetric-chart-container" series="metric.series"

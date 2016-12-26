@@ -45,6 +45,13 @@
 		site: true,
 		templateUrl: "partials/region/regionList.html",
 		controller: "regionListCtrl"
+	}).route("masterDetail", {
+		url: "/hadoopMetric/:hostname?startTime&endTime",
+		site: true,
+		reloadOnSearch: false,
+		templateUrl: "partials/overview.html",
+		controller: "overviewCtrl",
+		resolve: {time: true}
 	});
 
 	hadoopMetricApp.portal({
@@ -232,6 +239,8 @@
 			return _list;
 		};
 
+
+
 		METRIC.hbasehostStatus = function (condition, limit) {
 			var config = {
 				condition: METRIC.condition(condition),
@@ -240,6 +249,16 @@
 
 			var metrics_url = common.template(getQuery("HBASE_INSTANCE"), config);
 			return wrapList(METRIC.get(metrics_url));
+		};
+
+		METRIC.hbaseActiveMaster = function (siteId) {
+			var condition = {
+				site: siteId,
+				role: "hmaster",
+				status: "active"
+			}
+			var hbaseActiveMasterInfo = METRIC.hbasehostStatus(condition, 1);
+			return hbaseActiveMasterInfo;
 		};
 
 		METRIC.regionserverStatus = function (hostname, siteid) {
