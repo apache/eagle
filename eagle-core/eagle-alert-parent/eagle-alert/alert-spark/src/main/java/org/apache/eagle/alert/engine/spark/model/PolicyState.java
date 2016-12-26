@@ -36,15 +36,15 @@ public class PolicyState implements Serializable {
 
     private AtomicReference<Map<String, Map<String, PolicyDefinition>>> cachedPoliciesRef = new AtomicReference<>();
 
-    private static volatile Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies;
+    private Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies;
 
     private AtomicReference<Map<String, Map<String, PolicyDefinition>>> policyDefinitionRef = new AtomicReference<>();
 
-    private static volatile  Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition;
+    private Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition;
 
     private AtomicReference<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandlerRef = new AtomicReference<>();
 
-    private static volatile  Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler;
+    private Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler;
 
     public PolicyState(JavaStreamingContext jssc) {
         Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies = jssc.sparkContext().accumulator(new HashMap<>(), "policyAccum", new MapToMapAccum());
