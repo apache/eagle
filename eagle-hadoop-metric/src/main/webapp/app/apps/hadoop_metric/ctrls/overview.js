@@ -169,7 +169,8 @@
 					generateHbaseMetric(METRIC_NAME_ARRAY[20], {}, storageOption),
 					generateHbaseMetric(METRIC_NAME_ARRAY[21], {}),
 					generateHbaseMetric(METRIC_NAME_ARRAY[22], {}),
-					generateHbaseMetric(METRIC_NAME_ARRAY[23], {})
+					generateHbaseMetric(METRIC_NAME_ARRAY[23], {}),
+					hbaseservers
 				]).then(function (res) {
 					$scope.metricList = [
 						res[0], res[1], res[2], res[3], res[4],
