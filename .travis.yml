@@ -33,6 +33,7 @@ notifications:
   email:
     recipients:
       - denglingang@yhd.com
+      - luokun@yhd.com
     on_success: change
     on_failure: always
 deploy:
