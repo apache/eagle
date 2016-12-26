@@ -64,7 +64,7 @@
 
 				var promies = [];
 				$.each(METRIC_NAME, function (i, metric_name) {
-					promies.push(generateHbaseMetric(metric_name, 20, startTime, endTime));
+					promies.push(generateHbaseMetric(metric_name, startTime, endTime));
 				});
 				promies.push(METRIC.regionserverStatus($scope.hostname, $scope.site));
 
@@ -143,9 +143,12 @@
 			$scope.refresh();
 
 
-			function generateHbaseMetric(name, limit, startTime, endTime) {
-				limit = limit || 100;
+			function generateHbaseMetric(name, startTime, endTime) {
 				var hbaseMetric;
+				var interval = Time.diffInterval(startTime, endTime);
+				var intervalMin = interval / 1000 / 60;
+				var trendStartTime = Time.align(startTime, interval);
+				var trendEndTime = Time.align(endTime, interval);
 
 				$scope.site = $wrapState.param.siteId;
 				var condition = {
@@ -153,14 +156,16 @@
 					component: "regionserver",
 					host: $scope.hostname
 				};
-				hbaseMetric = METRIC.hbaseMetrics(condition, name, startTime, endTime, limit);
+				hbaseMetric = METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime));
 				return hbaseMetric._promise;
 			}
 
 			function mergeSeries(title, metrics, linename, option) {
 				var series = [];
-				$.each(metrics, function (i, metric) {
-					series.push(METRIC.metricsToSeries(linename[i], metric, option));
+				$.each(metrics, function (i, metricMap) {
+					$.map(metricMap, function (metric) {
+						series.push(METRIC.metricsToSeries(linename[i], metric, option));
+					});
 				});
 				return {
 					title: title,
