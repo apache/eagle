@@ -46,7 +46,7 @@
 
 .hadoopMetric-widget {
 	width: 100%;
-	box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 	border-radius: 2px;
 	padding: 10px;
 }
@@ -59,6 +59,13 @@
 .hadoopMetric-widget .hadoopMetric-chart-container {
 	height: 100px;
 }
+
 .summary-a {
 	color: #fff;
+}
+
+@media only screen and (min-device-width: 1280px) and (max-device-width: 1360px) {
+	.col-md-6 {
+		width: 50%;
+	}
 }
