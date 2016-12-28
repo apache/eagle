@@ -225,8 +225,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
             if (event.getAnchor() != null) {
                 this.outputCollector.ack(event);
             } else {
-                //TODO PartitionedEvent NOT USE TUPLE
-                //throw new IllegalStateException(event.toString() + " was not acked as anchor is null");
+                LOG.warn(event.toString() + " was not acked as anchor is null");
             }
         }
     }

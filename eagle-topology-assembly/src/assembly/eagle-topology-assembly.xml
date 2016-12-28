@@ -43,7 +43,6 @@
                 <exclude>org.slf4j:slf4j-api</exclude>
                 <exclude>org.slf4j:slf4j-log4j12</exclude>
                 <exclude>io.dropwizard:**</exclude>
-                <exclude>org.apache.storm:storm-core</exclude>                
             </excludes>
         </dependencySet>
     </dependencySets>
