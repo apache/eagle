@@ -100,8 +100,7 @@
 				$scope.site = $wrapState.param.siteId;
 
 				var metrics = cache[name] = cache[name] || $q.all([activeMasterInfo._promise]).then(function (res) {
-					// var hostname = cache[hostname] = cache[hostname] || res[0][0].tags.hostname;
-					var hostname = "10.17.28.15";
+					var hostname = cache[hostname] = cache[hostname] || res[0][0].tags.hostname;
 					$scope.defaultHostname = $wrapState.param.hostname || hostname
 
 					var jobCond = {
@@ -192,4 +191,3 @@
 		});
 	});
 })();
-//# sourceURL=overview.js

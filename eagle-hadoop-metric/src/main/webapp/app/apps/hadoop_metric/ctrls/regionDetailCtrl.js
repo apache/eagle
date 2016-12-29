@@ -177,4 +177,3 @@
 	});
 })
 ();
-//# sourceURL=regionDetailCtrl.js

@@ -92,7 +92,7 @@
 				baseURL = "http://" + host + ":" + port;
 			}
 
-			return common.template(METRIC["QUERY_" + queryName], {baseURL: "http://192.168.7.192:9090"});
+			return common.template(METRIC["QUERY_" + queryName], {baseURL: baseURL});
 		};
 
 		function wrapList(promise) {
@@ -292,4 +292,3 @@
 	hadoopMetricApp.require("ctrls/regionDetailCtrl.js");
 	hadoopMetricApp.require("ctrls/regionListCtrl.js");
 })();
-//# sourceURL=index.js

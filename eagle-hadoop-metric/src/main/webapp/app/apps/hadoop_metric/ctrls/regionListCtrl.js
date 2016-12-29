@@ -56,4 +56,3 @@
 		});
 	});
 })();
-//# sourceURL=regionListCtrl.js
