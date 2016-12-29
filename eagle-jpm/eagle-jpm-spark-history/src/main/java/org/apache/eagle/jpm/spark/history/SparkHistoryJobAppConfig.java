@@ -87,6 +87,10 @@ public class SparkHistoryJobAppConfig implements Serializable {
         if (config.hasPath("service.basePath")) {
             this.eagleInfo.basePath = config.getString("service.basePath");
         }
+        this.eagleInfo.flushLimit = 500;
+        if (config.hasPath("service.flushLimit")) {
+            this.eagleInfo.flushLimit = config.getInt("service.flushLimit");
+        }
 
         this.stormConfig.siteId = config.getString("siteId");
         this.stormConfig.spoutCrawlInterval = config.getInt("topology.spoutCrawlInterval");
@@ -126,5 +130,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
         public String password;
         public String basePath;
         public int timeout;
+        public int flushLimit;
     }
 }

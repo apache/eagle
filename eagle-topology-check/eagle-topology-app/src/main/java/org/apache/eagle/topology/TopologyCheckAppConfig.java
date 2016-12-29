@@ -69,14 +69,15 @@ public class TopologyCheckAppConfig implements Serializable {
         this.config = config;
 
         this.dataExtractorConfig.site = config.getString("siteId");
-        this.dataExtractorConfig.fetchDataIntervalInSecs = config.getLong("dataExtractorConfig.fetchDataIntervalInSecs");
+        this.dataExtractorConfig.fetchDataIntervalInSecs = config.getLong("topology.fetchDataIntervalInSecs");
         this.dataExtractorConfig.parseThreadPoolSize = MAX_NUM_THREADS;
-        if (config.hasPath("dataExtractorConfig.parseThreadPoolSize")) {
-            this.dataExtractorConfig.parseThreadPoolSize = config.getInt("dataExtractorConfig.parseThreadPoolSize");
+        if (config.hasPath("topology.parseThreadPoolSize")) {
+            this.dataExtractorConfig.parseThreadPoolSize = config.getInt("topology.parseThreadPoolSize");
         }
-        this.dataExtractorConfig.numDataFetcherSpout = config.getInt("dataExtractorConfig.numDataFetcherSpout");
-        this.dataExtractorConfig.numEntityPersistBolt = config.getInt("dataExtractorConfig.numEntityPersistBolt");
-        String resolveCls = config.getString("dataExtractorConfig.rackResolverCls");
+        this.dataExtractorConfig.numDataFetcherSpout = config.getInt("topology.numDataFetcherSpout");
+        this.dataExtractorConfig.numEntityPersistBolt = config.getInt("topology.numEntityPersistBolt");
+        this.dataExtractorConfig.numKafkaSinkBolt = config.getInt("topology.numOfKafkaSinkBolt");
+        String resolveCls = config.getString("topology.rackResolverCls");
         try {
             this.dataExtractorConfig.resolverCls = (Class<? extends TopologyRackResolver>) Class.forName(resolveCls);
         } catch (ClassNotFoundException e) {
@@ -85,7 +86,7 @@ public class TopologyCheckAppConfig implements Serializable {
             //e.printStackTrace();
         }
 
-        if (config.hasPath("dataSourceConfig.hbase") && config.getBoolean("dataSourceConfig.hbase.enabled")) {
+        if (config.hasPath("dataSourceConfig.hbase.enabled") && config.getBoolean("dataSourceConfig.hbase.enabled")) {
             topologyTypes.add(TopologyConstants.TopologyType.HBASE);
             hBaseConfig = new HBaseConfig();
 
@@ -98,14 +99,14 @@ public class TopologyCheckAppConfig implements Serializable {
             hBaseConfig.hbaseMasterPrincipal = getOptionalConfig("dataSourceConfig.hbase.kerberos.master.principal", null);
         }
 
-        if (config.hasPath("dataSourceConfig.mr") && config.getBoolean("dataSourceConfig.mr.enabled")) {
+        if (config.hasPath("dataSourceConfig.mr.enabled") && config.getBoolean("dataSourceConfig.mr.enabled")) {
             topologyTypes.add(TopologyConstants.TopologyType.MR);
             mrConfig = new MRConfig();
             mrConfig.rmUrls = config.getString("dataSourceConfig.mr.rmUrl").split(",\\s*");
             mrConfig.historyServerUrl = getOptionalConfig("dataSourceConfig.mr.historyServerUrl", null);
         }
 
-        if (config.hasPath("dataSourceConfig.hdfs") && config.getBoolean("dataSourceConfig.hdfs.enabled")) {
+        if (config.hasPath("dataSourceConfig.hdfs.enabled") && config.getBoolean("dataSourceConfig.hdfs.enabled")) {
             topologyTypes.add(TopologyConstants.TopologyType.HDFS);
             hdfsConfig = new HdfsConfig();
             hdfsConfig.namenodeUrls = config.getString("dataSourceConfig.hdfs.namenodeUrl").split(",\\s*");
@@ -116,6 +117,7 @@ public class TopologyCheckAppConfig implements Serializable {
         public String site;
         public int numDataFetcherSpout;
         public int numEntityPersistBolt;
+        public int numKafkaSinkBolt;
         public long fetchDataIntervalInSecs;
         public int parseThreadPoolSize;
         public Class<? extends TopologyRackResolver> resolverCls;
