@@ -48,6 +48,10 @@ public class StormEnvironment extends AbstractEnvironment {
         return new MetricStreamPersist(metricDefinition, config);
     }
 
+    public EntityStreamPersist getEntityPersist(Config config) {
+        return new EntityStreamPersist(config);
+    }
+
     public MetricSchemaGenerator getMetricSchemaGenerator(MetricDefinition metricDefinition, Config config) {
         return new MetricSchemaGenerator(metricDefinition, config);
     }

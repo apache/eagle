@@ -27,4 +27,12 @@ public class HDFSAuditLogObject {
     public String cmd;
     public String src;
     public String dst;
+
+    public static final String HDFS_TIMESTAMP_KEY = "timestamp";
+    public static final String HDFS_HOST_KEY = "host";
+    public static final String HDFS_ALLOWED_KEY = "allowed";
+    public static final String HDFS_USER_KEY = "user";
+    public static final String HDFS_CMD_KEY = "cmd";
+    public static final String HDFS_SRC_KEY = "src";
+    public static final String HDFS_DST_KEY = "dst";
 }

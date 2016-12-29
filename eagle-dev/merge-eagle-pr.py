@@ -54,15 +54,15 @@ JIRA_PASSWORD = os.environ.get("JIRA_PASSWORD", "")
 # https://github.com/settings/tokens. This script only requires the "public_repo" scope.
 GITHUB_OAUTH_KEY = os.environ.get("GITHUB_OAUTH_KEY")
 
-GITHUB_BASE = "https://github.com/apache/incubator-eagle/pull"
-GITHUB_API_BASE = "https://api.github.com/repos/apache/incubator-eagle"
+GITHUB_BASE = "https://github.com/apache/eagle/pull"
+GITHUB_API_BASE = "https://api.github.com/repos/apache/eagle"
 JIRA_BASE = "https://issues.apache.org/jira/browse"
 JIRA_API_BASE = "https://issues.apache.org/jira"
 # Prefix added to temporary branches
 BRANCH_PREFIX = "PR_TOOL"
 
-PR_REPO = "https://github.com/apache/incubator-eagle.git"
-PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
+PR_REPO = "https://github.com/apache/eagle.git"
+PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/eagle.git"
 
 
 def get_json(url):
@@ -74,7 +74,7 @@ def get_json(url):
     except urllib2.HTTPError as e:
         if "X-RateLimit-Remaining" in e.headers and e.headers["X-RateLimit-Remaining"] == '0':
             print "Exceeded the GitHub API rate limit; see the instructions in " + \
-                  "dev/merge_EAGLE_pr.py to configure an OAuth token for making authenticated " + \
+                  "eagle-dev/merge_eagle_pr.py to configure an OAuth token for making authenticated " + \
                   "GitHub requests."
         else:
             print "Unable to fetch URL, exiting: %s" % url

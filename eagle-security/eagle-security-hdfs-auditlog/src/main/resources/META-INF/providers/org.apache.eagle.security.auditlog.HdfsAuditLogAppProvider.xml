@@ -89,6 +89,13 @@
             <description>scheme class</description>
             <required>true</required>
         </property>
+        <property>
+            <name>dataSourceConfig.timeZone</name>
+            <displayName>Log Time Zone</displayName>
+            <description>time zone of hdfs audit log </description>
+            <value>GMT</value>
+            <required>true</required>
+        </property>
 
         <!-- data enrich configurations -->
         <property>
@@ -148,6 +155,25 @@
             <displayName>Kafka Producer RequestRequiredAcks</displayName>
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.trafficMonitorEnabled</name>
+            <displayName>Log Traffic Monitor Enabled</displayName>
+            <value>false</value>
+            <description>enable the log throughput calculation</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.metricWindowSize</name>
+            <displayName>Window Size for Traffic Counting</displayName>
+            <value>10</value>
+            <description>window size to calculate the throughput</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.metricSinkBatchSize</name>
+            <displayName>Batch Size for Flushing Traffic Metrics</displayName>
+            <value>1</value>
+            <description>batch size of flushing metrics </description>
         </property>
 
         <!-- web app related configurations -->

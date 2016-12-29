@@ -64,6 +64,12 @@
             <description>default timeout is 30s</description>
             <value>300</value>
         </property>
+        <property>
+            <name>service.flushLimit</name>
+            <displayName>service flushing limit</displayName>
+            <description>flushing entities limit</description>
+            <value>500</value>
+        </property>
 
         <!-- datasource config -->
         <property>

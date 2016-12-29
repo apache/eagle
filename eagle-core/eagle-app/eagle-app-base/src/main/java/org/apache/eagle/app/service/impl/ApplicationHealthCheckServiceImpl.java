@@ -49,6 +49,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private int initialDelay = 10;
     private int period = 300;
 
+    public static final String HEALTH_CHECK_PATH = "application.healthCheck";
     private static final String HEALTH_INITIAL_DELAY_PATH = "application.healthCheck.initialDelay";
     private static final String HEALTH_PERIOD_PATH = "application.healthCheck.period";
     private static final String HEALTH_PUBLISHER_PATH = "application.healthCheck.publisher";
