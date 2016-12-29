@@ -24,37 +24,50 @@
     <configuration>
         <!-- org.apache.eagle.topology.TopologyCheckApp -->
         <property>
-            <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
+            <name>topology.fetchDataIntervalInSecs</name>
             <displayName>Fetch Data Interval in Secs</displayName>
             <description>fetch data interval in secs</description>
             <value>300</value>
         </property>
         <property>
-            <name>dataExtractorConfig.parseThreadPoolSize</name>
+            <name>topology.parseThreadPoolSize</name>
             <displayName>Parser Thread Pool Size</displayName>
             <description>parser thread pool size</description>
             <value>5</value>
         </property>
         <property>
-            <name>dataExtractorConfig.numDataFetcherSpout</name>
+            <name>topology.numDataFetcherSpout</name>
             <displayName>Spout Task Number</displayName>
             <description>spout task number</description>
             <value>1</value>
         </property>
         <property>
-            <name>dataExtractorConfig.numEntityPersistBolt</name>
-            <displayName>Bolt Task Number</displayName>
-            <description>bolt task number</description>
+            <name>topology.numEntityPersistBolt</name>
+            <displayName>Storage Bolt Task Number</displayName>
+            <description>number of persist tasks to the storage</description>
             <value>1</value>
+        </property>
+        <property>
+            <name>topology.numOfKafkaSinkBolt</name>
+            <displayName>Kafka Sink Task Number</displayName>
+            <value>2</value>
+            <description>number of sinks to alert engine</description>
         </property>
 
         <property>
-            <name>dataExtractorConfig.rackResolverCls</name>
+            <name>topology.rackResolverCls</name>
             <displayName>Rack Resolver Class</displayName>
             <description>rack resolver class</description>
             <value>org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver</value>
         </property>
 
+        <property>
+            <name>dataSourceConfig.hbase.enabled</name>
+            <displayName>HBase Topology Check Enabled</displayName>
+            <description>HBase topology status check enabled</description>
+            <value>false</value>
+            <required>true</required>
+        </property>
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>HBase Zookeeper Quorum</displayName>
@@ -71,13 +84,6 @@
             <description>hbase zookeeper client port (optional)</description>
         </property>
 
-
-        <property>
-            <name>dataSourceConfig.hdfs.namenodeUrl</name>
-            <displayName>Hdfs Namenode Web URL</displayName>
-            <description>hdfs namenode web url for HDFS monitor</description>
-            <value>http://sandbox.hortonworks.com:50070</value>
-        </property>
         <property>
             <name>dataSourceConfig.hdfs.enabled</name>
             <displayName>HDFS Topology Check Enabled</displayName>
@@ -85,6 +91,13 @@
             <value>false</value>
             <required>true</required>
         </property>
+        <property>
+            <name>dataSourceConfig.hdfs.namenodeUrl</name>
+            <displayName>Hdfs Namenode Web URL</displayName>
+            <description>hdfs namenode web url for HDFS monitor</description>
+            <value>http://sandbox.hortonworks.com:50070</value>
+        </property>
+
         <property>
             <name>dataSourceConfig.mr.enabled</name>
             <displayName>MR Topology Check Enabled</displayName>
@@ -104,20 +117,7 @@
             <description>URL for history server monitor (optional)</description>
             <value></value>
         </property>
-        <property>
-            <name>dataSourceConfig.hbase.enabled</name>
-            <displayName>HBase Topology Check Enabled</displayName>
-            <description>HBase topology status check enabled</description>
-            <value>false</value>
-            <required>true</required>
-        </property>
 
-        <property>
-            <name>topology.numOfSinkTasks</name>
-            <displayName>topology.numOfSinkTasks</displayName>
-            <value>2</value>
-            <description>number of sink tasks</description>
-        </property>
 
         <!-- data sink configurations -->
         <property>
