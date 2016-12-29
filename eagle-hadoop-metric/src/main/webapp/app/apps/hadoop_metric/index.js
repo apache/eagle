@@ -256,9 +256,8 @@
 				site: siteId,
 				role: "hmaster",
 				status: "active"
-			}
-			var hbaseActiveMasterInfo = METRIC.hbasehostStatus(condition, 1);
-			return hbaseActiveMasterInfo;
+			};
+			return METRIC.hbasehostStatus(condition, 1);
 		};
 
 		METRIC.regionserverStatus = function (hostname, siteid) {

@@ -20,16 +20,16 @@
 	'use strict';
 
 	var scope = {};
-	if(typeof window != 'undefined') {
+	if (typeof window != 'undefined') {
 		scope = window;
-	} else if(typeof self != 'undefined') {
+	} else if (typeof self != 'undefined') {
 		scope = self;
 	}
 	var common = scope.common = {};
 
 	// ============================ Common ============================
 	common.template = function (str, list) {
-		$.each(list, function(key, value) {
+		$.each(list, function (key, value) {
 			var _regex = new RegExp("\\$\\{" + key + "\\}", "g");
 			str = str.replace(_regex, value);
 		});
@@ -37,27 +37,27 @@
 	};
 
 	common.getValueByPath = function (unit, path, defaultValue) {
-		if(unit === null || unit === undefined) throw "Unit can't be empty!";
-		if(path === "" || path === null || path === undefined) return unit;
+		if (unit === null || unit === undefined) throw "Unit can't be empty!";
+		if (path === "" || path === null || path === undefined) return unit;
 
-		if(typeof path === "string") {
+		if (typeof path === "string") {
 			path = path.replace(/\[(\d+)\]/g, ".$1").replace(/^\./, "").split(/\./);
 		}
-		for(var i = 0 ; i < path.length ; i += 1) {
+		for (var i = 0; i < path.length; i += 1) {
 			unit = unit[path[i]];
-			if(unit === null || unit === undefined) {
+			if (unit === null || unit === undefined) {
 				unit = null;
 				break;
 			}
 		}
-		if(unit === null && defaultValue !== undefined) {
+		if (unit === null && defaultValue !== undefined) {
 			unit = defaultValue;
 		}
 		return unit;
 	};
 
-	common.setValueByPath = function(unit, path, value) {
-		if(!unit || typeof path !== "string" || path === "") throw "Unit or path can't be empty!";
+	common.setValueByPath = function (unit, path, value) {
+		if (!unit || typeof path !== "string" || path === "") throw "Unit or path can't be empty!";
 
 		var _inArray = false;
 		var _end = 0;
@@ -66,11 +66,11 @@
 
 		function _nextPath(array) {
 			var _key = path.slice(_start, _end);
-			if(_inArray) {
+			if (_inArray) {
 				_key = _key.slice(0, -1);
 			}
-			if(!_unit[_key]) {
-				if(array) {
+			if (!_unit[_key]) {
+				if (array) {
 					_unit[_key] = [];
 				} else {
 					_unit[_key] = {};
@@ -79,12 +79,12 @@
 			_unit = _unit[_key];
 		}
 
-		for(; _end < path.length ; _end += 1) {
-			if(path[_end] === ".") {
+		for (; _end < path.length; _end += 1) {
+			if (path[_end] === ".") {
 				_nextPath(false);
 				_start = _end + 1;
 				_inArray = false;
-			} else if(path[_end] === "[") {
+			} else if (path[_end] === "[") {
 				_nextPath(true);
 				_start = _end + 1;
 				_inArray = true;
@@ -97,38 +97,39 @@
 	};
 
 	common.parseJSON = function (str, defaultVal) {
-		if(str && Number(str).toString() !== str) {
+		if (str && Number(str).toString() !== str) {
 			try {
 				str = (str + "").trim();
 				return JSON.parse(str);
-			} catch(err) {}
+			} catch (err) {
+			}
 		}
 
-		if(arguments.length === 1) {
+		if (arguments.length === 1) {
 			console.warn("Can't parse JSON: " + str);
 		}
 
 		return defaultVal === undefined ? null : defaultVal;
 	};
 
-	common.stringify = function(json) {
-		return JSON.stringify(json, function(key, value) {
-			if(/^(_|\$)/.test(key)) return undefined;
+	common.stringify = function (json) {
+		return JSON.stringify(json, function (key, value) {
+			if (/^(_|\$)/.test(key)) return undefined;
 			return value;
 		});
 	};
 
-	common.isEmpty = function(val) {
-		if($.isArray(val)) {
+	common.isEmpty = function (val) {
+		if ($.isArray(val)) {
 			return val.length === 0;
 		} else {
 			return val === null || val === undefined;
 		}
 	};
 
-	common.extend = function(target, origin) {
-		$.each(origin, function(key, value) {
-			if(/^(_|\$)/.test(key)) return;
+	common.extend = function (target, origin) {
+		$.each(origin, function (key, value) {
+			if (/^(_|\$)/.test(key)) return;
 
 			target[key] = value;
 		});
@@ -139,7 +140,7 @@
 		$.each(obj2, function (key, value) {
 			var oriValue = obj1[key];
 
-			if(typeof oriValue === "object" && typeof value === "object" && !common.isEmpty(value)) {
+			if (typeof oriValue === "object" && typeof value === "object" && !common.isEmpty(value)) {
 				merge(oriValue, value);
 			} else {
 				obj1[key] = value;
@@ -148,7 +149,7 @@
 	}
 
 	common.merge = function (mergedObj) {
-		for(var i = 1 ; i < arguments.length ; i += 1) {
+		for (var i = 1; i < arguments.length; i += 1) {
 			var obj = arguments[i];
 			merge(mergedObj, obj);
 		}
@@ -172,7 +173,7 @@
 	};
 
 	common.string.capitalize = function (str) {
-		return (str + "").replace(/\b\w/g, function(match) {
+		return (str + "").replace(/\b\w/g, function (match) {
 			return match.toUpperCase();
 		});
 	};
@@ -180,7 +181,7 @@
 	common.string.preFill = function (str, key, len) {
 		str = str + "";
 		len = len || 2;
-		while(str.length < len) {
+		while (str.length < len) {
 			str = key + str;
 		}
 		return str;
@@ -189,28 +190,28 @@
 	// ============================ Array =============================
 	common.array = {};
 
-	common.array.findIndex = function(val, list, path, findAll, caseSensitive) {
+	common.array.findIndex = function (val, list, path, findAll, caseSensitive) {
 		var _list = [];
 		val = caseSensitive === false ? (val + "").toUpperCase() : val;
 
-		for(var i = 0 ; i < list.length ; i += 1) {
+		for (var i = 0; i < list.length; i += 1) {
 			var unit = list[i];
 			var _val = common.getValueByPath(unit, path);
 			_val = caseSensitive === false ? (_val + "").toUpperCase() : _val;
 
-			if(_val === val) {
-				if(!findAll) return i;
+			if (_val === val) {
+				if (!findAll) return i;
 				_list.push(i);
 			}
 		}
 
-		return findAll ? _list: -1;
+		return findAll ? _list : -1;
 	};
 
-	common.array.find = function(val, list, path, findAll, caseSensitive) {
+	common.array.find = function (val, list, path, findAll, caseSensitive) {
 		var index = common.array.findIndex(val, list, path, findAll, caseSensitive);
 
-		if(findAll) {
+		if (findAll) {
 			return $.map(index, function (index) {
 				return list[index];
 			});
@@ -220,11 +221,11 @@
 	};
 
 	common.array.minus = function (list1, list2, path1, path2) {
-		if(arguments.length === 3) path2 = path1;
+		if (arguments.length === 3) path2 = path1;
 		var list = [];
 		$.each(list1, function (i, item) {
 			var val1 = common.getValueByPath(item, path1);
-			if(!common.array.find(val1, list2, path2)) {
+			if (!common.array.find(val1, list2, path2)) {
 				list.push(item);
 			}
 		});
@@ -241,7 +242,7 @@
 		var sortFunc;
 		sortList = sortList || [];
 
-		if(asc !== false) {
+		if (asc !== false) {
 			sortFunc = function (obj1, obj2) {
 				var val1 = common.getValueByPath(obj1, path);
 				var val2 = common.getValueByPath(obj2, path);
@@ -249,11 +250,11 @@
 				var index1 = common.array.findIndex(val1, sortList);
 				var index2 = common.array.findIndex(val2, sortList);
 
-				if(index1 !== -1 && index2 === -1) {
+				if (index1 !== -1 && index2 === -1) {
 					return -1;
-				} else if(index1 == -1 && index2 !== -1) {
+				} else if (index1 == -1 && index2 !== -1) {
 					return 1;
-				} else if(index1 !== -1 && index2 !== -1) {
+				} else if (index1 !== -1 && index2 !== -1) {
 					return index1 - index2;
 				}
 
@@ -272,11 +273,11 @@
 				var index1 = common.array.findIndex(val1, sortList);
 				var index2 = common.array.findIndex(val2, sortList);
 
-				if(index1 !== -1 && index2 === -1) {
+				if (index1 !== -1 && index2 === -1) {
 					return -1;
-				} else if(index1 == -1 && index2 !== -1) {
+				} else if (index1 == -1 && index2 !== -1) {
 					return 1;
-				} else if(index1 !== -1 && index2 !== -1) {
+				} else if (index1 !== -1 && index2 !== -1) {
 					return index1 - index2;
 				}
 
@@ -301,10 +302,11 @@
 		var failureList = [];
 		var hasFailure = false;
 		var rest = deferredList.length;
+
 		function doCheck() {
 			rest -= 1;
-			if(rest === 0) {
-				if(hasFailure) {
+			if (rest === 0) {
+				if (hasFailure) {
 					deferred.reject(failureList);
 				} else {
 					deferred.resolve(successList);
@@ -313,16 +315,16 @@
 		}
 
 		$.each(deferredList, function (i, deferred) {
-			if(deferred && deferred.then) {
+			if (deferred && deferred.then) {
 				var promise = deferred.then(function (data) {
 					successList[i] = data;
 				}, function (data) {
 					failureList[i] = data;
 					hasFailure = true;
 				});
-				if(promise.always) {
+				if (promise.always) {
 					promise.always(doCheck);
-				} else if(promise.finally) {
+				} else if (promise.finally) {
 					promise.finally(doCheck);
 				}
 			} else {
@@ -343,18 +345,18 @@
 
 	common.number.parse = function (num) {
 		num = Number(num);
-		if(isNaN(num)) num = 0;
+		if (isNaN(num)) num = 0;
 		return num;
 	};
 
 	common.number.toFixed = function (num, fixed) {
-		if(!common.number.isNumber(num)) return "-";
+		if (!common.number.isNumber(num)) return "-";
 		num = Number(num);
 		return num.toFixed(fixed || 0);
 	};
 
 	common.number.format = function (num, fixed) {
-		if(!common.number.isNumber(num)) return "-";
+		if (!common.number.isNumber(num)) return "-";
 		return common.number.toFixed(num, fixed).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	};
 
@@ -366,13 +368,13 @@
 		var sign = number < 0 ? -1 : 1;
 		var unit = '';
 		number = Math.abs(number);
-		if(isNaN(number)) return "-";
+		if (isNaN(number)) return "-";
 
-		for(var i = abbrev.length - 1; i >= 0; i--) {
+		for (var i = abbrev.length - 1; i >= 0; i--) {
 			var size = Math.pow(base, i + 1);
-			if(size <= number) {
+			if (size <= number) {
 				number = Math.round(number * decPlaces / size) / decPlaces;
-				if((number === base) && (i < abbrev.length - 1)) {
+				if ((number === base) && (i < abbrev.length - 1)) {
 					number = 1;
 					i++;
 				}
@@ -385,20 +387,20 @@
 	};
 
 	common.number.sizeFormat = function (number, digits) {
-		digits = (digits==0) ? digits : (digits || 2);
+		digits = (digits === 0) ? digits : (digits || 2);
 		var decPlaces = Math.pow(10, digits);
 		var abbrev = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 		var base = 1000;
 		var sign = number < 0 ? -1 : 1;
 		var unit = '';
 		number = Math.abs(number);
-		if(isNaN(number)) return "-";
+		if (isNaN(number)) return "-";
 
-		for(var i = abbrev.length - 1; i >= 0; i--) {
+		for (var i = abbrev.length - 1; i >= 0; i--) {
 			var size = Math.pow(base, i + 1);
-			if(size <= number) {
+			if (size <= number) {
 				number = Math.round(number * decPlaces / size) / decPlaces;
-				if((number === base) && (i < abbrev.length - 1)) {
+				if ((number === base) && (i < abbrev.length - 1)) {
 					number = 1;
 					i++;
 				}
@@ -411,16 +413,16 @@
 	};
 
 	common.number.compare = function (num1, num2) {
-		if(!common.number.isNumber(num1) || !common.number.isNumber(num2)) return "-";
-		if(num1 === 0) return 'N/A';
+		if (!common.number.isNumber(num1) || !common.number.isNumber(num2)) return "-";
+		if (num1 === 0) return 'N/A';
 		return (num2 - num1) / num1;
 	};
 
 	common.number.inRange = function (rangList, num) {
-		for(var i = 0 ; i < rangList.length - 1 ; i += 1) {
+		for (var i = 0; i < rangList.length - 1; i += 1) {
 			var start = rangList[i];
 			var end = rangList[i + 1];
-			if(start <= num && num < end) return i;
+			if (start <= num && num < end) return i;
 		}
 		return rangList.length - 1;
 	};
@@ -429,7 +431,7 @@
 		var total = 0;
 		$.each(list, function (i, obj) {
 			var value = common.getValueByPath(obj, path);
-			if(typeof value === "number" && !isNaN(value)) {
+			if (typeof value === "number" && !isNaN(value)) {
 				total += value;
 			}
 		});
