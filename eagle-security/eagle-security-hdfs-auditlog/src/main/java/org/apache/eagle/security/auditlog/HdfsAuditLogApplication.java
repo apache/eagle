@@ -30,8 +30,8 @@ import com.typesafe.config.ConfigFactory;
  */
 public class HdfsAuditLogApplication extends AbstractHdfsAuditLogApplication {
     @Override
-    public BaseRichBolt getParserBolt() {
-        return new HdfsAuditLogParserBolt();
+    public BaseRichBolt getParserBolt(Config config) {
+        return new HdfsAuditLogParserBolt(config);
     }
 
     @Override

@@ -77,6 +77,19 @@
             <displayName>Hdfs Namenode Web URL</displayName>
             <description>hdfs namenode web url for HDFS monitor</description>
             <value>http://sandbox.hortonworks.com:50070</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hdfs.enabled</name>
+            <displayName>HDFS Topology Check Enabled</displayName>
+            <description>HDFS topology status check enabled</description>
+            <value>false</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.mr.enabled</name>
+            <displayName>MR Topology Check Enabled</displayName>
+            <description>MR topology status check enabled</description>
+            <value>false</value>
             <required>true</required>
         </property>
         <property>
@@ -84,7 +97,6 @@
             <displayName>Resource Manager URL</displayName>
             <description>resource manager url for YARN monitor</description>
             <value>http://sandbox.hortonworks.com:8088</value>
-            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.mr.historyServerUrl</name>
@@ -94,8 +106,8 @@
         </property>
         <property>
             <name>dataSourceConfig.hbase.enabled</name>
-            <displayName>HBase Config Enabled</displayName>
-            <description>enabled for HBase monitor</description>
+            <displayName>HBase Topology Check Enabled</displayName>
+            <description>HBase topology status check enabled</description>
             <value>false</value>
             <required>true</required>
         </property>

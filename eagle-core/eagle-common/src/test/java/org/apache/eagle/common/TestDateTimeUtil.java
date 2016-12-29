@@ -19,8 +19,10 @@ package org.apache.eagle.common;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class TestDateTimeUtil {
     @Test
@@ -83,5 +85,18 @@ public class TestDateTimeUtil {
         cal.setTimeInMillis(tsInMS);
         //cal.setTimeInMillis(System.currentTimeMillis());
         System.out.println(cal.get(Calendar.DAY_OF_WEEK));
+    }
+
+    @Test
+    public void testTimeZone() throws ParseException {
+        for (String s : TimeZone.getAvailableIDs()) {
+            System.out.println(s);
+        }
+        String date = "2016-12-23 07:35:49";
+        TimeZone timeZone = TimeZone.getTimeZone("GMT+8");
+        long timestamp = DateTimeUtil.humanDateToSeconds(date, timeZone);
+        String dateUTC = "2016-12-22 23:35:49";
+        timeZone = TimeZone.getTimeZone("UTC");
+        Assert.assertTrue(DateTimeUtil.secondsToHumanDate(timestamp, timeZone).equals(dateUTC));
     }
 }

@@ -46,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
+import static org.apache.eagle.app.service.impl.ApplicationHealthCheckServiceImpl.HEALTH_CHECK_PATH;
+
 class ServerApplication extends Application<ServerConfig> {
     private static final Logger LOG = LoggerFactory.getLogger(ServerApplication.class);
     @Inject
@@ -121,9 +123,11 @@ class ServerApplication extends Application<ServerConfig> {
         environment.lifecycle().manage(updateAppStatusTask);
 
         // Initialize application extended health checks.
-        LOG.debug("Registering ApplicationHealthCheckService");
-        applicationHealthCheckService.init(environment);
-        environment.lifecycle().manage(new ManagedService(applicationHealthCheckService));
+        if (config.hasPath(HEALTH_CHECK_PATH)) {
+            LOG.debug("Registering ApplicationHealthCheckService");
+            applicationHealthCheckService.init(environment);
+            environment.lifecycle().manage(new ManagedService(applicationHealthCheckService));
+        }
 
         // Load application shared extension services.
         LOG.debug("Registering application shared extension services");
