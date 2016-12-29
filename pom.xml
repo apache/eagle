@@ -27,7 +27,7 @@
     <version>0.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Eagle::Parent</name>
-    <url>https://eagle.incubator.apache.org</url>
+    <url>https://eagle.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>
         Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize
@@ -45,9 +45,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:apache/incubator-eagle.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-eagle.git</developerConnection>
-        <url>scm:git:git@github.com:apache/incubator-eagle.git</url>
+        <connection>scm:git:git@github.com:apache/eagle.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/eagle.git</developerConnection>
+        <url>scm:git:git@github.com:apache/eagle.git</url>
         <tag>HEAD</tag>
     </scm>
     <issueManagement>
