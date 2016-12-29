@@ -89,7 +89,7 @@
 						yAxis: [{
 							axisLabel: {
 								formatter: function (value) {
-									return common.number.abbr(value, true);
+									return common.number.sizeFormat(value, 0);
 								}
 							}
 						}]
