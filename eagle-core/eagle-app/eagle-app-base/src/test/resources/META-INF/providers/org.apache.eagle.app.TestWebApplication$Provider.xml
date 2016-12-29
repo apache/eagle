@@ -19,7 +19,7 @@
 <application>
     <type>TEST_WEB_APPLICATION</type>
     <name>Test Monitoring Web Application</name>
-    <version>0.5.0-incubating</version>
+    <version>0.5.0-beta</version>
     <viewPath>/apps/test_web_app</viewPath>
     <dependencies>
         <dependency>
