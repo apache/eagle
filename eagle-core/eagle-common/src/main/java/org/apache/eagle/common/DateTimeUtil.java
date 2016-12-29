@@ -61,6 +61,14 @@ public class DateTimeUtil {
         return sdf.format(t);
     }
 
+    public static String secondsToHumanDate(long seconds, TimeZone timeZone) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(timeZone);
+        Date t = new Date();
+        t.setTime(seconds * 1000);
+        return sdf.format(t);
+    }
+
     public static String millisecondsToHumanDateWithMilliseconds(long milliseconds) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
         sdf.setTimeZone(CURRENT_TIME_ZONE);

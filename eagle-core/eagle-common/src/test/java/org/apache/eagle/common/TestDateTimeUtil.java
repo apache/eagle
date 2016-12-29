@@ -96,6 +96,7 @@ public class TestDateTimeUtil {
         TimeZone timeZone = TimeZone.getTimeZone("GMT+8");
         long timestamp = DateTimeUtil.humanDateToSeconds(date, timeZone);
         String dateUTC = "2016-12-22 23:35:49";
-        Assert.assertTrue(DateTimeUtil.secondsToHumanDate(timestamp).equals(dateUTC));
+        timeZone = TimeZone.getTimeZone("UTC");
+        Assert.assertTrue(DateTimeUtil.secondsToHumanDate(timestamp, timeZone).equals(dateUTC));
     }
 }
