@@ -16,12 +16,14 @@
  */
 package org.apache.eagle.metadata.model;
 
+import org.apache.eagle.common.Version;
+
 import javax.xml.bind.annotation.XmlElement;
 
 public class ApplicationDependency {
     private String type;
 
-    private String version;
+    private String version = Version.version;
     private boolean required = true;
 
     public String getVersion() {

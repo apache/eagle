@@ -24,7 +24,6 @@
     <dependencies>
         <dependency>
             <type>TEST_APPLICATION</type>
-            <version>0.5.0-incubating</version>
         </dependency>
     </dependencies>
     <docs>
