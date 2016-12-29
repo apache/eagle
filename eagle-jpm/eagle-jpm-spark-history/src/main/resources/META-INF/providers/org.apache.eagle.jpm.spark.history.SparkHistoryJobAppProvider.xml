@@ -19,7 +19,6 @@
 <application>
     <type>SPARK_HISTORY_JOB_APP</type>
     <name>Spark History Job Monitor</name>
-    <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.jpm.spark.history.SparkHistoryJobApp</appClass>
     <configuration>
         <!-- topology config -->
