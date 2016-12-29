@@ -74,7 +74,7 @@ def get_json(url):
     except urllib2.HTTPError as e:
         if "X-RateLimit-Remaining" in e.headers and e.headers["X-RateLimit-Remaining"] == '0':
             print "Exceeded the GitHub API rate limit; see the instructions in " + \
-                  "dev/merge_EAGLE_pr.py to configure an OAuth token for making authenticated " + \
+                  "eagle-dev/merge_eagle_pr.py to configure an OAuth token for making authenticated " + \
                   "GitHub requests."
         else:
             print "Unable to fetch URL, exiting: %s" % url
