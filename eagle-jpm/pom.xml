@@ -43,6 +43,7 @@
         <module>eagle-jpm-web</module>
         <module>eagle-jpm-service</module>
         <module>eagle-jpm-aggregation</module>
+        <module>eagle-jpm-analysis</module>
     </modules>
 
     <dependencies>
