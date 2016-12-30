@@ -30,8 +30,8 @@
     <url>https://eagle.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>
-        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize
-        attacks, malicious activities in Hadoop and take actions in real time.
+        Apache® Eagle™ is an open source analytics solution for identifying security and performance issues
+        instantly on big data platforms e.g. Apache Hadoop, Apache Spark, NoSQL etc.
     </description>
     <organization>
         <name>Apache Software Foundation</name>
