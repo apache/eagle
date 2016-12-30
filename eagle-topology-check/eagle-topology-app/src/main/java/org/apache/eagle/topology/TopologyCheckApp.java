@@ -30,7 +30,6 @@ import org.apache.eagle.topology.storm.TopologyDataPersistBolt;
 
 public class TopologyCheckApp extends StormApplication {
 
-    private static final String SINK_TASK_NUM = "topology.numOfSinkTasks";
     private static final String TOPOLOGY_HEALTH_CHECK_STREAM = "topology_health_check_stream";
 
     @Override
@@ -41,7 +40,6 @@ public class TopologyCheckApp extends StormApplication {
         String persistBoltName = TopologyCheckAppConfig.TOPOLOGY_ENTITY_PERSIST_BOLT_NAME;
         String parseBoltName = TopologyCheckAppConfig.PARSE_BOLT_NAME;
         String kafkaSinkBoltName = TopologyCheckAppConfig.SINK_BOLT_NAME;
-        int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
 
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         topologyBuilder.setSpout(
@@ -59,10 +57,15 @@ public class TopologyCheckApp extends StormApplication {
         topologyBuilder.setBolt(
             parseBoltName,
             new HealthCheckParseBolt(),
-            topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(persistBoltName);
+            topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt
+        ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(persistBoltName);
 
         StormStreamSink<?> sinkBolt = environment.getStreamSink(TOPOLOGY_HEALTH_CHECK_STREAM, config);
-        topologyBuilder.setBolt(kafkaSinkBoltName, sinkBolt, numOfSinkTasks).setNumTasks(numOfSinkTasks).shuffleGrouping(parseBoltName);
+        topologyBuilder.setBolt(
+                kafkaSinkBoltName,
+                sinkBolt,
+                topologyCheckAppConfig.dataExtractorConfig.numKafkaSinkBolt
+        ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numKafkaSinkBolt).shuffleGrouping(parseBoltName);
 
         return topologyBuilder.createTopology();
     }

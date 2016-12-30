@@ -28,7 +28,7 @@ public class HadoopQueueRunningAppProvider extends AbstractApplicationProvider<H
     }
 
     @Override
-    public Optional<HealthCheck> getAppHealthCheck(Config config) {
+    public Optional<HealthCheck> getManagedHealthCheck(Config config) {
         return Optional.of(new HadoopQueueRunningApplicationHealthCheck(config));
     }
 }

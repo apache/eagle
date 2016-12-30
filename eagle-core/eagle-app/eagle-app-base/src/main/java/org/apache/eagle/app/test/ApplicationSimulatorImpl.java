@@ -75,7 +75,23 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         statusUpdateService.updateApplicationEntityStatus(applicationEntity);
         applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
-        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        int attempt = 0;
+        while (attempt < 10) {
+            attempt++;
+            statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+            if (applicationEntity.getStatus() == ApplicationEntity.Status.STOPPED) {
+                break;
+            } else {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+            }
+        }
+        if (attempt >= 10 ) {
+            throw new IllegalStateException("Application status didn't become STOPPED in 10 attempts");
+        }
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
     }
 

@@ -49,6 +49,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     private int initialDelay = 10;
     private int period = 300;
 
+    public static final String HEALTH_CHECK_PATH = "application.healthCheck";
     private static final String HEALTH_INITIAL_DELAY_PATH = "application.healthCheck.initialDelay";
     private static final String HEALTH_PERIOD_PATH = "application.healthCheck.period";
     private static final String HEALTH_PUBLISHER_PATH = "application.healthCheck.publisher";
@@ -94,7 +95,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                             this.config.getConfig(HEALTH_PUBLISHER_PATH).withFallback(this.config.getConfig(SERVICE_PATH)));
                 }
             } catch (Exception e) {
-                LOG.warn("exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
+                LOG.warn("Exception found when create ApplicationHealthCheckPublisher instance {}", e.getCause());
             }
         }
     }
@@ -114,18 +115,18 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     @Override
     public void register(ApplicationEntity appEntity) {
         if (environment == null) {
-            LOG.warn("environment is null, can not register");
+            LOG.warn("Environment is null, can not register");
             return;
         }
         ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
-        Optional<HealthCheck> applicationHealthCheck = appProvider.getAppHealthCheck(
+        Optional<HealthCheck> applicationHealthCheck = appProvider.getManagedHealthCheck(
                         ConfigFactory.parseMap(appEntity.getContext())
                         .withFallback(config)
                         .withFallback(ConfigFactory.parseMap(appEntity.getConfiguration()))
         );
 
         if (!applicationHealthCheck.isPresent()) {
-            LOG.warn("application {} does not implement HealthCheck", appEntity.getAppId());
+            LOG.warn("Application {} does not implement HealthCheck", appEntity.getAppId());
             return;
         }
         this.environment.healthChecks().register(appEntity.getAppId(), applicationHealthCheck.get());
@@ -133,7 +134,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
         synchronized (lock) {
             if (!appHealthChecks.containsKey(appEntity.getAppId())) {
                 appHealthChecks.put(appEntity.getAppId(), applicationHealthCheck);
-                LOG.info("successfully register health check for {}", appEntity.getAppId());
+                LOG.info("Successfully register health check for {}", appEntity.getAppId());
             }
         }
     }
@@ -141,19 +142,19 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
     @Override
     public void unregister(ApplicationEntity appEntity) {
         if (environment == null) {
-            LOG.warn("environment is null, can not unregister");
+            LOG.warn("Environment is null, can not unregister");
             return;
         }
         this.environment.healthChecks().unregister(appEntity.getAppId());
         synchronized (lock) {
             appHealthChecks.remove(appEntity.getAppId());
         }
-        LOG.info("successfully unregister health check for {}", appEntity.getAppId());
+        LOG.info("Successfully unregister health check for {}", appEntity.getAppId());
     }
 
     @Override
     protected void runOneIteration() throws Exception {
-        LOG.info("start application health check");
+        LOG.info("Starting ApplicationHealthCheckService");
         registerAll();
 
         boolean isDaily = false;
@@ -185,10 +186,10 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                         results.put(appId, result);
                     }
                 }
-                LOG.info("application {} is healthy", appId);
+                LOG.info("Application {} is healthy", appId);
             } else {
                 results.put(appId, result);
-                LOG.warn("application {} is not healthy, {}", appId, result.getMessage(), result.getError());
+                LOG.warn("Application {} is not healthy, {}", appId, result.getMessage(), result.getError());
             }
         }
 
@@ -203,7 +204,7 @@ public class ApplicationHealthCheckServiceImpl extends ApplicationHealthCheckSer
                     hasSendDaily = true;
                 }
             } catch (Exception e) {
-                LOG.warn("failed to send email for unhealthy applications", e);
+                LOG.warn("Failed to send email for unhealthy applications", e);
             }
         }
 

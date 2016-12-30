@@ -38,14 +38,14 @@ public class AlertEmailPublisherTest {
     private SimpleSmtpServer server;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         config = ConfigFactory.load("application-test.conf");
         server = SimpleSmtpServer.start(SMTP_PORT);
     }
 
     @After
-    public void clear(){
-        if(server!=null) {
+    public void clear() {
+        if (server != null) {
             server.stop();
         }
     }
@@ -54,9 +54,9 @@ public class AlertEmailPublisherTest {
     public void testAlertEmailPublisher() throws Exception {
         AlertEmailPublisher publisher = new AlertEmailPublisher();
         Map<String, Object> properties = new HashMap<>();
-        properties.put(PublishConstants.SUBJECT,EMAIL_PUBLISHER_TEST_POLICY);
-        properties.put(PublishConstants.SENDER,"eagle@localhost");
-        properties.put(PublishConstants.RECIPIENTS,"somebody@localhost");
+        properties.put(PublishConstants.SUBJECT, EMAIL_PUBLISHER_TEST_POLICY);
+        properties.put(PublishConstants.SENDER, "eagle@localhost");
+        properties.put(PublishConstants.RECIPIENTS, "somebody@localhost");
         Publishment publishment = new Publishment();
         publishment.setName("testEmailPublishment");
         publishment.setType(org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher.class.getName());
@@ -65,9 +65,9 @@ public class AlertEmailPublisherTest {
         publishment.setSerializer(org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer.class.getName());
         publishment.setProperties(properties);
         Map<String, String> conf = new HashMap<>();
-        publisher.init(config, publishment,conf);
+        publisher.init(config, publishment, conf);
         publisher.onAlert(AlertPublisherTestHelper.mockEvent(EMAIL_PUBLISHER_TEST_POLICY));
-        Assert.assertEquals(1,server.getReceivedEmailSize());
+        Assert.assertEquals(1, server.getReceivedEmailSize());
         Assert.assertTrue(server.getReceivedEmail().hasNext());
         LOG.info("EMAIL:\n {}", server.getReceivedEmail().next());
     }

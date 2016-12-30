@@ -25,13 +25,17 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import com.typesafe.config.Config;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
 import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 /**
@@ -39,8 +43,19 @@ import java.util.TreeMap;
  */
 public class HdfsAuditLogParserBolt extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogParserBolt.class);
+    private static final String DATASOURCE_TIMEZONE_PATH = "dataSourceConfig.timeZone";
+
     private OutputCollector collector;
-    private static final HDFSAuditLogParser parser = new HDFSAuditLogParser();
+    private HDFSAuditLogParser parser;
+
+    public HdfsAuditLogParserBolt(Config config) {
+        if (config.hasPath(DATASOURCE_TIMEZONE_PATH)) {
+            TimeZone timeZone = TimeZone.getTimeZone(config.getString(DATASOURCE_TIMEZONE_PATH));
+            parser = new HDFSAuditLogParser(timeZone);
+        } else {
+            parser = new HDFSAuditLogParser();
+        }
+    }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -54,14 +69,14 @@ public class HdfsAuditLogParserBolt extends BaseRichBolt {
         try {
             entity = parser.parse(logLine);
             Map<String, Object> map = new TreeMap<>();
-            map.put("src", entity.src);
-            map.put("dst", entity.dst);
-            map.put("host", entity.host);
-            map.put("timestamp", entity.timestamp);
-            map.put("allowed", entity.allowed);
-            map.put("user", entity.user);
-            map.put("cmd", entity.cmd);
-            collector.emit(Collections.singletonList(map));
+            map.put(HDFSAuditLogObject.HDFS_SRC_KEY, entity.src);
+            map.put(HDFSAuditLogObject.HDFS_DST_KEY, entity.dst);
+            map.put(HDFSAuditLogObject.HDFS_HOST_KEY, entity.host);
+            map.put(HDFSAuditLogObject.HDFS_TIMESTAMP_KEY, entity.timestamp);
+            map.put(HDFSAuditLogObject.HDFS_ALLOWED_KEY, entity.allowed);
+            map.put(HDFSAuditLogObject.HDFS_USER_KEY, entity.user);
+            map.put(HDFSAuditLogObject.HDFS_CMD_KEY, entity.cmd);
+            collector.emit(input, Collections.singletonList(map));
         } catch (Exception ex) {
             LOG.error("Failing parse audit log message {}", logLine, ex);
         } finally {

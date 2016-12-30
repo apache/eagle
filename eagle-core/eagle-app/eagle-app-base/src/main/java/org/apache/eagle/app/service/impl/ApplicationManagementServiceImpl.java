@@ -161,7 +161,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
                 return applicationEntityService.delete(appEntity);
             } else {
-                throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
+                throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is " + currentStatus + ", uninstall operation is not allowed");
             }
         } catch (Throwable throwable) {
             LOGGER.error(throwable.getMessage(), throwable);

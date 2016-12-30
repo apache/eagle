@@ -22,15 +22,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.TimeZone;
 
 /**
  * e.g. 2015-09-21 21:36:52,172 INFO FSNamesystem.audit: allowed=true   ugi=hadoop (auth:KERBEROS)     ip=/x.x.x.x   cmd=getfileinfo src=/tmp   dst=null        perm=null       proto=rpc
  */
 
 public final class HDFSAuditLogParser implements Serializable {
-    private final static Logger LOG = LoggerFactory.getLogger(HDFSAuditLogParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HDFSAuditLogParser.class);
+    private TimeZone timeZone;
 
     public HDFSAuditLogParser() {
+        this.timeZone = DateTimeUtil.CURRENT_TIME_ZONE;
+    }
+
+    public HDFSAuditLogParser(TimeZone timeZone) {
+        this.timeZone = timeZone;
     }
 
     public static String parseUser(String ugi) {
@@ -91,7 +98,7 @@ public final class HDFSAuditLogParser implements Serializable {
         entity.dst = dst;
         entity.host = ip;
         entity.allowed = Boolean.valueOf(allowed);
-        entity.timestamp = DateTimeUtil.humanDateToMilliseconds(data);
+        entity.timestamp = DateTimeUtil.humanDateToMilliseconds(data, timeZone);
         return entity;
     }
 }
