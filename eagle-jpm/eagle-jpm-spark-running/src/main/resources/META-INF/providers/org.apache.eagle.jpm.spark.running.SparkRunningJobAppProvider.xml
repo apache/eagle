@@ -19,7 +19,6 @@
 <application>
     <type>SPARK_RUNNING_JOB_APP</type>
     <name>Spark Running Job Monitoring</name>
-    <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.jpm.spark.running.SparkRunningJobApp</appClass>
     <configuration>
         <!-- org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig -->

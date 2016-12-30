@@ -23,7 +23,6 @@
 <application>
     <type>GC_LOG_MONITOR</type>
     <name>GC Log Monitor</name>
-    <version>0.5.0-incubating</version>
     <configuration>
         <!-- topology level configurations -->
         <property>

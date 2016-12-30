@@ -19,7 +19,6 @@
 <application>
   <type>HADOOP_QUEUE_RUNNING_APP</type>
   <name>Hadoop Queue Monitor</name>
-  <version>0.5.0-incubating</version>
   <configuration>
     <!-- org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig -->
     <property>

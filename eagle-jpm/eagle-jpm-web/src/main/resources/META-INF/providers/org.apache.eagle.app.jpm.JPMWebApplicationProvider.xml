@@ -19,7 +19,6 @@
 <application>
     <type>JPM_WEB_APP</type>
     <name>Job Performance Monitoring Web </name>
-    <version>0.5.0-incubating</version>
     <viewPath>/apps/jpm</viewPath>
     <description>Job Performance Monitoring Web</description>
     <dependencies>

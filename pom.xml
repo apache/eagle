@@ -15,8 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache</groupId>
@@ -25,14 +24,14 @@
     </parent>
     <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-parent</artifactId>
-    <version>0.5.0-incubating-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Eagle::Parent</name>
-    <url>https://eagle.incubator.apache.org</url>
+    <url>https://eagle.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>
-        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize
-        attacks, malicious activities in Hadoop and take actions in real time.
+        Apache® Eagle™ is an open source analytics solution for identifying security and performance issues
+        instantly on big data platforms e.g. Apache Hadoop, Apache Spark, NoSQL etc.
     </description>
     <organization>
         <name>Apache Software Foundation</name>
@@ -46,9 +45,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:apache/incubator-eagle.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-eagle.git</developerConnection>
-        <url>scm:git:git@github.com:apache/incubator-eagle.git</url>
+        <connection>scm:git:git@github.com:apache/eagle.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/eagle.git</developerConnection>
+        <url>scm:git:git@github.com:apache/eagle.git</url>
         <tag>HEAD</tag>
     </scm>
     <issueManagement>
@@ -61,23 +60,23 @@
     <mailingLists>
         <mailingList>
             <name>Dev Mailing List</name>
-            <post>dev@eagle.incubator.apache.org</post>
-            <subscribe>dev-subscribe@eagle.incubator.apache.org</subscribe>
-            <unsubscribe>dev-unsubscribe@eagle.incubator.apache.org</unsubscribe>
+            <post>dev@eagle.apache.org</post>
+            <subscribe>dev-subscribe@eagle.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@eagle.apache.org</unsubscribe>
             <archive>http://mail-archives.apache.org/mod_mbox/eagle-dev/</archive>
         </mailingList>
         <mailingList>
             <name>User Mailing List</name>
-            <post>user@eagle.incubator.apache.org</post>
-            <subscribe>user-subscribe@eagle.incubator.apache.org</subscribe>
-            <unsubscribe>user-unsubscribe@eagle.incubator.apache.org</unsubscribe>
+            <post>user@eagle.apache.org</post>
+            <subscribe>user-subscribe@eagle.apache.org</subscribe>
+            <unsubscribe>user-unsubscribe@eagle.apache.org</unsubscribe>
             <archive>http://mail-archives.apache.org/mod_mbox/eagle-user/</archive>
         </mailingList>
         <mailingList>
             <name>Commits Mailing List</name>
-            <post>commits@eagle.incubator.apache.org</post>
-            <subscribe>commits-subscribe@eagle.incubator.apache.org</subscribe>
-            <unsubscribe>commits-unsubscribe@eagle.incubator.apache.org</unsubscribe>
+            <post>commits@eagle.apache.org</post>
+            <subscribe>commits-subscribe@eagle.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@eagle.apache.org</unsubscribe>
             <archive>http://mail-archives.apache.org/mod_mbox/eagle-commits/</archive>
         </mailingList>
     </mailingLists>
@@ -87,42 +86,42 @@
             <name>Edward Zhang</name>
             <email>yonzhang2012@apache.org</email>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
         <developer>
             <id>hao</id>
             <name>Hao Chen</name>
             <email>hao@apache.org</email>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
         <developer>
             <id>libsun</id>
             <name>Libin Sun</name>
             <email>libsun@apache.org</email>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
         <developer>
             <id>jilin</id>
             <name>Jilin Jiang</name>
             <email>jilin@apache.org</email>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
         <developer>
             <id>qingwzhao</id>
             <name>Qingwen Zhao</name>
             <email>qingwzhao@apache.org</email>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
         <developer>
             <id>cgupta</id>
             <name>Chaitali Gupta</name>
             <email>cgupta@apache.org</email>
             <organization>Apache Software Foundation</organization>
-            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
     </developers>
     <modules>

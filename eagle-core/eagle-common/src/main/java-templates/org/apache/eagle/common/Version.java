@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class Version {
-    public static final String projectName = "Eagle";
+    public static final String projectName = "Apache Eagle";
     public static final String moduleName = "${project.name}";
     public static final String version = "${project.version}";
     public static final String buildNumber = "${buildNumber}";
@@ -43,13 +43,13 @@ public final class Version {
         } catch (IOException e) {
             LOG.error(e.getMessage(),e);
         } finally {
-            LOG.info("Eagle {} {}",Version.version, DateTimeUtil.millisecondsToHumanDateWithSeconds(Long.parseLong(Version.timestamp)));
+            LOG.info("{} {} ({}, {})", projectName,Version.version,gitRevision,DateTimeUtil.millisecondsToHumanDateWithSecondsAndTimezone(Long.parseLong(Version.timestamp)));
         }
     }
 
     @Override
     public String toString() {
-        return String.format("%s version=%s buildNumber=%s gitRevision=%s built by %s on %s",
+        return String.format("%s %s buildNumber=%s gitRevision=%s built by %s on %s",
             projectName, version, buildNumber, gitRevision, userName, new Date(Long.parseLong(timestamp)));
     }
 
