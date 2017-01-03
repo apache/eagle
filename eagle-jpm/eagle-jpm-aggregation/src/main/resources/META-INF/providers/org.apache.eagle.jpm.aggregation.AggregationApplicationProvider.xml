@@ -19,7 +19,6 @@
 <application>
     <type>MR_JPM_AGGREGATION_APP</type>
     <name>MR Metrics Aggregation</name>
-    <version>0.5.0-incubating</version>
     <configuration>
         <property>
             <name>workers</name>

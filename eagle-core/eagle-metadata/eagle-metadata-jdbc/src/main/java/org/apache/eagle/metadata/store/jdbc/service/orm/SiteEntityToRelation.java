@@ -29,15 +29,17 @@ public class SiteEntityToRelation implements ThrowableConsumer2<PreparedStatemen
     @Override
     public void accept(PreparedStatement statement, SiteEntity entity) throws SQLException {
         int parameterIndex = 1;
-        if (StringUtils.isNotBlank(entity.getSiteId())) {
+        boolean addNullValue = (statement.getParameterMetaData().getParameterCount() > 5);
+
+        if (addNullValue || StringUtils.isNotBlank(entity.getSiteId())) {
             statement.setString(parameterIndex, entity.getSiteId());
             parameterIndex++;
         }
-        if (StringUtils.isNotBlank(entity.getSiteName())) {
+        if (addNullValue || StringUtils.isNotBlank(entity.getSiteName())) {
             statement.setString(parameterIndex, entity.getSiteName());
             parameterIndex++;
         }
-        if (StringUtils.isNotBlank(entity.getDescription())) {
+        if (addNullValue || StringUtils.isNotBlank(entity.getDescription())) {
             statement.setString(parameterIndex, entity.getDescription());
             parameterIndex++;
         }

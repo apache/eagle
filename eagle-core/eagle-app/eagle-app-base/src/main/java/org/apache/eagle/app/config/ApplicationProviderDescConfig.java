@@ -17,6 +17,7 @@
 package org.apache.eagle.app.config;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.common.Version;
 import org.apache.eagle.metadata.model.ApplicationDependency;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
@@ -45,7 +46,7 @@ public class ApplicationProviderDescConfig {
     private String name;
 
     @XmlElement(required = true)
-    private String version;
+    private String version = Version.version;
 
     private String description;
     private String viewPath;

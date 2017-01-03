@@ -23,7 +23,6 @@
 <application>
     <type>HDFS_AUDIT_LOG_MONITOR_APP</type>
     <name>Hdfs Audit Log Monitor</name>
-    <version>0.5.0-incubating</version>
     <configuration>
         <!-- topology related configurations -->
         <property>
