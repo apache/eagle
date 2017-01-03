@@ -15,19 +15,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-
-<style>
-	.box .box-header .box-title small a {
-		cursor: pointer;
-		padding: 0 5px;
-		border-right: 1px solid #999;
-	}
-
-	.box .box-header .box-title small a:last-child {
-		border-right: none;
-	}
-</style>
-
 <div class="box box-primary">
 	<div class="box-header with-border">
 		<h3 class="box-title">
@@ -55,8 +42,8 @@
 					<td>{{item.tags.rack}}</td>
 					<td>{{item.tags.site}}</td>
 					<td>
-						<span ng-if="item.status==='live'" class="label label-success">Healthy</span>
-						<span ng-if="item.status==='dead'" class="label label-danger">UnHealthy</span>
+						<span ng-if="item.status===live" class="label label-success">Healthy</span>
+						<span ng-if="item.status===dead" class="label label-danger">UnHealthy</span>
 					</td>
 				</tr>
 				</tbody>

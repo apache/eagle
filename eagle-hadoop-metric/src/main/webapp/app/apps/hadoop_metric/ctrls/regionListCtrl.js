@@ -41,16 +41,14 @@
 	register(function (hadoopMetricApp) {
 
 		hadoopMetricApp.controller("regionListCtrl", function ($wrapState, $scope, PageConfig, METRIC) {
+
 			// Initialization
 			PageConfig.title = "HBASE RegionServers";
 			$scope.tableScope = {};
+			$scope.live = METRIC.STATUS_LIVE;
+			$scope.dead = METRIC.STATUS_DEAD;
 			$scope.site = $wrapState.param.siteId;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-
-			$scope.fillSearch = function (key) {
-				$("#regionserverList").find(".search-box input").val(key).trigger('input');
-			};
-
 			$scope.regionserverList = METRIC.regionserverList($scope.site);
 
 		});

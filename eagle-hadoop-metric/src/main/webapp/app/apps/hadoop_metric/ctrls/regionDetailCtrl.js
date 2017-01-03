@@ -150,7 +150,6 @@
 				var trendStartTime = Time.align(startTime, interval);
 				var trendEndTime = Time.align(endTime, interval);
 
-				$scope.site = $wrapState.param.siteId;
 				var condition = {
 					site: $scope.site,
 					component: "regionserver",

@@ -60,12 +60,12 @@
 	height: 100px;
 }
 
-.summary-a {
+.hadoopMetric-summary-a {
 	color: #fff;
 }
 
 @media only screen and (min-device-width: 1280px) and (max-device-width: 1360px) {
-	.col-md-6 {
+	.hadoopMetric-col-md-6 {
 		width: 50%;
 	}
 }
