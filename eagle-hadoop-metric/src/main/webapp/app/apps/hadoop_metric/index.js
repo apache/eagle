@@ -206,7 +206,7 @@
 			return _list;
 		};
 
-		METRIC.aggMetricsToEntities = function (list, flatten) {
+		METRIC.aggMetricsToEntities = function (list,param, flatten) {
 			var _list = [];
 			_list.done = false;
 			_list._promise = list._promise.then(function () {
@@ -223,7 +223,8 @@
 						return {
 							timestamp: _startTime + index * _interval,
 							value: [value],
-							tags: tags
+							tags: tags,
+							flag: param
 						};
 					});
 
