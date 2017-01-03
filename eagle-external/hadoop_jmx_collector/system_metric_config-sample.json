@@ -1,0 +1,19 @@
+{
+  "env": {
+    "site": "sandbox",
+    "log_file": "/tmp/hadoop-jmx-collector.log"
+  },
+  "input": [
+  ],
+  "filter": {
+  },
+  "output": {
+    "kafka": {
+      "debug": false,
+      "default_topic": "system_metric_sandbox",
+      "broker_list": [
+        "sandbox.hortonworks.com:6667"
+      ]
+    }
+  }
+}
