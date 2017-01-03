@@ -33,8 +33,6 @@ public interface MetaManagementService {
 
     boolean addPublisherMeta(PublisherEntity publisherEntity);
 
-    boolean deletePublisherMeta(String userId, PublisherEntity publisherEntity);
-
     boolean deletePublisherMeta(String userId);
 
     List<PublisherEntity> getPublisherMeta(String userId);

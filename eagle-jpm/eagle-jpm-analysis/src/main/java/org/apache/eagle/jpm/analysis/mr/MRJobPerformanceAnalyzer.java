@@ -43,11 +43,9 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer<MRJobAnalysisEntity
 
     private List<Evaluator> evaluators = new ArrayList<>();
     private List<Publisher> publishers = new ArrayList<>();
-    private Config config;
     private MetaManagementService metaManagementService;
 
     public MRJobPerformanceAnalyzer(Config config) throws Exception {
-        this.config = config;
         evaluators.add(new SLAJobEvaluator(config));
         evaluators.add(new JobSuggestionEvaluator(config));
 

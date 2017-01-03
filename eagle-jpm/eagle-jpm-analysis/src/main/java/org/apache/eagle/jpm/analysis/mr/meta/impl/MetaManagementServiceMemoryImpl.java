@@ -103,25 +103,6 @@ public class MetaManagementServiceMemoryImpl implements MetaManagementService {
     }
 
     @Override
-    public boolean deletePublisherMeta(String userId, PublisherEntity publisherEntity) {
-        if (!publisherEntities.containsKey(userId)) {
-            LOG.warn("does not contain user {}", userId);
-            return false;
-        }
-
-        List<PublisherEntity> entities = publisherEntities.get(userId);
-        for (PublisherEntity entity : entities) {
-            if (entities.equals(publisherEntity)) {
-                entities.remove(entity);
-                return true;
-            }
-        }
-
-        LOG.warn("does not contain publisher meta {}", publisherEntity.toString());
-        return false;
-    }
-
-    @Override
     public boolean deletePublisherMeta(String userId) {
         if (!publisherEntities.containsKey(userId)) {
             LOG.warn("does not contain user {}", userId);
