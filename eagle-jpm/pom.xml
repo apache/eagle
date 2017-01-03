@@ -32,6 +32,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>eagle-jpm-analyzer</module>
         <module>eagle-jpm-spark-running</module>
         <module>eagle-jpm-spark-history</module>
         <module>eagle-jpm-mr-history</module>
@@ -42,7 +43,6 @@
         <module>eagle-jpm-web</module>
         <module>eagle-jpm-service</module>
         <module>eagle-jpm-aggregation</module>
-        <module>eagle-jpm-analysis</module>
     </modules>
 
     <dependencies>
