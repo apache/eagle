@@ -52,7 +52,27 @@ public class SiteEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Assert.assertEquals("testdesc", siteEntityFromDB.getDescription());
         Assert.assertEquals(createdTime, siteEntityFromDB.getCreatedTime());
         Assert.assertEquals(modifiedTime, siteEntityFromDB.getModifiedTime());
+    }
 
+    @Test
+    public void testInsertSiteEntityWithNullValues() throws SQLException {
+        SiteEntity siteEntity = new SiteEntity();
+        siteEntity.setSiteId("test-null-site");
+
+        siteEntityService.create(siteEntity);
+        String uuid = siteEntity.getUuid();
+        long createdTime = siteEntity.getCreatedTime();
+        long modifiedTime = siteEntity.getModifiedTime();
+
+        Collection<SiteEntity> results = siteEntityService.findAll();
+        Assert.assertEquals(1, results.size());
+        SiteEntity siteEntityFromDB = results.iterator().next();
+        Assert.assertEquals(uuid, siteEntityFromDB.getUuid());
+        Assert.assertEquals("test-null-site", siteEntityFromDB.getSiteId());
+        Assert.assertNull(siteEntityFromDB.getSiteName());
+        Assert.assertNull(siteEntityFromDB.getDescription());
+        Assert.assertEquals(createdTime, siteEntityFromDB.getCreatedTime());
+        Assert.assertEquals(modifiedTime, siteEntityFromDB.getModifiedTime());
     }
 
     @Test(expected = IllegalArgumentException.class)
