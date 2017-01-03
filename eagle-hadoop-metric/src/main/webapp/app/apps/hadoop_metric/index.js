@@ -63,8 +63,8 @@
 
 	hadoopMetricApp.service("METRIC", function ($q, $http, Time, Site, Application) {
 		var METRIC = window._METRIC = {};
-		METRIC.STATUS_LIVE="live";
-		METRIC.STATUS_DEAD="dead";
+		METRIC.STATUS_LIVE = "live";
+		METRIC.STATUS_DEAD = "dead";
 		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
 		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]{*}&pageSize=${limit}';
@@ -206,7 +206,7 @@
 			return _list;
 		};
 
-		METRIC.aggMetricsToEntities = function (list,param, flatten) {
+		METRIC.aggMetricsToEntities = function (list, param, flatten) {
 			var _list = [];
 			_list.done = false;
 			_list._promise = list._promise.then(function () {
@@ -239,7 +239,6 @@
 			});
 			return _list;
 		};
-
 
 
 		METRIC.hbasehostStatus = function (condition, limit) {

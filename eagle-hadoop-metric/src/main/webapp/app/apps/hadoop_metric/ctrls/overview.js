@@ -98,7 +98,7 @@
 
 				$scope.site = $wrapState.param.siteId;
 
-				var metrics = $q.all([activeMasterInfo._promise]).then(function (res) {
+				var metrics = cache[name] = cache[name] || $q.all([activeMasterInfo._promise]).then(function (res) {
 						var hostname = cache[hostname] = cache[hostname] || res[0][0].tags.hostname;
 						$scope.defaultHostname = $wrapState.param.hostname || hostname;
 
@@ -118,6 +118,7 @@
 					});
 				return metrics;
 			}
+
 			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
 				var series = [];
 
@@ -210,4 +211,3 @@
 		});
 	});
 })();
-//@ sourceURL=overview.js
