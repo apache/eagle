@@ -341,7 +341,7 @@
 	common.map2 = new Map();
 	function Map() {
 		var i;
-		this.elements = new Array();
+		this.elements = [];
 
 		//获取Map元素个数
 		this.size = function () {
@@ -353,14 +353,14 @@
 
 		//删除Map所有元素
 		this.clear = function () {
-			this.elements = new Array();
+			this.elements = [];
 		};
 
 		//向Map中增加元素（key, value)
 		this.put = function (_key, _value) {
-			if (this.containsKey(_key) == true) {
+			if (this.containsKey(_key) === true) {
 				if (this.containsValue(_value)) {
-					if (this.remove(_key) == true) {
+					if (this.remove(_key) === true) {
 						this.elements.push({
 							key: _key,
 							value: _value
@@ -449,7 +449,7 @@
 
 		//获取Map中所有key的数组（array）
 		this.keys = function () {
-			var arr = new Array();
+			var arr = [];
 			for (i = 0; i < this.elements.length; i++) {
 				arr.push(this.elements[i].key);
 			}
@@ -458,7 +458,7 @@
 
 		//获取Map中所有value的数组（array）
 		this.values = function () {
-			var arr = new Array();
+			var arr = [];
 			for (i = 0; i < this.elements.length; i++) {
 				arr.push(this.elements[i].value);
 			}
