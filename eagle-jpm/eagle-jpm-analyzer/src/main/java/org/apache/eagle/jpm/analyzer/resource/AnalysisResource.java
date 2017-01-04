@@ -25,9 +25,10 @@ import org.apache.eagle.metadata.resource.RESTResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/job/analysis")
+@Path("/job/analyzer")
 public class AnalysisResource {
     private MetaManagementService metaManagementService;
 
@@ -42,6 +43,7 @@ public class AnalysisResource {
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> addJobMeta(JobMetaEntity jobMetaEntity) {
         return RESTResponse.<Void>async((response) -> {
+            jobMetaEntity.ensureDefault();
             boolean ret = metaManagementService.addJobMeta(jobMetaEntity);
             String message = "Successfully add job meta for " + jobMetaEntity.getJobDefId();
             if (!ret) {
@@ -56,6 +58,7 @@ public class AnalysisResource {
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> updateJobMeta(@PathParam("jobDefId") String jobDefId, JobMetaEntity jobMetaEntity) {
         return RESTResponse.<Void>async((response) -> {
+            jobMetaEntity.ensureDefault();
             boolean ret = metaManagementService.updateJobMeta(jobDefId, jobMetaEntity);
             String message = "Successfully update job meta for " + jobDefId;
             if (!ret) {
@@ -68,7 +71,7 @@ public class AnalysisResource {
     @GET
     @Path("/meta/{jobDefId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<JobMetaEntity> getJobMeta(@PathParam("jobDefId") String jobDefId) {
+    public RESTResponse<List<JobMetaEntity>> getJobMeta(@PathParam("jobDefId") String jobDefId) {
         return RESTResponse.async(() -> metaManagementService.getJobMeta(jobDefId)).get();
     }
 
@@ -83,6 +86,7 @@ public class AnalysisResource {
             if (!ret) {
                 message = "Failed to delete job meta for " + jobDefId;
             }
+
             response.success(ret).message(message);
         }).get();
     }
@@ -93,6 +97,7 @@ public class AnalysisResource {
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> addPublisherMeta(PublisherEntity publisherEntity) {
         return RESTResponse.<Void>async((response) -> {
+            publisherEntity.ensureDefault();
             boolean ret = metaManagementService.addPublisherMeta(publisherEntity);
             String message = "Successfully add publisher meta for " + publisherEntity.getUserId();
             if (!ret) {

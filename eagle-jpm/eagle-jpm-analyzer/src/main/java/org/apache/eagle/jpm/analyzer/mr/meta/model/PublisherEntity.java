@@ -19,7 +19,9 @@ package org.apache.eagle.jpm.analyzer.mr.meta.model;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PublisherEntity extends PersistenceEntity {
     private String userId;
     private String mailAddress;

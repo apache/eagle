@@ -17,6 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.mr.meta.impl;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.mr.meta.MetaManagementService;
 import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
@@ -29,11 +30,8 @@ import java.util.List;
 public class MetaManagementServiceJDBCImpl implements MetaManagementService {
     private static final Logger LOG = LoggerFactory.getLogger(MetaManagementServiceJDBCImpl.class);
 
-    private Config config;
-
-    public MetaManagementServiceJDBCImpl(Config config) {
-        this.config = config;
-    }
+    @Inject
+    Config config;
 
     @Override
     public boolean addJobMeta(JobMetaEntity jobMetaEntity) {
@@ -48,7 +46,7 @@ public class MetaManagementServiceJDBCImpl implements MetaManagementService {
     }
 
     @Override
-    public JobMetaEntity getJobMeta(String jobDefId) {
+    public List<JobMetaEntity> getJobMeta(String jobDefId) {
 
         return null;
     }

@@ -56,7 +56,7 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer<MRJobAnalysisEntity
     public void analysis(MRJobAnalysisEntity mrJobAnalysisEntity) throws Exception {
         Result result = new Result();
 
-        JobMetaEntity jobMetaEntity = metaManagementService.getJobMeta(mrJobAnalysisEntity.getJobDefId());
+        JobMetaEntity jobMetaEntity = metaManagementService.getJobMeta(mrJobAnalysisEntity.getJobDefId()).get(0);
         for (Evaluator evaluator : evaluators) {
             if (!jobMetaEntity.getEvaluators().contains(evaluator.getClass().getSimpleName())) {
                 LOG.info("skip evaluator " + evaluator.getClass().getSimpleName());

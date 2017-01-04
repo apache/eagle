@@ -18,17 +18,23 @@
 package org.apache.eagle.jpm.analyzer.mr.meta.model;
 
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JobMetaEntity extends PersistenceEntity {
     private String jobDefId;
     private String siteId;
     private Map<String, Object> configuration = new HashMap<>();
     private Set<String> evaluators = new HashSet<>();
+
+    public JobMetaEntity() {
+
+    }
 
     public JobMetaEntity(String jobDefId,
                          String siteId,

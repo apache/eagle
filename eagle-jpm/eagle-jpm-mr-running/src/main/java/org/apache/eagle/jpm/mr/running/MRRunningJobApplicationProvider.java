@@ -21,6 +21,7 @@ import org.apache.eagle.app.spi.AbstractApplicationProvider;
 import org.apache.eagle.jpm.analyzer.mr.meta.MetaManagementService;
 import org.apache.eagle.jpm.analyzer.mr.meta.impl.MetaManagementServiceJDBCImpl;
 import org.apache.eagle.jpm.analyzer.mr.meta.impl.MetaManagementServiceMemoryImpl;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 import org.apache.eagle.metadata.store.jdbc.JDBCMetadataStore;
 
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class MRRunningJobApplicationProvider extends AbstractApplicationProvider
 
     @Override
     protected void onRegister() {
-        bindToMemoryMetaStore(MetaManagementService.class, MetaManagementServiceMemoryImpl.class);
+        bind(MemoryMetadataStore.class, MetaManagementService.class, MetaManagementServiceMemoryImpl.class);
         bind(JDBCMetadataStore.class, MetaManagementService.class, MetaManagementServiceJDBCImpl.class);
     }
 }

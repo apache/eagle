@@ -27,7 +27,7 @@ public interface MetaManagementService {
 
     boolean updateJobMeta(String jobDefId, JobMetaEntity jobMetaEntity);
 
-    JobMetaEntity getJobMeta(String jobDefId);
+    List<JobMetaEntity> getJobMeta(String jobDefId);
 
     boolean deleteJobMeta(String jobDefId);
 
