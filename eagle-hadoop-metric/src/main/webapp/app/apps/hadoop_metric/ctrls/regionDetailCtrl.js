@@ -29,46 +29,49 @@
 			$scope.metricList = [];
 			Time.autoRefresh = false;
 
-			var METRIC_NAME = [
-				"hadoop.memory.nonheapmemoryusage.used",
-				"hadoop.memory.heapmemoryusage.used",
-				"hadoop.bufferpool.direct.memoryused",
-				"hadoop.hbase.jvm.gccount",
-				"hadoop.hbase.jvm.gctimemillis",
-				"hadoop.hbase.ipc.ipc.queuesize",
-				"hadoop.hbase.ipc.ipc.numcallsingeneralqueue",
-				"hadoop.hbase.ipc.ipc.numactivehandler",
-				"hadoop.hbase.ipc.ipc.queuecalltime_99th_percentile",
-				"hadoop.hbase.ipc.ipc.processcalltime_99th_percentile",
-				"hadoop.hbase.ipc.ipc.queuecalltime_num_ops",
-				"hadoop.hbase.ipc.ipc.processcalltime_num_ops",
-				"hadoop.hbase.regionserver.server.regioncount",
-				"hadoop.hbase.regionserver.server.storecount",
-				"hadoop.hbase.regionserver.server.memstoresize",
-				"hadoop.hbase.regionserver.server.storefilesize",
-				"hadoop.hbase.regionserver.server.totalrequestcount",
-				"hadoop.hbase.regionserver.server.readrequestcount",
-				"hadoop.hbase.regionserver.server.writerequestcount",
-				"hadoop.hbase.regionserver.server.splitqueuelength",
-				"hadoop.hbase.regionserver.server.compactionqueuelength",
-				"hadoop.hbase.regionserver.server.flushqueuelength",
-				"hadoop.hbase.regionserver.server.blockcachesize",
-				"hadoop.hbase.regionserver.server.blockcachehitcount",
-				"hadoop.hbase.regionserver.server.blockcounthitpercent"
-			];
-
+			var seriesObj = {};
+			var metricObj = {};
+			metricObj["nonheap"] = "hadoop.memory.nonheapmemoryusage.used";
+			metricObj["heap"] = "hadoop.memory.heapmemoryusage.used";
+			metricObj["directmemory"] = "hadoop.bufferpool.direct.memoryused";
+			metricObj["GC count"] = "hadoop.hbase.jvm.gccount";
+			metricObj["GC TimeMillis"] = "hadoop.hbase.jvm.gctimemillis";
+			metricObj["QueueSize"] = "hadoop.hbase.ipc.ipc.queuesize";
+			metricObj["NumCallsInGeneralQueue"] = "hadoop.hbase.ipc.ipc.numcallsingeneralqueue";
+			metricObj["NumActiveHandler"] = "hadoop.hbase.ipc.ipc.numactivehandler";
+			metricObj["IPC Queue Time (99th"] = "hadoop.hbase.ipc.ipc.queuecalltime_99th_percentile";
+			metricObj["IPC Process Time (99th"] = "hadoop.hbase.ipc.ipc.processcalltime_99th_percentile";
+			metricObj["QueueCallTime_num_ops"] = "hadoop.hbase.ipc.ipc.queuecalltime_num_ops";
+			metricObj["ProcessCallTime_num_ops"] = "hadoop.hbase.ipc.ipc.processcalltime_num_ops";
+			metricObj["RegionCount"] = "hadoop.hbase.regionserver.server.regioncount";
+			metricObj["StoreCount"] = "hadoop.hbase.regionserver.server.storecount";
+			metricObj["MemStoreSize"] = "hadoop.hbase.regionserver.server.memstoresize";
+			metricObj["StoreFileSize"] = "hadoop.hbase.regionserver.server.storefilesize";
+			metricObj["TotalRequestCount"] = "hadoop.hbase.regionserver.server.totalrequestcount";
+			metricObj["ReadRequestCount"] = "hadoop.hbase.regionserver.server.readrequestcount";
+			metricObj["WriteRequestCount"] = "hadoop.hbase.regionserver.server.writerequestcount";
+			metricObj["SlitQueueLength"] = "hadoop.hbase.regionserver.server.splitqueuelength";
+			metricObj["CompactionQueueLength"] = "hadoop.hbase.regionserver.server.compactionqueuelength";
+			metricObj["FlushQueueLength"] = "hadoop.hbase.regionserver.server.flushqueuelength";
+			metricObj["BlockCacheSize"] = "hadoop.hbase.regionserver.server.blockcachesize";
+			metricObj["BlockCacheHitCount"] = "hadoop.hbase.regionserver.server.blockcachehitcount";
+			metricObj["BlockCacheCountHitPercent"] = "hadoop.hbase.regionserver.server.blockcounthitpercent";
 
 			$scope.refresh = function () {
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
 
-				var promies = [];
-				$.each(METRIC_NAME, function (i, metric_name) {
-					promies.push(generateHbaseMetric(metric_name, startTime, endTime));
-				});
-				promies.push(METRIC.regionserverStatus($scope.hostname, $scope.site));
+				var metricspromies = [];
+				for (var metricKey in metricObj) {
+					metricspromies.push(generateHbaseMetric(metricObj[metricKey], startTime, endTime, metricKey));
+				}
 
-				$q.all(promies).then(function (res) {
+
+				$q.all(metricspromies).then(function (res) {
+
+					$.each(res, function (i, metrics) {
+						seriesObj[metrics[0]] = metrics[1];
+					});
 
 					var sizeoption = {
 						animation: false,
@@ -108,32 +111,34 @@
 						}]
 					};
 					$scope.metricList = [];
-					$scope.metricList.push(mergeSeries("Memory Usage", [res[0], res[1]], ["nonheap", "heap"], sizeoption));
-					$scope.metricList.push(mergeSeries("Direct Memory Usage", [res[2]], ["directmemory"], sizeoption));
-					$scope.metricList.push(mergeSeries("GC count", [res[3]], ["GC count"], {}));
-					$scope.metricList.push(mergeSeries("GC TimeMillis", [res[4]], ["GC TimeMillis"], gctimeoption));
-					$scope.metricList.push(mergeSeries("QueueSize", [res[5]], ["QueueSize"], {}));
-					$scope.metricList.push(mergeSeries("NumCallsInGeneralQueue", [res[6]], ["NumCallsInGeneralQueue"], {}));
-					$scope.metricList.push(mergeSeries("NumActiveHandler", [res[7]], ["NumActiveHandler"], {}));
-					$scope.metricList.push(mergeSeries("IPC Queue Time (99th)", [res[8]], ["IPC Queue Time (99th)"], {}));
-					$scope.metricList.push(mergeSeries("IPC Process Time (99th)", [res[9]], ["IPC Process Time (99th)"], {}));
-					$scope.metricList.push(mergeSeries("QueueCallTime_num_ops", [res[10]], ["QueueCallTime_num_ops"], {}));
-					$scope.metricList.push(mergeSeries("ProcessCallTime_num_ops", [res[11]], ["ProcessCallTime_num_ops"], {}));
-					$scope.metricList.push(mergeSeries("RegionCount", [res[12]], ["RegionCount"], {}));
-					$scope.metricList.push(mergeSeries("StoreCount", [res[13]], ["StoreCount"], {}));
-					$scope.metricList.push(mergeSeries("MemStoreSize", [res[14]], ["MemStoreSize"], sizeoption));
-					$scope.metricList.push(mergeSeries("StoreFileSize", [res[15]], ["StoreFileSize"], sizeoption));
-					$scope.metricList.push(mergeSeries("TotalRequestCount", [res[16]], ["TotalRequestCount"], {}));
-					$scope.metricList.push(mergeSeries("ReadRequestCount", [res[17]], ["ReadRequestCount"], {}));
-					$scope.metricList.push(mergeSeries("WriteRequestCount", [res[18]], ["WriteRequestCount"], {}));
-					$scope.metricList.push(mergeSeries("SlitQueueLength", [res[19]], ["SlitQueueLength"], {}));
-					$scope.metricList.push(mergeSeries("CompactionQueueLength", [res[20]], ["CompactionQueueLength"], {}));
-					$scope.metricList.push(mergeSeries("FlushQueueLength", [res[21]], ["FlushQueueLength"], {}));
-					$scope.metricList.push(mergeSeries("BlockCacheSize", [res[22]], ["BlockCacheSize"], sizeoption));
-					$scope.metricList.push(mergeSeries("BlockCacheHitCount", [res[23]], ["BlockCacheHitCount"], {}));
-					$scope.metricList.push(mergeSeries("BlockCacheCountHitPercent", [res[24]], ["BlockCacheCountHitPercent"], {}));
+					$scope.metricList.push(mergeSeries("Memory Usage", [seriesObj["nonheap"], seriesObj["heap"]], ["nonheap", "heap"], sizeoption));
+					$scope.metricList.push(mergeSeries("Direct Memory Usage", [seriesObj["directmemory"]], ["directmemory"], sizeoption));
+					$scope.metricList.push(mergeSeries("GC count", [seriesObj["GC count"]], ["GC count"], {}));
+					$scope.metricList.push(mergeSeries("GC TimeMillis", [seriesObj["GC TimeMillis"]], ["GC TimeMillis"], gctimeoption));
+					$scope.metricList.push(mergeSeries("QueueSize", [seriesObj["QueueSize"]], ["QueueSize"], {}));
+					$scope.metricList.push(mergeSeries("NumCallsInGeneralQueue", [seriesObj["NumCallsInGeneralQueue"]], ["NumCallsInGeneralQueue"], {}));
+					$scope.metricList.push(mergeSeries("NumActiveHandler", [seriesObj["NumActiveHandler"]], ["NumActiveHandler"], {}));
+					$scope.metricList.push(mergeSeries("IPC Queue Time (99th)", [seriesObj["IPC Queue Time (99th)"]], ["IPC Queue Time (99th)"], {}));
+					$scope.metricList.push(mergeSeries("IPC Process Time (99th)", [seriesObj["IPC Process Time (99th)"]], ["IPC Process Time (99th)"], {}));
+					$scope.metricList.push(mergeSeries("QueueCallTime_num_ops", [seriesObj["QueueCallTime_num_ops"]], ["QueueCallTime_num_ops"], {}));
+					$scope.metricList.push(mergeSeries("ProcessCallTime_num_ops", [seriesObj["ProcessCallTime_num_ops"]], ["ProcessCallTime_num_ops"], {}));
+					$scope.metricList.push(mergeSeries("RegionCount", [seriesObj["RegionCount"]], ["RegionCount"], {}));
+					$scope.metricList.push(mergeSeries("StoreCount", [seriesObj["StoreCount"]], ["StoreCount"], {}));
+					$scope.metricList.push(mergeSeries("MemStoreSize", [seriesObj["MemStoreSize"]], ["MemStoreSize"], sizeoption));
+					$scope.metricList.push(mergeSeries("StoreFileSize", [seriesObj["StoreFileSize"]], ["StoreFileSize"], sizeoption));
+					$scope.metricList.push(mergeSeries("TotalRequestCount", [seriesObj["TotalRequestCount"]], ["TotalRequestCount"], {}));
+					$scope.metricList.push(mergeSeries("ReadRequestCount", [seriesObj["ReadRequestCount"]], ["ReadRequestCount"], {}));
+					$scope.metricList.push(mergeSeries("WriteRequestCount", [seriesObj["WriteRequestCount"]], ["WriteRequestCount"], {}));
+					$scope.metricList.push(mergeSeries("SlitQueueLength", [seriesObj["SlitQueueLength"]], ["SlitQueueLength"], {}));
+					$scope.metricList.push(mergeSeries("CompactionQueueLength", [seriesObj["CompactionQueueLength"]], ["CompactionQueueLength"], {}));
+					$scope.metricList.push(mergeSeries("FlushQueueLength", [seriesObj["FlushQueueLength"]], ["FlushQueueLength"], {}));
+					$scope.metricList.push(mergeSeries("BlockCacheSize", [seriesObj["BlockCacheSize"]], ["BlockCacheSize"], sizeoption));
+					$scope.metricList.push(mergeSeries("BlockCacheHitCount", [seriesObj["BlockCacheHitCount"]], ["BlockCacheHitCount"], {}));
+					$scope.metricList.push(mergeSeries("BlockCacheCountHitPercent", [seriesObj["BlockCacheCountHitPercent"]], ["BlockCacheCountHitPercent"], {}));
+				});
 
-					$scope.regionstatus = res[25];
+				METRIC.regionserverStatus($scope.hostname, $scope.site)._promise.then(function (res) {
+					$scope.regionstatus = res;
 				});
 			};
 			Time.onReload(function () {
@@ -143,8 +148,7 @@
 			$scope.refresh();
 
 
-			function generateHbaseMetric(name, startTime, endTime) {
-				var hbaseMetric;
+			function generateHbaseMetric(name, startTime, endTime, flag) {
 				var interval = Time.diffInterval(startTime, endTime);
 				var intervalMin = interval / 1000 / 60;
 				var trendStartTime = Time.align(startTime, interval);
@@ -155,8 +159,13 @@
 					component: "regionserver",
 					host: $scope.hostname
 				};
-				hbaseMetric = METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime));
-				return hbaseMetric._promise;
+				return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
+					._promise.then(function (list) {
+						var metricFlag = $.map(list, function (metrics) {
+							return metrics[0].flag;
+						});
+						return [metricFlag, list];
+					});
 			}
 
 			function mergeSeries(title, metrics, linename, option) {

@@ -23,47 +23,48 @@
 	register(function (hadoopMetricApp) {
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
 			var cache = {};
-			var mapRes = common.map2;
 			$scope.site = $wrapState.param.siteId;
 			var activeMasterInfo = METRIC.hbaseActiveMaster($scope.site);
-			var metricMap = common.map1;
-			metricMap.put("nonheap", "hadoop.memory.nonheapmemoryusage.used");
-			metricMap.put("heap", "hadoop.memory.heapmemoryusage.used");
-			metricMap.put("averageload", "hadoop.hbase.master.server.averageload");
-			metricMap.put("ritcount", "hadoop.hbase.master.assignmentmanger.ritcount");
-			metricMap.put("ritcountoverthreshold", "hadoop.hbase.master.assignmentmanger.ritcountoverthreshold");
-			metricMap.put("AssignNumOps", "hadoop.hbase.master.assignmentmanger.assign_num_ops");
-			metricMap.put("AssignMin", "hadoop.hbase.master.assignmentmanger.assign_min");
-			metricMap.put("AssignMax", "hadoop.hbase.master.assignmentmanger.assign_max");
-			metricMap.put("AssignPercentile75th", "hadoop.hbase.master.assignmentmanger.assign_75th_percentile");
-			metricMap.put("AssignPercentile95th", "hadoop.hbase.master.assignmentmanger.assign_95th_percentile");
-			metricMap.put("AssignPercentile99th", "hadoop.hbase.master.assignmentmanger.assign_99th_percentile");
-			metricMap.put("BulkAssignNum_ops", "hadoop.hbase.master.assignmentmanger.bulkassign_num_ops");
-			metricMap.put("BulkAssignMin", "hadoop.hbase.master.assignmentmanger.bulkassign_min");
-			metricMap.put("BulkAssignMax", "hadoop.hbase.master.assignmentmanger.bulkassign_max");
-			metricMap.put("BulkAssignPercentile75th", "hadoop.hbase.master.assignmentmanger.bulkassign_75th_percentile");
-			metricMap.put("BulkAssignPercentile95th", "hadoop.hbase.master.assignmentmanger.bulkassign_95th_percentile");
-			metricMap.put("BulkAssignPercentile99th", "hadoop.hbase.master.assignmentmanger.bulkassign_99th_percentile");
-			metricMap.put("BalancerClusterNum_ops", "hadoop.hbase.master.balancer.balancercluster_num_ops");
-			metricMap.put("BalancerClusterMin", "hadoop.hbase.master.balancer.balancercluster_min");
-			metricMap.put("BalancerClusterMax", "hadoop.hbase.master.balancer.balancercluster_max");
-			metricMap.put("BalancerClusterPercentile75th", "hadoop.hbase.master.balancer.balancercluster_75th_percentile");
-			metricMap.put("BalancerClusterPercentile95th", "hadoop.hbase.master.balancer.balancercluster_95th_percentile");
-			metricMap.put("BalancerClusterPercentile99th", "hadoop.hbase.master.balancer.balancercluster_99th_percentile");
-			metricMap.put("HlogSplitTimeMin", "hadoop.hbase.master.filesystem.hlogsplittime_min");
-			metricMap.put("HlogSplitTimeMax", "hadoop.hbase.master.filesystem.hlogsplittime_max");
-			metricMap.put("HlogSplitTimePercentile75th", "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile");
-			metricMap.put("HlogSplitTimePercentile95th", "hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile");
-			metricMap.put("HlogSplitTimePercentile99th", "hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile");
-			metricMap.put("HlogSplitSizeMin", "hadoop.hbase.master.filesystem.hlogsplitsize_min");
-			metricMap.put("HlogSplitSizeMax", "hadoop.hbase.master.filesystem.hlogsplitsize_max");
-			metricMap.put("MetaHlogSplitTimeMin", "hadoop.hbase.master.filesystem.metahlogsplittime_min");
-			metricMap.put("MetaHlogSplitTimeMax", "hadoop.hbase.master.filesystem.metahlogsplittime_max");
-			metricMap.put("MetaHlogSplitTimePercentile75th", "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile");
-			metricMap.put("MetaHlogSplitTimePercentile95th", "hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile");
-			metricMap.put("MetaHlogSplitTimePercentile99th", "hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile");
-			metricMap.put("MetaHlogSplitSizeMin", "hadoop.hbase.master.filesystem.metahlogsplitsize_min");
-			metricMap.put("MetaHlogSplitSizeMax", "hadoop.hbase.master.filesystem.metahlogsplitsize_max");
+
+			var seriesObj = {};
+			var metricObj = {};
+			metricObj["nonheap"] = "hadoop.memory.nonheapmemoryusage.used";
+			metricObj["heap"] = "hadoop.memory.heapmemoryusage.used";
+			metricObj["averageload"] = "hadoop.hbase.master.server.averageload";
+			metricObj["ritcount"] = "hadoop.hbase.master.assignmentmanger.ritcount";
+			metricObj["ritcountoverthreshold"] = "hadoop.hbase.master.assignmentmanger.ritcountoverthreshold";
+			metricObj["AssignNumOps"] = "hadoop.hbase.master.assignmentmanger.assign_num_ops";
+			metricObj["AssignMin"] = "hadoop.hbase.master.assignmentmanger.assign_min";
+			metricObj["AssignMax"] = "hadoop.hbase.master.assignmentmanger.assign_max";
+			metricObj["AssignPercentile75th"] = "hadoop.hbase.master.assignmentmanger.assign_75th_percentile";
+			metricObj["AssignPercentile95th"] = "hadoop.hbase.master.assignmentmanger.assign_95th_percentile";
+			metricObj["AssignPercentile99th"] = "hadoop.hbase.master.assignmentmanger.assign_99th_percentile";
+			metricObj["BulkAssignNum_ops"] = "hadoop.hbase.master.assignmentmanger.bulkassign_num_ops";
+			metricObj["BulkAssignMin"] = "hadoop.hbase.master.assignmentmanger.bulkassign_min";
+			metricObj["BulkAssignMax"] = "hadoop.hbase.master.assignmentmanger.bulkassign_max";
+			metricObj["BulkAssignPercentile75th"] = "hadoop.hbase.master.assignmentmanger.bulkassign_75th_percentile";
+			metricObj["BulkAssignPercentile95th"] = "hadoop.hbase.master.assignmentmanger.bulkassign_95th_percentile";
+			metricObj["BulkAssignPercentile99th"] = "hadoop.hbase.master.assignmentmanger.bulkassign_99th_percentile";
+			metricObj["BalancerClusterNum_ops"] = "hadoop.hbase.master.balancer.balancercluster_num_ops";
+			metricObj["BalancerClusterMin"] = "hadoop.hbase.master.balancer.balancercluster_min";
+			metricObj["BalancerClusterMax"] = "hadoop.hbase.master.balancer.balancercluster_max";
+			metricObj["BalancerClusterPercentile75th"] = "hadoop.hbase.master.balancer.balancercluster_75th_percentile";
+			metricObj["BalancerClusterPercentile95th"] = "hadoop.hbase.master.balancer.balancercluster_95th_percentile";
+			metricObj["BalancerClusterPercentile99th"] = "hadoop.hbase.master.balancer.balancercluster_99th_percentile";
+			metricObj["HlogSplitTimeMin"] = "hadoop.hbase.master.filesystem.hlogsplittime_min";
+			metricObj["HlogSplitTimeMax"] = "hadoop.hbase.master.filesystem.hlogsplittime_max";
+			metricObj["HlogSplitTimePercentile75th"] = "hadoop.hbase.master.filesystem.hlogsplittime_75th_percentile";
+			metricObj["HlogSplitTimePercentile95th"] = "hadoop.hbase.master.filesystem.hlogsplittime_95th_percentile";
+			metricObj["HlogSplitTimePercentile99th"] = "hadoop.hbase.master.filesystem.hlogsplittime_99th_percentile";
+			metricObj["HlogSplitSizeMin"] = "hadoop.hbase.master.filesystem.hlogsplitsize_min";
+			metricObj["HlogSplitSizeMax"] = "hadoop.hbase.master.filesystem.hlogsplitsize_max";
+			metricObj["MetaHlogSplitTimeMin"] = "hadoop.hbase.master.filesystem.metahlogsplittime_min";
+			metricObj["MetaHlogSplitTimeMax"] = "hadoop.hbase.master.filesystem.metahlogsplittime_max";
+			metricObj["MetaHlogSplitTimePercentile75th"] = "hadoop.hbase.master.filesystem.metahlogsplittime_75th_percentile";
+			metricObj["MetaHlogSplitTimePercentile95th"] = "hadoop.hbase.master.filesystem.metahlogsplittime_95th_percentile";
+			metricObj["MetaHlogSplitTimePercentile99th"] = "hadoop.hbase.master.filesystem.metahlogsplittime_99th_percentile";
+			metricObj["MetaHlogSplitSizeMin"] = "hadoop.hbase.master.filesystem.metahlogsplitsize_min";
+			metricObj["MetaHlogSplitSizeMax"] = "hadoop.hbase.master.filesystem.metahlogsplitsize_max";
 
 			PageConfig.title = 'Overview';
 			var storageOption = {
@@ -88,7 +89,7 @@
 			};
 			$scope.metricList = {};
 
-			function generateHbaseMetric(name, param) {
+			function generateHbaseMetric(name, flag) {
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
 				var interval = Time.diffInterval(startTime, endTime);
@@ -98,8 +99,8 @@
 
 				$scope.site = $wrapState.param.siteId;
 
-				var metrics = cache[name] = cache[name] || $q.all([activeMasterInfo._promise]).then(function (res) {
-						var hostname = cache[hostname] = cache[hostname] || res[0][0].tags.hostname;
+				return cache[name] = cache[name] || activeMasterInfo._promise.then(function (res) {
+						var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
 						$scope.defaultHostname = $wrapState.param.hostname || hostname;
 
 						var jobCond = {
@@ -107,16 +108,14 @@
 							component: "hbasemaster",
 							host: $scope.defaultHostname
 						};
-						return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), param)
+						return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
 							._promise.then(function (list) {
 								var metricFlag = $.map(list, function (metrics) {
 									return metrics[0].flag;
 								});
 								return [metricFlag, list];
 							});
-
 					});
-				return metrics;
 			}
 
 			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
@@ -125,8 +124,6 @@
 				$.each(metrics, function (i, metricMap) {
 					series.push(METRIC.metricsToSeries(legendName[i], metricMap[0], option));
 				});
-
-
 				return {
 					title: metricTitle,
 					series: series,
@@ -141,42 +138,38 @@
 			$scope.refresh = function () {
 				var hbaseservers = METRIC.hbasehostStatus({site: $scope.site});
 				var metricspromies = [];
-				var summaryPromises = [];
-				for (var i = 0; i < metricMap.keys().length; i += 1) {
-					var key = [];
-					key = metricMap.keys()[i];
-					var value = metricMap.get(key);
-					metricspromies.push(generateHbaseMetric(value, key));
+
+				for (var metricKey in metricObj) {
+					metricspromies.push(generateHbaseMetric(metricObj[metricKey], metricKey));
 				}
-				summaryPromises.push(hbaseservers._promise);
 				$q.all(metricspromies).then(function (res) {
 					$.each(res, function (i, metrics) {
-						mapRes.put(metrics[0], metrics[1]);
+						seriesObj[metrics[0]] = metrics[1];
 					});
 					$scope.metricList = [
-						mergeMetricToOneSeries("MemoryUsage", [mapRes.get("nonheap"), mapRes.get("heap")], ["nonheap", "heap"], storageOption),
-						mergeMetricToOneSeries("Master Averageload", [mapRes.get("averageload")], ["averageload"]),
-						mergeMetricToOneSeries("Ritcount", [mapRes.get("ritcount"), mapRes.get("ritcountoverthreshold")], ["ritcount", "ritcountoverthreshold"]),
-						mergeMetricToOneSeries("Assign", [mapRes.get("AssignNumOps"), mapRes.get("AssignMin"), mapRes.get("AssignMax")], ["numOps", "Min", "Max"]),
-						mergeMetricToOneSeries("Assign Percentile", [mapRes.get("AssignPercentile75th"), mapRes.get("AssignPercentile95th"), mapRes.get("AssignPercentile99th")], ["75th", "95th", "99th"]),
-						mergeMetricToOneSeries("BulkAssign", [mapRes.get("BulkAssignNum_ops"), mapRes.get("BulkAssignMin"), mapRes.get("BulkAssignMax")], ["num_ops", "min", "max"]),
-						mergeMetricToOneSeries("BulkAssign Percentile", [mapRes.get("BulkAssignPercentile75th"), mapRes.get("BulkAssignPercentile95th"), mapRes.get("BulkAssignPercentile99th")], ["75th", "95th", "99th"]),
-						mergeMetricToOneSeries("BalancerCluster", [mapRes.get("BalancerClusterNum_ops"), mapRes.get("BalancerClusterMin"), mapRes.get("BalancerClusterMax")], ["num_ops", "min", "max"]),
-						mergeMetricToOneSeries("BalancerCluster Percentile", [mapRes.get("BalancerClusterPercentile75th"), mapRes.get("BalancerClusterPercentile95th"), mapRes.get("BalancerClusterPercentile99th")], ["75th", "95th", "99th"]),
-						mergeMetricToOneSeries("HlogSplitTime", [mapRes.get("HlogSplitTimeMin"), mapRes.get("HlogSplitTimeMax")], ["HlogSplitTime_min", "HlogSplitTime_max"]),
-						mergeMetricToOneSeries("HlogSplitTime Percentile", [mapRes.get("HlogSplitTimePercentile75th"), mapRes.get("HlogSplitTimePercentile95th"), mapRes.get("HlogSplitTimePercentile99th")], ["75th", "95th", "99th"]),
-						mergeMetricToOneSeries("HlogSplitSize", [mapRes.get("HlogSplitSizeMin"), mapRes.get("HlogSplitSizeMax")], ["Min", "Max"]),
-						mergeMetricToOneSeries("MetaHlogSplitTime", [mapRes.get("MetaHlogSplitTimeMin"), mapRes.get("MetaHlogSplitTimeMax")], ["Min", "Max"]),
-						mergeMetricToOneSeries("MetaHlogSplitTime Percentile", [mapRes.get("MetaHlogSplitTimePercentile75th"), mapRes.get("MetaHlogSplitTimePercentile95th"), mapRes.get("MetaHlogSplitTimePercentile99th")], ["75th", "95th", "99th"]),
-						mergeMetricToOneSeries("MetaHlogSplitSize", [mapRes.get("MetaHlogSplitSizeMin"), mapRes.get("MetaHlogSplitSizeMax")], ["Min", "Max"])
+						mergeMetricToOneSeries("MemoryUsage", [seriesObj["nonheap"], seriesObj["heap"]], ["nonheap", "heap"], storageOption, {areaStyle: {normal: {}}}),
+						mergeMetricToOneSeries("Master Averageload", [seriesObj["averageload"]], ["averageload"]),
+						mergeMetricToOneSeries("Ritcount", [seriesObj["ritcount"], seriesObj["ritcountoverthreshold"]], ["ritcount", "ritcountoverthreshold"]),
+						mergeMetricToOneSeries("Assign", [seriesObj["AssignNumOps"], seriesObj["AssignMin"], seriesObj["AssignMax"]], ["numOps", "Min", "Max"]),
+						mergeMetricToOneSeries("Assign Percentile", [seriesObj["AssignPercentile75th"], seriesObj["AssignPercentile95th"], seriesObj["AssignPercentile99th"]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("BulkAssign", [seriesObj["BulkAssignNum_ops"], seriesObj["BulkAssignMin"], seriesObj["BulkAssignMax"]], ["num_ops", "min", "max"]),
+						mergeMetricToOneSeries("BulkAssign Percentile", [seriesObj["BulkAssignPercentile75th"], seriesObj["BulkAssignPercentile95th"], seriesObj["BulkAssignPercentile99th"]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("BalancerCluster", [seriesObj["BalancerClusterNum_ops"], seriesObj["BalancerClusterMin"], seriesObj["BalancerClusterMax"]], ["num_ops", "min", "max"]),
+						mergeMetricToOneSeries("BalancerCluster Percentile", [seriesObj["BalancerClusterPercentile75th"], seriesObj["BalancerClusterPercentile95th"], seriesObj["BalancerClusterPercentile99th"]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("HlogSplitTime", [seriesObj["HlogSplitTimeMin"], seriesObj["HlogSplitTimeMax"]], ["HlogSplitTime_min", "HlogSplitTime_max"]),
+						mergeMetricToOneSeries("HlogSplitTime Percentile", [seriesObj["HlogSplitTimePercentile75th"], seriesObj["HlogSplitTimePercentile95th"], seriesObj["HlogSplitTimePercentile99th"]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("HlogSplitSize", [seriesObj["HlogSplitSizeMin"], seriesObj["HlogSplitSizeMax"]], ["Min", "Max"]),
+						mergeMetricToOneSeries("MetaHlogSplitTime", [seriesObj["MetaHlogSplitTimeMin"], seriesObj["MetaHlogSplitTimeMax"]], ["Min", "Max"]),
+						mergeMetricToOneSeries("MetaHlogSplitTime Percentile", [seriesObj["MetaHlogSplitTimePercentile75th"], seriesObj["MetaHlogSplitTimePercentile95th"], seriesObj["MetaHlogSplitTimePercentile99th"]], ["75th", "95th", "99th"]),
+						mergeMetricToOneSeries("MetaHlogSplitSize", [seriesObj["MetaHlogSplitSizeMin"], seriesObj["MetaHlogSplitSizeMax"]], ["Min", "Max"])
 					];
 				});
-				$q.all(summaryPromises).then(function (res) {
+				hbaseservers._promise.then(function (res) {
 					var regionhealtynum = 0;
 					var regiontotal = 0;
 					var hmasteractive;
 					var hmasterstandby;
-					$.each(res[0], function (i, server) {
+					$.each(res, function (i, server) {
 						var role = server.tags.role;
 						var status = server.status;
 						if (role === "regionserver") {
@@ -204,7 +197,6 @@
 
 			Time.onReload(function () {
 				cache = {};
-				mapRes.clear();
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();
