@@ -30,7 +30,7 @@ class SystemMetricCollector(MetricCollector):
             self.collect_uptime_metric,
             self.collect_memory_metric,
             self.collect_loadavg_metric,
-            self.collect_ipmi_cpu_temp,
+            self.collect_cpu_temp_metric,
             self.collect_nic_metric,
             self.collect_smartdisk_metric,
             self.collect_diskstat_metric
@@ -185,7 +185,7 @@ class SystemMetricCollector(MetricCollector):
     # IPMI CPU Temp
     # ====================================
 
-    def collect_ipmi_cpu_temp(self):
+    def collect_cpu_temp_metric(self):
         output = os.popen('sudo ipmitool sdr | grep Temp | grep CPU').readlines()
         for item in output:
             items = re.split("^(CPU\d+)\sTemp\.\s+\|\s+(\d+|\d+\.\d+)\s", item.rstrip())
