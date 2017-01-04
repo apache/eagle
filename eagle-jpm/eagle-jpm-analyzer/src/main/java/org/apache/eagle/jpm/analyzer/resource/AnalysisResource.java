@@ -30,11 +30,10 @@ import java.util.List;
 
 @Path("/job/analyzer")
 public class AnalysisResource {
-    private MetaManagementService metaManagementService;
-
     @Inject
-    public AnalysisResource(MetaManagementService metaManagementService) {
-        this.metaManagementService = metaManagementService;
+    MetaManagementService metaManagementService;
+
+    public AnalysisResource() {
     }
 
     @POST

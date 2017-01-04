@@ -21,7 +21,9 @@ import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EmailPublisher implements Publisher {
+import java.io.Serializable;
+
+public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
 
     private Config config;

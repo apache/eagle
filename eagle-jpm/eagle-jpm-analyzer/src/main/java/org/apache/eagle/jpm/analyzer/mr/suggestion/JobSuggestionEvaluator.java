@@ -24,7 +24,9 @@ import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JobSuggestionEvaluator implements Evaluator<MRJobAnalysisEntity> {
+import java.io.Serializable;
+
+public class JobSuggestionEvaluator implements Evaluator<MRJobAnalysisEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionEvaluator.class);
 
     private Config config;

@@ -24,7 +24,9 @@ import org.apache.eagle.jpm.analyzer.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UnExpectedLongDurationJobProcessor implements Processor<MRJobAnalysisEntity> {
+import java.io.Serializable;
+
+public class UnExpectedLongDurationJobProcessor implements Processor<MRJobAnalysisEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(UnExpectedLongDurationJobProcessor.class);
 
     private Config config;
@@ -35,6 +37,8 @@ public class UnExpectedLongDurationJobProcessor implements Processor<MRJobAnalys
 
     @Override
     public Result.ProcessorResult process(MRJobAnalysisEntity mrJobAnalysisEntity) {
+        LOG.info("Job {} In UnExpectedLongDurationJobProcessor", mrJobAnalysisEntity.getJobDefId());
+
         return new Result.ProcessorResult(Result.ResultLevel.NOTICE, "");
     }
 }

@@ -25,9 +25,10 @@ import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class MetaManagementServiceMemoryImpl implements MetaManagementService {
+public class MetaManagementServiceMemoryImpl implements MetaManagementService, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MetaManagementServiceMemoryImpl.class);
 
     private final Map<String, JobMetaEntity> jobMetaEntities = new HashMap<>();
@@ -118,7 +119,7 @@ public class MetaManagementServiceMemoryImpl implements MetaManagementService {
     public List<PublisherEntity> getPublisherMeta(String userId) {
         if (!publisherEntities.containsKey(userId)) {
             LOG.warn("does not contain user {}, failed to get publisher", userId);
-            return null;
+            return new ArrayList<>();
         }
 
         return publisherEntities.get(userId);

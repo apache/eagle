@@ -21,7 +21,9 @@ import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EagleStorePublisher implements Publisher {
+import java.io.Serializable;
+
+public class EagleStorePublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EagleStorePublisher.class);
 
     private Config config;

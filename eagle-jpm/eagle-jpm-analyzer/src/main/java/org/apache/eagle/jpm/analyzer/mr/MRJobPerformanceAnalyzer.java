@@ -17,11 +17,9 @@
 
 package org.apache.eagle.jpm.analyzer.mr;
 
-import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.*;
 import org.apache.eagle.jpm.analyzer.Evaluator;
-import org.apache.eagle.jpm.analyzer.mr.meta.MetaManagementService;
 import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
 import org.apache.eagle.jpm.analyzer.mr.suggestion.JobSuggestionEvaluator;
@@ -29,22 +27,42 @@ import org.apache.eagle.jpm.analyzer.publisher.EagleStorePublisher;
 import org.apache.eagle.jpm.analyzer.publisher.EmailPublisher;
 import org.apache.eagle.jpm.analyzer.publisher.Publisher;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.Utils;
+import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.metadata.resource.RESTResponse;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MRJobPerformanceAnalyzer implements JobAnalyzer<MRJobAnalysisEntity> {
+public class MRJobPerformanceAnalyzer implements JobAnalyzer<MRJobAnalysisEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobPerformanceAnalyzer.class);
+
+    private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
+
+    private static final String HOST_PATH = "service.host";
+    private static final String PORT_PATH = "service.port";
+    private static final String CONTEXT_PATH = "service.context";
+    private static final String META_PATH = "/job/analyzer/meta";
 
     private List<Evaluator> evaluators = new ArrayList<>();
     private List<Publisher> publishers = new ArrayList<>();
 
-    @Inject
-    private MetaManagementService metaManagementService;
+    private Config config;
 
-    public MRJobPerformanceAnalyzer(Config config) throws Exception {
+    static {
+        OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    }
+
+    public MRJobPerformanceAnalyzer(Config config) {
+        this.config = config;
         evaluators.add(new SLAJobEvaluator(config));
         evaluators.add(new JobSuggestionEvaluator(config));
 
@@ -56,17 +74,41 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer<MRJobAnalysisEntity
     public void analysis(MRJobAnalysisEntity mrJobAnalysisEntity) throws Exception {
         Result result = new Result();
 
-        JobMetaEntity jobMetaEntity = metaManagementService.getJobMeta(mrJobAnalysisEntity.getJobDefId()).get(0);
+        List<JobMetaEntity> jobMetaEntities = getJobMeta(mrJobAnalysisEntity.getJobDefId());
         for (Evaluator evaluator : evaluators) {
-            if (!jobMetaEntity.getEvaluators().contains(evaluator.getClass().getSimpleName())) {
+            if (jobMetaEntities.size() > 0 && !jobMetaEntities.get(0).getEvaluators().contains(evaluator.getClass().getSimpleName())) {
                 LOG.info("skip evaluator " + evaluator.getClass().getSimpleName());
-                continue;
+                //continue;
             }
             result.addEvaluatorResult(evaluator.getClass(), evaluator.evaluate(mrJobAnalysisEntity));
         }
 
         for (Publisher publisher : publishers) {
             publisher.publish(result);
+        }
+    }
+
+    private List<JobMetaEntity> getJobMeta(String jobDefId) {
+        List<JobMetaEntity> result = new ArrayList<>();
+        String url = "http://"
+                + config.getString(HOST_PATH)
+                + ":"
+                + config.getInt(PORT_PATH)
+                + config.getString(CONTEXT_PATH)
+                + META_PATH
+                + "/"
+                + URLEncoder.encode(jobDefId);
+
+        InputStream is = null;
+        try {
+            is = InputStreamUtils.getInputStream(url, null, Constants.CompressionType.NONE);
+            LOG.info("get job meta from {}", url);
+            result = (List<JobMetaEntity>)OBJ_MAPPER.readValue(is, RESTResponse.class).getData();
+        } catch (Exception e) {
+            LOG.warn("failed to get job meta from {}", url, e);
+        } finally {
+            Utils.closeInputStream(is);
+            return result;
         }
     }
 }

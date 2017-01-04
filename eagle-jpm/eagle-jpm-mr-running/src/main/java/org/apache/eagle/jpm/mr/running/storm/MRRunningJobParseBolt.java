@@ -19,6 +19,7 @@
 package org.apache.eagle.jpm.mr.running.storm;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
@@ -51,18 +52,21 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     private ResourceFetcher resourceFetcher;
     private List<String> configKeys;
     private Config config;
+    private MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer;
 
     public MRRunningJobParseBolt(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                                  MRRunningJobConfig.EndpointConfig endpointConfig,
                                  MRRunningJobConfig.ZKStateConfig zkStateConfig,
                                  List<String> configKeys,
-                                 Config config) {
+                                 Config config,
+                                 MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer) {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
         this.runningMRParsers = new HashMap<>();
         this.zkStateConfig = zkStateConfig;
         this.configKeys = configKeys;
         this.config = config;
+        this.mrJobPerformanceAnalyzer = mrJobPerformanceAnalyzer;
     }
 
     @Override
@@ -83,7 +87,8 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
             applicationParser = new MRJobParser(endpointConfig, eagleServiceConfig,
-                    appInfo, mrJobs, runningJobManager, this.resourceFetcher, configKeys, this.config);
+                    appInfo, mrJobs, runningJobManager, this.resourceFetcher, configKeys, this.config,
+                    mrJobPerformanceAnalyzer);
             runningMRParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {

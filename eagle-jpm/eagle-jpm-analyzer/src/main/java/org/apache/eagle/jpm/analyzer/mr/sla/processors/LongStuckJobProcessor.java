@@ -24,7 +24,9 @@ import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LongStuckJobProcessor implements Processor<MRJobAnalysisEntity> {
+import java.io.Serializable;
+
+public class LongStuckJobProcessor implements Processor<MRJobAnalysisEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(LongStuckJobProcessor.class);
 
     private Config config;
@@ -35,6 +37,7 @@ public class LongStuckJobProcessor implements Processor<MRJobAnalysisEntity> {
 
     @Override
     public Result.ProcessorResult process(MRJobAnalysisEntity mrJobAnalysisEntity) {
+        LOG.info("Job {} In LongStuckJobProcessor", mrJobAnalysisEntity.getJobDefId());
         return new Result.ProcessorResult(Result.ResultLevel.NOTICE, "");
     }
 }

@@ -25,9 +25,10 @@ import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MetaManagementServiceJDBCImpl implements MetaManagementService {
+public class MetaManagementServiceJDBCImpl implements MetaManagementService, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MetaManagementServiceJDBCImpl.class);
 
     @Inject

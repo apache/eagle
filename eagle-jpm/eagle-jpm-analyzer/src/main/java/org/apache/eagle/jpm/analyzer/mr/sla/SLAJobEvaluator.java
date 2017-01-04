@@ -27,10 +27,11 @@ import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SLAJobEvaluator implements Evaluator<MRJobAnalysisEntity> {
+public class SLAJobEvaluator implements Evaluator<MRJobAnalysisEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SLAJobEvaluator.class);
 
     private List<Processor> processors = new ArrayList<>();
