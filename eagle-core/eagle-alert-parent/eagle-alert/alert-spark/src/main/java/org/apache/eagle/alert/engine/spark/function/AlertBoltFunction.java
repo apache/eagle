@@ -126,7 +126,7 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
         LOG.debug("getAdded {}", comparator.getAdded());
         LOG.debug("getRemoved {}", comparator.getRemoved());
         LOG.debug("getModified {}", comparator.getModified());
-        policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
+        policyGroupEvaluator.onPolicyChange(null, comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
 
         policyState.store(boltId, newPoliciesMap, policyGroupEvaluator.getPolicyDefinitionMap(), policyGroupEvaluator.getPolicyStreamHandlerMap());
 

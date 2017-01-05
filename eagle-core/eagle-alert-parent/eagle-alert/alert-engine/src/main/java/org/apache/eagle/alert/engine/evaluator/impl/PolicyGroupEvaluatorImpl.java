@@ -145,8 +145,8 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
 
     private static boolean isAcceptedByPolicy(PartitionedEvent event, PolicyDefinition policy) {
         return policy.getPartitionSpec().contains(event.getPartition())
-                && (policy.getInputStreams().contains(event.getEvent().getStreamId())
-                || policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()));
+            && (policy.getInputStreams().contains(event.getEvent().getStreamId())
+            || policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()));
     }
 
     @Override
