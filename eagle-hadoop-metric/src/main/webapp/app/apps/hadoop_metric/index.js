@@ -20,7 +20,7 @@
 	/**
 	 * `register` is global function that for application to set up 'controller', 'service', 'directive', 'route' in Eagle
 	 */
-	var hadoopMetricApp = register(['ngRoute', 'ngResource', 'ngAnimate', 'ui.router', 'eagle.service']);
+	var hadoopMetricApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
 	hadoopMetricApp.route("HadoopMetric", {
 		url: "/hadoopMetric?startTime&endTime",
@@ -298,4 +298,3 @@
 	hadoopMetricApp.require("ctrls/regionDetailCtrl.js");
 	hadoopMetricApp.require("ctrls/regionListCtrl.js");
 })();
-//# sourceURL=index.js
