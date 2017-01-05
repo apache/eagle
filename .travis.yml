@@ -15,7 +15,7 @@
 
 env:
   global:
-  - GH_REF: github.com/1haodian/incubator-eagle.git
+  - GH_REF: github.com/1haodian/eagle.git
 node_js:
   - "4"
 install:
@@ -39,7 +39,7 @@ notifications:
 deploy:
   provider: releases
   api_key: "${DLG_TOKEN}"
-  file: "eagle-server-assembly/target/eagle-0.5.0-incubating-SNAPSHOT-bin.tar.gz"
+  file: "eagle-server-assembly/target/eagle-0.5.0-SNAPSHOT-bin.tar.gz"
   skip_cleanup: true
   overwrite: true
   on:
