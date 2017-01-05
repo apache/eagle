@@ -25,6 +25,13 @@ class SystemMetricCollector(MetricCollector):
     METRIC_NAME_EXCLUDE = re.compile(r"[\(|\)]")
 
     def run(self):
+        if self.config["env"].has_key("cpu_stat_file"):
+            self.cpu_stat_file = self.config["env"]["cpu_stat_file"]
+            logging.info("Overrode env.cpu_stat_file: %s", self.cpu_stat_file)
+        else:
+            self.cpu_stat_file = "/tmp/eagle_cpu_usage_state"
+            logging.info("Using default env.cpu_stat_file: %s", self.cpu_stat_file)
+
         self.try_exec_func(
             self.collect_cpu_metric,
             self.collect_uptime_metric,
@@ -37,28 +44,57 @@ class SystemMetricCollector(MetricCollector):
         )
 
     def try_exec_func(self, *funcs):
+        result = dict()
+        succeed_num = 0
+        failed_num = 0
         for func in funcs:
             try:
                 logging.info("Executing: %s", func.__name__)
                 func()
+                result[func.__name__] = "success"
+                succeed_num = succeed_num + 1
             except Exception as e:
                 logging.warn("Failed to execute: %s", func.__name__)
                 logging.exception(e)
+                result[func.__name__] = "error: %s: %s" % (type(e), e)
+                failed_num = failed_num + 1
+        result_desc = ""
+        for key in result:
+            result_desc = result_desc + "%-30s: %-30s\n" % (key, result[key])
+        logging.info("Execution result (total: %s, succeed: %s, failed: %s): \n\n%s", len(funcs), succeed_num,
+                     failed_num, result_desc)
 
     # ====================================
     # CPU Usage
     # ====================================
 
     def collect_cpu_metric(self):
+        """
+        CPU Usage Percentage Metrics:
+
+        system.cpu.usage: (user + nice + system + wait + irq + softirq + steal + guest) / (user + nice + system + idle + wait + irq + softirq + steal + guest)
+
+            Example:
+
+                {'timestamp': 1483594861458, 'metric': 'system.cpu.usage', 'site': u'sandbox', 'value': 0.048, 'host': 'localhost', 'device': 'cpuN'}
+
+        system.cpu.totalusage: Sum(Each CPU Usage) / Sum (CPU Total)
+
+            Example:
+
+                {'timestamp': 1483594861484, 'metric': 'system.cpu.totalusage', 'site': u'sandbox', 'value': 0.17, 'host': 'sandbox.hortonworks.com', 'device': 'cpu'}
+
+        """
+
         cpu_metric = self.new_metric()
         cpu_info = os.popen('cat /proc/stat').readlines()
-        demension = ["cpu", "user", "nice", "system", "idle", "wait", "irq", "softirq", "steal", "guest"]
+        dimensions = ["cpu", "user", "nice", "system", "idle", "wait", "irq", "softirq", "steal", "guest"]
 
         total_cpu = 0
         total_cpu_usage = 0
         cpu_stat_pre = None
 
-        data_dir = "/tmp/eagle_cpu_stat_previous"
+        data_dir = self.cpu_stat_file
         if os.path.exists(data_dir):
             fd = open(data_dir, "r")
             cpu_stat_pre = fd.read()
@@ -69,29 +105,28 @@ class SystemMetricCollector(MetricCollector):
                 continue
 
             items = re.split("\s+", item.strip())
-            demens = min(len(demension), len(items))
-            tuple = dict()
+            demens = min(len(dimensions), len(items))
+            metric_event = dict()
             for i in range(1, demens):
-                tuple[demension[i]] = int(items[i])
+                metric_event[dimensions[i]] = int(items[i])
                 cpu_metric['timestamp'] = int(round(time.time() * 1000))
-                cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + demension[i]
+                cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + dimensions[i]
                 cpu_metric['device'] = items[0]
                 cpu_metric['value'] = items[i]
                 self.collect(cpu_metric)
 
-            per_cpu_usage = tuple["user"] + tuple["nice"] + tuple["system"] + tuple["wait"] + tuple["irq"] + tuple[
-                "softirq"] + tuple["steal"] + tuple["guest"]
-            per_cpu_total = tuple["user"] + tuple["nice"] + tuple["system"] + tuple["idle"] + tuple["wait"] + tuple[
-                "irq"] + \
-                            tuple["softirq"] + tuple["steal"] + tuple["guest"]
+            per_cpu_usage = metric_event["user"] + metric_event["nice"] + metric_event["system"] + metric_event[
+                "wait"] + metric_event["irq"] + metric_event["softirq"] + metric_event["steal"] + metric_event["guest"]
+            per_cpu_total = metric_event["user"] + metric_event["nice"] + metric_event["system"] + metric_event[
+                "idle"] + metric_event["wait"] + metric_event["irq"] + metric_event["softirq"] + metric_event["steal"] + metric_event["guest"]
             total_cpu += per_cpu_total
             total_cpu_usage += per_cpu_usage
 
             # system.cpu.usage
             cpu_metric['timestamp'] = int(round(time.time() * 1000))
-            cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + "perusage"
+            cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + "usage"
             cpu_metric['device'] = items[0]
-            cpu_metric['value'] = str(round(per_cpu_usage * 100.0 / per_cpu_total, 2))
+            cpu_metric['value'] = per_cpu_usage * 1.0 /per_cpu_total
             self.collect(cpu_metric)
 
         cup_stat_current = str(total_cpu_usage) + " " + str(total_cpu)
@@ -109,8 +144,7 @@ class SystemMetricCollector(MetricCollector):
         cpu_metric['timestamp'] = int(round(time.time() * 1000))
         cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + "totalusage"
         cpu_metric['device'] = "cpu"
-        cpu_metric['value'] = str(
-            round((total_cpu_usage - pre_total_cpu_usage) * 100.0 / (total_cpu - pre_total_cpu), 2))
+        cpu_metric['value'] = (total_cpu_usage - pre_total_cpu_usage) * 1.0 / (total_cpu - pre_total_cpu)
 
         self.collect(cpu_metric)
 
@@ -158,7 +192,7 @@ class SystemMetricCollector(MetricCollector):
                 mem_info[
                     'MemTotal']
         usage = round(usage, 2)
-        self.emit_metric(event,self.METRIC_PREFIX,"memory.usage", usage, "memory")
+        self.emit_metric(event, self.METRIC_PREFIX, "memory.usage", usage, "memory")
 
     # ====================================
     # Load AVG
@@ -201,7 +235,8 @@ class SystemMetricCollector(MetricCollector):
     # ====================================
 
     def collect_nic_metric(self):
-        demension = ['receivedbytes', 'receivedpackets', 'receivederrs', 'receiveddrop', 'transmitbytes', 'transmitpackets',
+        demension = ['receivedbytes', 'receivedpackets', 'receivederrs', 'receiveddrop', 'transmitbytes',
+                     'transmitpackets',
                      'transmiterrs', 'transmitdrop']
         output = os.popen("cat /proc/net/dev").readlines()
 
@@ -295,6 +330,7 @@ class SystemMetricCollector(MetricCollector):
         metric = dict()
         metric["host"] = self.fqdn
         return metric
+
 
 if __name__ == '__main__':
     Runner.run(SystemMetricCollector())
