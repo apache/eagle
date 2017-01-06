@@ -106,7 +106,7 @@ public class MRJobEntityCreationHandler {
                 entities.clear();
 
             } catch (Exception e) {
-                LOG.warn("exception found when flush entities, {}", e);
+                LOG.warn("exception found when flush entities", e);
                 if (!success && count < MAX_RETRY_COUNT) {
                     LOG.info("Sleep for a while before retrying");
                     Thread.sleep(10 * 1000);
