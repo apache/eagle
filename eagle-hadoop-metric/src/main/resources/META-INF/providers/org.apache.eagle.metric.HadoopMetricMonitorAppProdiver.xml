@@ -20,6 +20,12 @@
     <type>HADOOP_METRIC_MONITOR</type>
     <name>Hadoop Metrics Monitor</name>
     <viewPath>/apps/hadoop_metric</viewPath>
+    <dependencies>
+        <dependency>
+            <type>TOPOLOGY_HEALTH_CHECK_APP</type>
+            <required>true</required>
+        </dependency>
+    </dependencies>
     <configuration>
         <!-- data fromStream configurations -->
         <property>
@@ -83,6 +89,16 @@
             <displayName>Kafka Transaction Status Update MS</displayName>
             <description>Kafka Transaction Status Update MS</description>
             <required>false</required>
+        </property>
+        <property>
+            <name>service.host</name>
+            <displayName>Eagle Service Host</displayName>
+            <description>Set additional eagle service host, default: using current host</description>
+        </property>
+        <property>
+            <name>service.port</name>
+            <displayName>Eagle Service Port</displayName>
+            <description>Set additional eagle service port, default: using current port</description>
         </property>
     </configuration>
     <streams>

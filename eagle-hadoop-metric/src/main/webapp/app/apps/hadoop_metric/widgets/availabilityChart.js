@@ -97,7 +97,7 @@
 				$element.append(
 					$("<div hadoop-metric-widget data-type='" + serviceType + "'>")
 				);
-			}
+			};
 		}
 
 		hadoopMetricApp.widget("availabilityHDFSChart", withType('HDFS'), true);
