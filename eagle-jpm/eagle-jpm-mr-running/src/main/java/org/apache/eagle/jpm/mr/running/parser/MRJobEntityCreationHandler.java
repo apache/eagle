@@ -77,7 +77,8 @@ public class MRJobEntityCreationHandler {
             eagleServiceConfig.eagleServicePort,
             eagleServiceConfig.username,
             eagleServiceConfig.password);
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        //client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         try {
             return createEntities(client);
         } catch (Exception e) {

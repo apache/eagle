@@ -63,7 +63,8 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
             eagleServiceConfig.username,
             eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        //client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         List<JobConfigurationAPIEntity> list = new ArrayList<>();
         list.add(jobConfigurationEntity);
 

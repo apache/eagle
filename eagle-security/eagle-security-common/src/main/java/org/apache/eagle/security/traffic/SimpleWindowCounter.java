@@ -23,17 +23,19 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * non-thread safe
+ */
 public class SimpleWindowCounter implements Serializable {
 
     private int windowSize;
-
     private Map<Long, Long> counter;
     private Queue<Long> timeQueue;
 
     public SimpleWindowCounter(int size) {
         this.windowSize = size;
         counter = new ConcurrentHashMap<>(windowSize);
-        timeQueue = new PriorityQueue<>();
+        timeQueue = new PriorityQueue<>(windowSize, (a,b) -> a.compareTo(b));
     }
 
     public boolean insert(long timestamp, long countVal) {
@@ -63,7 +65,7 @@ public class SimpleWindowCounter implements Serializable {
         return counter.isEmpty();
     }
 
-    public synchronized Tuple2<Long, Long> poll() {
+    public Tuple2<Long, Long> poll() {
         long oldestTimestamp = timeQueue.poll();
         Tuple2<Long, Long> pair = new Tuple2<>(oldestTimestamp, counter.get(oldestTimestamp));
         counter.remove(oldestTimestamp);
@@ -72,6 +74,10 @@ public class SimpleWindowCounter implements Serializable {
 
     public long peek() {
         return timeQueue.peek();
+    }
+
+    public Queue<Long> getTimeQueue() {
+        return timeQueue;
     }
 
 }

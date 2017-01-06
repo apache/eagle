@@ -47,6 +47,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
     public final static String IPZONE_JOIN_TASK_NUM = "topology.numOfIPZoneJoinTasks";
     public final static String SINK_TASK_NUM = "topology.numOfSinkTasks";
     public final static String TRAFFIC_MONITOR_ENABLED = "dataSinkConfig.trafficMonitorEnabled";
+    private final static String TRAFFIC_MONITOR_TASK_NUM = "topology.numOfTrafficMonitorTasks";
 
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
@@ -59,6 +60,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         int numOfSensitivityJoinTasks = config.getInt(SENSITIVITY_JOIN_TASK_NUM);
         int numOfIPZoneJoinTasks = config.getInt(IPZONE_JOIN_TASK_NUM);
         int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
+        int numOfTrafficMonitorTasks = config.hasPath(TRAFFIC_MONITOR_TASK_NUM) ? config.getInt(TRAFFIC_MONITOR_TASK_NUM) : numOfParserTasks;
 
         builder.setSpout("ingest", spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
 
@@ -88,8 +90,8 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
 
         if (config.hasPath(TRAFFIC_MONITOR_ENABLED) && config.getBoolean(TRAFFIC_MONITOR_ENABLED)) {
             HadoopLogAccumulatorBolt auditLogAccumulator = new HadoopLogAccumulatorBolt(config);
-            BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfParserTasks);
-            auditLogAccumulatorDeclarer.setNumTasks(numOfParserTasks).shuffleGrouping("parserBolt");
+            BoltDeclarer auditLogAccumulatorDeclarer = builder.setBolt("logAccumulator", auditLogAccumulator, numOfTrafficMonitorTasks);
+            auditLogAccumulatorDeclarer.setNumTasks(numOfTrafficMonitorTasks).shuffleGrouping("parserBolt");
         }
 
         // ------------------------------
