@@ -304,6 +304,15 @@
 			return false;
 		};
 
+
+		$scope.checkPolicyName = function () {
+			if($scope.policy.name.length > 50) {
+				return "length should less than 50";
+			}
+			return false;
+		};
+
+
 		$scope.addPublisherConfirm = function () {
 			if($scope.addPublisherType === "exist") {
 				$scope.publisher = $.extend({
@@ -325,6 +334,7 @@
 			return (
 				!$scope.saveLock &&
 				$scope.policy.name &&
+				!$scope.checkPolicyName() &&
 				common.number.parse($scope.policy.parallelismHint) > 0 &&
 				$scope.policy.definition.value &&
 				$scope.policy.outputStreams.length &&
