@@ -74,6 +74,8 @@ public class MRMetricAggregator implements MetricAggregator, Serializable {
                 .endTime(endTime)
                 .pageSize(Integer.MAX_VALUE)
                 .send();
+
+            client.close();
         } catch (Exception e) {
             LOG.warn("{}", e);
             return false;
@@ -151,6 +153,7 @@ public class MRMetricAggregator implements MetricAggregator, Serializable {
             client.create(entities);
             LOG.info("finish flushing entities of total number " + entities.size());
             entities.clear();
+            client.close();
         } catch (Exception e) {
             LOG.warn("{}", e);
             return false;

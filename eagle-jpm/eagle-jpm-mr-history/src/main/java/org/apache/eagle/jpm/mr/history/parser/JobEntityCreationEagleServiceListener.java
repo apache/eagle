@@ -97,7 +97,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             eagleServiceConfig.username,
             eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         logger.info("start flushing entities of total number " + list.size());
         List<GenericMetricEntity> metricEntities = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
@@ -167,7 +167,6 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
 
         logger.info("finish flushing entities of total number " + list.size());
         list.clear();
-        client.getJerseyClient().destroy();
         client.close();
     }
 

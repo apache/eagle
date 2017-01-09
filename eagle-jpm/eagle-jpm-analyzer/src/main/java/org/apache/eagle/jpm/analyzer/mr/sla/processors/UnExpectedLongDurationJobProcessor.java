@@ -89,7 +89,7 @@ public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerJob
                 config.getString(Constants.USERNAME_PATH),
                 config.getString(Constants.PASSWORD_PATH));
 
-        client.getJerseyClient().setReadTimeout(config.getInt(Constants.READ_TIMEOUT_PATH) * 1000);
+        client.setReadTimeout(config.getInt(Constants.READ_TIMEOUT_PATH) * 1000);
 
         try {
             int timeLength = Constants.DEFAULT_EVALUATOR_TIME_LENGTH;
@@ -122,7 +122,6 @@ public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerJob
             LOG.warn("{}", e);
             return 0L;
         } finally {
-            client.getJerseyClient().destroy();
             try {
                 client.close();
             } catch (Exception e) {
