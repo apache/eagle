@@ -62,6 +62,12 @@
             <description>number of sink tasks</description>
         </property>
         <property>
+            <name>topology.numOfTrafficMonitorTasks</name>
+            <displayName>Topology Traffic Monitor Tasks</displayName>
+            <value>2</value>
+            <description>number of traffic monitor tasks</description>
+        </property>
+        <property>
             <name>topology.message.timeout.secs</name>
             <displayName>topology message timeout (secs)</displayName>
             <description>default timeout is 60s</description>
@@ -172,8 +178,8 @@
         <property>
             <name>dataSinkConfig.metricSinkBatchSize</name>
             <displayName>Batch Size for Flushing Traffic Metrics</displayName>
-            <value>1</value>
-            <description>batch size of flushing metrics </description>
+            <value>10</value>
+            <description>batch size of flushing metrics</description>
         </property>
 
         <!-- web app related configurations -->

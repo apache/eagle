@@ -402,7 +402,7 @@ public class MRJobParserTest {
         Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
         Assert.assertTrue(entities.isEmpty());
         verify(client, times(2)).create(any());
-        verify(client, times(2)).getJerseyClient();
+        verify(client, times(1)).getJerseyClient();
         verify(client, times(1)).close();
 
     }

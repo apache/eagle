@@ -77,7 +77,8 @@ public class MRJobEntityCreationHandler {
             eagleServiceConfig.eagleServicePort,
             eagleServiceConfig.username,
             eagleServiceConfig.password);
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        //client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         try {
             return createEntities(client);
         } catch (Exception e) {
@@ -105,7 +106,7 @@ public class MRJobEntityCreationHandler {
                 entities.clear();
 
             } catch (Exception e) {
-                LOG.warn("exception found when flush entities, {}", e);
+                LOG.warn("exception found when flush entities", e);
                 if (!success && count < MAX_RETRY_COUNT) {
                     LOG.info("Sleep for a while before retrying");
                     Thread.sleep(10 * 1000);

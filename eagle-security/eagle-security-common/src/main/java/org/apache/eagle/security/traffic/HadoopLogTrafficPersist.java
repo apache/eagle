@@ -28,20 +28,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HadoopLogTrafficPersist implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(HadoopLogTrafficPersist.class);
     private static final String SINK_BATCH_SIZE = "dataSinkConfig.metricSinkBatchSize";
-    private final Config config;
     private IEagleServiceClient client;
     private int batchSize;
-    private List<TaggedLogAPIEntity> entityBucket = new CopyOnWriteArrayList<>();
+    private List<TaggedLogAPIEntity> entityBucket = new ArrayList<>();
 
     public HadoopLogTrafficPersist(Config config) {
-        this.config = config;
         this.batchSize = config.hasPath(SINK_BATCH_SIZE) ? config.getInt(SINK_BATCH_SIZE) : 1;
+        this.client = new EagleServiceClientImpl(config);
     }
 
     public void emitMetric(GenericMetricEntity metricEntity) {
@@ -51,11 +51,9 @@ public class HadoopLogTrafficPersist implements Serializable {
         }
 
         try {
-            client = new EagleServiceClientImpl(config);
             GenericServiceAPIResponseEntity response = client.create(entityBucket);
             if (response.isSuccess()) {
-                LOG.info("persist {} entities with starttime={}", entityBucket.size(), entityBucket.get(0).getTimestamp());
-
+                LOG.info("persist {} entities with the earliest time={}", entityBucket.size(), entityBucket.get(0).getTimestamp());
             } else {
                 LOG.error("Service side error: {}", response.getException());
             }
@@ -63,14 +61,12 @@ public class HadoopLogTrafficPersist implements Serializable {
             LOG.error(e.getMessage(), e);
         } finally {
             entityBucket.clear();
-            close();
         }
     }
 
     public void close() {
         try {
             if (client != null) {
-                this.client.getJerseyClient().destroy();
                 this.client.close();
             }
         } catch (IOException e) {

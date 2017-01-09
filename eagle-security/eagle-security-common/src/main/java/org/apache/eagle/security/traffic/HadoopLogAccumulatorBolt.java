@@ -50,6 +50,7 @@ public class HadoopLogAccumulatorBolt extends BaseRichBolt {
     private int taskId;
     private String site;
     private String appId;
+    private Config config;
     private HadoopLogTrafficPersist client;
     private SimpleWindowCounter accumulator;
     private OutputCollector collector;
@@ -67,15 +68,15 @@ public class HadoopLogAccumulatorBolt extends BaseRichBolt {
         } else {
             this.windowSize = DEFAULT_WINDOW_SIZE;
         }
-        this.accumulator = new SimpleWindowCounter(windowSize);
-        this.client = new HadoopLogTrafficPersist(config);
-
+        this.config = config;
     }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.taskId = context.getThisTaskId();
         this.collector = collector;
+        this.client = new HadoopLogTrafficPersist(config);
+        this.accumulator = new SimpleWindowCounter(windowSize);
     }
 
     @Override
@@ -87,6 +88,9 @@ public class HadoopLogAccumulatorBolt extends BaseRichBolt {
             collector.ack(input);
             if (!isOrdered(timeInMin)) {
                 LOG.warn("data is out of order, the estimated throughput may be incorrect");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("time queue {} with event timestamp={}", accumulator.getTimeQueue().toString(), timeInMin);
+                }
                 return;
             }
             if (accumulator.isFull()) {
@@ -123,5 +127,10 @@ public class HadoopLogAccumulatorBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    }
+
+    @Override
+    public void cleanup() {
+        this.client.close();
     }
 }

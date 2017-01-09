@@ -50,7 +50,8 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
                 eagleServiceConfig.username,
                 eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        //client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        client.setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
 
         String message = "";
         try {

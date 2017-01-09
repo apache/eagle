@@ -35,6 +35,12 @@
             <value>5</value>
         </property>
         <property>
+            <name>topology.message.timeout.secs</name>
+            <displayName>topology message timeout (secs)</displayName>
+            <description>default timeout is 60s</description>
+            <value>60</value>
+        </property>
+        <property>
             <name>topology.numDataFetcherSpout</name>
             <displayName>Spout Task Number</displayName>
             <description>spout task number</description>
@@ -42,15 +48,15 @@
         </property>
         <property>
             <name>topology.numEntityPersistBolt</name>
-            <displayName>Storage Bolt Task Number</displayName>
-            <description>number of persist tasks to the storage</description>
+            <displayName>Data Storage Task Number</displayName>
+            <description>number of persist tasks writing to the storage</description>
             <value>1</value>
         </property>
         <property>
             <name>topology.numOfKafkaSinkBolt</name>
             <displayName>Kafka Sink Task Number</displayName>
             <value>2</value>
-            <description>number of sinks to alert engine</description>
+            <description>number of sinks connected to alert engine</description>
         </property>
 
         <property>
