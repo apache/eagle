@@ -28,6 +28,8 @@ public interface IEagleServiceClient extends IEagleServiceRequestBuilder, Closea
 
     Client getJerseyClient();
 
+    void setReadTimeout(int timeoutMs);
+
     IEagleServiceClient silence(boolean silence);
 
     /**

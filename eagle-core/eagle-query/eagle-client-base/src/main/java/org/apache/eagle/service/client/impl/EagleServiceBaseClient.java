@@ -122,6 +122,10 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
         return sb;
     }
 
+    public void setReadTimeout(int timeoutMs) {
+        client.setReadTimeout(timeoutMs);
+    }
+
     protected static String marshall(List<?> entities) throws JsonMappingException, JsonGenerationException, IOException {
         final JsonFactory factory = new JsonFactory();
         final ObjectMapper mapper = new ObjectMapper(factory);
@@ -132,7 +136,7 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
     protected <E extends TaggedLogAPIEntity> Map<String,List<E>> groupEntitiesByService(List<E> entities) throws EagleServiceClientException {
         Map<String,List<E>> serviceEntityMap = new HashMap<String, List<E>>();
         if(LOG.isDebugEnabled()) LOG.debug("Grouping entities by service name");
-        for(E entity: entities){
+        for(E entity: entities) {
             if(entity == null) {
                 LOG.warn("Skip null entity");
                 continue;
@@ -303,6 +307,7 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
             }
         }
         this.isStopped = true;
+        this.getJerseyClient().destroy();
     }
 
     @Override
