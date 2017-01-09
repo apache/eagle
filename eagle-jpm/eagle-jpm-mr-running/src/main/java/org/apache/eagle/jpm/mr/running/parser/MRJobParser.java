@@ -142,10 +142,9 @@ public class MRJobParser implements Runnable {
             if (fetchMRJobs()) {
                 break;
             } else if (i >= MAX_RETRY_TIMES - 1) {
-                //check whether the app has finished. if we test that we can connect rm, then we consider the jobs have finished
-                //if we get here either because of cannot connect rm or the jobs have finished
-                rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
-                mrJobEntityMap.keySet().forEach(this::finishMRJob);
+                if (app.getState().equals(Constants.AppState.FINISHED.toString())) {
+                    mrJobEntityMap.keySet().forEach(this::finishMRJob);
+                }
                 return;
             }
         }
@@ -166,9 +165,6 @@ public class MRJobParser implements Runnable {
                     }
                 }
                 if (i >= MAX_RETRY_TIMES) {
-                    //may caused by rm unreachable
-                    rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
-                    finishMRJob(jobId);
                     break;
                 }
             }
@@ -575,6 +571,7 @@ public class MRJobParser implements Runnable {
                     //delete from zk if needed
                     mrJobEntityMap.keySet()
                         .stream()
+                        .filter(jobId -> mrJobEntityMap.get(jobId).getInternalState() != null)
                         .filter(
                             jobId -> mrJobEntityMap.get(jobId).getInternalState().equals(Constants.AppState.FINISHED.toString())
                                 || mrJobEntityMap.get(jobId).getInternalState().equals(Constants.AppState.FAILED.toString()))

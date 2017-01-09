@@ -335,9 +335,9 @@ public class MRJobParserTest {
         Assert.assertTrue(jobIdToJobConfig.isEmpty());
         Assert.assertTrue(jobIdToJobExecutionAPIEntity.size() == 1);
         JobExecutionAPIEntity jobExecutionAPIEntity = jobIdToJobExecutionAPIEntity.get(JOB_ID);
-        Assert.assertEquals(Constants.AppState.FINISHED.toString(), jobExecutionAPIEntity.getInternalState());
+        Assert.assertEquals(Constants.AppState.RUNNING.toString(), jobExecutionAPIEntity.getInternalState());
         Assert.assertEquals(Constants.AppState.RUNNING.toString(), jobExecutionAPIEntity.getCurrentState());
-        Assert.assertTrue(mrJobParser.status() == MRJobParser.ParserStatus.APP_FINISHED);
+        Assert.assertTrue(mrJobParser.status() == MRJobParser.ParserStatus.FINISHED);
         Assert.assertTrue(curator.checkExists().forPath(ZK_JOB_PATH) == null);
         Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
         Assert.assertTrue(entities.isEmpty());
@@ -391,14 +391,14 @@ public class MRJobParserTest {
 
         mrJobParser.run();
 
-        Assert.assertTrue(jobIdToJobConfig.isEmpty());
+        Assert.assertTrue(!jobIdToJobConfig.isEmpty());
         Assert.assertTrue(jobIdToJobExecutionAPIEntity.size() == 1);
         JobExecutionAPIEntity jobExecutionAPIEntity = jobIdToJobExecutionAPIEntity.get(JOB_ID);
-        Assert.assertEquals(Constants.AppState.FINISHED.toString(), jobExecutionAPIEntity.getInternalState());
+        Assert.assertEquals(Constants.AppState.RUNNING.toString(), jobExecutionAPIEntity.getInternalState());
         Assert.assertEquals(Constants.AppState.RUNNING.toString(), jobExecutionAPIEntity.getCurrentState());
-        Assert.assertTrue(mrJobParser.status() == MRJobParser.ParserStatus.APP_FINISHED);
-        Assert.assertTrue(curator.checkExists().forPath(ZK_JOB_PATH) == null);
-        Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
+        Assert.assertTrue(mrJobParser.status() == MRJobParser.ParserStatus.FINISHED);
+        Assert.assertTrue(curator.checkExists().forPath(ZK_JOB_PATH) != null);
+        Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) != null);
         Assert.assertTrue(entities.isEmpty());
         verify(client, times(2)).create(any());
         verify(client, times(1)).getJerseyClient();
