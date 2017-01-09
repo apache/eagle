@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class LongStuckJobProcessor implements Processor<AnalyzerEntity>, Serializable {
+public class LongStuckJobProcessor implements Processor, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(LongStuckJobProcessor.class);
 
     private Config config;

@@ -18,9 +18,9 @@
 package org.apache.eagle.jpm.analyzer.resource;
 
 import com.google.inject.Inject;
-import org.apache.eagle.jpm.analyzer.mr.meta.MetaManagementService;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
+import org.apache.eagle.jpm.analyzer.meta.MetaManagementService;
+import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.PublisherEntity;
 import org.apache.eagle.metadata.resource.RESTResponse;
 
 import javax.ws.rs.*;

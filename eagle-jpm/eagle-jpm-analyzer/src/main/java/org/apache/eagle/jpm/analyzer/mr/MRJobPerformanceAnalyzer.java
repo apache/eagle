@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MRJobPerformanceAnalyzer implements JobAnalyzer<AnalyzerEntity>, Serializable {
+public class MRJobPerformanceAnalyzer implements JobAnalyzer, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobPerformanceAnalyzer.class);
 
     private List<Evaluator> evaluators = new ArrayList<>();

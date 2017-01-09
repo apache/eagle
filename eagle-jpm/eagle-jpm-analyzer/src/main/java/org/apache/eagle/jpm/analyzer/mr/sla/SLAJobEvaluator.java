@@ -20,7 +20,7 @@ package org.apache.eagle.jpm.analyzer.mr.sla;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Evaluator;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.processors.LongStuckJobProcessor;
 import org.apache.eagle.jpm.analyzer.mr.sla.processors.UnExpectedLongDurationJobProcessor;
 import org.apache.eagle.jpm.analyzer.Processor;
@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SLAJobEvaluator implements Evaluator<AnalyzerEntity>, Serializable {
+public class SLAJobEvaluator implements Evaluator, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SLAJobEvaluator.class);
 
     private List<Processor> processors = new ArrayList<>();

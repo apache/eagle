@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.analyzer.mr.meta;
+package org.apache.eagle.jpm.analyzer.meta;
 
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.PublisherEntity;
 
 import java.util.List;
 

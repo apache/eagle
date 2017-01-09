@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class JobSuggestionEvaluator implements Evaluator<AnalyzerEntity>, Serializable {
+public class JobSuggestionEvaluator implements Evaluator, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionEvaluator.class);
 
     private Config config;

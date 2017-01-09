@@ -19,7 +19,6 @@ package org.apache.eagle.jpm.analyzer.mr.sla.processors;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.util.Constants;
@@ -35,7 +34,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
-public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerEntity>, Serializable {
+public class UnExpectedLongDurationJobProcessor implements Processor, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(UnExpectedLongDurationJobProcessor.class);
 
     private Config config;

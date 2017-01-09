@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.analyzer.util;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import org.apache.eagle.metadata.resource.RESTResponse;
 import org.codehaus.jackson.JsonParser;
