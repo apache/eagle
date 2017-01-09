@@ -32,18 +32,18 @@ public class Result {
     private Map<String, List<Pair<ResultLevel, String>>> alertMessages = new HashMap<>();
 
     public void addEvaluatorResult(Class<?> type, EvaluatorResult result) {
-        String typeSimpleName = type.getSimpleName();
-        if (!alertMessages.containsKey(typeSimpleName)) {
-            alertMessages.put(typeSimpleName, new ArrayList<>());
-        }
-
         Map<Class<?>, ProcessorResult> processorResults = result.getProcessorResults();
         for (Class<?> processorType : processorResults.keySet()) {
             ProcessorResult processorResult = processorResults.get(processorType);
-            if (processorResult.resultLevel.equals(ResultLevel.NOTICE)) {
+            if (processorResult.resultLevel.equals(ResultLevel.NONE)) {
                 continue;
             }
-            alertMessages.get(typeSimpleName).add(Pair.of(processorResult.getResultLevel(), processorResult.getMessage()));
+
+            String typeName = type.getName();
+            if (!alertMessages.containsKey(typeName)) {
+                alertMessages.put(typeName, new ArrayList<>());
+            }
+            alertMessages.get(typeName).add(Pair.of(processorResult.getResultLevel(), processorResult.getMessage()));
         }
     }
 
@@ -60,6 +60,7 @@ public class Result {
      */
 
     public enum ResultLevel {
+        NONE,
         NOTICE,
         WARNING,
         CRITICAL

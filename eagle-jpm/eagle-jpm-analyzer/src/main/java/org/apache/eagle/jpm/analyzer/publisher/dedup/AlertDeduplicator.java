@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.analyzer.publisher;
+package org.apache.eagle.jpm.analyzer.publisher.dedup;
 
 import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.publisher.Result;
 
-public interface Publisher {
-    void publish(JobMetaEntity jobMetaEntity, Result result);
+public interface AlertDeduplicator {
+    boolean dedup(JobMetaEntity jobMetaEntity, Result result);
 }

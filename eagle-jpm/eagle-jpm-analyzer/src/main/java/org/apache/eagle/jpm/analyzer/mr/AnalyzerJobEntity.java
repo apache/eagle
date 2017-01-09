@@ -19,7 +19,11 @@ package org.apache.eagle.jpm.analyzer.mr;
 
 import java.util.Map;
 
-public class MRJobAnalysisEntity {
+/**
+ * will refactor later if other types of job needs this.
+ * AnalyzerJobEntity for each job needed to be analysised
+ */
+public class AnalyzerJobEntity {
     private String jobDefId;
     private String jobId;
     private String siteId;

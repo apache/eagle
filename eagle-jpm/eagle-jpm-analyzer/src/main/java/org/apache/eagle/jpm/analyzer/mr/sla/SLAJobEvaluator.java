@@ -19,7 +19,7 @@ package org.apache.eagle.jpm.analyzer.mr.sla;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.Evaluator;
-import org.apache.eagle.jpm.analyzer.mr.MRJobAnalysisEntity;
+import org.apache.eagle.jpm.analyzer.mr.AnalyzerJobEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.processors.LongStuckJobProcessor;
 import org.apache.eagle.jpm.analyzer.mr.sla.processors.UnExpectedLongDurationJobProcessor;
 import org.apache.eagle.jpm.analyzer.Processor;
@@ -31,7 +31,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SLAJobEvaluator implements Evaluator<MRJobAnalysisEntity>, Serializable {
+public class SLAJobEvaluator implements Evaluator<AnalyzerJobEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SLAJobEvaluator.class);
 
     private List<Processor> processors = new ArrayList<>();
@@ -42,11 +42,11 @@ public class SLAJobEvaluator implements Evaluator<MRJobAnalysisEntity>, Serializ
     }
 
     @Override
-    public Result.EvaluatorResult evaluate(MRJobAnalysisEntity mrJobAnalysisEntity) {
+    public Result.EvaluatorResult evaluate(AnalyzerJobEntity analyzerJobEntity) {
         Result.EvaluatorResult result = new Result.EvaluatorResult();
 
         for (Processor processor : processors) {
-            result.addProcessorResult(processor.getClass(), processor.process(mrJobAnalysisEntity));
+            result.addProcessorResult(processor.getClass(), processor.process(analyzerJobEntity));
         }
 
         return result;

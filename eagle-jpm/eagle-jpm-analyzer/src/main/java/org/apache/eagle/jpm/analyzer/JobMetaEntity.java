@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.analyzer.mr.meta.model;
+package org.apache.eagle.jpm.analyzer;
 
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;

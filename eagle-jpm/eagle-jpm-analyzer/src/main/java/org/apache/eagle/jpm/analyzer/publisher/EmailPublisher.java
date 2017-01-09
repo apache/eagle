@@ -18,6 +18,9 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
+import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +30,23 @@ public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
 
     private Config config;
+    private AlertDeduplicator alertDeduplicator;
 
     public EmailPublisher(Config config) {
         this.config = config;
+        this.alertDeduplicator = new SimpleDeduplicator();
     }
 
     @Override
-    public void publish(Result result) {
+    public void publish(JobMetaEntity jobMetaEntity, Result result) {
+        if (result.getAlertMessages().size() == 0) {
+            return;
+        }
 
+        LOG.info("EmailPublisher gets job {}", jobMetaEntity.getJobDefId());
+        if (alertDeduplicator.dedup(jobMetaEntity, result)) {
+            LOG.info("skip job {} alert because it is duplicated", jobMetaEntity.getJobDefId());
+            return;
+        }
     }
 }

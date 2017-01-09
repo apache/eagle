@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.mr.meta;
 
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
 
 import java.util.List;

@@ -19,14 +19,14 @@ package org.apache.eagle.jpm.analyzer.mr.suggestion;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.Evaluator;
-import org.apache.eagle.jpm.analyzer.mr.MRJobAnalysisEntity;
+import org.apache.eagle.jpm.analyzer.mr.AnalyzerJobEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class JobSuggestionEvaluator implements Evaluator<MRJobAnalysisEntity>, Serializable {
+public class JobSuggestionEvaluator implements Evaluator<AnalyzerJobEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionEvaluator.class);
 
     private Config config;
@@ -36,7 +36,7 @@ public class JobSuggestionEvaluator implements Evaluator<MRJobAnalysisEntity>, S
     }
 
     @Override
-    public Result.EvaluatorResult evaluate(MRJobAnalysisEntity mrJobEntity) {
+    public Result.EvaluatorResult evaluate(AnalyzerJobEntity mrJobEntity) {
         Result.EvaluatorResult result = new Result.EvaluatorResult();
         //TODO
         return result;

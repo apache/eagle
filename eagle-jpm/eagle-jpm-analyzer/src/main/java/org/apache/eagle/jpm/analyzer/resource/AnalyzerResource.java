@@ -19,25 +19,26 @@ package org.apache.eagle.jpm.analyzer.resource;
 
 import com.google.inject.Inject;
 import org.apache.eagle.jpm.analyzer.mr.meta.MetaManagementService;
-import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
 import org.apache.eagle.metadata.resource.RESTResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/job/analyzer")
-public class AnalysisResource {
+import static org.apache.eagle.jpm.analyzer.util.Constants.*;
+
+@Path(ANALYZER_PATH)
+public class AnalyzerResource {
     @Inject
     MetaManagementService metaManagementService;
 
-    public AnalysisResource() {
+    public AnalyzerResource() {
     }
 
     @POST
-    @Path("/meta")
+    @Path(META_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> addJobMeta(JobMetaEntity jobMetaEntity) {
@@ -53,9 +54,9 @@ public class AnalysisResource {
     }
 
     @POST
-    @Path("/meta/{jobDefId}")
+    @Path(JOB_META_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> updateJobMeta(@PathParam("jobDefId") String jobDefId, JobMetaEntity jobMetaEntity) {
+    public RESTResponse<Void> updateJobMeta(@PathParam(JOB_DEF_PATH) String jobDefId, JobMetaEntity jobMetaEntity) {
         return RESTResponse.<Void>async((response) -> {
             jobMetaEntity.ensureDefault();
             boolean ret = metaManagementService.updateJobMeta(jobDefId, jobMetaEntity);
@@ -68,17 +69,17 @@ public class AnalysisResource {
     }
 
     @GET
-    @Path("/meta/{jobDefId}")
+    @Path(JOB_META_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<List<JobMetaEntity>> getJobMeta(@PathParam("jobDefId") String jobDefId) {
+    public RESTResponse<List<JobMetaEntity>> getJobMeta(@PathParam(JOB_DEF_PATH) String jobDefId) {
         return RESTResponse.async(() -> metaManagementService.getJobMeta(jobDefId)).get();
     }
 
     @DELETE
-    @Path("/meta/{jobDefId}")
+    @Path(JOB_META_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> deleteJobMeta(@PathParam("jobDefId") String jobDefId) {
+    public RESTResponse<Void> deleteJobMeta(@PathParam(JOB_DEF_PATH) String jobDefId) {
         return RESTResponse.<Void>async((response) -> {
             boolean ret = metaManagementService.deleteJobMeta(jobDefId);
             String message = "Successfully delete job meta for " + jobDefId;
@@ -91,7 +92,7 @@ public class AnalysisResource {
     }
 
     @POST
-    @Path("/publisher")
+    @Path(PUBLISHER_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> addPublisherMeta(PublisherEntity publisherEntity) {
@@ -107,10 +108,10 @@ public class AnalysisResource {
     }
 
     @DELETE
-    @Path("/publisher/{userId}")
+    @Path(PUBLISHER_META_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> deletePublisherMeta(@PathParam("userId") String userId) {
+    public RESTResponse<Void> deletePublisherMeta(@PathParam(USER_PATH) String userId) {
         return RESTResponse.<Void>async((response) -> {
             boolean ret = metaManagementService.deletePublisherMeta(userId);
             String message = "Successfully delete publisher meta for " + userId;
@@ -122,9 +123,9 @@ public class AnalysisResource {
     }
 
     @GET
-    @Path("/publisher/{userId}")
+    @Path(PUBLISHER_META_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<List<PublisherEntity>> getPublisherMeta(@PathParam("userId") String userId) {
+    public RESTResponse<List<PublisherEntity>> getPublisherMeta(@PathParam(USER_PATH) String userId) {
         return RESTResponse.async(() -> metaManagementService.getPublisherMeta(userId)).get();
     }
 }

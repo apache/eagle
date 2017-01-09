@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.mr.running.parser;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.mr.MRJobAnalysisEntity;
+import org.apache.eagle.jpm.analyzer.mr.AnalyzerJobEntity;
 import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
@@ -596,8 +596,8 @@ public class MRJobParser implements Runnable {
         }
     }
 
-    private MRJobAnalysisEntity convertToAnalysisEntity(JobExecutionAPIEntity jobExecutionAPIEntity) {
-        MRJobAnalysisEntity mrJobAnalysisEntity = new MRJobAnalysisEntity();
+    private AnalyzerJobEntity convertToAnalysisEntity(JobExecutionAPIEntity jobExecutionAPIEntity) {
+        AnalyzerJobEntity mrJobAnalysisEntity = new AnalyzerJobEntity();
         Map<String, String> tags = jobExecutionAPIEntity.getTags();
         mrJobAnalysisEntity.setJobDefId(tags.get(MRJobTagName.JOD_DEF_ID.toString()));
         mrJobAnalysisEntity.setJobId(tags.get(MRJobTagName.JOB_ID.toString()));
