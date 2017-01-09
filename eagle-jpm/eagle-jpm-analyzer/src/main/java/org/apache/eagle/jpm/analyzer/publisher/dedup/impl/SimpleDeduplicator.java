@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.publisher.dedup.impl;
 
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
 import org.apache.eagle.jpm.analyzer.util.Constants;
@@ -37,22 +37,22 @@ public class SimpleDeduplicator implements AlertDeduplicator, Serializable {
     private Map<String, Long> lastUpdateTime = new HashMap<>();
 
     @Override
-    public boolean dedup(JobMetaEntity jobMetaEntity, Result result) {
+    public boolean dedup(AnalyzerEntity analyzerJobEntity, Result result) {
         long dedupInterval = Constants.DEFAULT_DEDUP_INTERVAL;
-        if (jobMetaEntity.getConfiguration().containsKey(Constants.DEDUP_INTERVAL_KEY)) {
-            dedupInterval = (Long)jobMetaEntity.getConfiguration().get(Constants.DEDUP_INTERVAL_KEY);
+        if (analyzerJobEntity.getJobMeta().containsKey(Constants.DEDUP_INTERVAL_KEY)) {
+            dedupInterval = (Long)analyzerJobEntity.getJobMeta().get(Constants.DEDUP_INTERVAL_KEY);
         }
 
         dedupInterval = dedupInterval * 1000;
         long currentTimeStamp = System.currentTimeMillis();
-        if (lastUpdateTime.containsKey(jobMetaEntity.getJobDefId())) {
-            if (lastUpdateTime.get(jobMetaEntity.getJobDefId()) + dedupInterval > currentTimeStamp) {
+        if (lastUpdateTime.containsKey(analyzerJobEntity.getJobDefId())) {
+            if (lastUpdateTime.get(analyzerJobEntity.getJobDefId()) + dedupInterval > currentTimeStamp) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            lastUpdateTime.put(jobMetaEntity.getJobDefId(), currentTimeStamp);
+            lastUpdateTime.put(analyzerJobEntity.getJobDefId(), currentTimeStamp);
             return false;
         }
     }

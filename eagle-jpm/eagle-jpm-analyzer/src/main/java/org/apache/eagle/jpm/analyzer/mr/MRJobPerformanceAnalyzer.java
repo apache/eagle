@@ -20,24 +20,20 @@ package org.apache.eagle.jpm.analyzer.mr;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.*;
 import org.apache.eagle.jpm.analyzer.Evaluator;
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
 import org.apache.eagle.jpm.analyzer.mr.suggestion.JobSuggestionEvaluator;
 import org.apache.eagle.jpm.analyzer.publisher.EagleStorePublisher;
 import org.apache.eagle.jpm.analyzer.publisher.EmailPublisher;
 import org.apache.eagle.jpm.analyzer.publisher.Publisher;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
-import org.apache.eagle.jpm.analyzer.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
-public class MRJobPerformanceAnalyzer implements JobAnalyzer<AnalyzerJobEntity>, Serializable {
+public class MRJobPerformanceAnalyzer implements JobAnalyzer<AnalyzerEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobPerformanceAnalyzer.class);
 
     private List<Evaluator> evaluators = new ArrayList<>();
@@ -55,30 +51,15 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer<AnalyzerJobEntity>,
     }
 
     @Override
-    public void analysis(AnalyzerJobEntity analyzerJobEntity) throws Exception {
+    public void analysis(AnalyzerEntity analyzerJobEntity) throws Exception {
         Result result = new Result();
 
-        List<JobMetaEntity> jobMetaEntities = Utils.getJobMeta(config, analyzerJobEntity.getJobDefId());
-        if (jobMetaEntities.size() == 0) {
-            LOG.info("MRJobPerformanceAnalyzer skip job {}", analyzerJobEntity.getJobDefId());
-            //return;
-        }
-
         for (Evaluator evaluator : evaluators) {
-            /*if (!jobMetaEntities.get(0).getEvaluators().contains(evaluator.getClass().getSimpleName())) {
-                LOG.info("skip evaluator " + evaluator.getClass().getSimpleName());
-                continue;
-            }*/
             result.addEvaluatorResult(evaluator.getClass(), evaluator.evaluate(analyzerJobEntity));
         }
 
-        JobMetaEntity jobMetaEntity = new JobMetaEntity(analyzerJobEntity.getJobDefId(),
-                analyzerJobEntity.getSiteId(),
-                new HashMap<>(),
-                new HashSet<>());
-        //JobMetaEntity jobMetaEntity = jobMetaEntities.get(0);
         for (Publisher publisher : publishers) {
-            publisher.publish(jobMetaEntity, result);
+            publisher.publish(analyzerJobEntity, result);
         }
     }
 }

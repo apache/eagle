@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.analyzer.mr;
+package org.apache.eagle.jpm.analyzer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * will refactor later if other types of job needs this.
- * AnalyzerJobEntity for each job needed to be analysised
+ * AnalyzerEntity for each job needed to be analysised
  */
-public class AnalyzerJobEntity {
+public class AnalyzerEntity {
     private String jobDefId;
     private String jobId;
     private String siteId;
@@ -34,7 +35,9 @@ public class AnalyzerJobEntity {
     private long durationTime;
     private String currentState;
 
-    private Map<String, Object> jobConfig;
+    private Map<String, Object> jobConfig = new HashMap<>();
+
+    private Map<String, Object> jobMeta = new HashMap<>();
 
     public String getJobDefId() {
         return jobDefId;
@@ -106,5 +109,13 @@ public class AnalyzerJobEntity {
 
     public void setJobConfig(Map<String, Object> jobConfig) {
         this.jobConfig = jobConfig;
+    }
+
+    public Map<String, Object> getJobMeta() {
+        return jobMeta;
+    }
+
+    public void setJobMeta(Map<String, Object> jobMeta) {
+        this.jobMeta = jobMeta;
     }
 }

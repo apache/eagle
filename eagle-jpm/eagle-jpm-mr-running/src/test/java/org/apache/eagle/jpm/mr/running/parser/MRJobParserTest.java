@@ -358,7 +358,7 @@ public class MRJobParserTest {
             eagleServiceConfig.username,
             eagleServiceConfig.password).thenReturn(client);
         when(client.create(any())).thenThrow(Exception.class).thenReturn(null);
-        when(client.getJerseyClient()).thenReturn(new Client());
+        //when(client.getJerseyClient()).thenReturn(new Client());
         mockInputJobSteam("/mrjob_30784.json", JOB_URL);
         mockInputJobSteamWithException(JOB_COUNT_URL);
         mockGetConnection("/mrconf_30784.xml");
@@ -402,7 +402,7 @@ public class MRJobParserTest {
         Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
         Assert.assertTrue(entities.isEmpty());
         verify(client, times(2)).create(any());
-        verify(client, times(1)).getJerseyClient();
+        //verify(client, times(1)).getJerseyClient();
         verify(client, times(1)).close();
 
     }

@@ -18,8 +18,8 @@
 package org.apache.eagle.jpm.analyzer.mr.sla.processors;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.mr.AnalyzerJobEntity;
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.util.Constants;
@@ -32,12 +32,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerJobEntity>, Serializable {
+public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(UnExpectedLongDurationJobProcessor.class);
 
     private Config config;
@@ -47,45 +45,36 @@ public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerJob
     }
 
     @Override
-    public Result.ProcessorResult process(AnalyzerJobEntity analyzerJobEntity) {
+    public Result.ProcessorResult process(AnalyzerEntity analyzerJobEntity) {
         LOG.info("Job {} In UnExpectedLongDurationJobProcessor", analyzerJobEntity.getJobDefId());
 
-        List<JobMetaEntity> jobMetaEntities = Utils.getJobMeta(config, analyzerJobEntity.getJobDefId());
-        if (jobMetaEntities.size() == 0) {
-            //return new Result.ProcessorResult(Result.ResultLevel.NONE, Constants.PROCESS_NONE);
-        }
-
-        JobMetaEntity jobMetaEntity = new JobMetaEntity(
-                analyzerJobEntity.getJobDefId(),
-                analyzerJobEntity.getSiteId(),
-                new HashMap<>(),
-                new HashSet<>());//jobMetaEntities.get(0);
-        long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaEntity);
+        Map<String, Object> jobMetaData = analyzerJobEntity.getJobMeta();
+        long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaData);
         if (avgDurationTime == 0L) {
             return new Result.ProcessorResult(Result.ResultLevel.NONE, Constants.PROCESS_NONE);
         }
 
         Map<Result.ResultLevel, Double> alertThreshold = Constants.DEFAULT_ALERT_THRESHOLD;
-        if (jobMetaEntity.getConfiguration().containsKey(Constants.ALERT_THRESHOLD_KEY)) {
-            alertThreshold = (Map<Result.ResultLevel, Double>)jobMetaEntity.getConfiguration().get(Constants.ALERT_THRESHOLD_KEY);
+        if (jobMetaData.containsKey(Constants.ALERT_THRESHOLD_KEY)) {
+            alertThreshold = (Map<Result.ResultLevel, Double>)jobMetaData.get(Constants.ALERT_THRESHOLD_KEY);
         }
         List<Map.Entry<Result.ResultLevel, Double>> sorted = Utils.sortByValue(alertThreshold);
 
         double expirePercent = (analyzerJobEntity.getDurationTime() - avgDurationTime) * 1.0 / avgDurationTime;
         for (Map.Entry<Result.ResultLevel, Double> entry : sorted) {
             if (expirePercent >= entry.getValue()) {
-                return new Result.ProcessorResult(entry.getKey(), String.format("Duration of Job %s exceeds the average duration by %f",
-                        analyzerJobEntity.getJobDefId(), entry.getValue()));
+                return new Result.ProcessorResult(entry.getKey(), String.format("duration exceeds the average duration by %f%%",
+                        expirePercent * 100));
             }
         }
 
         return new Result.ProcessorResult(Result.ResultLevel.NONE, Constants.PROCESS_NONE);
     }
 
-    private long getAvgDuration(AnalyzerJobEntity mrJobAnalysisEntity, JobMetaEntity jobMetaEntity) {
+    private long getAvgDuration(AnalyzerEntity mrJobAnalysisEntity, Map<String, Object> jobMetaData) {
         IEagleServiceClient client = new EagleServiceClientImpl(
-                "lvsapdes0005.stratus.lvs.ebay.com",//config.getString(Constants.HOST_PATH),
-                8080,//config.getInt(Constants.PORT_PATH),
+                config.getString(Constants.HOST_PATH),
+                config.getInt(Constants.PORT_PATH),
                 config.getString(Constants.USERNAME_PATH),
                 config.getString(Constants.PASSWORD_PATH));
 
@@ -94,8 +83,8 @@ public class UnExpectedLongDurationJobProcessor implements Processor<AnalyzerJob
         try {
             int timeLength = Constants.DEFAULT_EVALUATOR_TIME_LENGTH;
             try {
-                if (jobMetaEntity != null && jobMetaEntity.getConfiguration().containsKey(Constants.EVALUATOR_TIME_LENGTH_KEY)) {
-                    timeLength = Integer.parseInt(jobMetaEntity.getConfiguration().get(Constants.EVALUATOR_TIME_LENGTH_KEY).toString());
+                if (jobMetaData.containsKey(Constants.EVALUATOR_TIME_LENGTH_KEY)) {
+                    timeLength = Integer.parseInt(jobMetaData.get(Constants.EVALUATOR_TIME_LENGTH_KEY).toString());
                 }
             } catch (Exception e) {
                 LOG.warn("exception found when parse timeLength {}, use default", e);

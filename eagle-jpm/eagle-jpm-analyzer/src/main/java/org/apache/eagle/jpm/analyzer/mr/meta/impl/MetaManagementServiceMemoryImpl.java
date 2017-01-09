@@ -20,7 +20,7 @@ package org.apache.eagle.jpm.analyzer.mr.meta.impl;
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.mr.meta.MetaManagementService;
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.mr.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.meta.model.PublisherEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -18,13 +18,16 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
@@ -38,15 +41,23 @@ public class EmailPublisher implements Publisher, Serializable {
     }
 
     @Override
-    public void publish(JobMetaEntity jobMetaEntity, Result result) {
+    public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
         if (result.getAlertMessages().size() == 0) {
             return;
         }
 
-        LOG.info("EmailPublisher gets job {}", jobMetaEntity.getJobDefId());
-        if (alertDeduplicator.dedup(jobMetaEntity, result)) {
-            LOG.info("skip job {} alert because it is duplicated", jobMetaEntity.getJobDefId());
+        LOG.info("EmailPublisher gets job {}", analyzerJobEntity.getJobDefId());
+        if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
+            LOG.info("skip job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
             return;
+        }
+        Map<String, List<Pair<Result.ResultLevel, String>>> alertMessages = result.getAlertMessages();
+        for (String evaluator : alertMessages.keySet()) {
+            List<Pair<Result.ResultLevel, String>> messages = alertMessages.get(evaluator);
+            for (Pair<Result.ResultLevel, String> message : messages) {
+                LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
+                        analyzerJobEntity.getJobDefId(), message.getRight(), message.getLeft(), evaluator);
+            }
         }
     }
 }

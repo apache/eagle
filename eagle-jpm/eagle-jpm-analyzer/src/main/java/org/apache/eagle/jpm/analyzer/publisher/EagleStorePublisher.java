@@ -18,7 +18,7 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class EagleStorePublisher implements Publisher, Serializable {
     }
 
     @Override
-    public void publish(JobMetaEntity jobMetaEntity, Result result) {
+    public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
 
     }
 }

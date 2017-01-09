@@ -17,9 +17,9 @@
 
 package org.apache.eagle.jpm.analyzer.publisher.dedup;
 
-import org.apache.eagle.jpm.analyzer.JobMetaEntity;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 
 public interface AlertDeduplicator {
-    boolean dedup(JobMetaEntity jobMetaEntity, Result result);
+    boolean dedup(AnalyzerEntity analyzerJobEntity, Result result);
 }

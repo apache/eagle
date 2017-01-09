@@ -18,15 +18,15 @@
 package org.apache.eagle.jpm.analyzer.mr.sla.processors;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Processor;
-import org.apache.eagle.jpm.analyzer.mr.AnalyzerJobEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class LongStuckJobProcessor implements Processor<AnalyzerJobEntity>, Serializable {
+public class LongStuckJobProcessor implements Processor<AnalyzerEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(LongStuckJobProcessor.class);
 
     private Config config;
@@ -36,7 +36,7 @@ public class LongStuckJobProcessor implements Processor<AnalyzerJobEntity>, Seri
     }
 
     @Override
-    public Result.ProcessorResult process(AnalyzerJobEntity analyzerJobEntity) {
+    public Result.ProcessorResult process(AnalyzerEntity analyzerJobEntity) {
         LOG.info("Job {} In LongStuckJobProcessor", analyzerJobEntity.getJobDefId());
         return new Result.ProcessorResult(Result.ResultLevel.NONE, "");
     }
