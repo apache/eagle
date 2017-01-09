@@ -51,7 +51,8 @@ public class SpecManager {
             this.mtadataServiceClient = new MetadataServiceClientImpl(config);
             this.kafka2TupleMetadata = mtadataServiceClient.listDataSources();
             this.publishments = mtadataServiceClient.listPublishment();
-            this.policyDefinitions = mtadataServiceClient.listPolicies();
+            this.policyDefinitions = mtadataServiceClient.listPolicies().stream().filter((t) -> t.getPolicyStatus() != PolicyDefinition.PolicyStatus.DISABLED)
+                    .collect(Collectors.toList());
             this.streamDefinitions = mtadataServiceClient.listStreams();
         } catch (Exception e) {
             LOG.error("SpecManager error :" + e.getMessage(), e);
