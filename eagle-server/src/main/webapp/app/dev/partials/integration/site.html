@@ -62,10 +62,16 @@
 				<td class="text-center">
 					<div class="btn-group btn-group-xs" ng-if="app.installed">
 						<!--button class="btn btn-default btn-sm">Monitor</button-->
-						<button class="btn btn-default btn-sm" ng-click="startApp(app)" ng-if="app.descriptor.executable">
+						<button class="btn btn-default btn-sm" ng-click="startApp(app)" ng-if="app.descriptor.executable && app.status === 'INITIALIZED'">
 							<span class="fa fa-play"></span>
 						</button>
-						<button class="btn btn-default btn-sm" ng-click="stopApp(app)" ng-if="app.descriptor.executable">
+						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="app.descriptor.executable && app.status !== 'INITIALIZED'">
+							<span class="fa fa-play"></span>
+						</button>
+						<button class="btn btn-default btn-sm" ng-click="stopApp(app)" ng-if="app.descriptor.executable && app.status === 'RUNNING'">
+							<span class="fa fa-stop"></span>
+						</button>
+						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="app.descriptor.executable && app.status !== 'RUNNING'">
 							<span class="fa fa-stop"></span>
 						</button>
 						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="!app.descriptor.executable">
