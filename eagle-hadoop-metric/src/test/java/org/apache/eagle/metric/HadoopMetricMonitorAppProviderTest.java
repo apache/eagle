@@ -55,6 +55,11 @@ public class HadoopMetricMonitorAppProviderTest extends ApplicationTestBase {
 
         ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "HADOOP_METRIC_MONITOR", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
+
+        //Install dependency
+        ApplicationOperations.InstallOperation installOperationDependency = new ApplicationOperations.InstallOperation("test_site", "TOPOLOGY_HEALTH_CHECK_APP", ApplicationEntity.Mode.LOCAL);
+        applicationResource.installApplication(installOperationDependency);
+
         // Install application
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Uninstall application
