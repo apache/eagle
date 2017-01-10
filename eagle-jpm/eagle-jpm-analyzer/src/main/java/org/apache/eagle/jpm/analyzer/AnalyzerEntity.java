@@ -34,6 +34,7 @@ public class AnalyzerEntity {
     private long endTime;
     private long durationTime;
     private String currentState;
+    private double progress;
 
     private Map<String, Object> jobConfig = new HashMap<>();
 
@@ -117,5 +118,13 @@ public class AnalyzerEntity {
 
     public void setJobMeta(Map<String, Object> jobMeta) {
         this.jobMeta = jobMeta;
+    }
+
+    public double getProgress() {
+        return progress;
+    }
+
+    public void setProgress(double progress) {
+        this.progress = progress;
     }
 }

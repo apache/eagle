@@ -606,7 +606,7 @@ public class MRJobParser implements Runnable {
         mrJobAnalysisEntity.setDurationTime(jobExecutionAPIEntity.getDurationTime());
         mrJobAnalysisEntity.setCurrentState(jobExecutionAPIEntity.getInternalState());
         mrJobAnalysisEntity.setJobConfig(new HashMap<>(jobExecutionAPIEntity.getJobConfig()));
-
+        mrJobAnalysisEntity.setProgress(this.app.getProgress());
         return mrJobAnalysisEntity;
     }
 }

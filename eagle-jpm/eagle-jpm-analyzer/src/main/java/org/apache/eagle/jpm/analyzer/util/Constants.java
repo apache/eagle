@@ -56,4 +56,10 @@ public class Constants {
 
     public static final String DEDUP_INTERVAL_KEY = "alert.dedupInterval"; //seconds
     public static final int DEFAULT_DEDUP_INTERVAL = 300;
+
+    public static final String ANALYZER_REPORT_CONFIG_PATH = "application.analyzerReport";
+    public static final String ANALYZER_REPORT_SUBJECT = "Job Performance Alert For Job: %s";
+
+    public static final String ANALYZER_REPORT_DATA_BASIC_KEY = "basic";
+    public static final String ANALYZER_REPORT_DATA_EXTEND_KEY = "extend";
 }

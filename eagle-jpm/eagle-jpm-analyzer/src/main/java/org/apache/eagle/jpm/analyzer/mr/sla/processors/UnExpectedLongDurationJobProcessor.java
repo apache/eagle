@@ -62,8 +62,8 @@ public class UnExpectedLongDurationJobProcessor implements Processor, Serializab
         double expirePercent = (analyzerJobEntity.getDurationTime() - avgDurationTime) * 1.0 / avgDurationTime;
         for (Map.Entry<Result.ResultLevel, Double> entry : sorted) {
             if (expirePercent >= entry.getValue()) {
-                return new Result.ProcessorResult(entry.getKey(), String.format("duration exceeds the average duration by %f%%",
-                        expirePercent * 100));
+                return new Result.ProcessorResult(entry.getKey(), String.format("Job duration exceeds average duration by %d%%, average duration is %ds",
+                        (int)(expirePercent * 100), avgDurationTime / 1000));
             }
         }
 
