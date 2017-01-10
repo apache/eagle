@@ -394,9 +394,9 @@
 						});
 					}, function (res) {
 						var errormsg = "";
-						if(typeof res.data.message !== 'undefined'){
+						if(typeof res.data.message !== 'undefined') {
 							errormsg = res.data.message;
-						}else{
+						} else {
 							errormsg = res.data.errors;
 						}
 						$.dialog({
