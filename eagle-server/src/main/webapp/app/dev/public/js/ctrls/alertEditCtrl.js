@@ -393,9 +393,15 @@
 							$scope.policyLock = false;
 						});
 					}, function (res) {
+						var errormsg = "";
+						if(typeof res.data.message !== 'undefined'){
+							errormsg = res.data.message;
+						}else{
+							errormsg = res.data.errors;
+						}
 						$.dialog({
 							title: "OPS",
-							content: "Create policy failed: " + res.data.message
+							content: "Create policy failed: " + errormsg
 						});
 						$scope.policyLock = false;
 					});
