@@ -89,6 +89,7 @@ public class EmailPublisher implements Publisher, Serializable {
         alertData.put(Constants.ANALYZER_REPORT_DATA_BASIC_KEY, basic);
         alertData.put(Constants.ANALYZER_REPORT_DATA_EXTEND_KEY, extend);
 
+        //TODO, override email config in job meta data
         ApplicationEmailService emailService = new ApplicationEmailService(config, Constants.ANALYZER_REPORT_CONFIG_PATH);
         String subject = String.format(Constants.ANALYZER_REPORT_SUBJECT, analyzerJobEntity.getJobDefId());
         AlertEmailContext alertContext = emailService.buildEmailContext(subject);
@@ -96,7 +97,7 @@ public class EmailPublisher implements Publisher, Serializable {
     }
 
     private String getJobLink(AnalyzerEntity analyzerJobEntity) {
-        String url = "http://"
+        return "http://"
                 + config.getString(Constants.HOST_PATH)
                 + ":"
                 + config.getInt(Constants.PORT_PATH)
@@ -104,6 +105,5 @@ public class EmailPublisher implements Publisher, Serializable {
                 + analyzerJobEntity.getSiteId()
                 + "/jpm/detail/"
                 + analyzerJobEntity.getJobId();
-        return String.format("<a href=%s>%s</a>", url, url);
     }
 }

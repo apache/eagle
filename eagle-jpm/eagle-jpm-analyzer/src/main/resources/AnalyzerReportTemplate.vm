@@ -106,7 +106,7 @@
     <li>End Time: ${elem["basic"].get("end")}</li>
     <li>Duration Time: ${elem["basic"].get("duration")}</li>
     <li>Progress: ${elem["basic"].get("progress")}</li>
-    <li>Job Detail: ${elem["basic"].get("detail")}</li>
+    <li>Job Detail: <a href=${elem["basic"].get("detail")}>${elem["basic"].get("detail")}</a></li>
 </ul>
 
 <p><b>Analyzer Results: </b></p>

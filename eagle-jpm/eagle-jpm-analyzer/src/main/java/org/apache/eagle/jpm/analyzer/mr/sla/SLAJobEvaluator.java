@@ -50,8 +50,8 @@ public class SLAJobEvaluator implements Evaluator, Serializable {
         Result.EvaluatorResult result = new Result.EvaluatorResult();
 
         List<JobMetaEntity> jobMetaEntities = Utils.getJobMeta(config, analyzerJobEntity.getJobDefId());
-        if (jobMetaEntities.size() == 0 ||
-                !jobMetaEntities.get(0).getEvaluators().contains(this.getClass().getName())) {
+        if (jobMetaEntities.size() == 0
+                || !jobMetaEntities.get(0).getEvaluators().contains(this.getClass().getName())) {
             LOG.info("SLAJobEvaluator skip job {}", analyzerJobEntity.getJobDefId());
             return result;
         }
