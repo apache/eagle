@@ -29,12 +29,18 @@
 			controller: function($scope, $element, $attrs) {
 			},
 			compile: function ($element) {
-				$element.contents().remove();
+				var $content = $element.contents().remove();
 
 				return {
 					post: function preLink($scope, $element) {
 						var widget = $scope.widget;
 						$scope.site = Site.current();
+
+						// If not set widget, skip dynamic render. (AdminLTE use `data-widget` as attr key)
+						if (!widget) {
+							$element.append($content);
+							return;
+						}
 
 						if(widget.renderFunc) {
 							// Prevent auto compile if return false
