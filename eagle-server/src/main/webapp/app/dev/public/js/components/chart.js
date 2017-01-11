@@ -29,6 +29,10 @@
 		};
 	});
 
+	/**
+	 * @param {{}?} chart Set chart reference
+	 * @param {function} chart.refresh Refresh current chart
+	 */
 	eagleComponents.directive('chart', function(Chart) {
 		var charts = Chart.charts;
 
@@ -61,14 +65,43 @@
 			},
 			controller: function ($scope, $element, $attrs, Time) {
 				var i;
+				var lastSeriesCount = 0;
 				var lastTooltipEvent;
 				var chart = echarts.init($element[0]);
 				charts[chart.id] = chart;
+
+				function wrapChart() {
+					chart.refresh = function () {
+						refreshChart();
+					};
+
+					chart.forceRefresh = function () {
+						delete charts[chart.id];
+						chart.dispose();
+
+						chart = echarts.init($element[0]);
+						charts[chart.id] = chart;
+						lastSeriesCount = 0;
+
+						refreshChart();
+
+						wrapChart();
+					};
+				}
 
 				function refreshChart() {
 					var maxYAxis = 0;
 					var legendList = [];
 					var categoryList = $scope.category ? $scope.category : [];
+					var currentSeriesCount = ($scope.series || []).length;
+
+					if (lastSeriesCount > currentSeriesCount && chart.forceRefresh) {
+						console.log('Force refresh!');
+						// TODO: echart series bug. Need rebuild the chart. Ref: https://github.com/ecomfe/echarts/issues/4033
+						chart.forceRefresh();
+						return;
+					}
+					lastSeriesCount = currentSeriesCount;
 
 					var seriesList = $.map($scope.series || [], function (series, id) {
 						if(id === 0 && !$scope.category) {
@@ -166,13 +199,12 @@
 					$scope.$parent.$parent[$attrs.chart] = chart;
 				}
 
-				chart.refresh = function () {
-					refreshChart();
-				};
+				wrapChart();
 
 				// Render
 				refreshChart();
 				$scope.$watch("series", refreshChart);
+				$scope.$watch("series.length", refreshChart);
 
 				$scope.$on('$destroy', function() {
 					delete charts[chart.id];

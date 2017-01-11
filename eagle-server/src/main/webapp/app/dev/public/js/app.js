@@ -192,6 +192,15 @@ var app = {};
 					resolve: routeResolve({ application: false })
 				})
 
+				// ================================= Metric =================================
+				.state('metricPreview', {
+					url: "/metric/preview?startTime&endTime&site&metric&groups&fields",
+					templateUrl: "partials/metric/preview.html?_=" + window._TRS(),
+					controller: "metricPreviewCtrl",
+					reloadOnSearch: false,
+					resolve: routeResolve({ application: false, time: true })
+				})
+
 				// ================================== Site ==================================
 				.state('site', {
 					url: "/site/:siteId",
