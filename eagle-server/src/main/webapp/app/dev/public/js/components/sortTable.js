@@ -37,6 +37,7 @@
 			 * @param {string?} $attrs.scope			Will bind parent variable of current scope
 			 * @param {string?} $attrs.sortpath			Default sort path
 			 * @param {[]?} $attrs.searchPathList		Filter search path list
+			 * @param {string?} $attrs.maxSize			Set max display size of page
 			 */
 			controller: function($scope, $element, $attrs) {
 				var sortmatch;
@@ -49,7 +50,7 @@
 				// Initialization
 				$scope.pageNumber = 1;
 				$scope.pageSize = 10;
-				$scope.maxSize = 10;
+				$scope.maxSize = $attrs.maxSize || 10;
 				$scope.search = "";
 				$scope.orderKey = "";
 				$scope.orderAsc = true;

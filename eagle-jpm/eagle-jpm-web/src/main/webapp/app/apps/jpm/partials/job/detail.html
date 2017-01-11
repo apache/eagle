@@ -170,6 +170,56 @@
 	</div>
 </div>
 
+<!-- Task attempt -->
+<div class="box box-primary collapsed-box" ng-if="job.currentState === 'FAILED'">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Error Task Attempts
+
+			<small>
+				(<span ng-repeat="(category, count) in taskAttemptCategories track by $index" class="text-primary">
+					<span ng-if="$index !== 0">, </span>
+					{{category}}: {{count}}
+				</span>)
+			</small>
+
+			<span ng-show="!taskAttemptList._done" class="fa fa-refresh fa-spin no-animate"></span>
+		</h3>
+		<div class="box-tools pull-right">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse">
+				<i class="fa fa-plus"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<div sort-table="taskAttemptList" is-sorting="isSorting" class="table-responsive" max-size="7" ng-show="taskAttemptList._done">
+			<table class="table table-bordered">
+				<thead>
+				<tr>
+					<th sortpath="startTime">Start Time</th>
+					<th sortpath="endTime">End Time</th>
+					<th sortpath="tags.hostname">Host</th>
+					<th sortpath="tags.taskType">Type</th>
+					<th sortpath="tags.taskType">Attempt</th>
+					<th sortpath="tags.errorCategory">Error Category</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="item in jobList">
+					<td>{{Time.format(item.startTime)}}</td>
+					<td>{{Time.format(item.endTime)}}</td>
+					<td>{{item.tags.hostname || "-"}}</td>
+					<td>{{item.tags.taskType || "-"}}</td>
+					<td>{{item.tags.taskAttemptId || "-"}}</td>
+					<td>{{item.tags.errorCategory || "-"}}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Dashboard -->
 <div class="box box-primary">
 	<div class="box-header with-border">
 		<h3 class="box-title">

@@ -123,6 +123,25 @@
 				$scope.endTimestamp = $scope.job.endTime;
 				$scope.isRunning = !$scope.job.currentState || ($scope.job.currentState || "").toUpperCase() === 'RUNNING';
 
+
+				// =============================== task attempt ===============================
+				if ($scope.job.currentState === 'FAILED') {
+					$scope.taskAttemptList = JPM.list('TaskAttemptErrorCategoryService', {
+						site: $scope.job.tags.site,
+						jobId: $scope.job.tags.jobId
+					},
+						Time($scope.startTimestamp).subtract(1, 'day'),
+						Time($scope.endTimestamp).add(1, 'day'));
+					$scope.taskAttemptCategories = {};
+					$scope.taskAttemptList._promise.then(function () {
+						$.each($scope.taskAttemptList, function (i, attempt) {
+							$scope.taskAttemptCategories[attempt.tags.errorCategory] =
+								($scope.taskAttemptCategories[attempt.tags.errorCategory] || 0) + 1;
+						});
+					});
+				}
+
+				// ================================ dashboards ================================
 				// Dashboard 1: Allocated MB
 				metric_allocatedMB = JPM.metrics(jobCond, "hadoop.job.allocatedmb", startTime, endTime);
 
