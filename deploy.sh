@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+set -e
 echo "${TRAVIS_PULL_REQUEST}"
 echo "${TRAVIS_EVENT_TYPE}"
 

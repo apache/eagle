@@ -34,6 +34,9 @@ notifications:
     recipients:
       - denglingang@yhd.com
       - luokun@yhd.com
+      - chenchang@yhd.com
+      - tangjijun@yhd.com
+      - zhangqihui@yhd.com
     on_success: change
     on_failure: always
 before_deploy:
