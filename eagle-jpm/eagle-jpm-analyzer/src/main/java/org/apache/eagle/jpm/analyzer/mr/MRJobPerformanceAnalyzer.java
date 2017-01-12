@@ -55,7 +55,10 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer, Serializable {
         Result result = new Result();
 
         for (Evaluator evaluator : evaluators) {
-            result.addEvaluatorResult(evaluator.getClass(), evaluator.evaluate(analyzerJobEntity));
+            Result.EvaluatorResult evaluatorResult = evaluator.evaluate(analyzerJobEntity);
+            if (evaluatorResult != null) {
+                result.addEvaluatorResult(evaluator.getClass(), evaluatorResult);
+            }
         }
 
         for (Publisher publisher : publishers) {
