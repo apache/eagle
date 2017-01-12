@@ -173,7 +173,7 @@ public class MRJobParser implements Runnable {
                     break;
                 }
             }
-            mrJobPerformanceAnalyzer.analysis(convertToAnalysisEntity(mrJobEntityMap.get(jobId)));
+            mrJobPerformanceAnalyzer.analyze(convertToAnalysisEntity(mrJobEntityMap.get(jobId)));
         }
     }
 

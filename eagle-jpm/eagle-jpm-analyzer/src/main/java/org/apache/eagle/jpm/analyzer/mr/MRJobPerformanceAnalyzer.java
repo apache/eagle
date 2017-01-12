@@ -51,7 +51,7 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer, Serializable {
     }
 
     @Override
-    public void analysis(AnalyzerEntity analyzerJobEntity) throws Exception {
+    public void analyze(AnalyzerEntity analyzerJobEntity) throws Exception {
         Result result = new Result();
 
         for (Evaluator evaluator : evaluators) {
