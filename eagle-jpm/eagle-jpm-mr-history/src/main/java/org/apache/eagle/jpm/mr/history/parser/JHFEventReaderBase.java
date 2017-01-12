@@ -332,7 +332,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             }
         }
 
-        super.notifiyListeners(entity);
+        super.notifyListeners(entity);
     }
 
     protected abstract JobCounters parseCounters(Object value) throws IOException;

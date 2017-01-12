@@ -29,7 +29,7 @@ public class JobEntityCreationPublisher {
         listeners.add(l);
     }
 
-    public void notifiyListeners(JobBaseAPIEntity entity) throws Exception {
+    public void notifyListeners(JobBaseAPIEntity entity) throws Exception {
         for (HistoryJobEntityCreationListener l : listeners) {
             l.jobEntityCreated(entity);
         }
