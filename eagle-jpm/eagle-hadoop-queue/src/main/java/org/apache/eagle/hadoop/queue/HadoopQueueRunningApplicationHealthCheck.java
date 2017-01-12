@@ -52,7 +52,7 @@ public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthC
                 eagleServiceConfig.eagleService.username,
                 eagleServiceConfig.eagleService.password);
 
-        client.getJerseyClient().setReadTimeout(60000);
+        client.setReadTimeout(60000);
 
         String message = "";
         try {
@@ -91,7 +91,6 @@ public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthC
         } catch (Exception e) {
             return Result.unhealthy(printMessages(message, "An exception was caught when fetch application current process time: ", ExceptionUtils.getStackTrace(e)));
         } finally {
-            client.getJerseyClient().destroy();
             try {
                 client.close();
             } catch (Exception e) {

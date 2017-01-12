@@ -57,7 +57,7 @@ public class SparkAppEntityCreationHandler {
                 eagleServiceConfig.eagleServicePort,
                 eagleServiceConfig.username,
                 eagleServiceConfig.password)) {
-            client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+            client.setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
             LOG.info("start to flush spark app entities, size {}", entities.size());
             client.create(entities);
             LOG.info("finish flushing spark app entities, size {}", entities.size());

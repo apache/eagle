@@ -18,6 +18,11 @@ package org.apache.eagle.jpm.mr.running;
 
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.jpm.analyzer.meta.MetaManagementService;
+import org.apache.eagle.jpm.analyzer.meta.impl.MetaManagementServiceJDBCImpl;
+import org.apache.eagle.jpm.analyzer.meta.impl.MetaManagementServiceMemoryImpl;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
+import org.apache.eagle.metadata.store.jdbc.JDBCMetadataStore;
 
 import java.util.Optional;
 
@@ -30,5 +35,11 @@ public class MRRunningJobApplicationProvider extends AbstractApplicationProvider
     @Override
     public Optional<ApplicationListener> getApplicationListener() {
         return Optional.of(new MRRunningJobApplicationListener());
+    }
+
+    @Override
+    protected void onRegister() {
+        bind(MemoryMetadataStore.class, MetaManagementService.class, MetaManagementServiceMemoryImpl.class);
+        bind(JDBCMetadataStore.class, MetaManagementService.class, MetaManagementServiceJDBCImpl.class);
     }
 }

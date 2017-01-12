@@ -85,7 +85,6 @@ public class MRJobEntityCreationHandler {
             LOG.warn("exception found when flush entities, {}", e);
             return false;
         } finally {
-            client.getJerseyClient().destroy();
             try {
                 client.close();
             } catch (Exception e) {

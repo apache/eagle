@@ -19,6 +19,8 @@
 package org.apache.eagle.jpm.mr.running.parser;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobConfig;
@@ -82,6 +84,7 @@ public class MRJobParser implements Runnable {
     private static final int FLUSH_TASKS_EVERY_TIME = 5;
     private static final int MAX_TASKS_PERMIT = 5000;
     private Config config;
+    private MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -92,7 +95,8 @@ public class MRJobParser implements Runnable {
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
                        List<String> configKeys,
-                       Config config) {
+                       Config config,
+                       MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer) {
         this.app = app;
         if (mrJobMap == null) {
             this.mrJobEntityMap = new HashMap<>();
@@ -112,6 +116,7 @@ public class MRJobParser implements Runnable {
         this.finishedTaskIds = new HashSet<>();
         this.configKeys = configKeys;
         this.config = config;
+        this.mrJobPerformanceAnalyzer = mrJobPerformanceAnalyzer;
     }
 
     public void setAppInfo(AppInfo app) {
@@ -168,6 +173,7 @@ public class MRJobParser implements Runnable {
                     break;
                 }
             }
+            mrJobPerformanceAnalyzer.analysis(convertToAnalysisEntity(mrJobEntityMap.get(jobId)));
         }
     }
 
@@ -585,5 +591,22 @@ public class MRJobParser implements Runnable {
                 this.parserStatus = ParserStatus.FINISHED;
             }
         }
+    }
+
+    private AnalyzerEntity convertToAnalysisEntity(JobExecutionAPIEntity jobExecutionAPIEntity) {
+        AnalyzerEntity mrJobAnalysisEntity = new AnalyzerEntity();
+        Map<String, String> tags = jobExecutionAPIEntity.getTags();
+        mrJobAnalysisEntity.setJobDefId(tags.get(MRJobTagName.JOD_DEF_ID.toString()));
+        mrJobAnalysisEntity.setJobId(tags.get(MRJobTagName.JOB_ID.toString()));
+        mrJobAnalysisEntity.setSiteId(tags.get(MRJobTagName.SITE.toString()));
+        mrJobAnalysisEntity.setUserId(tags.get(MRJobTagName.USER.toString()));
+
+        mrJobAnalysisEntity.setStartTime(jobExecutionAPIEntity.getStartTime());
+        mrJobAnalysisEntity.setEndTime(jobExecutionAPIEntity.getEndTime());
+        mrJobAnalysisEntity.setDurationTime(jobExecutionAPIEntity.getDurationTime());
+        mrJobAnalysisEntity.setCurrentState(jobExecutionAPIEntity.getInternalState());
+        mrJobAnalysisEntity.setJobConfig(new HashMap<>(jobExecutionAPIEntity.getJobConfig()));
+        mrJobAnalysisEntity.setProgress(this.app.getProgress());
+        return mrJobAnalysisEntity;
     }
 }

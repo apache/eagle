@@ -708,7 +708,7 @@ public class JHFSparkEventReader {
             config.eagleInfo.username,
             config.eagleInfo.password);
         int timeout = config.eagleInfo.timeout;
-        client.getJerseyClient().setReadTimeout(timeout * 1000);
+        client.setReadTimeout(timeout * 1000);
 
         return client;
     }
