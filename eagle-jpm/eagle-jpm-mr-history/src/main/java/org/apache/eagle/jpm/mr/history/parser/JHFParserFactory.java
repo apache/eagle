@@ -38,11 +38,13 @@ public class JHFParserFactory {
         MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = appConfig.getEagleServiceConfig();
 
         JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter, appConfig);
+        // add HistoryJobEntityCreationListener
         reader2.addListener(new JobEntityCreationEagleServiceListener(appConfig));
         reader2.addListener(new TaskFailureListener(eagleServiceConfig));
         reader2.addListener(new TaskAttemptCounterListener(eagleServiceConfig));
         reader2.addListener(new JobConfigurationCreationServiceListener(eagleServiceConfig));
 
+        // add HistoryJobEntityLifecycleListener
         reader2.register(new JobEntityLifecycleAggregator());
         JHFParserBase parser = new JHFMRVer2Parser(reader2);
         return parser;
