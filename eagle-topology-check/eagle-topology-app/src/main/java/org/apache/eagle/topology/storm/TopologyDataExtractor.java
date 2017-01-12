@@ -23,10 +23,13 @@ import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.apache.eagle.topology.extractor.TopologyExtractorFactory;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.apache.eagle.topology.resolver.impl.ClusterNodeAPITopologyRackResolver;
 import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -74,10 +77,13 @@ public class TopologyDataExtractor {
         TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
         if (config.dataExtractorConfig.resolverCls != null) {
             try {
-                rackResolver = config.dataExtractorConfig.resolverCls.newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+                if (config.dataExtractorConfig.resolverCls == ClusterNodeAPITopologyRackResolver.class) {
+                    Constructor ctor = config.dataExtractorConfig.resolverCls.getConstructor(String.class);
+                    rackResolver = (ClusterNodeAPITopologyRackResolver) ctor.newInstance(config.dataExtractorConfig.resolverAPIUrl);
+                } else {
+                    rackResolver = config.dataExtractorConfig.resolverCls.newInstance();
+                }
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
