@@ -482,7 +482,7 @@
                 <div class="footer">
                     <table width="100%">
                         <tr>
-                            <td class="aligncenter content-block">Powered by <a href="http://eagle.incubator.apache.org">Apache Eagle</a> (version: $alert["version"])</td>
+                            <td class="aligncenter content-block">Powered by <a href="http://eagle.apache.org">Apache Eagle</a> (version: $alert["version"])</td>
                         </tr>
                     </table>
                 </div>
