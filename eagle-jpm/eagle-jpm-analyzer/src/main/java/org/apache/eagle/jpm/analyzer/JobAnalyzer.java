@@ -18,11 +18,11 @@
 package org.apache.eagle.jpm.analyzer;
 
 /**
- * Each JobAnalyzer contains one or more Evaluators to analysis each job.
+ * Each JobAnalyzer contains one or more Evaluators to analyze each job.
  * Each Evaluator is a group of Processors
- * Each Processor implements an algorithm or a model to analysis one dimension of a job
+ * Each Processor implements an algorithm or a model to analyze one dimension of a job
  *
  */
 public interface JobAnalyzer {
-    void analysis(AnalyzerEntity analyzerEntity) throws Exception;
+    void analyze(AnalyzerEntity analyzerEntity) throws Exception;
 }
