@@ -66,7 +66,7 @@ After successfully building, you will find eagle binary tarball under _eagle-ser
 
 * (Optional) Install/Start [HDP Sandbox](http://hortonworks.com/products/sandbox/) which provide an all-in-one virtual machine with most dependency services like Zookeeper, Kafka, HBase, etc and monitored hadoop components.
 * Import Eagle as maven project with popular IDE like [IntelliJ IDEA](https://www.jetbrains.com/idea/)
-* Start **Eagle Server** in `debug` mode by running (default http port: `9090`, default smpt port: `5025`)
+* Start **Eagle Server** in `debug` mode by running (default http port: `9090`, default smtp port: `5025`)
 
         org.apache.eagle.server.ServerDebug
   
