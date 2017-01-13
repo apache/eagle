@@ -56,7 +56,7 @@
 
 	hadoopMetricApp.portal({
 		name: "Services", icon: "heartbeat", list: [
-			{name: "Overview", path: "hadoopMetric"},
+			{name: "HBase", path: "hadoopMetric"},
 			{name: "HDFS", path: "hadoopMetric/hdfs"}
 		]
 	}, true);
