@@ -148,11 +148,11 @@ public class JdbcImplTest {
             OpResult result = dao.addPublishmentType(publishmentType);
             Assert.assertEquals(200, result.code);
             List<PublishmentType> types = dao.listPublishmentType();
-            Assert.assertEquals(5, types.size());
+            Assert.assertEquals(6, types.size());
 
             dao.removePublishmentType("KAFKA");
             types = dao.listPublishmentType();
-            Assert.assertTrue(types.size() == 4);
+            Assert.assertTrue(types.size() == 5);
         }
     }
 
