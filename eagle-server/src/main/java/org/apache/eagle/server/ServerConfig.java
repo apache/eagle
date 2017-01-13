@@ -19,7 +19,7 @@ package org.apache.eagle.server;
 import io.dropwizard.Configuration;
 import org.apache.eagle.common.Version;
 import org.apache.eagle.server.authentication.config.AuthenticationSettings;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ServerConfig extends Configuration {
     private static final String SERVER_NAME = "Apache Eagle";

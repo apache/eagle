@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.storage.operation;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 

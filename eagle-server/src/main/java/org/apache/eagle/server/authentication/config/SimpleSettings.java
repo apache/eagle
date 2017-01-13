@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.server.authentication.config;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SimpleSettings {
     private String username = null;

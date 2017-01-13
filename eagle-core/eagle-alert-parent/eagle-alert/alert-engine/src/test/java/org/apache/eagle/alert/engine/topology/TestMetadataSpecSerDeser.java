@@ -23,7 +23,7 @@ import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;

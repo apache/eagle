@@ -20,7 +20,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.Column;
 import org.apache.eagle.log.entity.meta.ColumnFamily;
 import org.apache.eagle.log.entity.meta.TimeSeries;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.apache.eagle.log.entity.meta.Prefix;
 import org.apache.eagle.log.entity.meta.Table;

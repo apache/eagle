@@ -17,10 +17,11 @@
 
 package org.apache.eagle.metadata.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 
 import java.util.List;
 import java.util.Map;

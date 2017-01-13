@@ -17,9 +17,9 @@
 package org.apache.eagle.alert.engine.evaluator;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class PoilcyExtendedTest {
             mapper.readTree(PoilcyExtendedTest.class.getResourceAsStream("/extend_policy.json"));
         Assert.assertEquals(1, arrayNode.size());
         for (JsonNode node : arrayNode) {
-            PolicyDefinition definition = mapper.readValue(node, PolicyDefinition.class);
+            PolicyDefinition definition = mapper.treeToValue(node, PolicyDefinition.class);
 
             Assert.assertNotNull(definition);
             Assert.assertNotNull(definition.getName());

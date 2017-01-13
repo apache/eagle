@@ -16,10 +16,11 @@
  */
 package org.apache.eagle.metadata.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 
 import java.util.List;
 

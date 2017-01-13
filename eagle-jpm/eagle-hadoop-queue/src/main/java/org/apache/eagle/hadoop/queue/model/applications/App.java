@@ -21,8 +21,8 @@
  */
 package org.apache.eagle.hadoop.queue.model.applications;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * App model for Yarn Resource http://[rm http address:port]/ws/v1/cluster/apps.

@@ -17,7 +17,7 @@
 package org.apache.eagle.log.entity.meta;
 
 import org.apache.hadoop.io.Writable;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

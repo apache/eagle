@@ -18,7 +18,7 @@ package org.apache.eagle.log.entity;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * GenericMetricEntity should use prefix field which is extended from TaggedLogAPIEntity as metric name

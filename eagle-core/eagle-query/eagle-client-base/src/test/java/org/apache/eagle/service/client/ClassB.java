@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.service.client;
 
-import org.codehaus.jackson.annotate.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("ClassB")
 public class ClassB extends Base {
