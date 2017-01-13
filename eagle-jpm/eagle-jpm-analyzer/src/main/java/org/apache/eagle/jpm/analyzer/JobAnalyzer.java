@@ -23,6 +23,6 @@ package org.apache.eagle.jpm.analyzer;
  * Each Processor implements an algorithm or a model to analyze one dimension of a job
  *
  */
-public interface JobAnalyzer {
-    void analyze(AnalyzerEntity analyzerEntity) throws Exception;
+public interface JobAnalyzer<T extends AnalyzerEntity> {
+    void analyze(T analyzerEntity) throws Exception;
 }
