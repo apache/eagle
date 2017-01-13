@@ -26,7 +26,7 @@
 			$scope.site = $wrapState.param.siteId;
 			var activeMasterInfo = METRIC.hbaseActiveMaster($scope.site);
 
-			PageConfig.title = 'Overview';
+			PageConfig.title = 'HBase';
 			var storageOption = {
 				animation: false,
 				tooltip: {
