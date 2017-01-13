@@ -32,6 +32,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>eagle-jpm-analyzer</module>
         <module>eagle-jpm-spark-running</module>
         <module>eagle-jpm-spark-history</module>
         <module>eagle-jpm-mr-history</module>

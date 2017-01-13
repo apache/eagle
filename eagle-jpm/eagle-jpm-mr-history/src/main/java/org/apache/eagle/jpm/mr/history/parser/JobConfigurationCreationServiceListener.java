@@ -84,7 +84,6 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
             } finally {
                 list.clear();
                 jobConfigurationEntity = null;
-                client.getJerseyClient().destroy();
                 client.close();
             }
             tried++;

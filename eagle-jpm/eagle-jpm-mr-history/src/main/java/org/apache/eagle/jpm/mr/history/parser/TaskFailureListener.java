@@ -139,7 +139,6 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
             }
             tried++;
         }
-        client.getJerseyClient().destroy();
         client.close();
     }
 }

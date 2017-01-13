@@ -50,7 +50,7 @@ public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthChec
                 eagleServiceConfig.username,
                 eagleServiceConfig.password);
 
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.timeout * 1000);
+        client.setReadTimeout(eagleServiceConfig.timeout * 1000);
 
         String message = "";
         try {
@@ -88,7 +88,6 @@ public class SparkHistoryJobApplicationHealthCheck extends ApplicationHealthChec
         } catch (Exception e) {
             return Result.unhealthy(printMessages(message, "An exception was caught when fetch application current process time: ", ExceptionUtils.getStackTrace(e)));
         } finally {
-            client.getJerseyClient().destroy();
             try {
                 client.close();
             } catch (Exception e) {

@@ -89,7 +89,6 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
         } catch (Exception e) {
             return Result.unhealthy(printMessages(message, "An exception was caught when fetch application current process time: ", ExceptionUtils.getStackTrace(e)));
         } finally {
-            client.getJerseyClient().destroy();
             try {
                 client.close();
             } catch (Exception e) {

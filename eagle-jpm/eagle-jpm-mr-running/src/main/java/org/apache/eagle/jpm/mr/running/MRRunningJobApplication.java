@@ -18,6 +18,7 @@ package org.apache.eagle.jpm.mr.running;
 
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobFetchSpout;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobParseBolt;
 import org.apache.eagle.jpm.util.Constants;
@@ -67,7 +68,8 @@ public class MRRunningJobApplication extends StormApplication {
                 mrRunningJobConfig.getEndpointConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys,
-                config),
+                config,
+                new MRJobPerformanceAnalyzer(config)),
                 tasks).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
         return topologyBuilder.createTopology();
     }

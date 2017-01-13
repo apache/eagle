@@ -19,6 +19,7 @@ package org.apache.eagle.app.spi;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationListener;
@@ -130,7 +131,7 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
         currentRegistry.register(scope, new AbstractModule() {
             @Override
             protected void configure() {
-                bind(type).to(impl);
+                bind(type).to(impl).in(Singleton.class);
             }
         });
     }

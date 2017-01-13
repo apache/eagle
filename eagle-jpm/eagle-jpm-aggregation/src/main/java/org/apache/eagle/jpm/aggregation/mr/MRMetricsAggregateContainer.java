@@ -74,6 +74,7 @@ public class MRMetricsAggregateContainer implements MetricsAggregateContainer, S
 
             List<Map<List<String>, List<Double>>> results = response.getObj();
             long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
+            client.close();
             return currentProcessTimeStamp;
         } catch (Exception e) {
             LOG.warn("{}", e);

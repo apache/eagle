@@ -39,7 +39,7 @@ public class Utils {
             try {
                 is.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.warn("{}", e);
             }
         }
     }
@@ -48,7 +48,7 @@ public class Utils {
         try {
             Thread.sleep(seconds * 1000);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("{}", e);
         }
     }
 
@@ -60,7 +60,7 @@ public class Utils {
             Date parsedDate = dateFormat.parse(date);
             timestamp = parsedDate.getTime();
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOG.warn("{}", e);
         }
 
         if (timestamp == 0L) {

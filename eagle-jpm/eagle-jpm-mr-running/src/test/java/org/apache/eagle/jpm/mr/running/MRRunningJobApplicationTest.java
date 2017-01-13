@@ -23,6 +23,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobFetchSpout;
@@ -88,7 +89,8 @@ public class MRRunningJobApplicationTest {
                 mrRunningJobConfig.getEndpointConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys,
-                config);
+                config,
+                new MRJobPerformanceAnalyzer(config));
         MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
         PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig()).thenReturn(mrRunningJobManager);
         mrRunningJobParseBolt.prepare(null, null, null);
