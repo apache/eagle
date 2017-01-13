@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 
 /**
@@ -206,7 +207,7 @@ public class MetadataResource {
 
     @Path("/policies")
     @POST
-    public OpResult addPolicy(PolicyDefinition policy) {
+    public OpResult addPolicy(@Valid PolicyDefinition policy) {
         PolicyValidationResult validationResult = this.validatePolicy(policy);
         if (validationResult.isSuccess()) {
             return dao.addPolicy(policy);

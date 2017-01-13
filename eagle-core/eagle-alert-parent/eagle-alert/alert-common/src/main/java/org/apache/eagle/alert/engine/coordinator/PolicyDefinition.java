@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.*;
@@ -31,6 +32,7 @@ import java.util.*;
 public class PolicyDefinition implements Serializable {
     private static final long serialVersionUID = 377581499339572414L;
     // unique identifier
+    @Length(min = 1, max = 50, message = "length should between 1 and 50")
     private String name;
     private String description;
     private List<String> inputStreams = new ArrayList<String>();
@@ -226,9 +228,9 @@ public class PolicyDefinition implements Serializable {
             }
             Definition another = (Definition) that;
             if (another.type.equals(this.type)
-                && another.value.equals(this.value)
-                && ListUtils.isEqualList(another.inputStreams, this.inputStreams)
-                && ListUtils.isEqualList(another.outputStreams, this.outputStreams)) {
+                    && another.value.equals(this.value)
+                    && ListUtils.isEqualList(another.inputStreams, this.inputStreams)
+                    && ListUtils.isEqualList(another.outputStreams, this.outputStreams)) {
                 return true;
             }
             return false;
