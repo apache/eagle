@@ -77,14 +77,15 @@ public class TopologyCheckAppConfig implements Serializable {
         this.dataExtractorConfig.numDataFetcherSpout = config.getInt("topology.numDataFetcherSpout");
         this.dataExtractorConfig.numEntityPersistBolt = config.getInt("topology.numEntityPersistBolt");
         this.dataExtractorConfig.numKafkaSinkBolt = config.getInt("topology.numOfKafkaSinkBolt");
-        this.dataExtractorConfig.resolverAPIUrl = config.getString("topology.resolverAPIUrl");
-        String resolveCls = config.getString("topology.rackResolverCls");
-        try {
-            this.dataExtractorConfig.resolverCls = (Class<? extends TopologyRackResolver>) Class.forName(resolveCls);
-        } catch (ClassNotFoundException e) {
-            LOG.warn("{} is not found, will use DefaultTopologyRackResolver instead", resolveCls);
-            this.dataExtractorConfig.resolverCls = DefaultTopologyRackResolver.class;
-            //e.printStackTrace();
+
+        this.dataExtractorConfig.resolverCls = DefaultTopologyRackResolver.class;
+        if (config.hasPath("topology.rackResolverCls")) {
+            String resolveCls = config.getString("topology.rackResolverCls");
+            try {
+                this.dataExtractorConfig.resolverCls = (Class<? extends TopologyRackResolver>) Class.forName(resolveCls);
+            } catch (ClassNotFoundException e) {
+                LOG.warn("{} is not found, will use DefaultTopologyRackResolver instead", resolveCls);
+            }
         }
 
         if (config.hasPath("dataSourceConfig.hbase.enabled") && config.getBoolean("dataSourceConfig.hbase.enabled")) {
@@ -121,7 +122,6 @@ public class TopologyCheckAppConfig implements Serializable {
         public int numKafkaSinkBolt;
         public long fetchDataIntervalInSecs;
         public int parseThreadPoolSize;
-        public String resolverAPIUrl;
         public Class<? extends TopologyRackResolver> resolverCls;
     }
 

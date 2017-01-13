@@ -18,7 +18,11 @@
 
 package org.apache.eagle.topology.resolver;
 
+import org.apache.eagle.topology.TopologyCheckAppConfig;
+
 public interface TopologyRackResolver {
+
+    default void prepare(TopologyCheckAppConfig config) {}
 
     /**
      *resolve rack by hostname.

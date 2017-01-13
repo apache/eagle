@@ -21,6 +21,7 @@ package org.apache.eagle.topology.resolver.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.app.utils.AppConstants;
 import org.apache.eagle.app.utils.connection.InputStreamUtils;
+import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.resolver.model.Node;
 import org.slf4j.Logger;
@@ -40,8 +41,9 @@ public class ClusterNodeAPITopologyRackResolver implements TopologyRackResolver 
     private String hostPort = "8041";//TODO configurable
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 
-    public ClusterNodeAPITopologyRackResolver(String activeApiUrl) {
-        this.activeApiUrl = activeApiUrl;
+    @Override
+    public void prepare(TopologyCheckAppConfig config) {
+        this.activeApiUrl = config.getConfig().getString("topology.resolverAPIUrl");
     }
 
     @Override
