@@ -81,6 +81,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     private long sumReduceTaskDuration;
 
     private JobCounterMetricsGenerator jobCounterMetricsGenerator;
+    private JobSuggestionListener jobSuggestionListener;
 
     private MRHistoryJobConfig appConfig;
 
@@ -127,6 +128,10 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
         this.appConfig = appConfig;
         this.jobCounterMetricsGenerator = new JobCounterMetricsGenerator(appConfig.getEagleServiceConfig());
+        this.jobSuggestionListener = new JobSuggestionListener();
+        if (this.configuration != null) {
+            this.jobSuggestionListener.jobConfigCreated(configuration);
+        }
     }
 
     public void register(HistoryJobEntityLifecycleListener lifecycleListener) {
@@ -179,7 +184,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         this.jobType = jobType;
     }
 
-    protected void handleJob(EventType eventType, Map<Keys, String> values, Object totalCounters) throws Exception {
+    protected void handleJob(EventType eventType, Map<Keys, String> values, Object totalCounters, Object mapCounters, Object reduceCounters) throws Exception {
         String id = values.get(Keys.JOBID);
 
         if (jobId == null) {
@@ -300,8 +305,15 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             this.jobCounterMetricsGenerator.setBaseTags(jobExecutionEntity.getTags());
 
             formatDiagnostics(values.get(Keys.DIAGNOSTICS));
-
             entityCreated(jobExecutionEntity);
+            jobSuggestionListener.jobEntityCreated(jobExecutionEntity);
+
+            if (configuration != null && totalCounters != null) {
+                JobCounters parsedTotalCounters = parseCounters(totalCounters);
+                JobCounters parsedMapCounters = parseCounters(mapCounters);
+                JobCounters parsedReduceCounters = parseCounters(reduceCounters);
+                jobSuggestionListener.jobCountersCreated(parsedTotalCounters, parsedMapCounters, parsedReduceCounters);
+            }
         }
     }
 
@@ -415,6 +427,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
             entityCreated(entity);
             this.jobCounterMetricsGenerator.taskExecutionEntityCreated(entity);
+            this.jobSuggestionListener.jobEntityCreated(entity);
             //_taskStartTime.remove(taskID); // clean this taskID
         } else if ((recType == RecordTypes.MapAttempt || recType == RecordTypes.ReduceAttempt) && startTime != null) { // task attempt start
             taskAttemptStartTime.put(taskAttemptID, Long.valueOf(startTime));
@@ -432,7 +445,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             // it is very likely that an attempt ID could be both succeeded and failed due to M/R system
             // in this case, we should ignore this attempt?
             if (taskAttemptStartTime.get(taskAttemptID) == null) {
-                LOG.warn("task attemp has consistency issue " + taskAttemptID);
+                LOG.warn("task attempt has consistency issue " + taskAttemptID);
                 return;
             }
             entity.setStartTime(taskAttemptStartTime.get(taskAttemptID));
@@ -441,6 +454,15 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             entity.setDuration(entity.getEndTime() - entity.getStartTime());
             entity.setTaskStatus(values.get(Keys.TASK_STATUS));
             entity.setError(values.get(Keys.ERROR));
+            if (values.containsKey(Keys.SHUFFLE_FINISHED)) {
+                entity.setShuffleFinishTime(Long.valueOf(values.get(Keys.SHUFFLE_FINISHED)));
+            }
+            if (values.containsKey(Keys.SORT_FINISHED)) {
+                entity.setSortFinishTime(Long.valueOf(values.get(Keys.SORT_FINISHED)));
+            }
+            if (values.containsKey(Keys.MAP_FINISH_TIME)) {
+                entity.setMapFinishTime(Long.valueOf(values.get(Keys.MAP_FINISH_TIME)));
+            }
             if (values.get(Keys.COUNTERS) != null || counters != null) {  // when task is killed, COUNTERS does not exist
                 //entity.setJobCounters(parseCounters(values.get(Keys.COUNTERS)));
                 entity.setJobCounters(parseCounters(counters));
@@ -473,8 +495,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 taskAttemptErrorCategoryEntity.setTimestamp(entity.getTimestamp());
                 entityCreated(taskAttemptErrorCategoryEntity);
             }
-
             taskAttemptStartTime.remove(taskAttemptID);
+            jobSuggestionListener.jobEntityCreated(entity);
         } else {
             // silently ignore
             LOG.warn("It's an exceptional case ?");

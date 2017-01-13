@@ -185,7 +185,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
         if (js.getJobQueueName() != null) {
             values.put(Keys.JOB_QUEUE, js.getJobQueueName().toString());
         }
-        handleJob(wrapper.getType(), values, null);
+        handleJob(wrapper.getType(), values, null, null, null);
     }
 
     private void handleJobInited(Event wrapper) throws Exception {
@@ -209,7 +209,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
         if (js.getUberized() != null) {
             values.put(Keys.UBERISED, js.getUberized().toString());
         }
-        handleJob(wrapper.getType(), values, null);
+        handleJob(wrapper.getType(), values, null, null, null);
     }
 
     private void handleJobFinished(Event wrapper) throws Exception {
@@ -234,7 +234,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
             values.put(Keys.FAILED_REDUCES, js.getFailedReduces().toString());
         }
         values.put(Keys.JOB_STATUS, EagleJobStatus.SUCCEEDED.name());
-        handleJob(wrapper.getType(), values, js.getTotalCounters());
+        handleJob(wrapper.getType(), values, js.getTotalCounters(), js.getMapCounters(), js.getReduceCounters());
     }
 
     private void handleJobUnsuccessfulCompletion(Event wrapper) throws Exception {
@@ -258,7 +258,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
         if (js.getDiagnostics() != null) {
             values.put(Keys.DIAGNOSTICS, js.getDiagnostics().toString());
         }
-        handleJob(wrapper.getType(), values, null);
+        handleJob(wrapper.getType(), values, null, null, null);
     }
 
     private void handleTaskStarted(Event wrapper) throws Exception {
@@ -539,6 +539,9 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
     }
 
     protected JobCounters parseCounters(Object value) throws IOException {
+        if (value == null) {
+            return null;
+        }
         JobCounters jc = new JobCounters();
         Map<String, Map<String, Long>> groups = new HashMap<>();
         JhCounters counters = (JhCounters) value;

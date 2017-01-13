@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+@Deprecated
 public enum JHFFormat {
     MRVer1,
     MRVer2
