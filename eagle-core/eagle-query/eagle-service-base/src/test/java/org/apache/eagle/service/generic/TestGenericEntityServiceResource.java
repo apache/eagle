@@ -206,7 +206,7 @@ public class TestGenericEntityServiceResource {
         Assert.assertTrue(responseEntity.isSuccess());
         Assert.assertTrue(responseEntity.getMeta().toString().startsWith("{firstTimestamp=null, totalResults=1, lastTimestamp=null, elapsedms="));
         Assert.assertEquals(null, responseEntity.getType());
-        Assert.assertEquals("{prefix=null, timestamp=" + timestamp + ", tags={cluster=test4UT, jobId=job_2, index=1, datacenter=dc1}, exp=null, encodedRowkey=null, serializeAlias=null, serializeVerbose=true, field1=1, field2=2, field3=3, field4=4, field5=5.0, field6=5.0, field7=7}", responseEntity.getObj().get(0).toString());
+        Assert.assertEquals("{timestamp=" + timestamp + ", tags={cluster=test4UT, jobId=job_2, index=1, datacenter=dc1}, serializeVerbose=true, field1=1, field2=2, field3=3, field4=4, field5=5.0, field6=5.0, field7=7}", responseEntity.getObj().get(0).toString());
         Assert.assertEquals(null, responseEntity.getException());
         verify(dataStorage).queryById(rowkeys, ed);
     }
