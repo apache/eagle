@@ -18,11 +18,11 @@
 
 package org.apache.eagle.topology.resolver.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.app.utils.AppConstants;
 import org.apache.eagle.app.utils.connection.InputStreamUtils;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.resolver.model.Node;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
