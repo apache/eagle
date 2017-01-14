@@ -61,13 +61,8 @@ public class TopologyDataExtractor {
         futures.forEach(future -> {
             try {
                 future.get(fetchTimeoutSecs, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                LOGGER.info("Caught an overtime exception with message" + e.getMessage());
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                LOGGER.error("Caught an overtime exception with message" + e.getMessage(), e);
             }
         });
     }
@@ -77,21 +72,17 @@ public class TopologyDataExtractor {
         TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
         if (config.dataExtractorConfig.resolverCls != null) {
             try {
-                if (config.dataExtractorConfig.resolverCls == ClusterNodeAPITopologyRackResolver.class) {
-                    Constructor ctor = config.dataExtractorConfig.resolverCls.getConstructor(String.class);
-                    rackResolver = (ClusterNodeAPITopologyRackResolver) ctor.newInstance(config.dataExtractorConfig.resolverAPIUrl);
-                } else {
-                    rackResolver = config.dataExtractorConfig.resolverCls.newInstance();
-                }
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                e.printStackTrace();
+                rackResolver = config.dataExtractorConfig.resolverCls.newInstance();
+                rackResolver.prepare(config);
+            } catch (InstantiationException | IllegalAccessException e) {
+                LOGGER.error(e.getMessage(), e);
             }
         }
         for (TopologyType type : config.topologyTypes) {
             try {
                 extractors.add(TopologyExtractorFactory.create(type, config, rackResolver, collector));
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         }
         return extractors;

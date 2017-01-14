@@ -36,6 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -89,37 +90,17 @@ public class TestResourceUnmarshal {
         Assert.assertEquals(timeSeriesAPIEntityList.get(0).getTags().get("datacenter"), result.get(0).getTags().get("datacenter"));
         Assert.assertEquals(timeSeriesAPIEntityList.get(0).getTags().get("index"), result.get(0).getTags().get("index"));
         Assert.assertEquals(timeSeriesAPIEntityList.get(0).getTags().get("jobId"), result.get(0).getTags().get("jobId"));
-
     }
 
     @Test
     public void testUnmarshalAsStringlist() throws NoSuchMethodException, JsonProcessingException, InvocationTargetException, IllegalAccessException {
-
-        TestTimeSeriesAPIEntity timeSeriesAPIEntity = new TestTimeSeriesAPIEntity();
-        timeSeriesAPIEntity.setTimestamp(1l);
-        timeSeriesAPIEntity.setField1(1);
-        timeSeriesAPIEntity.setField2(2);
-        timeSeriesAPIEntity.setField3(3);
-        timeSeriesAPIEntity.setField4(4L);
-        timeSeriesAPIEntity.setField5(5.0);
-        timeSeriesAPIEntity.setField6(5.0);
-        timeSeriesAPIEntity.setField7("7");
-        timeSeriesAPIEntity.setTags(new HashMap<>());
-        timeSeriesAPIEntity.getTags().put("cluster", "test4UT");
-        timeSeriesAPIEntity.getTags().put("datacenter", "dc1");
-        timeSeriesAPIEntity.getTags().put("index", "" + 1);
-        timeSeriesAPIEntity.getTags().put("jobId", "job_" + timeSeriesAPIEntity.getTimestamp());
-
-        List<TestTimeSeriesAPIEntity> timeSeriesAPIEntityList = new ArrayList<>();
-        timeSeriesAPIEntityList.add(timeSeriesAPIEntity);
-
+        String[] entityIds = new String[]{"key1","key2"};
         GenericEntityServiceResource genericEntityServiceResource = new GenericEntityServiceResource();
         Method unmarshalAsStringlist = genericEntityServiceResource.getClass().getDeclaredMethod("unmarshalAsStringlist", InputStream.class);
         unmarshalAsStringlist.setAccessible(true);
 
-        InputStream stream = new ByteArrayInputStream(MAPPER.writeValueAsString(timeSeriesAPIEntityList).getBytes(StandardCharsets.UTF_8));
+        InputStream stream = new ByteArrayInputStream(MAPPER.writeValueAsString(entityIds).getBytes(StandardCharsets.UTF_8));
         List<String> result = (List<String>) unmarshalAsStringlist.invoke(genericEntityServiceResource, stream);
-
-        Assert.assertEquals("[{, prefix, null, timestamp, 1, tags, {, cluster, test4UT, jobId, job_1, index, 1, datacenter, dc1, }, exp, null, encodedRowkey, null, serializeAlias, null, serializeVerbose, true, field1, 1, field2, 2, field3, 3, field4, 4, field5, 5.0, field6, 5.0, field7, 7, }]", result.toString());
+        Assert.assertArrayEquals(entityIds, result.toArray());
     }
 }

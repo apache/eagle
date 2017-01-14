@@ -49,9 +49,10 @@ public class IPMaskTopologyRackResolver implements TopologyRackResolver {
             InetAddress address = InetAddress.getByName(hostname);
             result = "rack" + (int) (address.getAddress()[rackPos] & 0xff);
         } catch (UnknownHostException e) {
-            //LOG.warn("UnknownHostException: {}", hostname);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("UnknownHostException: {}", hostname);
+            }
         }
         return result;
     }
-
 }

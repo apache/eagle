@@ -17,6 +17,7 @@
  */
 package org.apache.eagle.topology;
 
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.utils.connection.InputStreamUtils;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.resolver.impl.ClusterNodeAPITopologyRackResolver;
@@ -27,7 +28,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
+import java.util.HashMap;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
@@ -37,27 +38,31 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InputStreamUtils.class)
 public class TestClusterNodeAPITopologyRackResolver {
+    private static final String apiUrl = "http://yhd-jqhadoop168.int.yihaodian.com:8088/ws/v1/cluster/nodes";
+    private static final TopologyCheckAppConfig config = TopologyCheckAppConfig.newInstance(ConfigFactory.load().withFallback(
+        ConfigFactory.parseMap(new HashMap<String, String>() {{
+            put("topology.resolverAPIUrl", apiUrl);
+        }})));
+
     @Test
     public void testClusterNodeAPITopologyRackResolver() throws Exception {
         mockStatic(InputStreamUtils.class);
-        String apiUrl = "http://yhd-jqhadoop168.int.yihaodian.com:8088/ws/v1/cluster/nodes";
         String hostname = "hostname";
         mockInputSteam("/nodeinfo.json", apiUrl + "/" + hostname + ":8041");
-
         Class<? extends TopologyRackResolver> resolverCls = (Class<? extends TopologyRackResolver>) Class.forName("org.apache.eagle.topology.resolver.impl.ClusterNodeAPITopologyRackResolver");
         Assert.assertTrue(resolverCls == ClusterNodeAPITopologyRackResolver.class);
-        Constructor ctor = resolverCls.getConstructor(String.class);
-        TopologyRackResolver topologyRackResolver = (TopologyRackResolver) ctor.newInstance(apiUrl);
+        TopologyRackResolver topologyRackResolver = resolverCls.newInstance();
+        topologyRackResolver.prepare(config);
         Assert.assertEquals("/rowb/rack12", topologyRackResolver.resolve(hostname));
     }
 
     @Test
     public void testClusterNodeAPITopologyRackResolver1() throws Exception {
         mockStatic(InputStreamUtils.class);
-        String apiUrl = "http://yhd-jqhadoop168.int.yihaodian.com:8088/ws/v1/cluster/nodes";
         String hostname = "hostname";
         mockInputSteamWithException(apiUrl + "/" + hostname + ":8041");
-        TopologyRackResolver topologyRackResolver = new ClusterNodeAPITopologyRackResolver(apiUrl);
+        TopologyRackResolver topologyRackResolver = new ClusterNodeAPITopologyRackResolver();
+        topologyRackResolver.prepare(config);
         Assert.assertEquals("/default-rack", topologyRackResolver.resolve(hostname));
     }
 
