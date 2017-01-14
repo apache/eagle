@@ -28,7 +28,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 import static org.mockito.Matchers.anyObject;
@@ -41,7 +40,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 public class TestClusterNodeAPITopologyRackResolver {
     private static final String apiUrl = "http://yhd-jqhadoop168.int.yihaodian.com:8088/ws/v1/cluster/nodes";
     private static final TopologyCheckAppConfig config = TopologyCheckAppConfig.newInstance(ConfigFactory.load().withFallback(
-        ConfigFactory.parseMap(new HashMap<String,String>() {{
+        ConfigFactory.parseMap(new HashMap<String, String>() {{
             put("topology.resolverAPIUrl", apiUrl);
         }})));
 
