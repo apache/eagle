@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Map;
 
 public class EagleServiceClientImpl extends EagleServiceBaseClient {
-    private final static Logger LOG = LoggerFactory.getLogger(EagleServiceClientImpl.class);
-    private final static String SERVICE_HOST_KEY = "service.host";
-    private final static String SERVICE_PORT_KEY = "service.port";
-    private final static String SERVICE_USERNAME_KEY = "service.username";
-    private final static String SERVICE_PASSWORD_KEY = "service.password";
+    private static final Logger LOG = LoggerFactory.getLogger(EagleServiceClientImpl.class);
+    private static final String SERVICE_HOST_KEY = "service.host";
+    private static final String SERVICE_PORT_KEY = "service.port";
+    private static final String SERVICE_USERNAME_KEY = "service.username";
+    private static final String SERVICE_PASSWORD_KEY = "service.password";
 
     public EagleServiceClientImpl(String host, int port) {
         super(host, port);
@@ -61,11 +61,11 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
      * Try to get eagle service port from config by key: service.port no matter STRING or INT.
      */
     private static int tryGetPortFromConfig(Config config) {
-        if (config.hasPath("service.port")) {
+        if (config.hasPath(SERVICE_PORT_KEY)) {
             try {
-                return config.getInt("service.port");
+                return config.getInt(SERVICE_PORT_KEY);
             } catch (ConfigException.WrongType wrongType) {
-                return Integer.valueOf(config.getString("service.port"));
+                return Integer.valueOf(config.getString(SERVICE_PORT_KEY));
             }
         } else {
             return 9090;
