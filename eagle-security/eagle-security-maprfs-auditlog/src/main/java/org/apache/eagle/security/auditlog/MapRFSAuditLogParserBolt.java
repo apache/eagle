@@ -38,7 +38,7 @@ import java.util.TreeMap;
  * Since 8/11/16.
  */
 public class MapRFSAuditLogParserBolt extends BaseRichBolt {
-    private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogParserBolt.class);
+    private static Logger LOG = LoggerFactory.getLogger(MapRFSAuditLogParserBolt.class);
     private OutputCollector collector;
 
     @Override
