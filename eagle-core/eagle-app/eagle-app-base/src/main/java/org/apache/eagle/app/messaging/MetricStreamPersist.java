@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MetricStreamPersist extends BaseRichBolt  {
+public class MetricStreamPersist extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MetricStreamPersist.class);
     public static final String METRIC_NAME_FIELD = "metricName";
 
@@ -75,24 +75,26 @@ public class MetricStreamPersist extends BaseRichBolt  {
 
     @Override
     public void execute(Tuple input) {
+        GenericMetricEntity metricEntity = null;
         try {
-            GenericMetricEntity metricEntity = this.mapper.map(StreamConvertHelper.tupleToEvent(input).f1());
+            metricEntity = this.mapper.map(StreamConvertHelper.tupleToEvent(input).f1());
             if (batchSize <= 1) {
                 GenericServiceAPIResponseEntity<String> response = this.client.create(Collections.singletonList(metricEntity));
                 if (!response.isSuccess()) {
                     LOG.error("Service side error: {}", response.getException());
                     collector.reportError(new IllegalStateException(response.getException()));
-                } else {
-                    collector.emit(Collections.singletonList(metricEntity.getPrefix()));
-                    collector.ack(input);
                 }
             } else {
                 this.batchSender.send(metricEntity);
-                collector.ack(input);
             }
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
+        } finally {
+            if (metricEntity != null) {
+                collector.emit(Collections.singletonList(metricEntity.getPrefix()));
+            }
+            collector.ack(input);
         }
     }
 
@@ -127,12 +129,12 @@ public class MetricStreamPersist extends BaseRichBolt  {
         @Override
         public GenericMetricEntity map(Map event) {
             String metricName = metricDefinition.getNameSelector().getMetricName(event);
-            Preconditions.checkNotNull(metricName,"Metric name is null");
+            Preconditions.checkNotNull(metricName, "Metric name is null");
             Long timestamp = metricDefinition.getTimestampSelector().getTimestamp(event);
             Preconditions.checkNotNull(timestamp, "Timestamp is null");
-            Map<String,String> tags = new HashMap<>();
-            for (String dimensionField: metricDefinition.getDimensionFields()) {
-                Preconditions.checkNotNull(dimensionField,"Dimension field name is null");
+            Map<String, String> tags = new HashMap<>();
+            for (String dimensionField : metricDefinition.getDimensionFields()) {
+                Preconditions.checkNotNull(dimensionField, "Dimension field name is null");
                 tags.put(dimensionField, (String) event.get(dimensionField));
             }
 
@@ -141,7 +143,7 @@ public class MetricStreamPersist extends BaseRichBolt  {
                 values = new double[] {(double) event.get(metricDefinition.getValueField())};
             } else {
                 LOG.warn("Event has no value field '{}': {}, use 0 by default", metricDefinition.getValueField(), event);
-                values = new double[]{0};
+                values = new double[] {0};
             }
 
             GenericMetricEntity entity = new GenericMetricEntity();
