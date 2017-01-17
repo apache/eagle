@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * will refactor later if other types of job needs this.
- * AnalyzerEntity for each job needed to be analysised
+ * AnalyzerEntity for each job needed to be analyzed
  */
 public class AnalyzerEntity {
     private String jobDefId;

@@ -20,14 +20,18 @@ package org.apache.eagle.jpm.analyzer.mr.suggestion;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Evaluator;
+import org.apache.eagle.jpm.analyzer.Processor;
+import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class JobSuggestionEvaluator implements Evaluator, Serializable {
+public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionEvaluator.class);
 
     private Config config;
@@ -36,14 +40,37 @@ public class JobSuggestionEvaluator implements Evaluator, Serializable {
         this.config = config;
     }
 
+    private List<Processor> loadProcessors(MapReduceJobSuggestionContext context) {
+        List<Processor> processors = new ArrayList<>();
+        processors.add(new MapReduceCompressionSettingAnalyzer(context));
+        processors.add(new MapReduceSplitSettingAnalyzer(context));
+        processors.add(new MapReduceDataSkewAnalyzer(context));
+        processors.add(new MapReduceGCTimeAnalyzer(context));
+        processors.add(new MapReduceSpillAnalyzer(context));
+        processors.add(new MapReduceTaskNumAnalyzer(context));
+        processors.add(new MapReduceQueueResourceAnalyzer(context));
+
+        return processors;
+    }
+
     @Override
-    public Result.EvaluatorResult evaluate(AnalyzerEntity mrJobEntity) {
-        if (mrJobEntity.getCurrentState().equalsIgnoreCase(Constants.JobState.RUNNING.toString())) {
+    public Result.EvaluatorResult evaluate(MapReduceAnalyzerEntity analyzerEntity) {
+        if (analyzerEntity.getCurrentState().equalsIgnoreCase(Constants.JobState.RUNNING.toString())) {
+            return null;
+        }
+
+        MapReduceJobSuggestionContext jobContext = MapReduceJobSuggestionContext.getInstance().buildContext();
+        if (jobContext.getNumMaps() == 0) {
             return null;
         }
 
         Result.EvaluatorResult result = new Result.EvaluatorResult();
-        //TODO
+        for (Processor processor : loadProcessors(jobContext)) {
+            Result.ProcessorResult processorResult = processor.process(analyzerEntity);
+            if (processorResult != null) {
+                result.addProcessorResult(processor.getClass(), processorResult);
+            }
+        }
         return result;
     }
 }

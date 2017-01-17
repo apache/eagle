@@ -19,6 +19,6 @@ package org.apache.eagle.jpm.analyzer;
 
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 
-public interface Evaluator {
-    Result.EvaluatorResult evaluate(AnalyzerEntity analyzerEntity);
+public interface Evaluator<T extends AnalyzerEntity> {
+    Result.EvaluatorResult evaluate(T analyzerEntity);
 }
