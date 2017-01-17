@@ -128,7 +128,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
         this.appConfig = appConfig;
         this.jobCounterMetricsGenerator = new JobCounterMetricsGenerator(appConfig.getEagleServiceConfig());
-        this.jobSuggestionListener = new JobSuggestionListener();
+        this.jobSuggestionListener = new JobSuggestionListener(appConfig.getConfig());
         if (this.configuration != null) {
             this.jobSuggestionListener.jobConfigCreated(configuration);
         }
@@ -158,6 +158,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         for (HistoryJobEntityLifecycleListener listener : this.jobEntityLifecycleListeners) {
             listener.flush();
         }
+        jobSuggestionListener.flush();
     }
 
     private String buildJobTrackingUrl(String jobId) {

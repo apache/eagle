@@ -21,6 +21,8 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.util.MRJobTagName;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.TaskType;
 
@@ -62,76 +64,66 @@ public class MapReduceJobSuggestionContext {
 
     private static Boolean initialized = false;
 
-    private MapReduceJobSuggestionContext() {}
-    private static MapReduceJobSuggestionContext instance;
-    public static MapReduceJobSuggestionContext getInstance() {
-        if (instance == null) {
-            synchronized (MapReduceJobSuggestionContext.class) {
-                if (instance == null) {
-                    instance = new MapReduceJobSuggestionContext();
+    public MapReduceJobSuggestionContext(MapReduceAnalyzerEntity job) {
+        this.job = job;
+        this.jobconf = new JobConf(job.getJobConf());
+        buildContext();
+    }
+
+    private MapReduceJobSuggestionContext buildContext() {
+        avgMapTimeInSec = avgReduceTimeInSec = avgShuffleTimeInSec = 0;
+        numMaps = jobconf.getLong(NUM_MAPS, 0);
+        numReduces = jobconf.getLong(NUM_REDUCES, 0);
+
+        for (TaskAttemptExecutionAPIEntity attempt : job.getCompletedTaskAttemptsMap().values()) {
+            if (TaskType.MAP.toString().equalsIgnoreCase(getTaskType(attempt))) {
+                long mapTime = attempt.getEndTime() - attempt.getStartTime();
+                avgMapTimeInSec += mapTime;
+                if (firstMap == null || firstMap.getStartTime() > attempt.getStartTime()) {
+                    firstMap = attempt;
+                }
+                if (lastMap == null || lastMap.getEndTime() < attempt.getEndTime()) {
+                    lastMap = attempt;
+                }
+                if (worstMap == null || (worstMap.getEndTime() - worstMap.getStartTime()) < mapTime) {
+                    worstMap = attempt;
+                }
+                long tmpMem = getMinimumIOSortMemory(attempt);
+                if (tmpMem > minMapSpillMemBytes) {
+                    minMapSpillMemBytes = tmpMem;
+                }
+            } else if (TaskType.REDUCE.toString().equalsIgnoreCase(getTaskType(attempt))) {
+                long shuffleTime = attempt.getShuffleFinishTime() - attempt.getStartTime();
+                avgShuffleTimeInSec += shuffleTime;
+                if (firstShuffle == null || firstShuffle.getStartTime() > attempt.getStartTime()) {
+                    firstShuffle = attempt;
+                }
+                if (lastShuffle == null || lastShuffle.getShuffleFinishTime() < attempt.getShuffleFinishTime()) {
+                    lastShuffle = attempt;
+                }
+                if (worstShuffle == null || (worstShuffle.getShuffleFinishTime() - worstShuffle.getStartTime()) < shuffleTime) {
+                    worstShuffle = attempt;
+                }
+
+                long reduceTime = attempt.getEndTime() - attempt.getShuffleFinishTime();
+                avgReduceTimeInSec += reduceTime;
+                if (firstReduce == null || firstReduce.getStartTime() > attempt.getStartTime()) {
+                    firstReduce = attempt;
+                }
+                if (lastReduce == null || lastReduce.getEndTime() < attempt.getEndTime()) {
+                    lastReduce = attempt;
+                }
+                if (worstReduce == null || (worstReduce.getEndTime() - worstReduce.getShuffleFinishTime()) < reduceTime) {
+                    worstReduce = attempt;
                 }
             }
         }
-        return instance;
-    }
-
-    public MapReduceJobSuggestionContext buildContext() {
-        if (!initialized) {
-            avgMapTimeInSec = avgReduceTimeInSec = avgShuffleTimeInSec = 0;
-            numMaps = jobconf.getLong(NUM_MAPS, 0);
-            numReduces = jobconf.getLong(NUM_REDUCES, 0);
-
-            for (TaskAttemptExecutionAPIEntity attempt : job.getCompletedTaskAttemptsMap().values()) {
-                if (TaskType.MAP.toString().equalsIgnoreCase(getTaskType(attempt))) {
-                    long mapTime = attempt.getEndTime() - attempt.getStartTime();
-                    avgMapTimeInSec += mapTime;
-                    if (firstMap == null || firstMap.getStartTime() > attempt.getStartTime()) {
-                        firstMap = attempt;
-                    }
-                    if (lastMap == null || lastMap.getEndTime() < attempt.getEndTime()) {
-                        lastMap = attempt;
-                    }
-                    if (worstMap == null || (worstMap.getEndTime() - worstMap.getStartTime()) < mapTime) {
-                        worstMap = attempt;
-                    }
-                    long tmpMem = getMinimumIOSortMemory(attempt);
-                    if (tmpMem > minMapSpillMemBytes) {
-                        minMapSpillMemBytes = tmpMem;
-                    }
-                } else if (TaskType.REDUCE.toString().equalsIgnoreCase(getTaskType(attempt))) {
-                    long shuffleTime = attempt.getShuffleFinishTime() - attempt.getStartTime();
-                    avgShuffleTimeInSec += shuffleTime;
-                    if (firstShuffle == null || firstShuffle.getStartTime() > attempt.getStartTime()) {
-                        firstShuffle = attempt;
-                    }
-                    if (lastShuffle == null || lastShuffle.getShuffleFinishTime() < attempt.getShuffleFinishTime()) {
-                        lastShuffle = attempt;
-                    }
-                    if (worstShuffle == null || (worstShuffle.getShuffleFinishTime() - worstShuffle.getStartTime()) < shuffleTime) {
-                        worstShuffle = attempt;
-                    }
-
-                    long reduceTime = attempt.getEndTime() - attempt.getShuffleFinishTime();
-                    avgReduceTimeInSec += reduceTime;
-                    if (firstReduce == null || firstReduce.getStartTime() > attempt.getStartTime()) {
-                        firstReduce = attempt;
-                    }
-                    if (lastReduce == null || lastReduce.getEndTime() < attempt.getEndTime()) {
-                        lastReduce = attempt;
-                    }
-                    if (worstReduce == null || (worstReduce.getEndTime() - worstReduce.getShuffleFinishTime()) < reduceTime) {
-                        worstReduce = attempt;
-                    }
-                }
-            }
-            if (numMaps > 0) {
-                avgMapTimeInSec = avgMapTimeInSec / numMaps / DateTimeUtil.ONESECOND;
-            }
-            if (numReduces > 0) {
-                avgReduceTimeInSec = avgReduceTimeInSec / numReduces / DateTimeUtil.ONESECOND;
-                avgShuffleTimeInSec = avgShuffleTimeInSec / numReduces / DateTimeUtil.ONESECOND;
-            }
-            initialized = true;
+        if (numMaps > 0) {
+            avgMapTimeInSec = avgMapTimeInSec / numMaps / DateTimeUtil.ONESECOND;
+        }
+        if (numReduces > 0) {
+            avgReduceTimeInSec = avgReduceTimeInSec / numReduces / DateTimeUtil.ONESECOND;
+            avgShuffleTimeInSec = avgShuffleTimeInSec / numReduces / DateTimeUtil.ONESECOND;
         }
         return this;
     }

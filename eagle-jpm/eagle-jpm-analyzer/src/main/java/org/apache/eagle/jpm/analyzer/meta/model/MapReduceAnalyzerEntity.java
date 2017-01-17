@@ -21,6 +21,7 @@ import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
+import org.apache.hadoop.conf.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class MapReduceAnalyzerEntity extends AnalyzerEntity {
     private JobCounters reduceCounters;
     private Map<String, TaskExecutionAPIEntity> tasksMap;
     private Map<String, TaskAttemptExecutionAPIEntity> completedTaskAttemptsMap;
+    private Configuration jobConf;
 
     public MapReduceAnalyzerEntity() {
         this.setEndTime(-1);
@@ -162,5 +164,12 @@ public class MapReduceAnalyzerEntity extends AnalyzerEntity {
         this.completedTaskAttemptsMap = completedTaskAttemptsMap;
     }
 
+    public Configuration getJobConf() {
+        return jobConf;
+    }
+
+    public void setJobConf(Configuration jobConf) {
+        this.jobConf = jobConf;
+    }
 
 }

@@ -59,7 +59,7 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
             return null;
         }
 
-        MapReduceJobSuggestionContext jobContext = MapReduceJobSuggestionContext.getInstance().buildContext();
+        MapReduceJobSuggestionContext jobContext = new MapReduceJobSuggestionContext(analyzerEntity);
         if (jobContext.getNumMaps() == 0) {
             return null;
         }

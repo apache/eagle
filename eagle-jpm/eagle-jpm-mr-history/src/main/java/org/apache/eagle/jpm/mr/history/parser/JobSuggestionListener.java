@@ -17,7 +17,9 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
@@ -36,8 +38,13 @@ import org.slf4j.LoggerFactory;
 public class JobSuggestionListener implements HistoryJobEntityCreationListener {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionListener.class);
 
-    private MapReduceAnalyzerEntity info = new MapReduceAnalyzerEntity();
-    private Configuration jobConf;
+    private MapReduceAnalyzerEntity info;
+    private MRJobPerformanceAnalyzer<MapReduceAnalyzerEntity> analyzer;
+
+    public JobSuggestionListener(Config config) {
+        this.info = new MapReduceAnalyzerEntity();
+        this.analyzer = new MRJobPerformanceAnalyzer<>(config);
+    }
 
     @Override
     public void jobEntityCreated(JobBaseAPIEntity entity) throws Exception {
@@ -68,7 +75,7 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
     }
 
     public void jobConfigCreated(Configuration configuration) {
-        this.jobConf = configuration;
+        info.setJobConf(configuration);
     }
 
     public void jobCountersCreated(JobCounters totalCounters, JobCounters mapCounters, JobCounters reduceCounters) {
@@ -79,6 +86,6 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
 
     @Override
     public void flush() throws Exception {
-
+        analyzer.analyze(info);
     }
 }
