@@ -45,6 +45,11 @@
 		site: true,
 		templateUrl: "partials/region/regionList.html",
 		controller: "regionListCtrl"
+	}).route("backupMasterList", {
+		url: "/hadoopMetric/backupMasterList",
+		site: true,
+		templateUrl: "partials/backupMasterList.html",
+		controller: "backupMasterListCtrl"
 	}).route("masterDetail", {
 		url: "/hadoopMetric/:hostname?startTime&endTime",
 		site: true,
@@ -168,6 +173,17 @@
 			return wrapList(METRIC.get(metrics_url));
 		};
 
+		METRIC.hbaseMomentMetric = function (condition, metric, limit) {
+			var config = {
+				condition: METRIC.condition(condition),
+				metric: metric,
+				limit: limit || 10000
+			};
+
+			var metrics_url = common.template(getQuery("HBASE_METRICS"), config);
+			return METRIC.get(metrics_url);
+		};
+
 		METRIC.hbaseMetricsAggregation = function (condition, metric, groups, field, intervalMin, startTime, endTime, top, limit) {
 			var fields = field.split(/\s*,\s*/);
 			var orderId = -1;
@@ -251,13 +267,13 @@
 			return wrapList(METRIC.get(metrics_url));
 		};
 
-		METRIC.hbaseActiveMaster = function (siteId) {
+		METRIC.hbaseMaster = function (siteId, status, limit) {
 			var condition = {
 				site: siteId,
 				role: "hmaster",
-				status: "active"
+				status: status
 			};
-			return METRIC.hbasehostStatus(condition, 1);
+			return METRIC.hbasehostStatus(condition, limit);
 		};
 
 		METRIC.regionserverStatus = function (hostname, siteid) {
@@ -297,4 +313,5 @@
 	hadoopMetricApp.require("ctrls/hdfs.js");
 	hadoopMetricApp.require("ctrls/regionDetailCtrl.js");
 	hadoopMetricApp.require("ctrls/regionListCtrl.js");
+	hadoopMetricApp.require("ctrls/backupMasterListCtrl.js");
 })();

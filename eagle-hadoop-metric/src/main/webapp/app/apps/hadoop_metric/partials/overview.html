@@ -20,36 +20,33 @@
 	<div class="box-header with-border">
 		<span class="fa fa-television"></span>
 		<h3 class="box-title">
-			Service Summary Information
+			HBase Service Summary Information
 		</h3>
 	</div>
 	<div class="box-body">
-
-		<table class="table table-striped">
-			<tbody>
-			<tr ng-if="regiontotal > 0">
-				<th>RegionServer Status</th>
-				<td class="text-break">
-					<a ui-sref="regionList({siteId: site})" target="_blank">{{regiontotal}} RegionServers</a>
-					<span class="label label-success">{{regionhealtynum}} Healthy</span>
-					<span class="label label-danger">{{regiontotal - regionhealtynum}} UnHealthy</span>
-				</td>
+		<table class="table table-striped hadoopMetric-table">
+			<tr>
+				<td width="5%">{{hmasteractivenum}}</td>
+				<th width="45%">Active HBase Master</th>
+				<td width="5%">{{regionsnum}}</td>
+				<th width="45%">Regions
+				</th>
 			</tr>
-			<tr ng-if="hmasteractive">
-				<th>Active Hmaster Status</th>
-				<td class="text-break">
-					<span ng-if="defaultHostname !== hmasteractive.tags.hostname" class="label label-success">(<a class="hadoopMetric-summary-a" ui-sref="masterDetail({siteId: site, hostname: hmasteractive.tags.hostname})">{{hmasteractive.tags.hostname}}</a>) Healthy</span>
-					<span ng-if="defaultHostname === hmasteractive.tags.hostname" class="label label-success">({{hmasteractive.tags.hostname}}) Healthy</span>
-				</td>
+			<tr>
+				<td><a ui-sref="backupMasterList({siteId: site})" target="_blank">{{hmasterstandbynum}}</a></td>
+				<th>Backup HBase Master</th>
+				<td>{{hmasteraverageload}}</td>
+				<th>Average Load</th>
 			</tr>
-			<tr ng-if="hmasterstandby">
-				<th>Standby Hmaster Status</th>
-				<td class="text-break">
-					<span ng-if="defaultHostname !== hmasterstandby.tags.hostname" class="label label-success">(<a class="hadoopMetric-summary-a" ui-sref="masterDetail({siteId: site, hostname: hmasterstandby.tags.hostname})">{{hmasterstandby.tags.hostname}}</a>) Healthy</span>
-					<span ng-if="defaultHostname === hmasterstandby.tags.hostname" class="label label-success">({{hmasterstandby.tags.hostname}}) Healthy</span>
-				</td>
+			<tr>
+				<td><a ui-sref="regionList({siteId: site})">{{regionservertotal}}</a></td>
+				<th>RegionServers: <a ui-sref="regionList({siteId: site})">{{regionserverhealtynum}}</a> <span
+					class="label label-success">Good Health</span> / <a ui-sref="regionList({siteId: site})">{{regionservertotal-regionserverhealtynum}}</a>
+					<span class="label label-danger">Bad Health</span>
+				</th>
+				<td></td>
+				<th></th>
 			</tr>
-			</tbody>
 		</table>
 	</div>
 </div>
