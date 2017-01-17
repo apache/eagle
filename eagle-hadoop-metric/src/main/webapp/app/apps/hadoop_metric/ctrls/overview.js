@@ -24,7 +24,7 @@
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
-			var activeMasterInfo = METRIC.hbaseActiveMaster($scope.site);
+			var activeMasterInfo = METRIC.hbaseMaster($scope.site, "active", 1);
 
 			PageConfig.title = 'HBase';
 			var storageOption = {
@@ -132,34 +132,66 @@
 					});
 				});
 
+				METRIC.regionserverStatus($scope.hostname, $scope.site)._promise.then(function (res) {
+					$scope.regionstatus = res;
+				});
+
 				hbaseservers._promise.then(function (res) {
-					var regionhealtynum = 0;
-					var regiontotal = 0;
-					var hmasteractive;
-					var hmasterstandby;
+					var regionserverhealtynum = 0;
+					var regionservertotal = 0;
+					var hmasterstandbynum = 0;
+					var hmasteractivenum = 0;
+					var regionsnum = 0;
+					var regionArray = [];
 					$.each(res, function (i, server) {
 						var role = server.tags.role;
 						var status = server.status;
 						if (role === "regionserver") {
-							regiontotal++;
+							regionservertotal++;
 							if (status === "live") {
-								regionhealtynum++;
+								regionserverhealtynum++;
 							}
+							regionArray.push(METRIC.regionserverStatus(server.tags.hostname, $scope.site)._promise.then(function (res) {
+								return res[0].numRegions;
+							}));
 						}
 						else if (role === "hmaster") {
 							if (status === "active") {
-								hmasteractive = server;
+								hmasteractivenum++;
 							} else {
-								hmasterstandby = server;
+								hmasterstandbynum++;
 							}
 
 						}
 					});
-					$scope.regionhealtynum = regionhealtynum;
-					$scope.regiontotal = regiontotal;
-					$scope.hmasteractive = hmasteractive;
-					$scope.hmasterstandby = hmasterstandby;
-				})
+
+					$q.all(regionArray).then(function (res) {
+
+						for(var i=0; i<regionArray.length; i++) {
+							regionsnum+=res[i];
+						}
+						$scope.regionsnum = regionsnum;
+					});
+
+					$scope.regionserverhealtynum = regionserverhealtynum;
+					$scope.regionservertotal = regionservertotal;
+					$scope.hmasterstandbynum = hmasterstandbynum;
+					$scope.hmasteractivenum = hmasteractivenum;
+				});
+
+				activeMasterInfo._promise.then(function (res) {
+					var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
+					$scope.defaultHostname = $wrapState.param.hostname || hostname;
+					var jobCond = {
+						site: $scope.site,
+						component: "hbasemaster",
+						host: $scope.defaultHostname
+					};
+					METRIC.hbaseMomentMetric(jobCond,"hadoop.hbase.master.server.averageload", 1).then(function (res) {
+						$scope.hmasteraverageload = res.data.obj[0].value[0];
+					});
+				});
+
 			};
 
 

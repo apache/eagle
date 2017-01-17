@@ -64,3 +64,17 @@
 	color: #fff;
 }
 
+.small-box.hadoopMetric-widget {
+	margin: 0;
+	height: 100%;
+	min-height: 110px;
+}
+
+.hadoopMetric-widget-detail {
+	margin-left: 12px;
+	margin-top: 10px;
+}
+
+.hadoopMetric-table {
+	text-align: right;
+}

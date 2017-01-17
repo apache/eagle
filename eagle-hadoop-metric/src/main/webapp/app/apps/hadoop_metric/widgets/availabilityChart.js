@@ -27,61 +27,100 @@
 			Yarn: 'green',
 		};
 
-		var widgetChartOption = {
-			color: ['#FFFFFF'],
-			grid: {
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0,
-				containLabel: false,
-			},
-			xAxis: {
-				axisLine: {show: false},
-				axisLabel: {show: false},
-			},
-			yAxis: [{
-				axisLine: {show: false},
-				axisLabel: {show: false},
-				axisTick: {show: false},
-				splitLine: {show: false},
-			}],
-		};
-
 		hadoopMetricApp.directive("hadoopMetricWidget", function () {
 			return {
 				restrict: 'AE',
-				controller: function($scope, $attrs) {
+				controller: function ($scope, $attrs, METRIC, Application, $interval, Site, $wrapState) {
 					// Get site
 					var site = $scope.site;
+					var refreshInterval;
 
+					if(!site) {
+						$scope.list = $.map(Application.find("HADOOP_METRIC_MONITOR"), function (app) {
+							return {
+								siteId: app.site.siteId,
+								siteName: app.site.siteName || app.site.siteId,
+								count: -1
+							};
+						});
+					} else {
+						$scope.list = [{
+							siteId: site.siteId,
+							siteName: site.siteName || site.siteId,
+							count: -1
+						}];
+					}
 					// Get type
 					$scope.type = $attrs.type;
 
 					// Customize chart color
 					$scope.bgColor = COLOR_MAPPING[$scope.type];
 
-					$scope.chartOption = widgetChartOption;
-
-					// Mock fetch data
-					var now = +new Date();
-					var data = [];
-					for(var j = 0 ; j < 30 ; j += 1) {
-						data.push({x: now + j * 1000 * 60, y: Math.random() * 100});
-					}
-					$scope.series = [{
-						name: '',
-						type: 'line',
-						data: data,
-						showSymbol: false,
-					}];
 
 					// Ref: jpm widget if need keep refresh the widget
+
+					function refresh() {
+						$.each($scope.list, function (i, site) {
+							var hbaseservers = METRIC.hbasehostStatus({site: site.siteName});
+							hbaseservers._promise.then(function (res) {
+								var hmasternum = 0;
+								var hmasteractivenum = 0;
+								var regionserverHealthynum = 0;
+								var regionservertotal = 0;
+								$.each(res, function (i, server) {
+									var role = server.tags.role;
+									var status = server.status;
+									if (role === "hmaster") {
+										hmasternum++;
+										if (status === "active") {
+											hmasteractivenum++;
+										}
+									} else if (role === "regionserver") {
+										regionservertotal++;
+										if (status === "live") {
+											regionserverHealthynum++;
+										}
+									}
+								});
+								$scope.hbaseinfo = {
+									hmasternum: hmasternum,
+									hmasteractivenum: hmasteractivenum,
+									regionserverHealthynum: regionserverHealthynum,
+									regionservertotal: regionservertotal
+								};
+							});
+						});
+					}
+
+					refresh();
+					refreshInterval = $interval(refresh, 30 * 1000);
+
+					$scope.$on('$destroy', function () {
+						$interval.cancel(refreshInterval);
+					});
 				},
 				template:
-				'<div class="hadoopMetric-widget bg-{{bgColor}}">' +
-					'<h3>{{type}}</h3>' +
-					'<div chart class="hadoopMetric-chart-container" series="series" option="chartOption"></div>' +
+				'<div class="small-box hadoopMetric-widget bg-{{bgColor}}">' +
+				    '<div class="inner">' +
+				        '<h3>{{type}}</h3>' +
+				        '<div class="hadoopMetric-widget-detail">' +
+					        '<a ui-sref="HadoopMetric({siteId: site.siteName})">' +
+				            '<span>{{hbaseinfo.hmasternum}}</span> Masters (' +
+				            '<span>{{hbaseinfo.hmasteractivenum}}</span> Active / ' +
+				            '<span>{{hbaseinfo.hmasternum - hbaseinfo.hmasteractivenum}}</span> Standby)' +
+					        '</a>' +
+				        '</div>' +
+				        '<div class="hadoopMetric-widget-detail">' +
+				            '<a ui-sref="regionList({siteId: site.siteName})">' +
+				            '<span>{{hbaseinfo.regionservertotal}}</span> RegionServers (' +
+				            '<span>{{hbaseinfo.regionserverHealthynum}}</span> Healthy / ' +
+				            '<span>{{hbaseinfo.regionservertotal - hbaseinfo.regionserverHealthynum}}</span> Unhealthy)' +
+				            '</a>' +
+				        '</div>' +
+				    '</div>' +
+				    '<div class="icon">' +
+				        '<i class="fa fa-taxi"></i>' +
+				    '</div>' +
 				'</div>',
 				replace: true
 			};
@@ -99,9 +138,7 @@
 				);
 			};
 		}
-
-		hadoopMetricApp.widget("availabilityHDFSChart", withType('HDFS'), true);
 		hadoopMetricApp.widget("availabilityHBaseChart", withType('HBase'), true);
-		hadoopMetricApp.widget("availabilityYarnChart", withType('Yarn'), true);
 	});
 })();
+//# sourceURL=availabilityChart.js
