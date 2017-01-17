@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
@@ -29,9 +29,6 @@ import org.apache.hadoop.conf.Configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * JobEventCounterListener provides an interface to add job/task counter analyzers
@@ -58,15 +55,15 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
             info.setJobId(jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_ID.toString()));
             info.setJobDefId(jobExecutionAPIEntity.getTags().get(MRJobTagName.JOD_DEF_ID.toString()));
             info.setSiteId(jobExecutionAPIEntity.getTags().get(MRJobTagName.SITE.toString()));
-            info.jobName = jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_NAME.toString());
-            info.jobQueueName = jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_QUEUE.toString());
-            info.jobType = jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_TYPE.toString());
-            info.finishedMaps = jobExecutionAPIEntity.getNumFinishedMaps();
-            info.finishedReduces = jobExecutionAPIEntity.getNumFinishedReduces();
-            info.failedReduces = jobExecutionAPIEntity.getNumFailedReduces();
-            info.failedMaps = jobExecutionAPIEntity.getNumFailedMaps();
-            info.totalMaps = jobExecutionAPIEntity.getNumTotalMaps();
-            info.totalReduces = jobExecutionAPIEntity.getNumTotalReduces();
+            info.setJobName(jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_NAME.toString())) ;
+            info.setJobQueueName(jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_QUEUE.toString()));
+            info.setJobType(jobExecutionAPIEntity.getTags().get(MRJobTagName.JOB_TYPE.toString()));
+            info.setFinishedMaps(jobExecutionAPIEntity.getNumFinishedMaps());
+            info.setFinishedReduces(jobExecutionAPIEntity.getNumFinishedReduces());
+            info.setFailedReduces(jobExecutionAPIEntity.getNumFailedReduces());
+            info.setFailedMaps(jobExecutionAPIEntity.getNumFailedMaps());
+            info.setTotalMaps(jobExecutionAPIEntity.getNumTotalMaps());
+            info.setTotalReduces(jobExecutionAPIEntity.getNumTotalReduces());
         }
     }
 
@@ -75,96 +72,13 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
     }
 
     public void jobCountersCreated(JobCounters totalCounters, JobCounters mapCounters, JobCounters reduceCounters) {
-        info.totalCounters = totalCounters;
-        info.reduceCounters = reduceCounters;
-        info.mapCounters = mapCounters;
+        info.setTotalCounters(totalCounters);
+        info.setReduceCounters(reduceCounters);
+        info.setMapCounters(mapCounters);
     }
 
     @Override
     public void flush() throws Exception {
 
     }
-
-    public static class MapReduceAnalyzerEntity extends AnalyzerEntity {
-        String jobName;
-        String jobQueueName;
-        String jobType;
-        int totalMaps;
-        int totalReduces;
-        int failedMaps;
-        int failedReduces;
-        int finishedMaps;
-        int finishedReduces;
-        JobCounters totalCounters;
-        JobCounters mapCounters;
-        JobCounters reduceCounters;
-        Map<String, TaskExecutionAPIEntity> tasksMap;
-        Map<String, TaskAttemptExecutionAPIEntity> completedTaskAttemptsMap;
-
-        public MapReduceAnalyzerEntity() {
-            this.setEndTime(-1);
-            this.setStartTime(-1);
-            finishedMaps = finishedReduces = 0;
-            jobName = jobQueueName = "";
-            tasksMap = new HashMap<>();
-            completedTaskAttemptsMap = new HashMap<>();
-        }
-
-        public String getJobName() {
-            return jobName;
-        }
-
-        public String getJobQueueName() {
-            return jobQueueName;
-        }
-
-        public String getJobType() {
-            return jobType;
-        }
-
-        public int getTotalMaps() {
-            return totalMaps;
-        }
-
-        public int getTotalReduces() {
-            return totalReduces;
-        }
-
-        public int getFailedMaps() {
-            return failedMaps;
-        }
-
-        public int getFailedReduces() {
-            return failedReduces;
-        }
-
-        public int getFinishedMaps() {
-            return finishedMaps;
-        }
-
-        public int getFinishedReduces() {
-            return finishedReduces;
-        }
-
-        public JobCounters getTotalCounters() {
-            return totalCounters;
-        }
-
-        public JobCounters getMapCounters() {
-            return mapCounters;
-        }
-
-        public JobCounters getReduceCounters() {
-            return reduceCounters;
-        }
-
-        public Map<String, TaskExecutionAPIEntity> getTasksMap() {
-            return tasksMap;
-        }
-
-        public Map<String, TaskAttemptExecutionAPIEntity> getCompletedTaskAttemptsMap() {
-            return completedTaskAttemptsMap;
-        }
-    }
-
 }
