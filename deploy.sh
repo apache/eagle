@@ -28,6 +28,8 @@ echo "Pushing with force ..."
 git push --force origin master > /dev/null 2>&1 || exit 1
 echo "Pushed deployment successfully"
 
+set +e
+
 if [ -z "$TRAVIS_TAG" ]; then
 
 echo -e "Starting to tag commit.\n"
