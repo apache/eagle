@@ -40,14 +40,12 @@
 							return {
 								siteId: app.site.siteId,
 								siteName: app.site.siteName || app.site.siteId,
-								count: -1
 							};
 						});
 					} else {
 						$scope.list = [{
 							siteId: site.siteId,
 							siteName: site.siteName || site.siteId,
-							count: -1
 						}];
 					}
 					// Get type
@@ -141,4 +139,3 @@
 		hadoopMetricApp.widget("availabilityHBaseChart", withType('HBase'), true);
 	});
 })();
-//# sourceURL=availabilityChart.js

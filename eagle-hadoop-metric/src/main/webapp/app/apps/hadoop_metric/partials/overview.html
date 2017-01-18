@@ -35,7 +35,10 @@
 			<tr>
 				<td><a ui-sref="backupMasterList({siteId: site})" target="_blank">{{hmasterstandbynum}}</a></td>
 				<th>Backup HBase Master</th>
-				<td>{{hmasteraverageload}}</td>
+				<td>
+					<span ng-show="hmasteraverageload !== '-1'">{{hmasteraverageload}}</span>
+					<span ng-show="hmasteraverageload === '-1'" class="fa fa-question-circle"></span>
+				</td>
 				<th>Average Load</th>
 			</tr>
 			<tr>
@@ -64,8 +67,15 @@
 			<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
 				<div class="hadoopMetric-chart">
 					<h3>{{metric.title}}</h3>
-					<div chart class="hadoopMetric-chart-container" series="metric.series"
+					<div ng-show="metric.series.length" chart class="hadoopMetric-chart-container" series="metric.series"
 						 option="metric.option"></div>
+					<div ng-show="!metric.series.length" class="hadoopMetric-chart-container">
+						<div class="hadoopMetric-chart-container-withborder">
+							<div class="hadoopMetric-no-chart-data">
+								<span class="fa fa-question-circle"></span><span> NO DATA</span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

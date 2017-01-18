@@ -96,7 +96,14 @@
 			<div class="col-sm-6 hadoopMetric-col-md-6 col-lg-3" ng-repeat="metric in metricList track by $index">
 				<div class="hadoopMetric-chart">
 					<h3>{{metric.title}}</h3>
-					<div chart class="hadoopMetric-chart-container" series="metric.series" option="metric.option"></div>
+					<div ng-show="metric.series.length" chart class="hadoopMetric-chart-container"
+						 series="metric.series"
+						 option="metric.option"></div>
+					<div ng-show="!metric.series.length" class="hadoopMetric-chart-container">
+						<div class="hadoopMetric-no-chart-data">
+							<span class="fa fa-question-circle"></span><span> NO DATA</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
