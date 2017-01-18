@@ -67,7 +67,8 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("end", analyzerJobEntity.getEndTime() == 0
                 ? "0"
                 : DateTimeUtil.millisecondsToHumanDateWithSeconds(analyzerJobEntity.getEndTime()));
-        basic.put("progress", analyzerJobEntity.getProgress() + "%");
+        double progress = analyzerJobEntity.getCurrentState().equalsIgnoreCase(org.apache.eagle.jpm.util.Constants.JobState.RUNNING.toString()) ? analyzerJobEntity.getProgress() : 100;
+        basic.put("progress", progress + "%");
         basic.put("detail", getJobLink(analyzerJobEntity));
 
 
