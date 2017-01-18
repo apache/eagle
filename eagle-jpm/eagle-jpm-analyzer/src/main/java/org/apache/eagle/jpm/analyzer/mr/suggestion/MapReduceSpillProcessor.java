@@ -23,6 +23,8 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import static org.apache.eagle.jpm.analyzer.mr.suggestion.MapReduceJobSuggestionContext.MAX_HEAP_PATTERN;
@@ -45,6 +47,9 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
         StringBuilder sb = new StringBuilder();
+        List<String> optSettings = new ArrayList<>();
+        String setting;
+
         long outputRecords = 0L; // Map output records
         long spillRecords = 0L; //  Spilled Records
         try {
@@ -52,15 +57,16 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
             spillRecords = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.SPILLED_RECORDS);
 
             if (outputRecords < spillRecords) {
-                sb.append("Total Map output records: " + outputRecords);
-                sb.append(" Total Spilled Records: " + spillRecords);
-                sb.append(". Please set");
+                sb.append("Total Map output records: ").append(outputRecords);
+                sb.append(" Total Spilled Records: ").append(spillRecords).append(". Please set");
 
                 long minMapSpillMemBytes = context.getMinMapSpillMemBytes();
                 double spillPercent = context.getJobconf().getDouble(MAP_SORT_SPILL_PERCENT, 0.8);
                 if (minMapSpillMemBytes > 512 * FileUtils.ONE_MB * spillPercent) {
                     if (Math.abs(1.0 - spillPercent) > 0.001) {
-                        sb.append(" -D" + MAP_SORT_SPILL_PERCENT + "=1");
+                        setting = String.format("-D%s=1", MAP_SORT_SPILL_PERCENT);
+                        sb.append(" ").append(setting);
+                        optSettings.add(setting);
                     }
                 } else {
                     minMapSpillMemBytes /= spillPercent;
@@ -70,11 +76,15 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
                 if (minMapSpillMemMB >= 2047 ) {
                     sb.append(" Please reduce the block size of the input files and make sure they are splittable.");
                 } else {
-                    sb.append(" -D" + IO_SORT_MB + "=" + minMapSpillMemMB);
+                    setting = String.format("-D%s=%s", IO_SORT_MB, minMapSpillMemMB);
+                    sb.append(" ").append(setting);
+                    optSettings.add(setting);
                     long heapSize = getMaxHeapSize(context.getJobconf().get(MAP_JAVA_OPTS));
                     if (heapSize < 3 * minMapSpillMemMB) {
                         long expectedHeapSizeMB = (minMapSpillMemMB * 3 + 1024) / 1024 * 1024;
-                        sb.append(" -D" + MAP_JAVA_OPTS + "=-Xmx" + expectedHeapSizeMB + "M");
+                        setting = String.format(" -D%s=-Xmx%sM", MAP_JAVA_OPTS, expectedHeapSizeMB);
+                        sb.append(" ").append(setting);
+                        optSettings.add(setting);
                     }
                 }
                 sb.append(" to avoid spilled records.\n");
@@ -85,13 +95,13 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
             spillRecords = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.SPILLED_RECORDS);
             if (reduceInputRecords < spillRecords) {
                 sb.append("Please add more memory (mapreduce.reduce.java.opts) to avoid spilled records.");
-                sb.append(" Total Reduce input records: " + reduceInputRecords);
-                sb.append(" Total Spilled Records: " + spillRecords);
+                sb.append(" Total Reduce input records: ").append(reduceInputRecords);
+                sb.append(" Total Spilled Records: ").append(spillRecords);
                 sb.append("\n");
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString(), optSettings);
             }
         } catch (NullPointerException e) {
             //When job failed there may not have counters, so just ignore it

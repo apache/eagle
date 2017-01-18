@@ -22,6 +22,9 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.apache.hadoop.mapreduce.MRJobConfig.MAP_JAVA_OPTS;
 import static org.apache.hadoop.mapreduce.MRJobConfig.REDUCE_JAVA_OPTS;
 
@@ -35,12 +38,17 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
         StringBuilder sb = new StringBuilder();
+        List<String> optSettings = new ArrayList<>();
+        String setting;
+
         try {
             long mapGCTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.GC_MILLISECONDS);
             long mapCPUTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
 
             if (mapGCTime > mapCPUTime * 0.1) {
-                sb.append("Map GC_TIME_MILLIS took too long. Please increase mapper memory via -D" + MAP_JAVA_OPTS);
+                setting = String.format("-D%s", MAP_JAVA_OPTS);
+                optSettings.add(setting);
+                sb.append("Map GC_TIME_MILLIS took too long. Please increase mapper memory via ").append(setting);
                 sb.append(", or optimize your mapper class.\n");
             }
 
@@ -48,13 +56,15 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
                 long reduceGCTime = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.GC_MILLISECONDS);
                 long reduceCPUTime = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
                 if (reduceGCTime > reduceCPUTime * 0.1) {
-                    sb.append("Reduce GC_TIME_MILLIS took too long. Please increase memory for reduce via -D" + REDUCE_JAVA_OPTS);
+                    setting = String.format("-D%s", REDUCE_JAVA_OPTS);
+                    optSettings.add(setting);
+                    sb.append("Reduce GC_TIME_MILLIS took too long. Please increase memory for reduce via ").append(setting);
                     sb.append(", or optimize your reducer class.\n");
                 }
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString(), optSettings);
             }
         } catch (NullPointerException e) {
             // When job failed there may not have counters, so just ignore it

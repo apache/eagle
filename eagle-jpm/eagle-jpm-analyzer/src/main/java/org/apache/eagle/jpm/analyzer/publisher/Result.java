@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.publisher;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class Result {
     //for EagleStorePublisher
     private TaggedLogAPIEntity alertEntity = null;//TODO
     //for EmailPublisher
-    private Map<String, List<Pair<ResultLevel, String>>> alertMessages = new HashMap<>();
+    private Map<String, List<ProcessorResult>> alertMessages = new HashMap<>();
 
     public void addEvaluatorResult(Class<?> type, EvaluatorResult result) {
         Map<Class<?>, ProcessorResult> processorResults = result.getProcessorResults();
@@ -43,7 +43,8 @@ public class Result {
             if (!alertMessages.containsKey(typeName)) {
                 alertMessages.put(typeName, new ArrayList<>());
             }
-            alertMessages.get(typeName).add(Pair.of(processorResult.getResultLevel(), processorResult.getMessage()));
+            normalizeResult(processorResult);
+            alertMessages.get(typeName).add(processorResult);
         }
     }
 
@@ -51,8 +52,14 @@ public class Result {
         return alertEntity;
     }
 
-    public Map<String, List<Pair<ResultLevel, String>>> getAlertMessages() {
+    public Map<String, List<ProcessorResult>> getAlertMessages() {
         return alertMessages;
+    }
+
+    private void normalizeResult(ProcessorResult processorResult) {
+        if (processorResult.getSettings() != null && !processorResult.getSettings().isEmpty()) {
+            processorResult.setSuggestion(StringUtils.join(processorResult.getSettings(), "\n"));
+        }
     }
 
     /**
@@ -61,6 +68,7 @@ public class Result {
 
     public enum ResultLevel {
         NONE,
+        INFO,
         NOTICE,
         WARNING,
         CRITICAL
@@ -69,10 +77,19 @@ public class Result {
     public static class ProcessorResult {
         private ResultLevel resultLevel;
         private String message;
+        private List<String> settings;
+        private String suggestion;
+
+        public ProcessorResult(ResultLevel resultLevel, String message, List<String> settings) {
+            this.resultLevel = resultLevel;
+            this.message = message;
+            this.settings = settings;
+        }
 
         public ProcessorResult(ResultLevel resultLevel, String message) {
             this.resultLevel = resultLevel;
             this.message = message;
+            this.settings = new ArrayList<>();
         }
 
         public ResultLevel getResultLevel() {
@@ -89,6 +106,22 @@ public class Result {
 
         public void setMessage(String message) {
             this.message = message;
+        }
+
+        public List<String> getSettings() {
+            return settings;
+        }
+
+        public void setSettings(List<String> settings) {
+            this.settings = settings;
+        }
+
+        public String getSuggestion() {
+            return suggestion;
+        }
+
+        public void setSuggestion(String suggestion) {
+            this.suggestion = suggestion;
         }
     }
 

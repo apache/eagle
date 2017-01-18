@@ -71,16 +71,11 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("progress", progress + "%");
         basic.put("detail", getJobLink(analyzerJobEntity));
 
-
-        Map<String, Map<String, String>> extend = new HashMap<>();
-        Map<String, List<Pair<Result.ResultLevel, String>>> alertMessages = result.getAlertMessages();
-        for (String evaluator : alertMessages.keySet()) {
-            List<Pair<Result.ResultLevel, String>> messages = alertMessages.get(evaluator);
-            extend.put(evaluator, new HashMap<>());
-            for (Pair<Result.ResultLevel, String> message : messages) {
+        Map<String, List<Result.ProcessorResult>> extend = result.getAlertMessages();
+        for (String evaluator : extend.keySet()) {
+            for (Result.ProcessorResult message : extend.get(evaluator)) {
                 LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
-                        analyzerJobEntity.getJobDefId(), message.getRight(), message.getLeft(), evaluator);
-                extend.get(evaluator).put(message.getRight(), message.getLeft().toString());
+                        analyzerJobEntity.getJobDefId(), message.getMessage(), message.getResultLevel(), evaluator);
             }
         }
 

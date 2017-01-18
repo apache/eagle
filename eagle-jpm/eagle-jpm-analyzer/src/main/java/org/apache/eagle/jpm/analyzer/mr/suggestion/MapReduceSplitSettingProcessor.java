@@ -22,6 +22,9 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MapReduceSplitSettingProcessor implements Processor<MapReduceAnalyzerEntity> {
 
     private MapReduceJobSuggestionContext context;
@@ -33,10 +36,11 @@ public class MapReduceSplitSettingProcessor implements Processor<MapReduceAnalyz
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
         StringBuilder sb = new StringBuilder();
+
         if (context.getJobconf().getLong(FileInputFormat.SPLIT_MINSIZE, 0) > 1) {
             sb.append("Best practice: don't set " + FileInputFormat.SPLIT_MINSIZE);
             sb.append(", because it may lower data locality, hence maps will run slower.\n");
-            return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
+            return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString());
         }
         return null;
     }

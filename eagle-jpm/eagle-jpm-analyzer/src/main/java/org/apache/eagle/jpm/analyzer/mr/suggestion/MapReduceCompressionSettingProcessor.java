@@ -23,6 +23,9 @@ import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.apache.hadoop.mapreduce.MRJobConfig.MAP_OUTPUT_COMPRESS;
 import static org.apache.hadoop.mapreduce.MRJobConfig.MAP_OUTPUT_COMPRESS_CODEC;
 import static org.apache.hadoop.mapreduce.MRJobConfig.NUM_REDUCES;
@@ -39,20 +42,24 @@ public class MapReduceCompressionSettingProcessor implements Processor<MapReduce
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
         StringBuilder sb = new StringBuilder();
+        List<String> optSettings = new ArrayList<>();
+
         JobConf jobconf = new JobConf(context.getJobconf());
         if (jobconf.getLong(NUM_REDUCES, 0) > 0) {
             if (!jobconf.getCompressMapOutput()) {
+                optSettings.add(String.format("%s=true", MAP_OUTPUT_COMPRESS));
                 sb.append("Please set " + MAP_OUTPUT_COMPRESS + " to true to reduce network IO.\n");
             } else {
                 String codecClassName = jobconf.get(MAP_OUTPUT_COMPRESS_CODEC);
                 if (!(codecClassName.endsWith("LzoCodec") || codecClassName.endsWith("SnappyCodec"))) {
-                    sb.append("Best practice: use LzoCodec or SnappyCodec for " + MAP_OUTPUT_COMPRESS_CODEC);
-                    sb.append("\n");
+                    optSettings.add(String.format("%s=LzoCodec or SnappyCodec", MAP_OUTPUT_COMPRESS_CODEC));
+                    sb.append("Best practice: use LzoCodec or SnappyCodec for " + MAP_OUTPUT_COMPRESS_CODEC).append("\n");
                 }
             }
         }
 
         if (!jobconf.getBoolean(FileOutputFormat.COMPRESS, false)) {
+            optSettings.add(String.format("%s=true", FileOutputFormat.COMPRESS));
             sb.append("Please set " + FileOutputFormat.COMPRESS + " to true to reduce disk usage and network IO.\n");
         } else {
             String codecName = jobconf.get(FileOutputFormat.COMPRESS_CODEC, "");
@@ -68,7 +75,7 @@ public class MapReduceCompressionSettingProcessor implements Processor<MapReduce
         }
 
         if (sb.length() > 0) {
-            return new Result.ProcessorResult(Result.ResultLevel.WARNING, sb.toString());
+            return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString(), optSettings);
         }
         return null;
     }

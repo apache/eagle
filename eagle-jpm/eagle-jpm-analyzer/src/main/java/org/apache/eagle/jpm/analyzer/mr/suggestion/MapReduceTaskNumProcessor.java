@@ -23,6 +23,11 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.apache.hadoop.mapreduce.MRJobConfig.NUM_REDUCES;
+
 public class MapReduceTaskNumProcessor implements Processor<MapReduceAnalyzerEntity> {
     private static final String[] SIZE_UNITS = {"B", "K", "M", "G", "T", "P"};
     private MapReduceJobSuggestionContext context;
@@ -34,12 +39,13 @@ public class MapReduceTaskNumProcessor implements Processor<MapReduceAnalyzerEnt
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
         StringBuilder sb = new StringBuilder();
+        List<String> optSettings = new ArrayList<>();
         try {
-            sb.append(analyzeReduceTaskNum());
-            sb.append(analyzeMapTaskNum());
+            sb.append(analyzeReduceTaskNum(optSettings));
+            sb.append(analyzeMapTaskNum(optSettings));
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString(), optSettings);
             }
         } catch (NullPointerException e) {
             // When job failed there may not have counters, so just ignore it
@@ -48,7 +54,7 @@ public class MapReduceTaskNumProcessor implements Processor<MapReduceAnalyzerEnt
     }
 
 
-    private String analyzeReduceTaskNum() {
+    private String analyzeReduceTaskNum(List<String> optSettings) {
         StringBuilder sb = new StringBuilder();
 
         long numReduces = context.getNumReduces();
@@ -107,13 +113,15 @@ public class MapReduceTaskNumProcessor implements Processor<MapReduceAnalyzerEnt
                 } else {
                     sb.append("decreasing the ");
                 }
-                sb.append("reducer number. You could try -Dmapreduce.job.reduces=").append(suggestReduces).append("\n");
+                String setting = String.format("-D%s=%s", NUM_REDUCES, suggestReduces);
+                sb.append("reducer number. You could try ").append(setting).append("\n");
+                optSettings.add(setting);
             }
         }
         return sb.toString();
     }
 
-    private String analyzeMapTaskNum() {
+    private String analyzeMapTaskNum(List<String> optSettings) {
         StringBuilder sb = new StringBuilder();
 
         long numMaps = context.getNumMaps();

@@ -46,14 +46,14 @@ public class MapReduceDataSkewProcessor implements Processor<MapReduceAnalyzerEn
                 long worstInputs = worstReduce.getJobCounters().getCounterValue(JobCounters.CounterName.REDUCE_INPUT_RECORDS);
 
                 if (worstInputs > avgInputs * 5) {
-                    sb.append("Data skew detected in reducers. The average reduce time is " + context.getAvgReduceTimeInSec());
-                    sb.append(" seconds, the worst reduce time is " + worstTimeInSec);
+                    sb.append("Data skew detected in reducers. The average reduce time is ").append(context.getAvgReduceTimeInSec());
+                    sb.append(" seconds, the worst reduce time is ").append(worstTimeInSec);
                     sb.append(" seconds. Please investigate this problem to improve your job performance.\n");
                 }
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString());
             }
         } catch (NullPointerException e) {
             // When job failed there may not have counters, so just ignore it
