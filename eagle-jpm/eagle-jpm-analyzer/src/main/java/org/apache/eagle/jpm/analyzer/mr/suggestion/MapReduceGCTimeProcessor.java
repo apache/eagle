@@ -40,8 +40,7 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
             long mapCPUTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
 
             if (mapGCTime > mapCPUTime * 0.1) {
-                sb.append("Map GC_TIME_MILLIS took too long. Please increase mapper memory via -D"
-                    + MAP_JAVA_OPTS);
+                sb.append("Map GC_TIME_MILLIS took too long. Please increase mapper memory via -D" + MAP_JAVA_OPTS);
                 sb.append(", or optimize your mapper class.\n");
             }
 
@@ -49,8 +48,7 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
                 long reduceGCTime = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.GC_MILLISECONDS);
                 long reduceCPUTime = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
                 if (reduceGCTime > reduceCPUTime * 0.1) {
-                    sb.append("Reduce GC_TIME_MILLIS took too long. Please increase memory for reduce via -D"
-                        + REDUCE_JAVA_OPTS);
+                    sb.append("Reduce GC_TIME_MILLIS took too long. Please increase memory for reduce via -D" + REDUCE_JAVA_OPTS);
                     sb.append(", or optimize your reducer class.\n");
                 }
             }

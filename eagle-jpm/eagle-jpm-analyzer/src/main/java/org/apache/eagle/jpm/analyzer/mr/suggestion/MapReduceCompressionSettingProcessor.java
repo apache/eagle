@@ -41,24 +41,19 @@ public class MapReduceCompressionSettingProcessor implements Processor<MapReduce
         StringBuilder sb = new StringBuilder();
         JobConf jobconf = new JobConf(context.getJobconf());
         if (jobconf.getLong(NUM_REDUCES, 0) > 0) {
-            if (jobconf.getCompressMapOutput() == false) {
-                sb.append("Please set " + MAP_OUTPUT_COMPRESS
-                    + " to true to reduce network IO.\n");
+            if (!jobconf.getCompressMapOutput()) {
+                sb.append("Please set " + MAP_OUTPUT_COMPRESS + " to true to reduce network IO.\n");
             } else {
-                String codecClassName = jobconf
-                    .get(MAP_OUTPUT_COMPRESS_CODEC);
-                if (!(codecClassName.endsWith("LzoCodec") || codecClassName
-                    .endsWith("SnappyCodec"))) {
-                    sb.append("Best practice: use LzoCodec or SnappyCodec for "
-                        + MAP_OUTPUT_COMPRESS_CODEC);
+                String codecClassName = jobconf.get(MAP_OUTPUT_COMPRESS_CODEC);
+                if (!(codecClassName.endsWith("LzoCodec") || codecClassName.endsWith("SnappyCodec"))) {
+                    sb.append("Best practice: use LzoCodec or SnappyCodec for " + MAP_OUTPUT_COMPRESS_CODEC);
                     sb.append("\n");
                 }
             }
         }
 
         if (!jobconf.getBoolean(FileOutputFormat.COMPRESS, false)) {
-            sb.append("Please set " + FileOutputFormat.COMPRESS
-                + " to true to reduce disk usage and network IO.\n");
+            sb.append("Please set " + FileOutputFormat.COMPRESS + " to true to reduce disk usage and network IO.\n");
         } else {
             String codecName = jobconf.get(FileOutputFormat.COMPRESS_CODEC, "");
             String outputFileFormat = jobconf.get(OUTPUT_FORMAT_CLASS_ATTR, "");

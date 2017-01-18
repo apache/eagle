@@ -66,15 +66,15 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
                     minMapSpillMemBytes /= spillPercent;
                 }
 
-                minMapSpillMemBytes = (minMapSpillMemBytes / FileUtils.ONE_MB + 10) / 10 * 10;
-                if (minMapSpillMemBytes >= 2047 ) {
+                long minMapSpillMemMB = (minMapSpillMemBytes / FileUtils.ONE_MB + 10) / 10 * 10;
+                if (minMapSpillMemMB >= 2047 ) {
                     sb.append(" Please reduce the block size of the input files and make sure they are splittable.");
                 } else {
-                    sb.append(" -D" + IO_SORT_MB + "=" + minMapSpillMemBytes);
+                    sb.append(" -D" + IO_SORT_MB + "=" + minMapSpillMemMB);
                     long heapSize = getMaxHeapSize(context.getJobconf().get(MAP_JAVA_OPTS));
-                    if (heapSize < 3 * minMapSpillMemBytes) {
-                        sb.append(" -D" + MAP_JAVA_OPTS + "=-Xmx"
-                            + (long) (minMapSpillMemBytes * 3 + 1024) / 1024 * 1024 + "M");
+                    if (heapSize < 3 * minMapSpillMemMB) {
+                        long expectedHeapSizeMB = (minMapSpillMemMB * 3 + 1024) / 1024 * 1024;
+                        sb.append(" -D" + MAP_JAVA_OPTS + "=-Xmx" + expectedHeapSizeMB + "M");
                     }
                 }
                 sb.append(" to avoid spilled records.\n");

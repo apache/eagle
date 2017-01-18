@@ -17,6 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.mr.suggestion;
 
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
@@ -38,17 +39,15 @@ public class MapReduceDataSkewProcessor implements Processor<MapReduceAnalyzerEn
         }
         StringBuilder sb = new StringBuilder();
         try {
-            long worstTime = (worstReduce.getEndTime() - worstReduce
-                .getShuffleFinishTime()) / 1000;
-            if (worstTime - context.getAvgReduceTimeInSec() > 30 * 60 ) {
+            long worstTimeInSec = (worstReduce.getEndTime() - worstReduce.getShuffleFinishTime()) / DateTimeUtil.ONESECOND;
+            if (worstTimeInSec - context.getAvgReduceTimeInSec() > 30 * 60 ) {
                 long avgInputs = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.REDUCE_INPUT_RECORDS)
                     / context.getNumReduces();
                 long worstInputs = worstReduce.getJobCounters().getCounterValue(JobCounters.CounterName.REDUCE_INPUT_RECORDS);
 
-                if (worstInputs / 5 > avgInputs) {
-                    sb.append("Data skew detected in reducers. The average reduce time is "
-                        + context.getAvgReduceTimeInSec());
-                    sb.append(" seconds, the worst reduce time is " + worstTime);
+                if (worstInputs > avgInputs * 5) {
+                    sb.append("Data skew detected in reducers. The average reduce time is " + context.getAvgReduceTimeInSec());
+                    sb.append(" seconds, the worst reduce time is " + worstTimeInSec);
                     sb.append(" seconds. Please investigate this problem to improve your job performance.\n");
                 }
             }
