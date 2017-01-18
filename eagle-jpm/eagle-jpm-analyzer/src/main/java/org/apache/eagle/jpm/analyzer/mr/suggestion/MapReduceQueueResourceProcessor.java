@@ -68,7 +68,7 @@ public class MapReduceQueueResourceProcessor implements Processor<MapReduceAnaly
                 }
 
                 if (sb.length() > 0) {
-                    return new Result.ProcessorResult(Result.ResultLevel.WARNING, sb.toString());
+                    return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
                 }
             }
         } catch (Exception e) {

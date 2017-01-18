@@ -36,7 +36,7 @@ public class MapReduceSplitSettingProcessor implements Processor<MapReduceAnalyz
         if (context.getJobconf().getLong(FileInputFormat.SPLIT_MINSIZE, 0) > 1) {
             sb.append("Best practice: don't set " + FileInputFormat.SPLIT_MINSIZE);
             sb.append(", because it may lower data locality, hence maps will run slower.\n");
-            return new Result.ProcessorResult(Result.ResultLevel.WARNING, sb.toString());
+            return new Result.ProcessorResult(Result.ResultLevel.NONE, sb.toString());
         }
         return null;
     }
