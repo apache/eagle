@@ -32,6 +32,14 @@
 	position: relative;
 }
 
+.hadoopMetric-chart .hadoopMetric-no-chart-data {
+	position:absolute;
+	left: 38%;
+	top: 40%;
+	font-size: 20px;
+	color: #999;
+}
+
 .with-border .hadoopMetric-chart {
 	padding-bottom: 15px;
 	margin-bottom: 15px;

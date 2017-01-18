@@ -188,13 +188,10 @@
 						host: $scope.defaultHostname
 					};
 					METRIC.hbaseMomentMetric(jobCond,"hadoop.hbase.master.server.averageload", 1).then(function (res) {
-						$scope.hmasteraverageload = res.data.obj[0].value[0];
+						$scope.hmasteraverageload = (typeof res.data.obj[0] !== 'undefined') ? res.data.obj[0].value[0] : "-1";
 					});
 				});
-
 			};
-
-
 			Time.onReload(function () {
 				cache = {};
 				$scope.refresh();
