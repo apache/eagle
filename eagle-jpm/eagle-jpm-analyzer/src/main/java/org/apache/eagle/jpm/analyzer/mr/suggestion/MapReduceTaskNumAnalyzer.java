@@ -49,8 +49,8 @@ public class MapReduceTaskNumAnalyzer implements Processor<MapReduceAnalyzerEnti
                 long suggestReduces = 0;
                 StringBuilder tmpsb = new StringBuilder();
 
-                if (avgShuffleBytes < context._256MB && avgReduceTotalTime < 300
-                    && avgReduceOutput < context._256MB && numReduces > 1) {
+                if (avgShuffleBytes < 256 * FileUtils.ONE_MB && avgReduceTotalTime < 300
+                    && avgReduceOutput < 256 * FileUtils.ONE_MB && numReduces > 1) {
                     tmpsb.append("average reduce input bytes is: ");
                     tmpsb.append(FileUtils.byteCountToDisplaySize(avgShuffleBytes) + ", ");
                     if (suggestReduces == 0) {

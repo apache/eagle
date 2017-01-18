@@ -26,7 +26,7 @@ import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
+/*
  * Criterion: (TimeElapsed / (numTasks / 500 * avgTaskTime)) > 20
  */
 public class MapReduceQueueResourceAnalyzer implements Processor<MapReduceAnalyzerEntity> {

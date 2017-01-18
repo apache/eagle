@@ -63,9 +63,7 @@ public class MapReduceCompressionSettingAnalyzer implements Processor<MapReduceA
             String codecName = jobconf.get(FileOutputFormat.COMPRESS_CODEC, "");
             String outputFileFormat = jobconf.get(OUTPUT_FORMAT_CLASS_ATTR, "");
 
-            if ((codecName.endsWith("GzipCodec") ||
-                codecName.endsWith("SnappyCodec") ||
-                codecName.endsWith("DefaultCodec"))
+            if ((codecName.endsWith("GzipCodec") || codecName.endsWith("SnappyCodec") || codecName.endsWith("DefaultCodec"))
                 && outputFileFormat.endsWith("TextOutputFormat")) {
                 sb.append("Best practice: don't use Gzip/Snappy/DefaultCodec with TextOutputFormat");
                 sb.append(" as this will cause the output files to be unsplittable. ");

@@ -58,7 +58,7 @@ public class MapReduceSpillAnalyzer implements Processor<MapReduceAnalyzerEntity
 
                 long minMapSpillMemBytes = context.getMinMapSpillMemBytes();
                 double spillPercent = context.getJobconf().getDouble(MAP_SORT_SPILL_PERCENT, 0.8);
-                if (minMapSpillMemBytes > context._512MB * spillPercent) {
+                if (minMapSpillMemBytes > 512 * FileUtils.ONE_MB * spillPercent) {
                     if (Math.abs(1.0 - spillPercent) > 0.001) {
                         sb.append(" -D" + MAP_SORT_SPILL_PERCENT + "=1");
                     }

@@ -22,7 +22,6 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.util.MRJobTagName;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.TaskType;
 
@@ -57,12 +56,6 @@ public class MapReduceJobSuggestionContext {
     private long minMapSpillMemBytes;
 
     public static final Pattern MAX_HEAP_PATTERN = Pattern.compile("-Xmx([0-9]+)([kKmMgG]?)");
-    public final long _1MB = 1024 * 1024l;
-    public final long _256MB = 256 * _1MB;
-    public final long _512MB = 512 * _1MB;
-    public final long _1GB = 1024 * _1MB;
-
-    private static Boolean initialized = false;
 
     public MapReduceJobSuggestionContext(MapReduceAnalyzerEntity job) {
         this.job = job;
@@ -133,9 +126,10 @@ public class MapReduceJobSuggestionContext {
     }
 
     /**
-     * 16 is the default index size
+     * The default index size is 16.
+     *
      * @param attempt
-     * @return
+     * @return minimal sort memory
      */
     private long getMinimumIOSortMemory(TaskAttemptExecutionAPIEntity attempt) {
         long records = attempt.getJobCounters().getCounterValue(MAP_OUTPUT_RECORDS);

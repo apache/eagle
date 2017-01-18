@@ -25,9 +25,11 @@ import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
 public class MapReduceDataSkewAnalyzer implements Processor<MapReduceAnalyzerEntity> {
     private MapReduceJobSuggestionContext context;
+
     public MapReduceDataSkewAnalyzer(MapReduceJobSuggestionContext context) {
         this.context = context;
     }
+    
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
         TaskAttemptExecutionAPIEntity worstReduce = context.getWorstReduce();

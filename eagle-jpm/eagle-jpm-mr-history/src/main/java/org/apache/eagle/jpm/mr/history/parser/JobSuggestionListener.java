@@ -32,7 +32,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
+/*
  * JobEventCounterListener provides an interface to add job/task counter analyzers
  */
 public class JobSuggestionListener implements HistoryJobEntityCreationListener {
