@@ -34,11 +34,11 @@ import static org.apache.hadoop.mapreduce.MRJobConfig.MAP_SORT_SPILL_PERCENT;
  * Check whether spilled more than once, if true, find out the minimum value of the memory to hold all the data,
  * based on that value, find out how much memory need for heap size.
  */
-public class MapReduceSpillAnalyzer implements Processor<MapReduceAnalyzerEntity> {
+public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntity> {
 
     private MapReduceJobSuggestionContext context;
 
-    public MapReduceSpillAnalyzer(MapReduceJobSuggestionContext context) {
+    public MapReduceSpillProcessor(MapReduceJobSuggestionContext context) {
         this.context = context;
     }
 
@@ -91,7 +91,7 @@ public class MapReduceSpillAnalyzer implements Processor<MapReduceAnalyzerEntity
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.CRITICAL, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.WARNING, sb.toString());
             }
         } catch (NullPointerException e) {
             //When job failed there may not have counters, so just ignore it

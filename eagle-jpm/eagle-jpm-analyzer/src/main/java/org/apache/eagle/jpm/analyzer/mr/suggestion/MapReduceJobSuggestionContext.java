@@ -20,6 +20,7 @@ package org.apache.eagle.jpm.analyzer.mr.suggestion;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.MRJobTagName;
 
 import org.apache.hadoop.mapred.JobConf;
@@ -69,7 +70,8 @@ public class MapReduceJobSuggestionContext {
         numReduces = jobconf.getLong(NUM_REDUCES, 0);
 
         for (TaskAttemptExecutionAPIEntity attempt : job.getCompletedTaskAttemptsMap().values()) {
-            if (TaskType.MAP.toString().equalsIgnoreCase(getTaskType(attempt))) {
+            String taskType = getTaskType(attempt);
+            if (Constants.TaskType.MAP.toString().equalsIgnoreCase(taskType)) {
                 long mapTime = attempt.getEndTime() - attempt.getStartTime();
                 avgMapTimeInSec += mapTime;
                 if (firstMap == null || firstMap.getStartTime() > attempt.getStartTime()) {
@@ -85,7 +87,7 @@ public class MapReduceJobSuggestionContext {
                 if (tmpMem > minMapSpillMemBytes) {
                     minMapSpillMemBytes = tmpMem;
                 }
-            } else if (TaskType.REDUCE.toString().equalsIgnoreCase(getTaskType(attempt))) {
+            } else if (TaskType.REDUCE.toString().equalsIgnoreCase(taskType)) {
                 long shuffleTime = attempt.getShuffleFinishTime() - attempt.getStartTime();
                 avgShuffleTimeInSec += shuffleTime;
                 if (firstShuffle == null || firstShuffle.getStartTime() > attempt.getStartTime()) {
@@ -122,7 +124,7 @@ public class MapReduceJobSuggestionContext {
     }
 
     private String getTaskType(TaskAttemptExecutionAPIEntity taskAttemptInfo) {
-        return taskAttemptInfo.getTags().get(MRJobTagName.TASK_TYPE);
+        return taskAttemptInfo.getTags().get(MRJobTagName.TASK_TYPE.toString());
     }
 
     /**

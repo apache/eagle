@@ -18,7 +18,6 @@
 package org.apache.eagle.jpm.analyzer.mr.suggestion;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Evaluator;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
@@ -42,13 +41,13 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
 
     private List<Processor> loadProcessors(MapReduceJobSuggestionContext context) {
         List<Processor> processors = new ArrayList<>();
-        processors.add(new MapReduceCompressionSettingAnalyzer(context));
-        processors.add(new MapReduceSplitSettingAnalyzer(context));
-        processors.add(new MapReduceDataSkewAnalyzer(context));
-        processors.add(new MapReduceGCTimeAnalyzer(context));
-        processors.add(new MapReduceSpillAnalyzer(context));
-        processors.add(new MapReduceTaskNumAnalyzer(context));
-        processors.add(new MapReduceQueueResourceAnalyzer(context));
+        processors.add(new MapReduceCompressionSettingProcessor(context));
+        processors.add(new MapReduceSplitSettingProcessor(context));
+        processors.add(new MapReduceDataSkewProcessor(context));
+        processors.add(new MapReduceGCTimeProcessor(context));
+        processors.add(new MapReduceSpillProcessor(context));
+        processors.add(new MapReduceTaskNumProcessor(context));
+        //processors.add(new MapReduceQueueResourceProcessor(context));
 
         return processors;
     }
@@ -64,13 +63,19 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
             return null;
         }
 
-        Result.EvaluatorResult result = new Result.EvaluatorResult();
-        for (Processor processor : loadProcessors(jobContext)) {
-            Result.ProcessorResult processorResult = processor.process(analyzerEntity);
-            if (processorResult != null) {
-                result.addProcessorResult(processor.getClass(), processorResult);
+        try {
+            Result.EvaluatorResult result = new Result.EvaluatorResult();
+            for (Processor processor : loadProcessors(jobContext)) {
+                Result.ProcessorResult processorResult = processor.process(analyzerEntity);
+                if (processorResult != null) {
+                    result.addProcessorResult(processor.getClass(), processorResult);
+                }
             }
+            return result;
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            return null;
         }
-        return result;
+
     }
 }

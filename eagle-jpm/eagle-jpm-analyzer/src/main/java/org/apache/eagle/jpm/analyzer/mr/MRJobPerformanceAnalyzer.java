@@ -47,7 +47,7 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
         evaluators.add(new SLAJobEvaluator(config));
         evaluators.add(new JobSuggestionEvaluator(config));
 
-        publishers.add(new EagleStorePublisher(config));
+        //publishers.add(new EagleStorePublisher(config));
         publishers.add(new EmailPublisher(config));
     }
 

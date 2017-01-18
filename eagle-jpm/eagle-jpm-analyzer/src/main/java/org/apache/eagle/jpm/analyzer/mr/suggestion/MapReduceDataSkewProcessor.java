@@ -20,43 +20,41 @@ package org.apache.eagle.jpm.analyzer.mr.suggestion;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
+import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
-import static org.apache.hadoop.mapreduce.MRJobConfig.MAP_JAVA_OPTS;
-import static org.apache.hadoop.mapreduce.MRJobConfig.REDUCE_JAVA_OPTS;
-
-public class MapReduceGCTimeAnalyzer implements Processor<MapReduceAnalyzerEntity> {
+public class MapReduceDataSkewProcessor implements Processor<MapReduceAnalyzerEntity> {
     private MapReduceJobSuggestionContext context;
 
-    public MapReduceGCTimeAnalyzer(MapReduceJobSuggestionContext context) {
+    public MapReduceDataSkewProcessor(MapReduceJobSuggestionContext context) {
         this.context = context;
     }
-
+    
     @Override
     public Result.ProcessorResult process(MapReduceAnalyzerEntity jobAnalysisEntity) {
+        TaskAttemptExecutionAPIEntity worstReduce = context.getWorstReduce();
+        if (context.getNumReduces() == 0 || worstReduce == null) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
         try {
-            long mapGCTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.GC_MILLISECONDS);
-            long mapCPUTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
+            long worstTime = (worstReduce.getEndTime() - worstReduce
+                .getShuffleFinishTime()) / 1000;
+            if (worstTime - context.getAvgReduceTimeInSec() > 30 * 60 ) {
+                long avgInputs = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.REDUCE_INPUT_RECORDS)
+                    / context.getNumReduces();
+                long worstInputs = worstReduce.getJobCounters().getCounterValue(JobCounters.CounterName.REDUCE_INPUT_RECORDS);
 
-            if (mapGCTime > mapCPUTime * 0.1) {
-                sb.append("Map GC_TIME_MILLIS took too long. Please increase mapper memory via -D"
-                    + MAP_JAVA_OPTS);
-                sb.append(", or optimize your mapper class.\n");
-            }
-
-            if (context.getNumReduces() > 0) {
-                long reduceGCTime = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.GC_MILLISECONDS);
-                long reduceCPUTime = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
-                if (reduceGCTime > reduceCPUTime * 0.1) {
-                    sb.append("Reduce GC_TIME_MILLIS took too long. Please increase memory for reduce via -D"
-                        + REDUCE_JAVA_OPTS);
-                    sb.append(", or optimize your reducer class.\n");
+                if (worstInputs / 5 > avgInputs) {
+                    sb.append("Data skew detected in reducers. The average reduce time is "
+                        + context.getAvgReduceTimeInSec());
+                    sb.append(" seconds, the worst reduce time is " + worstTime);
+                    sb.append(" seconds. Please investigate this problem to improve your job performance.\n");
                 }
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.CRITICAL, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.WARNING, sb.toString());
             }
         } catch (NullPointerException e) {
             // When job failed there may not have counters, so just ignore it

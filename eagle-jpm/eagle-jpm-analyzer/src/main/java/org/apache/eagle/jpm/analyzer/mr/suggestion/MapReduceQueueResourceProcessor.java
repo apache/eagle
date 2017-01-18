@@ -29,12 +29,12 @@ import org.slf4j.LoggerFactory;
 /*
  * Criterion: (TimeElapsed / (numTasks / 500 * avgTaskTime)) > 20
  */
-public class MapReduceQueueResourceAnalyzer implements Processor<MapReduceAnalyzerEntity> {
-    private static final Logger LOG = LoggerFactory.getLogger(MapReduceQueueResourceAnalyzer.class);
+public class MapReduceQueueResourceProcessor implements Processor<MapReduceAnalyzerEntity> {
+    private static final Logger LOG = LoggerFactory.getLogger(MapReduceQueueResourceProcessor.class);
 
     private MapReduceJobSuggestionContext context;
 
-    public MapReduceQueueResourceAnalyzer(MapReduceJobSuggestionContext context) {
+    public MapReduceQueueResourceProcessor(MapReduceJobSuggestionContext context) {
         this.context = context;
     }
 

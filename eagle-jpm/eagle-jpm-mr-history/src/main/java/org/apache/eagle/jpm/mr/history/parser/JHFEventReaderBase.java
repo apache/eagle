@@ -304,7 +304,6 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
             formatDiagnostics(values.get(Keys.DIAGNOSTICS));
             entityCreated(jobExecutionEntity);
-            jobSuggestionListener.jobEntityCreated(jobExecutionEntity);
 
             if (configuration != null && totalCounters != null) {
                 JobCounters parsedTotalCounters = parseCounters(totalCounters);
@@ -426,7 +425,6 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
             entityCreated(entity);
             this.jobCounterMetricsGenerator.taskExecutionEntityCreated(entity);
-            this.jobSuggestionListener.jobEntityCreated(entity);
             //_taskStartTime.remove(taskID); // clean this taskID
         } else if ((recType == RecordTypes.MapAttempt || recType == RecordTypes.ReduceAttempt) && startTime != null) { // task attempt start
             taskAttemptStartTime.put(taskAttemptID, Long.valueOf(startTime));
@@ -495,7 +493,6 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 entityCreated(taskAttemptErrorCategoryEntity);
             }
             taskAttemptStartTime.remove(taskAttemptID);
-            jobSuggestionListener.jobEntityCreated(entity);
         } else {
             // silently ignore
             LOG.warn("It's an exceptional case ?");

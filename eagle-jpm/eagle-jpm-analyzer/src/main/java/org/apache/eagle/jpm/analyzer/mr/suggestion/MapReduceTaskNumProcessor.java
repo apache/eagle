@@ -23,11 +23,11 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
-public class MapReduceTaskNumAnalyzer implements Processor<MapReduceAnalyzerEntity> {
+public class MapReduceTaskNumProcessor implements Processor<MapReduceAnalyzerEntity> {
 
     private MapReduceJobSuggestionContext context;
 
-    public MapReduceTaskNumAnalyzer(MapReduceJobSuggestionContext context) {
+    public MapReduceTaskNumProcessor(MapReduceJobSuggestionContext context) {
         this.context = context;
     }
 
@@ -129,7 +129,7 @@ public class MapReduceTaskNumAnalyzer implements Processor<MapReduceAnalyzerEnti
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.CRITICAL, sb.toString());
+                return new Result.ProcessorResult(Result.ResultLevel.WARNING, sb.toString());
             }
         } catch (NullPointerException e) {
             // When job failed there may not have counters, so just ignore it

@@ -28,11 +28,11 @@ import static org.apache.hadoop.mapreduce.MRJobConfig.MAP_OUTPUT_COMPRESS_CODEC;
 import static org.apache.hadoop.mapreduce.MRJobConfig.NUM_REDUCES;
 import static org.apache.hadoop.mapreduce.MRJobConfig.OUTPUT_FORMAT_CLASS_ATTR;
 
-public class MapReduceCompressionSettingAnalyzer implements Processor<MapReduceAnalyzerEntity> {
+public class MapReduceCompressionSettingProcessor implements Processor<MapReduceAnalyzerEntity> {
 
     private MapReduceJobSuggestionContext context;
 
-    public MapReduceCompressionSettingAnalyzer(MapReduceJobSuggestionContext context) {
+    public MapReduceCompressionSettingProcessor(MapReduceJobSuggestionContext context) {
         this.context = context;
     }
 
