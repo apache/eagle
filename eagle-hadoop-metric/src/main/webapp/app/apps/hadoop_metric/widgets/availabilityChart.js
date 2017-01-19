@@ -54,38 +54,39 @@
 					// Customize chart color
 					$scope.bgColor = COLOR_MAPPING[$scope.type];
 
+					function countHBaseRole(site, status, role, groups, filed, limit) {
+						var jobCond = {
+							site: site,
+							status: status,
+							role: role
+						};
+						return METRIC.aggHBaseInstance(jobCond, groups, filed, limit);
+					}
 
 					// Ref: jpm widget if need keep refresh the widget
 
 					function refresh() {
 						$.each($scope.list, function (i, site) {
-							var hbaseservers = METRIC.hbasehostStatus({site: site.siteName});
-							hbaseservers._promise.then(function (res) {
-								var hmasternum = 0;
-								var hmasteractivenum = 0;
-								var regionserverHealthynum = 0;
-								var regionservertotal = 0;
-								$.each(res, function (i, server) {
-									var role = server.tags.role;
-									var status = server.status;
-									if (role === "hmaster") {
-										hmasternum++;
-										if (status === "active") {
-											hmasteractivenum++;
-										}
-									} else if (role === "regionserver") {
-										regionservertotal++;
-										if (status === "live") {
-											regionserverHealthynum++;
-										}
-									}
+
+							countHBaseRole(site.siteId, "active", "hmaster", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.hmasteractivenum = data.value[0];
 								});
-								$scope.hbaseinfo = {
-									hmasternum: hmasternum,
-									hmasteractivenum: hmasteractivenum,
-									regionserverHealthynum: regionserverHealthynum,
-									regionservertotal: regionservertotal
-								};
+							});
+							countHBaseRole(site.siteId, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.hmasterstandbynum = data.value[0]
+								});
+							});
+							countHBaseRole(site.siteId, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.regionserverhealtynum = data.value[0];
+								});
+							});
+							countHBaseRole(site.siteId, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.regionserverunhealtynum = data.value[0];
+								});
 							});
 						});
 					}
@@ -101,18 +102,21 @@
 				'<div class="small-box hadoopMetric-widget bg-{{bgColor}}">' +
 				    '<div class="inner">' +
 				        '<h3>{{type}}</h3>' +
-				        '<div class="hadoopMetric-widget-detail">' +
+				        '<div ng-show="hmasteractivenum" class="hadoopMetric-widget-detail">' +
 					        '<a ui-sref="HadoopMetric({siteId: site.siteName})">' +
-				            '<span>{{hbaseinfo.hmasternum}}</span> Masters (' +
-				            '<span>{{hbaseinfo.hmasteractivenum}}</span> Active / ' +
-				            '<span>{{hbaseinfo.hmasternum - hbaseinfo.hmasteractivenum}}</span> Standby)' +
+				            '<span>{{hmasteractivenum+hmasterstandbynum}}</span> Masters (' +
+				            '<span ng-show="hmasteractivenum">{{hmasteractivenum}}</span><span ng-show="!hmasteractivenum">0</span> Active / ' +
+				            '<span ng-show="hmasterstandbynum">{{hmasterstandbynum}}</span><span ng-show="!hmasterstandbynum">0</span> Standby)' +
 					        '</a>' +
 				        '</div>' +
-				        '<div class="hadoopMetric-widget-detail">' +
+				        '<div ng-show="!hmasteractivenum" class="hadoopMetric-widget-detail">' +
+				           '<span class="fa fa-question-circle"></span><span> NO DATA</span>' +
+				        '</div>' +
+				        '<div ng-show="hmasteractivenum" class="hadoopMetric-widget-detail">' +
 				            '<a ui-sref="regionList({siteId: site.siteName})">' +
-				            '<span>{{hbaseinfo.regionservertotal}}</span> RegionServers (' +
-				            '<span>{{hbaseinfo.regionserverHealthynum}}</span> Healthy / ' +
-				            '<span>{{hbaseinfo.regionservertotal - hbaseinfo.regionserverHealthynum}}</span> Unhealthy)' +
+				            '<span>{{regionserverhealtynum+regionserverunhealtynum}}</span> RegionServers (' +
+				            '<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span><span ng-show="!regionserverhealtynum">0</span> Healthy / ' +
+				            '<span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span><span ng-show="!regionserverunhealtynum">0</span> Unhealthy)' +
 				            '</a>' +
 				        '</div>' +
 				    '</div>' +
