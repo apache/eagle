@@ -72,7 +72,6 @@
 				var endTime = Time.endTime();
 				var metricspromies = [];
 				METRIC.getMetricObj().then(function (res) {
-					console.log(res.regionserver);
 					var masterMetricList = res.regionserver;
 					for (var metricKey in masterMetricList) {
 						metricspromies.push(generateHbaseMetric(masterMetricList[metricKey], startTime, endTime, metricKey));
@@ -87,13 +86,13 @@
 						$scope.metricList = [];
 						$scope.metricList.push(mergeSeries("Memory Usage", [seriesObj["nonheap"], seriesObj["heap"]], ["nonheap", "heap"], sizeoption));
 						$scope.metricList.push(mergeSeries("Direct Memory Usage", [seriesObj["directmemory"]], ["directmemory"], sizeoption));
-						$scope.metricList.push(mergeSeries("GC count", [seriesObj["GC count"]], ["GC count"], {}));
-						$scope.metricList.push(mergeSeries("GC TimeMillis", [seriesObj["GC TimeMillis"]], ["GC TimeMillis"], gctimeoption));
+						$scope.metricList.push(mergeSeries("GC count", [seriesObj["GCCount"]], ["GC count"], {}));
+						$scope.metricList.push(mergeSeries("GC TimeMillis", [seriesObj["GCTimeMillis"]], ["GC TimeMillis"], gctimeoption));
 						$scope.metricList.push(mergeSeries("QueueSize", [seriesObj["QueueSize"]], ["QueueSize"], {}));
 						$scope.metricList.push(mergeSeries("NumCallsInGeneralQueue", [seriesObj["NumCallsInGeneralQueue"]], ["NumCallsInGeneralQueue"], {}));
 						$scope.metricList.push(mergeSeries("NumActiveHandler", [seriesObj["NumActiveHandler"]], ["NumActiveHandler"], {}));
-						$scope.metricList.push(mergeSeries("IPC Queue Time (99th)", [seriesObj["IPC Queue Time (99th)"]], ["IPC Queue Time (99th)"], {}));
-						$scope.metricList.push(mergeSeries("IPC Process Time (99th)", [seriesObj["IPC Process Time (99th)"]], ["IPC Process Time (99th)"], {}));
+						$scope.metricList.push(mergeSeries("IPC Queue Time (99th)", [seriesObj["IPCQueueTime99th"]], ["IPC Queue Time (99th)"], {}));
+						$scope.metricList.push(mergeSeries("IPC Process Time (99th)", [seriesObj["IPCProcessTime99th"]], ["IPC Process Time (99th)"], {}));
 						$scope.metricList.push(mergeSeries("QueueCallTime_num_ops", [seriesObj["QueueCallTime_num_ops"]], ["QueueCallTime_num_ops"], {}));
 						$scope.metricList.push(mergeSeries("ProcessCallTime_num_ops", [seriesObj["ProcessCallTime_num_ops"]], ["ProcessCallTime_num_ops"], {}));
 						$scope.metricList.push(mergeSeries("RegionCount", [seriesObj["RegionCount"]], ["RegionCount"], {}));
