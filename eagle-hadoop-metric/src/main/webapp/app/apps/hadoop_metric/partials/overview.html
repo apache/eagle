@@ -46,7 +46,7 @@
 				</td>
 				<th>Backup HBase Master</th>
 				<td>
-					<span ng-show="hmasteraverageload !== '-1'">{{hmasteraverageload}}</span>
+					<span ng-show="hmasteraverageload !== '-1'">{{common.number.format(hmasteraverageload, 0)}}</span>
 					<span ng-show="hmasteraverageload === '-1'" class="fa fa-refresh fa-spin no-animate"></span>
 				</td>
 				<th>Average Load</th>
