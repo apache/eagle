@@ -62,4 +62,5 @@ public class Constants {
 
     public static final String ANALYZER_REPORT_DATA_BASIC_KEY = "basic";
     public static final String ANALYZER_REPORT_DATA_EXTEND_KEY = "extend";
+
 }

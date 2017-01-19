@@ -101,7 +101,7 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.ResultLevel.INFO, sb.toString(), optSettings);
+                return new Result.ProcessorResult(Result.RuleType.SPILL, Result.ResultLevel.INFO, sb.toString(), optSettings);
             }
         } catch (NullPointerException e) {
             //When job failed there may not have counters, so just ignore it

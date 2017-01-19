@@ -23,6 +23,7 @@ import org.apache.eagle.jpm.analyzer.Evaluator;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
 import org.apache.eagle.jpm.analyzer.mr.suggestion.JobSuggestionEvaluator;
+import org.apache.eagle.jpm.analyzer.publisher.EagleStorePublisher;
 import org.apache.eagle.jpm.analyzer.publisher.EmailPublisher;
 import org.apache.eagle.jpm.analyzer.publisher.Publisher;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
@@ -46,7 +47,7 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
         evaluators.add(new SLAJobEvaluator(config));
         evaluators.add(new JobSuggestionEvaluator(config));
 
-        //publishers.add(new EagleStorePublisher(config));
+        publishers.add(new EagleStorePublisher(config));
         publishers.add(new EmailPublisher(config));
     }
 

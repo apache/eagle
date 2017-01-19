@@ -38,6 +38,6 @@ public class LongStuckJobProcessor implements Processor, Serializable {
     @Override
     public Result.ProcessorResult process(AnalyzerEntity analyzerJobEntity) {
         LOG.info("Job {} In LongStuckJobProcessor", analyzerJobEntity.getJobDefId());
-        return new Result.ProcessorResult(Result.ResultLevel.NONE, "");
+        return new Result.ProcessorResult(Result.RuleType.LONG_STUCK_JOB, Result.ResultLevel.NONE, "");
     }
 }
