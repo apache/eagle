@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -42,6 +43,7 @@ import java.util.regex.Matcher;
 
 import static org.apache.eagle.topology.TopologyConstants.*;
 import static org.apache.eagle.topology.utils.EntityBuilderHelper.generateHostKey;
+
 
 public class MRTopologyEntityParser implements TopologyEntityParser {
 
