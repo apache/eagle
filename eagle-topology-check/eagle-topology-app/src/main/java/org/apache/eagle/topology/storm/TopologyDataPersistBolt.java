@@ -19,7 +19,6 @@
 package org.apache.eagle.topology.storm;
 
 import static org.apache.eagle.topology.TopologyConstants.HOSTNAME_TAG;
-import static org.apache.eagle.topology.TopologyConstants.RACK_TAG;
 import static org.apache.eagle.topology.TopologyConstants.ROLE_TAG;
 import static org.apache.eagle.topology.TopologyConstants.SITE_TAG;
 
@@ -76,18 +75,18 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         }
         String serviceName = input.getStringByField(TopologyConstants.SERVICE_NAME_FIELD);
         TopologyEntityParserResult result = (TopologyEntityParserResult) input.getValueByField(TopologyConstants.TOPOLOGY_DATA_FIELD);
-        Set<String> availableHostnames = new HashSet<String>();
+        Set<String> availableHostNames = new HashSet<String>();
         List<TopologyBaseAPIEntity> entitiesForDeletion = new ArrayList<>();
         List<TopologyBaseAPIEntity> entitiesToWrite = new ArrayList<>();
 
-        filterEntitiesToWrite(result, availableHostnames, entitiesToWrite);
+        filterEntitiesToWrite(result, availableHostNames, entitiesToWrite);
 
         String query = String.format("%s[@site=\"%s\"]{*}", serviceName, this.config.dataExtractorConfig.site);
         try {
             GenericServiceAPIResponseEntity<TopologyBaseAPIEntity> response = client.search().query(query).pageSize(Integer.MAX_VALUE).send();
             if (response.isSuccess() && response.getObj() != null) {
                 for (TopologyBaseAPIEntity entity : response.getObj()) {
-                    if (!availableHostnames.isEmpty() && !availableHostnames.contains(generateKey(entity))) {
+                    if (!availableHostNames.isEmpty() && !availableHostNames.contains(generatePersistKey(entity))) {
                         entitiesForDeletion.add(entity);
                     }
                 }
@@ -105,11 +104,11 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
     private void filterEntitiesToWrite(TopologyEntityParserResult result, Set<String> availableHostnames, List<TopologyBaseAPIEntity> entitiesToWrite) {
         if (!result.getSlaveNodes().isEmpty()) {
             for (TopologyBaseAPIEntity entity : result.getMasterNodes()) {
-                availableHostnames.add(generateKey(entity));
+                availableHostnames.add(generatePersistKey(entity));
                 entitiesToWrite.add(entity);
             }
             for (TopologyBaseAPIEntity entity : result.getSlaveNodes()) {
-                availableHostnames.add(generateKey(entity));
+                availableHostnames.add(generatePersistKey(entity));
                 entitiesToWrite.add(entity);
             }
         } else {
@@ -156,10 +155,11 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         entities.clear();
     }
 
-    private String generateKey(TopologyBaseAPIEntity entity) {
+    private String generatePersistKey(TopologyBaseAPIEntity entity) {
         return new HashCodeBuilder().append(entity.getTags().get(TopologyConstants.SITE_TAG))
                 .append(entity.getTags().get(TopologyConstants.HOSTNAME_TAG))
                 .append(entity.getTags().get(TopologyConstants.ROLE_TAG))
+                .append(entity.getTags().get(TopologyConstants.RACK_TAG))
                 .build().toString();
     }
 
