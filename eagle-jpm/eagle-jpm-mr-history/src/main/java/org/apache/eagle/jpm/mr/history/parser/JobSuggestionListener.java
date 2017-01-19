@@ -32,6 +32,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.eagle.jpm.util.MRJobTagName.TASK_ATTEMPT_ID;
+import static org.apache.eagle.jpm.util.MRJobTagName.TASK_ID;
+
 /*
  * JobEventCounterListener provides an interface to add job/task counter analyzers
  */
@@ -49,9 +52,9 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
     @Override
     public void jobEntityCreated(JobBaseAPIEntity entity) throws Exception {
         if (entity instanceof TaskExecutionAPIEntity) {
-            info.getTasksMap().put(entity.getTags().get(Keys.TASKID), (TaskExecutionAPIEntity) entity);
+            info.getTasksMap().put(entity.getTags().get(TASK_ID.toString()), (TaskExecutionAPIEntity) entity);
         } else if (entity instanceof TaskAttemptExecutionAPIEntity) {
-            info.getCompletedTaskAttemptsMap().put(entity.getTags().get(Keys.TASK_ATTEMPT_ID), (TaskAttemptExecutionAPIEntity) entity);
+            info.getCompletedTaskAttemptsMap().put(entity.getTags().get(TASK_ATTEMPT_ID.toString()), (TaskAttemptExecutionAPIEntity) entity);
         } else if (entity instanceof JobExecutionAPIEntity) {
             JobExecutionAPIEntity jobExecutionAPIEntity = (JobExecutionAPIEntity) entity;
             info.setCurrentState(jobExecutionAPIEntity.getCurrentState());

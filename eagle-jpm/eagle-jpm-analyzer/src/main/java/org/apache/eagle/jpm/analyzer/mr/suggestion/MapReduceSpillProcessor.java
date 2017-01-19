@@ -57,8 +57,8 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
             spillRecords = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.SPILLED_RECORDS);
 
             if (outputRecords < spillRecords) {
-                sb.append("Total Map output records: ").append(outputRecords);
-                sb.append(" Total Spilled Records: ").append(spillRecords).append(". Please set");
+                sb.append("Total map output records: ").append(outputRecords);
+                sb.append(" Total map spilled records: ").append(spillRecords).append(". Please set");
 
                 long minMapSpillMemBytes = context.getMinMapSpillMemBytes();
                 double spillPercent = context.getJobconf().getDouble(MAP_SORT_SPILL_PERCENT, 0.8);
@@ -74,7 +74,7 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
 
                 long minMapSpillMemMB = (minMapSpillMemBytes / FileUtils.ONE_MB + 10) / 10 * 10;
                 if (minMapSpillMemMB >= 2047 ) {
-                    sb.append(" Please reduce the block size of the input files and make sure they are splittable.");
+                    sb.append("\nPlease reduce the block size of the input files and make sure they are splittable.");
                 } else {
                     setting = String.format("-D%s=%s", IO_SORT_MB, minMapSpillMemMB);
                     sb.append(" ").append(setting);

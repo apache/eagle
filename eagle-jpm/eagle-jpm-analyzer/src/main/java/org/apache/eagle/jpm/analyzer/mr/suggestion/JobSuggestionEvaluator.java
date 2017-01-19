@@ -93,6 +93,7 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
         tags.put(USER.toString(), entity.getUserId());
         tags.put(RULE_TYPE.toString(), processorResult.getRuleType().toString());
         tags.put(JOB_QUEUE.toString(), entity.getJobQueueName());
+        tags.put(JOB_TYPE.toString(), entity.getJobType());
         JobSuggestionAPIEntity jobSuggestionAPIEntity = new JobSuggestionAPIEntity();
         jobSuggestionAPIEntity.setTags(tags);
         jobSuggestionAPIEntity.setTimestamp(entity.getStartTime());  // startTime as the job timestamp

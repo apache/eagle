@@ -42,8 +42,6 @@ public class Result {
                 continue;
             }
 
-            TaggedLogAPIEntity entity = processorEntities.get(processorType);
-
             String typeName = type.getName();
             if (!alertMessages.containsKey(typeName)) {
                 alertMessages.put(typeName, new ArrayList<>());
@@ -51,7 +49,7 @@ public class Result {
             }
             normalizeResult(processorResult);
             alertMessages.get(typeName).add(processorResult);
-            alertEntities.get(typeName).add(entity);
+            alertEntities.get(typeName).add(processorEntities.get(processorType));
 
         }
     }
