@@ -69,12 +69,12 @@
 							host: $scope.defaultHostname
 						};
 						return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
-						._promise.then(function (list) {
-							var metricFlag = $.map(list, function (metrics) {
-								return metrics[0].flag;
+							._promise.then(function (list) {
+								var metricFlag = $.map(list, function (metrics) {
+									return metrics[0].flag;
+								});
+								return [metricFlag, list];
 							});
-							return [metricFlag, list];
-						});
 					});
 			}
 
@@ -82,7 +82,7 @@
 				var series = [];
 
 				$.each(metrics, function (i, metricMap) {
-					if(typeof metricMap !== 'undefined') {
+					if (typeof metricMap !== 'undefined') {
 						series.push(METRIC.metricsToSeries(legendName[i], metricMap[0], option));
 					}
 				});
@@ -93,12 +93,28 @@
 				};
 			}
 
+			function countHBaseRole(site, status, role, groups, filed, limit) {
+				var jobCond = {
+					site: site,
+					status: status,
+					role: role
+				};
+				return METRIC.aggHBaseInstance(jobCond, groups, filed, limit);
+			}
+
+			function sumAllRegions(site, role, groups, filed, limit) {
+				var jobCond = {
+					site: site,
+					role: role
+				};
+				return METRIC.aggHBaseInstance(jobCond, groups, filed, limit);
+			}
+
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 
 
 			$scope.refresh = function () {
-				var hbaseservers = METRIC.hbasehostStatus({site: $scope.site});
 				var metricspromies = [];
 				METRIC.getMetricObj().then(function (res) {
 					var masterMetricList = res.master;
@@ -107,7 +123,7 @@
 					}
 					$q.all(metricspromies).then(function (resp) {
 						var metricObj = {};
-						for(var i=0; i < resp.length; i+=1) {
+						for (var i = 0; i < resp.length; i += 1) {
 							metricObj[resp[i][0]] = resp[i][1];
 						}
 						return metricObj;
@@ -132,51 +148,31 @@
 					});
 				});
 
-				METRIC.regionserverStatus($scope.hostname, $scope.site)._promise.then(function (res) {
-					$scope.regionstatus = res;
+				countHBaseRole($scope.site, "active", "hmaster", ["site"], "count")._promise.then(function (res) {
+					$.map(res, function (data) {
+						$scope.hmasteractivenum = data.value[0];
+					});
+				});
+				countHBaseRole($scope.site, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
+					$.map(res, function (data) {
+						$scope.hmasterstandbynum = data.value[0]
+					});
 				});
 
-				hbaseservers._promise.then(function (res) {
-					var regionserverhealtynum = 0;
-					var regionservertotal = 0;
-					var hmasterstandbynum = 0;
-					var hmasteractivenum = 0;
-					var regionsnum = 0;
-					var regionArray = [];
-					$.each(res, function (i, server) {
-						var role = server.tags.role;
-						var status = server.status;
-						if (role === "regionserver") {
-							regionservertotal++;
-							if (status === "live") {
-								regionserverhealtynum++;
-							}
-							regionArray.push(METRIC.regionserverStatus(server.tags.hostname, $scope.site)._promise.then(function (res) {
-								return res[0].numRegions;
-							}));
-						}
-						else if (role === "hmaster") {
-							if (status === "active") {
-								hmasteractivenum++;
-							} else {
-								hmasterstandbynum++;
-							}
-
-						}
+				countHBaseRole($scope.site, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
+					$.map(res, function (data) {
+						$scope.regionserverhealtynum = data.value[0];
 					});
-
-					$q.all(regionArray).then(function (res) {
-
-						for(var i=0; i<regionArray.length; i++) {
-							regionsnum+=res[i];
-						}
-						$scope.regionsnum = regionsnum;
+				});
+				countHBaseRole($scope.site, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
+					$.map(res, function (data) {
+						$scope.regionserverunhealtynum = data.value[0];
 					});
-
-					$scope.regionserverhealtynum = regionserverhealtynum;
-					$scope.regionservertotal = regionservertotal;
-					$scope.hmasterstandbynum = hmasterstandbynum;
-					$scope.hmasteractivenum = hmasteractivenum;
+				});
+				sumAllRegions($scope.site, "regionserver", ["site"], "sum(numRegions)")._promise.then(function (res) {
+					$.map(res, function (data) {
+						$scope.regionsnum = data.value[0];
+					});
 				});
 
 				activeMasterInfo._promise.then(function (res) {
@@ -187,7 +183,7 @@
 						component: "hbasemaster",
 						host: $scope.defaultHostname
 					};
-					METRIC.hbaseMomentMetric(jobCond,"hadoop.hbase.master.server.averageload", 1).then(function (res) {
+					METRIC.hbaseMomentMetric(jobCond, "hadoop.hbase.master.server.averageload", 1).then(function (res) {
 						$scope.hmasteraverageload = (typeof res.data.obj[0] !== 'undefined') ? res.data.obj[0].value[0] : "-1";
 					});
 				});

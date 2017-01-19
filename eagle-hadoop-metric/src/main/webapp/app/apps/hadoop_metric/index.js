@@ -73,6 +73,7 @@
 		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
 		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]{*}&pageSize=${limit}';
+		METRIC.QUERY_HBASE_INSTANCE_AGG = "${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]<${groups}>{${field}}&pageSize=${limit}";
 		METRIC.QUERY_HBASE_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		/**
 		 * Fetch query content with current site application configuration
@@ -182,6 +183,25 @@
 
 			var metrics_url = common.template(getQuery("HBASE_METRICS"), config);
 			return METRIC.get(metrics_url);
+		};
+
+		METRIC.aggHBaseInstance = function (condition, groups, field, limit) {
+			var fields = field.split(/\s*,\s*/);
+			var fieldStr = $.map(fields, function (field, index) {
+				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
+				if (matches[2]) {
+					orderId = index;
+				}
+				return matches[1];
+			}).join(", ");
+			var config = {
+				condition: METRIC.condition(condition),
+				groups: toFields(groups),
+				field: fieldStr,
+				limit: limit || 10000
+			};
+			var metrics_url = common.template(getQuery("HBASE_INSTANCE_AGG"), config);
+			return wrapList(METRIC.get(metrics_url));
 		};
 
 		METRIC.hbaseMetricsAggregation = function (condition, metric, groups, field, intervalMin, startTime, endTime, top, limit) {
