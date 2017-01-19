@@ -17,6 +17,8 @@
 
 package org.apache.eagle.jpm.analyzer;
 
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
+
 /**
  * Each JobAnalyzer contains one or more Evaluators to analyze each job.
  * Each Evaluator is a group of Processors

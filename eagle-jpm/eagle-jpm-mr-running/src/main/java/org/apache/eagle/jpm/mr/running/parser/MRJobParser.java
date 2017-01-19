@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.mr.running.parser;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;

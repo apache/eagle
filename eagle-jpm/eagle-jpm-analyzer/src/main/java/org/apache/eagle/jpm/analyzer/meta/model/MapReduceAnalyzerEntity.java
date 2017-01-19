@@ -17,7 +17,6 @@
 
 package org.apache.eagle.jpm.analyzer.meta.model;
 
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;

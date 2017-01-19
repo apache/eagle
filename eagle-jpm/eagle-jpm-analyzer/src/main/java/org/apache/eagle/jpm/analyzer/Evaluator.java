@@ -17,6 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer;
 
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 
 public interface Evaluator<T extends AnalyzerEntity> {

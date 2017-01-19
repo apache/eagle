@@ -18,7 +18,7 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
