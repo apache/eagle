@@ -295,23 +295,26 @@ class MetricCollector(threading.Thread):
         super(MetricCollector, self).start()
 
     def collect(self, msg):
-        if not msg.has_key("timestamp"):
-            msg["timestamp"] = int(round(time.time() * 1000))
-        if msg.has_key("value"):
-            msg["value"] = float(str(msg["value"]))
-        if not msg.has_key("host") or len(msg["host"]) == 0:
-            raise Exception("host is null: " + str(msg))
-        if not msg.has_key("site"):
-            msg["site"] = self.config["env"]["site"]
-        if len(self.filters) == 0:
-            self.sender.send(msg)
-            return
-        else:
-            for filter in self.filters:
-                if filter.filter_metric(msg):
-                    self.sender.send(msg)
-                    return
-        # logging.info("Drop metric: " + str(msg))
+        try:
+            if not msg.has_key("timestamp"):
+                msg["timestamp"] = int(round(time.time() * 1000))
+            if msg.has_key("value"):
+                msg["value"] = float(str(msg["value"]))
+            if not msg.has_key("host") or len(msg["host"]) == 0:
+                raise Exception("host is null: " + str(msg))
+            if not msg.has_key("site"):
+                msg["site"] = self.config["env"]["site"]
+            if len(self.filters) == 0:
+                self.sender.send(msg)
+                return
+            else:
+                for filter in self.filters:
+                    if filter.filter_metric(msg):
+                        self.sender.send(msg)
+                        return
+        except Exception as e:
+            logging.error("Failed to emit metric: %s" % msg)
+            logging.exception(e)
 
     def close(self):
         self.sender.close()
