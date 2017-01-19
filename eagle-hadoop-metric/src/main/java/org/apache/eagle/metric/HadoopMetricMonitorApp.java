@@ -19,23 +19,30 @@ package org.apache.eagle.metric;
 import backtype.storm.generated.StormTopology;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.builder.CounterToRateFunction;
 import org.apache.eagle.app.environment.builder.MetricDefinition;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.utils.ClockWithOffset;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class HadoopMetricMonitorApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        return environment.newApp(config)
-            .fromStream("HADOOP_JMX_METRIC_STREAM")
-            .saveAsMetric(MetricDefinition
+
+        MetricDefinition metricDefinition = MetricDefinition
                 .metricType("HADOOP_JMX_METRICS")
                 .namedByField("metric")
                 .eventTimeByField("timestamp")
-                .dimensionFields("host","component","site")
+                .dimensionFields("host", "component", "site")
                 .granularity(Calendar.MINUTE)
-                .valueField("value"))
-            .toTopology();
+                .valueField("value");
+
+        return environment.newApp(config)
+                .fromStream("HADOOP_JMX_METRIC_STREAM")
+                .transformBy(new CounterToRateFunction(metricDefinition, 3, TimeUnit.MINUTES, ClockWithOffset.INSTANCE))
+                .saveAsMetric(metricDefinition)
+                .toTopology();
     }
 }
