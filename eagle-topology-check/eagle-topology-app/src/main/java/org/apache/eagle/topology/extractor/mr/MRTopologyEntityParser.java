@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static org.apache.eagle.topology.TopologyConstants.*;
-import static org.apache.eagle.topology.utils.EntityBuilderHelper.generateKey;
+import static org.apache.eagle.topology.utils.EntityBuilderHelper.generateHostKey;
 
 public class MRTopologyEntityParser implements TopologyEntityParser {
 
@@ -156,7 +156,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                     nodeManagerEntity.setStatus(state);
                 }
 
-                nodeKey = generateKey(nodeManagerEntity);
+                nodeKey = generateHostKey(nodeManagerEntity);
                 if (nmMap.containsKey(nodeKey)) {
                     if (nmMap.get(nodeKey).getLastUpdateTime() < nodeManagerEntity.getLastHealthUpdate()) {
                         updateStatusCount(statusCount, nmMap.get(nodeKey).getStatus(), -1);
