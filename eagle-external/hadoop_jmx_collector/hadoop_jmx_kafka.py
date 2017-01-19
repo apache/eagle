@@ -82,6 +82,17 @@ class DatanodeFSDatasetState(JmxMetricListener):
             metric["metric"] = "hadoop.datanode.fsdatasetstate.dfsused"
             self.collector.collect(metric)
 
+class HBaseRegionServerMetric(JmxMetricListener):
+    def on_metric(self, metric):
+        """
+        Rename metric "hadoop.hbase.ipc.ipc.*" to "hadoop.hbase.regionserver.ipc.*" to support different hbase version metric
+        """
+        if fnmatch.fnmatch(metric["metric"],"hadoop.hbase.ipc.ipc.*") and metric["component"] == "regionserver":
+            new_metric_name = metric["metric"].replace("hadoop.hbase.ipc.ipc.","hadoop.hbase.regionserver.ipc.")
+            logging.debug("Rename metric %s to %s" % (metric["metric"], new_metric_name))
+            metric["metric"] = new_metric_name
+            self.collector.collect(metric)
+
 if __name__ == '__main__':
     collector = JmxMetricCollector()
     collector.register(
@@ -90,6 +101,7 @@ if __name__ == '__main__':
         MemoryUsageMetric(),
         NNCapacityUsageMetric(),
         JournalTransactionInfoMetric(),
-        DatanodeFSDatasetState()
+        DatanodeFSDatasetState(),
+        HBaseRegionServerMetric()
     )
     Runner.run(collector)
