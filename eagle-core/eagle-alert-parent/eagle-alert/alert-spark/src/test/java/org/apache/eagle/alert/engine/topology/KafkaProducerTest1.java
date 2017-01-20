@@ -103,8 +103,8 @@ public class KafkaProducerTest1 implements Serializable {
 
                 String msg = mapper.writeValueAsString(map1);
                 String msg2 = mapper.writeValueAsString(map2);
-                ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("hadoop_jmx_metric_yhd", "oozie1", msg);
-                ProducerRecord<String, String> producerRecord2 = new ProducerRecord<String, String>("topology_health_check_yhd", "oozie2", msg2);
+                ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("hadoop_jmx_metric_xhj", "oozie1", msg);
+                ProducerRecord<String, String> producerRecord2 = new ProducerRecord<String, String>("topology_health_check_koone", "oozie2", msg2);
 
                 if (count <= 200) {
                     producer.send(producerRecord);

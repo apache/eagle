@@ -68,7 +68,7 @@ public class RefreshUnionInputStreamFuntion implements Function2<JavaRDD<Message
             IMetadataServiceClient client = new MetadataServiceClientImpl(config);
             kafka2TupleMetadataList = client.listDataSources();
             for (Kafka2TupleMetadata ds : kafka2TupleMetadataList) {
-                // ds.getProperties().put("spout.kafkaBrokerZkQuorum", "192.168.7.184:2181,192.168.7.178:2181,192.168.7.196:2181");
+                // ds.getProperties().put("spout.kafkaBrokerZkQuorum", "localhost:2181");
                 dataSourceProperties.put(ds.getTopic(), ds.getProperties());
             }
             Map<KafkaClusterInfo, Set<String>> newClusterInfo = UnitSparkTopologyRunner4MultiKafka.getKafkaClustersByKafkaInfo(dataSourceProperties, clusterInfoRef.get());

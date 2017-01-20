@@ -27,6 +27,9 @@ import kafka.message.MessageAndMetadata;
 import kafka.serializer.StringDecoder;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.RetryNTimes;
 import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.spark.function.*;
@@ -45,7 +48,6 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.EagleKafkaUtils4MultiKafka;
 import org.apache.spark.streaming.kafka.KafkaCluster;
 import org.apache.spark.streaming.kafka.OffsetRange;
-import org.apache.zookeeper.ZooKeeper;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,6 +166,7 @@ public class UnitSparkTopologyRunner4MultiKafka implements Serializable {
         // 1. get kafka topic info from rest client
         Map<String, Map<String, String>> kafkaInfos = getAllTopicsInfoByConfig(config);
         clusterInfoRef.set(getKafkaClustersByKafkaInfo(kafkaInfos, new HashMap<>()));
+        LOG.info("clusterInfo : " + clusterInfoRef.get().toString());
         // 2. get offset for each kafka cluster
         EagleKafkaUtils4MultiKafka.fillInLatestOffsetsByCluster(clusterInfoRef.get(), fromOffsetsClusterMapRef, groupId);
 
@@ -280,6 +283,7 @@ public class UnitSparkTopologyRunner4MultiKafka implements Serializable {
                     clusters.put(cachedCluster.get(), Sets.newHashSet(topic));
                 } else {
                     String brokerList = listKafkaBrokersByZk(kafkaBrokerZkQuorum, kafkaBrokerPathQuorum);
+                    LOG.info("brokerlist :" + brokerList);
                     clusterInfo.setBrokerList(brokerList);
                     Map<String, String> kafkaParam = buildKafkaParam(clusterInfo);
                     KafkaCluster cluster = new KafkaCluster(JavaConverters.mapAsScalaMapConverter(kafkaParam).asScala().toMap(
@@ -311,7 +315,7 @@ public class UnitSparkTopologyRunner4MultiKafka implements Serializable {
             LOG.error("getTopicsByConfig error :" + e.getMessage(), e);
         }
         for (Kafka2TupleMetadata ds : kafka2TupleMetadataList) {
-            //ds.getProperties().put("spout.kafkaBrokerZkQuorum", "192.168.7.184:2181,192.168.7.178:2181,192.168.7.196:2181");
+            // ds.getProperties().put("spout.kafkaBrokerZkQuorum", "localhost:2181");
             dataSourceProperties.put(ds.getTopic(), ds.getProperties());
         }
         return dataSourceProperties;
@@ -319,12 +323,18 @@ public class UnitSparkTopologyRunner4MultiKafka implements Serializable {
 
     private static String listKafkaBrokersByZk(String kafkaBrokerZkQuorum, String kafkaBrokerZkPath) {
         Set<String> brokerList = Sets.newHashSet();
-        ZooKeeper zk = null; // curator
+        CuratorFramework curator = null;
         try {
-            zk = new ZooKeeper(kafkaBrokerZkQuorum, 1000, null);
-            List<String> ids = zk.getChildren(kafkaBrokerZkPath + "/ids", false);
+            curator = CuratorFrameworkFactory.newClient(
+                kafkaBrokerZkQuorum,
+                1000,
+                1000,
+                new RetryNTimes(3, 1000)
+            );
+            curator.start();
+            List<String> ids = curator.getChildren().forPath(kafkaBrokerZkPath + "/ids");
             for (String id : ids) {
-                Map e = (Map) JSONValue.parse(new String(zk.getData(kafkaBrokerZkPath + "/ids/" + id, false, null), "UTF-8"));
+                Map e = (Map) JSONValue.parse(new String(curator.getData().forPath(kafkaBrokerZkPath + "/ids/" + id), "UTF-8"));
                 String host = (String) e.get("host");
                 Integer port = Integer.valueOf(((Long) e.get("port")).intValue());
                 brokerList.add(host + ":" + port);
@@ -332,11 +342,7 @@ public class UnitSparkTopologyRunner4MultiKafka implements Serializable {
         } catch (Exception e) {
             LOG.error("listKafkaBrokersByZk error :" + e.getMessage(), e);
         } finally {
-            try {
-                zk.close();
-            } catch (InterruptedException e) {
-                LOG.error("close zk error :" + e.getMessage(), e);
-            }
+            curator.close();
         }
         return String.join(",", brokerList);
     }
