@@ -65,7 +65,7 @@ public class EntityBuilderHelper {
         return key.indexOf(TopologyConstants.COLON) > 0 ? key.substring(0, key.indexOf(TopologyConstants.COLON)) : key;
     }
 
-    public static String generateKey(TopologyBaseAPIEntity entity) {
+    public static String generateHostKey(TopologyBaseAPIEntity entity) {
         return new HashCodeBuilder().append(entity.getTags().get(TopologyConstants.SITE_TAG))
                 .append(entity.getTags().get(TopologyConstants.HOSTNAME_TAG))
                 .append(entity.getTags().get(TopologyConstants.ROLE_TAG))
