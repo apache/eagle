@@ -18,12 +18,10 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.app.service.ApplicationEmailService;
 import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
 import org.apache.eagle.jpm.analyzer.util.Constants;
@@ -31,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,19 +66,15 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("end", analyzerJobEntity.getEndTime() == 0
                 ? "0"
                 : DateTimeUtil.millisecondsToHumanDateWithSeconds(analyzerJobEntity.getEndTime()));
-        basic.put("progress", analyzerJobEntity.getProgress() + "%");
+        double progress = analyzerJobEntity.getCurrentState().equalsIgnoreCase(org.apache.eagle.jpm.util.Constants.JobState.RUNNING.toString()) ? analyzerJobEntity.getProgress() : 100;
+        basic.put("progress", progress + "%");
         basic.put("detail", getJobLink(analyzerJobEntity));
 
-
-        Map<String, Map<String, String>> extend = new HashMap<>();
-        Map<String, List<Pair<Result.ResultLevel, String>>> alertMessages = result.getAlertMessages();
-        for (String evaluator : alertMessages.keySet()) {
-            List<Pair<Result.ResultLevel, String>> messages = alertMessages.get(evaluator);
-            extend.put(evaluator, new HashMap<>());
-            for (Pair<Result.ResultLevel, String> message : messages) {
+        Map<String, List<Result.ProcessorResult>> extend = result.getAlertMessages();
+        for (String evaluator : extend.keySet()) {
+            for (Result.ProcessorResult message : extend.get(evaluator)) {
                 LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
-                        analyzerJobEntity.getJobDefId(), message.getRight(), message.getLeft(), evaluator);
-                extend.get(evaluator).put(message.getRight(), message.getLeft().toString());
+                        analyzerJobEntity.getJobDefId(), message.getMessage(), message.getResultLevel(), evaluator);
             }
         }
 

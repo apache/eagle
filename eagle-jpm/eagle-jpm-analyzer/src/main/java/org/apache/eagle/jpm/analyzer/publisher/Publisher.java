@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.publisher;
 
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 
 public interface Publisher {
     void publish(AnalyzerEntity analyzerJobEntity, Result result);

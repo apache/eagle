@@ -20,6 +20,7 @@ package org.apache.eagle.jpm.analyzer.mr;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.*;
 import org.apache.eagle.jpm.analyzer.Evaluator;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
 import org.apache.eagle.jpm.analyzer.mr.suggestion.JobSuggestionEvaluator;
 import org.apache.eagle.jpm.analyzer.publisher.EagleStorePublisher;
@@ -33,7 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MRJobPerformanceAnalyzer implements JobAnalyzer, Serializable {
+public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAnalyzer<T>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobPerformanceAnalyzer.class);
 
     private List<Evaluator> evaluators = new ArrayList<>();
@@ -51,11 +52,14 @@ public class MRJobPerformanceAnalyzer implements JobAnalyzer, Serializable {
     }
 
     @Override
-    public void analysis(AnalyzerEntity analyzerJobEntity) throws Exception {
+    public void analyze(T analyzerJobEntity) throws Exception {
         Result result = new Result();
 
         for (Evaluator evaluator : evaluators) {
-            result.addEvaluatorResult(evaluator.getClass(), evaluator.evaluate(analyzerJobEntity));
+            Result.EvaluatorResult evaluatorResult = evaluator.evaluate(analyzerJobEntity);
+            if (evaluatorResult != null) {
+                result.addEvaluatorResult(evaluator.getClass(), evaluatorResult);
+            }
         }
 
         for (Publisher publisher : publishers) {

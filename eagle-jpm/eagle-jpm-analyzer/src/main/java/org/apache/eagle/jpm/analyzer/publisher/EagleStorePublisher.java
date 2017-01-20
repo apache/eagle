@@ -18,23 +18,61 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
+import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.service.client.IEagleServiceClient;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class EagleStorePublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EagleStorePublisher.class);
 
     private Config config;
+    private IEagleServiceClient client;
+    private AlertDeduplicator alertDeduplicator;
 
     public EagleStorePublisher(Config config) {
         this.config = config;
+        this.alertDeduplicator = new SimpleDeduplicator();
     }
 
     @Override
     public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
+        if (result.getAlertMessages().size() == 0) {
+            return;
+        }
+
+        LOG.info("EagleStorePublisher gets job {}", analyzerJobEntity.getJobDefId());
+        if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
+            LOG.info("skip job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
+            return;
+        }
+
+        try {
+            this.client = new EagleServiceClientImpl(config);
+            for (Map.Entry<String, List<TaggedLogAPIEntity>> entry : result.getAlertEntities().entrySet()) {
+                client.create(entry.getValue());
+                LOG.info("successfully persist {} entities for evaluator {}", entry.getValue().size(), entry.getKey());
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    LOG.error(e.getMessage(), e);
+                }
+            }
+        }
 
     }
 }

@@ -21,6 +21,7 @@ package org.apache.eagle.jpm.mr.history.crawler;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.JHFParserBase;
 import org.apache.eagle.jpm.mr.history.parser.JHFParserFactory;
+import org.apache.eagle.jpm.util.MRJobTagName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", appConfig.getJobHistoryEndpointConfig().site);
+                put(MRJobTagName.SITE.toString(), appConfig.getJobHistoryEndpointConfig().site);
             }
         };
 

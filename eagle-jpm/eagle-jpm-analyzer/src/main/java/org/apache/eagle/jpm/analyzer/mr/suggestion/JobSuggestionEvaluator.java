@@ -18,15 +18,24 @@
 package org.apache.eagle.jpm.analyzer.mr.suggestion;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Evaluator;
+import org.apache.eagle.jpm.analyzer.Processor;
+import org.apache.eagle.jpm.mr.historyentity.JobSuggestionAPIEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
+import org.apache.eagle.jpm.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class JobSuggestionEvaluator implements Evaluator, Serializable {
+import static org.apache.eagle.jpm.util.MRJobTagName.*;
+
+public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionEvaluator.class);
 
     private Config config;
@@ -35,10 +44,63 @@ public class JobSuggestionEvaluator implements Evaluator, Serializable {
         this.config = config;
     }
 
-    @Override
-    public Result.EvaluatorResult evaluate(AnalyzerEntity mrJobEntity) {
-        Result.EvaluatorResult result = new Result.EvaluatorResult();
-        //TODO
-        return result;
+    private List<Processor> loadProcessors(MapReduceJobSuggestionContext context) {
+        List<Processor> processors = new ArrayList<>();
+        processors.add(new MapReduceCompressionSettingProcessor(context));
+        processors.add(new MapReduceSplitSettingProcessor(context));
+        processors.add(new MapReduceDataSkewProcessor(context));
+        processors.add(new MapReduceGCTimeProcessor(context));
+        processors.add(new MapReduceSpillProcessor(context));
+        processors.add(new MapReduceTaskNumProcessor(context));
+        //processors.add(new MapReduceQueueResourceProcessor(context));
+
+        return processors;
     }
+
+    @Override
+    public Result.EvaluatorResult evaluate(MapReduceAnalyzerEntity analyzerEntity) {
+        if (analyzerEntity.getCurrentState().equalsIgnoreCase(Constants.JobState.RUNNING.toString())) {
+            return null;
+        }
+
+        MapReduceJobSuggestionContext jobContext = new MapReduceJobSuggestionContext(analyzerEntity);
+        if (jobContext.getNumMaps() == 0) {
+            return null;
+        }
+
+        try {
+            Result.EvaluatorResult result = new Result.EvaluatorResult();
+            for (Processor processor : loadProcessors(jobContext)) {
+                Result.ProcessorResult processorResult = processor.process(analyzerEntity);
+                if (processorResult != null) {
+                    result.addProcessorResult(processor.getClass(), processorResult);
+                    result.addProcessorEntity(processor.getClass(), createJobSuggestionEntity(processorResult, analyzerEntity));
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            return null;
+        }
+
+    }
+
+    private static JobSuggestionAPIEntity createJobSuggestionEntity(Result.ProcessorResult processorResult, MapReduceAnalyzerEntity entity) {
+        Map<String, String> tags = new HashMap<>();
+        tags.put(JOB_ID.toString(), entity.getJobId());
+        tags.put(JOD_DEF_ID.toString(), entity.getJobDefId());
+        tags.put(SITE.toString(), entity.getSiteId());
+        tags.put(USER.toString(), entity.getUserId());
+        tags.put(RULE_TYPE.toString(), processorResult.getRuleType().toString());
+        tags.put(JOB_QUEUE.toString(), entity.getJobQueueName());
+        tags.put(JOB_TYPE.toString(), entity.getJobType());
+        JobSuggestionAPIEntity jobSuggestionAPIEntity = new JobSuggestionAPIEntity();
+        jobSuggestionAPIEntity.setTags(tags);
+        jobSuggestionAPIEntity.setTimestamp(entity.getStartTime());  // startTime as the job timestamp
+        jobSuggestionAPIEntity.setOptimizerSuggestion(processorResult.getMessage());
+        jobSuggestionAPIEntity.setOptimizerSettings(processorResult.getSettings());
+
+        return jobSuggestionAPIEntity;
+    }
+
 }

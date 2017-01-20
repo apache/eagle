@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.publisher.dedup;
 
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 
 public interface AlertDeduplicator {

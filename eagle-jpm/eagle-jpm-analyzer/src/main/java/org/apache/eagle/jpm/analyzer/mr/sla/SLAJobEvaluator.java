@@ -18,7 +18,7 @@
 package org.apache.eagle.jpm.analyzer.mr.sla;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Evaluator;
 import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.processors.LongStuckJobProcessor;
@@ -26,6 +26,7 @@ import org.apache.eagle.jpm.analyzer.mr.sla.processors.UnExpectedLongDurationJob
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.analyzer.util.Utils;
+import org.apache.eagle.jpm.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,10 @@ public class SLAJobEvaluator implements Evaluator, Serializable {
 
     @Override
     public Result.EvaluatorResult evaluate(AnalyzerEntity analyzerJobEntity) {
+        if (!analyzerJobEntity.getCurrentState().equalsIgnoreCase(Constants.JobState.RUNNING.toString())) {
+            return null;
+        }
+
         Result.EvaluatorResult result = new Result.EvaluatorResult();
 
         List<JobMetaEntity> jobMetaEntities = Utils.getJobMeta(config, analyzerJobEntity.getJobDefId());
