@@ -22,7 +22,7 @@ import org.apache.eagle.topology.resolver.TopologyRackResolver;
 
 public class DefaultTopologyRackResolver implements TopologyRackResolver {
 
-    private static final String DEFAULT_RACK_NAME = "default-rack";
+    private static final String DEFAULT_RACK_NAME = "/default-rack";
     private String rack;
 
     public DefaultTopologyRackResolver() {
@@ -34,7 +34,7 @@ public class DefaultTopologyRackResolver implements TopologyRackResolver {
     }
 
     /**
-     * If topology.script.file.name is unset, then the rack name for all hostnames is default-rack
+     * If topology.script.file.name is unset, then the rack name for all hostnames is /default-rack
      * @param hostname
      * @return rack
      */
