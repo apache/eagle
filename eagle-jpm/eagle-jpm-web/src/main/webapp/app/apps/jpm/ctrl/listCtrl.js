@@ -30,7 +30,7 @@
 			$scope.tableScope = {};
 
 			$scope.site = $wrapState.param.siteId;
-			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
+			$scope.searchPathList = [["tags", "jobId"],["tags", "jobName"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
 
 			function getCommonOption(left) {
 				return {
@@ -62,6 +62,7 @@
 				 * @property {[]} jobList
 				 * @property {{}} jobList.tags						unique job key
 				 * @property {string} jobList.tags.jobId			Job Id
+				 * @property {string} jobList.tags.jobName			Job Name
 				 * @property {string} jobList.tags.user				Submit user
 				 * @property {string} jobList.tags.queue			Queue
 				 * @property {string} jobList.currentState			Job state
