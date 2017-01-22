@@ -63,9 +63,11 @@ public class Result {
     }
 
     private void normalizeResult(ProcessorResult processorResult) {
+        String settingList = "";
         if (processorResult.getSettings() != null && !processorResult.getSettings().isEmpty()) {
-            processorResult.setSettingList(StringUtils.join(processorResult.getSettings(), "\n"));
+            settingList = StringUtils.join(processorResult.getSettings(), "\n");
         }
+        processorResult.setSettingList(settingList);
     }
 
     /**
