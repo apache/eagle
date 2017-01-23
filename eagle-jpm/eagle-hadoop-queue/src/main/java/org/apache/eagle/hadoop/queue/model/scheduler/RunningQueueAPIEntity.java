@@ -153,6 +153,6 @@ public class RunningQueueAPIEntity extends TaggedLogAPIEntity {
 
     public void setUsers(List<UserWrapper> users) {
         this.users = users;
-        valueChanged("numPendingApplications");
+        valueChanged("users");
     }
 }
