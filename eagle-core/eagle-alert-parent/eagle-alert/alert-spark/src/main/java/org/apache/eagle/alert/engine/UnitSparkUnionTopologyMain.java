@@ -19,12 +19,11 @@ package org.apache.eagle.alert.engine;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner;
-import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner4MultiKafka;
+import org.apache.eagle.alert.engine.runner.UnitSparkUnionTopologyRunner;
 
-public class UnitSparkTopology4MultiKafkaMain {
+public class UnitSparkUnionTopologyMain {
     public static void main(String[] args) throws InterruptedException {
         Config config = ConfigFactory.load();
-        new UnitSparkTopologyRunner4MultiKafka(config).run();
+        new UnitSparkUnionTopologyRunner(config).run();
     }
 }

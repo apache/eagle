@@ -1,30 +1,36 @@
 package org.apache.eagle.alert.engine.spark.model;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import kafka.common.TopicAndPartition;
 import org.apache.spark.streaming.kafka.KafkaCluster;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by koone on 2017/1/11.
  */
 public class KafkaClusterInfo implements Serializable {
-    private String topic;
+    private Set<String> topics = Sets.newHashSet();
     private String zkQuorum;
     private String brokerList;
     private KafkaCluster kafkaCluster;
+    private Map<String, String> kafkaParams = Maps.newHashMap();
+    private scala.collection.immutable.Map<TopicAndPartition, scala.Long> offsets;
 
-    public KafkaClusterInfo(String topic, String zkQuorum) {
-        this.topic = topic;
+    public KafkaClusterInfo(String zkQuorum) {
         this.zkQuorum = zkQuorum;
     }
 
-    public String getTopic() {
-        return topic;
+    public Set<String> getTopics() {
+        return topics;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setTopics(Set<String> topics) {
+        this.topics = topics;
     }
 
     public String getZkQuorum() {
@@ -49,6 +55,26 @@ public class KafkaClusterInfo implements Serializable {
 
     public void setKafkaCluster(KafkaCluster kafkaCluster) {
         this.kafkaCluster = kafkaCluster;
+    }
+
+    public Map<String, String> getKafkaParams() {
+        return kafkaParams;
+    }
+
+    public void setKafkaParams(Map<String, String> kafkaParams) {
+        this.kafkaParams = kafkaParams;
+    }
+
+    public scala.collection.immutable.Map<TopicAndPartition, scala.Long> getOffsets() {
+        return offsets;
+    }
+
+    public void setOffsets(scala.collection.immutable.Map<TopicAndPartition, scala.Long> offsets) {
+        this.offsets = offsets;
+    }
+
+    public void addTopic(String topic) {
+        this.topics.add(topic);
     }
 
     @Override
@@ -84,5 +110,6 @@ public class KafkaClusterInfo implements Serializable {
         }
         return result;
     }
+
 
 }

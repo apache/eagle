@@ -21,13 +21,10 @@ import com.typesafe.config.Config;
 import kafka.message.MessageAndMetadata;
 import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner4MultiKafka;
 import org.apache.eagle.alert.engine.spark.manager.SpecManager;
 import org.apache.eagle.alert.engine.spark.model.*;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.streaming.kafka.HasOffsetRanges;
-import org.apache.spark.streaming.kafka.OffsetRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +42,6 @@ public class ProcessSpecFunction4MultiKafka implements Function<JavaRDD<MessageA
     private AtomicReference<RouterSpec> routerSpecRef;
     private AtomicReference<AlertBoltSpec> alertBoltSpecRef;
     private AtomicReference<Map<String, StreamDefinition>> sdsRef;
-    private AtomicReference<Map<KafkaClusterInfo,Set<String>>> clusterInfoRef;
 
 
     private RouteState routeState;
@@ -59,7 +55,7 @@ public class ProcessSpecFunction4MultiKafka implements Function<JavaRDD<MessageA
 
     public ProcessSpecFunction4MultiKafka(AtomicReference<SpoutSpec> spoutSpecRef,
                                           AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef,
-                                          AtomicReference<PublishSpec> publishSpecRef, AtomicReference<Map<KafkaClusterInfo,Set<String>>> clusterInfoRef,
+                                          AtomicReference<PublishSpec> publishSpecRef,
                                           AtomicReference<RouterSpec> routerSpecRef, Config config, WindowState windowState,
                                           RouteState routeState, PolicyState policyState, PublishState publishState, SiddhiState siddhiState,
                                           int numOfAlertBolts
@@ -68,7 +64,6 @@ public class ProcessSpecFunction4MultiKafka implements Function<JavaRDD<MessageA
         this.alertBoltSpecRef = alertBoltSpecRef;
         this.routerSpecRef = routerSpecRef;
         this.publishSpecRef = publishSpecRef;
-        this.clusterInfoRef = clusterInfoRef;
         this.sdsRef = sdsRef;
         this.winstate = windowState;
         this.routeState = routeState;
@@ -96,10 +91,7 @@ public class ProcessSpecFunction4MultiKafka implements Function<JavaRDD<MessageA
         sdsRef.set(specManager.generateSds());
         publishSpecRef.set(specManager.generatePublishSpec());
         routerSpecRef.set(specManager.generateRouterSpec());
-
-        // reloadCluster(spoutSpec);
         recoverState();
-
         return rdd;
     }
 
@@ -110,22 +102,4 @@ public class ProcessSpecFunction4MultiKafka implements Function<JavaRDD<MessageA
         publishState.recover();
         siddhiState.recover();
     }
-
-
-    private void reloadCluster(SpoutSpec spoutSpec) {
-        //Set<String> newTopics = getTopicsBySpoutSpec(spoutSpec);
-        //Set<String> oldTopics = topicsRef.get();
-        //LOG.info("Topics were old={}, new={}", oldTopics, newTopics);
-        //topicsRef.set(new HashSet<>(newTopics));
-        // general new clusterinfo from old cache
-        Map<String, Map<String, String>> dataSourceProperties = new HashMap<>();
-        Collection<Kafka2TupleMetadata> kafka2TupleMetadataList = spoutSpec.getKafka2TupleMetadataMap().values();
-        for (Kafka2TupleMetadata ds : kafka2TupleMetadataList) {
-            //ds.getProperties().put("spout.kafkaBrokerZkQuorum", "localhost:2181");
-            dataSourceProperties.put(ds.getTopic(), ds.getProperties());
-        }
-        Map<KafkaClusterInfo, Set<String>> newClusterInfo = UnitSparkTopologyRunner4MultiKafka.getKafkaClustersByKafkaInfo(dataSourceProperties, clusterInfoRef.get());
-        clusterInfoRef.set(newClusterInfo);
-    }
-
 }

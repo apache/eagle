@@ -27,7 +27,9 @@ import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.Decoder
 import org.I0Itec.zkclient.ZkClient
-import org.apache.spark.api.java.function.{Function => JFunction}
+import org.apache.eagle.alert.engine.spark.function.RefreshClusterAndTopicFunction
+import org.apache.eagle.alert.engine.spark.model.KafkaClusterInfo
+import org.apache.spark.api.java.function.{Function2, VoidFunction2, Function => JFunction}
 import org.apache.spark.internal.Logging
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.api.java._
@@ -94,6 +96,35 @@ object EagleKafkaUtils extends Logging {
     val cleanedTopicAndPartitionHandler = ssc.sc.clean(topicAndPartitionHandler)
     new DynamicTopicKafkaInputDStream[K, V, KD, VD, R](
       ssc, kafkaParams, fromOffsets, cleanedTopicAndPartitionHandler, cleanedHandler)
+  }
+
+  def createUnionDerectStreamWithhandler[
+  K: ClassTag,
+  V: ClassTag,
+  KD <: Decoder[K] : ClassTag,
+  VD <: Decoder[V] : ClassTag,
+  R: ClassTag](jssc: JavaStreamingContext,
+               keyClass: Class[K],
+               valueClass: Class[V],
+               keyDecoderClass: Class[KD],
+               valueDecoderClass: Class[VD],
+               recordClass: Class[R],
+               clusterInfoJlist: JList[KafkaClusterInfo],
+               refreshClusterAndTopicHandler: JFunction[List[KafkaClusterInfo], List[KafkaClusterInfo]],
+               getOffsetRangeHandler: VoidFunction2[Array[OffsetRange], KafkaClusterInfo],
+               messageHandler: JFunction[MessageAndMetadata[K, V], R]
+              ): InputDStream[R] = {
+    implicit val keyCmt: ClassTag[K] = ClassTag(keyClass)
+    implicit val valueCmt: ClassTag[V] = ClassTag(valueClass)
+    implicit val keyDecoderCmt: ClassTag[KD] = ClassTag(keyDecoderClass)
+    implicit val valueDecoderCmt: ClassTag[VD] = ClassTag(valueDecoderClass)
+    implicit val recordCmt: ClassTag[R] = ClassTag(recordClass)
+    val cleanedHandler = jssc.sparkContext.clean(messageHandler.call _)
+    val cleanedRefreshClusterAndTopicHandler = jssc.sparkContext.clean(refreshClusterAndTopicHandler.call _)
+    val cleanedGetOffsetRangeHandler = jssc.sparkContext.clean(getOffsetRangeHandler.call _)
+    val clusterinfo = clusterInfoJlist.asScala.toList
+    new DynamicTopicKafkaUnionInputDStream[K, V, KD, VD, R](
+      jssc.ssc, clusterinfo, cleanedRefreshClusterAndTopicHandler, cleanedGetOffsetRangeHandler, cleanedHandler)
   }
 
 
