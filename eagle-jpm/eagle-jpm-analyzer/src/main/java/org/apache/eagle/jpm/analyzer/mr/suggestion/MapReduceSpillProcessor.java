@@ -82,14 +82,13 @@ public class MapReduceSpillProcessor implements Processor<MapReduceAnalyzerEntit
                     long heapSize = getMaxHeapSize(context.getJobconf().get(MAP_JAVA_OPTS));
                     if (heapSize < 3 * minMapSpillMemMB) {
                         long expectedHeapSizeMB = (minMapSpillMemMB * 3 + 1024) / 1024 * 1024;
-                        setting = String.format(" -D%s=-Xmx%sM", MAP_JAVA_OPTS, expectedHeapSizeMB);
+                        setting = String.format("-D%s=-Xmx%sM", MAP_JAVA_OPTS, expectedHeapSizeMB);
                         sb.append(" ").append(setting);
                         optSettings.add(setting);
                     }
                 }
                 sb.append(" to avoid spilled records.\n");
             }
-
 
             long reduceInputRecords = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.REDUCE_INPUT_RECORDS);
             spillRecords = context.getJob().getReduceCounters().getCounterValue(JobCounters.CounterName.SPILLED_RECORDS);

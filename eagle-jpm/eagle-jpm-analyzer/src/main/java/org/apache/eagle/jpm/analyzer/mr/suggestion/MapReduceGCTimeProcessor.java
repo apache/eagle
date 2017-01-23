@@ -20,6 +20,7 @@ package org.apache.eagle.jpm.analyzer.mr.suggestion;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 
 import java.util.ArrayList;
@@ -45,9 +46,11 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
             long mapGCTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.GC_MILLISECONDS);
             long mapCPUTime = context.getJob().getMapCounters().getCounterValue(JobCounters.CounterName.CPU_MILLISECONDS);
 
+            String message = "%s GC_MILLISECONDS is: %s, and CPU_MILLISECONDS is: %s. ";
             if (mapGCTime > mapCPUTime * 0.1) {
                 setting = String.format("-D%s", MAP_JAVA_OPTS);
                 optSettings.add(setting);
+                sb.append(String.format(message, Constants.TaskType.MAP, mapGCTime, mapCPUTime));
                 sb.append("Map GC_TIME_MILLIS took too long. Please increase mapper memory via ").append(setting);
                 sb.append(", or optimize your mapper class.\n");
             }
@@ -58,6 +61,7 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
                 if (reduceGCTime > reduceCPUTime * 0.1) {
                     setting = String.format("-D%s", REDUCE_JAVA_OPTS);
                     optSettings.add(setting);
+                    sb.append(String.format(message, Constants.TaskType.REDUCE, reduceGCTime, reduceCPUTime));
                     sb.append("Reduce GC_TIME_MILLIS took too long. Please increase memory for reduce via ").append(setting);
                     sb.append(", or optimize your reducer class.\n");
                 }
