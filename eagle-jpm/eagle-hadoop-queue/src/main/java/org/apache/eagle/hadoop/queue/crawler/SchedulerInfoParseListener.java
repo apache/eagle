@@ -116,11 +116,12 @@ public class SchedulerInfoParseListener {
         List<UserWrapper> userList = new ArrayList<>();
         if (queue.getUsers() != null && queue.getUsers().getUser() != null) {
             for (User user : queue.getUsers().getUser()) {
-                UserWrapper newUser = new UserWrapper(user);
-                userList.add(newUser);
+                userList.add(wrapUser(user));
             }
         }
-        _entity.setUsers(userList);
+        UserWrappers users = new UserWrappers();
+        users.setUsers(userList);
+        _entity.setUsers(users);
 
         runningQueueAPIEntities.add(_entity);
 
@@ -148,5 +149,15 @@ public class SchedulerInfoParseListener {
                 createQueues(subQueue, currentTimestamp, scheduler, queue.getQueueName());
             }
         }
+    }
+
+    private UserWrapper wrapUser(User user) {
+        UserWrapper wrapper = new UserWrapper();
+        wrapper.setUsername(user.getUsername());
+        wrapper.setMemory(user.getResourcesUsed().getMemory());
+        wrapper.setvCores(user.getResourcesUsed().getvCores());
+        wrapper.setNumActiveApplications(user.getNumActiveApplications());
+        wrapper.setNumPendingApplications(user.getNumPendingApplications());
+        return wrapper;
     }
 }

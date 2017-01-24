@@ -54,7 +54,7 @@ public class RunningQueueAPIEntity extends TaggedLogAPIEntity {
     @Column("j")
     private String scheduler;
     @Column("k")
-    private List<UserWrapper> users;
+    private UserWrappers users;
 
     public String getScheduler() {
         return scheduler;
@@ -147,11 +147,11 @@ public class RunningQueueAPIEntity extends TaggedLogAPIEntity {
         valueChanged("numPendingApplications");
     }
 
-    public List<UserWrapper> getUsers() {
+    public UserWrappers getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserWrapper> users) {
+    public void setUsers(UserWrappers users) {
         this.users = users;
         valueChanged("users");
     }

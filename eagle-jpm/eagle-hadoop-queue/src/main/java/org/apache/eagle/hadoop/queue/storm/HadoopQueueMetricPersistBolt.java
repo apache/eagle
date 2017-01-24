@@ -73,7 +73,7 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         } else if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.ENTITY.toString())) {
             List<RunningQueueAPIEntity> entities = (List<RunningQueueAPIEntity>) data;
             for (RunningQueueAPIEntity queue : entities) {
-                if (queue.getUsers() != null && !queue.getUsers().isEmpty() && queue.getMemory() != 0) {
+                if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
                     collector.emit(new Values(queue.getTags().get(HadoopClusterConstants.TAG_QUEUE), parseLeafQueueInfo(queue)));
                 }
             }
@@ -130,7 +130,7 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         queueInfoMap.put(LeafQueueInfo.QUEUE_USED_VCORES, queueAPIEntity.getVcores());
 
         double maxUserUsedCapacity = 0;
-        for (UserWrapper user : queueAPIEntity.getUsers()) {
+        for (UserWrapper user : queueAPIEntity.getUsers().getUsers()) {
             double userUsedCapacity = calculateUserUsedCapacity(
                     queueAPIEntity.getAbsoluteUsedCapacity(),
                     queueAPIEntity.getMemory(),
