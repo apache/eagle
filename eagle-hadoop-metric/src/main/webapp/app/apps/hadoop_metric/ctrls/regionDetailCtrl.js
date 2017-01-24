@@ -110,7 +110,7 @@
 							for (var r = 0; r < resp.length; r += 1) {
 								series.push(resp[r][1]);
 							}
-							$scope.metricList[charname] = mergeSeries(charname, series, $scope.chatmetricList[k], sizeoption[k]);
+							$scope.metricList[charname] = mergeSeries(charname, series, $scope.chatmetricList[k], $scope.chatoptionList[k]);
 						});
 					});
 				});
