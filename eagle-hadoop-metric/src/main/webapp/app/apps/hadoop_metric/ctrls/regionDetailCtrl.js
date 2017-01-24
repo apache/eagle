@@ -26,7 +26,6 @@
 			$scope.site = $wrapState.param.siteId;
 			$scope.hostname = $wrapState.param.hostname;
 			PageConfig.title = 'RegionServer ' + "(" + $scope.hostname + ")";
-			$scope.metricList = [];
 			Time.autoRefresh = false;
 
 			var sizeoption = {
@@ -67,47 +66,52 @@
 				}]
 			};
 
+			$scope.chatnameList = ["Memory Usage", "Direct Memory Usage", "GC count", "GC TimeMillis", "QueueSize", "NumCallsInGeneralQueue",
+				"NumActiveHandler", "IPC Queue Time (99th)", "IPC Process Time (99th)", "QueueCallTime_num_ops", "ProcessCallTime_num_ops",
+				"RegionCount", "StoreCount", "MemStoreSize", "StoreFileSize", "TotalRequestCount", "ReadRequestCount", "WriteRequestCount",
+				"SlitQueueLength", "CompactionQueueLength", "FlushQueueLength", "BlockCacheSize", "BlockCacheHitCount", "BlockCacheCountHitPercent"];
+			$scope.chatmetricList = [["nonheap", "heap"], ["directmemory"], ["GCCount"], ["GCTimeMillis"], ["QueueSize"], ["NumCallsInGeneralQueue"],
+				["NumActiveHandler"], ["IPCQueueTime99th"], ["IPCProcessTime99th"], ["QueueCallTime_num_ops"], ["ProcessCallTime_num_ops"],
+				["RegionCount"], ["StoreCount"], ["MemStoreSize"], ["StoreFileSize"], ["TotalRequestCount"], ["ReadRequestCount"], ["WriteRequestCount"],
+				["SlitQueueLength"], ["CompactionQueueLength"], ["FlushQueueLength"], ["BlockCacheSize"], ["BlockCacheHitCount"], ["BlockCacheCountHitPercent"]];
+			$scope.chatoptionList = [sizeoption, sizeoption, {}, gctimeoption, {}, {}, {}, {}, {}, {}, {}, {}, {}, sizeoption, sizeoption, {}, {}, {}, {}, {}, {}, sizeoption, {}, {}];
+
+			$scope.metricList = [];
+			$.each($scope.chatnameList, function (i) {
+				var charname = $scope.chatnameList[i];
+				$scope.metricList[charname] = {
+					title: $scope.chatnameList[i],
+					series: {},
+					option: {},
+					loading: true,
+					promises: []
+				};
+			});
 			$scope.refresh = function () {
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
-				var metricspromies = [];
+
 				METRIC.getMetricObj().then(function (res) {
 					var masterMetricList = res.regionserver;
-					for (var metricKey in masterMetricList) {
-						metricspromies.push(generateHbaseMetric(masterMetricList[metricKey], startTime, endTime, metricKey));
-					}
-					$q.all(metricspromies).then(function (resp) {
-						var metricObj = {};
-						for(var i=0; i < resp.length; i+=1) {
-							metricObj[resp[i][0]] = resp[i][1];
-						}
-						return metricObj;
-					}).then(function (seriesObj) {
-						$scope.metricList = [];
-						$scope.metricList.push(mergeSeries("Memory Usage", [seriesObj["nonheap"], seriesObj["heap"]], ["nonheap", "heap"], sizeoption));
-						$scope.metricList.push(mergeSeries("Direct Memory Usage", [seriesObj["directmemory"]], ["directmemory"], sizeoption));
-						$scope.metricList.push(mergeSeries("GC count", [seriesObj["GCCount"]], ["GC count"], {}));
-						$scope.metricList.push(mergeSeries("GC TimeMillis", [seriesObj["GCTimeMillis"]], ["GC TimeMillis"], gctimeoption));
-						$scope.metricList.push(mergeSeries("QueueSize", [seriesObj["QueueSize"]], ["QueueSize"], {}));
-						$scope.metricList.push(mergeSeries("NumCallsInGeneralQueue", [seriesObj["NumCallsInGeneralQueue"]], ["NumCallsInGeneralQueue"], {}));
-						$scope.metricList.push(mergeSeries("NumActiveHandler", [seriesObj["NumActiveHandler"]], ["NumActiveHandler"], {}));
-						$scope.metricList.push(mergeSeries("IPC Queue Time (99th)", [seriesObj["IPCQueueTime99th"]], ["IPC Queue Time (99th)"], {}));
-						$scope.metricList.push(mergeSeries("IPC Process Time (99th)", [seriesObj["IPCProcessTime99th"]], ["IPC Process Time (99th)"], {}));
-						$scope.metricList.push(mergeSeries("QueueCallTime_num_ops", [seriesObj["QueueCallTime_num_ops"]], ["QueueCallTime_num_ops"], {}));
-						$scope.metricList.push(mergeSeries("ProcessCallTime_num_ops", [seriesObj["ProcessCallTime_num_ops"]], ["ProcessCallTime_num_ops"], {}));
-						$scope.metricList.push(mergeSeries("RegionCount", [seriesObj["RegionCount"]], ["RegionCount"], {}));
-						$scope.metricList.push(mergeSeries("StoreCount", [seriesObj["StoreCount"]], ["StoreCount"], {}));
-						$scope.metricList.push(mergeSeries("MemStoreSize", [seriesObj["MemStoreSize"]], ["MemStoreSize"], sizeoption));
-						$scope.metricList.push(mergeSeries("StoreFileSize", [seriesObj["StoreFileSize"]], ["StoreFileSize"], sizeoption));
-						$scope.metricList.push(mergeSeries("TotalRequestCount", [seriesObj["TotalRequestCount"]], ["TotalRequestCount"], {}));
-						$scope.metricList.push(mergeSeries("ReadRequestCount", [seriesObj["ReadRequestCount"]], ["ReadRequestCount"], {}));
-						$scope.metricList.push(mergeSeries("WriteRequestCount", [seriesObj["WriteRequestCount"]], ["WriteRequestCount"], {}));
-						$scope.metricList.push(mergeSeries("SlitQueueLength", [seriesObj["SlitQueueLength"]], ["SlitQueueLength"], {}));
-						$scope.metricList.push(mergeSeries("CompactionQueueLength", [seriesObj["CompactionQueueLength"]], ["CompactionQueueLength"], {}));
-						$scope.metricList.push(mergeSeries("FlushQueueLength", [seriesObj["FlushQueueLength"]], ["FlushQueueLength"], {}));
-						$scope.metricList.push(mergeSeries("BlockCacheSize", [seriesObj["BlockCacheSize"]], ["BlockCacheSize"], sizeoption));
-						$scope.metricList.push(mergeSeries("BlockCacheHitCount", [seriesObj["BlockCacheHitCount"]], ["BlockCacheHitCount"], {}));
-						$scope.metricList.push(mergeSeries("BlockCacheCountHitPercent", [seriesObj["BlockCacheCountHitPercent"]], ["BlockCacheCountHitPercent"], {}));
+					$.each($scope.chatmetricList, function (i) {
+						var metricList = $scope.chatmetricList[i];
+						$.each(metricList, function (j) {
+							var metricKey = metricList[j];
+							var metricspromies = generateHbaseMetric(masterMetricList[metricKey], startTime, endTime, metricKey);
+							var charname = $scope.chatnameList[i];
+							$scope.metricList[charname].promises.push(metricspromies);
+						});
+					});
+
+					$.each($scope.chatmetricList, function (k) {
+						var charname = $scope.chatnameList[k];
+						$q.all($scope.metricList[charname].promises).then(function (resp) {
+							var series = [];
+							for (var r = 0; r < resp.length; r += 1) {
+								series.push(resp[r][1]);
+							}
+							$scope.metricList[charname] = mergeSeries(charname, series, $scope.chatmetricList[k], sizeoption[k]);
+						});
 					});
 				});
 
@@ -146,7 +150,7 @@
 				var series = [];
 				$.each(metrics, function (i, metricMap) {
 					$.map(metricMap, function (metric) {
-						if(typeof metric !== 'undefined') {
+						if (typeof metric !== 'undefined') {
 							series.push(METRIC.metricsToSeries(linename[i], metric, option));
 						}
 					});
@@ -154,10 +158,12 @@
 				return {
 					title: title,
 					series: series,
-					option: option || {}
+					option: option || {},
+					loading: false
 				};
 			}
 		});
 	});
 })
 ();
+//# sourceURL=regionDetailCtrl.js
