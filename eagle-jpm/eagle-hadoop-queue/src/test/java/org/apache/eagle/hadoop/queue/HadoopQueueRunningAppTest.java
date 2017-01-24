@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class HadoopQueueRunningAppTest {
     @Test
-    public void testRun(){
+    public void testRun() {
         new HadoopQueueRunningApp().run(ConfigFactory.load());
     }
 }

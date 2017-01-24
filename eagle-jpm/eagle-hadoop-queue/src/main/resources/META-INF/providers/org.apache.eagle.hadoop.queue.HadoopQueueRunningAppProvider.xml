@@ -119,40 +119,48 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>user</name>
+                    <name>state</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>jobType</name>
+                    <name>scheduler</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>jobDefId</name>
-                    <type>string</type>
+                    <name>absoluteCapacity</name>
+                    <type>double</type>
                 </column>
                 <column>
-                    <name>jobId</name>
-                    <type>string</type>
+                    <name>absoluteMaxCapacity</name>
+                    <type>double</type>
                 </column>
                 <column>
-                    <name>submissionTime</name>
+                    <name>absoluteUsedCapacity</name>
+                    <type>double</type>
+                </column>
+                <column>
+                    <name>maxUserUsedCapacity</name>
+                    <type>double</type>
+                </column>
+                <column>
+                    <name>memory</name>
                     <type>long</type>
                 </column>
                 <column>
-                    <name>trackingUrl</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>startTime</name>
+                    <name>vcores</name>
                     <type>long</type>
                 </column>
                 <column>
-                    <name>endTime</name>
-                    <type>long</type>
+                    <name>numActiveApplications</name>
+                    <type>int</type>
                 </column>
                 <column>
-                    <name>currentState</name>
-                    <type>string</type>
+                    <name>numPendingApplications</name>
+                    <type>int</type>
+                </column>
+                <column>
+                    <name>maxActiveApplications</name>
+                    <type>int</type>
                 </column>
             </columns>
         </stream>
