@@ -108,7 +108,10 @@
 						$q.all($scope.metricList[charname].promises).then(function (resp) {
 							var series = [];
 							for (var r = 0; r < resp.length; r += 1) {
-								series.push(resp[r][1]);
+								var rs = resp[r][1];
+								if (rs.length > 0) {
+									series.push(rs);
+								}
 							}
 							$scope.metricList[charname] = mergeSeries(charname, series, $scope.chatmetricList[k], $scope.chatoptionList[k]);
 						});
