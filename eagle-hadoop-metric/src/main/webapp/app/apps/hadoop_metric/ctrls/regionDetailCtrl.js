@@ -166,4 +166,4 @@
 	});
 })
 ();
-//# sourceURL=regionDetailCtrl.js
+
