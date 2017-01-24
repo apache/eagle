@@ -61,6 +61,23 @@ public class HadoopClusterConstants {
 
     }
 
+    public static class LeafQueueInfo {
+
+        public static final String QUEUE_SITE = "site";
+        public static final String QUEUE_NAME = "queue";
+        public static final String QUEUE_STATE = "state";
+        public static final String QUEUE_SCHEDULER = "scheduler";
+        public static final String QUEUE_ABSOLUTE_CAPACITY = "absoluteCapacity";
+        public static final String QUEUE_ABSOLUTE_MAX_CAPACITY = "absoluteMaxCapacity";
+        public static final String QUEUE_ABSOLUTE_USED_CAPACITY = "absoluteUsedCapacity";
+        public static final String QUEUE_MAX_USER_USED_CAPACITY = "maxUserUsedCapacity";
+        public static final String QUEUE_USED_MEMORY = "memory";
+        public static final String QUEUE_USED_VCORES = "vcores";
+        public static final String QUEUE_NUM_ACTIVE_APPS = "numActiveApplications";
+        public static final String QUEUE_NUM_PENDING_APPS = "numPendingApplications";
+        public static final String QUEUE_MAX_ACTIVE_APPS = "maxActiveApplications";
+    }
+
     public static final String RUNNING_QUEUE_SERVICE_NAME = "RunningQueueService";
 
     // tag constants

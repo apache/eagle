@@ -18,7 +18,14 @@
 
 package org.apache.eagle.hadoop.queue.model.scheduler;
 
-public class UserWrapper {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.io.Serializable;
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserWrapper implements Serializable {
 
     private String username;
     private long memory;

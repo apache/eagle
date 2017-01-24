@@ -17,36 +17,146 @@
   -->
 
 <application>
-  <type>HADOOP_QUEUE_RUNNING_APP</type>
-  <name>Hadoop Queue Monitor</name>
-  <configuration>
-    <!-- org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig -->
-    <property>
-      <name>dataSourceConfig.rMEndPoints</name>
-      <displayName>Resource Manager End Points</displayName>
-      <description>end points of resource manager, comma-separated for multiple</description>
-      <value>http://sandbox.hortonworks.com:8088/</value>
-      <required>true</required>
-    </property>
-    <property>
-      <name>workers</name>
-      <displayName>Storm Worker Number</displayName>
-      <description>the number of storm worker</description>
-      <value>1</value>
-    </property>
-    <property>
-      <name>topology.numOfParserTasks</name>
-      <displayName>Parallel Tasks Per Bolt</displayName>
-      <description>the number of tasks that should be assigned to execute a bolt</description>
-      <value>2</value>
-    </property>
-    <property>
-      <name>dataSourceConfig.fetchIntervalSec</name>
-      <displayName>Fetching Metric Interval in Seconds</displayName>
-      <description>interval seconds of fetching metric from resource manager</description>
-      <value>10</value>
-    </property>
-  </configuration>
+    <type>HADOOP_QUEUE_RUNNING_APP</type>
+    <name>Hadoop Queue Monitor</name>
+    <configuration>
+        <!-- org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig -->
+        <property>
+            <name>dataSourceConfig.rMEndPoints</name>
+            <displayName>Resource Manager End Points</displayName>
+            <description>end points of resource manager, comma-separated for multiple</description>
+            <value>http://sandbox.hortonworks.com:8088/</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>workers</name>
+            <displayName>Storm Worker Number</displayName>
+            <description>the number of storm worker</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>topology.numPersistTasks</name>
+            <displayName>Tasks for Data Storage Bolt</displayName>
+            <description>the number of tasks that persist metrics or entities into the database</description>
+            <value>2</value>
+        </property>
+        <property>
+            <name>topology.numSinkTasks</name>
+            <displayName>Tasks for Stream Sink Bolt</displayName>
+            <description>the number of tasks that stream leaf queue info into Kafka</description>
+            <value>2</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.fetchIntervalSec</name>
+            <displayName>Fetching Metric Interval in Seconds</displayName>
+            <description>interval seconds of fetching metric from resource manager</description>
+            <value>10</value>
+        </property>
+
+        <!-- sink to kafka -->
+        <property>
+            <name>dataSinkConfig.topic</name>
+            <displayName>dataSinkConfig.topic</displayName>
+            <value>hadoop_leaf_queue</value>
+            <description>topic for kafka data sink</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.brokerList</name>
+            <displayName>dataSinkConfig.brokerList</displayName>
+            <value>localhost:6667</value>
+            <description>kafka broker list</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.serializerClass</name>
+            <displayName>dataSinkConfig.serializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message value</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.keySerializerClass</name>
+            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message key</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.producerType</name>
+            <displayName>dataSinkConfig.producerType</displayName>
+            <value>async</value>
+            <description>whether the messages are sent asynchronously in a background thread</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.numBatchMessages</name>
+            <displayName>dataSinkConfig.numBatchMessages</displayName>
+            <value>4096</value>
+            <description>number of messages to send in one batch when using async mode</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.maxQueueBufferMs</name>
+            <displayName>dataSinkConfig.maxQueueBufferMs</displayName>
+            <value>5000</value>
+            <description>maximum time to buffer data when using async mode</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.requestRequiredAcks</name>
+            <displayName>dataSinkConfig.requestRequiredAcks</displayName>
+            <value>0</value>
+            <description>value controls when a produce request is considered completed</description>
+        </property>
+    </configuration>
+    <streams>
+        <stream>
+            <streamId>HADOOP_LEAF_QUEUE_STREAM</streamId>
+            <description>Hadoop Leaf Queue Info Stream</description>
+            <validate>true</validate>
+            <columns>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>queue</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>user</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>jobType</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>jobDefId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>jobId</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>submissionTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>trackingUrl</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>startTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>endTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>currentState</name>
+                    <type>string</type>
+                </column>
+            </columns>
+        </stream>
+    </streams>
   <docs>
     <install>
     </install>
