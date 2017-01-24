@@ -19,7 +19,7 @@ public class KafkaClusterInfo implements Serializable {
     private String brokerList;
     private KafkaCluster kafkaCluster;
     private Map<String, String> kafkaParams = Maps.newHashMap();
-    private scala.collection.immutable.Map<TopicAndPartition, scala.Long> offsets;
+    private Map<TopicAndPartition, Long> offsets;
 
     public KafkaClusterInfo(String zkQuorum) {
         this.zkQuorum = zkQuorum;
@@ -65,11 +65,11 @@ public class KafkaClusterInfo implements Serializable {
         this.kafkaParams = kafkaParams;
     }
 
-    public scala.collection.immutable.Map<TopicAndPartition, scala.Long> getOffsets() {
+    public Map<TopicAndPartition, Long> getOffsets() {
         return offsets;
     }
 
-    public void setOffsets(scala.collection.immutable.Map<TopicAndPartition, scala.Long> offsets) {
+    public void setOffsets(Map<TopicAndPartition, Long> offsets) {
         this.offsets = offsets;
     }
 

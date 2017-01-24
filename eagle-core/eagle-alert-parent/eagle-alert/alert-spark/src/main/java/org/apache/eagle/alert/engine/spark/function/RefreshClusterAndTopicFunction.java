@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
+import com.clearspring.analytics.util.Lists;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.runner.UnitSparkUnionTopologyRunner;
 import org.apache.eagle.alert.engine.spark.model.KafkaClusterInfo;
@@ -39,7 +40,9 @@ public class RefreshClusterAndTopicFunction implements Function<scala.collection
 
     @Override
     public scala.collection.immutable.List<KafkaClusterInfo> call(scala.collection.immutable.List<KafkaClusterInfo> cachedClusterInfo) throws Exception {
-        Iterator<KafkaClusterInfo> javaList = UnitSparkUnionTopologyRunner.getKafkaCLusterInfoByCache(config, cachedClusterInfo).iterator();
+        List<KafkaClusterInfo> javaCachedClusterInfo = Lists.newArrayList();
+        JavaConversions.asJavaIterable(cachedClusterInfo).forEach(kafkaClusterInfo -> javaCachedClusterInfo.add(kafkaClusterInfo));
+        Iterator<KafkaClusterInfo> javaList = UnitSparkUnionTopologyRunner.getKafkaCLusterInfoByCache(javaCachedClusterInfo).iterator();
         return JavaConversions.asScalaIterator(javaList).toList();
     }
 }

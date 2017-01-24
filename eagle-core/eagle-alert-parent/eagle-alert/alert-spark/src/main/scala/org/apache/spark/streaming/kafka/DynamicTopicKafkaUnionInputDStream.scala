@@ -18,7 +18,7 @@
  */
 package org.apache.spark.streaming.kafka
 
-import java.util.{List => JList, Map => JMap, Set => JSet}
+import java.lang.{Long => JLong}
 
 import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
@@ -68,7 +68,7 @@ R: ClassTag](
     // refresh topic and cluster
     currentClusterInfo = refreshClusterAndTopicHandler(currentClusterInfo)
     val rdds = currentClusterInfo.map{ kafkaClusterInfo  =>
-      val fromOffsets = kafkaClusterInfo.getOffsets
+      val fromOffsets = Map(kafkaClusterInfo.getOffsets.asScala.mapValues(_.longValue()).toSeq: _*)
       var kafkaParams = Map(kafkaClusterInfo.getKafkaParams.asScala.toSeq: _*)
       val kc = kafkaClusterInfo.getKafkaCluster
       // get until offsets
@@ -92,7 +92,7 @@ R: ClassTag](
       val inputInfo = StreamInputInfo(id, rdd.count, metadata)
       ssc.scheduler.inputInfoTracker.reportInfo(validTime, inputInfo)
       // refresh currentoffset map
-      kafkaClusterInfo.setOffsets(untilOffsets.map(kv => kv._1 -> kv._2.offset))
+      kafkaClusterInfo.setOffsets(untilOffsets.map(kv => kv._1 -> kv._2.offset.asInstanceOf[JLong]).asJava)
       getOffsetRangeHandler(rdd.offsetRanges, kafkaClusterInfo)
       rdd
     }
@@ -202,7 +202,8 @@ R: ClassTag](
     override def restore() {
       // this is assuming that the topics don't change during execution, which is true currently
       currentClusterInfo.foreach { clusterInfo =>
-        val topics = clusterInfo.getOffsets.keySet
+        val offsets = Map(clusterInfo.getOffsets.asScala.mapValues(_.longValue()).toSeq: _*)
+        val topics = offsets.keySet
         val leaders = KafkaCluster.checkErrors(clusterInfo.getKafkaCluster.findLeaders(topics))
         batchForTime.toSeq.sortBy(_._1)(Time.ordering).foreach { case (t, b) =>
           logInfo(s"Restoring KafkaRDD for time $t ${b.mkString("[", ", ", "]")}")

@@ -18,7 +18,7 @@
  */
 package org.apache.spark.streaming.kafka
 
-import java.lang.{Integer => JInt, Long => JLong}
+import java.lang.{Long => JLong}
 import java.util.concurrent.TimeUnit
 import java.util.{List => JList, Map => JMap, Set => JSet}
 
@@ -27,9 +27,8 @@ import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.Decoder
 import org.I0Itec.zkclient.ZkClient
-import org.apache.eagle.alert.engine.spark.function.RefreshClusterAndTopicFunction
 import org.apache.eagle.alert.engine.spark.model.KafkaClusterInfo
-import org.apache.spark.api.java.function.{Function2, VoidFunction2, Function => JFunction}
+import org.apache.spark.api.java.function.{VoidFunction2, Function => JFunction}
 import org.apache.spark.internal.Logging
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.api.java._
@@ -103,7 +102,21 @@ object EagleKafkaUtils extends Logging {
   V: ClassTag,
   KD <: Decoder[K] : ClassTag,
   VD <: Decoder[V] : ClassTag,
-  R: ClassTag](jssc: JavaStreamingContext,
+  R: ClassTag](ssc: StreamingContext,
+               clusterInfolist: List[KafkaClusterInfo],
+               refreshClusterAndTopicHandler: List[KafkaClusterInfo] => List[KafkaClusterInfo],
+               getOffsetRangeHandler: (Array[OffsetRange], KafkaClusterInfo) => Unit,
+               messageHandler: MessageAndMetadata[K, V] => R
+              ): InputDStream[R] = {
+    val cleanedHandler = ssc.sc.clean(messageHandler)
+    val cleanedRefreshClusterAndTopicHandler = ssc.sc.clean(refreshClusterAndTopicHandler)
+    val cleanedGetOffsetRangeHandler = ssc.sc.clean(getOffsetRangeHandler)
+    new DynamicTopicKafkaUnionInputDStream[K, V, KD, VD, R](
+      ssc, clusterInfolist, cleanedRefreshClusterAndTopicHandler, cleanedGetOffsetRangeHandler, cleanedHandler
+    )
+  }
+
+  def createUnionDirectStream[K, V, KD <: Decoder[K], VD <: Decoder[V], R](jssc: JavaStreamingContext,
                keyClass: Class[K],
                valueClass: Class[V],
                keyDecoderClass: Class[KD],
@@ -113,7 +126,7 @@ object EagleKafkaUtils extends Logging {
                refreshClusterAndTopicHandler: JFunction[List[KafkaClusterInfo], List[KafkaClusterInfo]],
                getOffsetRangeHandler: VoidFunction2[Array[OffsetRange], KafkaClusterInfo],
                messageHandler: JFunction[MessageAndMetadata[K, V], R]
-              ): InputDStream[R] = {
+              ): JavaInputDStream[R] = {
     implicit val keyCmt: ClassTag[K] = ClassTag(keyClass)
     implicit val valueCmt: ClassTag[V] = ClassTag(valueClass)
     implicit val keyDecoderCmt: ClassTag[KD] = ClassTag(keyDecoderClass)
@@ -123,11 +136,14 @@ object EagleKafkaUtils extends Logging {
     val cleanedRefreshClusterAndTopicHandler = jssc.sparkContext.clean(refreshClusterAndTopicHandler.call _)
     val cleanedGetOffsetRangeHandler = jssc.sparkContext.clean(getOffsetRangeHandler.call _)
     val clusterinfo = clusterInfoJlist.asScala.toList
-    new DynamicTopicKafkaUnionInputDStream[K, V, KD, VD, R](
-      jssc.ssc, clusterinfo, cleanedRefreshClusterAndTopicHandler, cleanedGetOffsetRangeHandler, cleanedHandler)
+    createUnionDerectStreamWithhandler[K, V, KD, VD, R](
+      jssc.ssc,
+      clusterinfo,
+      cleanedRefreshClusterAndTopicHandler,
+      cleanedGetOffsetRangeHandler,
+      cleanedHandler
+    )
   }
-
-
   /**
     * Create an input stream that directly pulls messages from Kafka Brokers
     * without using any receiver. This stream can guarantee that each message
@@ -285,4 +301,46 @@ object EagleKafkaUtils extends Logging {
     currentOffsetsWithOutNouseTopic.asJava
   }
 
+  def refreshUnionOffsets(topics: JSet[String], currentOffsets: JMap[TopicAndPartition, JLong], groupId: String, kafkaCluster: KafkaCluster, zkServers: String): JMap[TopicAndPartition, JLong] = {
+    if (topics == null) {
+      //first init
+      return null
+    }
+    val zkClient: ZkClient = new ZkClient(zkServers, ZK_TIMEOUT_MSEC, ZK_TIMEOUT_MSEC);
+    var currentOffsetsWithOutNouseTopic: Map[TopicAndPartition, JLong] = Map()
+    try {
+      val effectiveTopics = topics.asScala.filter(topic => AdminUtils.topicExists(zkClient, topic))
+      val tp = kafkaCluster.getPartitions(effectiveTopics.toSet).right.get
+
+      currentOffsets.asScala.keys.foreach(
+        currentTp => {
+          //remove nouse TopicAndPartition
+          if (tp.contains(currentTp)) {
+            val offset = currentOffsets.get(currentTp)
+            currentOffsetsWithOutNouseTopic = currentOffsetsWithOutNouseTopic + (currentTp -> offset)
+          }
+        }
+      )
+
+      tp.foreach(
+        eachTp => {
+          if (!currentOffsetsWithOutNouseTopic.contains(eachTp)) {
+            //add new TopicAndPartition
+            val result = kafkaCluster.getConsumerOffsets(groupId, Set(eachTp))
+            if (result.isLeft) {
+              currentOffsetsWithOutNouseTopic = currentOffsetsWithOutNouseTopic + (eachTp -> 0L)
+            } else {
+              result.right.get.foreach(tpAndOffset => {
+                currentOffsetsWithOutNouseTopic = currentOffsetsWithOutNouseTopic + (tpAndOffset._1 -> tpAndOffset._2)
+              })
+            }
+          }
+        }
+      )
+
+    } finally {
+      zkClient.close;
+    }
+    currentOffsetsWithOutNouseTopic.asJava
+  }
 }
