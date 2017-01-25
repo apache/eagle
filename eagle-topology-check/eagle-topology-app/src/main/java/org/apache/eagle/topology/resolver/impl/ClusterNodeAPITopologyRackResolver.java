@@ -19,6 +19,7 @@
 package org.apache.eagle.topology.resolver.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.app.utils.AppConstants;
 import org.apache.eagle.app.utils.connection.InputStreamUtils;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
@@ -36,7 +37,7 @@ import java.io.InputStream;
 public class ClusterNodeAPITopologyRackResolver implements TopologyRackResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterNodeAPITopologyRackResolver.class);
-    private static final String DEFAULT_RACK_NAME = "/default-rack";
+    private static final String DEFAULT_RACK_NAME = "default-rack";
     private String activeApiUrl = "";
     private String hostPort = "8041";//TODO configurable
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
@@ -56,7 +57,7 @@ public class ClusterNodeAPITopologyRackResolver implements TopologyRackResolver 
             is = InputStreamUtils.getInputStream(requestUrl, null, AppConstants.CompressionType.NONE);
             LOG.info("resolve rack by api url {}", requestUrl);
             Node node = OBJ_MAPPER.readValue(is, Node.class);
-            rack = node.getNode().getRack();
+            rack = StringUtils.removeStart(node.getNode().getRack(),"/");
         } catch (Exception e) {
             LOG.warn("resolve rack by api url {} failed, {}", requestUrl, e);
             return rack;

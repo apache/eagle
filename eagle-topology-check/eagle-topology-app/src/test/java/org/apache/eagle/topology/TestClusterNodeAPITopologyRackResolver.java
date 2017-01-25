@@ -38,7 +38,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InputStreamUtils.class)
 public class TestClusterNodeAPITopologyRackResolver {
-    private static final String apiUrl = "http://yhd-jqhadoop168.int.yihaodian.com:8088/ws/v1/cluster/nodes";
+    private static final String apiUrl = "http://xxx-xxx.xxx.xxx.com:8088/ws/v1/cluster/nodes";
     private static final TopologyCheckAppConfig config = TopologyCheckAppConfig.newInstance(ConfigFactory.load().withFallback(
         ConfigFactory.parseMap(new HashMap<String, String>() {{
             put("topology.resolverAPIUrl", apiUrl);
@@ -53,7 +53,7 @@ public class TestClusterNodeAPITopologyRackResolver {
         Assert.assertTrue(resolverCls == ClusterNodeAPITopologyRackResolver.class);
         TopologyRackResolver topologyRackResolver = resolverCls.newInstance();
         topologyRackResolver.prepare(config);
-        Assert.assertEquals("/rowb/rack12", topologyRackResolver.resolve(hostname));
+        Assert.assertEquals("rowb/rack12", topologyRackResolver.resolve(hostname));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class TestClusterNodeAPITopologyRackResolver {
         mockInputSteamWithException(apiUrl + "/" + hostname + ":8041");
         TopologyRackResolver topologyRackResolver = new ClusterNodeAPITopologyRackResolver();
         topologyRackResolver.prepare(config);
-        Assert.assertEquals("/default-rack", topologyRackResolver.resolve(hostname));
+        Assert.assertEquals("default-rack", topologyRackResolver.resolve(hostname));
     }
 
     private void mockInputSteam(String mockDataFilePath, String url) throws Exception {
