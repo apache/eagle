@@ -112,6 +112,7 @@ public class SchedulerInfoParseListener {
         _entity.setNumPendingApplications(queue.getNumPendingApplications());
         _entity.setMaxActiveApplications(queue.getMaxActiveApplications());
         _entity.setTimestamp(currentTimestamp);
+        _entity.setUserLimitFactor(queue.getUserLimitFactor());
 
         List<UserWrapper> userList = new ArrayList<>();
         if (queue.getUsers() != null && queue.getUsers().getUser() != null) {

@@ -143,6 +143,10 @@
                     <type>double</type>
                 </column>
                 <column>
+                    <name>userLimitCapacity</name>
+                    <type>double</type>
+                </column>
+                <column>
                     <name>memory</name>
                     <type>long</type>
                 </column>

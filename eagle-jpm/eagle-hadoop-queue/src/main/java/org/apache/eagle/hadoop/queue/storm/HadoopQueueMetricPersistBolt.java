@@ -154,6 +154,7 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
 
         }
         queueInfoMap.put(LeafQueueInfo.QUEUE_MAX_USER_USED_CAPACITY, maxUserUsedCapacity);
+        queueInfoMap.put(LeafQueueInfo.QUEUE_USER_LIMIT_CAPACITY, queueAPIEntity.getUserLimitFactor() * queueAPIEntity.getAbsoluteCapacity());
         return queueInfoMap;
     }
 

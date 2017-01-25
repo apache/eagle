@@ -71,6 +71,7 @@ public class HadoopClusterConstants {
         public static final String QUEUE_ABSOLUTE_MAX_CAPACITY = "absoluteMaxCapacity";
         public static final String QUEUE_ABSOLUTE_USED_CAPACITY = "absoluteUsedCapacity";
         public static final String QUEUE_MAX_USER_USED_CAPACITY = "maxUserUsedCapacity";
+        public static final String QUEUE_USER_LIMIT_CAPACITY = "userLimitCapacity";
         public static final String QUEUE_USED_MEMORY = "memory";
         public static final String QUEUE_USED_VCORES = "vcores";
         public static final String QUEUE_NUM_ACTIVE_APPS = "numActiveApplications";

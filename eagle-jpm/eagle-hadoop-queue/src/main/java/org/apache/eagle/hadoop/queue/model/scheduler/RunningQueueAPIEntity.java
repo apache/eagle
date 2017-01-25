@@ -55,6 +55,8 @@ public class RunningQueueAPIEntity extends TaggedLogAPIEntity {
     private String scheduler;
     @Column("k")
     private UserWrappers users;
+    @Column("l")
+    private double userLimitFactor;
 
     public String getScheduler() {
         return scheduler;
@@ -154,5 +156,14 @@ public class RunningQueueAPIEntity extends TaggedLogAPIEntity {
     public void setUsers(UserWrappers users) {
         this.users = users;
         valueChanged("users");
+    }
+
+    public double getUserLimitFactor() {
+        return userLimitFactor;
+    }
+
+    public void setUserLimitFactor(double userLimitFactor) {
+        this.userLimitFactor = userLimitFactor;
+        valueChanged("userLimitFactor");
     }
 }
