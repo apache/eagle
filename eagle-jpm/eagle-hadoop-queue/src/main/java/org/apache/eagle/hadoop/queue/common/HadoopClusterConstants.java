@@ -62,7 +62,7 @@ public class HadoopClusterConstants {
     }
 
     public static class LeafQueueInfo {
-
+        public static final String TIMESTAMP = "timestamp";
         public static final String QUEUE_SITE = "site";
         public static final String QUEUE_NAME = "queue";
         public static final String QUEUE_STATE = "state";

@@ -111,6 +111,10 @@
             <validate>true</validate>
             <columns>
                 <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
                     <name>site</name>
                     <type>string</type>
                 </column>
