@@ -37,6 +37,7 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,17 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         declarer.declare(new Fields(HadoopClusterConstants.LeafQueueInfo.QUEUE_NAME, "message"));
     }
 
+    @Override
+    public void cleanup() {
+        if (client != null) {
+            try {
+                client.close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage(), e);
+            }
+        }
+    }
+
     private void writeEntities(List<RunningQueueAPIEntity> entities) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
@@ -130,8 +142,9 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         queueInfoMap.put(LeafQueueInfo.QUEUE_USED_VCORES, queueAPIEntity.getVcores());
 
         double maxUserUsedCapacity = 0;
+        double userUsedCapacity;
         for (UserWrapper user : queueAPIEntity.getUsers().getUsers()) {
-            double userUsedCapacity = calculateUserUsedCapacity(
+            userUsedCapacity = calculateUserUsedCapacity(
                     queueAPIEntity.getAbsoluteUsedCapacity(),
                     queueAPIEntity.getMemory(),
                     user.getMemory());
