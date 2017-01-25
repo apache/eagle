@@ -22,10 +22,14 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.LeafQueueInfo;
 import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
+import org.apache.eagle.hadoop.queue.model.scheduler.UserWrapper;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -33,6 +37,8 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +73,11 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
             writeMetrics(metrics);
         } else if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.ENTITY.toString())) {
             List<RunningQueueAPIEntity> entities = (List<RunningQueueAPIEntity>) data;
+            for (RunningQueueAPIEntity queue : entities) {
+                if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
+                    collector.emit(new Values(queue.getTags().get(HadoopClusterConstants.TAG_QUEUE), parseLeafQueueInfo(queue)));
+                }
+            }
             writeEntities(entities);
         }
         this.collector.ack(input);
@@ -74,7 +85,18 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields(HadoopClusterConstants.LeafQueueInfo.QUEUE_NAME, "message"));
+    }
 
+    @Override
+    public void cleanup() {
+        if (client != null) {
+            try {
+                client.close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void writeEntities(List<RunningQueueAPIEntity> entities) {
@@ -104,5 +126,40 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         }
     }
 
+    private Map<String, Object> parseLeafQueueInfo(RunningQueueAPIEntity queueAPIEntity) {
+        Map<String, Object> queueInfoMap = new HashMap<>();
+        queueInfoMap.put(LeafQueueInfo.QUEUE_SITE, queueAPIEntity.getTags().get(HadoopClusterConstants.TAG_SITE));
+        queueInfoMap.put(LeafQueueInfo.QUEUE_NAME, queueAPIEntity.getTags().get(HadoopClusterConstants.TAG_QUEUE));
+        queueInfoMap.put(LeafQueueInfo.QUEUE_ABSOLUTE_CAPACITY, queueAPIEntity.getAbsoluteCapacity());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_ABSOLUTE_MAX_CAPACITY, queueAPIEntity.getAbsoluteMaxCapacity());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_ABSOLUTE_USED_CAPACITY, queueAPIEntity.getAbsoluteUsedCapacity());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_MAX_ACTIVE_APPS, queueAPIEntity.getMaxActiveApplications());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_NUM_ACTIVE_APPS, queueAPIEntity.getNumActiveApplications());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_NUM_PENDING_APPS, queueAPIEntity.getNumPendingApplications());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_SCHEDULER, queueAPIEntity.getScheduler());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_STATE, queueAPIEntity.getState());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_USED_MEMORY, queueAPIEntity.getMemory());
+        queueInfoMap.put(LeafQueueInfo.QUEUE_USED_VCORES, queueAPIEntity.getVcores());
+        queueInfoMap.put(LeafQueueInfo.TIMESTAMP, queueAPIEntity.getTimestamp());
 
+        double maxUserUsedCapacity = 0;
+        double userUsedCapacity;
+        for (UserWrapper user : queueAPIEntity.getUsers().getUsers()) {
+            userUsedCapacity = calculateUserUsedCapacity(
+                    queueAPIEntity.getAbsoluteUsedCapacity(),
+                    queueAPIEntity.getMemory(),
+                    user.getMemory());
+            if (userUsedCapacity > maxUserUsedCapacity) {
+                maxUserUsedCapacity = userUsedCapacity;
+            }
+
+        }
+        queueInfoMap.put(LeafQueueInfo.QUEUE_MAX_USER_USED_CAPACITY, maxUserUsedCapacity);
+        queueInfoMap.put(LeafQueueInfo.QUEUE_USER_LIMIT_CAPACITY, queueAPIEntity.getUserLimitFactor() * queueAPIEntity.getAbsoluteCapacity());
+        return queueInfoMap;
+    }
+
+    private double calculateUserUsedCapacity(double absoluteUsedCapacity, long queueUsedMem, long userUsedMem) {
+        return userUsedMem * absoluteUsedCapacity / queueUsedMem;
+    }
 }
