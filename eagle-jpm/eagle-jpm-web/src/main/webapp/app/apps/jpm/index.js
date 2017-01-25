@@ -55,18 +55,25 @@
 		reloadOnSearch: false,
 		templateUrl: "partials/job/compare.html",
 		controller: "compareCtrl"
+
+	}).route("jpmQueue", {
+		url: "/jpm/queue?startTime&endTime",
+		site: true,
+		templateUrl: "partials/queue/overview.html",
+		controller: "queueCtrl",
+		resolve: { time: true }
 	});
 
 	jpmApp.portal({name: "YARN Jobs", icon: "taxi", list: [
 		{name: "Overview", path: "jpm/overview"},
 		{name: "Job Statistics", path: "jpm/statistics"},
-		{name: "Job List", path: "jpm/list"}
+		{name: "Job List", path: "jpm/list"},
+		{name: "Queue", path: "jpm/queue"}
 	]}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time, Site, Application) {
 		var JPM = window._JPM = {};
 
-		// TODO: timestamp support
 		JPM.QUERY_LIST = '${baseURL}/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_GROUPS = '${baseURL}/rest/entities?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_GROUPS_INTERVAL = '${baseURL}/rest/entities?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
@@ -484,4 +491,5 @@
 	jpmApp.require("ctrl/detailCtrl.js");
 	jpmApp.require("ctrl/jobTaskCtrl.js");
 	jpmApp.require("ctrl/compareCtrl.js");
+	jpmApp.require("ctrl/queueCtrl.js");
 })();
