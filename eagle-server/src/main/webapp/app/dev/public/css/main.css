@@ -277,6 +277,15 @@ ul.stepGuide li > .title {
 	overflow-x: auto;
 }
 
+.box-header > .box-tools {
+	white-space: nowrap;
+}
+
+.box-header > .box-tools > .form-control {
+	display: inline-block;
+	width: initial;
+}
+
 /* ========================================================================
  * =                                 Tab                                  =
  * ======================================================================== */

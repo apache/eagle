@@ -24,7 +24,7 @@
 	// ============================================================
 	// =                           Page                           =
 	// ============================================================
-	serviceModule.service('PageConfig', function() {
+	serviceModule.service('PageConfig', function($wrapState) {
 		function PageConfig() {
 		}
 
@@ -33,6 +33,45 @@
 			PageConfig.subTitle = "";
 			PageConfig.navPath = [];
 			PageConfig.hideTitle = false;
+		};
+
+		var cachedNavPath = [];
+		var cachedGenNavPath = [];
+		PageConfig.getNavPath = function () {
+			if (cachedNavPath !== PageConfig.navPath || cachedGenNavPath.length !== cachedNavPath.length) {
+				cachedNavPath = PageConfig.navPath;
+				cachedGenNavPath = $.map(cachedNavPath, function (navPath) {
+					var pathEntity = $.extend({}, navPath);
+
+					if (!pathEntity.path || !pathEntity.param) return pathEntity;
+
+					// Parse param as `key=value` format
+					var params = {};
+					$.each(pathEntity.param, function (i, param) {
+						if (!param) return;
+
+						var match = param.match(/^([^=]+)(=(.*))?$/);
+						var key = match[1];
+						var value = match[3];
+						params[key] = value !== undefined ? value : $wrapState.param[key];
+					});
+
+					// Generate path with param
+					var path = "/" + pathEntity.path.replace(/^[\\\/]/, "");
+					if (params.siteId) {
+						pathEntity.path = "/site/" + $wrapState.param.siteId + path;
+						delete params.siteId;
+					} else {
+						pathEntity.path = path;
+					}
+					pathEntity.path += '?' + $.map(params, function (value, key) {
+						return key + '=' + value;
+					}).join('&');
+
+					return pathEntity;
+				});
+			}
+			return cachedGenNavPath;
 		};
 
 		return PageConfig;

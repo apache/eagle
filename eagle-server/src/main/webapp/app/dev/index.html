@@ -162,13 +162,13 @@
 
 
 					<ol class="breadcrumb">
-						<li ng-repeat="navPath in PageConfig.navPath">
+						<li ng-repeat="navPath in PageConfig.getNavPath() track by $index">
 							<span ng-if="!navPath.path">
-								<span class="fa fa-home" ng-if="$first"></span>
+								<span class="fa fa-{{navPath.icon || 'home'}}" ng-if="$first"></span>
 								{{navPath.title || navPath.path}}
 							</span>
 							<a ng-if="navPath.path" ng-href="#{{navPath.path}}">
-								<span class="fa fa-home" ng-if="$first"></span>
+								<span class="fa fa-{{navPath.icon || 'home'}}" ng-if="$first"></span>
 								{{navPath.title || navPath.path}}
 							</a>
 						</li>
