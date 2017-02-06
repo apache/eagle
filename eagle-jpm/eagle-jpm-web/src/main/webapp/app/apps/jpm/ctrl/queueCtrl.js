@@ -94,12 +94,16 @@
 				promiseList.push(JPM.aggMetricsToEntities(
 					JPM.groups('RunningQueueService', condition, ['queue', 'parentQueue'], 'max(absoluteUsedCapacity)', intervalMin, startTime, endTime)
 				)._promise.then(function (list) {
+					$scope.subQueueList = [];
+
 					// Filter top queue
 					var queueTrendSeries = $.map(list, function (subList) {
 						var tags = subList[0].tags;
 						if (!$scope.currentQueue && tags.parentQueue !== QUEUE_ROOT) return;
 
-						return JPM.metricsToSeries(subList[0].tags.queue, subList, {
+						var name = subList[0].tags.queue;
+						$scope.subQueueList.push(name);
+						return JPM.metricsToSeries(name, subList, {
 							stack: "queue",
 							areaStyle: {normal: {}}
 						});
@@ -109,17 +113,30 @@
 					$scope.refreshQueueStatistic();
 
 					return queueTrendSeries;
-					// $scope.trendLoading = false;
 				}));
 
-				// Load parent capacity line
 				if ($scope.currentQueue) {
+					// Load current queue trend
+					promiseList.push(JPM.aggMetricsToEntities(
+						JPM.groups('RunningQueueService', { site: $scope.site, queue: $scope.currentQueue }, ['queue'], 'max(absoluteUsedCapacity)', intervalMin, startTime, endTime)
+					)._promise.then(function (list) {
+						// Filter top queue
+						var queueTrendSeries = $.map(list, function (subList) {
+							return JPM.metricsToSeries(subList[0].tags.queue, subList, {
+								areaStyle: {normal: {}}
+							});
+						});
+
+						return queueTrendSeries;
+					}));
+
+					// Load parent capacity line
 					var DISPLAY_MARK_NAME = ['Guaranteed Capacity', 'Max Capacity'];
 					promiseList.push(JPM.aggMetricsToEntities(
 						JPM.groups('RunningQueueService', { site: $scope.site, queue: $scope.currentQueue }, ['queue'], 'max(absoluteCapacity), max(absoluteMaxCapacity)', intervalMin, startTime, endTime)
 					)._promise.then(function (list) {
 						return $.map(list, function (valueSeries, i) {
-							var pointValue = common.getValueByPath(valueSeries, [0, 'value', 0]);
+							var pointValue = common.getValueByPath(valueSeries, [0, 'value', 0], 0);
 
 							return JPM.metricsToSeries(DISPLAY_MARK_NAME[i], valueSeries, {
 								markPoint: {
@@ -131,7 +148,7 @@
 											},
 											position: 'insideRight',
 											textStyle: {
-												color: '#337ab7',
+												color: '#333',
 												fontWeight: 'bolder',
 												fontSize: 14,
 											}
@@ -158,7 +175,13 @@
 
 				$q.all(promiseList).then(function (seriesList) {
 					$scope.queueTrendSeries = seriesList[0];
-					if (seriesList[1]) $scope.queueTrendSeries = $scope.queueTrendSeries.concat(seriesList[1]);
+
+					if (seriesList[1]) {
+						if (!seriesList[0].length) {
+							$scope.queueTrendSeries = seriesList[1];
+						}
+						$scope.queueTrendSeries = $scope.queueTrendSeries.concat(seriesList[2]);
+					}
 					$scope.trendLoading = false;
 				});
 			};

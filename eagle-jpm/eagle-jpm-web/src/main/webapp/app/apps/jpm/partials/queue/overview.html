@@ -21,10 +21,10 @@
 		<h3 class="box-title">
 			Queue Capacity Trend
 		</h3>
-		<div class="box-tools" ng-show="queueTrendSeries.length">
+		<div class="box-tools" ng-show="subQueueList.length">
 			<select class="form-control input-sm" ng-model="selectedSubQueue" ng-change="switchToSubQueue()">
 				<option value="">[View Sub Queue]</option>
-				<option ng-repeat="series in queueTrendSeries track by $index" value="{{series.name}}">{{series.name}}</option>
+				<option ng-repeat="queue in subQueueList track by $index" value="{{queue}}">{{queue}}</option>
 			</select>
 		</div>
 	</div>
@@ -47,7 +47,7 @@
 
 		<li class="pull-right">
 			<select class="form-control" ng-model="selectedQueue" ng-change="refreshQueueStatistic()">
-				<option ng-repeat="series in queueTrendSeries track by $index" value="{{series.name}}">{{series.name}}</option>
+				<option ng-repeat="queue in subQueueList track by $index" value="{{queue}}">{{queue}}</option>
 			</select>
 		</li>
 	</ul>
