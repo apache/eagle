@@ -21,42 +21,160 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
+		var QUEUE_ROOT = 'unassigned';
+
 		jpmApp.controller("queueCtrl", function ($q, $wrapState, $element, $scope, $timeout, PageConfig, Time, Entity, JPM) {
-			PageConfig.title = "Queue";
-			PageConfig.subTitle = "Overview";
-
 			$scope.site = $wrapState.param.siteId;
+			$scope.currentQueue = $wrapState.param.queue;
+			$scope.selectedQueue = '';
+			$scope.selectedSubQueue = '';
+			$scope.trendLoading = true;
 
+			PageConfig.title = "Queue";
+			PageConfig.subTitle = $scope.currentQueue || "Overview";
+			var navPath = PageConfig.navPath = [];
+
+			$scope.chartOption = {
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									Math.floor(point.value) + '%';
+							}).reverse().join("<br/>");
+					}
+				},
+				yAxis: [{
+					axisLabel: {formatter: function (value) {
+						return value + '%';
+					}}
+				}]
+			};
+
+			// Load queue tree
+			(function () {
+				var startTime = new Time('startTime');
+				var endTime = startTime.clone().add(1, 'h');
+				JPM
+					.groups('RunningQueueService', { site: $scope.site, queue: $scope.currentQueue }, ['queue', 'parentQueue'], 'count', 60, startTime, endTime)
+					._promise
+					.then(function (list) {
+						$.each(list, function (i, entity) {
+							var parent = entity.key[1];
+							$scope.parentQueue = parent === QUEUE_ROOT ? null : parent;
+
+							// Update navigation path
+							navPath.push(
+								{
+									title: $scope.parentQueue || 'queue list',
+									icon: 'sitemap',
+									param: ['siteId', 'startTime', 'endTime', $scope.parentQueue && 'queue=' + $scope.parentQueue],
+									path: "/jpm/queue"
+								},
+								{title: $scope.currentQueue}
+							);
+
+							return false;
+						});
+					});
+			})();
+
+			// Refresh Trend Chart
 			$scope.refresh = function () {
-				console.log('refresh!!!');
-
+				$scope.trendLoading = true;
 				var startTime = new Time('startTime');
 				var endTime = new Time('endTime');
 				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
-				JPM.aggMetricsToEntities(
-					JPM.groups('RunningQueueService', { site: $scope.site }, ['queue', 'parentQueue'], 'max(absoluteUsedCapacity)', intervalMin, startTime, endTime)
+				var condition = {site: $scope.site};
+				if ($scope.currentQueue) condition.parentQueue = $scope.currentQueue;
+
+				var promiseList = [];
+				// Load sub queue trend
+				promiseList.push(JPM.aggMetricsToEntities(
+					JPM.groups('RunningQueueService', condition, ['queue', 'parentQueue'], 'max(absoluteUsedCapacity)', intervalMin, startTime, endTime)
 				)._promise.then(function (list) {
-					/* $scope.topUserJobCountTrendSeries = $.map(list, function (subList) {
-						return JPM.metricsToSeries(subList[0].tags.user, subList, {
-							stack: "user",
-							areaStyle: {normal: {}}
-						});
-					});
-
-					var flatten = flattenTrendSeries("User", $scope.topUserJobCountTrendSeries);
-					$scope.topUserJobCountSeries = flatten.series;
-					$scope.topUserJobCountSeriesCategory = flatten.category; */
-					console.log('~>', list);
-
-					$scope.queueTrendSeries = $.map(list, function (subList) {
-						// console.log('>>>', subList);
+					// Filter top queue
+					var queueTrendSeries = $.map(list, function (subList) {
+						var tags = subList[0].tags;
+						if (!$scope.currentQueue && tags.parentQueue !== QUEUE_ROOT) return;
 
 						return JPM.metricsToSeries(subList[0].tags.queue, subList, {
 							stack: "queue",
 							areaStyle: {normal: {}}
 						});
 					});
-					console.log('=>', $scope.queueTrendSeries);
+
+					$scope.selectedQueue = common.getValueByPath(queueTrendSeries, ['0', 'name']);
+					$scope.refreshQueueStatistic();
+
+					return queueTrendSeries;
+					// $scope.trendLoading = false;
+				}));
+
+				// Load parent capacity line
+				if ($scope.currentQueue) {
+					var DISPLAY_MARK_NAME = ['Guaranteed Capacity', 'Max Capacity'];
+					promiseList.push(JPM.aggMetricsToEntities(
+						JPM.groups('RunningQueueService', { site: $scope.site, queue: $scope.currentQueue }, ['queue'], 'max(absoluteCapacity), max(absoluteMaxCapacity)', intervalMin, startTime, endTime)
+					)._promise.then(function (list) {
+						return $.map(list, function (valueSeries, i) {
+							var pointValue = common.getValueByPath(valueSeries, [0, 'value', 0]);
+
+							return JPM.metricsToSeries(DISPLAY_MARK_NAME[i], valueSeries, {
+								markPoint: {
+									silent: true,
+									label: {
+										normal: {
+											formatter: function () {
+												return DISPLAY_MARK_NAME[i];
+											},
+											position: 'insideRight',
+											textStyle: {
+												color: '#337ab7',
+												fontWeight: 'bolder',
+												fontSize: 14,
+											}
+									}
+									},
+									data: [
+										{
+											name: '',
+											coord: [valueSeries.length - 1, pointValue],
+											symbolSize: 40,
+											itemStyle: {
+												normal: {color: 'rgba(0,0,0,0)'}
+											}
+										}
+									],
+								},
+								lineStyle: {
+									normal: { type: 'dashed' }
+								}
+							});
+						});
+					}));
+				}
+
+				$q.all(promiseList).then(function (seriesList) {
+					$scope.queueTrendSeries = seriesList[0];
+					if (seriesList[1]) $scope.queueTrendSeries = $scope.queueTrendSeries.concat(seriesList[1]);
+					$scope.trendLoading = false;
+				});
+			};
+
+			// Refresh Queue static info
+			$scope.refreshQueueStatistic = function () {
+				var startTime = new Time('startTime');
+				var endTime = new Time('endTime');
+			};
+
+			// Go to sub queue view
+			$scope.switchToSubQueue = function () {
+				$wrapState.go(".", {
+					queue: $scope.selectedSubQueue,
+					startTime: Time.format('startTime'),
+					endTime: Time.format('endTime'),
 				});
 			};
 
@@ -64,6 +182,7 @@
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();
+
 		});
 	});
 })();

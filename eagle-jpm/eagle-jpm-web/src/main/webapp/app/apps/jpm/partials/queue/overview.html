@@ -16,4 +16,42 @@
   limitations under the License.
   -->
 
-Hello World!!!
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Queue Capacity Trend
+		</h3>
+		<div class="box-tools" ng-show="queueTrendSeries.length">
+			<select class="form-control input-sm" ng-model="selectedSubQueue" ng-change="switchToSubQueue()">
+				<option value="">[View Sub Queue]</option>
+				<option ng-repeat="series in queueTrendSeries track by $index" value="{{series.name}}">{{series.name}}</option>
+			</select>
+		</div>
+	</div>
+	<div class="box-body">
+		<div class="jpm-chart">
+			<div chart class="jpm-chart-container" series="queueTrendSeries" option="chartOption"></div>
+			<h1 class="jpm-chart-tip" ng-if="queueTrendSeries && queueTrendSeries.length === 0">No Data</h1>
+		</div>
+	</div>
+
+	<div ng-if="trendLoading" class="overlay">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+</div>
+
+<div class="nav-tabs-custom">
+	<ul class="nav nav-tabs">
+		<li class="active"><a data-toggle="tab" href="#queueUser">User</a></li>
+		<li><a data-toggle="tab" href="#queueJob">Job</a></li>
+
+		<li class="pull-right">
+			<select class="form-control" ng-model="selectedQueue" ng-change="refreshQueueStatistic()">
+				<option ng-repeat="series in queueTrendSeries track by $index" value="{{series.name}}">{{series.name}}</option>
+			</select>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active"></div>
+	</div>
+</div>

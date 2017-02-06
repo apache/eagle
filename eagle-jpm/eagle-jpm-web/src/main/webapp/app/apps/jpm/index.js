@@ -57,7 +57,7 @@
 		controller: "compareCtrl"
 
 	}).route("jpmQueue", {
-		url: "/jpm/queue?startTime&endTime",
+		url: "/jpm/queue?queue&startTime&endTime",
 		site: true,
 		templateUrl: "partials/queue/overview.html",
 		controller: "queueCtrl",
@@ -149,6 +149,7 @@
 		};
 
 		JPM.condition = function (condition) {
+			if (typeof condition === 'string') return condition;
 			return $.map(condition, function (value, key) {
 				return "@" + key + '="' + value + '"';
 			}).join(" AND ");
@@ -196,7 +197,8 @@
 			_list._aggInfo = {
 				groups: groups,
 				startTime: Time(startTime).valueOf(),
-				interval: intervalMin * 60 * 1000
+				interval: intervalMin * 60 * 1000,
+				order: fields[orderId]
 			};
 			_list._promise.then(function () {
 				if(top) _list.reverse();
@@ -317,7 +319,7 @@
 			_list._aggInfo = {
 				groups: groups,
 				startTime: Time(startTime).valueOf(),
-				interval: intervalMin * 60 * 1000
+				interval: intervalMin * 60 * 1000,
 			};
 			_list._promise.then(function () {
 				_list.reverse();
@@ -338,19 +340,23 @@
 						tags[group] = obj.key[j];
 					});
 
-					var _subList = $.map(obj.value[0], function (value, index) {
-						return {
-							timestamp: _startTime + index * _interval,
-							value: [value],
-							tags: tags
-						};
-					});
+					$.each(obj.value, function (j, values) {
+						if (list._aggInfo.order && j === list.length - 1) return;
 
-					if(flatten) {
-						_list.push.apply(_list, _subList);
-					} else {
-						_list.push(_subList);
-					}
+						var _subList = $.map(values, function (value, index) {
+							return {
+								timestamp: _startTime + index * _interval,
+								value: [value],
+								tags: tags
+							};
+						});
+
+						if(flatten) {
+							_list.push.apply(_list, _subList);
+						} else {
+							_list.push(_subList);
+						}
+					});
 				});
 				_list.done = true;
 				return _list;
