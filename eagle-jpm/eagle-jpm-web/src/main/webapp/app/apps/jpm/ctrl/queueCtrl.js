@@ -24,6 +24,9 @@
 		var QUEUE_ROOT = 'unassigned';
 
 		jpmApp.controller("queueCtrl", function ($q, $wrapState, $element, $scope, $timeout, PageConfig, Time, Entity, JPM) {
+			var TEXT_MAX_CAPACITY = 'Max Capacity';
+			var DISPLAY_MARK_NAME = ['Guaranteed Capacity', TEXT_MAX_CAPACITY];
+
 			$scope.site = $wrapState.param.siteId;
 			$scope.currentQueue = $wrapState.param.queue;
 			$scope.selectedQueue = '';
@@ -118,69 +121,85 @@
 				if ($scope.currentQueue) {
 					// Load current queue trend
 					promiseList.push(JPM.aggMetricsToEntities(
-						JPM.groups('RunningQueueService', { site: $scope.site, queue: $scope.currentQueue }, ['queue'], 'max(absoluteUsedCapacity)', intervalMin, startTime, endTime)
+						JPM.groups('RunningQueueService',
+							{ site: $scope.site, queue: $scope.currentQueue },
+							['queue'],
+							'max(absoluteUsedCapacity), max(memory), max(absoluteCapacity), max(absoluteMaxCapacity)',
+							intervalMin, startTime, endTime)
 					)._promise.then(function (list) {
 						// Filter top queue
-						var queueTrendSeries = $.map(list, function (subList) {
-							return JPM.metricsToSeries(subList[0].tags.queue, subList, {
-								areaStyle: {normal: {}}
-							});
-						});
+						return $.map(list, function (valueSeries, seriesIndex) {
+							var seriesName = valueSeries[0].tags.queue;
+							var option = {};
+							if (seriesIndex === 0) {
+								option.areaStyle = {normal: {}};
+							} else if (seriesIndex === 1) {
+								return;
+							} else {
+								seriesName = DISPLAY_MARK_NAME[seriesIndex - 2];
+								var markDisplayText = seriesName;
 
-						return queueTrendSeries;
-					}));
+								if (seriesName === TEXT_MAX_CAPACITY) {
+									var lastMemory = list[1][list[1].length - 1].value[0];
+									var lastCapacity = list[0][list[0].length - 1].value[0];
+									var lastMaxCapacity = list[seriesIndex][list[seriesIndex].length - 1].value[0];
+									var lastMaxMemory = lastMemory / lastCapacity * lastMaxCapacity;
+									lastMaxMemory *= 1024 * 1024;
 
-					// Load parent capacity line
-					var DISPLAY_MARK_NAME = ['Guaranteed Capacity', 'Max Capacity'];
-					promiseList.push(JPM.aggMetricsToEntities(
-						JPM.groups('RunningQueueService', { site: $scope.site, queue: $scope.currentQueue }, ['queue'], 'max(absoluteCapacity), max(absoluteMaxCapacity)', intervalMin, startTime, endTime)
-					)._promise.then(function (list) {
-						return $.map(list, function (valueSeries, i) {
-							var pointValue = common.getValueByPath(valueSeries, [0, 'value', 0], 0);
-
-							return JPM.metricsToSeries(DISPLAY_MARK_NAME[i], valueSeries, {
-								markPoint: {
-									silent: true,
-									label: {
-										normal: {
-											formatter: function () {
-												return DISPLAY_MARK_NAME[i];
-											},
-											position: 'insideRight',
-											textStyle: {
-												color: '#333',
-												fontWeight: 'bolder',
-												fontSize: 14,
-											}
-									}
-									},
-									data: [
-										{
-											name: '',
-											coord: [valueSeries.length - 1, pointValue],
-											symbolSize: 40,
-											itemStyle: {
-												normal: {color: 'rgba(0,0,0,0)'}
-											}
-										}
-									],
-								},
-								lineStyle: {
-									normal: { type: 'dashed' }
+									if (!isNaN(lastMaxMemory)) markDisplayText += '(Memory:' + common.number.abbr(lastMaxMemory, true, 0) + ')';
 								}
-							});
+
+								var pointValue = common.getValueByPath(valueSeries, [valueSeries.length - 1, 'value', 0], 0);
+								option = {
+									markPoint: {
+										silent: true,
+										label: {
+											normal: {
+												formatter: function () {
+													return markDisplayText;
+												},
+												position: 'insideRight',
+												textStyle: {
+													color: '#333',
+													fontSize: 12,
+												}
+											}
+										},
+										data: [
+											{
+												name: '',
+												coord: [valueSeries.length - 1, pointValue],
+												symbolSize: 30,
+												itemStyle: {
+													normal: {color: 'rgba(0,0,0,0)'}
+												}
+											}
+										],
+									},
+									lineStyle: {
+										normal: { type: 'dotted' }
+									}
+								};
+							}
+
+							return JPM.metricsToSeries(seriesName, valueSeries, option);
 						});
 					}));
 				}
 
 				$q.all(promiseList).then(function (seriesList) {
-					$scope.queueTrendSeries = seriesList[0];
+
+					var subQueuesSeries = seriesList[0];
+					$scope.queueTrendSeries = subQueuesSeries;
 
 					if (seriesList[1]) {
-						if (!seriesList[0].length) {
-							$scope.queueTrendSeries = seriesList[1];
+						var queueSeries = [seriesList[1][0]];
+						var capacitySeries = seriesList[1].slice(1);
+
+						if (!subQueuesSeries.length) {
+							$scope.queueTrendSeries = queueSeries;
 						}
-						$scope.queueTrendSeries = $scope.queueTrendSeries.concat(seriesList[2]);
+						$scope.queueTrendSeries = $scope.queueTrendSeries.concat(capacitySeries);
 					}
 					$scope.trendLoading = false;
 				});
