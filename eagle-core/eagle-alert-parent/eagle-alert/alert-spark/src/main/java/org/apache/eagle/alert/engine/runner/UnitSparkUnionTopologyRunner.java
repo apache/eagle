@@ -240,11 +240,11 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
                     clusterInfo.addTopic(topic);
                 } else {
                     Optional<KafkaClusterInfo> clusterInList = resutlSet.stream().filter(item -> item.equals(finalClusterInfo)).findFirst();
-                    if(clusterInList.isPresent()){
+                    if (clusterInList.isPresent()) {
                         clusterInfo = clusterInList.get();
                         offsets = clusterInfo.getOffsets();
                         clusterInfo.addTopic(topic);
-                    }else{
+                    } else {
                         // get kafka broker
                         String brokerList = listKafkaBrokersByZk(kafkaBrokerZkQuorum, kafkaBrokerPathQuorum);
                         LOG.info("brokerlist :" + brokerList);
