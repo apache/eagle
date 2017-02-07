@@ -220,7 +220,7 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     }
 
     public static List<KafkaClusterInfo> getKafkaCLusterInfoByCache(List<KafkaClusterInfo> cachedKafkaClusterInfo) {
-        List<KafkaClusterInfo> result = Lists.newArrayList();
+        Set<KafkaClusterInfo> resutlSet = Sets.newHashSet();
         List<Kafka2TupleMetadata> kafka2TupleMetadataList = getAllTopicsInfoByConfig(config);
         for (Kafka2TupleMetadata kafka2TupleMetadata : kafka2TupleMetadataList) {
             if ("KAFKA".equals(kafka2TupleMetadata.getType())) {
@@ -239,19 +239,26 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
                     offsets = clusterInfo.getOffsets();
                     clusterInfo.addTopic(topic);
                 } else {
-                    // get kafka broker
-                    String brokerList = listKafkaBrokersByZk(kafkaBrokerZkQuorum, kafkaBrokerPathQuorum);
-                    LOG.info("brokerlist :" + brokerList);
-                    clusterInfo.setBrokerList(brokerList);
-                    // build kafka param
-                    Map<String, String> kafkaParam = buildKafkaParam(clusterInfo);
-                    // build kafkaCluster
-                    KafkaCluster cluster = new KafkaCluster(JavaConverters.mapAsScalaMapConverter(kafkaParam).asScala().toMap(
-                        Predef.<Tuple2<String, String>>conforms()
-                    ));
-                    clusterInfo.setKafkaCluster(cluster);
-                    clusterInfo.setKafkaParams(kafkaParam);
-                    clusterInfo.addTopic(topic);
+                    Optional<KafkaClusterInfo> clusterInList = resutlSet.stream().filter(item -> item.equals(finalClusterInfo)).findFirst();
+                    if(clusterInList.isPresent()){
+                        clusterInfo = clusterInList.get();
+                        offsets = clusterInfo.getOffsets();
+                        clusterInfo.addTopic(topic);
+                    }else{
+                        // get kafka broker
+                        String brokerList = listKafkaBrokersByZk(kafkaBrokerZkQuorum, kafkaBrokerPathQuorum);
+                        LOG.info("brokerlist :" + brokerList);
+                        clusterInfo.setBrokerList(brokerList);
+                        // build kafka param
+                        Map<String, String> kafkaParam = buildKafkaParam(clusterInfo);
+                        // build kafkaCluster
+                        KafkaCluster cluster = new KafkaCluster(JavaConverters.mapAsScalaMapConverter(kafkaParam).asScala().toMap(
+                            Predef.<Tuple2<String, String>>conforms()
+                        ));
+                        clusterInfo.setKafkaCluster(cluster);
+                        clusterInfo.setKafkaParams(kafkaParam);
+                        clusterInfo.addTopic(topic);
+                    }
                 }
                 // refresh current offset
                 Map<TopicAndPartition, Long> newOffset = EagleKafkaUtils.refreshUnionOffsets(
@@ -261,10 +268,10 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
                     clusterInfo.getKafkaCluster(),
                     clusterInfo.getZkQuorum());
                 clusterInfo.setOffsets(newOffset);
-                result.add(clusterInfo);
+                resutlSet.add(clusterInfo);
             }
         }
-        return result;
+        return Lists.newArrayList(resutlSet);
     }
 
     /**
