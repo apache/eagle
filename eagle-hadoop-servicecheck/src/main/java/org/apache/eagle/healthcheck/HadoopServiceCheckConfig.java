@@ -16,14 +16,10 @@
  */
 package org.apache.eagle.healthcheck;
 
-import org.apache.eagle.app.config.ConfigRoot;
-
-@ConfigRoot("application.serviceCheck")
 public class HadoopServiceCheckConfig {
     private int durationInSec;
     private HBaseServiceCheckJobConfig hbaseCheckConfig;
     private HDFSServiceCheckJobConfig hdfsCheckConfig;
-
     public int getDurationInSec() {
         return durationInSec;
     }
@@ -36,7 +32,7 @@ public class HadoopServiceCheckConfig {
         return hdfsCheckConfig;
     }
 
-    private class HBaseServiceCheckJobConfig {
+    public static class HBaseServiceCheckJobConfig {
         private boolean enabled;
         private String properties;
 
@@ -49,7 +45,7 @@ public class HadoopServiceCheckConfig {
         }
     }
 
-    private class HDFSServiceCheckJobConfig {
+    public static class HDFSServiceCheckJobConfig {
         private boolean enabled;
         private String properties;
 

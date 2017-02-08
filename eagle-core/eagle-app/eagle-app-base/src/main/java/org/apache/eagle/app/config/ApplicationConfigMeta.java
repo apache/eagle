@@ -26,6 +26,7 @@ class ApplicationConfigMeta<T extends Object> {
     private final Map<Field, Config> fieldProperties;
     private final Map<String, Field> fieldNameFields;
 
+
     ApplicationConfigMeta(Class<? extends T> configurationClass) {
         this.configurationClass = configurationClass;
         fieldNameFields = new HashMap<>();
@@ -42,6 +43,10 @@ class ApplicationConfigMeta<T extends Object> {
                 fieldProperties.put(field, config);
             }
         }
+    }
+
+    public boolean hasAnyDeclaredProperties() {
+        return fieldProperties.size() > 0;
     }
 
     public Class<? extends T> getConfigClass() {

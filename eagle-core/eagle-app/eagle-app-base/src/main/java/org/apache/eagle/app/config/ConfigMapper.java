@@ -29,11 +29,11 @@ import java.util.Map;
 public class ConfigMapper<T extends Object> {
     private final ApplicationConfigMeta<T> meta;
 
-    public ConfigMapper(Class<T> configurationClass) {
+    private ConfigMapper(Class<T> configurationClass) {
         this.meta = new ApplicationConfigMeta<>(configurationClass);
     }
 
-    public void mapTo(Config config, Object configuration) {
+    private void mapTo(Config config, Object configuration) {
         meta.getFieldProperties().forEach((field, property) -> {
             String path = StringUtils.isEmpty(property.value()) ? property.name() : property.value();
             if (StringUtils.isEmpty(path)) {
@@ -46,7 +46,7 @@ public class ConfigMapper<T extends Object> {
 
                     // Handle POJO type config field
                     if (!Map.class.isAssignableFrom(field.getType()) && fieldVal.getClass().equals(HashMap.class)) {
-                        fieldVal = new ObjectMapper().convertValue(fieldVal,field.getType());
+                        fieldVal = new ObjectMapper().convertValue(fieldVal, field.getType());
                     }
                     PropertyUtils.setProperty(configuration, field.getName(), fieldVal);
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -57,6 +57,9 @@ public class ConfigMapper<T extends Object> {
     }
 
     public T mapFrom(Config config) {
+        if (!this.meta.hasAnyDeclaredProperties()) {
+            return convertFrom(config);
+        }
         try {
             T configuration = this.meta.newInstance();
             mapTo(config, configuration);
@@ -66,7 +69,11 @@ public class ConfigMapper<T extends Object> {
         }
     }
 
-    private final static Map<Class<?>, ConfigMapper<?>> CACHE = new HashMap<>();
+    public T convertFrom(Config config) {
+        return new ObjectMapper().convertValue(config.root().unwrapped(), this.meta.getConfigClass());
+    }
+
+    private static final Map<Class<?>, ConfigMapper<?>> CACHE = new HashMap<>();
 
     public static <T> ConfigMapper<T> typeOf(Class<T> clazz) {
         synchronized (ConfigMapper.class) {
