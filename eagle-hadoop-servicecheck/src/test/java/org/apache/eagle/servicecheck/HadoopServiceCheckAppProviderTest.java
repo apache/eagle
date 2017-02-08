@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.healthcheck;
+package org.apache.eagle.servicecheck;
 
 
 import com.google.inject.Inject;

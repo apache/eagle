@@ -14,21 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.healthcheck;
+package org.apache.eagle.app.config;
 
 
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.app.config.ConfigMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class HadoopServiceCheckConfigTest {
+public class ConfigBuilderTest {
     @Test
-    public void testHadoopServiceCheckConfigMapper() {
-        HadoopServiceCheckConfig config = ConfigMapper.typeOf(HadoopServiceCheckConfig.class).convertFrom(ConfigFactory.load().getConfig("application.serviceCheck"));
+    public void testConfigMapper() {
+        MockDataSinkConfig config = ConfigBuilder.typeOf(MockDataSinkConfig.class).mapFrom(ConfigFactory.load());
         Assert.assertNotNull(config);
-        Assert.assertEquals(5, config.getDurationInSec());
-        Assert.assertNotNull(config.getHbaseCheckConfig());
-        Assert.assertNotNull(config.getHdfsCheckConfig());
+        Assert.assertEquals("test_topic", config.getTopic());
+        Assert.assertEquals("sandbox.hortonworks.com:6667", config.getBrokerList());
+        Assert.assertEquals("kafka.serializer.StringEncoder", config.getSerializerClass());
+        Assert.assertEquals("kafka.serializer.StringEncoder", config.getKeySerializerClass());
+        Assert.assertNull(config.getNotExistField());
+        Assert.assertEquals("org.apache.eagle.metadata.service.memory.MemoryMetadataStore", config.getMetadata().getStore());
     }
 }

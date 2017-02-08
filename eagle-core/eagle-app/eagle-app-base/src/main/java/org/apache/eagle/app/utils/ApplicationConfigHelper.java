@@ -23,7 +23,7 @@ import java.util.Map;
 
 //public class ApplicationConfigHelper {
 //    private static final ObjectMapper mapper = new ObjectMapper();
-//    public static <Conf extends Configuration> Conf convertFrom(Map<String,Object> configMap, Class<Conf> confClass){
+//    public static <Conf extends Configuration> Conf bindWith(Map<String,Object> configMap, Class<Conf> confClass){
 //        return mapper.convertValue(configMap,confClass);
 //    }
 //

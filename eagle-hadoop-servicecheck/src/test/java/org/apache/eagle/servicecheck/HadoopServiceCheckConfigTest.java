@@ -14,13 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.healthcheck;
+package org.apache.eagle.servicecheck;
 
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
-public class HadoopServiceCheckAppProvider extends AbstractApplicationProvider<HadoopServiceCheckApp> {
-    @Override
-    public HadoopServiceCheckApp getApplication() {
-        return new HadoopServiceCheckApp();
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.app.config.ConfigBuilder;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class HadoopServiceCheckConfigTest {
+    @Test
+    public void testHadoopServiceCheckConfigMapper() {
+        HadoopServiceCheckConfig config = ConfigBuilder
+            .typeOf(HadoopServiceCheckConfig.class)
+            .bindWith(ConfigFactory.load().getConfig("application.serviceCheck"));
+        Assert.assertNotNull(config);
+        Assert.assertEquals(5, config.getDurationInSec());
+        Assert.assertNotNull(config.getHbaseCheckConfig());
+        Assert.assertNotNull(config.getHdfsCheckConfig());
     }
 }

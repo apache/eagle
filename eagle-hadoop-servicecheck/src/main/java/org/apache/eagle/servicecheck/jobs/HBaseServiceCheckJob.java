@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.healthcheck.jobs;
+package org.apache.eagle.servicecheck.jobs;
 
 import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
 import org.quartz.Job;

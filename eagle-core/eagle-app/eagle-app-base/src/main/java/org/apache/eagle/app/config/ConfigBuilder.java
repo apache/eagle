@@ -26,10 +26,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConfigMapper<T extends Object> {
+public class ConfigBuilder<T extends Object> {
     private final ApplicationConfigMeta<T> meta;
 
-    private ConfigMapper(Class<T> configurationClass) {
+    private ConfigBuilder(Class<T> configurationClass) {
         this.meta = new ApplicationConfigMeta<>(configurationClass);
     }
 
@@ -58,7 +58,7 @@ public class ConfigMapper<T extends Object> {
 
     public T mapFrom(Config config) {
         if (!this.meta.hasAnyDeclaredProperties()) {
-            return convertFrom(config);
+            return bindWith(config);
         }
         try {
             T configuration = this.meta.newInstance();
@@ -69,20 +69,20 @@ public class ConfigMapper<T extends Object> {
         }
     }
 
-    public T convertFrom(Config config) {
+    public T bindWith(Config config) {
         return new ObjectMapper().convertValue(config.root().unwrapped(), this.meta.getConfigClass());
     }
 
-    private static final Map<Class<?>, ConfigMapper<?>> CACHE = new HashMap<>();
+    private static final Map<Class<?>, ConfigBuilder<?>> CACHE = new HashMap<>();
 
-    public static <T> ConfigMapper<T> typeOf(Class<T> clazz) {
-        synchronized (ConfigMapper.class) {
+    public static <T> ConfigBuilder<T> typeOf(Class<T> clazz) {
+        synchronized (ConfigBuilder.class) {
             if (!CACHE.containsKey(clazz)) {
-                ConfigMapper<T> mapper = new ConfigMapper<>(clazz);
+                ConfigBuilder<T> mapper = new ConfigBuilder<>(clazz);
                 CACHE.put(clazz, mapper);
                 return mapper;
             } else {
-                return (ConfigMapper<T>) CACHE.get(clazz);
+                return (ConfigBuilder<T>) CACHE.get(clazz);
             }
         }
     }

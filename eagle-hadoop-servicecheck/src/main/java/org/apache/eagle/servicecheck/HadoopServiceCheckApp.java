@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.healthcheck;
+package org.apache.eagle.servicecheck;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.ScheduledApplication;
 import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.ScheduledPlan;
-import org.apache.eagle.healthcheck.jobs.HBaseServiceCheckJob;
+import org.apache.eagle.servicecheck.jobs.HBaseServiceCheckJob;
 import org.quartz.*;
 
 public class HadoopServiceCheckApp extends ScheduledApplication {

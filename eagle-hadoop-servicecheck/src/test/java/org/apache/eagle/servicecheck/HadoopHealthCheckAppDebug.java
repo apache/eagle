@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.healthcheck.jobs;
+package org.apache.eagle.servicecheck;
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-
-public class HDFSServiceCheckJob implements Job {
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-
+public class HadoopHealthCheckAppDebug {
+    public static void main(String[] args) {
+        new HadoopServiceCheckApp().run(args);
     }
 }
