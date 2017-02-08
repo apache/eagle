@@ -14,21 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.impl;
+package org.apache.eagle.app;
 
-import org.apache.eagle.app.StaticApplication;
+import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
+import org.apache.eagle.app.environment.impl.ScheduledPlan;
 
-/**
- * Web Application Container.
- */
-public class StaticApplicationExecutor {
-    private final StaticApplication webApplication;
-
-    public StaticApplicationExecutor(StaticApplication webApplication) {
-        this.webApplication = webApplication;
-    }
-
-    public StaticApplication getWebApplication() {
-        return webApplication;
+public abstract class ScheduledApplication extends ExecutableApplication<ScheduledEnvironment, ScheduledPlan> {
+    @Override
+    public Class<? extends ScheduledEnvironment> getEnvironmentType() {
+        return ScheduledEnvironment.class;
     }
 }

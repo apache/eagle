@@ -14,21 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.impl;
+package org.apache.eagle.healthcheck;
 
-import org.apache.eagle.app.StaticApplication;
-
-/**
- * Web Application Container.
- */
-public class StaticApplicationExecutor {
-    private final StaticApplication webApplication;
-
-    public StaticApplicationExecutor(StaticApplication webApplication) {
-        this.webApplication = webApplication;
-    }
-
-    public StaticApplication getWebApplication() {
-        return webApplication;
+public class HadoopHealthCheckAppDebug {
+    public static void main(String[] args) {
+        new HadoopHealthCheckApp().run(args);
     }
 }

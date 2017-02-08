@@ -74,7 +74,7 @@ public class ApplicationAction implements Serializable {
         Preconditions.checkNotNull(metadata, "ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(), serverConfig);
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntimeSingleton(application.getEnvironmentType(), serverConfig);
         Map<String, Object> executionConfig = new HashMap<>(metadata.getConfiguration());
         if (executionConfig == null) {
             executionConfig = Collections.emptyMap();

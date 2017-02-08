@@ -16,19 +16,14 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import org.apache.eagle.app.StaticApplication;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.spi.JobFactory;
 
-/**
- * Web Application Container.
- */
-public class StaticApplicationExecutor {
-    private final StaticApplication webApplication;
+public interface ScheduledPlan {
+    void schedule(Scheduler scheduler, String appId) throws SchedulerException;
 
-    public StaticApplicationExecutor(StaticApplication webApplication) {
-        this.webApplication = webApplication;
-    }
+    boolean unschedule(Scheduler scheduler, String appId) throws SchedulerException;
 
-    public StaticApplication getWebApplication() {
-        return webApplication;
-    }
+    boolean scheduling(Scheduler scheduler, String appId) throws SchedulerException;
 }

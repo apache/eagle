@@ -180,7 +180,7 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>jobType</name>
+                    <name>jobGroup</name>
                     <type>string</type>
                 </column>
                 <column>
@@ -235,7 +235,7 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>jobType</name>
+                    <name>jobGroup</name>
                     <type>string</type>
                 </column>
                 <column>

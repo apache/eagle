@@ -14,21 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.impl;
+package org.apache.eagle.healthcheck.jobs;
 
-import org.apache.eagle.app.StaticApplication;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Web Application Container.
- */
-public class StaticApplicationExecutor {
-    private final StaticApplication webApplication;
+public class HBaseHealthCheckJob implements Job {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HBaseHealthCheckJob.class);
 
-    public StaticApplicationExecutor(StaticApplication webApplication) {
-        this.webApplication = webApplication;
-    }
-
-    public StaticApplication getWebApplication() {
-        return webApplication;
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        LOGGER.info("#### Executing ....");
     }
 }

@@ -207,7 +207,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
                 Config effectiveConfig = ConfigFactory.parseMap(new HashMap<>(entity.getConfiguration()))
                     .withFallback(config).withFallback(ConfigFactory.parseMap(entity.getContext()));
 
-                ExecutionRuntime runtime = ExecutionRuntimeManager.getInstance().getRuntime(
+                ExecutionRuntime runtime = ExecutionRuntimeManager.getInstance().getRuntimeSingleton(
                     applicationProviderService.getApplicationProviderByType(entity.getDescriptor().getType()).getApplication().getEnvironmentType(), config);
                 StreamSinkConfig streamSinkConfig = runtime.environment()
                     .stream().getSinkConfig(StreamIdConversions.parseStreamTypeId(copied.getSiteId(), copied.getStreamId()), effectiveConfig);

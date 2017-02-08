@@ -40,10 +40,11 @@ public class ExecutionRuntimeManager {
         getInstance().register(StormEnvironment.class, new StormExecutionRuntime.Provider());
         getInstance().register(SparkEnvironment.class, new SparkExecutionRuntime.Provider());
         getInstance().register(StaticEnvironment.class, new StaticExecutionRuntime.Provider());
+        getInstance().register(ScheduledEnvironment.class, new ScheduledExecutionRuntime.Provider());
     }
 
     private final Map<Class<? extends Environment>, ExecutionRuntimeProvider> executionRuntimeProviders;
-    private final Map<Environment, ExecutionRuntime> executionRuntimeCache;
+    private final Map<Class<? extends Environment>, ExecutionRuntime> executionRuntimeCache;
 
     private ExecutionRuntimeManager() {
         executionRuntimeProviders = new HashMap<>();
@@ -54,16 +55,15 @@ public class ExecutionRuntimeManager {
         return INSTANCE;
     }
 
-    public <E extends Environment, P> ExecutionRuntime getRuntime(E environment) {
+    public <E extends Environment, P> ExecutionRuntime getRuntimeSingleton(E environment) {
         Preconditions.checkNotNull(environment, "Failed to create execution runtime as environment is null");
-        if (executionRuntimeCache.containsKey(environment)) {
-            return executionRuntimeCache.get(environment);
+        if (executionRuntimeCache.containsKey(environment.getClass())) {
+            return executionRuntimeCache.get(environment.getClass());
         }
-
         if (executionRuntimeProviders.containsKey(environment.getClass())) {
             ExecutionRuntime<E, P> runtime = ((ExecutionRuntimeProvider<E, P>) executionRuntimeProviders.get(environment.getClass())).get();
             runtime.prepare(environment);
-            executionRuntimeCache.put(environment, runtime);
+            executionRuntimeCache.put(environment.getClass(), runtime);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Created new execution runtime {} for environment: {}", runtime, environment);
             }
@@ -74,10 +74,13 @@ public class ExecutionRuntimeManager {
         }
     }
 
-    public <E extends Environment> ExecutionRuntime getRuntime(Class<E> environmentClass, Config config) {
+    public <E extends Environment> ExecutionRuntime getRuntimeSingleton(Class<E> environmentClass, Config config) {
         try {
+            if (executionRuntimeCache.containsKey(environmentClass)) {
+                return executionRuntimeCache.get(environmentClass);
+            }
             E environment = environmentClass.getConstructor(Config.class).newInstance(config);
-            return getRuntime(environment);
+            return getRuntimeSingleton(environment);
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             LOGGER.error("Failed to create environment instance of type: " + environmentClass, e);
             throw new RuntimeException("Failed to create environment instance of type: " + environmentClass, e);

@@ -48,7 +48,8 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     private final Config config;
     private final ApplicationHealthCheckService applicationHealthCheckService;
 
-    @Inject private Injector currentInjector;
+    @Inject
+    private Injector currentInjector;
 
     @Inject
     public ApplicationManagementServiceImpl(
@@ -94,8 +95,10 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
         if (applicationDesc.getConfiguration() != null) {
             List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
-            for (Property p : propertyList) {
-                appConfig.put(p.getName(), p.getValue());
+            if (propertyList != null) {
+                for (Property p : propertyList) {
+                    appConfig.put(p.getName(), p.getValue());
+                }
             }
             if (operation.getConfiguration() != null) {
                 appConfig.putAll(operation.getConfiguration());
@@ -118,7 +121,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationHealthCheckService.register(applicationEntity);
 
         // UpdateMetadata
-        ApplicationEntity result =  applicationEntityService.create(applicationEntity);
+        ApplicationEntity result = applicationEntityService.create(applicationEntity);
 
         // AfterInstall Callback
         applicationProvider.getApplicationListener().ifPresent((listener) -> {
@@ -244,7 +247,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     }
 
     @Override
-    public ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation)  {
+    public ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation) {
         try {
             ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
             Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();

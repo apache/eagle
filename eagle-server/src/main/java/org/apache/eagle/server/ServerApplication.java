@@ -30,6 +30,8 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.app.environment.ExecutionRuntimeManager;
+import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
@@ -40,6 +42,7 @@ import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
 import org.apache.eagle.server.task.ManagedService;
 import org.apache.eagle.server.module.GuiceBundleLoader;
+import org.apache.eagle.server.task.ScheduledEnvLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,5 +144,9 @@ class ServerApplication extends Application<ServerConfig> {
                 LOG.info("Registered {} services for {}", services.size(), applicationProvider.getApplicationDesc().getType());
             }));
         }
+
+        // Register ScheduledEnvironment lifecycle
+        environment.lifecycle().manage(new ScheduledEnvLifecycle(
+            (ScheduledEnvironment) ExecutionRuntimeManager.getInstance().getRuntimeSingleton(ScheduledEnvironment.class,config).environment()));
     }
 }

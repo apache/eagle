@@ -14,21 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.impl;
+package org.apache.eagle.server.task;
 
-import org.apache.eagle.app.StaticApplication;
+import io.dropwizard.lifecycle.Managed;
+import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 
-/**
- * Web Application Container.
- */
-public class StaticApplicationExecutor {
-    private final StaticApplication webApplication;
+public class ScheduledEnvLifecycle implements Managed {
+    private final ScheduledEnvironment environment;
 
-    public StaticApplicationExecutor(StaticApplication webApplication) {
-        this.webApplication = webApplication;
+    public ScheduledEnvLifecycle(ScheduledEnvironment environment) {
+        this.environment = environment;
     }
 
-    public StaticApplication getWebApplication() {
-        return webApplication;
+    @Override
+    public void start() throws Exception {
+        this.environment.start();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        this.environment.stop();
     }
 }

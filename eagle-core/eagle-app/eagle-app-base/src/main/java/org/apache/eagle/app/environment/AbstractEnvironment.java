@@ -34,6 +34,7 @@ public abstract class AbstractEnvironment implements Environment {
     public AbstractEnvironment(Config config) {
         this.config = config;
         this.streamProvider = loadStreamProvider();
+        LOGGER.info("Initializing application environment {}", this);
     }
 
     private StreamProvider loadStreamProvider() {

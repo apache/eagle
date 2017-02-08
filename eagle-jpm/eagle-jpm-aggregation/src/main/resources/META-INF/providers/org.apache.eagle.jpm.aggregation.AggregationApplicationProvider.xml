@@ -62,7 +62,7 @@
             <name>aggregate.counters.groupBys</name>
             <displayName>Group By Columns For Each Metrics, Each Group Split By ;</displayName>
             <description>group by columns for each metrics, if has many groups, each group split by ;</description>
-            <value>site, jobType; site, user; site</value>
+            <value>site, jobGroup; site, user; site</value>
             <required>true</required>
         </property>
     </configuration>
