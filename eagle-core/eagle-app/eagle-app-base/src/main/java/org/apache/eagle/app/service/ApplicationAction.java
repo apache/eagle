@@ -89,13 +89,13 @@ public class ApplicationAction implements Serializable {
 
         if (serverConfig.hasPath(AlertConstants.COORDINATOR)) {
             this.effectiveConfig = ConfigFactory.parseMap(executionConfig)
-                    .withFallback(serverConfig)
                     .withFallback(ConfigFactory.parseMap(metadata.getContext()))
+                    .withFallback(serverConfig)
                     .withFallback(serverConfig.getConfig(AlertConstants.COORDINATOR));
         } else {
             this.effectiveConfig = ConfigFactory.parseMap(executionConfig)
-                    .withFallback(serverConfig)
-                    .withFallback(ConfigFactory.parseMap(metadata.getContext()));
+                    .withFallback(ConfigFactory.parseMap(metadata.getContext()))
+                    .withFallback(serverConfig);
         }
         this.alertMetadataService = alertMetadataService;
     }
