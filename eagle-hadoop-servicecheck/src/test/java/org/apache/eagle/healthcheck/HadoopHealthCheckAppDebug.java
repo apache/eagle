@@ -18,6 +18,6 @@ package org.apache.eagle.healthcheck;
 
 public class HadoopHealthCheckAppDebug {
     public static void main(String[] args) {
-        new HadoopHealthCheckApp().run(args);
+        new HadoopServiceCheckApp().run(args);
     }
 }

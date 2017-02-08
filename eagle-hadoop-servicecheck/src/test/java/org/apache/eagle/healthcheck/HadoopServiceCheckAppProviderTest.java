@@ -32,7 +32,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HadoopHealthCheckAppProviderTest extends ApplicationTestBase {
+public class HadoopServiceCheckAppProviderTest extends ApplicationTestBase {
 
     @Inject
     private SiteResource siteResource;

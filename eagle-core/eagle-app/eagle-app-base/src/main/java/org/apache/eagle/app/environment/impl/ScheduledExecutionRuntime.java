@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
@@ -44,11 +43,9 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
 
     @Override
     public void start(Application<ScheduledEnvironment, ScheduledPlan> executor, Config config) {
-        String appId = config.getString("appId");
-        Preconditions.checkNotNull(appId, "[appId] is required by null for " + executor.getClass().getCanonicalName());
         ScheduledPlan scheduledPlan = executor.execute(config, this.environment);
         try {
-            scheduledPlan.schedule(this.environment.getScheduler(), appId);
+            scheduledPlan.schedule();
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage(),e);
         }
@@ -56,11 +53,9 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
 
     @Override
     public void stop(Application<ScheduledEnvironment, ScheduledPlan> executor, Config config) {
-        String appId = config.getString("appId");
-        Preconditions.checkNotNull(appId, "[appId] is required by null for " + executor.getClass().getCanonicalName());
         ScheduledPlan scheduledPlan = executor.execute(config, this.environment);
         try {
-            scheduledPlan.unschedule(this.environment.getScheduler(), appId);
+            scheduledPlan.unschedule();
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage(),e);
         }
@@ -68,11 +63,9 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
 
     @Override
     public ApplicationEntity.Status status(Application<ScheduledEnvironment, ScheduledPlan> executor, Config config) {
-        String appId = config.getString("appId");
-        Preconditions.checkNotNull(appId, "[appId] is required by null for " + executor.getClass().getCanonicalName());
         ScheduledPlan scheduledPlan = executor.execute(config, this.environment);
         try {
-            if (scheduledPlan.scheduling(this.environment.getScheduler(), appId)) {
+            if (scheduledPlan.scheduling()) {
                 return ApplicationEntity.Status.RUNNING;
             } else {
                 return ApplicationEntity.Status.STOPPED;

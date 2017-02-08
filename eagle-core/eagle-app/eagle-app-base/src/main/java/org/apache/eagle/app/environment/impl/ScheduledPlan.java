@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.spi.JobFactory;
 
 public interface ScheduledPlan {
-    void schedule(Scheduler scheduler, String appId) throws SchedulerException;
+    String getAppId();
 
-    boolean unschedule(Scheduler scheduler, String appId) throws SchedulerException;
+    void schedule() throws SchedulerException;
 
-    boolean scheduling(Scheduler scheduler, String appId) throws SchedulerException;
+    boolean unschedule() throws SchedulerException;
+
+    boolean scheduling() throws SchedulerException;
 }

@@ -37,7 +37,7 @@ public class ScheduledEnvironment extends AbstractEnvironment {
         this.start();
     }
 
-    public Scheduler getScheduler() {
+    public Scheduler scheduler() {
         return scheduler;
     }
 

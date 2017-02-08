@@ -55,6 +55,6 @@ public class ServerResource {
     @Path("/jobs")
     @Produces( {"application/json"})
     public List<JobExecutionContext> getScheduledJobs() throws SchedulerException {
-        return scheduledEnvironment.getScheduler().getCurrentlyExecutingJobs();
+        return scheduledEnvironment.scheduler().getCurrentlyExecutingJobs();
     }
 }
