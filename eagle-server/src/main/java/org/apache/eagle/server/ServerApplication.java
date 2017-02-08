@@ -32,6 +32,7 @@ import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
+import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
 import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
@@ -146,7 +147,7 @@ class ServerApplication extends Application<ServerConfig> {
         }
 
         // Register ScheduledEnvironment lifecycle
-        environment.lifecycle().manage(new ScheduledEnvLifecycle(
-            (ScheduledEnvironment) ExecutionRuntimeManager.getInstance().getRuntimeSingleton(ScheduledEnvironment.class,config).environment()));
+        ScheduledExecutionRuntime scheduledRuntime = (ScheduledExecutionRuntime) ExecutionRuntimeManager.getInstance().getRuntimeSingleton(ScheduledEnvironment.class,config);
+        environment.lifecycle().manage(new ScheduledEnvLifecycle(scheduledRuntime.environment()));
     }
 }

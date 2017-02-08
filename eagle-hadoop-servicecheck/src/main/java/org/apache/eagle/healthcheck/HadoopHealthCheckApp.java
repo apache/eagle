@@ -24,22 +24,21 @@ import org.apache.eagle.healthcheck.jobs.HBaseHealthCheckJob;
 import org.quartz.*;
 
 public class HadoopHealthCheckApp extends ScheduledApplication {
-    private static final String HBASE_HEALTHCHECK_JOB_NAME = "HBASE_HEALTHCHECK_JOB";
-    private static final String HBASE_HEALTHCHECK_JOB_TRIGGER_NAME = "HBASE_HEALTHCHECK_JOB_TRIGGER";
+    private static final String HBASE_SERVICE_CHECK_JOB_NAME = "HBASE_SERVICE_CHECK_JOB";
+    private static final String HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME = "HBASE_SERVICE_CHECK_JOB_TRIGGER";
 
     @Override
     public ScheduledPlan execute(Config config, ScheduledEnvironment environment) {
         return new ScheduledPlan() {
-
             @Override
             public void schedule(Scheduler scheduler, String appId) throws SchedulerException {
                 JobDetail hbaseHealthCheckJob = JobBuilder
                     .newJob(HBaseHealthCheckJob.class)
-                    .withIdentity(JobKey.jobKey(HBASE_HEALTHCHECK_JOB_NAME, appId))
+                    .withIdentity(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME, appId))
                     .build();
                 Trigger hbaseHealthCheckJobTrigger = TriggerBuilder
                     .newTrigger()
-                    .withIdentity(TriggerKey.triggerKey(HBASE_HEALTHCHECK_JOB_TRIGGER_NAME, appId))
+                    .withIdentity(TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME, appId))
                     .startNow()
                     .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10))
                     .build();
@@ -48,13 +47,13 @@ public class HadoopHealthCheckApp extends ScheduledApplication {
 
             @Override
             public boolean unschedule(Scheduler scheduler, String appId) throws SchedulerException {
-                return scheduler.unscheduleJob(TriggerKey.triggerKey(HBASE_HEALTHCHECK_JOB_TRIGGER_NAME, appId))
-                    && scheduler.deleteJob(JobKey.jobKey(HBASE_HEALTHCHECK_JOB_NAME, appId));
+                return scheduler.unscheduleJob(TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME, appId))
+                    && scheduler.deleteJob(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME, appId));
             }
 
             @Override
             public boolean scheduling(Scheduler scheduler, String appId) throws SchedulerException {
-                return scheduler.checkExists(JobKey.jobKey(HBASE_HEALTHCHECK_JOB_NAME, appId));
+                return scheduler.checkExists(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME, appId));
             }
         };
     }

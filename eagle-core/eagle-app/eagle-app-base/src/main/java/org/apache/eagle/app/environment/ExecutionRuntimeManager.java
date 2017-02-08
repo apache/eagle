@@ -16,9 +16,19 @@
  */
 package org.apache.eagle.app.environment;
 
+import com.google.inject.*;
+import com.google.inject.util.Providers;
 import org.apache.eagle.app.environment.impl.*;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
+import org.apache.eagle.app.service.ApplicationHealthCheckService;
+import org.apache.eagle.app.service.ApplicationManagementService;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.service.impl.ApplicationHealthCheckServiceImpl;
+import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
+import org.apache.eagle.app.service.impl.ApplicationStatusUpdateServiceImpl;
+import org.apache.eagle.metadata.service.ApplicationDescService;
+import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +63,10 @@ public class ExecutionRuntimeManager {
 
     public static ExecutionRuntimeManager getInstance() {
         return INSTANCE;
+    }
+
+    public Module getInjectModule() {
+        throw new RuntimeException("Not IMPL");
     }
 
     public <E extends Environment, P> ExecutionRuntime getRuntimeSingleton(E environment) {
@@ -92,5 +106,6 @@ public class ExecutionRuntimeManager {
             throw new IllegalStateException("Duplicated application type registered: " + appSuperClass.getCanonicalName());
         }
         executionRuntimeProviders.put(appSuperClass, executionRuntimeProvider);
+
     }
 }

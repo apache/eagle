@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.app.environment;
 
-public interface ExecutionRuntimeProvider<E extends Environment, P> {
-    ExecutionRuntime<E, P> get();
+import com.google.inject.Provider;
+
+public interface ExecutionRuntimeProvider<E extends Environment, P> extends Provider<ExecutionRuntime<E, P>> {
+
 }

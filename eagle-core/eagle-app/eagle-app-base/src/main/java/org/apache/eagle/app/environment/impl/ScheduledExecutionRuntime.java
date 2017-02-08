@@ -83,6 +83,7 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
         return ApplicationEntity.Status.UNKNOWN;
     }
 
+    @Singleton
     public static class Provider implements ExecutionRuntimeProvider<ScheduledEnvironment,ScheduledPlan> {
         @Override
         public ExecutionRuntime<ScheduledEnvironment, ScheduledPlan> get() {
