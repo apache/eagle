@@ -324,6 +324,22 @@ var app = {};
 			});
 
 			// ================================ Function ================================
+			// Get parent side bar navigation item class by submenu
+			$scope.getPNavClass = function (subportals) {
+				var classname = "";
+				if (typeof subportals === 'undefined') {
+					return "";
+				}
+				$.each(subportals, function (i) {
+					if (classname === "active") {
+						return;
+					}
+					classname = $scope.getNavClass(subportals[i]);
+				});
+				return classname;
+
+			};
+
 			// Get side bar navigation item class
 			$scope.getNavClass = function (portal) {
 				var path = (portal.path || "").replace(/^#/, '');
