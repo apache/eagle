@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvironment, ScheduledPlan>, Managed {
+public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvironment, SchedulingPlan>, Managed {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledExecutionRuntime.class);
     private ScheduledEnvironment environment;
 
@@ -46,10 +46,10 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
     }
 
     @Override
-    public void start(Application<ScheduledEnvironment, ScheduledPlan> executor, Config config) {
-        ScheduledPlan scheduledPlan = executor.execute(config, this.environment);
+    public void start(Application<ScheduledEnvironment, SchedulingPlan> executor, Config config) {
+        SchedulingPlan schedulingPlan = executor.execute(config, this.environment);
         try {
-            scheduledPlan.schedule();
+            schedulingPlan.schedule();
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -88,10 +88,10 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
     }
 
     @Override
-    public void stop(Application<ScheduledEnvironment, ScheduledPlan> executor, Config config) {
-        ScheduledPlan scheduledPlan = executor.execute(config, this.environment);
+    public void stop(Application<ScheduledEnvironment, SchedulingPlan> executor, Config config) {
+        SchedulingPlan schedulingPlan = executor.execute(config, this.environment);
         try {
-            scheduledPlan.unschedule();
+            schedulingPlan.unschedule();
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -108,10 +108,10 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
     }
 
     @Override
-    public ApplicationEntity.Status status(Application<ScheduledEnvironment, ScheduledPlan> executor, Config config) {
-        ScheduledPlan scheduledPlan = executor.execute(config, this.environment);
+    public ApplicationEntity.Status status(Application<ScheduledEnvironment, SchedulingPlan> executor, Config config) {
+        SchedulingPlan schedulingPlan = executor.execute(config, this.environment);
         try {
-            if (scheduledPlan.scheduling()) {
+            if (schedulingPlan.scheduling()) {
                 return ApplicationEntity.Status.RUNNING;
             } else {
                 return ApplicationEntity.Status.STOPPED;
@@ -123,9 +123,9 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
     }
 
     @Singleton
-    public static class Provider implements ExecutionRuntimeProvider<ScheduledEnvironment, ScheduledPlan> {
+    public static class Provider implements ExecutionRuntimeProvider<ScheduledEnvironment, SchedulingPlan> {
         @Override
-        public ExecutionRuntime<ScheduledEnvironment, ScheduledPlan> get() {
+        public ExecutionRuntime<ScheduledEnvironment, SchedulingPlan> get() {
             return new ScheduledExecutionRuntime();
         }
     }

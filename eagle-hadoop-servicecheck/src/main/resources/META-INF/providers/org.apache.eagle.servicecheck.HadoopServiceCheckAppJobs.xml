@@ -21,31 +21,27 @@
                      version="1.8">
     <schedule>
         <job>
-            <name>HBASE_SERVICE_CHECK_JOB_${appId}</name>
+            <name>HBASE_SERVICE_CHECK_JOB_$config.getString("appId")</name>
             <group>HEALTH_CHECK_JOBS</group>
             <description>The job description</description>
             <job-class>org.apache.eagle.servicecheck.jobs.HBaseServiceCheckJob</job-class>
             <job-data-map allows-transient-data="false">
                 <entry>
-                    <key>burger-type</key>
-                    <value>hotdog</value>
+                    <key>appId</key>
+                    <value>$config.getString("appId")</value>
                 </entry>
                 <entry>
-                    <key>dressing-list</key>
-                    <value>ketchup,mayo</value>
+                    <key>connectionProps</key>
+                    <value>$config.getString("serviceCheck.hbaseCheckConfig.connectionProps")</value>
                 </entry>
             </job-data-map>
         </job>
         <trigger>
-            <cron>
-                <name>my-trigger</name>
-                <group>MYTRIGGER_GROUP</group>
-                <job-name>my-very-clever-job</job-name>
-                <job-group>MYJOB_GROUP</job-group>
-                <!-- trigger every night at 4:30 am -->
-                <!-- do not forget to light the kitchen's light -->
-                <cron-expression>0 30 4 * * ?</cron-expression>
-            </cron>
+            <simple>
+                <name>HBASE_SERVICE_CHECK_JOB_TRIGGER_$config.getString("appId")</name>
+                <group>HEALTH_CHECK_JOBS</group>
+                <job-name>HBASE_SERVICE_CHECK_JOB_$config.getString("appId")</job-name>
+            </simple>
         </trigger>
     </schedule>
 </job-scheduling-data>

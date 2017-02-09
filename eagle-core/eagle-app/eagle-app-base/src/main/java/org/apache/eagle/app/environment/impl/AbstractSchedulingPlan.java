@@ -23,7 +23,7 @@ import org.quartz.*;
 import java.util.Date;
 import java.util.Map;
 
-public abstract class AbstractScheduledPlan implements ScheduledPlan {
+public abstract class AbstractSchedulingPlan implements SchedulingPlan {
     private static final String APP_CONFIG_KEY = "appConfig";
     private static final String APP_ID_KEY = "appId";
 
@@ -31,7 +31,7 @@ public abstract class AbstractScheduledPlan implements ScheduledPlan {
     private final ScheduledEnvironment environment;
     private final Config config;
 
-    public AbstractScheduledPlan(Config config, ScheduledEnvironment environment) {
+    public AbstractSchedulingPlan(Config config, ScheduledEnvironment environment) {
         this.appId = config.getString("appId");
         Preconditions.checkNotNull(appId, "[appId] is null");
         this.environment = environment;

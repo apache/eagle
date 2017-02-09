@@ -18,13 +18,11 @@ package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
-import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
-import org.apache.eagle.app.environment.impl.ScheduledPlan;
-import org.quartz.SchedulerException;
+import org.apache.eagle.app.environment.impl.SchedulingPlan;
 
-public abstract class ScheduledApplication extends ExecutableApplication<ScheduledEnvironment, ScheduledPlan> {
+public abstract class ScheduledApplication extends ExecutableApplication<ScheduledEnvironment, SchedulingPlan> {
     @Override
     public Class<? extends ScheduledEnvironment> getEnvironmentType() {
         return ScheduledEnvironment.class;

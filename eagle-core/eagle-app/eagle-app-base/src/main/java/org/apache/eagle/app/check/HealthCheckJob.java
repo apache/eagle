@@ -25,10 +25,6 @@ import org.slf4j.LoggerFactory;
 public abstract class HealthCheckJob implements Job {
     public static final String HEALTH_CHECK_JOBS_GROUP = "HEALTH_CHECK_JOBS";
 
-    public static final String ENABLED_FIELD = "enabled";
-    public static final String TIMEOUT_SEC_FIELD = "timeoutSec";
-    public static final int DEFAULT_TIMEOUT_SEC = 60;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthCheckJob.class);
 
     @Override

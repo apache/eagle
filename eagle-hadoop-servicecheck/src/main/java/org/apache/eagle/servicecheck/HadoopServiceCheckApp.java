@@ -19,9 +19,9 @@ package org.apache.eagle.servicecheck;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.ScheduledApplication;
 import org.apache.eagle.app.check.HealthCheckJob;
-import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
+import org.apache.eagle.app.environment.impl.AbstractSchedulingPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
-import org.apache.eagle.app.environment.impl.ScheduledPlan;
+import org.apache.eagle.app.environment.impl.SchedulingPlan;
 import org.apache.eagle.servicecheck.jobs.HBaseHealthCheckJob;
 import org.quartz.*;
 
@@ -30,8 +30,8 @@ public class HadoopServiceCheckApp extends ScheduledApplication {
     private static final String HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME = "HBASE_SERVICE_CHECK_JOB_TRIGGER";
 
     @Override
-    public ScheduledPlan execute(Config config, ScheduledEnvironment environment) {
-        return new AbstractScheduledPlan(config, environment) {
+    public SchedulingPlan execute(Config config, ScheduledEnvironment environment) {
+        return new AbstractSchedulingPlan(config, environment) {
             @Override
             public void schedule() throws SchedulerException {
                 // Schedule Job: HBASE_SERVICE_CHECK_JOB

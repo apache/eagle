@@ -1,9 +1,9 @@
 package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
+import org.apache.eagle.app.environment.impl.AbstractSchedulingPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
-import org.apache.eagle.app.environment.impl.ScheduledPlan;
+import org.apache.eagle.app.environment.impl.SchedulingPlan;
 import org.quartz.SchedulerException;
 
 /**
@@ -17,12 +17,12 @@ public class XmlScheduledApplication extends ScheduledApplication {
     }
 
     @Override
-    public ScheduledPlan execute(Config config, ScheduledEnvironment environment) {
-         return new XmlScheduledPlan(schedulingXmlFile,config, environment);
+    public SchedulingPlan execute(Config config, ScheduledEnvironment environment) {
+         return new XmlSchedulingPlan(schedulingXmlFile,config, environment);
     }
 
-    private class XmlScheduledPlan extends AbstractScheduledPlan {
-        public XmlScheduledPlan(String schedulingXmlFile, Config config, ScheduledEnvironment environment) {
+    private class XmlSchedulingPlan extends AbstractSchedulingPlan {
+        public XmlSchedulingPlan(String schedulingXmlFile, Config config, ScheduledEnvironment environment) {
             super(config, environment);
             throw new RuntimeException("Just proposal, not implemented yet");
         }
