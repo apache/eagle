@@ -16,16 +16,16 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.quartz.*;
 
 import java.util.Date;
+import java.util.Map;
 
 public abstract class AbstractScheduledPlan implements ScheduledPlan {
     private static final String APP_CONFIG_KEY = "appConfig";
-    private static final String APP_ID_KEY = "appID";
+    private static final String APP_ID_KEY = "appId";
 
     private final String appId;
     private final ScheduledEnvironment environment;
@@ -43,11 +43,11 @@ public abstract class AbstractScheduledPlan implements ScheduledPlan {
         return this.appId;
     }
 
-    protected Date addJob(JobDetail jobDetail, Trigger trigger) throws SchedulerException {
+    protected Date scheduleJob(JobDetail jobDetail, Trigger trigger) throws SchedulerException {
         return this.environment.scheduler().scheduleJob(jobDetail, trigger);
     }
 
-    protected Date addJob(Trigger trigger) throws SchedulerException {
+    protected Date scheduleJob(Trigger trigger) throws SchedulerException {
         return this.environment.scheduler().scheduleJob(trigger);
     }
 
@@ -59,28 +59,26 @@ public abstract class AbstractScheduledPlan implements ScheduledPlan {
         return environment.scheduler().checkExists(jobKey);
     }
 
-    protected JobDataMap getDefaultJobDataMap() {
-        JobDataMap jobDataMap =  new JobDataMap();
+    protected Scheduler getScheduler() {
+        return environment.scheduler();
+    }
+
+    protected JobDataMap getJobDataMap() {
+        JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(APP_CONFIG_KEY, this.config);
         jobDataMap.put(APP_ID_KEY, this.getAppId());
         return jobDataMap;
     }
 
-    public static class JobConfig {
-        private final Config config;
-        private final String appId;
+    protected JobDataMap getJobDataMap(Map<String, Object> dataMap) {
+        JobDataMap jobDataMap = getJobDataMap();
+        jobDataMap.putAll(dataMap);
+        return jobDataMap;
+    }
 
-        public JobConfig(JobExecutionContext jobExecutionContext) {
-            this.config = (Config) jobExecutionContext.getMergedJobDataMap().get(AbstractScheduledPlan.APP_CONFIG_KEY);
-            this.appId = jobExecutionContext.getMergedJobDataMap().getString(AbstractScheduledPlan.APP_ID_KEY);
-        }
-
-        public Config getConfig() {
-            return config;
-        }
-
-        public String getAppId() {
-            return appId;
-        }
+    protected JobDataMap getJobDataMap(Config dataMap) {
+        JobDataMap jobDataMap = getJobDataMap();
+        jobDataMap.putAll(dataMap.root().unwrapped());
+        return jobDataMap;
     }
 }

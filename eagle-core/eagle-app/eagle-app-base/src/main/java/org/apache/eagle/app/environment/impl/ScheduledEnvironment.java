@@ -19,17 +19,14 @@ package org.apache.eagle.app.environment.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
-import io.dropwizard.lifecycle.Managed;
+import org.apache.eagle.app.check.HealthCheckJob;
+import org.apache.eagle.app.check.HealthCheckJobListener;
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 @Singleton
 public class ScheduledEnvironment extends AbstractEnvironment {
@@ -40,7 +37,14 @@ public class ScheduledEnvironment extends AbstractEnvironment {
     @Inject
     public ScheduledEnvironment(Config config) throws SchedulerException {
         super(config);
-        this.scheduler = new StdSchedulerFactory().getScheduler();
+        this.scheduler = initializeScheduler(config);
+    }
+
+    private static Scheduler initializeScheduler(Config config) throws SchedulerException {
+        Scheduler scheduler =  new StdSchedulerFactory().getScheduler();
+        scheduler.getListenerManager()
+            .addJobListener(new HealthCheckJobListener(config), GroupMatcher.groupContains(HealthCheckJob.HEALTH_CHECK_JOBS_GROUP));
+        return scheduler;
     }
 
     public Scheduler scheduler() {

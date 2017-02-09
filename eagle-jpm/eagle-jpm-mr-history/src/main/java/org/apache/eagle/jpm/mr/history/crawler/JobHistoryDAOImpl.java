@@ -111,7 +111,7 @@ public class JobHistoryDAOImpl extends AbstractJobHistoryDAO {
             // continue to execute
             return serialNumbers;
         } catch (Exception ex) {
-            LOG.error("fail reading serial numbers under one day " + dailyPath, ex);
+            LOG.error("critical reading serial numbers under one day " + dailyPath, ex);
             throw ex;
         }
         StringBuilder sb = new StringBuilder();

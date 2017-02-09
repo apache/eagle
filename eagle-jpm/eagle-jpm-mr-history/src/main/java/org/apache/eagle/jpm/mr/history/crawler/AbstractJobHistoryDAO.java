@@ -126,7 +126,7 @@ public abstract class AbstractJobHistoryDAO implements JobHistoryLCM {
             LOG.error("fail reading job history file", ex);
             throw ex;
         } catch (Throwable t) {
-            LOG.error("fail reading job history file", t);
+            LOG.error("critical reading job history file", t);
             throw new Exception(t);
         } finally {
             try {

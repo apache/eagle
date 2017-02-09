@@ -164,7 +164,7 @@
 
 				<div class="form-group">
 					<p class="text-muted">Severity</p>
-					<select class="form-control" ng-model="policy.alertDefinition.severity" ng-disabled="policyLock" >
+					<select class="form-control" ng-model="policy.alertDefinition.status" ng-disabled="policyLock" >
 						<option value="WARNING" class="text-{{Policy.getSeverityClass('WARNING')}}">WARNING</option>
 						<option value="CRITICAL" class="text-{{Policy.getSeverityClass('CRITICAL')}}">CRITICAL</option>
 						<option value="FATAL" class="text-{{Policy.getSeverityClass('FATAL')}}">FATAL</option>

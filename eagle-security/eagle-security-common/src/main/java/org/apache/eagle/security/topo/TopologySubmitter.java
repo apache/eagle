@@ -77,7 +77,7 @@ public class TopologySubmitter {
             try {
                 StormSubmitter.submitTopologyWithProgressBar(topologyId, stormConfig, topology);
             } catch(Exception ex) {
-                LOG.error("fail submitting topology {}", topology, ex);
+                LOG.error("critical submitting topology {}", topology, ex);
                 throw new IllegalStateException(ex);
             }
         }

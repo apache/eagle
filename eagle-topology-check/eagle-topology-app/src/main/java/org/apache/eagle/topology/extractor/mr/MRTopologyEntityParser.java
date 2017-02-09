@@ -99,7 +99,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 LOGGER.warn(e.getMessage(), e);
                 rmStatus = RESOURCE_MANAGER_INACTIVE_STATUS;
             } catch (Exception ex) {
-                LOGGER.error("fail to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
+                LOGGER.error("critical to parse url {} due to {}, and will cancel this parsing", url, ex.getMessage(), ex);
                 result.getSlaveNodes().clear();
             }
             resourceManagerEntity.setStatus(rmStatus);

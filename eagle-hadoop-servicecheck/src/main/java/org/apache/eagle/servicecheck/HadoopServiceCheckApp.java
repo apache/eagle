@@ -18,10 +18,11 @@ package org.apache.eagle.servicecheck;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.ScheduledApplication;
+import org.apache.eagle.app.check.HealthCheckJob;
 import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.ScheduledPlan;
-import org.apache.eagle.servicecheck.jobs.HBaseServiceCheckJob;
+import org.apache.eagle.servicecheck.jobs.HBaseHealthCheckJob;
 import org.quartz.*;
 
 public class HadoopServiceCheckApp extends ScheduledApplication {
@@ -30,25 +31,25 @@ public class HadoopServiceCheckApp extends ScheduledApplication {
 
     @Override
     public ScheduledPlan execute(Config config, ScheduledEnvironment environment) {
-        return new AbstractScheduledPlan(config,environment) {
+        return new AbstractScheduledPlan(config, environment) {
             @Override
             public void schedule() throws SchedulerException {
                 // Schedule Job: HBASE_SERVICE_CHECK_JOB
-                addJob(JobBuilder
-                    .newJob(HBaseServiceCheckJob.class)
-                    .withIdentity(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME, getAppId()))
-                    .build(),
-                    TriggerBuilder
-                    .newTrigger()
-                    .withIdentity(TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME, getAppId()))
-                    .usingJobData(getDefaultJobDataMap())
-                    .startNow()
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10)).build());
+                scheduleJob(JobBuilder.newJob(HBaseHealthCheckJob.class)
+                        .withIdentity(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME + "_" + getAppId(), HealthCheckJob.HEALTH_CHECK_JOBS_GROUP))
+                        .build(),
+                    TriggerBuilder.newTrigger()
+                        .withIdentity(TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME + "_" + getAppId(), HealthCheckJob.HEALTH_CHECK_JOBS_GROUP))
+                        .usingJobData(getJobDataMap(config.getConfig("serviceCheck.hbaseCheckConfig")))
+                        .startNow()
+                        .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(config.getInt("serviceCheck.hbaseCheckConfig.intervalSec"))).build()
+                );
             }
 
             @Override
             public boolean unschedule() throws SchedulerException {
-                return removeJob(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME, getAppId()),TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME, getAppId()));
+                return removeJob(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME + "_" + getAppId(), HealthCheckJob.HEALTH_CHECK_JOBS_GROUP),
+                    TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME + "_" + getAppId(), HealthCheckJob.HEALTH_CHECK_JOBS_GROUP));
             }
 
             @Override

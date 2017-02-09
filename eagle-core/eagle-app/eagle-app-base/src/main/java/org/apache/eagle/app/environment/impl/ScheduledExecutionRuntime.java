@@ -51,7 +51,17 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
         try {
             scheduledPlan.schedule();
         } catch (SchedulerException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void start() throws Exception {
+        if (!this.environment.scheduler().isStarted()) {
+            LOGGER.info("Starting scheduler {}", this.environment.scheduler().getSchedulerName());
+            this.environment.scheduler().start();
+        } else {
+            LOGGER.info("Scheduler {} already started", this.environment.scheduler().getSchedulerName());
         }
     }
 
@@ -71,7 +81,7 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
 
     public List<Trigger> getScheduledTriggers() throws SchedulerException {
         List<Trigger> triggers = new LinkedList<>();
-        for(JobDetail jobDetail: this.getScheduledJobs()) {
+        for (JobDetail jobDetail : this.getScheduledJobs()) {
             triggers.addAll(this.getScheduler().getTriggersOfJob(jobDetail.getKey()));
         }
         return triggers;
@@ -83,7 +93,17 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
         try {
             scheduledPlan.unschedule();
         } catch (SchedulerException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if (this.environment.scheduler().isShutdown()) {
+            LOGGER.info("Shutting down scheduler {}", this.environment.scheduler().getSchedulerName());
+            this.environment.scheduler().shutdown();
+        } else {
+            LOGGER.info("Scheduler {} already shutdown", this.environment.scheduler().getSchedulerName());
         }
     }
 
@@ -97,32 +117,13 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
                 return ApplicationEntity.Status.STOPPED;
             }
         } catch (SchedulerException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
         }
         return ApplicationEntity.Status.UNKNOWN;
     }
 
-    @Override
-    public void start() throws Exception {
-        if (!this.environment.scheduler().isStarted()) {
-            LOGGER.info("Starting scheduler {}", this.environment.scheduler().getSchedulerName());
-            this.environment.scheduler().start();
-        } else {
-            LOGGER.info("Scheduler {} already started", this.environment.scheduler().getSchedulerName());
-        }
-    }
-
-    @Override
-    public void stop() throws Exception {
-        if (this.environment.scheduler().isShutdown()) {
-            LOGGER.info("Shutting down scheduler {}", this.environment.scheduler().getSchedulerName());
-            this.environment.scheduler().shutdown();
-        } else {
-            LOGGER.info("Scheduler {} already stopped", this.environment.scheduler().getSchedulerName());
-        }
-    }
     @Singleton
-    public static class Provider implements ExecutionRuntimeProvider<ScheduledEnvironment,ScheduledPlan> {
+    public static class Provider implements ExecutionRuntimeProvider<ScheduledEnvironment, ScheduledPlan> {
         @Override
         public ExecutionRuntime<ScheduledEnvironment, ScheduledPlan> get() {
             return new ScheduledExecutionRuntime();

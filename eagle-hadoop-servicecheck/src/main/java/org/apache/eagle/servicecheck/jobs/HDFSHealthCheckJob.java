@@ -14,23 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.servicecheck;
+package org.apache.eagle.servicecheck.jobs;
 
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
-import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.app.config.ConfigBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+public class HDFSHealthCheckJob implements Job {
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
-public class HadoopServiceCheckConfigTest {
-    @Test
-    public void testHadoopServiceCheckConfigMapper() {
-        HadoopServiceCheckConfig config = ConfigBuilder
-            .typeOf(HadoopServiceCheckConfig.class)
-            .bindWith(ConfigFactory.load().getConfig("application.serviceCheck"));
-        Assert.assertNotNull(config);
-        Assert.assertEquals(5, config.getDurationInSec());
-        Assert.assertNotNull(config.getHbaseCheckConfig());
-        Assert.assertNotNull(config.getHdfsCheckConfig());
     }
 }
