@@ -17,38 +17,37 @@
 package org.apache.eagle.server.resource;
 
 import com.google.inject.Inject;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
-import org.apache.eagle.server.ServerConfig;
-import org.quartz.JobDetail;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerMetaData;
-import org.quartz.Trigger;
+import org.quartz.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import java.util.List;
 
-/**
- * Serve server internal information as API.
- */
-@Path("server")
-public class ServerResource {
-    private @Inject Config config;
+
+@Path("scheduler")
+public class SchedulerResource {
+    private @Inject ScheduledExecutionRuntime scheduledRuntime;
 
     @GET
-    @Path("/version")
+    @Path("/jobs")
     @Produces( {"application/json"})
-    public ServerConfig.ServerVersion version() {
-        return ServerConfig.getServerVersion();
+    public List<JobDetail> getScheduledJobs() throws SchedulerException {
+        return scheduledRuntime.getScheduledJobs();
     }
 
     @GET
-    @Path("/config")
+    @Path("/triggers")
     @Produces( {"application/json"})
-    public String config() {
-        return config.root().render(ConfigRenderOptions.concise());
+    public List<Trigger> getScheduledTriggers() throws SchedulerException {
+        return scheduledRuntime.getScheduledTriggers();
+    }
+
+    @GET
+    @Path("/")
+    @Produces( {"application/json"})
+    public SchedulerMetaData getSchedulerMetaData() throws SchedulerException {
+        return scheduledRuntime.getScheduler().getMetaData();
     }
 }

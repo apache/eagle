@@ -16,14 +16,20 @@
  */
 package org.apache.eagle.app.environment.impl;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import io.dropwizard.lifecycle.Managed;
 import org.apache.eagle.app.environment.AbstractEnvironment;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Singleton
 public class ScheduledEnvironment extends AbstractEnvironment {
@@ -31,31 +37,13 @@ public class ScheduledEnvironment extends AbstractEnvironment {
 
     private final Scheduler scheduler;
 
+    @Inject
     public ScheduledEnvironment(Config config) throws SchedulerException {
         super(config);
         this.scheduler = new StdSchedulerFactory().getScheduler();
-        this.start();
     }
 
     public Scheduler scheduler() {
         return scheduler;
-    }
-
-    public void start() throws SchedulerException {
-        if (!this.scheduler.isStarted()) {
-            LOGGER.info("Starting scheduler {}", this.scheduler.getSchedulerName());
-            this.scheduler.start();
-        } else {
-            LOGGER.info("Scheduler {} already started", this.scheduler.getSchedulerName());
-        }
-    }
-
-    public void stop() throws SchedulerException {
-        if (this.scheduler.isShutdown()) {
-            LOGGER.info("Shutting down scheduler {}", this.scheduler.getSchedulerName());
-            this.scheduler.shutdown();
-        } else {
-            LOGGER.info("Scheduler {} already stopped", this.scheduler.getSchedulerName());
-        }
     }
 }

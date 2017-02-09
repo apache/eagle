@@ -16,12 +16,26 @@
  */
 package org.apache.eagle.app;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
+import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
 import org.apache.eagle.app.environment.impl.ScheduledPlan;
 
 public abstract class ScheduledApplication extends ExecutableApplication<ScheduledEnvironment, ScheduledPlan> {
     @Override
     public Class<? extends ScheduledEnvironment> getEnvironmentType() {
         return ScheduledEnvironment.class;
+    }
+
+    @Override
+    public void run(Config config) {
+        ScheduledExecutionRuntime runtime = (ScheduledExecutionRuntime) ExecutionRuntimeManager.getInstance().getRuntimeSingleton(getEnvironmentType(), config);
+        try {
+            runtime.start();
+            runtime.start(this, config);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

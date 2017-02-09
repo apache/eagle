@@ -16,17 +16,21 @@
  */
 package org.apache.eagle.server.module;
 
+import com.google.inject.AbstractModule;
+import com.typesafe.config.Config;
+import org.apache.eagle.app.environment.ExecutionRuntimeModule;
 import org.apache.eagle.app.module.ApplicationGuiceModule;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.metadata.persistence.MetadataStoreModuleFactory;
-import com.google.inject.AbstractModule;
 
 public class ServerModule extends AbstractModule {
     private ApplicationProviderService appProviderInst;
+    private Config config;
 
-    public ServerModule(ApplicationProviderService appProviderInst) {
+    public ServerModule(Config config, ApplicationProviderService appProviderInst) {
         this.appProviderInst = appProviderInst;
+        this.config = config;
     }
 
     @Override
@@ -34,5 +38,6 @@ public class ServerModule extends AbstractModule {
         install(new CommonGuiceModule());
         install(new ApplicationGuiceModule(appProviderInst));
         install(MetadataStoreModuleFactory.getModule());
+        install(new ExecutionRuntimeModule(config));
     }
 }

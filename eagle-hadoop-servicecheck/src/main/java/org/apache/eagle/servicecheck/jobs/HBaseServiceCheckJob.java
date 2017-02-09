@@ -35,6 +35,11 @@ public class HBaseServiceCheckJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         HBaseServiceCheckJobConfig jobConfig = new HBaseServiceCheckJobConfig(jobExecutionContext);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         LOGGER.info("#### Executing ....");
     }
 }

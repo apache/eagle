@@ -30,8 +30,6 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
-import org.apache.eagle.app.environment.ExecutionRuntimeManager;
-import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
 import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
@@ -43,7 +41,6 @@ import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
 import org.apache.eagle.server.task.ManagedService;
 import org.apache.eagle.server.module.GuiceBundleLoader;
-import org.apache.eagle.server.task.ScheduledEnvLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +61,8 @@ class ServerApplication extends Application<ServerConfig> {
     private Injector injector;
     @Inject
     private Config config;
+    @Inject
+    private ScheduledExecutionRuntime scheduledExecutionRuntime;
 
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
@@ -146,8 +145,7 @@ class ServerApplication extends Application<ServerConfig> {
             }));
         }
 
-        // Register ScheduledEnvironment lifecycle
-        ScheduledExecutionRuntime scheduledRuntime = (ScheduledExecutionRuntime) ExecutionRuntimeManager.getInstance().getRuntimeSingleton(ScheduledEnvironment.class,config);
-        environment.lifecycle().manage(new ScheduledEnvLifecycle(scheduledRuntime.environment()));
+        // Register ScheduledEnvironment to manage scheduler lifecycle
+        environment.lifecycle().manage(scheduledExecutionRuntime);
     }
 }

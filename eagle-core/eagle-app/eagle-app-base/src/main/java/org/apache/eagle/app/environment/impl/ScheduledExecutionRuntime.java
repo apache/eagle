@@ -18,16 +18,20 @@ package org.apache.eagle.app.environment.impl;
 
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import io.dropwizard.lifecycle.Managed;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.quartz.SchedulerException;
+import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Singleton
-public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvironment, ScheduledPlan> {
+import java.util.LinkedList;
+import java.util.List;
+
+public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvironment, ScheduledPlan>, Managed {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledExecutionRuntime.class);
     private ScheduledEnvironment environment;
 
@@ -49,6 +53,28 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage(),e);
         }
+    }
+
+    public Scheduler getScheduler() {
+        return this.environment.scheduler();
+    }
+
+    public List<JobDetail> getScheduledJobs() throws SchedulerException {
+        List<JobDetail> jobDetails = new LinkedList<>();
+        for (String groupName : this.getScheduler().getJobGroupNames()) {
+            for (JobKey jobKey : getScheduler().getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+                jobDetails.add(getScheduler().getJobDetail(jobKey));
+            }
+        }
+        return jobDetails;
+    }
+
+    public List<Trigger> getScheduledTriggers() throws SchedulerException {
+        List<Trigger> triggers = new LinkedList<>();
+        for(JobDetail jobDetail: this.getScheduledJobs()) {
+            triggers.addAll(this.getScheduler().getTriggersOfJob(jobDetail.getKey()));
+        }
+        return triggers;
     }
 
     @Override
@@ -76,6 +102,25 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
         return ApplicationEntity.Status.UNKNOWN;
     }
 
+    @Override
+    public void start() throws Exception {
+        if (!this.environment.scheduler().isStarted()) {
+            LOGGER.info("Starting scheduler {}", this.environment.scheduler().getSchedulerName());
+            this.environment.scheduler().start();
+        } else {
+            LOGGER.info("Scheduler {} already started", this.environment.scheduler().getSchedulerName());
+        }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if (this.environment.scheduler().isShutdown()) {
+            LOGGER.info("Shutting down scheduler {}", this.environment.scheduler().getSchedulerName());
+            this.environment.scheduler().shutdown();
+        } else {
+            LOGGER.info("Scheduler {} already stopped", this.environment.scheduler().getSchedulerName());
+        }
+    }
     @Singleton
     public static class Provider implements ExecutionRuntimeProvider<ScheduledEnvironment,ScheduledPlan> {
         @Override

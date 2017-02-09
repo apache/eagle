@@ -46,7 +46,7 @@ public class GuiceBundleLoader {
         // Eagle server module
         Config config = ConfigFactory.load();
         ApplicationProviderService appProviderSvc = new ApplicationProviderServiceImpl(config);
-        ServerModule serveBaseModule = new ServerModule(appProviderSvc);
+        ServerModule serveBaseModule = new ServerModule(config,appProviderSvc);
 
         // load application specific modules
         ModuleRegistry registry = ApplicationExtensionLoader.load(serveBaseModule);
@@ -60,7 +60,7 @@ public class GuiceBundleLoader {
             extensionNum = metadataExtensions.size();
             metadataExtensions.forEach(builder::addModule);
         }
-        LOGGER.warn("Loaded {} modules (scope: metadataStore)", extensionNum);
+        LOGGER.warn("Loaded {} modules (scope: metadata)", extensionNum);
 
         List<Module> globalExtensions = registry.getModules(GlobalScope.class);
         extensionNum = 0;
