@@ -29,7 +29,7 @@
 			<tbody>
 				<tr>
 					<th>Severity</th>
-					<td><span class="label label-{{Policy.getSeverityClass(alert.tags.severity)}}">{{alert.tags.severity}}</span></td>
+					<td><span class="label label-{{Policy.getSeverityClass(alert.tags.status)}}">{{alert.tags.status}}</span></td>
 					<th width="15%">Time</th>
 					<td width="35%">{{Time.format(alert.timestamp)}}</td>
 				</tr>

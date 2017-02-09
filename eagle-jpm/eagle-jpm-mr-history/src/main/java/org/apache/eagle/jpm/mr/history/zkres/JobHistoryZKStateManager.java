@@ -207,7 +207,7 @@ public class JobHistoryZKStateManager {
                 curator.setData().forPath(path);
             }
         } catch (Exception e) {
-            LOG.error("fail adding processed jobs", e);
+            LOG.error("critical adding processed jobs", e);
             throw new RuntimeException(e);
         }
     }

@@ -32,7 +32,7 @@
 							Time
 							<span class="fa fa-refresh fa-spin no-animate" ng-show="loading || isSorting"></span>
 						</th>
-						<th sortpath="tags.severity" width="85">Severity</th>
+						<th sortpath="tags.status" width="85">Severity</th>
 						<th sortpath="tags.siteId" width="75">Site</th>
 						<!--th sortpath="streamId" width="75">Stream</th-->
 						<th width="100" sortpath="tags.category" >Category</th>
@@ -45,8 +45,8 @@
 					<tr>
 						<td>{{Time.format(item.timestamp)}}</td>
 						<td>
-							<span class="label label-{{Policy.getSeverityClass(item.tags.severity)}}">
-								{{item.tags.severity}}
+							<span class="label label-{{Policy.getSeverityClass(item.tags.status)}}">
+								{{item.tags.status}}
 							</span>
 						</td>
 						<td>{{item.tags.siteId}}</td>

@@ -121,7 +121,7 @@ public class JobHistoryZKStateManager {
             });
 
         } catch (Exception e) {
-            LOG.error("fail to read unprocessed jobs", e);
+            LOG.error("critical to read unprocessed jobs", e);
             throw new RuntimeException(e);
         } finally {
             try {
@@ -150,7 +150,7 @@ public class JobHistoryZKStateManager {
             }
             return info;
         } catch (Exception e) {
-            LOG.error("fail to read application attempt info", e);
+            LOG.error("critical to read application attempt info", e);
             throw new RuntimeException(e);
         }
     }
@@ -215,7 +215,7 @@ public class JobHistoryZKStateManager {
                 }
             }
         } catch (Exception e) {
-            LOG.error("fail to update last finished time", e);
+            LOG.error("critical to update last finished time", e);
             throw new RuntimeException(e);
         }
 

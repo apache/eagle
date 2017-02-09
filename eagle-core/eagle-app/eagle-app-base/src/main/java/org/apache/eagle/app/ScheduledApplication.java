@@ -34,6 +34,16 @@ public abstract class ScheduledApplication extends ExecutableApplication<Schedul
     public void run(Config config) {
         ScheduledExecutionRuntime runtime = (ScheduledExecutionRuntime) ExecutionRuntimeManager.getInstance().getRuntimeSingleton(getEnvironmentType(), config);
         try {
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        runtime.stop();
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            });
             runtime.start();
             runtime.start(this, config);
         } catch (Exception e) {

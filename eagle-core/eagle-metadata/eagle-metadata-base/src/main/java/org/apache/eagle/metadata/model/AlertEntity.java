@@ -47,6 +47,8 @@ public class AlertEntity extends TaggedLogAPIEntity {
     private String alertSubject;
     @Column("e")
     private String alertBody;
+    @Column("f")
+    private String alertSource;
 
     public List<String> getAppIds() {
         return appIds;
@@ -91,5 +93,14 @@ public class AlertEntity extends TaggedLogAPIEntity {
     public void setAlertSubject(String alertSubject) {
         this.alertSubject = alertSubject;
         valueChanged("alertSubject");
+    }
+
+    public String getAlertSource() {
+        return alertSource;
+    }
+
+    public void setAlertSource(String alertSource) {
+        this.alertSource = alertSource;
+        valueChanged("alertSource");
     }
 }

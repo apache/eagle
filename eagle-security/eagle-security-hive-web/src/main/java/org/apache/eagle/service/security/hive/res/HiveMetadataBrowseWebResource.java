@@ -65,7 +65,7 @@ public class HiveMetadataBrowseWebResource {
             HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(hiveConfig);
             databases = dao.getDatabases();
         } catch(Exception ex){
-            LOG.error("fail getting databases", ex);
+            LOG.error("critical getting databases", ex);
             response.setException(EagleExceptionWrapper.wrap(ex));
         }
 
