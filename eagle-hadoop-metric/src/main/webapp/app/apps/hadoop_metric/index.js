@@ -23,35 +23,35 @@
 	var hadoopMetricApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
 	hadoopMetricApp.route("HadoopMetric", {
-		url: "/Service/HBase/overview?startTime&endTime",
+		url: "/Services/HBase/overview?startTime&endTime",
 		site: true,
 		templateUrl: "partials/overview.html",
 		controller: "overviewCtrl",
 		resolve: {time: true}
 	}).route("HadoopMetric_HDFS", {
-		url: "/Service/HDFS",
+		url: "/Services/HDFS",
 		site: true,
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
 		resolve: {time: true}
 	}).route("regionDetail", {
-		url: "/Service/HBase/RegionServer/:hostname",
+		url: "/Services/HBase/RegionServer/:hostname",
 		site: true,
 		templateUrl: "partials/region/regionDetail.html",
 		controller: "regionDetailCtrl",
 		resolve: {time: true}
 	}).route("regionList", {
-		url: "/Service/HBase/RegionServers",
+		url: "/Services/HBase/RegionServers",
 		site: true,
 		templateUrl: "partials/region/regionList.html",
 		controller: "regionListCtrl"
 	}).route("backupMasterList", {
-		url: "/Service/HBase/backupMasterList",
+		url: "/Services/HBase/backupMasterList",
 		site: true,
 		templateUrl: "partials/backupMasterList.html",
 		controller: "backupMasterListCtrl"
 	}).route("masterDetail", {
-		url: "/Service/HBase/:hostname?startTime&endTime",
+		url: "/Services/HBase/:hostname?startTime&endTime",
 		site: true,
 		reloadOnSearch: false,
 		templateUrl: "partials/overview.html",
@@ -63,9 +63,9 @@
 		name: "Services", icon: "heartbeat", list: [
 			{
 				name: "HBase", 
-				list: [{name: "Overview", path: "Service/HBase/overview"},{name: "RegionServer", path: "Service/HBase/RegionServers"},{name: "BackupMaster", path: "Service/HBase/backupMasterList"}]
+				list: [{name: "Overview", path: "Services/HBase/overview"},{name: "RegionServer", path: "Services/HBase/RegionServers"},{name: "BackupMaster", path: "Service/HBase/backupMasterList"}]
 			},
-			{name: "HDFS", path: "Service/HDFS"}
+			{name: "HDFS", path: "Services/HDFS"}
 		]
 	}, true);
 
