@@ -18,9 +18,11 @@ package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
+import org.apache.eagle.app.environment.impl.AbstractScheduledPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
 import org.apache.eagle.app.environment.impl.ScheduledPlan;
+import org.quartz.SchedulerException;
 
 public abstract class ScheduledApplication extends ExecutableApplication<ScheduledEnvironment, ScheduledPlan> {
     @Override
@@ -37,5 +39,9 @@ public abstract class ScheduledApplication extends ExecutableApplication<Schedul
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public static XmlScheduledApplication buildFromXml(String schedulingXmlFile) {
+        return new XmlScheduledApplication(schedulingXmlFile);
     }
 }
