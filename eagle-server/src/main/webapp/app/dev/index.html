@@ -141,7 +141,16 @@
 									<a ng-href="{{subPortal.path}}">
 										<i class="fa fa-{{subPortal.icon || 'circle-o'}}"></i>
 										<span>{{subPortal.name}}</span>
+										<i class="fa fa-angle-left pull-right" ng-if="subPortal.list"></i>
 									</a>
+									<ul class="treeview-menu" ng-if="subPortal.list">
+										<li ng-repeat="leafPortal in subPortal.list track by $index" ng-class="{active: getNavClass(leafPortal)}">
+											<a ng-href="{{leafPortal.path}}">
+												<i class="fa fa-{{leafPortal.icon || 'circle-o'}}"></i>
+												<span>{{leafPortal.name}}</span>
+											</a>
+										</li>
+									</ul>
 								</li>
 							</ul>
 						</li>

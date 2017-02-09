@@ -23,35 +23,35 @@
 	var hadoopMetricApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
 	hadoopMetricApp.route("HadoopMetric", {
-		url: "/hadoopMetric?startTime&endTime",
+		url: "/Service/HBase/overview?startTime&endTime",
 		site: true,
 		templateUrl: "partials/overview.html",
 		controller: "overviewCtrl",
 		resolve: {time: true}
 	}).route("HadoopMetric_HDFS", {
-		url: "/hadoopMetric/hdfs",
+		url: "/Service/HDFS",
 		site: true,
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
 		resolve: {time: true}
 	}).route("regionDetail", {
-		url: "/hadoopMetric/regionDetail/:hostname",
+		url: "/Service/HBase/RegionServer/:hostname",
 		site: true,
 		templateUrl: "partials/region/regionDetail.html",
 		controller: "regionDetailCtrl",
 		resolve: {time: true}
 	}).route("regionList", {
-		url: "/hadoopMetric/regionList",
+		url: "/Service/HBase/RegionServers",
 		site: true,
 		templateUrl: "partials/region/regionList.html",
 		controller: "regionListCtrl"
 	}).route("backupMasterList", {
-		url: "/hadoopMetric/backupMasterList",
+		url: "/Service/HBase/backupMasterList",
 		site: true,
 		templateUrl: "partials/backupMasterList.html",
 		controller: "backupMasterListCtrl"
 	}).route("masterDetail", {
-		url: "/hadoopMetric/:hostname?startTime&endTime",
+		url: "/Service/HBase/:hostname?startTime&endTime",
 		site: true,
 		reloadOnSearch: false,
 		templateUrl: "partials/overview.html",
@@ -61,8 +61,11 @@
 
 	hadoopMetricApp.portal({
 		name: "Services", icon: "heartbeat", list: [
-			{name: "HBase", path: "hadoopMetric"},
-			{name: "HDFS", path: "hadoopMetric/hdfs"}
+			{
+				name: "HBase", 
+				list: [{name: "Overview", path: "Service/HBase/overview"},{name: "RegionServer", path: "Service/HBase/RegionServers"},{name: "BackupMaster", path: "Service/HBase/backupMasterList"}]
+			},
+			{name: "HDFS", path: "Service/HDFS"}
 		]
 	}, true);
 
