@@ -130,7 +130,7 @@
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
 					<ul class="sidebar-menu">
-						<li ng-repeat="portal in Portal.list track by $index" ng-class="{treeview: portal.list}" ng-if="portal.showFunc ? portal.showFunc() : true">
+						<li ng-repeat="portal in Portal.list track by $index" ng-class="{treeview: portal.list , active: getPNavClass(portal.list)}" ng-if="portal.showFunc ? portal.showFunc() : true">
 							<a ng-href="{{portal.path}}">
 								<i class="fa fa-{{portal.icon || 'circle-o'}}"></i>
 								<span>{{portal.name}}</span>
