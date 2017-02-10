@@ -25,6 +25,7 @@ import org.apache.eagle.app.environment.impl.SchedulingPlan;
 import org.apache.eagle.health.detector.HBaseHealthCheckJob;
 import org.quartz.*;
 
+@Deprecated
 public class HBaseHealthMonitorApp extends SchedulingApplication {
     private static final String HBASE_SERVICE_CHECK_JOB_NAME = "HBASE_SERVICE_CHECK_JOB";
     private static final String HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME = "HBASE_SERVICE_CHECK_JOB_TRIGGER";
