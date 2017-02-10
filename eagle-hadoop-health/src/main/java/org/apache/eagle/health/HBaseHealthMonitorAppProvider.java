@@ -23,6 +23,6 @@ public class HBaseHealthMonitorAppProvider extends AbstractApplicationProvider<X
     @Override
     public XmlSchedulingApplication getApplication() {
         // return new HBaseHealthMonitorApp();
-        return new XmlSchedulingApplication("org.apache.eagle.servicecheck.HBaseHealthMonitorAppJobs.xml");
+        return new XmlSchedulingApplication("org.apache.eagle.health.HBaseHealthMonitorAppJobs.xml");
     }
 }
