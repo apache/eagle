@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.health.jobs;
+package org.apache.eagle.health.detector;
 
 public class URLPingCheckJob {
 

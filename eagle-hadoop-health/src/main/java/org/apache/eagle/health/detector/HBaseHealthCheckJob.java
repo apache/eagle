@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.health.jobs;
+package org.apache.eagle.health.detector;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -31,6 +31,7 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
+@DisallowConcurrentExecution
 public class HBaseHealthCheckJob extends MonitorJob implements Watcher {
     private static final Logger LOG = LoggerFactory.getLogger(HBaseHealthCheckJob.class);
     private static final String CONNECTION_PROPS_KEY = "connectionProps";
@@ -64,11 +66,6 @@ public class HBaseHealthCheckJob extends MonitorJob implements Watcher {
     @Override
     public void process(WatchedEvent watchedEvent) {
         LOG.info(watchedEvent.toString());
-    }
-
-    @Override
-    protected boolean isParallelTriggerAllowed() {
-        return false;
     }
 
     @Override

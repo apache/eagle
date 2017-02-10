@@ -101,7 +101,7 @@ public class ScheduledExecutionRuntime implements ExecutionRuntime<ScheduledEnvi
     public void stop() throws Exception {
         if (this.environment.scheduler().isShutdown()) {
             LOGGER.info("Shutting down scheduler {}", this.environment.scheduler().getSchedulerName());
-            this.environment.scheduler().shutdown();
+            this.environment.scheduler().shutdown(true);
         } else {
             LOGGER.info("Scheduler {} already shutdown", this.environment.scheduler().getSchedulerName());
         }

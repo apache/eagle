@@ -15,6 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <job-scheduling-data xmlns="http://www.quartz-scheduler.org/xml/JobSchedulingData"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://www.quartz-scheduler.org/xml/JobSchedulingData http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
@@ -24,7 +25,7 @@
             <name>HBASE_SERVICE_CHECK_JOB_$config.getString("appId")</name>
             <group>HEALTH_CHECK_JOBS</group>
             <description>The job description</description>
-            <job-class>org.apache.eagle.servicecheck.jobs.HBaseServiceCheckJob</job-class>
+            <job-class>org.apache.eagle.health.HBaseHealthMonitorApp</job-class>
             <job-data-map allows-transient-data="false">
                 <entry>
                     <key>appId</key>
@@ -32,7 +33,7 @@
                 </entry>
                 <entry>
                     <key>connectionProps</key>
-                    <value>$config.getString("serviceCheck.hbaseCheckConfig.connectionProps")</value>
+                    <value>$config.getString("serviceCheck.hbaseHealth.connectionProps")</value>
                 </entry>
             </job-data-map>
         </job>

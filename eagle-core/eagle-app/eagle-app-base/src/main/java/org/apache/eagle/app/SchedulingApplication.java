@@ -22,7 +22,7 @@ import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.ScheduledExecutionRuntime;
 import org.apache.eagle.app.environment.impl.SchedulingPlan;
 
-public abstract class ScheduledApplication extends ExecutableApplication<ScheduledEnvironment, SchedulingPlan> {
+public abstract class SchedulingApplication extends ExecutableApplication<ScheduledEnvironment, SchedulingPlan> {
     @Override
     public Class<? extends ScheduledEnvironment> getEnvironmentType() {
         return ScheduledEnvironment.class;
@@ -49,7 +49,7 @@ public abstract class ScheduledApplication extends ExecutableApplication<Schedul
         }
     }
 
-    public static XmlScheduledApplication buildFromXml(String schedulingXmlFile) {
-        return new XmlScheduledApplication(schedulingXmlFile);
+    public static XmlSchedulingApplication buildFromXml(String schedulingXmlFile) {
+        return new XmlSchedulingApplication(schedulingXmlFile);
     }
 }

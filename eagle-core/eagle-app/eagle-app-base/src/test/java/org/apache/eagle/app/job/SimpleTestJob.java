@@ -22,34 +22,11 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-public abstract class MonitorJob implements Job {
-    public static final String HEALTH_CHECK_JOBS_GROUP = "HEALTH_CHECK_JOBS";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MonitorJob.class);
+public class SimpleTestJob implements Job {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTestJob.class);
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        try {
-            prepare(jobExecutionContext);
-            jobExecutionContext.setResult(execute());
-        } catch (MonitorException ex) {
-            jobExecutionContext.setResult(ex.getResult());
-        } catch (Throwable ex) {
-            LOGGER.error(ex.getMessage(), ex);
-            jobExecutionContext.setResult(MonitorResult.critical(ex.getMessage(), ex));
-        } finally {
-            try {
-                this.close();
-            } catch (Throwable t) {
-                LOGGER.error(t.getMessage(), t);
-            }
-        }
+        LOGGER.info("Executing {}", jobExecutionContext);
     }
-
-    protected abstract MonitorResult execute() throws JobExecutionException, Exception;
-
-    protected abstract void prepare(JobExecutionContext context) throws JobExecutionException;
-
-    protected abstract void close() throws JobExecutionException;
 }

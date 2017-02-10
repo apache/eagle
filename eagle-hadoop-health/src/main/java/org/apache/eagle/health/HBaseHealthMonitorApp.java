@@ -17,15 +17,15 @@
 package org.apache.eagle.health;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.app.ScheduledApplication;
+import org.apache.eagle.app.SchedulingApplication;
 import org.apache.eagle.app.job.MonitorJob;
 import org.apache.eagle.app.environment.impl.AbstractSchedulingPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.SchedulingPlan;
-import org.apache.eagle.health.jobs.HBaseHealthCheckJob;
+import org.apache.eagle.health.detector.HBaseHealthCheckJob;
 import org.quartz.*;
 
-public class HBaseHealthMonitorApp extends ScheduledApplication {
+public class HBaseHealthMonitorApp extends SchedulingApplication {
     private static final String HBASE_SERVICE_CHECK_JOB_NAME = "HBASE_SERVICE_CHECK_JOB";
     private static final String HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME = "HBASE_SERVICE_CHECK_JOB_TRIGGER";
 
@@ -35,12 +35,13 @@ public class HBaseHealthMonitorApp extends ScheduledApplication {
             @Override
             public void schedule() throws SchedulerException {
                 // Schedule Job: HBASE_SERVICE_CHECK_JOB
+                JobDataMap jobDataMap = getJobDataMap(config.getConfig("hbaseHealth"));
                 scheduleJob(JobBuilder.newJob(HBaseHealthCheckJob.class)
                         .withIdentity(JobKey.jobKey(HBASE_SERVICE_CHECK_JOB_NAME + "_" + getAppId(), MonitorJob.HEALTH_CHECK_JOBS_GROUP))
                         .build(),
                     TriggerBuilder.newTrigger()
                         .withIdentity(TriggerKey.triggerKey(HBASE_HEALTH_CHECK_JOB_TRIGGER_NAME + "_" + getAppId(), MonitorJob.HEALTH_CHECK_JOBS_GROUP))
-                        .usingJobData(getJobDataMap(config.getConfig("hbaseHealth")))
+                        .usingJobData(jobDataMap)
                         .startNow()
                         .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(config.getInt("hbaseHealth.intervalSec"))).build()
                 );
