@@ -14,11 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.coordinator;
+package org.apache.eagle.app.job;
 
-/**
- * Severity Levels for alerts, events, logs, etc.
- */
-public enum AlertSeverity {
-    UNKNOWN, OK, WARNING, CRITICAL, FATAL
+import org.quartz.JobExecutionContext;
+
+public class JobSkippedResult {
+    private final JobExecutionContext jobExecutionContext;
+
+    public JobSkippedResult(JobExecutionContext jobExecutionContext) {
+        this.jobExecutionContext = jobExecutionContext;
+    }
+
+    public JobExecutionContext getJobExecutionContext() {
+        return jobExecutionContext;
+    }
 }

@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.coordinator;
+package org.apache.eagle.app.job;
 
-/**
- * Severity Levels for alerts, events, logs, etc.
- */
-public enum AlertSeverity {
-    UNKNOWN, OK, WARNING, CRITICAL, FATAL
+
+public class MonitorException extends Exception {
+    private MonitorResult result;
+
+    public MonitorResult getResult() {
+        return result;
+    }
 }

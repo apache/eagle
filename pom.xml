@@ -132,7 +132,7 @@
         <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
-        <module>eagle-hadoop-servicecheck</module>
+        <module>eagle-hadoop-health</module>
         <module>eagle-server</module>
         <module>eagle-jpm</module>
         <module>eagle-server-assembly</module>

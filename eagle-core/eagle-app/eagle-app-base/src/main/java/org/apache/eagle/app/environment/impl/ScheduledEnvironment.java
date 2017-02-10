@@ -19,8 +19,8 @@ package org.apache.eagle.app.environment.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.check.HealthCheckJob;
-import org.apache.eagle.app.check.HealthCheckJobListener;
+import org.apache.eagle.app.job.MonitorJob;
+import org.apache.eagle.app.job.MonitorJobListener;
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -43,7 +43,7 @@ public class ScheduledEnvironment extends AbstractEnvironment {
     private static Scheduler initializeScheduler(Config config) throws SchedulerException {
         Scheduler scheduler =  new StdSchedulerFactory().getScheduler();
         scheduler.getListenerManager()
-            .addJobListener(new HealthCheckJobListener(config), GroupMatcher.groupContains(HealthCheckJob.HEALTH_CHECK_JOBS_GROUP));
+            .addJobListener(new MonitorJobListener(config), GroupMatcher.groupContains(MonitorJob.HEALTH_CHECK_JOBS_GROUP));
         return scheduler;
     }
 
