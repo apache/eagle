@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
@@ -66,7 +67,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     }
 
     private List<AppInfo> doFetchFinishApplicationsList(String urlString, Constants.CompressionType compressionType) throws Exception {
-        List<AppInfo> result;
+        List<AppInfo> result = new ArrayList<>(0);
         InputStream is = null;
         try {
             checkUrl();
@@ -76,9 +77,8 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             if (appWrapper != null && appWrapper.getApps() != null
                 && appWrapper.getApps().getApp() != null) {
                 result = appWrapper.getApps().getApp();
-                return result;
             }
-            return null;
+            return result;
         } finally {
             if (is != null) {
                 try {
@@ -113,7 +113,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     }
 
     private List<AppInfo> doFetchRunningApplicationsList(String urlString, Constants.CompressionType compressionType) throws Exception {
-        List<AppInfo> result;
+        List<AppInfo> result = new ArrayList<>(0);
         InputStream is = null;
         try {
             checkUrl();
@@ -122,9 +122,8 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
             if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
                 result = appWrapper.getApps().getApp();
-                return result;
             }
-            return null;
+            return result;
         } finally {
             if (is != null) {
                 try {
