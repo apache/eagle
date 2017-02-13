@@ -324,8 +324,8 @@ var app = {};
 			});
 
 			// ================================ Function ================================
-			// Get parent side bar navigation item class by submenu
-			$scope.getPNavClass = function (subportals) {
+			// Get Page class by submenu
+			$scope.getPageNavClass = function (subportals) {
 				var classname = "";
 				if (typeof subportals === 'undefined') {
 					return "";
