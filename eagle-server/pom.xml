@@ -338,7 +338,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
-                    <artifactId>eagle-hadoop-servicecheck</artifactId>
+                    <artifactId>eagle-hadoop-health</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
