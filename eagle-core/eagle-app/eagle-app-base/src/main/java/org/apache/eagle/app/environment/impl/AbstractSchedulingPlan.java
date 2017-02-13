@@ -18,6 +18,8 @@ package org.apache.eagle.app.environment.impl;
 
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
+import org.abego.treelayout.internal.util.java.lang.string.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 
 import java.util.Date;
@@ -26,16 +28,26 @@ import java.util.Map;
 public abstract class AbstractSchedulingPlan implements SchedulingPlan {
     private static final String APP_CONFIG_KEY = "appConfig";
     private static final String APP_ID_KEY = "appId";
+    private static final String SITE_ID_KEY = "siteId";
 
     private final String appId;
+    private final String siteId;
     private final ScheduledEnvironment environment;
     private final Config config;
 
     public AbstractSchedulingPlan(Config config, ScheduledEnvironment environment) {
-        this.appId = config.getString("appId");
-        Preconditions.checkNotNull(appId, "[appId] is null");
+        this.appId = config.getString(APP_ID_KEY);
+        Preconditions.checkArgument(!StringUtils.isBlank(appId), "[appId] is blank");
+        this.siteId = config.getString(SITE_ID_KEY);
+        Preconditions.checkArgument(!StringUtils.isBlank(siteId), "[siteId] is blank");
         this.environment = environment;
         this.config = config;
+    }
+
+
+    @Override
+    public String getSiteId() {
+        return this.siteId;
     }
 
     @Override

@@ -21,7 +21,7 @@ import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.job.MonitorJob;
-import org.apache.eagle.app.job.MonitorJobListener;
+import org.apache.eagle.app.job.listener.GlobalMonitorJobListener;
 import org.quartz.JobKey;
 import org.quartz.Matcher;
 import org.quartz.Scheduler;
@@ -44,7 +44,7 @@ public class ScheduledEnvironment extends AbstractEnvironment {
 
     private static Scheduler initializeScheduler(Config config) throws SchedulerException {
         Scheduler scheduler =  new StdSchedulerFactory().getScheduler();
-        scheduler.getListenerManager().addJobListener(new MonitorJobListener(config), (Matcher<JobKey>) jobKey -> {
+        scheduler.getListenerManager().addJobListener(new GlobalMonitorJobListener(config), (Matcher<JobKey>) jobKey -> {
             try {
                 return MonitorJob.class.isAssignableFrom(scheduler.getJobDetail(jobKey).getJobClass());
             } catch (SchedulerException e) {

@@ -25,6 +25,7 @@ import java.util.Map;
 public class MonitorResult {
     private AlertSeverity status = AlertSeverity.OK;
     private String type = "UNKNOWN";
+    private String group = "DEFAULT";
     private boolean success;
     private String message;
     private Map<String,Object> data = new HashMap<>();
@@ -64,8 +65,8 @@ public class MonitorResult {
 
     @Override
     public String toString() {
-        return String.format("type=%s, status=%s, message=%s, data=%s, exception=%s",
-            this.type, this.status,this.message, this.data, this.exception);
+        return String.format("group=%s, type=%s, status=%s, message=%s, data=%s, exception=%s",
+            this.group, this.type, this.status,this.message, this.data, this.exception);
     }
 
     public static MonitorResult critical(String message, Throwable throwable) {
@@ -95,5 +96,13 @@ public class MonitorResult {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

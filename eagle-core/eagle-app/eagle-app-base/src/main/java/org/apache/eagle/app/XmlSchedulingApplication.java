@@ -22,8 +22,10 @@ import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.AbstractSchedulingPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.SchedulingPlan;
-import org.apache.eagle.app.job.plugins.XMLStreamSchedulingDataProcessor;
+import org.apache.eagle.app.job.listener.ApplicationMonitorJobListener;
+import org.apache.eagle.app.job.plugin.XMLStreamSchedulingDataProcessor;
 import org.quartz.SchedulerException;
+import org.quartz.impl.matchers.KeyMatcher;
 import org.quartz.spi.MutableTrigger;
 import org.quartz.xml.ValidationException;
 import org.slf4j.Logger;
@@ -35,6 +37,7 @@ import javax.xml.xpath.XPathException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.stream.Collectors;
 
 public class XmlSchedulingApplication extends SchedulingApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlSchedulingPlan.class);
@@ -52,10 +55,12 @@ public class XmlSchedulingApplication extends SchedulingApplication {
 
     private class XmlSchedulingPlan extends AbstractSchedulingPlan {
         private final String schedulingXmlFile;
+        private final ApplicationMonitorJobListener appJobListener;
 
         public XmlSchedulingPlan(String schedulingXmlFile, Config config, ScheduledEnvironment environment) {
             super(config, environment);
             this.schedulingXmlFile = schedulingXmlFile;
+            this.appJobListener = new ApplicationMonitorJobListener(config, getAppId() + "_LISTENER");
         }
 
         private InputStream getSchedulingXmlAsStream() {
@@ -79,6 +84,9 @@ public class XmlSchedulingApplication extends SchedulingApplication {
                     getAppId(),
                     getScheduler()
                 );
+                LOGGER.info("Adding job listener: {} for application: {}", this.appJobListener, this.getAppId());
+                this.getScheduler().getListenerManager().addJobListener(this.appJobListener,
+                        processor.getParsedJobs().stream().map(jobDetail -> KeyMatcher.keyEquals(jobDetail.getKey())).collect(Collectors.toList()));
             } catch (ParserConfigurationException | IOException | XPathException | ParseException | SAXException | ValidationException | ClassNotFoundException e) {
                 LOGGER.error("Failed to schedule {}: {}", this.getAppId(), e.getMessage(), e);
                 throw new SchedulerException(e.getMessage(), e);
@@ -95,6 +103,9 @@ public class XmlSchedulingApplication extends SchedulingApplication {
                     getAppId(),
                     getScheduler()
                 );
+
+                LOGGER.info("Adding job listener: {} for application: {}", this.appJobListener, this.getAppId());
+                this.getScheduler().getListenerManager().removeJobListener(this.appJobListener.getName());
                 return true;
             } catch (ParserConfigurationException | IOException | XPathException | ParseException | SAXException | ValidationException | ClassNotFoundException e) {
                 LOGGER.error("Failed to unschedule {}: {}", this.getAppId(), e.getMessage(), e);
