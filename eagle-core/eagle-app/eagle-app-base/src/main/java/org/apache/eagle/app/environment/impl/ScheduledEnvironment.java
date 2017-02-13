@@ -19,12 +19,14 @@ package org.apache.eagle.app.environment.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.job.MonitorJob;
 import org.apache.eagle.app.job.MonitorJobListener;
-import org.apache.eagle.app.environment.AbstractEnvironment;
-import org.quartz.*;
+import org.quartz.JobKey;
+import org.quartz.Matcher;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +44,13 @@ public class ScheduledEnvironment extends AbstractEnvironment {
 
     private static Scheduler initializeScheduler(Config config) throws SchedulerException {
         Scheduler scheduler =  new StdSchedulerFactory().getScheduler();
-        scheduler.getListenerManager()
-            .addJobListener(new MonitorJobListener(config), GroupMatcher.groupContains(MonitorJob.HEALTH_CHECK_JOBS_GROUP));
+        scheduler.getListenerManager().addJobListener(new MonitorJobListener(config), (Matcher<JobKey>) jobKey -> {
+            try {
+                return MonitorJob.class.isAssignableFrom(scheduler.getJobDetail(jobKey).getJobClass());
+            } catch (SchedulerException e) {
+                throw new IllegalStateException(e);
+            }
+        });
         return scheduler;
     }
 
