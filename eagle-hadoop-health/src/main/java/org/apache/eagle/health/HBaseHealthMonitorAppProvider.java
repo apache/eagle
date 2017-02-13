@@ -16,13 +16,8 @@
  */
 package org.apache.eagle.health;
 
-import org.apache.eagle.app.XmlSchedulingApplication;
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.app.spi.XmlSchedulingApplicationProvider;
 
-public class HBaseHealthMonitorAppProvider extends AbstractApplicationProvider<XmlSchedulingApplication> {
-    @Override
-    public XmlSchedulingApplication getApplication() {
-        // return new HBaseHealthMonitorApp();
-        return new XmlSchedulingApplication("org.apache.eagle.health.HBaseHealthMonitorAppJobs.xml");
-    }
+public class HBaseHealthMonitorAppProvider extends XmlSchedulingApplicationProvider {
+    // HBaseHealthMonitorAppProvider SPI Implementation
 }

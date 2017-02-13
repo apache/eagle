@@ -16,12 +16,14 @@
  */
 package org.apache.eagle.app.job.plugins;
 
-import org.apache.velocity.VelocityContext;
+import com.typesafe.config.Config;
+import org.apache.eagle.common.config.ConfigStringResolver;
 import org.apache.velocity.app.VelocityEngine;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
+import org.quartz.simpl.SimpleClassLoadHelper;
 import org.quartz.simpl.ThreadContextClassLoadHelper;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.MutableTrigger;
@@ -50,10 +52,11 @@ public class XMLStreamSchedulingDataProcessor extends XMLSchedulingDataProcessor
     }
 
     public XMLStreamSchedulingDataProcessor() throws ParserConfigurationException {
-        super(new ThreadContextClassLoadHelper());
+        super(new SimpleClassLoadHelper());
     }
 
-    public void processStreamAndUnscheduleJobs(InputStream stream, String systemId, Scheduler scheduler) throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
+    public void processStreamAndUnscheduleJobs(InputStream stream, String systemId, Scheduler scheduler)
+        throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
         this.prepForProcessing();
         LOGGER.info("Parsing XML from stream with systemId: " + systemId);
         InputSource is = new InputSource(stream);
@@ -62,7 +65,7 @@ public class XMLStreamSchedulingDataProcessor extends XMLSchedulingDataProcessor
         this.maybeThrowValidationException();
         this.getLoadedJobs();
         List<TriggerKey> triggerKeyList = new LinkedList<>();
-        for (MutableTrigger trigger: this.getLoadedTriggers()) {
+        for (MutableTrigger trigger : this.getLoadedTriggers()) {
             triggerKeyList.add(trigger.getKey());
         }
         scheduler.unscheduleJobs(triggerKeyList);
@@ -70,16 +73,24 @@ public class XMLStreamSchedulingDataProcessor extends XMLSchedulingDataProcessor
     }
 
 
-    public void processStreamWithTemplateAndScheduleJobs(InputStream stream, VelocityContext context, String systemId, Scheduler scheduler) throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
-        throw new IllegalStateException("TODO: Not implemented");
+    public void processStreamWithConfigAndScheduleJobs(InputStream stream, Config config, String systemId, Scheduler scheduler)
+        throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException, ParserConfigurationException {
+        processStreamAndScheduleJobs(new ConfigStringResolver(config).resolveAsStream(stream), systemId, scheduler);
     }
 
-    public void processStreamWithTemplateAndUnscheduleJobs(InputStream stream, VelocityContext context, String systemId, Scheduler scheduler) throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
-        throw new IllegalStateException("TODO: Not implemented");
+    public void processStreamWithConfigAndUnscheduleJobs(InputStream stream, Config config, String systemId, Scheduler scheduler)
+        throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
+        processStreamAndUnscheduleJobs(new ConfigStringResolver(config).resolveAsStream(stream), systemId, scheduler);
     }
 
-    public void processStreamWithTemplate(InputStream stream, VelocityContext context, String systemId, Scheduler scheduler) throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
-        throw new IllegalStateException("TODO: Not implemented");
+    public void processStreamWithConfig(InputStream stream, Config config, String systemId)
+        throws SchedulerException, ValidationException, ClassNotFoundException, SAXException, XPathException, ParseException, IOException {
+        this.prepForProcessing();
+        LOGGER.info("Parsing XML from stream with systemId: " + systemId);
+        InputSource is = new InputSource(new ConfigStringResolver(config).resolveAsStream(stream));
+        is.setSystemId(systemId);
+        this.process(is);
+        this.maybeThrowValidationException();
     }
 
     public List<MutableTrigger> getParsedTriggers() {

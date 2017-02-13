@@ -59,6 +59,10 @@ public abstract class AbstractSchedulingPlan implements SchedulingPlan {
         return environment.scheduler().checkExists(jobKey);
     }
 
+    protected Config getConfig() {
+        return this.config;
+    }
+
     protected Scheduler getScheduler() {
         return environment.scheduler();
     }

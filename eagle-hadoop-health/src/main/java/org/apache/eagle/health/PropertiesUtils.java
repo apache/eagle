@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 
 public class PropertiesUtils {
-    private final static Logger LOG = LoggerFactory.getLogger(PropertiesUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtils.class);
 
     public static Integer getInt(Properties properties, String key, int defaultValue) {
         Object obj = properties.get(key);

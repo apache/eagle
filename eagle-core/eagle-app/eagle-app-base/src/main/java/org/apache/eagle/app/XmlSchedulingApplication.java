@@ -17,12 +17,12 @@
 
 package org.apache.eagle.app;
 
+import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.AbstractSchedulingPlan;
 import org.apache.eagle.app.environment.impl.ScheduledEnvironment;
 import org.apache.eagle.app.environment.impl.SchedulingPlan;
 import org.apache.eagle.app.job.plugins.XMLStreamSchedulingDataProcessor;
-import org.apache.velocity.VelocityContext;
 import org.quartz.SchedulerException;
 import org.quartz.spi.MutableTrigger;
 import org.quartz.xml.ValidationException;
@@ -62,21 +62,23 @@ public class XmlSchedulingApplication extends SchedulingApplication {
         }
 
         private InputStream getSchedulingXmlAsStream() {
-            return XmlSchedulingPlan.class.getResourceAsStream("/META-INF/jobs/" + this.schedulingXmlFile);
-        }
+            String metaInfoSchedulingXmlFile = "/META-INF/jobs/" + this.schedulingXmlFile;
 
-        private VelocityContext getVelocityContext() {
-            // TODO: Build XML Scheduling File Context
-            return new VelocityContext();
+            InputStream inputStream = XmlSchedulingPlan.class.getResourceAsStream("/META-INF/jobs/" + this.schedulingXmlFile);
+            if (inputStream == null) {
+                inputStream = XmlSchedulingPlan.class.getResourceAsStream(this.schedulingXmlFile);
+            }
+            Preconditions.checkNotNull(inputStream, "Unable to load resource " + metaInfoSchedulingXmlFile);
+            return inputStream;
         }
 
         @Override
         public void schedule() throws SchedulerException {
             try {
                 XMLStreamSchedulingDataProcessor processor = new XMLStreamSchedulingDataProcessor();
-                processor.processStreamWithTemplateAndScheduleJobs(
+                processor.processStreamWithConfigAndScheduleJobs(
                     getSchedulingXmlAsStream(),
-                    getVelocityContext(),
+                    this.getConfig(),
                     getAppId(),
                     getScheduler()
                 );
@@ -90,9 +92,9 @@ public class XmlSchedulingApplication extends SchedulingApplication {
         public boolean unschedule() throws SchedulerException {
             try {
                 XMLStreamSchedulingDataProcessor processor = new XMLStreamSchedulingDataProcessor();
-                processor.processStreamWithTemplateAndUnscheduleJobs(
+                processor.processStreamWithConfigAndUnscheduleJobs(
                     getSchedulingXmlAsStream(),
-                    getVelocityContext(),
+                    getConfig(),
                     getAppId(),
                     getScheduler()
                 );
@@ -107,11 +109,10 @@ public class XmlSchedulingApplication extends SchedulingApplication {
         public boolean scheduling() throws SchedulerException {
             try {
                 XMLStreamSchedulingDataProcessor processor = new XMLStreamSchedulingDataProcessor();
-                processor.processStreamWithTemplate(
+                processor.processStreamWithConfig(
                     getSchedulingXmlAsStream(),
-                    getVelocityContext(),
-                    getAppId(),
-                    getScheduler()
+                    getConfig(),
+                    getAppId()
                 );
                 boolean scheduling = false;
                 for (MutableTrigger trigger : processor.getParsedTriggers()) {
