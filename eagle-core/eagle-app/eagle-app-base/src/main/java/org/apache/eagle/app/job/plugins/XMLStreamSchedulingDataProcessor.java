@@ -52,7 +52,7 @@ public class XMLStreamSchedulingDataProcessor extends XMLSchedulingDataProcessor
     }
 
     public XMLStreamSchedulingDataProcessor() throws ParserConfigurationException {
-        super(new SimpleClassLoadHelper());
+        super(new ThreadContextClassLoadHelper());
     }
 
     public void processStreamAndUnscheduleJobs(InputStream stream, String systemId, Scheduler scheduler)

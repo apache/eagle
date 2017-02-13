@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.health;
 
-public class HadoopHealthMonitorXmlAppDebug {
+public class HadoopHealthMonitorAppProviderDebug {
     public static void main(String[] args) {
         new HBaseHealthMonitorAppProvider().getApplication().run(args);
     }

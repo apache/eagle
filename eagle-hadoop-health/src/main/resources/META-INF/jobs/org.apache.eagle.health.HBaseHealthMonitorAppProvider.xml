@@ -24,7 +24,7 @@
             <name>HBASE_SERVICE_CHECK_JOB_${appId}</name>
             <group>HEALTH_CHECK_JOBS</group>
             <description>The job description</description>
-            <job-class>org.apache.eagle.health.detector.HBaseHealthCheckJob</job-class>
+            <job-class>org.apache.eagle.health.job.HBaseHealthCheckJob</job-class>
         </job>
         <trigger>
             <simple>

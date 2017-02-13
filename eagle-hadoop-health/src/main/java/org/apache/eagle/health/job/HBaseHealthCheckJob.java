@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.health.detector;
+package org.apache.eagle.health.job;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.app.job.MonitorJob;
 import org.apache.eagle.app.job.MonitorResult;
-import org.apache.eagle.health.EventType;
-import org.apache.eagle.health.PropertiesUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;

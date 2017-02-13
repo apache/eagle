@@ -36,9 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
-/**
- * TODO: Support load scheduling from XML instead of in-line code.
- */
 public class XmlSchedulingApplication extends SchedulingApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlSchedulingPlan.class);
 
