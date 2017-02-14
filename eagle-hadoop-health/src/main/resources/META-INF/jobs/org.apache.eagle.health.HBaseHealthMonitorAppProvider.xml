@@ -24,7 +24,7 @@
             <name>HBASE_SERVICE_CHECK_JOB</name>
             <group>${appId}</group>
             <description>HBase Health Check job</description>
-            <job-class>org.apache.eagle.health.job.HBaseHealthCheckJob</job-class>
+            <job-class>org.apache.eagle.health.jobs.HBaseHealthCheckJob</job-class>
             <job-data-map>
                 <entry>
                     <key>appId</key>

@@ -14,15 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.health.job;
+package org.apache.eagle.health.jobs;
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+/**
+ * Healthy Checker Event/Status Type.
+ */
+public enum EventType {
+    OK,
 
-public class HDFSHealthCheckJob implements Job {
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    UNKNOWN_ERROR,
+    TIMEOUT_ERROR,
+    EXECUTION_ERROR,
+    INTERRUPTED_ERROR,
 
-    }
+    MAPRED_JOB_ERROR,
+
+    HDFS_CONNECT_ERROR,
+    HDFS_READ_ERROR,
+    HDFS_WRITE_ERROR,
+    HDFS_DELETE_ERROR,
+    HDFS_CREATE_ERROR,
+
+    HBASE_MASTER_NOT_RUNNING,
+    HBASE_READ_TABLE_ERROR,
+    HBASE_CREATE_TABLE_ERROR,
+    HBASE_CREATE_REGION_ERROR,
+    HBASE_MOVE_REGION_ERROR,
+    HBASE_WRITE_REGION_ERROR,
+    HBASE_READ_REGION_ERROR,
+
+    ZOOKEEPER_ERROR,
+    ZOOKEEPER_CONNECTION_ERROR,
+    ZOOKEEPER_IO_ERROR,
 }
