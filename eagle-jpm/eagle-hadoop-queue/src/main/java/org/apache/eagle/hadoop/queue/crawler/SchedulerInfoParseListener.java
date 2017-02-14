@@ -23,6 +23,7 @@ import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.MetricName;
 import org.apache.eagle.hadoop.queue.model.scheduler.*;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 
 import backtype.storm.spout.SpoutOutputCollector;
@@ -43,6 +44,7 @@ public class SchedulerInfoParseListener {
 
     private final List<RunningQueueAPIEntity> runningQueueAPIEntities = new ArrayList<>();
     private final List<GenericMetricEntity> metricEntities = new ArrayList<>();
+    private final Map<String, String> queueMap = new HashMap<>();
 
     private String site;
     private SpoutOutputCollector collector;
@@ -56,8 +58,9 @@ public class SchedulerInfoParseListener {
         Map<String, String> tags = buildMetricTags(null, null);
         createMetric(MetricName.HADOOP_CLUSTER_CAPACITY, tags, currentTimestamp, scheduler.getCapacity());
         createMetric(MetricName.HADOOP_CLUSTER_USED_CAPACITY, tags, currentTimestamp, scheduler.getUsedCapacity());
+        queueMap.clear();
         for (Queue queue : scheduler.getQueues().getQueue()) {
-            createQueues(queue, currentTimestamp, scheduler, null);
+            createQueues(queue, currentTimestamp, scheduler, null, queueMap);
         }
     }
 
@@ -69,11 +72,18 @@ public class SchedulerInfoParseListener {
 
         LOG.info("Flushing {} RunningQueueEntities in memory", runningQueueAPIEntities.size());
         messageId = new HadoopQueueMessageId(HadoopClusterConstants.DataType.ENTITY, HadoopClusterConstants.DataSource.SCHEDULER, System.currentTimeMillis());
-        List<RunningQueueAPIEntity> entities = new ArrayList<>(runningQueueAPIEntities);
+        List<TaggedLogAPIEntity> entities = new ArrayList<>(runningQueueAPIEntities);
+
+        ParentQueueAPIEntity parentQueueAPIEntity = new ParentQueueAPIEntity();
+        parentQueueAPIEntity.setQueueMap(new HashMap<>(queueMap));
+        parentQueueAPIEntity.setTags(buildMetricTags(null, null));
+        entities.add(parentQueueAPIEntity);
+
         collector.emit(new ValuesArray(HadoopClusterConstants.DataType.ENTITY.name(), entities), messageId);
 
         runningQueueAPIEntities.clear();
         metricEntities.clear();
+        queueMap.clear();
     }
 
     private Map<String, String> buildMetricTags(String queueName, String parentQueueName) {
@@ -97,7 +107,9 @@ public class SchedulerInfoParseListener {
         this.metricEntities.add(e);
     }
 
-    private void createQueues(Queue queue, long currentTimestamp, SchedulerInfo scheduler, String parentQueueName) throws Exception {
+    private void createQueues(Queue queue, long currentTimestamp, SchedulerInfo scheduler, String parentQueueName,
+                              Map<String, String> queueMap) throws Exception {
+        queueMap.put(queue.getQueueName(), parentQueueName);
         RunningQueueAPIEntity _entity = new RunningQueueAPIEntity();
         Map<String, String> _tags = buildMetricTags(queue.getQueueName(), parentQueueName);
         _entity.setTags(_tags);
@@ -147,7 +159,7 @@ public class SchedulerInfoParseListener {
 
         if (queue.getQueues() != null && queue.getQueues().getQueue() != null) {
             for (Queue subQueue : queue.getQueues().getQueue()) {
-                createQueues(subQueue, currentTimestamp, scheduler, queue.getQueueName());
+                createQueues(subQueue, currentTimestamp, scheduler, queue.getQueueName(), queueMap);
             }
         }
     }
