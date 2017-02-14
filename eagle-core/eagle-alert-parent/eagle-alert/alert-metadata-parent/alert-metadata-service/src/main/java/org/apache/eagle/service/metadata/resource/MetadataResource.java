@@ -146,6 +146,7 @@ public class MetadataResource {
         stream.ensureDefault();
         OpResult createStreamResult = dao.createStream(stream.getStreamDefinition());
         OpResult createDataSourceResult = dao.addDataSource(stream.getStreamSource());
+        // TODO: Check kafka topic exist or not.
         if (createStreamResult.code == OpResult.SUCCESS
                 && createDataSourceResult.code == OpResult.SUCCESS) {
             return OpResult.success("Successfully create stream "
