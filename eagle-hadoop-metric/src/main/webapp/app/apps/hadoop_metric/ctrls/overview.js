@@ -113,24 +113,104 @@
 
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
-			$scope.chatnameList = ["MemoryUsage", "Master Averageload", "Ritcount", "AssignOpsNum", "Assign", "BulkAssignOpsNum",
-				"BulkAssign", "BalancerClusterOpsNum", "BalancerCluster", "HlogSplitTime", "HlogSplitTime Percentile",
-				"HlogSplitSize", "MetaHlogSplitTime", "MetaHlogSplitTime Percentile", "MetaHlogSplitSize"];
-			$scope.chatmetricList = [["nonheap", "heap"], ["averageload"], ["ritcount", "ritcountoverthreshold"], ["AssignNumOps"], ["AssignMin", "AssignMax", "AssignPercentile75th", "AssignPercentile95th", "AssignPercentile99th"],
-				["BulkAssignNum_ops"], ["BulkAssignMin", "BulkAssignMax", "BulkAssignPercentile75th", "BulkAssignPercentile95th", "BulkAssignPercentile99th"], ["BalancerClusterNum_ops"],
-				["BalancerClusterMin", "BalancerClusterMax", "BalancerClusterPercentile75th", "BalancerClusterPercentile95th", "BalancerClusterPercentile99th"],
-				["HlogSplitTimeMin", "HlogSplitTimeMax"], ["HlogSplitTimePercentile75th", "HlogSplitTimePercentile95th", "HlogSplitTimePercentile99th"],
-				["MetaHlogSplitTimeMin", "MetaHlogSplitTimeMax"], ["MetaHlogSplitTimeMin", "MetaHlogSplitTimeMax"],
-				["MetaHlogSplitTimePercentile75th", "MetaHlogSplitTimePercentile95th", "MetaHlogSplitTimePercentile99th"], ["MetaHlogSplitSizeMin", "MetaHlogSplitSizeMax"]
+			$scope.chartList = [
+				{
+					name: "MemoryUsage",
+					metrics: ["nonheap", "heap"],
+					linename: ["nonheap", "heap"],
+					option: storageOption
+				},
+				{
+					name: "Master Averageload",
+					metrics: ["averageload"],
+					linename: ["averageload"],
+					option: {}
+				},
+				{
+					name: "Ritcount",
+					metrics: ["ritcount", "ritcountoverthreshold"],
+					linename: ["ritcount", "ritcountoverthreshold"],
+					option: {}
+				},
+				{
+					name: "AssignOpsNum",
+					metrics: ["AssignNumOps"],
+					linename: ["numOps"],
+					option: {}
+				},
+				{
+					name: "Assign",
+					metrics: ["AssignMin", "AssignMax", "AssignPercentile75th", "AssignPercentile95th", "AssignPercentile99th"],
+					linename: ["min", "max", "75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "BulkAssignOpsNum",
+					metrics: ["BulkAssignNum_ops"],
+					linename: ["num_ops"],
+					option: {}
+				},
+				{
+					name: "BulkAssign",
+					metrics: ["BulkAssignMin", "BulkAssignMax", "BulkAssignPercentile75th", "BulkAssignPercentile95th", "BulkAssignPercentile99th"],
+					linename: ["min", "max", "75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "BalancerClusterOpsNum",
+					metrics: ["BalancerClusterNum_ops"],
+					linename: ["num_ops"],
+					option: {}
+				},
+				{
+					name: "BalancerCluster",
+					metrics: ["BalancerClusterMin", "BalancerClusterMax", "BalancerClusterPercentile75th", "BalancerClusterPercentile95th", "BalancerClusterPercentile99th"],
+					linename: ["min", "max", "75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "HlogSplitTime",
+					metrics: ["HlogSplitTimeMin", "HlogSplitTimeMax"],
+					linename: ["HlogSplitTime_min", "HlogSplitTime_max"],
+					option: {}
+				},
+				{
+					name: "HlogSplitTime Percentile",
+					metrics: ["HlogSplitTimePercentile75th", "HlogSplitTimePercentile95th", "HlogSplitTimePercentile99th"],
+					linename: ["75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "HlogSplitSize",
+					metrics: ["HlogSplitSizeMin","HlogSplitSizeMax"],
+					linename: ["Min", "Max"],
+					option: {}
+				},
+				{
+					name: "MetaHlogSplitTime",
+					metrics: ["MetaHlogSplitTimeMin", "MetaHlogSplitTimeMax"],
+					linename: ["Min", "Max"],
+					option: {}
+				},
+				{
+					name: "MetaHlogSplitTime Percentile",
+					metrics: ["MetaHlogSplitTimePercentile75th", "MetaHlogSplitTimePercentile95th", "MetaHlogSplitTimePercentile99th"],
+					linename: ["75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "MetaHlogSplitSize",
+					metrics: ["MetaHlogSplitSizeMin", "MetaHlogSplitSizeMax"],
+					linename: ["Min", "Max"],
+					option: {}
+				}
 			];
-			$scope.chatdataoptionList = [storageOption, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-			$scope.chatlineNameList = [["nonheap", "heap"], ["averageload"], ["ritcount", "ritcountoverthreshold"], ["numOps"], ["min", "max", "75th", "95th", "99th"], ["num_ops"],
-				["min", "max", "75th", "95th", "99th"], ["num_ops"], ["min", "max", "75th", "95th", "99th"], ["HlogSplitTime_min", "HlogSplitTime_max"], ["75th", "95th", "99th"], ["Min", "Max"], ["Min", "Max"], ["75th", "95th", "99th"], ["Min", "Max"]];
 			$scope.metricList = [];
-			$.each($scope.chatnameList, function (i) {
-				var charname = $scope.chatnameList[i];
-				$scope.metricList[charname] = {
-					title: $scope.chatnameList[i],
+			$.each($scope.chartList, function (i) {
+				var chart = $scope.chartList[i];
+				var chartname = chart.name;
+				$scope.metricList[chartname] = {
+					title: chartname,
 					series: {},
 					option: {},
 					loading: true,
@@ -141,19 +221,21 @@
 
 				METRIC.getMetricObj().then(function (res) {
 					var masterMetricList = res.master;
-					$.each($scope.chatmetricList, function (i) {
-						var metricList = $scope.chatmetricList[i];
+					$.each($scope.chartList, function (i) {
+						var chart = $scope.chartList[i];
+						var metricList = chart.metrics;
 						$.each(metricList, function (j) {
 							var metricKey = metricList[j];
 							var metricspromies = generateHbaseMetric(masterMetricList[metricKey], metricKey);
-							var charname = $scope.chatnameList[i];
-							$scope.metricList[charname].promises.push(metricspromies);
+							var chartname = chart.name;
+							$scope.metricList[chartname].promises.push(metricspromies);
 						});
 					});
 
-					$.each($scope.chatmetricList, function (k) {
-						var charname = $scope.chatnameList[k];
-						$q.all($scope.metricList[charname].promises).then(function (resp) {
+					$.each($scope.chartList, function (k) {
+						var chart = $scope.chartList[k];
+						var chartname = chart.name;
+						$q.all($scope.metricList[chartname].promises).then(function (resp) {
 							var series = [];
 							for (var r = 0; r < resp.length; r += 1) {
 								var rs = resp[r][1];
@@ -161,7 +243,7 @@
 									series.push(rs);
 								}
 							}
-							$scope.metricList[charname] = mergeMetricToOneSeries(charname, series, $scope.chatlineNameList[k], $scope.chatdataoptionList[k]);
+							$scope.metricList[chartname] = mergeMetricToOneSeries(chartname, series, chart.linename, chart.option);
 						});
 					});
 				});

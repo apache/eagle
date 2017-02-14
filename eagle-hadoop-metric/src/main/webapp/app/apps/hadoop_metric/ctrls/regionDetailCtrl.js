@@ -65,22 +65,135 @@
 					}
 				}]
 			};
-
-			$scope.chatnameList = ["Memory Usage", "Direct Memory Usage", "GC count", "GC TimeMillis", "QueueSize", "NumCallsInGeneralQueue",
-				"NumActiveHandler", "IPC Queue Time (99th)", "IPC Process Time (99th)", "QueueCallTime_num_ops", "ProcessCallTime_num_ops",
-				"RegionCount", "StoreCount", "MemStoreSize", "StoreFileSize", "TotalRequestCount", "ReadRequestCount", "WriteRequestCount",
-				"SlitQueueLength", "CompactionQueueLength", "FlushQueueLength", "BlockCacheSize", "BlockCacheHitCount", "BlockCacheCountHitPercent"];
-			$scope.chatmetricList = [["nonheap", "heap"], ["directmemory"], ["GCCount"], ["GCTimeMillis"], ["QueueSize"], ["NumCallsInGeneralQueue"],
-				["NumActiveHandler"], ["IPCQueueTime99th"], ["IPCProcessTime99th"], ["QueueCallTime_num_ops"], ["ProcessCallTime_num_ops"],
-				["RegionCount"], ["StoreCount"], ["MemStoreSize"], ["StoreFileSize"], ["TotalRequestCount"], ["ReadRequestCount"], ["WriteRequestCount"],
-				["SlitQueueLength"], ["CompactionQueueLength"], ["FlushQueueLength"], ["BlockCacheSize"], ["BlockCacheHitCount"], ["BlockCacheCountHitPercent"]];
-			$scope.chatoptionList = [sizeoption, sizeoption, {}, gctimeoption, {}, {}, {}, {}, {}, {}, {}, {}, {}, sizeoption, sizeoption, {}, {}, {}, {}, {}, {}, sizeoption, {}, {}];
+			$scope.chartList = [
+				{
+					name: "Memory Usage",
+					metrics: ["nonheap", "heap"],
+					option: sizeoption
+				},
+				{
+					name: "Direct Memory Usage",
+					metrics: ["directmemory"],
+					option: sizeoption
+				},
+				{
+					name: "GC count",
+					metrics: ["GCCount"],
+					option: {}
+				},
+				{
+					name: "GC TimeMillis",
+					metrics: ["GCTimeMillis"],
+					option: gctimeoption
+				},
+				{
+					name: "QueueSize",
+					metrics: ["QueueSize"],
+					option: {}
+				},
+				{
+					name: "NumCallsInGeneralQueue",
+					metrics: ["NumCallsInGeneralQueue"],
+					option: {}
+				},
+				{
+					name: "NumActiveHandler",
+					metrics: ["NumActiveHandler"],
+					option: {}
+				},
+				{
+					name: "IPC Queue Time (99th)",
+					metrics: ["IPCQueueTime99th"],
+					option: {}
+				},
+				{
+					name: "IPC Process Time (99th)",
+					metrics: ["IPCProcessTime99th"],
+					option: {}
+				},
+				{
+					name: "QueueCallTime_num_ops",
+					metrics: ["QueueCallTime_num_ops"],
+					option: {}
+				},
+				{
+					name: "ProcessCallTime_num_ops",
+					metrics: ["ProcessCallTime_num_ops"],
+					option: {}
+				},
+				{
+					name: "RegionCount",
+					metrics: ["RegionCount"],
+					option: {}
+				},
+				{
+					name: "StoreCount",
+					metrics: ["StoreCount"],
+					option: {}
+				},
+				{
+					name: "MemStoreSize",
+					metrics: ["MemStoreSize"],
+					option: sizeoption
+				},
+				{
+					name: "StoreFileSize",
+					metrics: ["StoreFileSize"],
+					option: sizeoption
+				},
+				{
+					name: "TotalRequestCount",
+					metrics: ["TotalRequestCount"],
+					option: {}
+				},
+				{
+					name: "ReadRequestCount",
+					metrics: ["ReadRequestCount"],
+					option: {}
+				},
+				{
+					name: "WriteRequestCount",
+					metrics: ["WriteRequestCount"],
+					option: {}
+				},
+				{
+					name: "SlitQueueLength",
+					metrics: ["SlitQueueLength"],
+					option: {}
+				},
+				{
+					name: "CompactionQueueLength",
+					metrics: ["CompactionQueueLength"],
+					option: {}
+				},
+				{
+					name: "FlushQueueLength",
+					metrics: ["FlushQueueLength"],
+					option: {}
+				},
+				{
+					name: "BlockCacheSize",
+					metrics: ["BlockCacheSize"],
+					option: sizeoption
+				},
+				{
+					name: "BlockCacheHitCount",
+					metrics: ["BlockCacheHitCount"],
+					option: {}
+				},
+				{
+					name: "BlockCacheCountHitPercent",
+					metrics: ["BlockCacheCountHitPercent"],
+					option: {}
+				}
+			];
 
 			$scope.metricList = [];
-			$.each($scope.chatnameList, function (i) {
-				var charname = $scope.chatnameList[i];
-				$scope.metricList[charname] = {
-					title: $scope.chatnameList[i],
+			$.each($scope.chartList, function (i) {
+				var chart = $scope.chartList[i];
+				var chartname = chart.name;
+				$scope.metricList[chartname] = {
+					title: chartname,
 					series: {},
 					option: {},
 					loading: true,
@@ -93,19 +206,21 @@
 
 				METRIC.getMetricObj().then(function (res) {
 					var masterMetricList = res.regionserver;
-					$.each($scope.chatmetricList, function (i) {
-						var metricList = $scope.chatmetricList[i];
+					$.each($scope.chartList, function (i) {
+						var chart = $scope.chartList[i];
+						var metricList = chart.metrics;
 						$.each(metricList, function (j) {
 							var metricKey = metricList[j];
 							var metricspromies = generateHbaseMetric(masterMetricList[metricKey], startTime, endTime, metricKey);
-							var charname = $scope.chatnameList[i];
-							$scope.metricList[charname].promises.push(metricspromies);
+							var chartname = chart.name;
+							$scope.metricList[chartname].promises.push(metricspromies);
 						});
 					});
 
-					$.each($scope.chatmetricList, function (k) {
-						var charname = $scope.chatnameList[k];
-						$q.all($scope.metricList[charname].promises).then(function (resp) {
+					$.each($scope.chartList, function (k) {
+						var chart = $scope.chartList[k];
+						var chartname = chart.name;
+						$q.all($scope.metricList[chartname].promises).then(function (resp) {
 							var series = [];
 							for (var r = 0; r < resp.length; r += 1) {
 								var rs = resp[r][1];
@@ -113,7 +228,7 @@
 									series.push(rs);
 								}
 							}
-							$scope.metricList[charname] = mergeSeries(charname, series, $scope.chatmetricList[k], $scope.chatoptionList[k]);
+							$scope.metricList[chartname] = mergeSeries(chartname, series, chart.metrics, chart.option);
 						});
 					});
 				});
@@ -169,4 +284,4 @@
 	});
 })
 ();
-
+//# sourceURL=regionDetailCtrl.js

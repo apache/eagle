@@ -93,14 +93,14 @@
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">
-			<div class="col-sm-6 hadoopMetric-col-md-6 col-lg-3" ng-repeat="chatname in chatnameList track by $index">
+			<div class="col-sm-6 hadoopMetric-col-md-6 col-lg-3" ng-repeat="chart in chartList track by $index">
 				<div class="hadoopMetric-chart">
-					<h3>{{metricList[chatname].title}}</h3>
-					<div ng-show="metricList[chatname].loading" class="fa fa-refresh fa-spin no-animate"></div>
-					<div ng-show="metricList[chatname].series.length" chart class="hadoopMetric-chart-container"
-						 series="metricList[chatname].series"
-						 option="metricList[chatname].option"></div>
-					<div ng-show="!metricList[chatname].series.length && !metricList[chatname].loading" class="hadoopMetric-chart-container">
+					<h3>{{metricList[chart.name].title}}</h3>
+					<div ng-show="metricList[chart.name].loading" class="fa fa-refresh fa-spin no-animate"></div>
+					<div ng-show="metricList[chart.name].series.length" chart class="hadoopMetric-chart-container"
+						 series="metricList[chart.name].series"
+						 option="metricList[chart.name].option"></div>
+					<div ng-show="!metricList[chart.name].series.length && !metricList[chart.name].loading" class="hadoopMetric-chart-container">
 						<div class="hadoopMetric-no-chart-data">
 							<span class="fa fa-question-circle"></span><span> NO DATA</span>
 						</div>
