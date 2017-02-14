@@ -24,7 +24,7 @@
 		var COLOR_MAPPING = {
 			HDFS: 'orange',
 			HBase: 'yellow',
-			Yarn: 'green',
+			Yarn: 'green'
 		};
 
 		hadoopMetricApp.directive("hadoopMetricWidget", function () {
@@ -39,13 +39,13 @@
 						$scope.list = $.map(Application.find("HADOOP_METRIC_MONITOR"), function (app) {
 							return {
 								siteId: app.site.siteId,
-								siteName: app.site.siteName || app.site.siteId,
+								siteName: app.site.siteName || app.site.siteId
 							};
 						});
 					} else {
 						$scope.list = [{
 							siteId: site.siteId,
-							siteName: site.siteName || site.siteId,
+							siteName: site.siteName || site.siteId
 						}];
 					}
 					// Get type
@@ -75,7 +75,7 @@
 							});
 							countHBaseRole(site.siteId, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
-									$scope.hmasterstandbynum = data.value[0]
+									$scope.hmasterstandbynum = data.value[0];
 								});
 							});
 							countHBaseRole(site.siteId, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
