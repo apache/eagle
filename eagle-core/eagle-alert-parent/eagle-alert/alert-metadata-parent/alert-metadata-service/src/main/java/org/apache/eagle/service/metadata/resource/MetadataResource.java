@@ -18,6 +18,7 @@ package org.apache.eagle.service.metadata.resource;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -135,6 +136,26 @@ public class MetadataResource {
     @POST
     public OpResult createStream(StreamDefinition stream) {
         return dao.createStream(stream);
+    }
+
+    @Path("/streams/create")
+    @POST
+    public OpResult createStream(StreamDefinitionWrapper stream) {
+        Preconditions.checkNotNull(stream.getStreamDefinition(),"Stream definition is null");
+        Preconditions.checkNotNull(stream.getStreamSource(),"Stream source is null");
+        stream.generateSourceId();
+        OpResult createStreamResult = dao.createStream(stream.getStreamDefinition());
+        OpResult createDataSourceResult = dao.addDataSource(stream.getStreamSource());
+        if (createStreamResult.code == OpResult.SUCCESS
+                && createDataSourceResult.code == OpResult.SUCCESS) {
+            return OpResult.success("Successfully create stream "
+                    + stream.getStreamDefinition().getStreamId()
+                    + ", and datasource "
+                    + stream.getStreamSource().getName());
+        } else {
+            return OpResult.fail("Error: "
+                    + StringUtils.join(new String[]{createDataSourceResult.message, createDataSourceResult.message},","));
+        }
     }
 
     @Path("/streams/batch")
