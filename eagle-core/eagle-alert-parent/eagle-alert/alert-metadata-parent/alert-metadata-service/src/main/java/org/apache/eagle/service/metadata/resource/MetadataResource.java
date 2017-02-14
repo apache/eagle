@@ -143,7 +143,7 @@ public class MetadataResource {
     public OpResult createStream(StreamDefinitionWrapper stream) {
         Preconditions.checkNotNull(stream.getStreamDefinition(),"Stream definition is null");
         Preconditions.checkNotNull(stream.getStreamSource(),"Stream source is null");
-        stream.generateSourceId();
+        stream.ensureDefault();
         OpResult createStreamResult = dao.createStream(stream.getStreamDefinition());
         OpResult createDataSourceResult = dao.addDataSource(stream.getStreamSource());
         if (createStreamResult.code == OpResult.SUCCESS

@@ -18,7 +18,11 @@
 package org.apache.eagle.service.metadata.resource;
 
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
+import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
+
+import java.util.Properties;
 
 public class StreamDefinitionWrapper {
     private Kafka2TupleMetadata streamSource;
@@ -40,9 +44,16 @@ public class StreamDefinitionWrapper {
         this.streamDefinition = streamDefinition;
     }
 
-    public void generateSourceId() {
+    public void ensureDefault() {
         String dataSourceName = (getStreamDefinition().getStreamId() + "_SOURCE").toUpperCase();
         getStreamDefinition().setDataSource(dataSourceName);
         getStreamSource().setName(dataSourceName);
+        Tuple2StreamMetadata codec = new Tuple2StreamMetadata();
+        codec.setTimestampColumn("timestamp");
+        codec.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getName());
+        codec.setStreamNameSelectorProp(new Properties(){{
+            put("userProvidedStreamName", streamSource.getName());
+        }});
+        this.streamSource.setCodec(codec);
     }
 }
