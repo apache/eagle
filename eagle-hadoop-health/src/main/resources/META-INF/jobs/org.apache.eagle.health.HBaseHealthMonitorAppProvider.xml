@@ -34,6 +34,10 @@
                     <key>connectionProps</key>
                     <value>${hbaseHealth.connectionProps}</value>
                 </entry>
+                <entry>
+                    <key>tableName</key>
+                    <value>${hbaseHealth.tableName}</value>
+                </entry>
             </job-data-map>
         </job>
         <trigger>

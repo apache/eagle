@@ -65,8 +65,8 @@ public class MonitorResult {
 
     @Override
     public String toString() {
-        return String.format("group=%s, type=%s, status=%s, message=%s, data=%s, exception=%s",
-            this.group, this.type, this.status,this.message, this.data, this.exception);
+        return String.format("group=%s, status=%s, type=%s, message=%s, data=%s, exception=%s",
+            this.group, this.status, this.type,this.message, this.data, this.exception);
     }
 
     public static MonitorResult critical(String message, Throwable throwable) {

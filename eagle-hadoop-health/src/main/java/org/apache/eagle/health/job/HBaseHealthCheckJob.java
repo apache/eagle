@@ -91,13 +91,22 @@ public class HBaseHealthCheckJob extends MonitorJob implements Watcher {
 
     @Override
     protected MonitorResult execute() throws Exception {
+        checkClusterServers();
         try {
-            doCheck();
+            checkRegionServer();
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
             throw e;
         }
         return MonitorResult.ok("HBase is healthy");
+    }
+
+    private void checkClusterServers() throws IOException {
+        ClusterStatus clusterStatus = this.hbaseAdmin.getClusterStatus();
+        ServerName masterServerName = clusterStatus.getMaster();
+        Collection<ServerName> regionServerServerName = clusterStatus.getServers();
+        LOG.info("Checking master {}", masterServerName);
+        LOG.info("Checking region server {}", regionServerServerName);
     }
 
     private void deleteTable(HBaseAdmin hbaseAdmin) throws IOException {
@@ -156,7 +165,7 @@ public class HBaseHealthCheckJob extends MonitorJob implements Watcher {
     }
 
 
-    private void doCheck() throws JobExecutionException {
+    private void checkRegionServer() throws JobExecutionException {
         boolean tableExists;
         try {
             LOG.info("Checking whether hbase table {} exists", tableNameStr);
