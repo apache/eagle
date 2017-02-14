@@ -190,4 +190,9 @@ public interface IMetadataDao extends Closeable {
         }
         return result;
     }
+
+    default List<PolicyDefinition> getPoliciesBySiteId(String siteId) {
+        Preconditions.checkNotNull(siteId,"siteId");
+        return listPolicies().stream().filter(pc -> pc.getSiteId().equals(siteId)).collect(Collectors.toList());
+    }
 }

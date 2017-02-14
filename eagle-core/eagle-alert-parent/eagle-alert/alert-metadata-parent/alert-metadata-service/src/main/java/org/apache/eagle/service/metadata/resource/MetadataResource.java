@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -29,15 +31,15 @@ import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
-
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @since Apr 11, 2016.
@@ -201,8 +203,12 @@ public class MetadataResource {
 
     @Path("/policies")
     @GET
-    public List<PolicyDefinition> listPolicies() {
-        return dao.listPolicies();
+    public List<PolicyDefinition> listPolicies(@QueryParam("siteId") String siteId) {
+        if (siteId != null) {
+            return dao.getPoliciesBySiteId(siteId);
+        } else {
+            return dao.listPolicies();
+        }
     }
 
     @Path("/policies")
@@ -281,7 +287,7 @@ public class MetadataResource {
         try {
             PolicyDefinition policyDefinition = getPolicyById(policyId);
             policyDefinition.setPolicyStatus(status);
-            OpResult updateResult  = addPolicy(policyDefinition);
+            OpResult updateResult = addPolicy(policyDefinition);
             result.code = updateResult.code;
 
             if (result.code == OpResult.SUCCESS) {
@@ -292,7 +298,7 @@ public class MetadataResource {
                 LOG.error(result.message);
             }
         } catch (Exception e) {
-            LOG.error("Error: " + e.getMessage(),e);
+            LOG.error("Error: " + e.getMessage(), e);
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
         }
