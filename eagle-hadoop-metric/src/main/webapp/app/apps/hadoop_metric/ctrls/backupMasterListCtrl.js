@@ -26,7 +26,9 @@
 
 			// Initialization
 			PageConfig.title = "HBASE BackupMasters";
+			$scope.tableScope = {};
 			$scope.site = $wrapState.param.siteId;
+			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
 			$scope.backupMasterList = METRIC.hbaseMaster($scope.site, "standby", 1000);
 		});
 	});
