@@ -57,6 +57,7 @@ public class ApplicationStatusUpdateServiceImpl extends ApplicationStatusUpdateS
             for (ApplicationEntity applicationEntity : applicationEntities) {
                 if (applicationEntity.getDescriptor().isExecutable()) {
                     updateApplicationEntityStatus(applicationEntity);
+                    applicationEntityService.update(applicationEntity);
                 }
             }
             LOG.info("Updated {} application status", applicationEntities.size());
@@ -71,51 +72,59 @@ public class ApplicationStatusUpdateServiceImpl extends ApplicationStatusUpdateS
     }
 
     @Override
-    public void updateApplicationEntityStatus(Collection<ApplicationEntity> applicationEntities) {
-    }
-
-    @Override
     public void updateApplicationEntityStatus(ApplicationEntity applicationEntity) {
         String appUuid = applicationEntity.getUuid();
-        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        ApplicationEntity.Status preStatus = applicationEntity.getStatus();
         try {
-            ApplicationEntity.Status topologyStatus = applicationManagementService.getStatus(new ApplicationOperations.CheckStatusOperation(appUuid));
-            if (currentStatus == ApplicationEntity.Status.STARTING) {
-                if (topologyStatus == ApplicationEntity.Status.RUNNING) {
-                    applicationEntityService.delete(applicationEntity);
-                    applicationEntity.setStatus(ApplicationEntity.Status.RUNNING);
-                    applicationEntityService.create(applicationEntity);
+            ApplicationEntity.Status currentStatus = applicationManagementService.getStatus(new ApplicationOperations.CheckStatusOperation(appUuid));
+            if (preStatus == ApplicationEntity.Status.STARTING) {
+                if (currentStatus == ApplicationEntity.Status.RUNNING) {
+                    // applicationEntityService.delete(applicationEntity);
+                    // applicationEntity.setStatus(ApplicationEntity.Status.RUNNING);
+                    // applicationEntityService.create(applicationEntity);
+                    currentStatus = ApplicationEntity.Status.RUNNING;
                     // handle the topology corruption case:
-                } else if (topologyStatus == ApplicationEntity.Status.REMOVED) {
-                    applicationEntityService.delete(applicationEntity);
-                    applicationEntity.setStatus(ApplicationEntity.Status.INITIALIZED);
-                    applicationEntityService.create(applicationEntity);
+                } else if (currentStatus == ApplicationEntity.Status.REMOVED) {
+                    // applicationEntityService.delete(applicationEntity);
+                    // applicationEntity.setStatus(ApplicationEntity.Status.INITIALIZED);
+                    // applicationEntityService.create(applicationEntity);
+                    currentStatus = ApplicationEntity.Status.INITIALIZED;
                 }
-            } else if (currentStatus == ApplicationEntity.Status.STOPPING) {
-                if (topologyStatus == ApplicationEntity.Status.REMOVED) {
-                    applicationEntityService.delete(applicationEntity);
-                    applicationEntity.setStatus(ApplicationEntity.Status.INITIALIZED);
-                    applicationEntityService.create(applicationEntity);
+            } else if (preStatus == ApplicationEntity.Status.STOPPING) {
+                if (currentStatus == ApplicationEntity.Status.REMOVED) {
+                    // applicationEntityService.delete(applicationEntity);
+                    // applicationEntity.setStatus(ApplicationEntity.Status.INITIALIZED);
+                    // applicationEntityService.create(applicationEntity);
+                    currentStatus = ApplicationEntity.Status.INITIALIZED;
                 }
-            } else if (currentStatus == ApplicationEntity.Status.RUNNING) {
+            } else if (preStatus == ApplicationEntity.Status.RUNNING) {
                 // handle the topology corruption case:
-                if (topologyStatus == ApplicationEntity.Status.REMOVED) {
-                    applicationEntityService.delete(applicationEntity);
-                    applicationEntity.setStatus(ApplicationEntity.Status.INITIALIZED);
-                    applicationEntityService.create(applicationEntity);
+                if (currentStatus == ApplicationEntity.Status.REMOVED) {
+                    // applicationEntityService.delete(applicationEntity);
+                    // applicationEntity.setStatus(ApplicationEntity.Status.INITIALIZED);
+                    // applicationEntityService.create(applicationEntity);
+                    currentStatus = ApplicationEntity.Status.INITIALIZED;
                 }
-            } else if (currentStatus == ApplicationEntity.Status.INITIALIZED) {
+            } else if (preStatus == ApplicationEntity.Status.INITIALIZED) {
                 //corner case: when Storm service go down, app status-> initialized,
                 //then when storm server is up again, storm topology will be launched automatically->active
-                if (topologyStatus == ApplicationEntity.Status.RUNNING) {
-                    applicationEntityService.delete(applicationEntity);
-                    applicationEntity.setStatus(ApplicationEntity.Status.RUNNING);
-                    applicationEntityService.create(applicationEntity);
+                if (currentStatus == ApplicationEntity.Status.RUNNING) {
+                    // applicationEntityService.delete(applicationEntity);
+                    // applicationEntity.setStatus(ApplicationEntity.Status.RUNNING);
+                    // applicationEntityService.create(applicationEntity);
+                    currentStatus = ApplicationEntity.Status.RUNNING;
                 }
             }
-            // "STOPPED" is not used in Eagle, so just do nothing.
 
-            applicationEntity.setStatus(topologyStatus);
+            if (currentStatus == ApplicationEntity.Status.REMOVED) {
+                currentStatus = ApplicationEntity.Status.INITIALIZED;
+            }
+
+            // "STOPPED" is not used in Eagle, so just do nothing.
+            if (preStatus != currentStatus) {
+                LOG.info("Application {} status changed from {} to {}", applicationEntity.getAppId(), preStatus, currentStatus);
+            }
+            applicationEntity.setStatus(currentStatus);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
         }

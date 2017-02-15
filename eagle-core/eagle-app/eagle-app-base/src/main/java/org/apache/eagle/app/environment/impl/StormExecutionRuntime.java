@@ -186,9 +186,10 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
                     } else if (topologySummary.get_status().equalsIgnoreCase("INACTIVE")) {
                         status = ApplicationEntity.Status.STOPPED;
                     } else if (topologySummary.get_status().equalsIgnoreCase("KILLED")) {
-                        status = ApplicationEntity.Status.STOPPED;
+                        status = ApplicationEntity.Status.STOPPING;
                     } else {
                         LOG.error("Unknown storm topology ({}) status: {}", topologySummary.get_status(),topologySummary.get_status());
+                        status = ApplicationEntity.Status.UNKNOWN;
                     }
                 }
             }
