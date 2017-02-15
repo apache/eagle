@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Application Service KafkaStreamMessaging Interface.
+ * Application Service Provider Interface (SPI)
  *
  * @param <T> Application Type.
  */
