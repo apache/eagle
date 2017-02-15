@@ -143,7 +143,7 @@ public class MetadataResource {
     public OpResult createStream(StreamDefinitionWrapper stream) {
         Preconditions.checkNotNull(stream.getStreamDefinition(),"Stream definition is null");
         Preconditions.checkNotNull(stream.getStreamSource(),"Stream source is null");
-        stream.ensureDefault();
+        stream.validateAndEnsureDefault();
         OpResult createStreamResult = dao.createStream(stream.getStreamDefinition());
         OpResult createDataSourceResult = dao.addDataSource(stream.getStreamSource());
         // TODO: Check kafka topic exist or not.

@@ -17,6 +17,8 @@
 
 package org.apache.eagle.service.metadata.resource;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -44,8 +46,13 @@ public class StreamDefinitionWrapper {
         this.streamDefinition = streamDefinition;
     }
 
-    public void ensureDefault() {
-        String dataSourceName = (getStreamDefinition().getStreamId() + "_SOURCE").toUpperCase();
+    public void validateAndEnsureDefault() {
+        Preconditions.checkNotNull(streamSource);
+        Preconditions.checkNotNull(streamDefinition);
+        if (streamSource.getType() == null) {
+            streamSource.setType("KAFKA");
+        }
+        String dataSourceName = (getStreamDefinition().getStreamId() + "_CUSTOMIZED").toUpperCase();
         getStreamDefinition().setDataSource(dataSourceName);
         getStreamSource().setName(dataSourceName);
         Tuple2StreamMetadata codec = new Tuple2StreamMetadata();
@@ -54,6 +61,12 @@ public class StreamDefinitionWrapper {
         Properties streamNameSelectorProp = new Properties();
         streamNameSelectorProp.put("userProvidedStreamName", streamSource.getName());
         codec.setStreamNameSelectorProp(streamNameSelectorProp);
+        if (StringUtils.isBlank(codec.getStreamNameSelectorCls())) {
+            codec.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getName());
+        }
+        if (StringUtils.isBlank(codec.getTimestampFormat())) {
+            codec.setTimestampFormat(null);
+        }
         this.streamSource.setCodec(codec);
     }
 }
