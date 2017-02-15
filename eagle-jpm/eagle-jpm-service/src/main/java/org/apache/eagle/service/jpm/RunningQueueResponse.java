@@ -15,33 +15,36 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.hadoop.queue.model.scheduler;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.*;
+package org.apache.eagle.service.jpm;
 
 import java.util.Map;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@Table("queue_map")
-@ColumnFamily("f")
-@Prefix("queueMap")
-@Service(HadoopClusterConstants.QUEUE_MAPPING_SERVICE_NAME)
-@TimeSeries(false)
-@Partition( {"site"})
-public class ParentQueueAPIEntity extends TaggedLogAPIEntity {
-    @Column("a")
-    Map<String, String> queueMap;
+public class RunningQueueResponse {
+    private String errMessage;
+    private Map<String, Long> jobs;
+    private Map<String, Long> users;
 
-    public Map<String, String> getQueueMap() {
-        return queueMap;
+    public String getErrMessage() {
+        return errMessage;
     }
 
-    public void setQueueMap(Map<String, String> queueMap) {
-        this.queueMap = queueMap;
-        valueChanged("queueMap");
+    public void setErrMessage(String errMessage) {
+        this.errMessage = errMessage;
     }
 
+    public Map<String, Long> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(Map<String, Long> jobs) {
+        this.jobs = jobs;
+    }
+
+    public Map<String, Long> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Map<String, Long> users) {
+        this.users = users;
+    }
 }

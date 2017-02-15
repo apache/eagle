@@ -17,30 +17,138 @@
 
 package org.apache.eagle.service.jpm;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.utils.Tuple2;
+import org.apache.eagle.hadoop.queue.model.scheduler.QueueStructureAPIEntity;
+import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.generic.GenericEntityServiceResource;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
+
+import static org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.QUEUE_MAPPING_SERVICE_NAME;
+import static org.apache.eagle.jpm.util.Constants.JPA_JOB_EXECUTION_SERVICE_NAME;
+import static org.apache.eagle.jpm.util.Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME;
+import static org.apache.eagle.jpm.util.MRJobTagName.JOB_ID;
+import static org.apache.eagle.jpm.util.MRJobTagName.JOB_QUEUE;
+import static org.apache.eagle.jpm.util.MRJobTagName.USER;
 
 @Path("queue")
 public class RunningQueueResource {
 
-    @Path("/{queueName}/users")
+    @GET
+    @Path("memory")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Double> getUsersByQueue(@QueryParam("top") int top, @QueryParam("currentTime") long currentTime) {
-        return null;
+    public RunningQueueResponse getTopByQueue(@QueryParam("site") String site,
+                                              @QueryParam("queue") String queue,
+                                              @QueryParam("currentTime") long currentTime,
+                                              @QueryParam("top") int top) {
+        RunningQueueResponse result = new RunningQueueResponse();
+        try {
+            if (site == null || queue == null || currentTime == 0L || top == 0) {
+                throw new Exception("Invalid query parameters: site == null || queue == null || currentTime == 0L || top == 0");
+            }
+            Tuple2<String, String> queryTimeRange = getQueryTimeRange(currentTime);
+            Map<String, Set<String>> queueMap = getQueueMap(site);
+            List<JobExecutionAPIEntity> runningJobs = getRunningJobs(site, currentTime, queryTimeRange.f0(), queryTimeRange.f1());
+            List<org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity> jobs = getJobs(site, currentTime, queryTimeRange.f0(), queryTimeRange.f1());
+            Set<String> jobIds = new HashSet<>();
+            jobs.forEach(job -> jobIds.add(job.getTags().get(JOB_ID.toString())));
+
+            TreeMap<Long, String> sortedJobUsage = new TreeMap<>();
+            Map<String, Long> userUsage = new HashMap<>();
+            for (JobExecutionAPIEntity job : runningJobs) {
+                String jobId = job.getTags().get(JOB_ID.toString());
+                String jobQueue = job.getTags().get(JOB_QUEUE.toString());
+                String user = job.getTags().get(USER.toString());
+
+                if (jobIds.contains(jobId) && queueMap.get(queue).contains(jobQueue)) {
+                    if (userUsage.containsKey(user)) {
+                        userUsage.put(user, userUsage.get(user) + job.getAllocatedMB());
+                    } else {
+                        userUsage.put(user, 0L);
+                    }
+                    sortedJobUsage.put(job.getAllocatedMB(), jobId);
+                }
+            }
+
+            TreeMap<Long, String> sortedUserUsage = new TreeMap<>();
+            for (Map.Entry<String, Long> entry : userUsage.entrySet()) {
+                sortedUserUsage.put(entry.getValue(), entry.getKey());
+            }
+            result.setJobs(getTopRecords(top, sortedJobUsage));
+            result.setUsers(getTopRecords(top, sortedUserUsage));
+         } catch (Exception e) {
+            result.setErrMessage(e.getMessage());
+        }
+        return result;
     }
 
-    @Path("/{queueName}/jobs")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Double> getJobsByQueue(@QueryParam("top") int top, @QueryParam("currentTime") long currentTime) {
-        return null;
+    private List<JobExecutionAPIEntity> getRunningJobs(String site, long currentTime, String startTime, String endTime) throws Exception {
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
+        String query = String.format("%s[@site=\"%s\" and @startTime<=%s and (@internalState=\"RUNNING\" or @endTime>%s)]{@jobId, @user, @queue, @allocatedMB}", JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, site, currentTime, currentTime);
+        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> runningJobResponse = resource.search(query, startTime, endTime, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
+
+        if (!runningJobResponse.isSuccess() || runningJobResponse.getObj() == null) {
+            throw new IOException(runningJobResponse.getException());
+        }
+
+        return runningJobResponse.getObj();
     }
 
+    private List<org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity> getJobs(String site, long currentTime,  String startTime, String endTime) throws Exception{
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
+        String query = String.format("%s[@site=\"%s\" and @startTime<=%s and @endTime>%s]{@jobId}", JPA_JOB_EXECUTION_SERVICE_NAME, site, currentTime, currentTime);
 
+        GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity> response =
+                resource.search(query, startTime, endTime, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
 
+        if (!response.isSuccess() || response.getObj() == null) {
+            throw new IOException(response.getException());
+        }
+
+        return response.getObj();
+    }
+
+    private Map<String, Set<String>> getQueueMap(String site) throws IOException {
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
+
+        String query = String.format("%s[@site=\"%s\"]{*}", QUEUE_MAPPING_SERVICE_NAME, site);
+        GenericServiceAPIResponseEntity<QueueStructureAPIEntity> responseEntity = resource.search(query, null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
+
+        if (!responseEntity.isSuccess() || responseEntity.getObj() == null) {
+            throw new IOException(responseEntity.getException());
+        }
+        Map<String, Set<String>> result = new HashMap<>();
+        for(QueueStructureAPIEntity entity : responseEntity.getObj()) {
+            String queue = entity.getTags().get("queue");
+            Set<String> subQueues = new HashSet<>();
+            subQueues.addAll(entity.getAllSubQueues());
+            result.put(queue, subQueues);
+        }
+        return result;
+    }
+
+    private Tuple2<String, String> getQueryTimeRange(long currentTime) throws ParseException {
+        String startTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(currentTime - DateTimeUtil.ONEHOUR * 12);
+        String endTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(currentTime + DateTimeUtil.ONEMINUTE);
+        return new Tuple2<>(startTime, endTime);
+    }
+
+    private Map<String, Long> getTopRecords(int top, TreeMap<Long, String> map) {
+        Map<String, Long> newMap = new LinkedHashMap<>();
+        for (Map.Entry<Long, String> entry : map.entrySet()) {
+            if (newMap.size() < top) {
+                newMap.put(entry.getValue(), entry.getKey());
+            } else {
+                break;
+            }
+        }
+        return newMap;
+    }
 }
