@@ -31,7 +31,7 @@ import com.typesafe.config.Config;
  * Created on 2/10/16.
  * Notification Plug-in interface which provide abstraction layer to notify to different system
  */
-public interface AlertPublishPlugin extends Closeable{
+public interface AlertPublishPlugin extends Closeable {
     /**
      * Init alert publish plugin.
      *

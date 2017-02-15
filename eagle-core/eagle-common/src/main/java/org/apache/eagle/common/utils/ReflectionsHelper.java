@@ -21,6 +21,7 @@ import org.reflections.Reflections;
 
 public class ReflectionsHelper {
     private final Reflections reflections;
+
     private ReflectionsHelper() {
         this.reflections = new Reflections();
     }
