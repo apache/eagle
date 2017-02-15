@@ -60,29 +60,25 @@ public class RunningQueueResource {
             Set<String> jobIds = new HashSet<>();
             jobs.forEach(job -> jobIds.add(job.getTags().get(JOB_ID.toString())));
 
-            TreeMap<Long, String> sortedJobUsage = new TreeMap<>();
             Map<String, Long> userUsage = new HashMap<>();
+            Map<String, Long> jobUsage = new HashMap<>();
             for (JobExecutionAPIEntity job : runningJobs) {
                 String jobId = job.getTags().get(JOB_ID.toString());
                 String jobQueue = job.getTags().get(JOB_QUEUE.toString());
                 String user = job.getTags().get(USER.toString());
 
-                if (jobIds.contains(jobId) && queueMap.get(queue).contains(jobQueue)) {
+                if (jobIds.contains(jobId) && queueMap.containsKey(queue)
+                        && (queueMap.containsKey(jobQueue) || queueMap.get(queue).contains(jobQueue))) {
                     if (userUsage.containsKey(user)) {
                         userUsage.put(user, userUsage.get(user) + job.getAllocatedMB());
                     } else {
                         userUsage.put(user, 0L);
                     }
-                    sortedJobUsage.put(job.getAllocatedMB(), jobId);
+                    jobUsage.put(jobId, job.getAllocatedMB());
                 }
             }
-
-            TreeMap<Long, String> sortedUserUsage = new TreeMap<>();
-            for (Map.Entry<String, Long> entry : userUsage.entrySet()) {
-                sortedUserUsage.put(entry.getValue(), entry.getKey());
-            }
-            result.setJobs(getTopRecords(top, sortedJobUsage));
-            result.setUsers(getTopRecords(top, sortedUserUsage));
+            result.setJobs(getTopRecords(top, jobUsage));
+            result.setUsers(getTopRecords(top, userUsage));
          } catch (Exception e) {
             result.setErrMessage(e.getMessage());
         }
@@ -140,11 +136,14 @@ public class RunningQueueResource {
         return new Tuple2<>(startTime, endTime);
     }
 
-    private Map<String, Long> getTopRecords(int top, TreeMap<Long, String> map) {
+    private Map<String, Long> getTopRecords(int top, Map<String, Long> map) {
         Map<String, Long> newMap = new LinkedHashMap<>();
-        for (Map.Entry<Long, String> entry : map.entrySet()) {
+
+        List<Map.Entry<String,Long>> list = new ArrayList<>(map.entrySet());
+        Collections.sort(list, (o1, o2) -> o1.getValue() >= o2.getValue() ? 1 : -1);
+        for (Map.Entry<String, Long> entry : list) {
             if (newMap.size() < top) {
-                newMap.put(entry.getValue(), entry.getKey());
+                newMap.put(entry.getKey(), entry.getValue());
             } else {
                 break;
             }
