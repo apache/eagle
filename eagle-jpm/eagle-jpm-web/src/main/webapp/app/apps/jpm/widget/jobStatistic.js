@@ -79,7 +79,7 @@
 							'<a ui-sref="jpmList({siteId: site.siteId})">' +
 								'<strong>{{site.siteName}}</strong>: ' +
 								'<span ng-show="site.count === -1" class="fa fa-refresh fa-spin no-animate"></span>' +
-								'<span ng-show="site.count !== -1">{{site.count}}</span> Running Jobs' +
+								'<span ng-show="site.count !== -1">{{site.count || "N/A"}}</span> Running Jobs' +
 							'</a>' +
 						'</p>' +
 					'</div>' +
