@@ -140,7 +140,7 @@ public class RunningQueueResource {
         Map<String, Long> newMap = new LinkedHashMap<>();
 
         List<Map.Entry<String,Long>> list = new ArrayList<>(map.entrySet());
-        Collections.sort(list, (o1, o2) -> o1.getValue() >= o2.getValue() ? 1 : -1);
+        Collections.sort(list, (o1, o2) -> o1.getValue() < o2.getValue() ? 1 : -1);
         for (Map.Entry<String, Long> entry : list) {
             if (newMap.size() < top) {
                 newMap.put(entry.getKey(), entry.getValue());
