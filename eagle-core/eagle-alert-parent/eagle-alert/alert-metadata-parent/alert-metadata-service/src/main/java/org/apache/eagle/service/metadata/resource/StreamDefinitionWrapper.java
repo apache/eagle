@@ -51,7 +51,7 @@ public class StreamDefinitionWrapper {
         Tuple2StreamMetadata codec = new Tuple2StreamMetadata();
         codec.setTimestampColumn("timestamp");
         codec.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getName());
-        codec.setStreamNameSelectorProp(new Properties(){{
+        codec.setStreamNameSelectorProp(new Properties() {{
             put("userProvidedStreamName", streamSource.getName());
         }});
         this.streamSource.setCodec(codec);
