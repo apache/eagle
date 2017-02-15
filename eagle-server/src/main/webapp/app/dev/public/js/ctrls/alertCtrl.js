@@ -116,13 +116,32 @@
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
 		PageConfig.title = "Policies";
+		$scope.loading = false;
 
+		var originPolicyList = [];
 		$scope.policyList = [];
+		$scope.siteFilter = '';
+
+		$scope.updateSiteFilter = function (siteId) {
+			if (siteId !== undefined) $scope.siteFilter = siteId;
+
+			if ($scope.siteFilter) {
+				$scope.policyList = $.grep(originPolicyList, function (policy) {
+					return policy.definition.siteId === $scope.siteFilter;
+				});
+			} else {
+				$scope.policyList = originPolicyList;
+			}
+		};
 
 		function updateList() {
 			var list = Entity.queryMetadata("policies");
+			$scope.loading = true;
+
 			list._then(function () {
-				$scope.policyList = list;
+				$scope.loading = false;
+				originPolicyList = list;
+				$scope.updateSiteFilter();
 			});
 		}
 		updateList();
