@@ -19,7 +19,9 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailConstants;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailGenerator;
@@ -41,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.eagle.alert.service.MetadataServiceClientImpl.*;
 import static org.apache.eagle.common.mail.AlertEmailConstants.*;
 
-public class AlertEmailPublisher extends AbstractPublishPlugin {
+public class AlertEmailPublisher extends AbstractPublishPlugin implements AlertPublishPluginProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPublisher.class);
     private static final int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
@@ -205,5 +207,17 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     @Override
     protected Logger getLogger() {
         return LOG;
+    }
+
+    @Override
+    public PublishmentType getPluginType() {
+        return new PublishmentType.Builder()
+                .name("Email")
+                .type(AlertEmailPublisher.class)
+                .description("Email alert publisher")
+                .field("subject")
+                .field("sender")
+                .field("recipients")
+                .build();
     }
 }

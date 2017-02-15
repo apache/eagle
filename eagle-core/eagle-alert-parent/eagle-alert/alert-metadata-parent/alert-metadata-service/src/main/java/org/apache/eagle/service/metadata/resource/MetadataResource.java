@@ -28,6 +28,7 @@ import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
 import org.apache.eagle.alert.engine.interpreter.PolicyParseResult;
 import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
+import org.apache.eagle.alert.engine.publisher.PublishementTypeLoader;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
@@ -378,17 +379,19 @@ public class MetadataResource {
     @Path("/publishmentTypes")
     @GET
     public List<PublishmentType> listPublishmentType() {
-        return dao.listPublishmentType();
+        return PublishementTypeLoader.loadPublishmentTypes();
     }
 
     @Path("/publishmentTypes")
     @POST
+    @Deprecated
     public OpResult addPublishmentType(PublishmentType publishmentType) {
         return dao.addPublishmentType(publishmentType);
     }
 
     @Path("/publishmentTypes/batch")
     @POST
+    @Deprecated
     public List<OpResult> addPublishmentTypes(List<PublishmentType> publishmentTypes) {
         List<OpResult> results = new LinkedList<>();
         for (PublishmentType pubType : publishmentTypes) {
@@ -399,12 +402,14 @@ public class MetadataResource {
 
     @Path("/publishmentTypes/{name}")
     @DELETE
+    @Deprecated
     public OpResult removePublishmentType(@PathParam("name") String name) {
         return dao.removePublishmentType(name);
     }
 
     @Path("/publishmentTypes")
     @DELETE
+    @Deprecated
     public List<OpResult> removePublishmentTypes(List<String> pubTypes) {
         List<OpResult> results = new LinkedList<>();
         for (String pubType : pubTypes) {

@@ -25,8 +25,10 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ import java.util.Map;
 /**
  * @since Sep 14, 2016.
  */
-public class AlertSlackPublisher extends AbstractPublishPlugin {
+public class AlertSlackPublisher extends AbstractPublishPlugin implements AlertPublishPluginProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AlertSlackPublisher.class);
 
     private SlackSession session;
@@ -154,5 +156,18 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
         //get a channel
         SlackChannel channel = session.findChannelByName(channelName);
         session.sendMessage(channel, message, attachment);
+    }
+
+    @Override
+    public PublishmentType getPluginType() {
+        return new PublishmentType.Builder()
+                .name("Slack")
+                .type(getClass())
+                .description("Slack alert publisher")
+                .field("token")
+                .field("channels")
+                .field("severitys")
+                .field("urltemplate")
+                .build();
     }
 }

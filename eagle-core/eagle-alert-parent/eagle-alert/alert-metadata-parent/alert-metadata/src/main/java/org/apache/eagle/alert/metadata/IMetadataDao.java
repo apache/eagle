@@ -75,10 +75,13 @@ public interface IMetadataDao extends Closeable {
 
     OpResult removePublishment(String pubId);
 
+    @Deprecated
     List<PublishmentType> listPublishmentType();
 
+    @Deprecated
     OpResult addPublishmentType(PublishmentType publishmentType);
 
+    @Deprecated
     OpResult removePublishmentType(String pubType);
 
     List<AlertPublishEvent> listAlertPublishEvent(int size);

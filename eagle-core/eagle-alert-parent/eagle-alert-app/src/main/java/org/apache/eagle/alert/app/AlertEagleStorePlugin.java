@@ -19,7 +19,9 @@ package org.apache.eagle.alert.app;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
 import org.apache.eagle.alert.engine.publisher.impl.AbstractPublishPlugin;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.metadata.model.AlertEntity;
@@ -36,7 +38,7 @@ import java.util.Map;
 
 import static org.apache.eagle.alert.engine.model.AlertPublishEvent.*;
 
-public class AlertEagleStorePlugin extends AbstractPublishPlugin {
+public class AlertEagleStorePlugin extends AbstractPublishPlugin implements AlertPublishPluginProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
     private IEagleServiceClient client;
 
@@ -93,5 +95,14 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         alertEvent.setAlertBody(event.getBody());
         alertEvent.setTags(tags);
         return alertEvent;
+    }
+
+    @Override
+    public PublishmentType getPluginType() {
+        return new PublishmentType.Builder()
+                .name("HBaseStorage")
+                .type(getClass())
+                .description("HBase Storage alert publisher")
+                .build();
     }
 }
