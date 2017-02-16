@@ -77,14 +77,12 @@ public class MRJobParser implements Runnable {
     private Map<String, String> commonTags = new HashMap<>();
     private MRRunningJobManager runningJobManager;
     private ParserStatus parserStatus;
-    private ResourceFetcher rmResourceFetcher;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
     private static final int TOP_BOTTOM_TASKS_BY_ELAPSED_TIME = 10;
     private static final int FLUSH_TASKS_EVERY_TIME = 5;
     private static final int MAX_TASKS_PERMIT = 5000;
     private Config config;
-    private MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -93,10 +91,9 @@ public class MRJobParser implements Runnable {
     public MRJobParser(MRRunningJobConfig.EndpointConfig endpointConfig,
                        MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
-                       MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
+                       MRRunningJobManager runningJobManager,
                        List<String> configKeys,
-                       Config config,
-                       MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer) {
+                       Config config) {
         this.app = app;
         if (mrJobMap == null) {
             this.mrJobEntityMap = new HashMap<>();
@@ -112,11 +109,9 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
         this.parserStatus = ParserStatus.FINISHED;
-        this.rmResourceFetcher = rmResourceFetcher;
         this.finishedTaskIds = new HashSet<>();
         this.configKeys = configKeys;
         this.config = config;
-        this.mrJobPerformanceAnalyzer = mrJobPerformanceAnalyzer;
     }
 
     public void setAppInfo(AppInfo app) {
@@ -173,7 +168,6 @@ public class MRJobParser implements Runnable {
                     break;
                 }
             }
-            mrJobPerformanceAnalyzer.analyze(convertToAnalysisEntity(mrJobEntityMap.get(jobId)));
         }
     }
 
@@ -570,7 +564,10 @@ public class MRJobParser implements Runnable {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
             } finally {
                 for (String jobId : mrJobEntityMap.keySet()) {
-                    mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));
+                    JobExecutionAPIEntity entity = mrJobEntityMap.get(jobId);
+                    if (entity.getTags().containsKey(MRJobTagName.JOB_TYPE.toString())) {
+                        mrJobEntityCreationHandler.add(entity);
+                    }
                 }
                 if (mrJobEntityCreationHandler.flush()) { //force flush
                     //we must flush entities before delete from zk in case of missing finish state of jobs
