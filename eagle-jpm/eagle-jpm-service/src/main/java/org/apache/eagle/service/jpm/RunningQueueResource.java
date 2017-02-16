@@ -71,7 +71,7 @@ public class RunningQueueResource {
                     if (userUsage.containsKey(user)) {
                         userUsage.put(user, userUsage.get(user) + job.getAllocatedMB());
                     } else {
-                        userUsage.put(user, 0L);
+                        userUsage.put(user, job.getAllocatedMB());
                     }
                     jobUsage.put(jobId, job.getAllocatedMB());
                 }
