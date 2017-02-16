@@ -17,13 +17,11 @@
 
 package org.apache.eagle.storage.hbase;
 
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocol;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.junit.AfterClass;
