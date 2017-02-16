@@ -17,13 +17,27 @@
 
 package org.apache.eagle.common.utils;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReflectionsHelper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionsHelper.class);
     private final Reflections reflections;
+    private static final String DEFAULT_PACKAGE = "org.apache.eagle";
 
     private ReflectionsHelper() {
-        this.reflections = new Reflections();
+        Config config = ConfigFactory.load();
+        String[] packages;
+        if (config.hasPath("scanPackages")) {
+            packages = config.getString("scanPackages").split(",");
+        } else {
+            packages = new String[]{DEFAULT_PACKAGE};
+        }
+        LOGGER.info("Scanning packages: {}", packages);
+        this.reflections = new Reflections(packages);
     }
 
     private static ReflectionsHelper INSTANCE = new ReflectionsHelper();
