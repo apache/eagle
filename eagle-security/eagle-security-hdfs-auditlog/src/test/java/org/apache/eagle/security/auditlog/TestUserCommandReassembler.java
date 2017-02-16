@@ -19,9 +19,9 @@
 
 package org.apache.eagle.security.auditlog;
 
-import backtype.storm.task.IOutputCollector;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.tuple.Tuple;
+import org.apache.storm.task.IOutputCollector;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
@@ -81,6 +81,11 @@ public class TestUserCommandReassembler {
             }
 
             @Override
+            public void resetTimeout(Tuple tuple) {
+
+            }
+
+            @Override
             public void reportError(Throwable error) {
 
             }
@@ -125,6 +130,11 @@ public class TestUserCommandReassembler {
 
             @Override
             public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void resetTimeout(Tuple tuple) {
 
             }
 
@@ -180,6 +190,11 @@ public class TestUserCommandReassembler {
 
             @Override
             public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void resetTimeout(Tuple tuple) {
 
             }
 

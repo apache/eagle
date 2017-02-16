@@ -24,13 +24,13 @@ import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-import backtype.storm.Config;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.Nimbus;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.generated.TopologySummary;
-import backtype.storm.utils.NimbusClient;
-import backtype.storm.utils.Utils;
+import org.apache.storm.Config;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.Nimbus;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.generated.TopologySummary;
+import org.apache.storm.utils.NimbusClient;
+import org.apache.storm.utils.Utils;
 import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +55,7 @@ public class TopologyMgmtResourceImpl {
     private Map getStormConf(List<StreamingCluster> clusters, String clusterId) throws Exception {
         Map<String, Object> stormConf = Utils.readStormConfig();
         if (clusterId == null) {
+            // TODO: change to NIMBUS_SEEDS list in EAGLE-907
             stormConf.put(Config.NIMBUS_HOST, DEFAULT_NIMBUS_HOST);
             stormConf.put(Config.NIMBUS_THRIFT_PORT, DEFAULT_NIMBUS_THRIFT_PORT);
         } else {
@@ -68,6 +69,7 @@ public class TopologyMgmtResourceImpl {
             } else {
                 throw new Exception("Fail to find cluster: " + clusterId);
             }
+            // TODO: change to NIMBUS_SEEDS list in EAGLE-907
             stormConf.put(Config.NIMBUS_HOST, cluster.getDeployments().getOrDefault(StreamingCluster.NIMBUS_HOST, DEFAULT_NIMBUS_HOST));
             stormConf.put(Config.NIMBUS_THRIFT_PORT, Integer.valueOf(cluster.getDeployments().get(StreamingCluster.NIMBUS_THRIFT_PORT)));
         }

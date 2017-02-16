@@ -18,7 +18,7 @@
 
 package org.apache.eagle.topology.extractor;
 
-import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;

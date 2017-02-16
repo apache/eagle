@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.dataproc.impl.storm;
 
-import backtype.storm.topology.base.BaseRichSpout;
+import org.apache.storm.topology.base.BaseRichSpout;
 import com.typesafe.config.Config;
 
 /**

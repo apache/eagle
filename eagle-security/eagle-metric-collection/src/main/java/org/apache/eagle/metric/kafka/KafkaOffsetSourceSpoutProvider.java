@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.metric.kafka;
 
-import backtype.storm.topology.base.BaseRichSpout;
+import org.apache.storm.topology.base.BaseRichSpout;
 import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider;

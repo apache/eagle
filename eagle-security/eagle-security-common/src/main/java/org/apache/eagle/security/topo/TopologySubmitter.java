@@ -17,14 +17,14 @@
 
 package org.apache.eagle.security.topo;
 
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.utils.Utils;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.utils.Utils;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import storm.kafka.bolt.KafkaBolt;
+import org.apache.storm.kafka.bolt.KafkaBolt;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class TopologySubmitter {
     private static Logger LOG = LoggerFactory.getLogger(TopologySubmitter.class);
 
     public static void submit(StormTopology topology, Config config){
-        backtype.storm.Config stormConfig = new backtype.storm.Config();
+        org.apache.storm.Config stormConfig = new org.apache.storm.Config();
         int messageTimeoutSecs = config.hasPath(MESSAGE_TIMEOUT_SECS)?config.getInt(MESSAGE_TIMEOUT_SECS) : DEFAULT_MESSAGE_TIMEOUT_SECS;
         LOG.info("Set topology.message.timeout.secs as {}",messageTimeoutSecs);
         stormConfig.setMessageTimeoutSecs(messageTimeoutSecs);
@@ -52,7 +52,8 @@ public class TopologySubmitter {
             props.put("metadata.broker.list", config.getString("dataSinkConfig.brokerList"));
             props.put("serializer.class", config.getString("dataSinkConfig.serializerClass"));
             props.put("key.serializer.class", config.getString("dataSinkConfig.keySerializerClass"));
-            stormConfig.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
+            //  KafkaBolt.KAFKA_BROKER_PROPERTIES is removed, using direct string
+            stormConfig.put("kafka.broker.properties", props);
         }
 
         if(config.hasPath("dataSinkConfig.serializerClass")){

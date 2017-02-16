@@ -16,17 +16,17 @@
  */
 package org.apache.eagle.app.messaging;
 
-import backtype.storm.spout.Scheme;
-import backtype.storm.spout.SchemeAsMultiScheme;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.spout.Scheme;
+import org.apache.storm.spout.SchemeAsMultiScheme;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.spout.SchemeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import storm.kafka.*;
+import org.apache.storm.kafka.*;
 
 import java.util.Arrays;
 import java.util.HashMap;

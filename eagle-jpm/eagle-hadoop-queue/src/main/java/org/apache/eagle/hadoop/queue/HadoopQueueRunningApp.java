@@ -16,9 +16,10 @@
  */
 package org.apache.eagle.hadoop.queue;
 
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.IRichSpout;
-import backtype.storm.topology.TopologyBuilder;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.BoltDeclarer;
+import org.apache.storm.topology.IRichSpout;
+import org.apache.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;

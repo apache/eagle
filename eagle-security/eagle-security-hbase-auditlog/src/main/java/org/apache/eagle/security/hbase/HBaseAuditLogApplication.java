@@ -16,18 +16,18 @@
  */
 package org.apache.eagle.security.hbase;
 
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.BoltDeclarer;
-import backtype.storm.topology.IRichSpout;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.BoltDeclarer;
+import org.apache.storm.topology.IRichSpout;
+import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.messaging.StormStreamSink;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
-import storm.kafka.StringScheme;
+import org.apache.storm.kafka.StringScheme;
 
 /**
  * Since 7/27/16.

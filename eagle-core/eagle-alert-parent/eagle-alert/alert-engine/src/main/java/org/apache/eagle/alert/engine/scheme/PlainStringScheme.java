@@ -19,12 +19,13 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
+import org.apache.storm.spout.Scheme;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -58,9 +59,9 @@ public class PlainStringScheme implements Scheme {
 
     @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
-    public List<Object> deserialize(byte[] ser) {
+    public List<Object> deserialize(ByteBuffer ser) {
         Map m = new HashMap<>();
-        m.put("value", deserializeString(ser));
+        m.put("value", deserializeString(ser.array()));
         m.put("timestamp", System.currentTimeMillis());
         return new Values(topic, m);
     }

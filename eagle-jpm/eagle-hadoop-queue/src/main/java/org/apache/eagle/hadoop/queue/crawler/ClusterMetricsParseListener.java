@@ -32,7 +32,7 @@ import org.apache.eagle.hadoop.queue.model.cluster.ClusterMetrics;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 
-import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.*;
 import java.util.stream.Collectors;

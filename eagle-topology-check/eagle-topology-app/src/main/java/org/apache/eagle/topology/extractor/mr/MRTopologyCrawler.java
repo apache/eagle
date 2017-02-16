@@ -18,8 +18,8 @@
 
 package org.apache.eagle.topology.extractor.mr;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.tuple.Values;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.tuple.Values;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyCheckMessageId;
 import org.apache.eagle.topology.TopologyConstants;

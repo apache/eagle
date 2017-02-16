@@ -18,12 +18,12 @@
 
 package org.apache.eagle.service.topology.resource.impl;
 
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.ClusterSummary;
-import backtype.storm.generated.Nimbus;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.generated.TopologySummary;
-import backtype.storm.utils.NimbusClient;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.ClusterSummary;
+import org.apache.storm.generated.Nimbus;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.generated.TopologySummary;
+import org.apache.storm.utils.NimbusClient;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.eagle.alert.coordination.model.internal.Topology;

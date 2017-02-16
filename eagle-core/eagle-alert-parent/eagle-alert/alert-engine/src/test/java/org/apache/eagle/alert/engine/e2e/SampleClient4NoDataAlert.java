@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import backtype.storm.utils.Utils;
+import org.apache.storm.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;

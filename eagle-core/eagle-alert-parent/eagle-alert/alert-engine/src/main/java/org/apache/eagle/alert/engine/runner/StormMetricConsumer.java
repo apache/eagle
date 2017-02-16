@@ -18,9 +18,9 @@ package org.apache.eagle.alert.engine.runner;
 
 import org.apache.eagle.alert.metric.IMetricSystem;
 import org.apache.eagle.alert.metric.MetricSystem;
-import backtype.storm.metric.api.IMetricsConsumer;
-import backtype.storm.task.IErrorReporter;
-import backtype.storm.task.TopologyContext;
+import org.apache.storm.metric.api.IMetricsConsumer;
+import org.apache.storm.task.IErrorReporter;
+import org.apache.storm.task.TopologyContext;
 import com.codahale.metrics.Gauge;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;

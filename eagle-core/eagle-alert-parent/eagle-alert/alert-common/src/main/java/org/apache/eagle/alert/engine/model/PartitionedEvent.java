@@ -17,7 +17,7 @@
 package org.apache.eagle.alert.engine.model;
 
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import backtype.storm.tuple.Tuple;
+import org.apache.storm.tuple.Tuple;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;

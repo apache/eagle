@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.jpm.mr.history;
 
-import backtype.storm.topology.BoltDeclarer;
+import org.apache.storm.topology.BoltDeclarer;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.messaging.StormStreamSink;
@@ -30,8 +30,8 @@ import org.apache.eagle.jpm.mr.history.publisher.TaskAttemptStreamPublisher;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
 import org.apache.eagle.jpm.util.Constants;
 
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 
 import java.util.ArrayList;

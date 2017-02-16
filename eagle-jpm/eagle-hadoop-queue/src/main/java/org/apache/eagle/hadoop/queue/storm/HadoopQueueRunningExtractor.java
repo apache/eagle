@@ -18,7 +18,7 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
-import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.crawler.ClusterMetricsCrawler;
 import org.apache.eagle.hadoop.queue.crawler.RunningAppsCrawler;

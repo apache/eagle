@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.alert.engine.evaluator;
 
-import backtype.storm.task.IOutputCollector;
-import backtype.storm.task.OutputCollector;
+import org.apache.storm.task.IOutputCollector;
+import org.apache.storm.task.OutputCollector;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorThreadSafeWrapper;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.router.impl.StormOutputCollector;

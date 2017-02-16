@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.engine;
 
-import backtype.storm.metric.api.MultiCountMetric;
+import org.apache.storm.metric.api.MultiCountMetric;
 
 public class StormMultiCountMetric implements StreamCounter {
     private MultiCountMetric countMetric;

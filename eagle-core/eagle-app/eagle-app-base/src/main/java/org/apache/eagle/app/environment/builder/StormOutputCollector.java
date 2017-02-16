@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.app.environment.builder;
 
-import backtype.storm.task.OutputCollector;
+import org.apache.storm.task.OutputCollector;
 
 import java.util.Arrays;
 

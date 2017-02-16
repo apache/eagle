@@ -22,8 +22,8 @@ import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.jpm.aggregation.mr.MRMetricsAggregateContainer;
 import org.apache.eagle.jpm.aggregation.storm.AggregationBolt;
 import org.apache.eagle.jpm.aggregation.storm.AggregationSpout;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 
 import java.util.*;

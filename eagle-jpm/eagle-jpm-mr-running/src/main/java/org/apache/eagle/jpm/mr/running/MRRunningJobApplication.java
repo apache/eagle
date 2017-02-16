@@ -23,9 +23,9 @@ import org.apache.eagle.jpm.mr.running.storm.MRRunningAppMetricBolt;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobFetchSpout;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobParseBolt;
 import org.apache.eagle.jpm.util.Constants;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import storm.trident.planner.SpoutNode;
 

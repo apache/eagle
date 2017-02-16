@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.app.messaging;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;

@@ -17,7 +17,7 @@
 
 package org.apache.eagle.app.messaging;
 
-import backtype.storm.spout.Scheme;
+import org.apache.storm.spout.Scheme;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

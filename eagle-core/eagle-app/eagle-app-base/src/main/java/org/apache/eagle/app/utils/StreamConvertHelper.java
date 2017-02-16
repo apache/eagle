@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.app.utils;
 
-import backtype.storm.tuple.Tuple;
+import org.apache.storm.tuple.Tuple;
 import org.apache.eagle.common.utils.Tuple2;
 
 import java.util.HashMap;

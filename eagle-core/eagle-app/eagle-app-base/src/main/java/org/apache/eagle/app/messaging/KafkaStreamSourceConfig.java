@@ -21,7 +21,7 @@ import org.apache.eagle.metadata.model.StreamSourceConfig;
 public class KafkaStreamSourceConfig implements StreamSourceConfig {
     private static final String DEFAULT_CONSUMER_GROUP_ID = "eagleKafkaSource";
     private static final String DEFAULT_TRANSACTION_ZK_ROOT = "/consumers";
-    private static final Class<? extends backtype.storm.spout.Scheme> DEFAULT_KAFKA_SCHEMA = JsonSchema.class;
+    private static final Class<? extends org.apache.storm.spout.Scheme> DEFAULT_KAFKA_SCHEMA = JsonSchema.class;
 
     // Read Config
     private String topicId;
@@ -36,7 +36,7 @@ public class KafkaStreamSourceConfig implements StreamSourceConfig {
     private long transactionStateUpdateMS = 2000;
     private int startOffsetTime = -1;
     private boolean forceFromStart = false;
-    private Class<? extends backtype.storm.spout.Scheme> schemaClass = DEFAULT_KAFKA_SCHEMA;
+    private Class<? extends org.apache.storm.spout.Scheme> schemaClass = DEFAULT_KAFKA_SCHEMA;
 
     public String getBrokerZkQuorum() {
         return brokerZkQuorum;
@@ -118,11 +118,11 @@ public class KafkaStreamSourceConfig implements StreamSourceConfig {
         this.forceFromStart = forceFromStart;
     }
 
-    public Class<? extends backtype.storm.spout.Scheme> getSchemaClass() {
+    public Class<? extends org.apache.storm.spout.Scheme> getSchemaClass() {
         return schemaClass;
     }
 
-    public void setSchemaClass(Class<? extends backtype.storm.spout.Scheme> schemaClass) {
+    public void setSchemaClass(Class<? extends org.apache.storm.spout.Scheme> schemaClass) {
         this.schemaClass = schemaClass;
     }
 

@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.security.hive.jobrunning;
 
-import backtype.storm.topology.base.BaseRichSpout;
+import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.security.hive.config.RunningJobCrawlConfig;

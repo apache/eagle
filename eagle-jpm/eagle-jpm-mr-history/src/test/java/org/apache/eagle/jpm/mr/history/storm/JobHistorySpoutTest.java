@@ -16,9 +16,9 @@
  */
 package org.apache.eagle.jpm.mr.history.storm;
 
-import backtype.storm.spout.ISpoutOutputCollector;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
+import org.apache.storm.spout.ISpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.Client;
 import com.typesafe.config.ConfigFactory;
@@ -118,6 +118,11 @@ public class JobHistorySpoutTest {
             @Override
             public void emitDirect(int i, String s, List<Object> list, Object o) {
 
+            }
+
+            @Override
+            public long getPendingCount() {
+                return 0;
             }
 
             @Override
