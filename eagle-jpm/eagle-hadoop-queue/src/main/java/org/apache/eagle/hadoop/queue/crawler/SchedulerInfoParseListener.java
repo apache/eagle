@@ -161,6 +161,7 @@ public class SchedulerInfoParseListener {
         queueStructureAPIEntity.setTags(_tags);
         queueStructureAPIEntity.setSubQueues(subQueues);
         queueStructureAPIEntity.setAllSubQueues(allSubQueues);
+        queueStructureAPIEntity.setLastUpdateTime(currentTimestamp);
         runningQueueAPIEntities.add(queueStructureAPIEntity);
 
         return allSubQueues;

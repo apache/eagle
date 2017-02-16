@@ -36,6 +36,8 @@ public class QueueStructureAPIEntity extends TaggedLogAPIEntity {
     private List<String> subQueues;
     @Column("b")
     private List<String> allSubQueues;
+    @Column("c")
+    private long lastUpdateTime;
 
     public List<String> getSubQueues() {
         return subQueues;
@@ -53,6 +55,15 @@ public class QueueStructureAPIEntity extends TaggedLogAPIEntity {
     public void setAllSubQueues(List<String> allSubQueues) {
         this.allSubQueues = allSubQueues;
         valueChanged("allSubQueues");
+    }
+
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+        valueChanged("lastUpdateTime");
     }
 
 }
