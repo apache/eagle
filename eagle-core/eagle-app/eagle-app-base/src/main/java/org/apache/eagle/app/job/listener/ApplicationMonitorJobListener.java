@@ -32,6 +32,7 @@ public class ApplicationMonitorJobListener implements JobListener {
     public ApplicationMonitorJobListener(Config config, String name) {
         this.name = name;
     }
+
     @Override
     public String getName() {
         return this.name;
