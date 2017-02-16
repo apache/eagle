@@ -54,7 +54,7 @@ public class RunningQueueResource {
                 throw new Exception("Invalid query parameters: site == null || queue == null || currentTime == 0L || top == 0");
             }
             Tuple2<String, String> queryTimeRange = getQueryTimeRange(currentTime);
-            Map<String, Set<String>> queueMap = getQueueMap(site);
+            Set<String> queueSet = getSubQueueSet(site, queue);
             List<JobExecutionAPIEntity> runningJobs = getRunningJobs(site, currentTime, queryTimeRange.f0(), queryTimeRange.f1());
             List<org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity> jobs = getJobs(site, currentTime, queryTimeRange.f0(), queryTimeRange.f1());
             Set<String> jobIds = new HashSet<>();
@@ -67,8 +67,7 @@ public class RunningQueueResource {
                 String jobQueue = job.getTags().get(JOB_QUEUE.toString());
                 String user = job.getTags().get(USER.toString());
 
-                if (jobIds.contains(jobId) && queueMap.containsKey(queue)
-                        && (queueMap.containsKey(jobQueue) || queueMap.get(queue).contains(jobQueue))) {
+                if (jobIds.contains(jobId) && queueSet.contains(jobQueue)) {
                     if (userUsage.containsKey(user)) {
                         userUsage.put(user, userUsage.get(user) + job.getAllocatedMB());
                     } else {
@@ -111,23 +110,21 @@ public class RunningQueueResource {
         return response.getObj();
     }
 
-    private Map<String, Set<String>> getQueueMap(String site) throws IOException {
+    private Set<String> getSubQueueSet(String site, String parentQueue) throws IOException {
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
 
-        String query = String.format("%s[@site=\"%s\"]{*}", QUEUE_MAPPING_SERVICE_NAME, site);
+        String query = String.format("%s[@site=\"%s\" and @queue=\"%s\"]{*}", QUEUE_MAPPING_SERVICE_NAME, site, parentQueue);
         GenericServiceAPIResponseEntity<QueueStructureAPIEntity> responseEntity = resource.search(query, null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
 
         if (!responseEntity.isSuccess() || responseEntity.getObj() == null) {
             throw new IOException(responseEntity.getException());
         }
-        Map<String, Set<String>> result = new HashMap<>();
-        for(QueueStructureAPIEntity entity : responseEntity.getObj()) {
-            String queue = entity.getTags().get("queue");
-            Set<String> subQueues = new HashSet<>();
-            subQueues.addAll(entity.getAllSubQueues());
-            result.put(queue, subQueues);
-        }
-        return result;
+
+        Set<String> subQueues = new HashSet<>();
+        subQueues.add(parentQueue);
+        subQueues.addAll(responseEntity.getObj().get(0).getAllSubQueues());
+
+        return subQueues;
     }
 
     private Tuple2<String, String> getQueryTimeRange(long currentTime) throws ParseException {
