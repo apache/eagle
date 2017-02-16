@@ -78,7 +78,7 @@ public class RunningQueueResource {
             }
             result.setJobs(getTopRecords(top, jobUsage));
             result.setUsers(getTopRecords(top, userUsage));
-         } catch (Exception e) {
+        } catch (Exception e) {
             result.setErrMessage(e.getMessage());
         }
         return result;
@@ -86,7 +86,8 @@ public class RunningQueueResource {
 
     private List<JobExecutionAPIEntity> getRunningJobs(String site, long currentTime, String startTime, String endTime) throws Exception {
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
-        String query = String.format("%s[@site=\"%s\" and @startTime<=%s and (@internalState=\"RUNNING\" or @endTime>%s)]{@jobId, @user, @queue, @allocatedMB}", JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, site, currentTime, currentTime);
+        String query = String.format("%s[@site=\"%s\" and @startTime<=%s and (@internalState=\"RUNNING\" or @endTime>%s)]{@jobId, @user, @queue, @allocatedMB}",
+                JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, site, currentTime, currentTime);
         GenericServiceAPIResponseEntity<JobExecutionAPIEntity> runningJobResponse = resource.search(query, startTime, endTime, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
 
         if (!runningJobResponse.isSuccess() || runningJobResponse.getObj() == null) {
@@ -96,7 +97,10 @@ public class RunningQueueResource {
         return runningJobResponse.getObj();
     }
 
-    private List<org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity> getJobs(String site, long currentTime,  String startTime, String endTime) throws Exception{
+    private List<org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity> getJobs(String site,
+                                                                                      long currentTime,
+                                                                                      String startTime,
+                                                                                      String endTime) throws Exception {
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
         String query = String.format("%s[@site=\"%s\" and @startTime<=%s and @endTime>%s]{@jobId}", JPA_JOB_EXECUTION_SERVICE_NAME, site, currentTime, currentTime);
 
