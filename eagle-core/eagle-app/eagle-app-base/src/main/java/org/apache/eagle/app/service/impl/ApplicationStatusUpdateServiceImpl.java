@@ -57,7 +57,6 @@ public class ApplicationStatusUpdateServiceImpl extends ApplicationStatusUpdateS
             for (ApplicationEntity applicationEntity : applicationEntities) {
                 if (applicationEntity.getDescriptor().isExecutable()) {
                     updateApplicationEntityStatus(applicationEntity);
-                    applicationEntityService.update(applicationEntity);
                 }
             }
             LOG.info("Updated {} application status", applicationEntities.size());
@@ -125,6 +124,7 @@ public class ApplicationStatusUpdateServiceImpl extends ApplicationStatusUpdateS
                 LOG.info("Application {} status changed from {} to {}", applicationEntity.getAppId(), preStatus, currentStatus);
             }
             applicationEntity.setStatus(currentStatus);
+            applicationEntityService.update(applicationEntity);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
         }
