@@ -84,6 +84,7 @@ public class JPMWebApplicationTest extends ApplicationTestBase {
 //        // Stop application
 //        applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
         //Uninstall application
+        awaitApplicationStop(applicationEntity);
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {
             applicationResource.getApplicationEntityByUUID(applicationEntity.getUuid());

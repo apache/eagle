@@ -59,7 +59,7 @@ public class ApplicationResourceTest extends ApplicationTestBase {
         statusUpdateService.updateApplicationEntityStatus(applicationEntity);
         // Stop application
         applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
-        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        awaitApplicationStop(applicationEntity);
         // Uninstall application
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {

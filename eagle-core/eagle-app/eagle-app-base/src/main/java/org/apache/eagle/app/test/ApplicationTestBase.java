@@ -17,11 +17,19 @@
 package org.apache.eagle.app.test;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
+import org.junit.Assert;
 import org.junit.Before;
 
 public class ApplicationTestBase {
     private Injector injector;
+
+
+    @Inject
+    ApplicationStatusUpdateService statusUpdateService;
 
     @Before
     public void setUp() {
@@ -31,5 +39,22 @@ public class ApplicationTestBase {
 
     protected Injector injector() {
         return injector;
+    }
+
+    protected void awaitApplicationStop(ApplicationEntity applicationEntity) throws InterruptedException {
+        int attempt = 0;
+        while (attempt < 10) {
+            attempt ++;
+            if (applicationEntity.getStatus() == ApplicationEntity.Status.STOPPED
+                    || applicationEntity.getStatus() == ApplicationEntity.Status.INITIALIZED) {
+                break;
+            } else {
+                statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+                Thread.sleep(1000);
+            }
+        }
+        if (attempt > 10) {
+            Assert.fail("Failed to wait for application to STOPPED after 10 attempts");
+        }
     }
 }
