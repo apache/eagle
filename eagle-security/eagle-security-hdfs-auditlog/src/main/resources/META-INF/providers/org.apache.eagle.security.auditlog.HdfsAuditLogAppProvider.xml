@@ -115,7 +115,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>Kafka Topic for Parsed Data Sink</displayName>
-            <value>hdfs_audit_log_enriched</value>
+            <value>hdfs_audit_event</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
