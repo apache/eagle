@@ -45,8 +45,7 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin implements Aler
     @Override
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
         super.init(config, publishment, conf);
-        client = new EagleServiceClientImpl(config.getString("service.host"), config.getInt("service.port"),
-                config.getString("service.username"), config.getString("service.password"));
+        client = new EagleServiceClientImpl(config);
     }
 
     @Override
