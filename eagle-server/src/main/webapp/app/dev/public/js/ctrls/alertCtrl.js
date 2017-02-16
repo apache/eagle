@@ -27,8 +27,22 @@
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig, CompatibleEntity, Time) {
 		PageConfig.title = "Alerts";
 
+		var originAlertList = [];
 		$scope.alertList = [];
+		$scope.siteFilter = '';
 		$scope.loading = false;
+
+		$scope.updateSiteFilter = function (siteId) {
+			if (siteId !== undefined) $scope.siteFilter = siteId;
+
+			if ($scope.siteFilter) {
+				$scope.alertList = $.grep(originAlertList, function (alert) {
+					return alert.tags.siteId === $scope.siteFilter;
+				});
+			} else {
+				$scope.alertList = originAlertList;
+			}
+		};
 
 		function loadAlerts() {
 			$scope.loading = true;
@@ -38,21 +52,14 @@
 				endTime: new Time('endTime')
 			});
 			list._then(function () {
-				$scope.alertList = list;
+				originAlertList = list;
+				$scope.updateSiteFilter();
 				$scope.loading = false;
 			});
 		}
 		loadAlerts();
 
 		Time.onReload(loadAlerts, $scope);
-
-		// ================================================================
-		// =                             Sync                             =
-		// ================================================================
-		/* var refreshInterval = $interval($scope.alertList._refresh, 1000 * 10);
-		$scope.$on('$destroy', function() {
-			$interval.cancel(refreshInterval);
-		}); */
 	});
 
 	eagleControllers.controller('alertDetailCtrl', function ($sce, $scope, $wrapState, PageConfig, CompatibleEntity) {
@@ -86,12 +93,28 @@
 	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application, Entity) {
 		PageConfig.title = "Streams";
 
+		var originStreamList = [];
 		$scope.streamList = [];
+		$scope.siteFilter = '';
+
+		$scope.updateSiteFilter = function (siteId) {
+			if (siteId !== undefined) $scope.siteFilter = siteId;
+
+			if ($scope.siteFilter) {
+				$scope.streamList = $.grep(originStreamList, function (stream) {
+					return stream.siteId === $scope.siteFilter;
+				});
+			} else {
+				$scope.streamList = originStreamList;
+			}
+		};
+
 		Entity.queryMetadata("streams")._then(function (res) {
-			$scope.streamList = $.map(res.data, function (stream) {
+			originStreamList = $.map(res.data, function (stream) {
 				var application = Application.findProvider(stream.dataSource);
 				return $.extend({application: application}, stream);
 			});
+			$scope.updateSiteFilter();
 		});
 
 		$scope.dataSources = {};
@@ -116,13 +139,32 @@
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
 		PageConfig.title = "Policies";
+		$scope.loading = false;
 
+		var originPolicyList = [];
 		$scope.policyList = [];
+		$scope.siteFilter = '';
+
+		$scope.updateSiteFilter = function (siteId) {
+			if (siteId !== undefined) $scope.siteFilter = siteId;
+
+			if ($scope.siteFilter) {
+				$scope.policyList = $.grep(originPolicyList, function (policy) {
+					return policy.definition.siteId === $scope.siteFilter;
+				});
+			} else {
+				$scope.policyList = originPolicyList;
+			}
+		};
 
 		function updateList() {
 			var list = Entity.queryMetadata("policies");
+			$scope.loading = true;
+
 			list._then(function () {
-				$scope.policyList = list;
+				$scope.loading = false;
+				originPolicyList = list;
+				$scope.updateSiteFilter();
 			});
 		}
 		updateList();

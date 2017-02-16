@@ -23,6 +23,9 @@ import org.apache.hadoop.hbase.MiniHBaseCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
+@Deprecated
 public class EmbeddedHbase {
     private HBaseTestingUtility util;
     private MiniHBaseCluster hbaseCluster;
@@ -58,7 +61,7 @@ public class EmbeddedHbase {
         return getInstance(null);
     }
 
-    private EmbeddedHbase() {
+    public EmbeddedHbase() {
         this(DEFAULT_PORT, DEFAULT_ZNODE);
     }
 
@@ -115,7 +118,7 @@ public class EmbeddedHbase {
     public void createTable(String tableName, String cf) {
         try {
             util.createTable(tableName, cf);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             LOG.warn("Create table failed, probably table already existed, table name: " + tableName);
         }
     }

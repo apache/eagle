@@ -28,10 +28,7 @@ import org.apache.eagle.storage.operation.QueryStatement;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,18 +37,12 @@ import java.util.List;
 
 public class TestHBaseStatement extends TestHBaseBase {
 
-    EntityDefinition entityDefinition;
+    private static EntityDefinition entityDefinition;
 
-    @Before
-    public void setUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
+    @BeforeClass
+    public static void setUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
         hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
-    }
-
-    @After
-    public void cleanUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
-        entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
-        hbase.deleteTable(entityDefinition.getTable());
     }
 
     @Test

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.storage.hbase.TestWithHBaseCoprocessor;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
@@ -53,30 +54,21 @@ import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl
 /**
  * @since : 11/10/14,2014
  */
-public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
+public class TestGroupAggregateTimeSeriesClient extends TestWithHBaseCoprocessor {
 
     private final static Logger LOG = LoggerFactory.getLogger(TestGroupAggregateTimeSeriesClient.class);
 
-    HTableInterface table;
-    long startTime;
-    long endTime;
-    List<String> rowkeys;
-    AggregateClient client;
-    Scan scan;
-    EntityDefinition ed;
-
-    // This is Bad, It will hide TestHBaseBase.setUpHBase!!!!
-    @BeforeClass
-    public static void setUpHBase() {
-        Configuration conf = new Configuration();
-        conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY,AggregateProtocolEndPoint.class.getName());
-        TestHBaseBase.setupHBaseWithConfig(conf);
-    }
+    private HTableInterface table;
+    private long startTime;
+    private long endTime;
+    private List<String> rowkeys;
+    private AggregateClient client;
+    private Scan scan;
+    private EntityDefinition ed;
 
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException {
         ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
-        hbase.createTable("unittest", "f");
         table = EagleConfigFactory.load().getHTable("unittest");
         startTime = System.currentTimeMillis();
         try {

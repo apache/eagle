@@ -26,7 +26,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -37,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 
-public class AlertKafkaPublisher extends AbstractPublishPlugin {
+public class AlertKafkaPublisher extends AbstractPublishPlugin implements AlertPublishPluginProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertKafkaPublisher.class);
     private static final long MAX_TIMEOUT_MS = 60000;
@@ -180,5 +182,16 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
     @Override
     protected Logger getLogger() {
         return LOG;
+    }
+
+    @Override
+    public PublishmentType getPluginType() {
+        return new PublishmentType.Builder()
+                .name("Kafka")
+                .type(getClass())
+                .description("Kafka alert publisher")
+                .field("kafka_broker","localhost:9092")
+                .field("topic")
+                .build();
     }
 }

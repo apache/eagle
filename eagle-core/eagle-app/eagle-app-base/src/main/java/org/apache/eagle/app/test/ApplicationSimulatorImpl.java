@@ -79,7 +79,8 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         while (attempt < 10) {
             attempt++;
             statusUpdateService.updateApplicationEntityStatus(applicationEntity);
-            if (applicationEntity.getStatus() == ApplicationEntity.Status.STOPPED) {
+            if (applicationEntity.getStatus() == ApplicationEntity.Status.STOPPED
+                    || applicationEntity.getStatus() == ApplicationEntity.Status.INITIALIZED) {
                 break;
             } else {
                 try {

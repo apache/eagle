@@ -19,8 +19,10 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.common.DateTimeUtil;
 
@@ -33,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.*;
 
-public class AlertFilePublisher extends AbstractPublishPlugin {
+public class AlertFilePublisher extends AbstractPublishPlugin implements AlertPublishPluginProvider {
 
     private Logger filelogger = Logger.getLogger(AlertFilePublisher.class.getName());
     private FileHandler handler;
@@ -65,6 +67,15 @@ public class AlertFilePublisher extends AbstractPublishPlugin {
         handler.setFormatter(new AlertFileFormatter());
         filelogger.addHandler(handler);
         filelogger.setUseParentHandlers(false);
+    }
+
+    @Override
+    public PublishmentType getPluginType() {
+        return new PublishmentType.Builder()
+                .name("File")
+                .type(AlertFilePublisher.class)
+                .description("Local log file publisher")
+                .build();
     }
 
     class AlertFileFormatter extends Formatter {

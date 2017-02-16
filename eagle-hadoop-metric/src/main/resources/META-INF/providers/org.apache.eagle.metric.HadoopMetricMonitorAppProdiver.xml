@@ -31,7 +31,7 @@
         <property>
             <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
             <displayName>JMX Metric Kafka Topic</displayName>
-            <value>hadoop_jmx_metric</value>
+            <value>hadoop_jmx_metric_${siteId}</value>
             <description>Hadoop JMX metric kafka topic name for stream: HADOOP_JMX_METRIC_STREAM</description>
             <required>true</required>
         </property>

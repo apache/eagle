@@ -35,8 +35,10 @@ import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.Version;
+import org.apache.eagle.common.utils.ReflectionsHelper;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.entity.repo.EntityRepositoryScanner;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
 import org.apache.eagle.server.task.ManagedService;
@@ -75,6 +77,12 @@ class ServerApplication extends Application<ServerConfig> {
 
         LOG.debug("Initializing guice injector context for current ServerApplication");
         guiceBundle.getInjector().injectMembers(this);
+
+        try {
+            EntityRepositoryScanner.scan();
+        } catch (IllegalAccessException | InstantiationException e) {
+            LOG.error("Failed to scan entity repository", e);
+        }
     }
 
     @Override

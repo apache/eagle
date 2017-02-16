@@ -31,20 +31,20 @@
 
     <dependencies>
         <!-- put extcos dependency at the top for using asm 4.0 jar !-->
-        <dependency>
-            <groupId>net.sf.extcos</groupId>
-            <artifactId>extcos</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm-all</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-all</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>net.sf.extcos</groupId>-->
+            <!--<artifactId>extcos</artifactId>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.ow2.asm</groupId>-->
+                    <!--<artifactId>asm-all</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.ow2.asm</groupId>-->
+            <!--<artifactId>asm-all</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-common</artifactId>
