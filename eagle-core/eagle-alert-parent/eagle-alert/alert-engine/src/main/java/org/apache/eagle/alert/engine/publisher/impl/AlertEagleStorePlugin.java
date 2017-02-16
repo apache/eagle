@@ -20,8 +20,10 @@ package org.apache.eagle.alert.engine.publisher.impl;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AlertEagleStorePlugin extends AbstractPublishPlugin {
+public class AlertEagleStorePlugin extends AbstractPublishPlugin implements AlertPublishPluginProvider {
 
     private static Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
     private transient IMetadataServiceClient client;
@@ -72,4 +74,12 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin {
         return LOG;
     }
 
+    @Override
+    public PublishmentType getPluginType() {
+        return new PublishmentType.Builder()
+                .name("JDBCStorage")
+                .type(getClass())
+                .description("Publish alerts into eagle metadata store")
+                .build();
+    }
 }

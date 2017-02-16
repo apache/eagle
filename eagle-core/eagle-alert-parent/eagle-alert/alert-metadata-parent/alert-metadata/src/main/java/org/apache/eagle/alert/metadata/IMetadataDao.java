@@ -75,10 +75,13 @@ public interface IMetadataDao extends Closeable {
 
     OpResult removePublishment(String pubId);
 
+    @Deprecated
     List<PublishmentType> listPublishmentType();
 
+    @Deprecated
     OpResult addPublishmentType(PublishmentType publishmentType);
 
+    @Deprecated
     OpResult removePublishmentType(String pubType);
 
     List<AlertPublishEvent> listAlertPublishEvent(int size);
@@ -189,5 +192,10 @@ public interface IMetadataDao extends Closeable {
             LOG.error(result.message,ex);
         }
         return result;
+    }
+
+    default List<PolicyDefinition> getPoliciesBySiteId(String siteId) {
+        Preconditions.checkNotNull(siteId,"siteId");
+        return listPolicies().stream().filter(pc -> pc.getSiteId().equals(siteId)).collect(Collectors.toList());
     }
 }

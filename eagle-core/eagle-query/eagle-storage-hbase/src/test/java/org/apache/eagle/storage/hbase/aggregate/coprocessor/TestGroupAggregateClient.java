@@ -16,28 +16,7 @@
  */
 package org.apache.eagle.storage.hbase.aggregate.coprocessor;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.eagle.common.config.EagleConfigFactory;
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
-import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl;
-
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateClient;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.client.HTableFactory;
-import org.apache.hadoop.hbase.client.HTableInterface;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.DoubleWritable;
-import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericEntityWriter;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
@@ -48,12 +27,28 @@ import org.apache.eagle.query.aggregate.AggregateFunctionType;
 import org.apache.eagle.query.aggregate.raw.GroupbyKey;
 import org.apache.eagle.query.aggregate.raw.GroupbyKeyValue;
 import org.apache.eagle.query.aggregate.raw.GroupbyValue;
-import org.apache.eagle.service.hbase.TestHBaseBase;
+import org.apache.eagle.storage.hbase.TestWithHBaseCoprocessor;
+import org.apache.eagle.storage.hbase.query.coprocessor.AggregateClient;
+import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl;
+import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.DoubleWritable;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @since : 10/30/14,2014
  */
-public class TestGroupAggregateClient extends TestHBaseBase {
+public class TestGroupAggregateClient extends TestWithHBaseCoprocessor {
     HTableInterface table;
     long startTime;
     long endTime;
@@ -64,17 +59,8 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 
     private final static Logger LOG = LoggerFactory.getLogger(TestGroupAggregateClient.class);
 
-    // This is Bad, It will hide TestHBaseBase.setUpHBase!!!!
-    @BeforeClass
-    public static void setUpHBase() {
-        Configuration conf = new Configuration();
-        conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY,AggregateProtocolEndPoint.class.getName());
-        TestHBaseBase.setupHBaseWithConfig(conf);
-    }
-
     @Before
     public void setUp() {
-        hbase.createTable("unittest", "f");
         startTime = System.currentTimeMillis();
         try {
             rowkeys = prepareData(num);
@@ -95,16 +81,6 @@ public class TestGroupAggregateClient extends TestHBaseBase {
             Assert.fail(e.getMessage());
         }
         scan.setFilter(compiler.filter());
-    }
-
-    @After
-    public void shutdown() {
-        try {
-            hbase.deleteTable("unittest");
-            new HTableFactory().releaseHTableInterface(table);
-        } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
-        }
     }
 
     private List<String> prepareData(int count) throws Exception {

@@ -21,16 +21,25 @@ package org.apache.eagle.alert.engine.coordinator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublishmentType {
     private String name;
+
+    @Override
+    public String toString() {
+        return "PublishmentType{"
+                + "name='" + name + '\''
+                + ", type='" + type + '\''
+                + ", description='" + description + '\''
+                + ", fields=" + fields
+                + '}';
+    }
+
     private String type;
     private String description;
-    private List<Map<String, String>> fields;
+    private List<Map<String, String>> fields = new LinkedList<>();
 
     public String getName() {
         return name;
@@ -64,6 +73,8 @@ public class PublishmentType {
         this.fields = fields;
     }
 
+
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PublishmentType) {
@@ -84,5 +95,57 @@ public class PublishmentType {
             .append(description)
             .append(fields)
             .build();
+    }
+
+
+    public static class Builder {
+        private final PublishmentType publishmentType;
+
+        public Builder() {
+            this.publishmentType = new PublishmentType();
+        }
+
+        public Builder type(Class<?> typeClass) {
+            this.publishmentType.setType(typeClass.getName());
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.publishmentType.setName(name);
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.publishmentType.setDescription(description);
+            return this;
+        }
+
+        public Builder field(Map<String,String> fieldDesc) {
+            this.publishmentType.getFields().add(fieldDesc);
+            return this;
+        }
+
+        public Builder field(String name, String value) {
+            this.publishmentType.getFields().add(new HashMap<String,String>() {
+                {
+                    put("name", name);
+                    put("value", value);
+                }
+            });
+            return this;
+        }
+
+        public Builder field(String name) {
+            this.publishmentType.getFields().add(new HashMap<String,String>() {
+                {
+                    put("name", name);
+                }
+            });
+            return this;
+        }
+
+        public PublishmentType build() {
+            return this.publishmentType;
+        }
     }
 }
