@@ -78,11 +78,10 @@
 		}, $scope.policy);
 		console.log("[Policy]", $scope.policy);
 
-		var cacheSearchType;
+		var cacheSiteId;
 		var cacheSearchSourceKey;
 		var searchApplications;
 
-		$scope.searchType = "app";
 		$scope.searchSourceKey = "";
 		$scope.applications = {};
 		$scope.newPolicy = !$scope.policy.name;
@@ -105,25 +104,32 @@
 		// =                        Input Stream                        =
 		// ==============================================================
 		$scope.getSearchApplication = function() {
-			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSearchType !== $scope.searchType) {
-				var match = false;
-				cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
-				cacheSearchType = $scope.searchType;
+			var siteId = $scope.policy.definition.siteId;
 
-				searchApplications = {};
-				$.each($scope.applications, function (appName, streams) {
-					$.each(streams, function (i, stream) {
-						var groupName = cacheSearchType === "app" ? stream.dataSource : stream.siteId;
-						if(
-							groupName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0 ||
-							stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0
-						) {
-							match = true;
-							var group = searchApplications[groupName] = searchApplications[groupName] || [];
-							group.push(stream);
-						}
+			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSiteId !== siteId) {
+				var match = false;
+
+				if (siteId) {
+					cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
+					cacheSiteId = siteId;
+
+					searchApplications = {};
+					$.each($scope.applications, function (appName, streams) {
+						$.each(streams, function (i, stream) {
+							var groupName = stream.dataSource;
+							if(
+								stream.siteId === siteId && (
+									groupName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0 ||
+									stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0
+								)
+							) {
+								match = true;
+								var group = searchApplications[groupName] = searchApplications[groupName] || [];
+								group.push(stream);
+							}
+						});
 					});
-				});
+				}
 
 				if(!match) {
 					searchApplications = null;
@@ -336,6 +342,7 @@
 				$scope.policy.name &&
 				!$scope.checkPolicyName() &&
 				common.number.parse($scope.policy.parallelismHint) > 0 &&
+				$scope.policy.definition.siteId &&
 				$scope.policy.definition.value &&
 				$scope.policy.outputStreams.length &&
 				$scope.policyPublisherList.length
