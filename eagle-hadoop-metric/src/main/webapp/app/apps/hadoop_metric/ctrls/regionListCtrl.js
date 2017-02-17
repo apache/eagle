@@ -31,7 +31,7 @@
 			$scope.dead = METRIC.STATUS_DEAD;
 			$scope.site = $wrapState.param.siteId;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-			$scope.regionserverList = METRIC.regionserverList($scope.site);
+			$scope.regionserverList = METRIC.getListByRoleName("HbaseServiceInstance", "regionserver", $scope.site);
 
 		});
 	});

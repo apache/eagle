@@ -30,7 +30,7 @@
 		hadoopMetricApp.directive("hadoopMetricWidget", function () {
 			return {
 				restrict: 'AE',
-				controller: function ($scope, $attrs, METRIC, Application, $interval, Site, $wrapState) {
+				controller: function ($scope, $attrs, METRIC, Application, $interval) {
 					// Get site
 					var site = $scope.site;
 					var refreshInterval;
@@ -54,36 +54,25 @@
 					// Customize chart color
 					$scope.bgColor = COLOR_MAPPING[$scope.type];
 
-					function countHBaseRole(site, status, role, groups, filed, limit) {
-						var jobCond = {
-							site: site,
-							status: status,
-							role: role
-						};
-						return METRIC.aggHBaseInstance(jobCond, groups, filed, limit);
-					}
-
-					// Ref: jpm widget if need keep refresh the widget
-
 					function refresh() {
 						$.each($scope.list, function (i, site) {
 
-							countHBaseRole(site.siteId, "active", "hmaster", ["site"], "count")._promise.then(function (res) {
+							METRIC.countHadoopRole("HbaseServiceInstance", site.siteId, "active", "hmaster", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.hmasteractivenum = data.value[0];
 								});
 							});
-							countHBaseRole(site.siteId, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
+							METRIC.countHadoopRole("HbaseServiceInstance", site.siteId, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.hmasterstandbynum = data.value[0];
 								});
 							});
-							countHBaseRole(site.siteId, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
+							METRIC.countHadoopRole("HbaseServiceInstance", site.siteId, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.regionserverhealtynum = data.value[0];
 								});
 							});
-							countHBaseRole(site.siteId, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
+							METRIC.countHadoopRole("HbaseServiceInstance", site.siteId, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.regionserverunhealtynum = data.value[0];
 								});

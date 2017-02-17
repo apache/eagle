@@ -233,7 +233,7 @@
 					});
 				});
 
-				METRIC.regionserverStatus($scope.hostname, $scope.site)._promise.then(function (res) {
+				METRIC.getStatusByRoleAndHost("HbaseServiceInstance", $scope.hostname, "regionserver", $scope.site)._promise.then(function (res) {
 					$scope.regionstatus = res;
 				});
 			};
@@ -255,7 +255,7 @@
 					component: "regionserver",
 					host: $scope.hostname
 				};
-				return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
+				return METRIC.aggMetricsToEntities(METRIC.hadoopMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
 					._promise.then(function (list) {
 						var metricFlag = $.map(list, function (metrics) {
 							return metrics[0].flag;
