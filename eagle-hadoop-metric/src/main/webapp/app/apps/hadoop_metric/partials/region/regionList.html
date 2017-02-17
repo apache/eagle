@@ -37,7 +37,7 @@
 				<tbody>
 				<tr ng-repeat="item in regionserverList">
 					<td>
-						<a ui-sref="regionDetail({siteId: site, hostname: item.tags.hostname})" target="_blank">{{item.tags.hostname}}</a>
+						<a ui-sref="regionDetail({siteId: site, hostname: item.tags.hostname})">{{item.tags.hostname}}</a>
 					</td>
 					<td>{{item.tags.rack}}</td>
 					<td>{{item.tags.site}}</td>
