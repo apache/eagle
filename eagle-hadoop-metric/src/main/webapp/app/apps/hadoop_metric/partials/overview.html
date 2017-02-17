@@ -85,13 +85,19 @@
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">
-			<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
+			<div class="col-sm-6 col-md-4 col-lg-6" ng-repeat="chart in chartList track by $index">
 				<div class="hadoopMetric-chart">
-					<h3>{{metric.title}}</h3>
-					<div ng-show="metric.series.length" chart class="hadoopMetric-chart-container"
-						 series="metric.series"
-						 option="metric.option"></div>
-					<div ng-show="!metric.series.length" class="hadoopMetric-chart-container">
+					<h3>{{metricList[chart.name].title}}</h3>
+					<div ng-show="metricList[chart.name].loading" chart class="hadoopMetric-chart-container"></div>
+					<div ng-show="metricList[chart.name].loading" class="overlay-wrapper">
+						<div class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+					<div ng-show="metricList[chart.name].series.length" chart class="hadoopMetric-chart-container"
+						 series="metricList[chart.name].series"
+						 option="metricList[chart.name].option"></div>
+					<div ng-show="!metricList[chart.name].series.length && !metricList[chart.name].loading" class="hadoopMetric-chart-container">
 						<div class="hadoopMetric-chart-container-withborder">
 							<div class="hadoopMetric-no-chart-data">
 								<span class="fa fa-question-circle"></span><span> NO DATA</span>
@@ -102,5 +108,4 @@
 			</div>
 		</div>
 	</div>
-</div>
 </div>

@@ -47,7 +47,7 @@
 					}
 				}]
 			};
-			$scope.metricList = {};
+
 
 			function generateHbaseMetric(name, flag) {
 				var startTime = Time.startTime();
@@ -58,8 +58,7 @@
 				var trendEndTime = Time.align(endTime, interval);
 
 				$scope.site = $wrapState.param.siteId;
-
-				return cache[name] = cache[name] || activeMasterInfo._promise.then(function (res) {
+				var result = cache[name] || activeMasterInfo._promise.then(function (res) {
 						var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
 						$scope.defaultHostname = $wrapState.param.hostname || hostname;
 
@@ -76,6 +75,7 @@
 								return [metricFlag, list];
 							});
 					});
+				return result;
 			}
 
 			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
@@ -89,7 +89,8 @@
 				return {
 					title: metricTitle,
 					series: series,
-					option: dataOption || {}
+					option: dataOption || {},
+					loading: false
 				};
 			}
 
@@ -112,39 +113,138 @@
 
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
-
-
+			$scope.chartList = [
+				{
+					name: "MemoryUsage",
+					metrics: ["nonheap", "heap"],
+					linename: ["nonheap", "heap"],
+					option: storageOption
+				},
+				{
+					name: "Master Averageload",
+					metrics: ["averageload"],
+					linename: ["averageload"],
+					option: {}
+				},
+				{
+					name: "Ritcount",
+					metrics: ["ritcount", "ritcountoverthreshold"],
+					linename: ["ritcount", "ritcountoverthreshold"],
+					option: {}
+				},
+				{
+					name: "AssignOpsNum",
+					metrics: ["AssignNumOps"],
+					linename: ["numOps"],
+					option: {}
+				},
+				{
+					name: "Assign",
+					metrics: ["AssignMin", "AssignMax", "AssignPercentile75th", "AssignPercentile95th", "AssignPercentile99th"],
+					linename: ["min", "max", "75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "BulkAssignOpsNum",
+					metrics: ["BulkAssignNum_ops"],
+					linename: ["num_ops"],
+					option: {}
+				},
+				{
+					name: "BulkAssign",
+					metrics: ["BulkAssignMin", "BulkAssignMax", "BulkAssignPercentile75th", "BulkAssignPercentile95th", "BulkAssignPercentile99th"],
+					linename: ["min", "max", "75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "BalancerClusterOpsNum",
+					metrics: ["BalancerClusterNum_ops"],
+					linename: ["num_ops"],
+					option: {}
+				},
+				{
+					name: "BalancerCluster",
+					metrics: ["BalancerClusterMin", "BalancerClusterMax", "BalancerClusterPercentile75th", "BalancerClusterPercentile95th", "BalancerClusterPercentile99th"],
+					linename: ["min", "max", "75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "HlogSplitTime",
+					metrics: ["HlogSplitTimeMin", "HlogSplitTimeMax"],
+					linename: ["HlogSplitTime_min", "HlogSplitTime_max"],
+					option: {}
+				},
+				{
+					name: "HlogSplitTime Percentile",
+					metrics: ["HlogSplitTimePercentile75th", "HlogSplitTimePercentile95th", "HlogSplitTimePercentile99th"],
+					linename: ["75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "HlogSplitSize",
+					metrics: ["HlogSplitSizeMin","HlogSplitSizeMax"],
+					linename: ["Min", "Max"],
+					option: {}
+				},
+				{
+					name: "MetaHlogSplitTime",
+					metrics: ["MetaHlogSplitTimeMin", "MetaHlogSplitTimeMax"],
+					linename: ["Min", "Max"],
+					option: {}
+				},
+				{
+					name: "MetaHlogSplitTime Percentile",
+					metrics: ["MetaHlogSplitTimePercentile75th", "MetaHlogSplitTimePercentile95th", "MetaHlogSplitTimePercentile99th"],
+					linename: ["75th", "95th", "99th"],
+					option: {}
+				},
+				{
+					name: "MetaHlogSplitSize",
+					metrics: ["MetaHlogSplitSizeMin", "MetaHlogSplitSizeMax"],
+					linename: ["Min", "Max"],
+					option: {}
+				}
+			];
+			$scope.metricList = [];
+			$.each($scope.chartList, function (i) {
+				var chart = $scope.chartList[i];
+				var chartname = chart.name;
+				$scope.metricList[chartname] = {
+					title: chartname,
+					series: {},
+					option: {},
+					loading: true,
+					promises: []
+				};
+			});
 			$scope.refresh = function () {
-				var metricspromies = [];
+
 				METRIC.getMetricObj().then(function (res) {
 					var masterMetricList = res.master;
-					for (var metricKey in masterMetricList) {
-						metricspromies.push(generateHbaseMetric(masterMetricList[metricKey], metricKey));
-					}
-					$q.all(metricspromies).then(function (resp) {
-						var metricObj = {};
-						for (var i = 0; i < resp.length; i += 1) {
-							metricObj[resp[i][0]] = resp[i][1];
-						}
-						return metricObj;
-					}).then(function (seriesObj) {
-						$scope.metricList = [
-							mergeMetricToOneSeries("MemoryUsage", [seriesObj["nonheap"], seriesObj["heap"]], ["nonheap", "heap"], storageOption, {areaStyle: {normal: {}}}),
-							mergeMetricToOneSeries("Master Averageload", [seriesObj["averageload"]], ["averageload"]),
-							mergeMetricToOneSeries("Ritcount", [seriesObj["ritcount"], seriesObj["ritcountoverthreshold"]], ["ritcount", "ritcountoverthreshold"]),
-							mergeMetricToOneSeries("AssignOpsNum", [seriesObj["AssignNumOps"]], ["numOps"]),
-							mergeMetricToOneSeries("Assign", [seriesObj["AssignMin"], seriesObj["AssignMax"], seriesObj["AssignPercentile75th"], seriesObj["AssignPercentile95th"], seriesObj["AssignPercentile99th"]], ["min", "max", "75th", "95th", "99th"]),
-							mergeMetricToOneSeries("BulkAssignOpsNum", [seriesObj["BulkAssignNum_ops"]], ["num_ops"]),
-							mergeMetricToOneSeries("BulkAssign", [seriesObj["BulkAssignMin"], seriesObj["BulkAssignMax"], seriesObj["BulkAssignPercentile75th"], seriesObj["BulkAssignPercentile95th"], seriesObj["BulkAssignPercentile99th"]], ["min", "max", "75th", "95th", "99th"]),
-							mergeMetricToOneSeries("BalancerClusterOpsNum", [seriesObj["BalancerClusterNum_ops"]], ["num_ops"]),
-							mergeMetricToOneSeries("BalancerCluster", [seriesObj["BalancerClusterMin"], seriesObj["BalancerClusterMax"], seriesObj["BalancerClusterPercentile75th"], seriesObj["BalancerClusterPercentile95th"], seriesObj["BalancerClusterPercentile99th"]], ["min", "max", "75th", "95th", "99th"]),
-							mergeMetricToOneSeries("HlogSplitTime", [seriesObj["HlogSplitTimeMin"], seriesObj["HlogSplitTimeMax"]], ["HlogSplitTime_min", "HlogSplitTime_max"]),
-							mergeMetricToOneSeries("HlogSplitTime Percentile", [seriesObj["HlogSplitTimePercentile75th"], seriesObj["HlogSplitTimePercentile95th"], seriesObj["HlogSplitTimePercentile99th"]], ["75th", "95th", "99th"]),
-							mergeMetricToOneSeries("HlogSplitSize", [seriesObj["HlogSplitSizeMin"], seriesObj["HlogSplitSizeMax"]], ["Min", "Max"]),
-							mergeMetricToOneSeries("MetaHlogSplitTime", [seriesObj["MetaHlogSplitTimeMin"], seriesObj["MetaHlogSplitTimeMax"]], ["Min", "Max"]),
-							mergeMetricToOneSeries("MetaHlogSplitTime Percentile", [seriesObj["MetaHlogSplitTimePercentile75th"], seriesObj["MetaHlogSplitTimePercentile95th"], seriesObj["MetaHlogSplitTimePercentile99th"]], ["75th", "95th", "99th"]),
-							mergeMetricToOneSeries("MetaHlogSplitSize", [seriesObj["MetaHlogSplitSizeMin"], seriesObj["MetaHlogSplitSizeMax"]], ["Min", "Max"])
-						];
+					$.each($scope.chartList, function (i) {
+						var chart = $scope.chartList[i];
+						var metricList = chart.metrics;
+						$.each(metricList, function (j) {
+							var metricKey = metricList[j];
+							var metricspromies = generateHbaseMetric(masterMetricList[metricKey], metricKey);
+							var chartname = chart.name;
+							$scope.metricList[chartname].promises.push(metricspromies);
+						});
+					});
+
+					$.each($scope.chartList, function (k) {
+						var chart = $scope.chartList[k];
+						var chartname = chart.name;
+						$q.all($scope.metricList[chartname].promises).then(function (resp) {
+							var series = [];
+							for (var r = 0; r < resp.length; r += 1) {
+								var rs = resp[r][1];
+								if (rs.length > 0) {
+									series.push(rs);
+								}
+							}
+							$scope.metricList[chartname] = mergeMetricToOneSeries(chartname, series, chart.linename, chart.option);
+						});
 					});
 				});
 
@@ -155,7 +255,7 @@
 				});
 				countHBaseRole($scope.site, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
-						$scope.hmasterstandbynum = data.value[0]
+						$scope.hmasterstandbynum = data.value[0];
 					});
 				});
 

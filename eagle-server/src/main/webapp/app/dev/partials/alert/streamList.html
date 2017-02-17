@@ -24,6 +24,16 @@
 		</h3>
 	</div>
 	<div class="box-body">
+		<!-- Site Filter -->
+		<ul class="nav nav-pills with-border">
+			<li><span>Site Filter:</span></li>
+			<li ng-class="{active: siteFilter === ''}" ng-click="updateSiteFilter('')"><a>All</a></li>
+			<li ng-class="{active: siteFilter === site.siteId}" ng-click="updateSiteFilter(site.siteId)"
+			    ng-repeat="site in Site.list track by $index">
+				<a>{{site.siteName || site.siteId}}</a>
+			</li>
+		</ul>
+
 		<div sort-table="streamList">
 			<table class="table table-bordered table-hover">
 				<thead>

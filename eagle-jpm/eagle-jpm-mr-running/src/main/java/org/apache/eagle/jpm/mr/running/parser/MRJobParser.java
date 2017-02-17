@@ -135,6 +135,8 @@ public class MRJobParser implements Runnable {
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(mrJobId);
         jobExecutionAPIEntity.setInternalState(Constants.AppState.FINISHED.toString());
         jobExecutionAPIEntity.setCurrentState(Constants.AppState.RUNNING.toString());
+        // set an estimated job finished time because it's hard the get the specific one
+        jobExecutionAPIEntity.setEndTime(System.currentTimeMillis());
         mrJobConfigs.remove(mrJobId);
         if (mrJobConfigs.size() == 0) {
             this.parserStatus = ParserStatus.APP_FINISHED;

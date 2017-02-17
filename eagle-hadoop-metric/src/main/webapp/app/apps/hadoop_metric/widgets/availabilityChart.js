@@ -24,7 +24,7 @@
 		var COLOR_MAPPING = {
 			HDFS: 'orange',
 			HBase: 'yellow',
-			Yarn: 'green',
+			Yarn: 'green'
 		};
 
 		hadoopMetricApp.directive("hadoopMetricWidget", function () {
@@ -39,13 +39,13 @@
 						$scope.list = $.map(Application.find("HADOOP_METRIC_MONITOR"), function (app) {
 							return {
 								siteId: app.site.siteId,
-								siteName: app.site.siteName || app.site.siteId,
+								siteName: app.site.siteName || app.site.siteId
 							};
 						});
 					} else {
 						$scope.list = [{
 							siteId: site.siteId,
-							siteName: site.siteName || site.siteId,
+							siteName: site.siteName || site.siteId
 						}];
 					}
 					// Get type
@@ -75,7 +75,7 @@
 							});
 							countHBaseRole(site.siteId, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
-									$scope.hmasterstandbynum = data.value[0]
+									$scope.hmasterstandbynum = data.value[0];
 								});
 							});
 							countHBaseRole(site.siteId, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
@@ -103,7 +103,7 @@
 				    '<div class="inner">' +
 				        '<h3>{{type}}</h3>' +
 				        '<div ng-show="hmasteractivenum" class="hadoopMetric-widget-detail">' +
-					        '<a ui-sref="HadoopMetric({siteId: site.siteName})">' +
+					        '<a ui-sref="HadoopMetric({siteId: site.siteId})">' +
 				            '<span>{{hmasteractivenum+hmasterstandbynum}}</span> Masters (' +
 				            '<span ng-show="hmasteractivenum">{{hmasteractivenum}}</span><span ng-show="!hmasteractivenum">0</span> Active / ' +
 				            '<span ng-show="hmasterstandbynum">{{hmasterstandbynum}}</span><span ng-show="!hmasterstandbynum">0</span> Standby)' +
@@ -113,7 +113,7 @@
 				           '<span class="fa fa-question-circle"></span><span> NO DATA</span>' +
 				        '</div>' +
 				        '<div ng-show="hmasteractivenum" class="hadoopMetric-widget-detail">' +
-				            '<a ui-sref="regionList({siteId: site.siteName})">' +
+				            '<a ui-sref="regionList({siteId: site.siteId})">' +
 				            '<span>{{regionserverhealtynum+regionserverunhealtynum}}</span> RegionServers (' +
 				            '<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span><span ng-show="!regionserverhealtynum">0</span> Healthy / ' +
 				            '<span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span><span ng-show="!regionserverunhealtynum">0</span> Unhealthy)' +
