@@ -17,8 +17,8 @@
   -->
 
 <application>
-    <type>HADOOP_HEALTH_MONITOR</type>
-    <name>Hadoop Health Monitor</name>
+    <type>HBASE_HEALTH_MONITOR</type>
+    <name>HBase Health Monitor</name>
     <configuration>
     </configuration>
     <streams>

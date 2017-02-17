@@ -32,7 +32,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HBaseHealthMonitorAppProviderTest extends ApplicationTestBase {
+public class HBaseHealthMonitorAppTest extends ApplicationTestBase {
 
     @Inject
     private SiteResource siteResource;
@@ -42,6 +42,10 @@ public class HBaseHealthMonitorAppProviderTest extends ApplicationTestBase {
     private ApplicationSimulator simulator;
     @Inject
     ApplicationStatusUpdateService statusUpdateService;
+
+    public static void main(String[] args) {
+        new HBaseHealthMonitorAppProvider().getApplication().run(args);
+    }
 
     @Test
     public void testApplicationLifecycle() throws InterruptedException {

@@ -15,27 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.health.jobs;
+package org.apache.eagle.health;
 
-import org.apache.eagle.app.job.MonitorJob;
-import org.apache.eagle.app.job.MonitorResult;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-
-public class HDFSMissingBlockCheckJob extends MonitorJob {
-    @Override
-    protected MonitorResult execute() throws JobExecutionException, Exception {
-        // Compare current missing block and previous version of under-replicated
-        return null;
-    }
-
-    @Override
-    protected void prepare(JobExecutionContext context) throws JobExecutionException {
-        // Previous dump under-replication blocks
-    }
-
-    @Override
-    protected void close() throws JobExecutionException {
-
+public class HDFSHealthMonitorAppTest {
+    public static void main(String[] args) {
+        new HDFSHealthMonitorAppProvider().getApplication().run(args);
     }
 }

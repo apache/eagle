@@ -64,9 +64,9 @@ public class XmlSchedulingApplication extends SchedulingApplication {
         }
 
         private InputStream getSchedulingXmlAsStream() {
-            String metaInfoSchedulingXmlFile = "/META-INF/jobs/" + this.schedulingXmlFile;
+            String metaInfoSchedulingXmlFile = "/META-INF/providers/jobs/" + this.schedulingXmlFile;
 
-            InputStream inputStream = XmlSchedulingPlan.class.getResourceAsStream("/META-INF/jobs/" + this.schedulingXmlFile);
+            InputStream inputStream = XmlSchedulingPlan.class.getResourceAsStream(metaInfoSchedulingXmlFile);
             if (inputStream == null) {
                 inputStream = XmlSchedulingPlan.class.getResourceAsStream(this.schedulingXmlFile);
             }

@@ -14,3 +14,4 @@
 # limitations under the License.
 
 org.apache.eagle.health.HBaseHealthMonitorAppProvider
+org.apache.eagle.health.HDFSHealthMonitorAppProvider
