@@ -38,7 +38,7 @@
 			<div class="box-body">
 				<div class="form-group">
 					<label>* Site</label>
-					<select class="form-control" ng-model="policy.definition.siteId">
+					<select class="form-control" ng-model="policy.siteId">
 						<option ng-repeat="site in Site.list track by $index" value="{{site.siteId}}">
 							{{site.siteName || site.siteId}}
 						</option>

@@ -104,7 +104,7 @@
 		// =                        Input Stream                        =
 		// ==============================================================
 		$scope.getSearchApplication = function() {
-			var siteId = $scope.policy.definition.siteId;
+			var siteId = $scope.policy.siteId;
 
 			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSiteId !== siteId) {
 				var match = false;
@@ -342,7 +342,7 @@
 				$scope.policy.name &&
 				!$scope.checkPolicyName() &&
 				common.number.parse($scope.policy.parallelismHint) > 0 &&
-				$scope.policy.definition.siteId &&
+				$scope.policy.siteId &&
 				$scope.policy.definition.value &&
 				$scope.policy.outputStreams.length &&
 				$scope.policyPublisherList.length
