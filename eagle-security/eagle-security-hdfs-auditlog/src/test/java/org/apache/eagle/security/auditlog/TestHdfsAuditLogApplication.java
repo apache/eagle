@@ -38,8 +38,6 @@ public class TestHdfsAuditLogApplication extends ApplicationTestBase {
     private SiteResource siteResource;
     @Inject
     private ApplicationResource applicationResource;
-    @Inject
-    ApplicationStatusUpdateService statusUpdateService;
 
     @Test
     public void testHdfsAuditLogApplication() throws InterruptedException {
