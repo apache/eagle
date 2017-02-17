@@ -57,4 +57,20 @@ public class ApplicationTestBase {
             Assert.fail("Failed to wait for application to STOPPED after 10 attempts");
         }
     }
+
+    protected void awaitApplicationStatus(ApplicationEntity applicationEntity, ApplicationEntity.Status status) throws InterruptedException {
+        int attempt = 0;
+        while (attempt < 10) {
+            attempt ++;
+            if (applicationEntity.getStatus() == status) {
+                break;
+            } else {
+                statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+                Thread.sleep(1000);
+            }
+        }
+        if (attempt > 10) {
+            Assert.fail("Failed to wait for application to STOPPED after 10 attempts");
+        }
+    }
 }
