@@ -29,19 +29,19 @@
 		controller: "overviewCtrl",
 		resolve: {time: true}
 	}).route("HadoopMetric_HDFS", {
-		url: "/hadoopService/HDFS",
+		url: "/hadoopService/hdfs",
 		site: true,
 		templateUrl: "partials/hdfs/index.html",
 		controller: "hdfsCtrl",
 		resolve: {time: true}
 	}).route("regionDetail", {
-		url: "/hadoopService/HBase/RegionServer/:hostname",
+		url: "/hadoopService/HBase/regionDetail/:hostname",
 		site: true,
 		templateUrl: "partials/region/regionDetail.html",
 		controller: "regionDetailCtrl",
 		resolve: {time: true}
 	}).route("regionList", {
-		url: "/hadoopService/HBase/RegionServers",
+		url: "/hadoopService/HBase/regionList",
 		site: true,
 		templateUrl: "partials/region/regionList.html",
 		controller: "regionListCtrl"
@@ -61,11 +61,8 @@
 
 	hadoopMetricApp.portal({
 		name: "Services", icon: "heartbeat", list: [
-			{
-				name: "HBase", 
-				list: [{name: "Overview", path: "hadoopService/HBase/overview"},{name: "RegionServer", path: "hadoopService/HBase/RegionServers"},{name: "BackupMaster", path: "Service/HBase/backupMasterList"}]
-			},
-			{name: "HDFS", path: "hadoopService/HDFS"}
+			{name: "HBase", path: "hadoopService/HBase/overview"},
+			{name: "HDFS", path: "hadoopService/hdfs"}
 		]
 	}, true);
 

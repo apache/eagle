@@ -141,16 +141,7 @@
 									<a ng-href="{{subPortal.path}}">
 										<i class="fa fa-{{subPortal.icon || 'circle-o'}}"></i>
 										<span>{{subPortal.name}}</span>
-										<i class="fa fa-angle-left pull-right" ng-if="subPortal.list"></i>
 									</a>
-									<ul class="treeview-menu" ng-if="subPortal.list">
-										<li ng-repeat="leafPortal in subPortal.list track by $index" ng-class="{active: getNavClass(leafPortal)}">
-											<a ng-href="{{leafPortal.path}}">
-												<i class="fa fa-{{leafPortal.icon || 'circle-o'}}"></i>
-												<span>{{leafPortal.name}}</span>
-											</a>
-										</li>
-									</ul>
 								</li>
 							</ul>
 						</li>
@@ -171,13 +162,13 @@
 
 
 					<ol class="breadcrumb">
-						<li ng-repeat="navPath in PageConfig.getNavPath() track by $index">
+						<li ng-repeat="navPath in PageConfig.navPath">
 							<span ng-if="!navPath.path">
-								<span class="fa fa-{{navPath.icon || 'home'}}" ng-if="$first"></span>
+								<span class="fa fa-home" ng-if="$first"></span>
 								{{navPath.title || navPath.path}}
 							</span>
 							<a ng-if="navPath.path" ng-href="#{{navPath.path}}">
-								<span class="fa fa-{{navPath.icon || 'home'}}" ng-if="$first"></span>
+								<span class="fa fa-home" ng-if="$first"></span>
 								{{navPath.title || navPath.path}}
 							</a>
 						</li>
