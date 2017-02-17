@@ -150,7 +150,7 @@
 
 			if ($scope.siteFilter) {
 				$scope.policyList = $.grep(originPolicyList, function (policy) {
-					return policy.definition.siteId === $scope.siteFilter;
+					return policy.siteId === $scope.siteFilter;
 				});
 			} else {
 				$scope.policyList = originPolicyList;
