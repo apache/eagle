@@ -99,9 +99,9 @@
         </property>
         <property>
             <name>dataSourceConfig.schemeCls</name>
-            <displayName>Kafka Consumer SchemeCls for Auditlog</displayName>
-            <value>storm.kafka.StringScheme</value>
-            <description>Kafka spout scheme class</description>
+            <displayName>Kafka Consumer SchemeCls</displayName>
+            <value>org.apache.storm.kafka.StringScheme</value>
+            <description>scheme class</description>
             <required>true</required>
         </property>
         <property>
