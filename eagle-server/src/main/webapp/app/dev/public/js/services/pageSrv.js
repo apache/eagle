@@ -132,6 +132,22 @@
 			return portal;
 		}
 
+		/**
+		 * Merge navigation item if same name
+		 */
+		function mergePortalList(list) {
+			var mergedList = [];
+			$.each(list, function (i, portal) {
+				var mergedPortal = common.array.find(portal.name, mergedList, ['name']);
+				if (mergedPortal && portal.list && mergedPortal.list) {
+					mergedPortal.list = mergedPortal.list.concat(portal.list);
+				} else {
+					mergedList.push($.extend({}, portal));
+				}
+			});
+			return mergedList;
+		}
+
 		Portal.refresh = function () {
 			// TODO: check admin
 
@@ -144,17 +160,20 @@
 				};
 			});
 			connectedMainPortalList.push({name: "Sites", icon: "server", showFunc: checkApplication, list: siteList});
+			connectedMainPortalList = mergePortalList(connectedMainPortalList);
 
 			// Site level
 			sitePortals = {};
 			$.each(Site.list, function (i, site) {
 				var siteHome = {name: site.siteName || site.siteId + " Home", icon: "home", path: "#/site/" + site.siteId};
-				sitePortals[site.siteId] = [backHome, siteHome].concat($.map(sitePortalList, function (portal) {
+				var sitePortalList = [backHome, siteHome].concat($.map(sitePortalList, function (portal) {
 					var hasApp = !!common.array.find(portal.application, site.applicationList, "descriptor.type");
 					if(hasApp) {
 						return convertSitePortal(site, portal);
 					}
 				}));
+
+				sitePortals[site.siteId] = mergePortalList(sitePortalList);
 			});
 		};
 

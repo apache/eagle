@@ -57,7 +57,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hadoop_leaf_queue</value>
+            <value>yarn_queue</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>

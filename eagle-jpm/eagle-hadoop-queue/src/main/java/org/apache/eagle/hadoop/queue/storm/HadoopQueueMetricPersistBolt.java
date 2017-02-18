@@ -30,6 +30,7 @@ import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.LeafQueueInfo;
 import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
 import org.apache.eagle.hadoop.queue.model.scheduler.UserWrapper;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -72,10 +73,14 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
             List<GenericMetricEntity> metrics = (List<GenericMetricEntity>) data;
             writeMetrics(metrics);
         } else if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.ENTITY.toString())) {
-            List<RunningQueueAPIEntity> entities = (List<RunningQueueAPIEntity>) data;
-            for (RunningQueueAPIEntity queue : entities) {
-                if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
-                    collector.emit(new Values(queue.getTags().get(HadoopClusterConstants.TAG_QUEUE), parseLeafQueueInfo(queue)));
+            List<TaggedLogAPIEntity> entities = (List<TaggedLogAPIEntity>) data;
+            for (TaggedLogAPIEntity entity : entities) {
+                if (entity instanceof RunningQueueAPIEntity) {
+                    RunningQueueAPIEntity queue = (RunningQueueAPIEntity) entity;
+                    if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
+                        collector.emit(new Values(queue.getTags().get(HadoopClusterConstants.TAG_QUEUE),
+                                parseLeafQueueInfo(queue)));
+                    }
                 }
             }
             writeEntities(entities);
@@ -99,7 +104,7 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         }
     }
 
-    private void writeEntities(List<RunningQueueAPIEntity> entities) {
+    private void writeEntities(List<TaggedLogAPIEntity> entities) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
             if (!response.isSuccess()) {

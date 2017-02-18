@@ -36,17 +36,21 @@
 				</div>
 			</div>
 			<div class="box-body">
+				<div class="form-group">
+					<label>* Site</label>
+					<select class="form-control" ng-model="policy.siteId">
+						<option ng-repeat="site in Site.list track by $index" value="{{site.siteId}}">
+							{{site.siteName || site.siteId}}
+						</option>
+					</select>
+				</div>
+				<hr />
+
 				<div ng-show="sourceTab === 'all'">
 					<div class="input-with-icon">
-						<input type="text" class="form-control" placeholder="Search..." ng-model="searchSourceKey" />
+						<input type="text" class="form-control" placeholder="Filter..." ng-model="searchSourceKey" />
 						<span class="fa fa-search"></span>
 					</div>
-					<p>
-						Group Type:
-						<a ng-class="{'text-bold': searchType === 'app'}" ng-click="searchType = 'app'">Application</a>
-						/
-						<a ng-class="{'text-bold': searchType === 'site'}" ng-click="searchType = 'site'">Site</a>
-					</p>
 
 					<p ng-hide="getSearchApplication()" class="text-warning">No stream match</p>
 					<div ng-show="getSearchApplication()">
