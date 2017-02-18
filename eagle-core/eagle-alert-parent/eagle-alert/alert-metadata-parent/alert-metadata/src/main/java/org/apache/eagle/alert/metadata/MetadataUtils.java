@@ -18,20 +18,20 @@
 
 package org.apache.eagle.alert.metadata;
 
-import org.apache.eagle.alert.coordination.model.ScheduleState;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.engine.coordinator.PublishmentType;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import com.typesafe.config.Config;
-import org.apache.eagle.alert.engine.model.AlertPublishEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import org.apache.eagle.alert.coordination.model.ScheduleState;
+import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
 
 public class MetadataUtils {
 
@@ -45,6 +45,7 @@ public class MetadataUtils {
     public static final String JDBC_CONNECTION_PATH = "jdbc.connection";
     public static final String JDBC_CONNECTION_PROPERTIES_PATH = "jdbc.connectionProperties";
     public static final String MONGO_CONNECTION_PATH = "mongo.connection";
+    public static final String MONGO_DATABASE = "mongo.database";
 
     public static <T> String getKey(T t) {
         if (t instanceof StreamDefinition) {
