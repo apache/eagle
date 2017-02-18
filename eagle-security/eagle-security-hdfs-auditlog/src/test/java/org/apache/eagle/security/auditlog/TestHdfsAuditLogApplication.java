@@ -38,8 +38,6 @@ public class TestHdfsAuditLogApplication extends ApplicationTestBase {
     private SiteResource siteResource;
     @Inject
     private ApplicationResource applicationResource;
-    @Inject
-    ApplicationStatusUpdateService statusUpdateService;
 
     @Test
     public void testHdfsAuditLogApplication() throws InterruptedException {
@@ -57,7 +55,7 @@ public class TestHdfsAuditLogApplication extends ApplicationTestBase {
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
-        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        awaitApplicationStatus(applicationEntity, ApplicationEntity.Status.RUNNING);
         // Stop application
         applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
         awaitApplicationStop(applicationEntity);
