@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -17,11 +16,11 @@
  */
 package org.apache.eagle.health.entities;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
+import org.apache.eagle.log.entity.meta.JavaObjectSerDeser;
 
-public class HDFSHealthEntityRepository extends EntityRepository {
-    public HDFSHealthEntityRepository() {
-        registerEntity(HDFSBlockEntity.class);
-        registerSerDeser(HDFSBlockEntity.class, new BlockEntitySerDeser());
+public class BlockEntitySerDeser extends JavaObjectSerDeser<HDFSBlockEntity> {
+    @Override
+    public Class<HDFSBlockEntity> type() {
+        return HDFSBlockEntity.class;
     }
 }

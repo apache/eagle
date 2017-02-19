@@ -21,9 +21,29 @@
                      version="2.1">
     <schedule>
         <job>
-            <name>HDFS_FSCK_JOB</name>
+            <name>HDFS_BLOCK_SNAPSHOT_JOB</name>
             <group>${appId}</group>
-            <description>HDFS Health Check job</description>
+            <description>HDFS Block Snapshot job</description>
+            <job-class>org.apache.eagle.health.jobs.HDFSBlockSnapshotJob</job-class>
+            <job-data-map>
+                <entry>
+                    <key>connectionProps</key>
+                    <value>${hdfsHealth.connectionProps}</value>
+                </entry>
+                <entry>
+                    <key>serviceHost</key>
+                    <value>${service.host}</value>
+                </entry>
+                <entry>
+                    <key>servicePort</key>
+                    <value>${service.port}</value>
+                </entry>
+            </job-data-map>
+        </job>
+        <job>
+            <name>HDFS_BLOCK_CHECK_JOB</name>
+            <group>${appId}</group>
+            <description>HDFS Block Check job</description>
             <job-class>org.apache.eagle.health.jobs.HDFSBlockCheckJob</job-class>
             <job-data-map>
                 <entry>
@@ -33,10 +53,22 @@
             </job-data-map>
         </job>
         <trigger>
+            <!-- Every -->
             <simple>
-                <name>HDFS_FSCK_JOB_TRIGGER</name>
+                <name>HDFS_BLOCK_SNAPSHOT_JOB_TRIGGER</name>
                 <group>${appId}</group>
-                <job-name>HDFS_FSCK_JOB</job-name>
+                <job-name>HDFS_BLOCK_SNAPSHOT_JOB</job-name>
+                <job-group>${appId}</job-group>
+                <repeat-count>-1</repeat-count>
+                <repeat-interval>${hdfsHealth.intervalMs}</repeat-interval>
+            </simple>
+        </trigger>
+        <trigger>
+            <!-- Every -->
+            <simple>
+                <name>HDFS_BLOCK_CHECK_JOB_TRIGGER</name>
+                <group>${appId}</group>
+                <job-name>HDFS_BLOCK_CHECK_JOB</job-name>
                 <job-group>${appId}</job-group>
                 <repeat-count>-1</repeat-count>
                 <repeat-interval>${hdfsHealth.intervalMs}</repeat-interval>

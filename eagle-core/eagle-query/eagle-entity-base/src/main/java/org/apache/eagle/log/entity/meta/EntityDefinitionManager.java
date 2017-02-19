@@ -47,9 +47,9 @@ public class EntityDefinitionManager {
 	private static Map<Integer, Class<?>> _serIDDeserClassMap = new ConcurrentHashMap<Integer, Class<?>>(); 
 	private static Map<String, Map<Integer, EntityDefinition>> entityPrefixMap = new ConcurrentHashMap<String, Map<Integer, EntityDefinition>>();
 	private static Map<String, Map<Integer, IndexDefinition>> indexPrefixMap = new ConcurrentHashMap<String, Map<Integer, IndexDefinition>>();
+	private static int id = 0;
 
 	static{
-		int id = 0;
 		_serDeserMap.put(NullObject.class, new NullSerDeser());
 		_serIDDeserClassMap.put(id, NullObject.class);
 		_serDeserClassIDMap.put(NullObject.class, id++);
@@ -285,6 +285,8 @@ public class EntityDefinitionManager {
 	 */
 	public static void registerSerDeser(Class<?> clazz, EntitySerDeser<?> entitySerDeser) {
 		_serDeserMap.put(clazz, entitySerDeser);
+		_serIDDeserClassMap.put(id, clazz);
+		_serDeserClassIDMap.put(clazz, id++);
 	}
 
 	/**

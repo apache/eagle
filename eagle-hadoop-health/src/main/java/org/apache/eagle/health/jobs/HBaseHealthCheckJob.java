@@ -82,7 +82,7 @@ public class HBaseHealthCheckJob extends MonitorJob implements Watcher {
                 this.tableNameStr = DEFAULT_TABLE_NAME;
             }
             this.tableName = TableName.valueOf(tableNameStr);
-            PropertiesUtils.merge(connectionProps, this.conf);
+            Utils.merge(connectionProps, this.conf);
             doConnect();
         } catch (IOException | KeeperException | InterruptedException e) {
             throw new JobExecutionException(e);
@@ -255,7 +255,7 @@ public class HBaseHealthCheckJob extends MonitorJob implements Watcher {
             LOG.warn("Table {} already exists", tableNameStr);
         } catch (IOException e) {
             LOG.error("Failed to create hbase table {}", tableNameStr, e);
-            throw new JobExecutionException(EventType.HBASE_CREATE_TABLE_ERROR + ": Failed to create hbase table " + Arrays.toString(tableName.getName()), e);
+            throw new JobExecutionException("HBASE_CREATE_TABLE_ERROR: Failed to create hbase table " + Arrays.toString(tableName.getName()), e);
         }
 
         LOG.info("Table " + tableNameStr + " created.");

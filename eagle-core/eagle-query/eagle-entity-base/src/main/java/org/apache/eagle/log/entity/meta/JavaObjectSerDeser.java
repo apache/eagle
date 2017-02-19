@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,13 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.health.entities;
+package org.apache.eagle.log.entity.meta;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public class HDFSHealthEntityRepository extends EntityRepository {
-    public HDFSHealthEntityRepository() {
-        registerEntity(HDFSBlockEntity.class);
-        registerSerDeser(HDFSBlockEntity.class, new BlockEntitySerDeser());
+import org.apache.eagle.common.SerializableUtils;
+
+public abstract class JavaObjectSerDeser<T> implements EntitySerDeser<T> {
+    @SuppressWarnings("unchecked")
+    @Override
+    public T deserialize(byte[] bytes) {
+        return (T) SerializableUtils.deserializeFromByteArray(bytes, "Deserialize as " +this.getClass().getName());
     }
+
+    @Override
+    public byte[] serialize(T t) {
+        return SerializableUtils.serializeToByteArray(t);
+    }
+
 }
