@@ -28,10 +28,10 @@ import io.dropwizard.auth.CachingAuthenticator;
 import io.dropwizard.auth.basic.BasicAuthProvider;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Environment;
-import org.apache.eagle.common.authentication.User;
+import org.apache.eagle.common.authentication.UserPrincipal;
 import org.apache.eagle.server.authentication.authenticator.LdapBasicAuthenticator;
 import org.apache.eagle.server.authentication.authenticator.SimpleBasicAuthenticator;
-import org.apache.eagle.server.authentication.config.AuthenticationSettings;
+import org.apache.eagle.server.authentication.config.AuthenticationConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,16 +39,19 @@ import java.util.Map;
 public class BasicAuthProviderBuilder {
     private static final String SIMPLE_MODE_REALM = "SIMPLE_AUTHENTICATION";
     private static final String LDAP_MODE_REALM = "LDAP_AUTHENTICATION";
-    private static final Map<String, BasicAuthProvider<User>> MAPPING = new HashMap<>();
-    private AuthenticationSettings authSettings;
+    private static final Map<String, BasicAuthProvider<UserPrincipal>> MAPPING = new HashMap<>();
+    private AuthenticationConfig authSettings;
     private Environment environment;
 
-    public BasicAuthProviderBuilder(AuthenticationSettings authSettings, Environment environment) {
-        this.authSettings = authSettings;
+    public BasicAuthProviderBuilder(AuthenticationConfig authConfig, Environment environment) {
+        this.authSettings = authConfig;
         this.environment = environment;
-        Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleBasicAuthenticator(authSettings.getSimple());
-        Authenticator<BasicCredentials, User> ldapAuthenticator = new LdapBasicAuthenticator(authSettings.getLdap());
-        boolean needsCaching = authSettings.needsCaching();
+        Authenticator<BasicCredentials, UserPrincipal> simpleAuthenticator = new SimpleBasicAuthenticator(authConfig.getSimple());
+        Authenticator<BasicCredentials, UserPrincipal> ldapAuthenticator = new LdapBasicAuthenticator(authConfig.getLdap());
+        boolean needsCaching = authConfig.needsCaching();
+
+        // TODO: Decouple the initiate Authenticator code to different  BasicAuthProvider implementation
+
         MAPPING.put("simple",
                 new BasicAuthProvider<>(needsCaching ? cache(simpleAuthenticator) : simpleAuthenticator, SIMPLE_MODE_REALM));
         MAPPING.put("ldap",
@@ -64,11 +67,11 @@ public class BasicAuthProviderBuilder {
                 throw new RuntimeException(String.format("No matching mode found: %s", mode));
             }
         } else {
-            return new BasicAuthProvider<User>(null, "") {
+            return new BasicAuthProvider<UserPrincipal>(null, "") {
                 public Injectable<?> getInjectable(ComponentContext ic, Auth a, Parameter c) {
-                    return new AbstractHttpContextInjectable<User>() {
-                        public User getValue(HttpContext c) {
-                            return new User("non-auth");
+                    return new AbstractHttpContextInjectable<UserPrincipal>() {
+                        public UserPrincipal getValue(HttpContext c) {
+                            return new UserPrincipal("non-auth");
                         }
                     };
                 }
@@ -76,7 +79,7 @@ public class BasicAuthProviderBuilder {
         }
     }
 
-    private Authenticator<BasicCredentials, User> cache(Authenticator<BasicCredentials, User> authenticator) {
+    private Authenticator<BasicCredentials, UserPrincipal> cache(Authenticator<BasicCredentials, UserPrincipal> authenticator) {
         return new CachingAuthenticator<>(environment.metrics(), authenticator, CacheBuilderSpec.parse(authSettings.getCachePolicy()));
     }
 }

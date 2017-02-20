@@ -34,7 +34,6 @@ import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.Version;
-import org.apache.eagle.common.utils.ReflectionsHelper;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.repo.EntityRepositoryScanner;
@@ -116,7 +115,7 @@ class ServerApplication extends Application<ServerConfig> {
             .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
         // Register authentication provider
-        environment.jersey().register(new BasicAuthProviderBuilder(configuration.getAuth(), environment).build());
+        environment.jersey().register(new BasicAuthProviderBuilder(configuration.getAuthConfig(), environment).build());
 
         // Context listener
         environment.servlets().addServletListeners(new CoordinatorListener());

@@ -212,7 +212,7 @@ public class TestParser {
     public void testCreateTable() throws Exception {
         String query = "CREATE TABLE page_view(viewTime INT, userid BIGINT,\n" +
                 "                page_url STRING, referrer_url STRING,\n" +
-                "                ip STRING COMMENT 'IP Address of the User')\n" +
+                "                ip STRING COMMENT 'IP Address of the UserPrincipal')\n" +
                 "COMMENT 'This is the page view table'\n" +
                 "PARTITIONED BY(dt STRING, country STRING)\n" +
                 "STORED AS SEQUENCEFILE";

@@ -26,7 +26,7 @@ server:
 # ---------------------------------------------
 auth:
   # indicating if authentication is enabled, true for enabled, false for disabled
-  enabled: false
+  enabled: true
 
   # indicating authentication mode, "simple" or "ldap"
   mode: simple
@@ -46,10 +46,12 @@ auth:
 
   # for basic authentication, effective only when auth.mode=simple
   simple:
-    # username for basic authentication, effective only when auth.mode=simple
-    username: admin
-    # password for basic authentication, effective only when auth.mode=simple
-    password: secret
+    users:
+      username: admin
+      password: secret
+      roles:
+        - USER
+        - ADMIN
 
   # for ldap authentication, effective only when auth.mode=ldap
   ldap:

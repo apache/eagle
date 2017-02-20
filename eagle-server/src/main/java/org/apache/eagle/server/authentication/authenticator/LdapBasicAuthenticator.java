@@ -20,8 +20,8 @@ import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
-import org.apache.eagle.common.authentication.User;
-import org.apache.eagle.server.authentication.config.LdapSettings;
+import org.apache.eagle.common.authentication.UserPrincipal;
+import org.apache.eagle.server.authentication.config.LdapConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ import javax.naming.directory.InitialDirContext;
 import java.io.File;
 import java.util.Hashtable;
 
-public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, User> {
+public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, UserPrincipal> {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapBasicAuthenticator.class);
     private static final String LDAP_LDAP_CTX_FACTORY_NAME = "com.sun.jndi.ldap.LdapCtxFactory";
     private static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
@@ -39,17 +39,17 @@ public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, U
     private static final String SYS_PROP_SSL_TRUST_STORE = "javax.net.ssl.trustStore";
     private static final String LDAPS_URL_PREFIX = "ldaps://";
     private static final String SSL_PROTOCOL_VALUE = "ssl";
-    private LdapSettings settings = null;
+    private LdapConfig settings = null;
 
-    public LdapBasicAuthenticator(LdapSettings settings) {
+    public LdapBasicAuthenticator(LdapConfig settings) {
         this.settings = settings;
     }
 
-    public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
+    public Optional<UserPrincipal> authenticate(BasicCredentials credentials) throws AuthenticationException {
         String sanitizedUsername = sanitizeUsername(credentials.getUsername());
         try {
             new InitialDirContext(getContextEnvironment(sanitizedUsername, credentials.getPassword()));
-            return Optional.of(new User(sanitizedUsername));
+            return Optional.of(new UserPrincipal(sanitizedUsername));
         } catch (javax.naming.AuthenticationException ae) {
             LOGGER.warn(String.format("Authentication failed for user[%s]: wrong username or password", sanitizedUsername));
             return Optional.absent();

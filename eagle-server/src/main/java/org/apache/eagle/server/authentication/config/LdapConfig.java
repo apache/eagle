@@ -19,7 +19,7 @@ package org.apache.eagle.server.authentication.config;
 import io.dropwizard.util.Duration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LdapSettings {
+public class LdapConfig {
 
     private String providerUrl = "";
     private String strategy = "";
@@ -34,7 +34,7 @@ public class LdapSettings {
     }
 
     @JsonProperty
-    public LdapSettings setProviderUrl(String providerUrl) {
+    public LdapConfig setProviderUrl(String providerUrl) {
         this.providerUrl = providerUrl;
         return this;
     }
@@ -45,7 +45,7 @@ public class LdapSettings {
     }
 
     @JsonProperty
-    public LdapSettings setPrincipalTemplate(String principalTemplate) {
+    public LdapConfig setPrincipalTemplate(String principalTemplate) {
         this.principalTemplate = principalTemplate;
         return this;
     }
@@ -56,7 +56,7 @@ public class LdapSettings {
     }
 
     @JsonProperty
-    public LdapSettings setStrategy(String strategy) {
+    public LdapConfig setStrategy(String strategy) {
         this.strategy = strategy;
         return this;
     }
@@ -67,7 +67,7 @@ public class LdapSettings {
     }
 
     @JsonProperty
-    public LdapSettings setConnectingTimeout(Duration connectingTimeout) {
+    public LdapConfig setConnectingTimeout(Duration connectingTimeout) {
         this.connectingTimeout = connectingTimeout;
         return this;
     }
@@ -78,7 +78,7 @@ public class LdapSettings {
     }
 
     @JsonProperty
-    public LdapSettings setReadingTimeout(Duration readingTimeout) {
+    public LdapConfig setReadingTimeout(Duration readingTimeout) {
         this.readingTimeout = readingTimeout;
         return this;
     }
@@ -89,7 +89,7 @@ public class LdapSettings {
     }
 
     @JsonProperty
-    public LdapSettings setCertificateAbsolutePath(String certificateAbsolutePath) {
+    public LdapConfig setCertificateAbsolutePath(String certificateAbsolutePath) {
         this.certificateAbsolutePath = certificateAbsolutePath;
         return this;
     }

@@ -18,29 +18,42 @@ package org.apache.eagle.server.authentication.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SimpleSettings {
-    private String username = null;
-    private String password = null;
+import java.util.List;
 
-    @JsonProperty
-    public String getUsername() {
-        return username;
+public class SimpleConfig {
+    private List<UserAccount> users;
+
+    public List<UserAccount> getUsers() {
+        return users;
     }
 
     @JsonProperty
-    public SimpleSettings setUsername(String username) {
-        this.username = username;
-        return this;
+    public void setUsers(List<UserAccount> users) {
+        this.users = users;
     }
 
-    @JsonProperty
-    public String getPassword() {
-        return password;
-    }
-
-    @JsonProperty
-    public SimpleSettings setPassword(String password) {
-        this.password = password;
-        return this;
-    }
+//    private String username = null;
+//    private String password = null;
+//
+//    @JsonProperty
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    @JsonProperty
+//    public SimpleConfig setUsername(String username) {
+//        this.username = username;
+//        return this;
+//    }
+//
+//    @JsonProperty
+//    public String getPassword() {
+//        return password;
+//    }
+//
+//    @JsonProperty
+//    public SimpleConfig setPassword(String password) {
+//        this.password = password;
+//        return this;
+//    }
 }

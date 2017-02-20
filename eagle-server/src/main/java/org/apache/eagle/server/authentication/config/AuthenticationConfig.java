@@ -19,15 +19,15 @@ package org.apache.eagle.server.authentication.config;
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AuthenticationSettings extends Configuration {
+public class AuthenticationConfig extends Configuration {
     private boolean enabled = false;
     private String mode = null;
     private boolean caching = false;
     private String cachePolicy = null;
     private boolean authorization = false;
     private boolean annotated = true;
-    private SimpleSettings simple = new SimpleSettings();
-    private LdapSettings ldap = new LdapSettings();
+    private SimpleConfig simple = new SimpleConfig();
+    private LdapConfig ldap = new LdapConfig();
 
     @JsonProperty
     public boolean isEnabled() {
@@ -35,7 +35,7 @@ public class AuthenticationSettings extends Configuration {
     }
 
     @JsonProperty
-    public AuthenticationSettings setEnabled(boolean enabled) {
+    public AuthenticationConfig setEnabled(boolean enabled) {
         this.enabled = enabled;
         return this;
     }
@@ -46,7 +46,7 @@ public class AuthenticationSettings extends Configuration {
     }
 
     @JsonProperty
-    public AuthenticationSettings setMode(String mode) {
+    public AuthenticationConfig setMode(String mode) {
         this.mode = mode;
         return this;
     }
@@ -57,7 +57,7 @@ public class AuthenticationSettings extends Configuration {
     }
 
     @JsonProperty
-    public AuthenticationSettings setCaching(boolean caching) {
+    public AuthenticationConfig setCaching(boolean caching) {
         this.caching = caching;
         return this;
     }
@@ -68,7 +68,7 @@ public class AuthenticationSettings extends Configuration {
     }
 
     @JsonProperty
-    public AuthenticationSettings setCachePolicy(String cachePolicy) {
+    public AuthenticationConfig setCachePolicy(String cachePolicy) {
         this.cachePolicy = cachePolicy;
         return this;
     }
@@ -79,7 +79,7 @@ public class AuthenticationSettings extends Configuration {
     }
 
     @JsonProperty
-    public AuthenticationSettings setAuthorization(boolean authorization) {
+    public AuthenticationConfig setAuthorization(boolean authorization) {
         this.authorization = authorization;
         return this;
     }
@@ -90,29 +90,29 @@ public class AuthenticationSettings extends Configuration {
     }
 
     @JsonProperty
-    public AuthenticationSettings setAnnotated(boolean annotated) {
+    public AuthenticationConfig setAnnotated(boolean annotated) {
         this.annotated = annotated;
         return this;
     }
 
     @JsonProperty("ldap")
-    public LdapSettings getLdap() {
+    public LdapConfig getLdap() {
         return ldap;
     }
 
     @JsonProperty("ldap")
-    public AuthenticationSettings setLdap(LdapSettings ldap) {
+    public AuthenticationConfig setLdap(LdapConfig ldap) {
         this.ldap = ldap;
         return this;
     }
 
     @JsonProperty("simple")
-    public SimpleSettings getSimple() {
+    public SimpleConfig getSimple() {
         return simple;
     }
 
     @JsonProperty("simple")
-    public AuthenticationSettings setSimple(SimpleSettings simple) {
+    public AuthenticationConfig setSimple(SimpleConfig simple) {
         this.simple = simple;
         return this;
     }

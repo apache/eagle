@@ -17,7 +17,7 @@
 package org.apache.eagle.server.authentication.resource;
 
 import io.dropwizard.auth.Auth;
-import org.apache.eagle.common.authentication.User;
+import org.apache.eagle.common.authentication.UserPrincipal;
 import org.apache.eagle.metadata.resource.RESTResponse;
 import org.junit.Ignore;
 
@@ -33,7 +33,7 @@ public class TestBasicAuthenticationResource {
     @GET
     @Path("/ba/simple")
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<User> getIt(@Auth User user) {
-        return RESTResponse.<User>builder().data(user).success(true).status(Response.Status.OK).get();
+    public RESTResponse<UserPrincipal> getIt(@Auth UserPrincipal user) {
+        return RESTResponse.<UserPrincipal>builder().data(user).success(true).status(Response.Status.OK).get();
     }
 }

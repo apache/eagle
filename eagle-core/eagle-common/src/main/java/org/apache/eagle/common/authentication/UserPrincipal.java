@@ -18,29 +18,60 @@ package org.apache.eagle.common.authentication;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class User implements Principal, Serializable {
-    private String username = "Unauthenticated";
-    private Set<String> roles = null;
+public class UserPrincipal implements Principal, Serializable {
+    private String username;
+    private List<Role> roles;
 
-    public User() {
+    public UserPrincipal() {
+
     }
 
-    public User(String username) {
+    public UserPrincipal(String username) {
         this.username = username;
     }
 
-    public User(String username, Set<String> roles) {
+    public UserPrincipal(String username, List<Role> roles) {
         this.username = username;
         this.roles = roles;
     }
 
-    public Set<String> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
     public String getName() {
         return username;
+    }
+
+    public enum Role {
+        ADMIN_ROLE("ADMIN"),
+        USER_ROLE("USER");
+
+        private static Map<String,Role> nameRoleMap = new HashMap<String,Role>() {
+            {
+                put(ADMIN_ROLE.roleName, ADMIN_ROLE);
+                put(USER_ROLE.roleName, USER_ROLE);
+            }
+        };
+
+        Role(String roleName) {
+            this.roleName = roleName;
+        }
+
+        @Override
+        public String toString() {
+            return roleName;
+        }
+
+        public static Role locate(String roleName) {
+            return nameRoleMap.get(roleName);
+        }
+
+        private final String roleName;
     }
 }
