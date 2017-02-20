@@ -128,13 +128,13 @@ var app = {};
 					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
 					controller: "alertListCtrl",
 					resolve: routeResolve({ time: { autoRefresh: true } })
-				})*/
+				})
 				.state('policyList', {
 					url: "/policies",
 					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
 					controller: "policyListCtrl",
 					resolve: routeResolve()
-				})
+				}) */
 				.state('streamList', {
 					url: "/streams",
 					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
@@ -216,6 +216,12 @@ var app = {};
 					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
 					controller: "alertListCtrl",
 					resolve: routeResolve({ time: { autoRefresh: true } })
+				})
+				.state('policyList', {
+					url: "/site/:siteId/policies",
+					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
+					controller: "policyListCtrl",
+					resolve: routeResolve()
 				})
 			;
 
