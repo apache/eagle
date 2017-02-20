@@ -248,7 +248,7 @@ public class MRJobParserTest {
         Assert.assertTrue(curator.checkExists().forPath(ZK_JOB_PATH) == null);
         Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
         Assert.assertTrue(entities.isEmpty());
-        verify(client, times(1)).create(any());
+        verify(client, times(0)).create(any());
     }
 
 
@@ -342,7 +342,7 @@ public class MRJobParserTest {
         Assert.assertTrue(curator.checkExists().forPath(ZK_JOB_PATH) == null);
         Assert.assertTrue(curator.checkExists().forPath(ZK_APP_PATH) == null);
         Assert.assertTrue(entities.isEmpty());
-        verify(client, times(1)).create(any());
+        verify(client, times(0)).create(any());
     }
 
 
