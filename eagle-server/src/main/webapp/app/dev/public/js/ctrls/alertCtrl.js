@@ -128,30 +128,16 @@
 		PageConfig.title = "Policies";
 		$scope.loading = false;
 
-		var originPolicyList = [];
 		$scope.policyList = [];
-		$scope.siteFilter = '';
-
-		$scope.updateSiteFilter = function (siteId) {
-			if (siteId !== undefined) $scope.siteFilter = siteId;
-
-			if ($scope.siteFilter) {
-				$scope.policyList = $.grep(originPolicyList, function (policy) {
-					return policy.siteId === $scope.siteFilter;
-				});
-			} else {
-				$scope.policyList = originPolicyList;
-			}
-		};
+		$scope.site = $wrapState.param.siteId;
 
 		function updateList() {
-			var list = Entity.queryMetadata("policies");
+			var list = Entity.queryMetadata("policies", { siteId: $scope.site });
 			$scope.loading = true;
 
 			list._then(function () {
 				$scope.loading = false;
-				originPolicyList = list;
-				$scope.updateSiteFilter();
+				$scope.policyList = list;
 			});
 		}
 		updateList();

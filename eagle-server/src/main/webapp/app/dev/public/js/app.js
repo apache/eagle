@@ -141,7 +141,7 @@ var app = {};
 					controller: "alertStreamListCtrl",
 					resolve: routeResolve()
 				})
-				.state('policyCreate', {
+				/* .state('policyCreate', {
 					url: "/policy/create",
 					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyCreateCtrl",
@@ -165,7 +165,7 @@ var app = {};
 					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
 					controller: "policyDetailCtrl",
 					resolve: routeResolve()
-				})
+				}) */
 
 				// =============================== Integration ==============================
 				.state('integration', {
@@ -221,6 +221,32 @@ var app = {};
 					url: "/site/:siteId/policies",
 					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
 					controller: "policyListCtrl",
+					resolve: routeResolve()
+				})
+
+				.state('policyCreate', {
+					url: "/site/:siteId/policy/create",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
+					controller: "policyCreateCtrl",
+					resolve: routeResolve()
+				})
+				.state('policyEdit', {
+					url: "/site/:siteId/policy/edit/{name}",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
+					controller: "policyEditCtrl",
+					resolve: routeResolve()
+				})
+
+				.state('alertDetail', {
+					url: "/site/:siteId/alert/detail/{alertId}",
+					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
+					controller: "alertDetailCtrl",
+					resolve: routeResolve()
+				})
+				.state('policyDetail', {
+					url: "/site/:siteId/policy/detail/{name}",
+					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
+					controller: "policyDetailCtrl",
 					resolve: routeResolve()
 				})
 			;

@@ -62,7 +62,7 @@
 
 		<div class="callout callout-warning no-margin" ng-show="!loading && policyList.length === 0">
 			<h4>No Policy yet</h4>
-			<p>You have not create policy yet. Click <a ui-sref="policyCreate()">here</a> to create a new policy.</p>
+			<p>You have not create policy yet. Click <a ui-sref="policyCreate({ siteId: site })">here</a> to create a new policy.</p>
 		</div>
 	</div>
 
@@ -71,6 +71,6 @@
 	</div>
 
 	<div class="box-footer text-right">
-		<a ui-sref="policyCreate()" class="btn btn-primary">New Policy</a>
+		<a ui-sref="policyCreate({ siteId: site })" class="btn btn-primary">New Policy</a>
 	</div>
 </div>
