@@ -201,7 +201,7 @@ var app = {};
 				})
 
 				.state('alertDetail', {
-					url: "/site/:siteId/alert/detail/{alertId}",
+					url: "/site/:siteId/alert/detail/{alertId}?timestamp",
 					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
 					controller: "alertDetailCtrl",
 					resolve: routeResolve()
