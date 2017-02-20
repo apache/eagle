@@ -89,8 +89,7 @@ public class MRRunningJobApplicationTest {
                 mrRunningJobConfig.getEndpointConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys,
-                config,
-                new MRJobPerformanceAnalyzer(config));
+                config);
         MRRunningJobManager mrRunningJobManager = mock(MRRunningJobManager.class);
         PowerMockito.whenNew(MRRunningJobManager.class).withArguments(mrRunningJobConfig.getZkStateConfig()).thenReturn(mrRunningJobManager);
         mrRunningJobParseBolt.prepare(null, null, null);

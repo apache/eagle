@@ -68,8 +68,7 @@ public class MRRunningJobApplication extends StormApplication {
                 mrRunningJobConfig.getEndpointConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys,
-                config,
-                new MRJobPerformanceAnalyzer(config)),
+                config),
                 tasks).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
         return topologyBuilder.createTopology();
     }
