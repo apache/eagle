@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eagle_hdfs_metadata")
 @ColumnFamily("f")
@@ -40,24 +39,41 @@ import java.util.Map;
 @Tags({"site","path","blockId", "poolId", "owner", "group"})
 public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable {
     public static final String HDFS_BLOCK_SERVICE_NAME = "HDFSBlockService";
-
+    @Column("a")
     private String[] racks;
+    @Column("b")
     private String[] hosts;
+    @Column("c")
     private String[] ipAddresses;
+    @Column("d")
     private DatanodeInfo.AdminStates[] states;
+    @Column("e")
     private String[] storageIds;
+    @Column("f")
     private StorageType[] storageTypes;
+    @Column("g")
+    private long generationStamp;
+    @Column("h")
     private boolean corrupt;
+    @Column("i")
     private boolean underReplicated;
-    private int existingReplicas;
+    @Column("j")
+    private int actualReplicas;
+    @Column("k")
     private int missingReplicas;
+    @Column("l")
     private int blockReplication;
+    @Column("m")
     private Boolean isdir;
+    @Column("n")
     private long blockSize;
+    @Column("o")
     private String[] lastRacks;
+    @Column("p")
     private String[] lastHosts;
+    @Column("q")
     private String[] lastIpAddresses;
-
+    @Column("r")
     private long modifiedTime;
 
     public HDFSBlockEntity() {}
@@ -92,11 +108,14 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
         this.setBlockSize(block.getBlockSize());
         this.setIsdir(status.isDirectory());
         this.setUnderReplicated(underReplicated);
-        this.setExistingReplicas(block.getLocations().length);
-        this.setMissingReplicas(status.getReplication() - this.getExistingReplicas());
+        this.setActualReplicas(block.getLocations().length);
+        this.setMissingReplicas(status.getReplication() - this.getActualReplicas());
+        this.setGenerationStamp(block.getBlock().getGenerationStamp());
 
         this.setModifiedTime(timestamp);
         this.setTimestamp(timestamp);
+
+        // Avoid erase all location information when corrupt.
 
         if (!ArrayUtils.isEmpty(this.getHosts())) {
             this.setLastHosts(this.getHosts());
@@ -115,6 +134,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setRacks(String[] racks) {
         this.racks = racks;
+        valueChanged("racks");
     }
 
     public boolean isCorrupt() {
@@ -123,6 +143,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setCorrupt(boolean corrupt) {
         this.corrupt = corrupt;
+        valueChanged("corrupt");
     }
 
     public String[] getHosts() {
@@ -131,6 +152,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setHosts(String[] hosts) {
         this.hosts = hosts;
+        valueChanged("hosts");
     }
 
     public String[] getIpAddresses() {
@@ -139,6 +161,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setIpAddresses(String[] ipAddresses) {
         this.ipAddresses = ipAddresses;
+        valueChanged("ipAddresses");
     }
 
     public DatanodeInfo.AdminStates[] getStates() {
@@ -147,14 +170,16 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setStates(DatanodeInfo.AdminStates[] states) {
         this.states = states;
+        valueChanged("states");
     }
 
-    public int getExistingReplicas() {
-        return existingReplicas;
+    public int getActualReplicas() {
+        return actualReplicas;
     }
 
-    public void setExistingReplicas(int existingReplicas) {
-        this.existingReplicas = existingReplicas;
+    public void setActualReplicas(int actualReplicas) {
+        this.actualReplicas = actualReplicas;
+        valueChanged("actualReplicas");
     }
 
     public int getMissingReplicas() {
@@ -163,6 +188,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setMissingReplicas(int missingReplicas) {
         this.missingReplicas = missingReplicas;
+        valueChanged("missingReplicas");
     }
 
     public boolean isUnderReplicated() {
@@ -171,6 +197,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setUnderReplicated(boolean underReplicated) {
         this.underReplicated = underReplicated;
+        valueChanged("underReplicated");
     }
 
     public int getBlockReplication() {
@@ -179,6 +206,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setBlockReplication(int blockReplication) {
         this.blockReplication = blockReplication;
+        valueChanged("blockReplication");
     }
 
     public long getModifiedTime() {
@@ -187,6 +215,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setModifiedTime(long modifiedTime) {
         this.modifiedTime = modifiedTime;
+        valueChanged("modifiedTime");
     }
 
     public long getBlockSize() {
@@ -195,6 +224,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setBlockSize(long blockSize) {
         this.blockSize = blockSize;
+        valueChanged("blockSize");
     }
 
     public Boolean getIsdir() {
@@ -203,6 +233,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setIsdir(Boolean isdir) {
         this.isdir = isdir;
+        valueChanged("isdir");
     }
 
     public String[] getLastRacks() {
@@ -211,6 +242,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setLastRacks(String[] lastRacks) {
         this.lastRacks = lastRacks;
+        valueChanged("lastRacks");
     }
 
     public String[] getLastHosts() {
@@ -219,6 +251,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setLastHosts(String[] lastHosts) {
         this.lastHosts = lastHosts;
+        valueChanged("lastHosts");
     }
 
     public String[] getLastIpAddresses() {
@@ -227,6 +260,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setLastIpAddresses(String[] lastIpAddresses) {
         this.lastIpAddresses = lastIpAddresses;
+        valueChanged("lastIpAddresses");
     }
 
     public StorageType[] getStorageTypes() {
@@ -235,6 +269,7 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setStorageTypes(StorageType[] storageTypes) {
         this.storageTypes = storageTypes;
+        valueChanged("storageTypes");
     }
 
     public String[] getStorageIds() {
@@ -243,5 +278,15 @@ public class HDFSBlockEntity extends TaggedLogAPIEntity implements Serializable 
 
     public void setStorageIds(String[] storageIds) {
         this.storageIds = storageIds;
+        valueChanged("storageIds");
+    }
+
+    public long getGenerationStamp() {
+        return generationStamp;
+    }
+
+    public void setGenerationStamp(long generationStamp) {
+        this.generationStamp = generationStamp;
+        valueChanged("generationStamp");
     }
 }
