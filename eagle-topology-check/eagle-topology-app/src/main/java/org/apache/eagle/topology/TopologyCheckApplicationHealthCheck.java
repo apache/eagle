@@ -71,8 +71,8 @@ public class TopologyCheckApplicationHealthCheck extends ApplicationHealthCheckB
             }
 
             if (!message.isEmpty() || currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
-                message += String.format("Current process time is %sms, delay %s minutes.",
-                        currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L);
+                message += String.format("Current process time is %sms, delay %s.",
+                        currentProcessTimeStamp, formatMillSeconds(currentTimeStamp - currentProcessTimeStamp));
                 return Result.unhealthy(message);
             } else {
                 return Result.healthy();
