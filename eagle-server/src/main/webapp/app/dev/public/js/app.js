@@ -43,6 +43,8 @@ var app = {};
 		// ======================================================================================
 		// =                                   Router config                                    =
 		// ======================================================================================
+		var defaultRouterStates = ['site', 'alertList', 'policyList', 'streamList', 'policyCreate', 'policyEdit', 'alertDetail', 'policyDetail'];
+
 		function routeResolve(config) {
 			var resolve = {};
 			if(config === false) return resolve;
@@ -72,7 +74,7 @@ var app = {};
 			resolve._router = function (Site, $wrapState, $q) {
 				var name = state_next.name;
 				var siteId = param_next.siteId;
-				if (siteId && name !== "site") {
+				if (siteId && defaultRouterStates.indexOf(name) === -1) {
 					return Site.getPromise(config).then(function () {
 						var match =  false;
 						$.each(common.getValueByPath(Site.find(siteId), ["applicationList"]), function (i, app) {
@@ -121,12 +123,12 @@ var app = {};
 					resolve: routeResolve({ site: false, application: false })
 				})
 				// ================================= Alerts =================================
-				.state('alertList', {
+				/*.state('alertList', {
 					url: "/alerts?startTime&endTime",
 					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
 					controller: "alertListCtrl",
 					resolve: routeResolve({ time: { autoRefresh: true } })
-				})
+				})*/
 				.state('policyList', {
 					url: "/policies",
 					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
@@ -207,6 +209,13 @@ var app = {};
 					templateUrl: "partials/site/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
 					resolve: routeResolve()
+				})
+
+				.state('alertList', {
+					url: "/site/:siteId/alerts?startTime&endTime",
+					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
+					controller: "alertListCtrl",
+					resolve: routeResolve({ time: { autoRefresh: true } })
 				})
 			;
 

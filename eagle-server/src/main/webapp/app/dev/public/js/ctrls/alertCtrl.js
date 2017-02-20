@@ -26,34 +26,21 @@
 	// ======================================================================================
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig, CompatibleEntity, Time) {
 		PageConfig.title = "Alerts";
+		$scope.site = $wrapState.param.siteId;
 
-		var originAlertList = [];
 		$scope.alertList = [];
-		$scope.siteFilter = '';
 		$scope.loading = false;
-
-		$scope.updateSiteFilter = function (siteId) {
-			if (siteId !== undefined) $scope.siteFilter = siteId;
-
-			if ($scope.siteFilter) {
-				$scope.alertList = $.grep(originAlertList, function (alert) {
-					return alert.tags.siteId === $scope.siteFilter;
-				});
-			} else {
-				$scope.alertList = originAlertList;
-			}
-		};
 
 		function loadAlerts() {
 			$scope.loading = true;
 			var list = CompatibleEntity.query("LIST", {
 				query: "AlertService",
+				condition: {siteId: $scope.site},
 				startTime: new Time('startTime'),
 				endTime: new Time('endTime')
 			});
 			list._then(function () {
-				originAlertList = list;
-				$scope.updateSiteFilter();
+				$scope.alertList = list;
 				$scope.loading = false;
 			});
 		}
