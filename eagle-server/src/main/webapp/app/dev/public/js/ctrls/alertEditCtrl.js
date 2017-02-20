@@ -76,6 +76,7 @@
 			partitionSpec: [],
 			parallelismHint: 5
 		}, $scope.policy);
+		$scope.policy.siteId = $scope.policy.siteId || $wrapState.param.siteId;
 		console.log("[Policy]", $scope.policy);
 
 		var cacheSiteId;
@@ -388,7 +389,7 @@
 								title: "Done",
 								content: "Close dialog to go to the policy detail page."
 							}, function () {
-								$wrapState.go("policyDetail", {name: $scope.policy.name});
+								$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
 							});
 						}, function (res) {
 							// Link Failed

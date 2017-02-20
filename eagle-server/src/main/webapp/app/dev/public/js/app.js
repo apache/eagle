@@ -43,6 +43,8 @@ var app = {};
 		// ======================================================================================
 		// =                                   Router config                                    =
 		// ======================================================================================
+		var defaultRouterStates = ['site', 'alertList', 'policyList', 'streamList', 'policyCreate', 'policyEdit', 'alertDetail', 'policyDetail'];
+
 		function routeResolve(config) {
 			var resolve = {};
 			if(config === false) return resolve;
@@ -72,7 +74,7 @@ var app = {};
 			resolve._router = function (Site, $wrapState, $q) {
 				var name = state_next.name;
 				var siteId = param_next.siteId;
-				if (siteId && name !== "site") {
+				if (siteId && defaultRouterStates.indexOf(name) === -1) {
 					return Site.getPromise(config).then(function () {
 						var match =  false;
 						$.each(common.getValueByPath(Site.find(siteId), ["applicationList"]), function (i, app) {
@@ -120,50 +122,6 @@ var app = {};
 					controller: "setupCtrl",
 					resolve: routeResolve({ site: false, application: false })
 				})
-				// ================================= Alerts =================================
-				.state('alertList', {
-					url: "/alerts?startTime&endTime",
-					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
-					controller: "alertListCtrl",
-					resolve: routeResolve({ time: { autoRefresh: true } })
-				})
-				.state('policyList', {
-					url: "/policies",
-					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
-					controller: "policyListCtrl",
-					resolve: routeResolve()
-				})
-				.state('streamList', {
-					url: "/streams",
-					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
-					controller: "alertStreamListCtrl",
-					resolve: routeResolve()
-				})
-				.state('policyCreate', {
-					url: "/policy/create",
-					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
-					controller: "policyCreateCtrl",
-					resolve: routeResolve()
-				})
-				.state('policyEdit', {
-					url: "/policy/edit/{name}",
-					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
-					controller: "policyEditCtrl",
-					resolve: routeResolve()
-				})
-
-				.state('alertDetail', {
-					url: "/alert/detail/{alertId}",
-					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
-					controller: "alertDetailCtrl",
-					resolve: routeResolve()
-				})
-				.state('policyDetail', {
-					url: "/policy/detail/{name}",
-					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
-					controller: "policyDetailCtrl",
-					resolve: routeResolve()
-				})
 
 				// =============================== Integration ==============================
 				.state('integration', {
@@ -206,6 +164,52 @@ var app = {};
 					url: "/site/:siteId",
 					templateUrl: "partials/site/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
+					resolve: routeResolve()
+				})
+
+				// ============================== Site: Alerts ==============================
+				.state('alertList', {
+					url: "/site/:siteId/alerts?startTime&endTime",
+					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
+					controller: "alertListCtrl",
+					resolve: routeResolve({ time: { autoRefresh: true } })
+				})
+				.state('policyList', {
+					url: "/site/:siteId/policies",
+					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
+					controller: "policyListCtrl",
+					resolve: routeResolve()
+				})
+				.state('streamList', {
+					url: "/site/:siteId/streams",
+					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
+					controller: "alertStreamListCtrl",
+					resolve: routeResolve()
+				})
+
+				.state('policyCreate', {
+					url: "/site/:siteId/policy/create",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
+					controller: "policyCreateCtrl",
+					resolve: routeResolve()
+				})
+				.state('policyEdit', {
+					url: "/site/:siteId/policy/edit/{name}",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
+					controller: "policyEditCtrl",
+					resolve: routeResolve()
+				})
+
+				.state('alertDetail', {
+					url: "/site/:siteId/alert/detail/{alertId}",
+					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
+					controller: "alertDetailCtrl",
+					resolve: routeResolve()
+				})
+				.state('policyDetail', {
+					url: "/site/:siteId/policy/detail/{name}",
+					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
+					controller: "policyDetailCtrl",
 					resolve: routeResolve()
 				})
 			;

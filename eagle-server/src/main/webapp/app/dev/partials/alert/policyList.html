@@ -24,16 +24,6 @@
 		</h3>
 	</div>
 	<div class="box-body">
-		<!-- Site Filter -->
-		<ul class="nav nav-pills with-border">
-			<li><span>Site Filter:</span></li>
-			<li ng-class="{active: siteFilter === ''}" ng-click="updateSiteFilter('')"><a>All</a></li>
-			<li ng-class="{active: siteFilter === site.siteId}" ng-click="updateSiteFilter(site.siteId)"
-			    ng-repeat="site in Site.list track by $index">
-				<a>{{site.siteName || site.siteId}}</a>
-			</li>
-		</ul>
-
 		<div sort-table="policyList" ng-show="policyList.length">
 			<table class="table table-bordered">
 				<thead>
@@ -72,7 +62,7 @@
 
 		<div class="callout callout-warning no-margin" ng-show="!loading && policyList.length === 0">
 			<h4>No Policy yet</h4>
-			<p>You have not create policy yet. Click <a ui-sref="policyCreate()">here</a> to create a new policy.</p>
+			<p>You have not create policy yet. Click <a ui-sref="policyCreate({ siteId: site })">here</a> to create a new policy.</p>
 		</div>
 	</div>
 
@@ -81,6 +71,6 @@
 	</div>
 
 	<div class="box-footer text-right">
-		<a ui-sref="policyCreate()" class="btn btn-primary">New Policy</a>
+		<a ui-sref="policyCreate({ siteId: site })" class="btn btn-primary">New Policy</a>
 	</div>
 </div>
