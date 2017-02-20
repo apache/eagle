@@ -80,28 +80,14 @@
 	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application, Entity) {
 		PageConfig.title = "Streams";
 
-		var originStreamList = [];
 		$scope.streamList = [];
-		$scope.siteFilter = '';
+		$scope.site = $wrapState.param.siteId;
 
-		$scope.updateSiteFilter = function (siteId) {
-			if (siteId !== undefined) $scope.siteFilter = siteId;
-
-			if ($scope.siteFilter) {
-				$scope.streamList = $.grep(originStreamList, function (stream) {
-					return stream.siteId === $scope.siteFilter;
-				});
-			} else {
-				$scope.streamList = originStreamList;
-			}
-		};
-
-		Entity.queryMetadata("streams")._then(function (res) {
-			originStreamList = $.map(res.data, function (stream) {
+		Entity.queryMetadata("streams", { siteId: $scope.site })._then(function (res) {
+			$scope.streamList = $.map(res.data, function (stream) {
 				var application = Application.findProvider(stream.dataSource);
 				return $.extend({application: application}, stream);
 			});
-			$scope.updateSiteFilter();
 		});
 
 		$scope.dataSources = {};
