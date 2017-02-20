@@ -25,6 +25,9 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.MetricName;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
+import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.model.applications.App;
 import org.apache.eagle.hadoop.queue.model.applications.Apps;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
@@ -54,19 +57,29 @@ public class RunningAppParseListener {
     };
 
     private String site;
+    private String rmUrl;
     private SpoutOutputCollector collector;
     private Map<String, GenericMetricEntity> appMetricEntities = new HashMap<>();
+    private List<App> acceptedApps = new ArrayList<>();
 
-    public RunningAppParseListener(String site, SpoutOutputCollector collector) {
+    public RunningAppParseListener(String site, SpoutOutputCollector collector, String rmUrl) {
         this.site = site;
+        this.rmUrl = rmUrl;
         this.collector = collector;
     }
 
     public void flush() {
-        logger.info("start sending app metrics, size: " + appMetricEntities.size());
-        HadoopQueueMessageId messageId = new HadoopQueueMessageId(HadoopClusterConstants.DataType.METRIC, HadoopClusterConstants.DataSource.RUNNING_APPS, System.currentTimeMillis());
+        logger.info("crawled {} running app metrics", appMetricEntities.size());
+        HadoopQueueMessageId messageId = new HadoopQueueMessageId(DataType.METRIC, DataSource.RUNNING_APPS, System.currentTimeMillis());
         List<GenericMetricEntity> metrics = new ArrayList<>(appMetricEntities.values());
-        collector.emit(new ValuesArray(HadoopClusterConstants.DataType.METRIC.name(), metrics), messageId);
+        collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.METRIC.name(), metrics), messageId);
+
+        logger.info("crawled {} accepted apps", acceptedApps.size());
+        messageId = new HadoopQueueMessageId(DataType.STREAM, DataSource.RUNNING_APPS, System.currentTimeMillis());
+        List<App> entities = new ArrayList<>(acceptedApps);
+        collector.emit(new ValuesArray(DataSource.RUNNING_APPS.name(), DataType.STREAM.name(), entities), messageId);
+
+        acceptedApps.clear();
         appMetricEntities.clear();
     }
 
@@ -97,16 +110,21 @@ public class RunningAppParseListener {
     public void onMetric(Apps apps, long timestamp) throws Exception {
         timestamp = timestamp / AGGREGATE_INTERVAL * AGGREGATE_INTERVAL;
         for (App app : apps.getApp()) {
-            Map<String, String> tags = new HashMap<>();
-            tags.put(HadoopClusterConstants.TAG_USER, app.getUser());
-            tags.put(HadoopClusterConstants.TAG_QUEUE, app.getQueue());
-            for (AggLevel level : AggLevel.values()) {
-                Map<String, String> newTags = buildMetricTags(level, tags);
-                for (java.util.Map.Entry<String, String> entry : metrics.entrySet()) {
-                    Method method = App.class.getMethod(entry.getValue());
-                    Integer value = (Integer) method.invoke(app);
-                    String metricName = String.format(entry.getKey(), level.name);
-                    createMetric(metricName, newTags, timestamp, value);
+            if (app.getState().equalsIgnoreCase(HadoopClusterConstants.AppState.ACCEPTED.toString())) {
+                app.setTrackingUrl(YarnClusterResourceURLBuilder.buildAcceptedAppTrackingURL(rmUrl, app.getId()));
+                acceptedApps.add(app);
+            } else {
+                Map<String, String> tags = new HashMap<>();
+                tags.put(HadoopClusterConstants.TAG_USER, app.getUser());
+                tags.put(HadoopClusterConstants.TAG_QUEUE, app.getQueue());
+                for (AggLevel level : AggLevel.values()) {
+                    Map<String, String> newTags = buildMetricTags(level, tags);
+                    for (java.util.Map.Entry<String, String> entry : metrics.entrySet()) {
+                        Method method = App.class.getMethod(entry.getValue());
+                        Integer value = (Integer) method.invoke(app);
+                        String metricName = String.format(entry.getKey(), level.name);
+                        createMetric(metricName, newTags, timestamp, value);
+                    }
                 }
             }
         }

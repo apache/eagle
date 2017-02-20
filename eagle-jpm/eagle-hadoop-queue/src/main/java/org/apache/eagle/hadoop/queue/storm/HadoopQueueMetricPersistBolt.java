@@ -27,11 +27,11 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
-import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.LeafQueueInfo;
+import org.apache.eagle.hadoop.queue.model.applications.App;
+import org.apache.eagle.hadoop.queue.model.applications.AppStreamInfo;
+import org.apache.eagle.hadoop.queue.model.scheduler.QueueStreamInfo;
 import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
-import org.apache.eagle.hadoop.queue.model.scheduler.UserWrapper;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -39,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,18 +46,25 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
 
     private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueMetricPersistBolt.class);
 
+    private Map<HadoopClusterConstants.DataSource, String> streamMap;
     private HadoopQueueRunningAppConfig config;
     private IEagleServiceClient client;
     private OutputCollector collector;
 
-    public HadoopQueueMetricPersistBolt(HadoopQueueRunningAppConfig config) {
+    public HadoopQueueMetricPersistBolt(HadoopQueueRunningAppConfig config,
+                                        Map<HadoopClusterConstants.DataSource, String> streamMap) {
         this.config = config;
+        this.streamMap = streamMap;
     }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         HadoopQueueRunningAppConfig.EagleProps.EagleService eagleService = config.eagleProps.eagleService;
-        this.client = new EagleServiceClientImpl(eagleService.host, eagleService.port, eagleService.username, eagleService.password);
+        this.client = new EagleServiceClientImpl(
+                eagleService.host,
+                eagleService.port,
+                eagleService.username,
+                eagleService.password);
         this.collector = collector;
     }
 
@@ -67,30 +73,41 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         if (input == null) {
             return;
         }
+        String dataSource = input.getStringByField(HadoopClusterConstants.FIELD_DATASOURCE);
         String dataType = input.getStringByField(HadoopClusterConstants.FIELD_DATATYPE);
         Object data = input.getValueByField(HadoopClusterConstants.FIELD_DATA);
-        if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.METRIC.toString())) {
-            List<GenericMetricEntity> metrics = (List<GenericMetricEntity>) data;
-            writeMetrics(metrics);
-        } else if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.ENTITY.toString())) {
+
+       if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.STREAM.toString())) {
+            List<App> apps = (List<App>) data;
+            for (App app : apps) {
+                collector.emit(streamMap.get(dataSource), new Values(app.getId(),
+                        AppStreamInfo.convertAppToStream(app, config.eagleProps.site)));
+            }
+        } else {
             List<TaggedLogAPIEntity> entities = (List<TaggedLogAPIEntity>) data;
             for (TaggedLogAPIEntity entity : entities) {
                 if (entity instanceof RunningQueueAPIEntity) {
                     RunningQueueAPIEntity queue = (RunningQueueAPIEntity) entity;
                     if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
-                        collector.emit(new Values(queue.getTags().get(HadoopClusterConstants.TAG_QUEUE),
-                                parseLeafQueueInfo(queue)));
+                        String queueName = queue.getTags().get(HadoopClusterConstants.TAG_QUEUE);
+                        collector.emit(streamMap.get(dataSource), new Values(queueName, QueueStreamInfo.convertEntityToStream(queue)));
                     }
                 }
             }
-            writeEntities(entities);
+            writeEntities(entities, dataType, dataSource);
         }
         this.collector.ack(input);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(HadoopClusterConstants.LeafQueueInfo.QUEUE_NAME, "message"));
+        if (streamMap != null) {
+            for (String stormStreamId : streamMap.values()) {
+                declarer.declareStream(stormStreamId, new Fields("f1", "message"));
+            }
+        } else {
+            declarer.declare(new Fields("f1", "message"));
+        }
     }
 
     @Override
@@ -104,67 +121,17 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         }
     }
 
-    private void writeEntities(List<TaggedLogAPIEntity> entities) {
+    private void writeEntities(List<TaggedLogAPIEntity> entities, String dataType, String dataSource) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
             if (!response.isSuccess()) {
                 LOG.error("Got exception from eagle service: " + response.getException());
             } else {
-                LOG.info("Successfully wrote " + entities.size() + " RunningQueueAPIEntity entities");
+                LOG.info("Successfully wrote {} items of {} for {}", entities.size(), dataType, dataSource);
             }
         } catch (Exception e) {
-            LOG.error("cannot create running queue entities successfully", e);
+            LOG.error("cannot create {} entities", entities.size(), e);
         }
         entities.clear();
-    }
-
-    private void writeMetrics(List<GenericMetricEntity> entities) {
-        try {
-            GenericServiceAPIResponseEntity response = client.create(entities);
-            if (response.isSuccess()) {
-                LOG.info("Successfully wrote " + entities.size() + " GenericMetricEntity entities");
-            } else {
-                LOG.error(response.getException());
-            }
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
-    }
-
-    private Map<String, Object> parseLeafQueueInfo(RunningQueueAPIEntity queueAPIEntity) {
-        Map<String, Object> queueInfoMap = new HashMap<>();
-        queueInfoMap.put(LeafQueueInfo.QUEUE_SITE, queueAPIEntity.getTags().get(HadoopClusterConstants.TAG_SITE));
-        queueInfoMap.put(LeafQueueInfo.QUEUE_NAME, queueAPIEntity.getTags().get(HadoopClusterConstants.TAG_QUEUE));
-        queueInfoMap.put(LeafQueueInfo.QUEUE_ABSOLUTE_CAPACITY, queueAPIEntity.getAbsoluteCapacity());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_ABSOLUTE_MAX_CAPACITY, queueAPIEntity.getAbsoluteMaxCapacity());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_ABSOLUTE_USED_CAPACITY, queueAPIEntity.getAbsoluteUsedCapacity());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_MAX_ACTIVE_APPS, queueAPIEntity.getMaxActiveApplications());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_NUM_ACTIVE_APPS, queueAPIEntity.getNumActiveApplications());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_NUM_PENDING_APPS, queueAPIEntity.getNumPendingApplications());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_SCHEDULER, queueAPIEntity.getScheduler());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_STATE, queueAPIEntity.getState());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_USED_MEMORY, queueAPIEntity.getMemory());
-        queueInfoMap.put(LeafQueueInfo.QUEUE_USED_VCORES, queueAPIEntity.getVcores());
-        queueInfoMap.put(LeafQueueInfo.TIMESTAMP, queueAPIEntity.getTimestamp());
-
-        double maxUserUsedCapacity = 0;
-        double userUsedCapacity;
-        for (UserWrapper user : queueAPIEntity.getUsers().getUsers()) {
-            userUsedCapacity = calculateUserUsedCapacity(
-                    queueAPIEntity.getAbsoluteUsedCapacity(),
-                    queueAPIEntity.getMemory(),
-                    user.getMemory());
-            if (userUsedCapacity > maxUserUsedCapacity) {
-                maxUserUsedCapacity = userUsedCapacity;
-            }
-
-        }
-        queueInfoMap.put(LeafQueueInfo.QUEUE_MAX_USER_USED_CAPACITY, maxUserUsedCapacity);
-        queueInfoMap.put(LeafQueueInfo.QUEUE_USER_LIMIT_CAPACITY, queueAPIEntity.getUserLimitFactor() * queueAPIEntity.getAbsoluteCapacity());
-        return queueInfoMap;
-    }
-
-    private double calculateUserUsedCapacity(double absoluteUsedCapacity, long queueUsedMem, long userUsedMem) {
-        return userUsedMem * absoluteUsedCapacity / queueUsedMem;
     }
 }
