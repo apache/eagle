@@ -69,24 +69,28 @@ public class HadoopQueueRunningApplicationHealthCheck extends ApplicationHealthC
             GenericServiceAPIResponseEntity response = client
                     .search(query)
                     .metricName(HadoopClusterConstants.MetricName.HADOOP_CLUSTER_ALLOCATED_MEMORY)
-                    .startTime(System.currentTimeMillis() - 24 * 60 * 60000L)
+                    .startTime(System.currentTimeMillis() - 30 * 24 * 60 * 60000L)
                     .endTime(System.currentTimeMillis())
                     .pageSize(10)
                     .send();
             List<Map<List<String>, List<Double>>> results = response.getObj();
-            long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
-            long currentTimeStamp = System.currentTimeMillis();
-            long maxDelayTime = DEFAULT_MAX_DELAY_TIME;
-            if (hadoopQueueRunningAppConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
-                maxDelayTime = hadoopQueueRunningAppConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
-            }
+            try {
+                long currentProcessTimeStamp = results.get(0).get("value").get(0).longValue();
+                long maxDelayTime = DEFAULT_MAX_DELAY_TIME;
+                long currentTimeStamp = System.currentTimeMillis();
+                if (hadoopQueueRunningAppConfig.getConfig().hasPath(MAX_DELAY_TIME_KEY)) {
+                    maxDelayTime = hadoopQueueRunningAppConfig.getConfig().getLong(MAX_DELAY_TIME_KEY);
+                }
 
-            if (!message.isEmpty() || currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
-                message += String.format("Current process time is %sms, delay %s minutes.",
-                        currentProcessTimeStamp, (currentTimeStamp - currentProcessTimeStamp) * 1.0 / 60000L);
-                return Result.unhealthy(message);
-            } else {
-                return Result.healthy();
+                if (!message.isEmpty() || currentTimeStamp - currentProcessTimeStamp > maxDelayTime) {
+                    message += String.format("Current process time is %sms, delay %s.",
+                            currentProcessTimeStamp, formatMillSeconds(currentTimeStamp - currentProcessTimeStamp));
+                    return Result.unhealthy(message);
+                } else {
+                    return Result.healthy();
+                }
+            } catch (Exception e) {
+                return Result.unhealthy("delay more than 30 days");
             }
         } catch (Exception e) {
             return Result.unhealthy(printMessages(message, "An exception was caught when fetch application current process time: ", ExceptionUtils.getStackTrace(e)));

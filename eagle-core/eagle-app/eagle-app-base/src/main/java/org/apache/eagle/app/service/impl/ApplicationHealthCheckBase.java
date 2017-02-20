@@ -53,4 +53,20 @@ public abstract class ApplicationHealthCheckBase extends HealthCheck {
         }
         return sw.getBuffer().toString();
     }
+
+    protected String formatMillSeconds(long millseconds) {
+        millseconds = millseconds / 1000;
+        String result;
+        if (millseconds <= 60) {
+            result = millseconds + " seconds";
+        } else if (millseconds > 60 && millseconds <= 3600) {
+            result = String.format("%.2f minutes", millseconds * 1.0 / 60);
+        } else if (millseconds > 3600 && millseconds <= 3600 * 24) {
+            result = String.format("%.2f hours", millseconds * 1.0 / 3600);
+        } else {
+            result = String.format("%.2f days", millseconds * 1.0 / 3600 / 24);
+        }
+
+        return result;
+    }
 }
