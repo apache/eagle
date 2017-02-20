@@ -23,7 +23,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-hadoop-metric</artifactId>
-    <name>Eagle::App::HadoopMetric::Hdfs::WebUI</name>
+    <name>Eagle::App::HadoopMetric</name>
     <dependencies>
         <dependency>
             <groupId>org.apache.eagle</groupId>
