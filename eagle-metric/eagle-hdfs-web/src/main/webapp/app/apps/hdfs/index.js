@@ -36,5 +36,7 @@
 		]
 	}, true);
 
-	hadoopMetricApp.require("ctrls/overview.js");
+    hadoopMetricApp.requireCSS("style/index.css");
+    hadoopMetricApp.require("widget/availabilityChart.js");
+	hadoopMetricApp.require("ctrl/overview.js");
 })();

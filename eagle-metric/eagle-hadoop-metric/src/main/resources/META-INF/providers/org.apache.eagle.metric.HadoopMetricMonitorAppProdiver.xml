@@ -19,13 +19,6 @@
 <application>
     <type>HADOOP_METRIC_MONITOR</type>
     <name>Hadoop Metrics Monitor</name>
-    <viewPath>/apps/hadoop_metric</viewPath>
-    <dependencies>
-        <dependency>
-            <type>TOPOLOGY_HEALTH_CHECK_APP</type>
-            <required>true</required>
-        </dependency>
-    </dependencies>
     <configuration>
         <!-- data fromStream configurations -->
         <property>

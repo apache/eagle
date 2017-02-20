@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.hdfs;
+package org.apache.eagle.metric;
 
 import org.apache.eagle.app.StaticApplicationProvider;
 
-public class HdfsWebApplicationProvider extends StaticApplicationProvider {
+public class HdfsMetricWebApplicationProvider extends StaticApplicationProvider {
     // HdfsWebApplicationProvider SPI Interface
 }
