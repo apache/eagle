@@ -16,10 +16,10 @@
 server:
   applicationConnectors:
     - type: http
-      port: 10010
+      port: 9090
   adminConnectors:
     - type: http
-      port: 9092
+      port: 9091
 
 # ---------------------------------------------
 # Eagle Authentication Configuration

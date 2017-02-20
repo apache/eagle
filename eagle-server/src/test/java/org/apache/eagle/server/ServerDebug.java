@@ -36,7 +36,7 @@ public class ServerDebug {
 
         String userDir = System.getProperty("user.dir");
         LOGGER.info("user.dir = {}", userDir);
-        serverConf = "/usr/master/incubator-eagle/eagle-server/src/test/resources/configuration.yml";
+        serverConf = userDir + "/eagle-server/src/test/resources/configuration.yml";
 
         try {
             Class.forName(EmbeddedMailService.class.getName());
