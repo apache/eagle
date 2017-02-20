@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @since Apr 11, 2016.
@@ -129,8 +130,14 @@ public class MetadataResource {
 
     @Path("/streams")
     @GET
-    public List<StreamDefinition> listStreams() {
-        return dao.listStreams();
+    public List<StreamDefinition> listStreams(@QueryParam("siteId") String siteId) {
+        if (siteId == null) {
+            return dao.listStreams();
+        } else {
+            return dao.listStreams().stream()
+                .filter((streamDefinition -> streamDefinition.getSiteId().equals(siteId)))
+                .collect(Collectors.toList());
+        }
     }
 
     @Path("/streams")
