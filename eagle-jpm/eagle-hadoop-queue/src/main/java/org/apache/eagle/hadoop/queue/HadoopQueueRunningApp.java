@@ -35,10 +35,6 @@ public class HadoopQueueRunningApp extends StormApplication {
     public StormTopology execute(Config config, StormEnvironment environment) {
         HadoopQueueRunningAppConfig appConfig = new HadoopQueueRunningAppConfig(config);
 
-        int numOfPersistTasks = appConfig.topology.numPersistTasks;
-        int numOfSinkTasks = appConfig.topology.numSinkTasks;
-        int numOfSpoutTasks = 1;
-
         String spoutName = "runningQueueSpout";
         String persistBoltName = "persistBolt";
 
@@ -49,6 +45,10 @@ public class HadoopQueueRunningApp extends StormApplication {
         String schedulerStreamId = persistBoltName + "-to-" + DataSource.SCHEDULER.toString();
         streamMaps.put(DataSource.RUNNING_APPS, acceptedAppStreamId);
         streamMaps.put(DataSource.SCHEDULER, schedulerStreamId);
+
+        int numOfPersistTasks = appConfig.topology.numPersistTasks;
+        int numOfSinkTasks = appConfig.topology.numSinkTasks;
+        int numOfSpoutTasks = 1;
 
         HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(appConfig, streamMaps);
         TopologyBuilder builder = new TopologyBuilder();

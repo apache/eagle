@@ -27,6 +27,8 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
 import org.apache.eagle.hadoop.queue.model.applications.App;
 import org.apache.eagle.hadoop.queue.model.applications.AppStreamInfo;
 import org.apache.eagle.hadoop.queue.model.scheduler.QueueStreamInfo;
@@ -73,11 +75,11 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         if (input == null) {
             return;
         }
-        String dataSource = input.getStringByField(HadoopClusterConstants.FIELD_DATASOURCE);
-        String dataType = input.getStringByField(HadoopClusterConstants.FIELD_DATATYPE);
+        DataSource dataSource = (DataSource) input.getValueByField(HadoopClusterConstants.FIELD_DATASOURCE);
+        DataType dataType = (DataType) input.getValueByField(HadoopClusterConstants.FIELD_DATATYPE);
         Object data = input.getValueByField(HadoopClusterConstants.FIELD_DATA);
 
-       if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.STREAM.toString())) {
+        if (dataType.equals(HadoopClusterConstants.DataType.STREAM)) {
             List<App> apps = (List<App>) data;
             for (App app : apps) {
                 collector.emit(streamMap.get(dataSource), new Values(app.getId(),
@@ -90,7 +92,8 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
                     RunningQueueAPIEntity queue = (RunningQueueAPIEntity) entity;
                     if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
                         String queueName = queue.getTags().get(HadoopClusterConstants.TAG_QUEUE);
-                        collector.emit(streamMap.get(dataSource), new Values(queueName, QueueStreamInfo.convertEntityToStream(queue)));
+                        collector.emit(streamMap.get(dataSource),
+                                new Values(queueName, QueueStreamInfo.convertEntityToStream(queue)));
                     }
                 }
             }
@@ -121,7 +124,7 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         }
     }
 
-    private void writeEntities(List<TaggedLogAPIEntity> entities, String dataType, String dataSource) {
+    private void writeEntities(List<TaggedLogAPIEntity> entities, DataType dataType, DataSource dataSource) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
             if (!response.isSuccess()) {
