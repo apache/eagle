@@ -122,7 +122,7 @@ public class User implements Principal, Serializable {
 
     @Override
     public String toString() {
-        return "User{"
+        return "User {"
             + "name='" + username + '\''
             + ", firstName='" + firstName + '\''
             + ", lastName='" + lastName + '\''
@@ -133,7 +133,6 @@ public class User implements Principal, Serializable {
     }
 
     public enum Role implements Serializable {
-        VISITOR("VISITOR"),               // VISITOR role with user-level permissions
         USER("USER"),                     // USER role with user-level permissions
         APPLICATION("APPLICATION"),       // APPLICATION role with application-level permissions
         ADMINISTRATOR("ADMINISTRATOR");   // ADMINISTRATOR role with admin-level permissions
