@@ -48,7 +48,7 @@ public class YarnClusterResourceURLBuilder {
     }
 
     public static String buildAcceptedAppTrackingURL(String urlBase, String appId) {
-        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "/" + appId + ANONYMOUS_PARAMETER);
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "/" + appId);
     }
 
     public static String buildFinishedAppsURL(String urlBase) {
