@@ -35,7 +35,7 @@ import java.util.List;
         @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false),
         @Index(name = "Index_1_jobDefId", columns = { "jobDefId" }, unique = false),
         @Index(name = "Index_1_jobIdAndErrorCategory", columns = { "jobId", "errorCategory" }, unique = true)
-})
+    })
 public class JobErrorCategoryMappingAPIEntity extends JobBaseAPIEntity {
     @Column("a")
     private String error;
