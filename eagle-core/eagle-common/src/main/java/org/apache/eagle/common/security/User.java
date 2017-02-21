@@ -65,7 +65,7 @@ public class User implements Principal, Serializable {
     }
 
     public String getFullName() {
-        if (this.fullName !=null ) {
+        if (this.fullName != null ) {
             return this.fullName;
         }
         if (this.firstName == null && this.lastName == null) {
