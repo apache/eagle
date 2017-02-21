@@ -104,20 +104,21 @@ public class Constants {
     public static final String TASK_FINISHED = "FINISHED";
 
     //MR
-    public static final String JPA_JOB_CONFIG_SERVICE_NAME = "JobConfigService";
-    public static final String JPA_JOB_EVENT_SERVICE_NAME = "JobEventService";
-    public static final String JPA_JOB_EXECUTION_SERVICE_NAME = "JobExecutionService";
-    public static final String JPA_JOB_COUNT_SERVICE_NAME = "JobCountService";
-    public static final String JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME = "RunningJobExecutionService";
-    public static final String JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "TaskAttemptExecutionService";
-    public static final String JPA_TASK_ATTEMPT_ERROR_SERVICE_NAME = "TaskAttemptErrorCategoryService";
-    public static final String JPA_TASK_FAILURE_COUNT_SERVICE_NAME = "TaskFailureCountService";
-    public static final String JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME = "TaskAttemptCounterService";
-    public static final String JPA_TASK_EXECUTION_SERVICE_NAME = "TaskExecutionService";
-    public static final String JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME = "RunningTaskExecutionService";
-    public static final String JPA_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
-    public static final String JPA_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
-    public static final String JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME = "JobOptimizerSuggestionService";
+    public static final String MR_JOB_CONFIG_SERVICE_NAME = "JobConfigService";
+    public static final String MR_JOB_EVENT_SERVICE_NAME = "JobEventService";
+    public static final String MR_JOB_EXECUTION_SERVICE_NAME = "JobExecutionService";
+    public static final String MR_JOB_ERROR_MAPPING_SERVICE_NAME = "JobErrorMappingService";
+    public static final String MR_JOB_COUNT_SERVICE_NAME = "JobCountService";
+    public static final String MR_RUNNING_JOB_EXECUTION_SERVICE_NAME = "RunningJobExecutionService";
+    public static final String MR_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "TaskAttemptExecutionService";
+    public static final String MR_TASK_ATTEMPT_ERROR_SERVICE_NAME = "TaskAttemptErrorCategoryService";
+    public static final String MR_TASK_FAILURE_COUNT_SERVICE_NAME = "TaskFailureCountService";
+    public static final String MR_TASK_ATTEMPT_COUNTER_SERVICE_NAME = "TaskAttemptCounterService";
+    public static final String MR_TASK_EXECUTION_SERVICE_NAME = "TaskExecutionService";
+    public static final String MR_RUNNING_TASK_EXECUTION_SERVICE_NAME = "RunningTaskExecutionService";
+    public static final String MR_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
+    public static final String MR_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
+    public static final String MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME = "JobOptimizerSuggestionService";
 
     public static final String JOB_TASK_TYPE_TAG = "taskType";
 

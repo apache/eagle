@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejpa_process")
 @ColumnFamily("f")
 @Prefix("process")
-@Service(Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME)
+@Service(Constants.MR_JOB_PROCESS_TIME_STAMP_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 public class JobProcessTimeStampEntity extends TaggedLogAPIEntity {

@@ -21,7 +21,6 @@ package org.apache.eagle.jpm.aggregation.mr;
 import org.apache.eagle.jpm.aggregation.AggregationConfig;
 import org.apache.eagle.jpm.aggregation.common.MetricAggregator;
 import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
-import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -62,7 +61,7 @@ public class MRMetricsAggregateContainer implements MetricsAggregateContainer, S
                     eagleServiceConfig.password);
 
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
-                Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
+                Constants.MR_JOB_PROCESS_TIME_STAMP_NAME,
                 appConfig.getStormConfig().site);
 
             GenericServiceAPIResponseEntity response = client

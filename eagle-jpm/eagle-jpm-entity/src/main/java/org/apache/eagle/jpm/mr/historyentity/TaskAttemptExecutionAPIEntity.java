@@ -27,11 +27,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejpa_task")
 @ColumnFamily("f")
 @Prefix("taexec")
-@Service(Constants.JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME)
+@Service(Constants.MR_TASK_ATTEMPT_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-    @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false),
+        @Index(name = "Index_1_taskAttemptId", columns = { "taskAttemptId" }, unique = true)
     })
 public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")

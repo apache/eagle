@@ -57,6 +57,9 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     // taskAttemptID to task attempt startTime
     protected Map<String, Long> taskAttemptStartTime;
 
+    //errorCategory, <taskId, taskAttemptId(last attempt)>
+    protected Map<String, Map<String, String>> errorCategoryTaskMapping;
+
     // taskID to host mapping, for task it's the host where the last attempt runs on
     protected Map<String, String> taskRunningHosts;
     // hostname to rack mapping
@@ -117,6 +120,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
         taskStartTime = new HashMap<>();
         taskAttemptStartTime = new HashMap<>();
+        errorCategoryTaskMapping = new HashMap<>();
 
         this.configuration = configuration;
 
@@ -305,6 +309,25 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             formatDiagnostics(values.get(Keys.DIAGNOSTICS));
             entityCreated(jobExecutionEntity);
 
+            for (String errorCategory : errorCategoryTaskMapping.keySet()) {
+                JobErrorCategoryMappingAPIEntity jobErrorCategoryMappingAPIEntity = new JobErrorCategoryMappingAPIEntity();
+                jobErrorCategoryMappingAPIEntity.setTags(new HashMap<>(jobExecutionEntity.getTags()));
+                jobErrorCategoryMappingAPIEntity.getTags().put(MRJobTagName.ERROR_CATEGORY.toString(), errorCategory);
+                jobErrorCategoryMappingAPIEntity.setTimestamp(jobExecutionEntity.getTimestamp());
+
+                for (String taskId : errorCategoryTaskMapping.get(errorCategory).keySet()) {
+                    jobErrorCategoryMappingAPIEntity.getTaskAttempts().add(errorCategoryTaskMapping.get(errorCategory).get(taskId));
+                }
+
+                if (jobErrorCategoryMappingAPIEntity.getTaskAttempts().size() > 0) {
+                    jobErrorCategoryMappingAPIEntity.setError(
+                            attempt2ErrorMsg.get(
+                                    jobErrorCategoryMappingAPIEntity.getTaskAttempts().get(0)
+                            ).getRight()
+                    );
+                }
+                entityCreated(jobErrorCategoryMappingAPIEntity);
+            }
             if (configuration != null && totalCounters != null) {
                 JobCounters parsedTotalCounters = parseCounters(totalCounters);
                 JobCounters parsedMapCounters = parseCounters(mapCounters);
@@ -491,6 +514,13 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 taskAttemptErrorCategoryEntity.setEndTime(entity.getEndTime());
                 taskAttemptErrorCategoryEntity.setTimestamp(entity.getTimestamp());
                 entityCreated(taskAttemptErrorCategoryEntity);
+
+                String errorCategory = entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString());
+                if (!errorCategoryTaskMapping.containsKey(errorCategory)) {
+                    errorCategoryTaskMapping.put(errorCategory, new HashMap<>());
+                }
+
+                errorCategoryTaskMapping.get(errorCategory).put(taskID, taskAttemptID);
             }
             taskAttemptStartTime.remove(taskAttemptID);
         } else {

@@ -61,7 +61,7 @@ public class MRHistoryJobApplicationHealthCheck extends ApplicationHealthCheckBa
             }
 
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
-                    Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
+                    Constants.MR_JOB_PROCESS_TIME_STAMP_NAME,
                     mrHistoryJobConfig.getJobHistoryEndpointConfig().site);
 
             GenericServiceAPIResponseEntity response = client

@@ -90,7 +90,7 @@ public class UnExpectedLongDurationJobProcessor implements Processor, Serializab
             }
 
             String query = String.format("%s[@site=\"%s\" and @jobDefId=\"%s\"]<@site>{avg(durationTime)}",
-                    org.apache.eagle.jpm.util.Constants.JPA_JOB_EXECUTION_SERVICE_NAME,
+                    org.apache.eagle.jpm.util.Constants.MR_JOB_EXECUTION_SERVICE_NAME,
                     mrJobAnalysisEntity.getSiteId(),
                     URLEncoder.encode(mrJobAnalysisEntity.getJobDefId()));
 

@@ -18,39 +18,45 @@
 
 package org.apache.eagle.jpm.mr.historyentity;
 
-import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.log.entity.meta.*;
+
+import java.util.List;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@Table("eaglejcount")
+@Table("eaglejpa")
 @ColumnFamily("f")
-@Prefix("jcount")
-@Service(Constants.MR_JOB_COUNT_SERVICE_NAME)
+@Prefix("jecm")
+@Service(Constants.MR_JOB_ERROR_MAPPING_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
-public class JobCountEntity extends TaggedLogAPIEntity {
+@Indexes({
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false),
+        @Index(name = "Index_1_jobDefId", columns = { "jobDefId" }, unique = false),
+        @Index(name = "Index_1_jobIdAndErrorCategory", columns = { "jobId", "errorCategory" }, unique = true)
+    })
+public class JobErrorCategoryMappingAPIEntity extends JobBaseAPIEntity {
     @Column("a")
-    private int total;
+    private String error;
     @Column("b")
-    private int fail;
+    private List<String> taskAttempts;
 
-    public int getTotal() {
-        return total;
+    public String getError() {
+        return error;
     }
 
-    public void setTotal(int total) {
-        this.total = total;
-        valueChanged("total");
+    public void setError(String error) {
+        this.error = error;
+        valueChanged("error");
     }
 
-    public int getFail() {
-        return fail;
+    public List<String> getTaskAttempts() {
+        return taskAttempts;
     }
 
-    public void setFail(int fail) {
-        this.fail = fail;
-        valueChanged("fail");
+    public void setTaskAttempts(List<String> taskAttempts) {
+        this.taskAttempts = taskAttempts;
+        valueChanged("taskAttempts");
     }
 }

@@ -23,13 +23,13 @@ import org.apache.eagle.log.entity.meta.*;
 import java.util.List;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import static org.apache.eagle.jpm.util.Constants.JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME;
+import static org.apache.eagle.jpm.util.Constants.MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jsuggestion")
-@Service(JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME)
+@Service(MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
