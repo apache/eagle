@@ -21,37 +21,41 @@ import com.google.common.base.Preconditions;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
-import org.apache.eagle.common.authentication.UserPrincipal;
+import org.apache.eagle.common.rest.RESTResponse;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.server.authentication.config.SimpleConfig;
 import org.apache.eagle.server.authentication.config.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.*;
 
-public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials, UserPrincipal> {
+public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials, User> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleBasicAuthenticator.class);
     private final Map<String, UserAccount> userAccountRepository;
 
     public SimpleBasicAuthenticator(SimpleConfig config) {
         userAccountRepository = new HashMap<>();
-        for (UserAccount userAccount : config.getUsers()) {
-            Preconditions.checkNotNull(userAccount.getUsername()," Username is null " + userAccount);
-            Preconditions.checkArgument(!userAccountRepository.containsKey(userAccount.getUsername()), "Duplicated user name: " + userAccount.getUsername());
+        for (UserAccount userAccount : config.getAccounts()) {
+            Preconditions.checkNotNull(userAccount.getName()," Username is null " + userAccount);
+            Preconditions.checkArgument(!userAccountRepository.containsKey(userAccount.getName()), "Duplicated user name: " + userAccount.getName());
             if (userAccount.getRoles() == null) {
-                LOGGER.warn("UserPrincipal {} has no roles, set as {} by default", userAccount.getUsername(), UserPrincipal.Role.USER_ROLE);
-                userAccount.setRoles(Collections.singletonList(UserPrincipal.Role.USER_ROLE));
+                LOGGER.warn("UserPrincipal {} has no roles, set as {} by default", userAccount.getName(), User.Role.USER);
+                userAccount.setRoles(User.Role.USER.toString());
             }
-            userAccountRepository.put(userAccount.getUsername(), userAccount);
+            userAccountRepository.put(userAccount.getName(), userAccount);
         }
     }
 
-    public Optional<UserPrincipal> authenticate(BasicCredentials credentials) throws AuthenticationException {
+    public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         if (userAccountRepository.containsKey(credentials.getUsername())
             && Objects.equals(userAccountRepository.get(credentials.getUsername()).getPassword(), credentials.getPassword())) {
                 UserAccount userAccount =  userAccountRepository.get(credentials.getUsername());
-            return Optional.of(new UserPrincipal(userAccount.getUsername(), userAccount.getRoles()));
+            return Optional.of(new User(userAccount));
+        } else {
+            return Optional.absent();
         }
-        return Optional.absent();
     }
 }

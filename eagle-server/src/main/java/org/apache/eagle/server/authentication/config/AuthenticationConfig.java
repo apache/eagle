@@ -24,8 +24,6 @@ public class AuthenticationConfig extends Configuration {
     private String mode = null;
     private boolean caching = false;
     private String cachePolicy = null;
-    private boolean authorization = false;
-    private boolean annotated = true;
     private SimpleConfig simple = new SimpleConfig();
     private LdapConfig ldap = new LdapConfig();
 
@@ -70,28 +68,6 @@ public class AuthenticationConfig extends Configuration {
     @JsonProperty
     public AuthenticationConfig setCachePolicy(String cachePolicy) {
         this.cachePolicy = cachePolicy;
-        return this;
-    }
-
-    @JsonProperty
-    public boolean needsAuthorization() {
-        return authorization;
-    }
-
-    @JsonProperty
-    public AuthenticationConfig setAuthorization(boolean authorization) {
-        this.authorization = authorization;
-        return this;
-    }
-
-    @JsonProperty
-    public boolean byAnnotated() {
-        return annotated;
-    }
-
-    @JsonProperty
-    public AuthenticationConfig setAnnotated(boolean annotated) {
-        this.annotated = annotated;
         return this;
     }
 

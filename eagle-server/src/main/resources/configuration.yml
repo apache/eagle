@@ -38,18 +38,15 @@ auth:
   # indicating the cache policy, containing maximumSize and expireAfterWrite, e.g. maximumSize=10000, expireAfterWrite=10m
   cachePolicy: maximumSize=10000, expireAfterWrite=1m
 
-  # indicating whether authorization is needed
-  authorization: false
-
-  # indicating whether @Auth annotation on parameters is needed
-  annotated: true
-
   # for basic authentication, effective only when auth.mode=simple
   simple:
-    # username for basic authentication, effective only when auth.mode=simple
-    username: admin
-    # password for basic authentication, effective only when auth.mode=simple
-    password: secret
+    accounts:
+      - name: admin
+        password: secret
+        roles: ADMINISTRATOR
+        firstName: Admin
+        lastName: Admin
+        email: unknown-admin@eagle.apache.org
 
   # for ldap authentication, effective only when auth.mode=ldap
   ldap:
@@ -58,7 +55,7 @@ auth:
     providerUrl: ldap://server.address.or.domain:port
 
     # template string containing ${USERNAME} placeholder. This is designed for some orgs who don't use plain usernames
-    # to authenticate, e.g. they may use its members' email address as the username: ${USERNAME}@some.org. When username
+    # to authenticate, e.g. they may use its members' email address as the name: ${USERNAME}@some.org. When name
     # is supposed to be recognized originally, just configure this parameter as ${USERNAME}
     principalTemplate: ${USERNAME}@maybe.email.suffix
 

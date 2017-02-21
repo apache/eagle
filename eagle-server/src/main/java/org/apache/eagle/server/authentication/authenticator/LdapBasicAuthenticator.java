@@ -20,7 +20,7 @@ import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
-import org.apache.eagle.common.authentication.UserPrincipal;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.server.authentication.config.LdapConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import javax.naming.directory.InitialDirContext;
 import java.io.File;
 import java.util.Hashtable;
 
-public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, UserPrincipal> {
+public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, User> {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapBasicAuthenticator.class);
     private static final String LDAP_LDAP_CTX_FACTORY_NAME = "com.sun.jndi.ldap.LdapCtxFactory";
     private static final String LDAP_CONNECT_TIMEOUT_KEY = "com.sun.jndi.ldap.connect.timeout";
@@ -45,11 +45,11 @@ public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, U
         this.settings = settings;
     }
 
-    public Optional<UserPrincipal> authenticate(BasicCredentials credentials) throws AuthenticationException {
+    public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         String sanitizedUsername = sanitizeUsername(credentials.getUsername());
         try {
             new InitialDirContext(getContextEnvironment(sanitizedUsername, credentials.getPassword()));
-            return Optional.of(new UserPrincipal(sanitizedUsername));
+            return Optional.of(new User(sanitizedUsername));
         } catch (javax.naming.AuthenticationException ae) {
             LOGGER.warn(String.format("Authentication failed for user[%s]: wrong username or password", sanitizedUsername));
             return Optional.absent();

@@ -16,46 +16,37 @@
  */
 package org.apache.eagle.server.authentication.config;
 
-import org.apache.eagle.common.authentication.UserPrincipal;
+import com.google.common.base.Preconditions;
+import org.apache.eagle.common.security.User;
 
-import java.util.List;
+import java.util.*;
 
-public class UserAccount {
-    private String username;
-    private String password;
-    private List<UserPrincipal.Role> roles;
-
-    public UserAccount(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
+public class UserAccount extends User {
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    private String password;
+
+    public UserAccount() {
+
+    }
+
+    public UserAccount(String username, String password) {
+        this.setName(username);
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return String.format("username: %s, roles: %s", this.username, this.roles);
-    }
-
-    public void setRoles(List<UserPrincipal.Role> roles) {
-        this.roles = roles;
-    }
-
-    public List<UserPrincipal.Role> getRoles() {
-        return this.roles;
+    public void setRoles(String roles) {
+        if (roles != null) {
+            String[] roleStrArray = roles.split(",");
+            Set<User.Role> rolesSet = new HashSet<>();
+            for (String roleStr:roleStrArray) {
+                User.Role role = User.Role.locateCaseInsensitive(roleStr.trim());
+                Preconditions.checkNotNull(role, "Invalid role " + roleStr);
+                rolesSet.add(role);
+            }
+            super.setRoles(rolesSet);
+        }
     }
 }

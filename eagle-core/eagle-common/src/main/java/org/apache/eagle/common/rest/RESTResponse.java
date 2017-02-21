@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.resource;
+package org.apache.eagle.common.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.eagle.common.function.ThrowableConsumer;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -33,9 +35,14 @@ import java.util.function.Supplier;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class RESTResponse<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTResponse.class);
+
+    @JsonProperty
     private boolean success = false;
+    @JsonProperty
     private String message;
+    @JsonProperty
     private String exception;
+    @JsonProperty
     private T data;
 
     public RESTResponse() {
@@ -109,7 +116,6 @@ public class RESTResponse<T> {
     public void setException(String exception) {
         this.exception = exception;
     }
-
 
     public static class RestResponseBuilder<E> {
         private RESTResponse current = new RESTResponse();
@@ -242,5 +248,8 @@ public class RESTResponse<T> {
             return current;
         }
 
+        public Response build() {
+            return Response.status(status).entity(current).type(MediaType.APPLICATION_JSON).build();
+        }
     }
 }

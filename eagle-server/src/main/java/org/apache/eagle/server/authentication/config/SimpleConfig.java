@@ -21,15 +21,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class SimpleConfig {
-    private List<UserAccount> users;
+    private List<UserAccount> accounts;
 
-    public List<UserAccount> getUsers() {
-        return users;
+    @JsonProperty("accounts")
+    public List<UserAccount> getAccounts() {
+        return accounts;
     }
 
-    @JsonProperty
-    public void setUsers(List<UserAccount> users) {
-        this.users = users;
+    public void setAccounts(List<UserAccount> accounts) {
+        this.accounts = accounts;
     }
 
 //    private String username = null;

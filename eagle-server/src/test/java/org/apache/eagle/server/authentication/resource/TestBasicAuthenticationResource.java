@@ -17,23 +17,65 @@
 package org.apache.eagle.server.authentication.resource;
 
 import io.dropwizard.auth.Auth;
-import org.apache.eagle.common.authentication.UserPrincipal;
-import org.apache.eagle.metadata.resource.RESTResponse;
+import org.apache.eagle.common.security.DenyAll;
+import org.apache.eagle.common.security.PermitAll;
+import org.apache.eagle.common.security.RolesAllowed;
+import org.apache.eagle.common.security.User;
 import org.junit.Ignore;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 @Ignore
-@Path("/test")
+@Path("/testAuth")
 public class TestBasicAuthenticationResource {
     @GET
-    @Path("/ba/simple")
+    @Path("/userOnly")
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<UserPrincipal> getIt(@Auth UserPrincipal user) {
-        return RESTResponse.<UserPrincipal>builder().data(user).success(true).status(Response.Status.OK).get();
+    public User getUser(@Auth User user) {
+        return user;
+    }
+
+    @GET
+    @Path("/adminOnly")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({User.Role.ADMINISTRATOR})
+    public User getAdminUser(@Auth User user) {
+        return user;
+    }
+
+    @GET
+    @Path("/userOrAdmin")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({User.Role.ADMINISTRATOR, User.Role.USER})
+    public User getUserOrAdmin(@Auth User user) {
+        return user;
+    }
+
+    @GET
+    @Path("/securityContext")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SecurityContext getSecurityContext(@Context SecurityContext securityContext) {
+        return securityContext;
+    }
+
+    @GET
+    @Path("/permitAll")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    public User getPermitAllUser(@Auth(required = false) User user) {
+        return user;
+    }
+
+    @GET
+    @Path("/denyAll")
+    @Produces(MediaType.APPLICATION_JSON)
+    @DenyAll
+    public User getDenyAllUser(@Auth User user) {
+        return user;
     }
 }

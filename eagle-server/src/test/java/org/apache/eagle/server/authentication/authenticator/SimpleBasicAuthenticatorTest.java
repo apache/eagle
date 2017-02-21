@@ -20,12 +20,13 @@ package org.apache.eagle.server.authentication.authenticator;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.basic.BasicCredentials;
-import org.apache.eagle.common.authentication.UserPrincipal;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.server.authentication.config.SimpleConfig;
 import org.apache.eagle.server.authentication.config.UserAccount;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.ws.rs.WebApplicationException;
 import java.util.Collections;
 
 public class SimpleBasicAuthenticatorTest {
@@ -36,44 +37,44 @@ public class SimpleBasicAuthenticatorTest {
     private static final String TEST_WRONG_SECRET_PHRASE = "wrong-secret-phrase";
 
     private static SimpleConfig config = new SimpleConfig();
+
     static {
-        config.setUsers(Collections.singletonList(new UserAccount(TEST_USERNAME, TEST_SECRET_PHRASE)));
+        config.setAccounts(Collections.singletonList(new UserAccount(TEST_USERNAME, TEST_SECRET_PHRASE)));
     }
+
     private static SimpleBasicAuthenticator authenticator = new SimpleBasicAuthenticator(config);
 
     @Test
     public void testNormal() {
         try {
             BasicCredentials credentials = new BasicCredentials(TEST_USERNAME, TEST_SECRET_PHRASE);
-            Optional<UserPrincipal> result = authenticator.authenticate(credentials);
+            Optional<User> result = authenticator.authenticate(credentials);
             Assert.assertTrue("result isn't present when passed correct credentials", result.isPresent());
-            UserPrincipal user = result.get();
+            User user = result.get();
             Assert.assertEquals("authenticated user is not expected", TEST_USERNAME, user.getName());
-        }
-        catch (AuthenticationException e) {
-            Assert.fail("unexpected error occurs: "+e.getMessage());
+        } catch (AuthenticationException e) {
+            Assert.fail("unexpected error occurs: " + e.getMessage());
         }
     }
 
-    @Test
+    @Test (expected = WebApplicationException.class)
     public void testUnexistingUsername() {
         try {
-            Optional<UserPrincipal> result = authenticator.authenticate(new BasicCredentials(TEST_UNEXISTING_USERNAME, TEST_SECRET_PHRASE));
+            Optional<User> result = authenticator.authenticate(new BasicCredentials(TEST_UNEXISTING_USERNAME, TEST_SECRET_PHRASE));
             Assert.assertFalse("result is present when passed unexisting username", result.isPresent());
-        }
-        catch (AuthenticationException e) {
-            Assert.fail("unexpected error occurs: "+e.getMessage());
+        } catch (AuthenticationException e) {
+            Assert.fail("unexpected error occurs: " + e.getMessage());
         }
     }
 
-    @Test
+
+    @Test (expected = WebApplicationException.class)
     public void testWrongPassword() {
         try {
-            Optional<UserPrincipal> result = authenticator.authenticate(new BasicCredentials(TEST_USERNAME, TEST_WRONG_SECRET_PHRASE));
+            Optional<User> result = authenticator.authenticate(new BasicCredentials(TEST_USERNAME, TEST_WRONG_SECRET_PHRASE));
             Assert.assertFalse("result is present when passed wrong password", result.isPresent());
-        }
-        catch (AuthenticationException e) {
-            Assert.fail("unexpected error occurs: "+e.getMessage());
+        } catch (AuthenticationException e) {
+            Assert.fail("unexpected error occurs: " + e.getMessage());
         }
     }
 }

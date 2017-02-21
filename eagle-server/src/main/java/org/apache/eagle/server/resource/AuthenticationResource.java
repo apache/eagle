@@ -17,24 +17,49 @@
 package org.apache.eagle.server.resource;
 
 import io.dropwizard.auth.Auth;
-import org.apache.eagle.common.authentication.UserPrincipal;
+import org.apache.eagle.common.security.User;
+import org.apache.eagle.common.rest.RESTResponse;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-@Path("/authentication")
+@Path("/auth")
 public class AuthenticationResource {
     @GET
     @Path("/principal")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserPrincipal getCurrentPrincipal(@Auth UserPrincipal user) {
-        return user;
+    public Response getCurrentPrincipal(@Auth(required = false) User user) {
+        if (user != null) {
+            return RESTResponse.of(user)
+                .status(true, Response.Status.OK)
+                .build();
+        } else {
+            return RESTResponse.builder()
+                .message("No authorized principal found")
+                .status(false, Response.Status.OK)
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/validate")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validate(@Auth User user) {
+        return RESTResponse.of(user)
+            .message("Validated successfully as " + user.getName())
+            .status(true, Response.Status.OK).build();
     }
 
     @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserPrincipal login(@Auth UserPrincipal user) {
-        return user;
+    public Response login(@Auth User user) {
+        return RESTResponse.of(user)
+            .message("Login successfully as " + user.getName())
+            .status(true, Response.Status.OK).build();
     }
 }
