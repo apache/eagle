@@ -55,9 +55,15 @@
 
         <!-- sink to kafka -->
         <property>
-            <name>dataSinkConfig.topic</name>
-            <displayName>dataSinkConfig.topic</displayName>
+            <name>dataSinkConfig.HADOOP_QUEUE_STREAM.topic</name>
+            <displayName>Destination(Kafka Topic) Of Queue Stream Data</displayName>
             <value>yarn_queue</value>
+            <description>topic for kafka data sink</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.ACCEPTED_APP_STREAM.topic</name>
+            <displayName>Destination(Kafka Topic) Of App Stream Data</displayName>
+            <value>yarn_accepted_app</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
