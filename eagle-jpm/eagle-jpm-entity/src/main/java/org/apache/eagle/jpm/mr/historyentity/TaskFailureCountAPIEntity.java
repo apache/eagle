@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejpa_anomaly")
 @ColumnFamily("f")
 @Prefix("taskfailurecount")
-@Service(Constants.JPA_TASK_FAILURE_COUNT_SERVICE_NAME)
+@Service(Constants.MR_TASK_FAILURE_COUNT_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {

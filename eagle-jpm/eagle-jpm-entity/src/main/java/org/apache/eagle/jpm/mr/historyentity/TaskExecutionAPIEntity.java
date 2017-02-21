@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejpa_task")
 @ColumnFamily("f")
 @Prefix("texec")
-@Service(Constants.JPA_TASK_EXECUTION_SERVICE_NAME)
+@Service(Constants.MR_TASK_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({

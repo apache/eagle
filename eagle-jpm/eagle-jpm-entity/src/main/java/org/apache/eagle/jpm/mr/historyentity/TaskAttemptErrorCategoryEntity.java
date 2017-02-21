@@ -28,7 +28,7 @@ import org.apache.eagle.log.entity.meta.*;
 @Table("eaglejpa_task")
 @ColumnFamily("f")
 @Prefix("taexece")
-@Service(Constants.JPA_TASK_ATTEMPT_ERROR_SERVICE_NAME)
+@Service(Constants.MR_TASK_ATTEMPT_ERROR_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({

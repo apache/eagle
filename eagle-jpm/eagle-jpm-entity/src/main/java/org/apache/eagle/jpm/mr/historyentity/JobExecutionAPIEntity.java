@@ -23,13 +23,11 @@ import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.log.entity.meta.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.Map;
-
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jexec")
-@Service(Constants.JPA_JOB_EXECUTION_SERVICE_NAME)
+@Service(Constants.MR_JOB_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
