@@ -31,29 +31,4 @@ public class SimpleConfig {
     public void setAccounts(List<UserAccount> accounts) {
         this.accounts = accounts;
     }
-
-//    private String username = null;
-//    private String password = null;
-//
-//    @JsonProperty
-//    public String getUsername() {
-//        return username;
-//    }
-//
-//    @JsonProperty
-//    public SimpleConfig setUsername(String username) {
-//        this.username = username;
-//        return this;
-//    }
-//
-//    @JsonProperty
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    @JsonProperty
-//    public SimpleConfig setPassword(String password) {
-//        this.password = password;
-//        return this;
-//    }
 }

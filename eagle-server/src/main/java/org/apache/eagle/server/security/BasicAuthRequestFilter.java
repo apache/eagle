@@ -36,7 +36,7 @@ import java.util.StringTokenizer;
 public class BasicAuthRequestFilter implements ContainerRequestFilter {
     private final Authenticator<BasicCredentials, User> authenticator;
     private final AbstractMethod method;
-    private Logger LOG = LoggerFactory.getLogger(BasicAuthRequestFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BasicAuthRequestFilter.class);
     private boolean isSecurityDefined = false;
     private boolean isAuthRequired = false;
     private boolean hasPermitAllAnnotation = false;
@@ -56,11 +56,11 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
             }
             Auth[] authAnnotations = parameter.getAnnotationsByType(Auth.class);
             this.isSecurityDefined = this.isSecurityDefined || authAnnotations.length > 0;
-            for (Auth auth: authAnnotations) {
+            for (Auth auth : authAnnotations) {
                 this.isAuthRequired = this.isAuthRequired || auth.required();
             }
         }
-        Preconditions.checkArgument(!(this.hasDenyAllAnnotation && this.hasPermitAllAnnotation), "Conflict @DenyAll and @PermitAll on method " +this.method.toString());
+        Preconditions.checkArgument(!(this.hasDenyAllAnnotation && this.hasPermitAllAnnotation), "Conflict @DenyAll and @PermitAll on method " + this.method.toString());
     }
 
 
@@ -94,7 +94,7 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
         final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
 
         //If no authorization information present; block access
-        if ((authorization == null || authorization.isEmpty()) && isAuthRequired ) {
+        if ((authorization == null || authorization.isEmpty()) && isAuthRequired) {
             throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
         }
 
@@ -147,7 +147,7 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
                                     .build());
                         }
                     }
-                }  else {
+                } else {
                     throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
                 }
             } catch (AuthenticationException e) {

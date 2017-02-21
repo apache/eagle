@@ -36,7 +36,7 @@ public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials,
     public SimpleBasicAuthenticator(SimpleConfig config) {
         userAccountRepository = new HashMap<>();
         for (UserAccount userAccount : config.getAccounts()) {
-            Preconditions.checkNotNull(userAccount.getName()," Username is null " + userAccount);
+            Preconditions.checkNotNull(userAccount.getName(), " Username is null " + userAccount);
             Preconditions.checkArgument(!userAccountRepository.containsKey(userAccount.getName()), "Duplicated user name: " + userAccount.getName());
             if (userAccount.getRoles() == null) {
                 LOGGER.warn("UserPrincipal {} has no roles, set as {} by default", userAccount.getName(), User.Role.USER);
@@ -49,7 +49,7 @@ public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials,
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         if (userAccountRepository.containsKey(credentials.getUsername())
             && Objects.equals(userAccountRepository.get(credentials.getUsername()).getPassword(), credentials.getPassword())) {
-                UserAccount userAccount =  userAccountRepository.get(credentials.getUsername());
+            UserAccount userAccount = userAccountRepository.get(credentials.getUsername());
             return Optional.of(new User(userAccount));
         } else {
             return Optional.absent();
