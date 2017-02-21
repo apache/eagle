@@ -21,11 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AppStreamInfo {
-    private static final String SITE = "site";
-    private static final String ID = "id";
-    private static final String USER = "user";
+    public static final String SITE = "site";
+    public static final String ID = "id";
+    public static final String USER = "user";
+    public static final String QUEUE = "queue";
     private static final String NAME = "appName";
-    private static final String QUEUE = "queue";
     private static final String STATE = "state";
     private static final String STARTEDTIME = "startTime";
     private static final String ELAPSEDTIME = "elapsedTime";
@@ -33,19 +33,19 @@ public class AppStreamInfo {
     private static final String CLUSTER_USAGE_PERCENTAGE = "clusterUsagePercentage";
     private static final String TRACKING_URL = "trackingUrl";
 
-    public static Map<String, Object> convertAppToStream(App app, String site) {
+    public static Map<String, Object> convertAppToStream(YarnAppAPIEntity appAPIEntity) {
         Map<String, Object> queueStreamInfo = new HashMap<>();
-        queueStreamInfo.put(SITE, site);
-        queueStreamInfo.put(ID, app.getId());
-        queueStreamInfo.put(USER, app.getUser());
-        queueStreamInfo.put(NAME, app.getName());
-        queueStreamInfo.put(QUEUE, app.getQueue());
-        queueStreamInfo.put(STATE, app.getState());
-        queueStreamInfo.put(ELAPSEDTIME, app.getElapsedTime());
-        queueStreamInfo.put(STARTEDTIME, app.getStartedTime());
-        queueStreamInfo.put(QUEUE_USAGE_PERCENTAGE, app.getQueueUsagePercentage());
-        queueStreamInfo.put(CLUSTER_USAGE_PERCENTAGE, app.getClusterUsagePercentage());
-        queueStreamInfo.put(TRACKING_URL, app.getTrackingUrl());
+        queueStreamInfo.put(SITE, appAPIEntity.getTags().get(SITE));
+        queueStreamInfo.put(ID, appAPIEntity.getTags().get(ID));
+        queueStreamInfo.put(USER, appAPIEntity.getTags().get(USER));
+        queueStreamInfo.put(QUEUE, appAPIEntity.getTags().get(QUEUE));
+        queueStreamInfo.put(NAME, appAPIEntity.getAppName());
+        queueStreamInfo.put(STATE, appAPIEntity.getState());
+        queueStreamInfo.put(ELAPSEDTIME, appAPIEntity.getElapsedTime());
+        queueStreamInfo.put(STARTEDTIME, appAPIEntity.getStartedTime());
+        queueStreamInfo.put(QUEUE_USAGE_PERCENTAGE, appAPIEntity.getQueueUsagePercentage());
+        queueStreamInfo.put(CLUSTER_USAGE_PERCENTAGE, appAPIEntity.getClusterUsagePercentage());
+        queueStreamInfo.put(TRACKING_URL, appAPIEntity.getTrackingUrl());
 
         return queueStreamInfo;
     }

@@ -29,8 +29,8 @@ import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
-import org.apache.eagle.hadoop.queue.model.applications.App;
 import org.apache.eagle.hadoop.queue.model.applications.AppStreamInfo;
+import org.apache.eagle.hadoop.queue.model.applications.YarnAppAPIEntity;
 import org.apache.eagle.hadoop.queue.model.scheduler.QueueStreamInfo;
 import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -79,14 +79,10 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         DataType dataType = (DataType) input.getValueByField(HadoopClusterConstants.FIELD_DATATYPE);
         Object data = input.getValueByField(HadoopClusterConstants.FIELD_DATA);
 
-        if (dataType.equals(HadoopClusterConstants.DataType.STREAM)) {
-            List<App> apps = (List<App>) data;
-            for (App app : apps) {
-                collector.emit(streamMap.get(dataSource), new Values(app.getId(),
-                        AppStreamInfo.convertAppToStream(app, config.eagleProps.site)));
-            }
+        List<TaggedLogAPIEntity> entities = (List<TaggedLogAPIEntity>) data;
+        if (dataType.equals(DataType.METRIC)) {
+            writeEntities(entities, dataType, dataSource);
         } else {
-            List<TaggedLogAPIEntity> entities = (List<TaggedLogAPIEntity>) data;
             for (TaggedLogAPIEntity entity : entities) {
                 if (entity instanceof RunningQueueAPIEntity) {
                     RunningQueueAPIEntity queue = (RunningQueueAPIEntity) entity;
@@ -95,6 +91,10 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
                         collector.emit(streamMap.get(dataSource),
                                 new Values(queueName, QueueStreamInfo.convertEntityToStream(queue)));
                     }
+                } else if (entity instanceof YarnAppAPIEntity) {
+                    YarnAppAPIEntity appAPIEntity = (YarnAppAPIEntity) entity;
+                    collector.emit(streamMap.get(dataSource),
+                            new Values(appAPIEntity.getAppName(), AppStreamInfo.convertAppToStream(appAPIEntity)));
                 }
             }
             writeEntities(entities, dataType, dataSource);

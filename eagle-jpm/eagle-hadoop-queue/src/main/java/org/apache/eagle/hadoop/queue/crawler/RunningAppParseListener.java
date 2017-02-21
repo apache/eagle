@@ -29,7 +29,9 @@ import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.model.applications.App;
+import org.apache.eagle.hadoop.queue.model.applications.AppStreamInfo;
 import org.apache.eagle.hadoop.queue.model.applications.Apps;
+import org.apache.eagle.hadoop.queue.model.applications.YarnAppAPIEntity;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -60,7 +62,7 @@ public class RunningAppParseListener {
     private String rmUrl;
     private SpoutOutputCollector collector;
     private Map<String, GenericMetricEntity> appMetricEntities = new HashMap<>();
-    private List<App> acceptedApps = new ArrayList<>();
+    private List<YarnAppAPIEntity> acceptedApps = new ArrayList<>();
 
     public RunningAppParseListener(String site, SpoutOutputCollector collector, String rmUrl) {
         this.site = site;
@@ -75,9 +77,9 @@ public class RunningAppParseListener {
         collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.METRIC, metrics), messageId);
 
         logger.info("crawled {} accepted apps", acceptedApps.size());
-        messageId = new HadoopQueueMessageId(DataType.STREAM, DataSource.RUNNING_APPS, System.currentTimeMillis());
-        List<App> entities = new ArrayList<>(acceptedApps);
-        collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.STREAM, entities), messageId);
+        messageId = new HadoopQueueMessageId(DataType.ENTITY, DataSource.RUNNING_APPS, System.currentTimeMillis());
+        List<YarnAppAPIEntity> entities = new ArrayList<>(acceptedApps);
+        collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.ENTITY, entities), messageId);
 
         acceptedApps.clear();
         appMetricEntities.clear();
@@ -111,8 +113,16 @@ public class RunningAppParseListener {
         timestamp = timestamp / AGGREGATE_INTERVAL * AGGREGATE_INTERVAL;
         for (App app : apps.getApp()) {
             if (app.getState().equalsIgnoreCase(HadoopClusterConstants.AppState.ACCEPTED.toString())) {
-                app.setTrackingUrl(YarnClusterResourceURLBuilder.buildAcceptedAppTrackingURL(rmUrl, app.getId()));
-                acceptedApps.add(app);
+                YarnAppAPIEntity appAPIEntity = new YarnAppAPIEntity();
+                appAPIEntity.setTags(buildAppTags(app));
+                appAPIEntity.setTrackingUrl(YarnClusterResourceURLBuilder.buildAcceptedAppTrackingURL(rmUrl, app.getId()));
+                appAPIEntity.setAppName(app.getName());
+                appAPIEntity.setClusterUsagePercentage(app.getClusterUsagePercentage());
+                appAPIEntity.setQueueUsagePercentage(app.getQueueUsagePercentage());
+                appAPIEntity.setElapsedTime(app.getElapsedTime());
+                appAPIEntity.setStartedTime(app.getStartedTime());
+                appAPIEntity.setState(app.getState());
+                acceptedApps.add(appAPIEntity);
             } else {
                 Map<String, String> tags = new HashMap<>();
                 tags.put(HadoopClusterConstants.TAG_USER, app.getUser());
@@ -128,6 +138,15 @@ public class RunningAppParseListener {
                 }
             }
         }
+    }
+
+    private Map<String, String> buildAppTags(App app) {
+        Map<String, String> tags = new HashMap<>();
+        tags.put(AppStreamInfo.SITE, this.site);
+        tags.put(AppStreamInfo.ID, app.getId());
+        tags.put(AppStreamInfo.QUEUE, app.getQueue());
+        tags.put(AppStreamInfo.USER, app.getUser());
+        return tags;
     }
 
     private enum AggLevel {
