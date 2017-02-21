@@ -314,6 +314,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 jobErrorCategoryMappingAPIEntity.setTags(new HashMap<>(jobExecutionEntity.getTags()));
                 jobErrorCategoryMappingAPIEntity.getTags().put(MRJobTagName.ERROR_CATEGORY.toString(), errorCategory);
                 jobErrorCategoryMappingAPIEntity.setTimestamp(jobExecutionEntity.getTimestamp());
+                jobErrorCategoryMappingAPIEntity.setTaskAttempts(new ArrayList<>());
 
                 for (String taskId : errorCategoryTaskMapping.get(errorCategory).keySet()) {
                     jobErrorCategoryMappingAPIEntity.getTaskAttempts().add(errorCategoryTaskMapping.get(errorCategory).get(taskId));
