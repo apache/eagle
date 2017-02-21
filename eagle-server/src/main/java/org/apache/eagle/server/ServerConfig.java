@@ -18,7 +18,7 @@ package org.apache.eagle.server;
 
 import io.dropwizard.Configuration;
 import org.apache.eagle.common.Version;
-import org.apache.eagle.server.authentication.config.AuthenticationConfig;
+import org.apache.eagle.server.security.config.AuthenticationConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ServerConfig extends Configuration {

@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.server.authentication.authenticator;
+package org.apache.eagle.server.security.authenticator;
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.security.User;
-import org.apache.eagle.server.authentication.config.LdapConfig;
+import org.apache.eagle.server.security.config.LdapConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

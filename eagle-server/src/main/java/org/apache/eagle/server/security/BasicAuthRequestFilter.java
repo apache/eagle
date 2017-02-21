@@ -1,4 +1,4 @@
-package org.apache.eagle.server.authentication;
+package org.apache.eagle.server.security;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;

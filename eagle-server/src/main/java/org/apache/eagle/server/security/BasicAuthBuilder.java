@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.server.authentication;
+package org.apache.eagle.server.security;
 
 import com.google.common.cache.CacheBuilderSpec;
 import com.sun.jersey.api.core.HttpContext;
@@ -29,9 +29,9 @@ import io.dropwizard.auth.basic.BasicAuthProvider;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Environment;
 import org.apache.eagle.common.security.User;
-import org.apache.eagle.server.authentication.authenticator.LdapBasicAuthenticator;
-import org.apache.eagle.server.authentication.authenticator.SimpleBasicAuthenticator;
-import org.apache.eagle.server.authentication.config.AuthenticationConfig;
+import org.apache.eagle.server.security.authenticator.LdapBasicAuthenticator;
+import org.apache.eagle.server.security.authenticator.SimpleBasicAuthenticator;
+import org.apache.eagle.server.security.config.AuthenticationConfig;
 
 import java.util.Arrays;
 

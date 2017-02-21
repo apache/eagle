@@ -14,22 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.server.authentication.authenticator;
+package org.apache.eagle.server.security.authenticator;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
-import org.apache.eagle.common.rest.RESTResponse;
 import org.apache.eagle.common.security.User;
-import org.apache.eagle.server.authentication.config.SimpleConfig;
-import org.apache.eagle.server.authentication.config.UserAccount;
+import org.apache.eagle.server.security.config.SimpleConfig;
+import org.apache.eagle.server.security.config.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.util.*;
 
 public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials, User> {

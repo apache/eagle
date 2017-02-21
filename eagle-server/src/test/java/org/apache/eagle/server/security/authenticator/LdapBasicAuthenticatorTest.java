@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.server.authentication.authenticator;
+package org.apache.eagle.server.security.authenticator;
 
 import io.dropwizard.util.Duration;
-import org.apache.eagle.server.authentication.config.LdapConfig;
+import org.apache.eagle.server.security.config.LdapConfig;
 import org.junit.Assert;
 import org.junit.Test;
 

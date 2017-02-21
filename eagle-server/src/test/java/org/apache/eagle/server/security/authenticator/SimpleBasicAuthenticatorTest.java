@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.server.authentication.authenticator;
+package org.apache.eagle.server.security.authenticator;
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.security.User;
-import org.apache.eagle.server.authentication.config.SimpleConfig;
-import org.apache.eagle.server.authentication.config.UserAccount;
+import org.apache.eagle.server.security.config.SimpleConfig;
+import org.apache.eagle.server.security.config.UserAccount;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.Collections;
 
 public class SimpleBasicAuthenticatorTest {
