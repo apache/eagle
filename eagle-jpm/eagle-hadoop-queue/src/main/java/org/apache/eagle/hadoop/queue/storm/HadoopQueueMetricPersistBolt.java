@@ -97,7 +97,9 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
                             new Values(appAPIEntity.getAppName(), AppStreamInfo.convertAppToStream(appAPIEntity)));
                 }
             }
-            writeEntities(entities, dataType, dataSource);
+            if (!dataSource.equals(DataSource.RUNNING_APPS)) {
+                writeEntities(entities, dataType, dataSource);
+            }
         }
         this.collector.ack(input);
     }

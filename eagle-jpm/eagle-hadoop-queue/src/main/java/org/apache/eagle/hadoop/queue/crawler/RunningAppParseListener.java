@@ -122,6 +122,7 @@ public class RunningAppParseListener {
                 appAPIEntity.setElapsedTime(app.getElapsedTime());
                 appAPIEntity.setStartedTime(app.getStartedTime());
                 appAPIEntity.setState(app.getState());
+                appAPIEntity.setTimestamp(app.getStartedTime());
                 acceptedApps.add(appAPIEntity);
             } else {
                 Map<String, String> tags = new HashMap<>();
