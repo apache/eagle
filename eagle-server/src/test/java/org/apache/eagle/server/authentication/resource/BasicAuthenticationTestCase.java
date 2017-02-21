@@ -63,6 +63,65 @@ public class BasicAuthenticationTestCase {
     }
 
     @Test
+    public void testAdminOnlyWithoutAuth() {
+        Client client = new Client();
+        client.resource(String.format("http://localhost:%d/rest/testAuth/adminOnlyWithoutAuth", RULE.getLocalPort()))
+            .header("Authorization", ADMIN_AUTH_KEY)
+            .get(String.class);
+    }
+
+
+    @Test
+    public void testUserWithoutRole() {
+        Client client = new Client();
+        User user = client.resource(String.format("http://localhost:%d/rest/testAuth/userWithoutRole", RULE.getLocalPort()))
+            .header("Authorization", ADMIN_AUTH_KEY)
+            .get(User.class);
+        Assert.assertEquals("admin", user.getName());
+
+        user = client.resource(String.format("http://localhost:%d/rest/testAuth/userWithoutRole", RULE.getLocalPort()))
+            .header("Authorization", USER_AUTH_KEY)
+            .get(User.class);
+        Assert.assertEquals("user", user.getName());
+
+        try {
+            client.resource(String.format("http://localhost:%d/rest/testAuth/userWithoutRole", RULE.getLocalPort()))
+                .get(User.class);
+            Assert.fail();
+        } catch (UniformInterfaceException e) {
+            Assert.assertEquals(401, e.getResponse().getStatus());
+        }
+    }
+
+    @Test
+    public void testUserWithoutRequiredAuth() {
+        Client client = new Client();
+        String response = client.resource(String.format("http://localhost:%d/rest/testAuth/userWithNotRequiredAuth", RULE.getLocalPort()))
+            .header("Authorization", ADMIN_AUTH_KEY)
+            .get(String.class);
+        Assert.assertNotNull(response);
+        Assert.assertEquals("User found admin", response);
+
+        response = client.resource(String.format("http://localhost:%d/rest/testAuth/userWithNotRequiredAuth", RULE.getLocalPort()))
+            .get(String.class);
+        Assert.assertEquals("User not found", response);
+    }
+
+
+    @Test
+    public void testAdminOnlyWithoutAuthByUser() {
+        try {
+            Client client = new Client();
+            client.resource(String.format("http://localhost:%d/rest/testAuth/adminOnlyWithoutAuth", RULE.getLocalPort()))
+                .header("Authorization", USER_AUTH_KEY)
+                .get(String.class);
+            Assert.fail();
+        } catch (UniformInterfaceException e) {
+            Assert.assertEquals(403, e.getResponse().getStatus());
+        }
+    }
+
+    @Test
     public void testAuthPermitAll() {
         Client client = new Client();
         client.resource(String.format("http://localhost:%d/rest/testAuth/permitAll", RULE.getLocalPort()))
@@ -76,6 +135,7 @@ public class BasicAuthenticationTestCase {
         try {
             client.resource(String.format("http://localhost:%d/rest/testAuth/permitAll", RULE.getLocalPort()))
                 .get(User.class);
+            Assert.fail();
         } catch (UniformInterfaceException e) {
             Assert.assertEquals(204, e.getResponse().getStatus());
         }
@@ -88,6 +148,7 @@ public class BasicAuthenticationTestCase {
             client.resource(String.format("http://localhost:%d/rest/testAuth/permitAll", RULE.getLocalPort()))
                 .header("Authorization", BAD_AUTH_KEY)
                 .get(User.class);
+            Assert.fail();
         } catch (UniformInterfaceException e) {
             Assert.assertEquals(401, e.getResponse().getStatus());
         }

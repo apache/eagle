@@ -55,9 +55,9 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
                 break;
             }
             Auth[] authAnnotations = parameter.getAnnotationsByType(Auth.class);
-            this.isSecurityDefined = authAnnotations.length > 0 || this.isSecurityDefined;
+            this.isSecurityDefined = this.isSecurityDefined || authAnnotations.length > 0;
             for (Auth auth: authAnnotations) {
-                this.isAuthRequired = auth.required() || this.isAuthRequired;
+                this.isAuthRequired = this.isAuthRequired || auth.required();
             }
         }
         Preconditions.checkArgument(!(this.hasDenyAllAnnotation && this.hasPermitAllAnnotation), "Conflict @DenyAll and @PermitAll on method " +this.method.toString());

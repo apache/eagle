@@ -57,7 +57,7 @@ public class SimpleBasicAuthenticatorTest {
         }
     }
 
-    @Test (expected = WebApplicationException.class)
+    @Test
     public void testUnexistingUsername() {
         try {
             Optional<User> result = authenticator.authenticate(new BasicCredentials(TEST_UNEXISTING_USERNAME, TEST_SECRET_PHRASE));
@@ -68,7 +68,7 @@ public class SimpleBasicAuthenticatorTest {
     }
 
 
-    @Test (expected = WebApplicationException.class)
+    @Test
     public void testWrongPassword() {
         try {
             Optional<User> result = authenticator.authenticate(new BasicCredentials(TEST_USERNAME, TEST_WRONG_SECRET_PHRASE));

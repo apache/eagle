@@ -36,6 +36,7 @@ public class TestBasicAuthenticationResource {
     @GET
     @Path("/userOnly")
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed(User.Role.USER)
     public User getUser(@Auth User user) {
         return user;
     }
@@ -43,9 +44,34 @@ public class TestBasicAuthenticationResource {
     @GET
     @Path("/adminOnly")
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({User.Role.ADMINISTRATOR})
+    @RolesAllowed(User.Role.ADMINISTRATOR)
     public User getAdminUser(@Auth User user) {
         return user;
+    }
+
+    @GET
+    @Path("/adminOnlyWithoutAuth")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed(User.Role.ADMINISTRATOR)
+    public String getAdminUserWithoutAuth() {
+        return "Success";
+    }
+
+    @GET
+    @Path("/userWithoutRole")
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getUserWithoutRole(@Auth User user) {
+        return user;
+    }
+
+    @GET
+    @Path("/userWithNotRequiredAuth")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getUserWithNotRequiredAuth(@Auth(required = false) User user) {
+        if (user == null) {
+            return "User not found";
+        }
+        return "User found " + user.getName();
     }
 
     @GET
