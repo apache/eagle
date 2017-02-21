@@ -91,7 +91,7 @@ public abstract class AbstractURLSelector implements HAURLSelector {
                             LOG.info("Successfully switch to new url : " + selectedUrl);
                             return;
                         }
-                        LOG.info("try url " + urlToCheck + "fail for " + (time + 1) + " times, sleep 5 seconds before try again. ");
+                        LOG.info("try url " + urlToCheck + " failed for " + (time + 1) + " times, sleep 5 seconds before try again. ");
                         try {
                             Thread.sleep(5 * 1000);
                         } catch (InterruptedException ex) {
