@@ -72,12 +72,12 @@ public class RunningAppParseListener {
         logger.info("crawled {} running app metrics", appMetricEntities.size());
         HadoopQueueMessageId messageId = new HadoopQueueMessageId(DataType.METRIC, DataSource.RUNNING_APPS, System.currentTimeMillis());
         List<GenericMetricEntity> metrics = new ArrayList<>(appMetricEntities.values());
-        collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.METRIC.name(), metrics), messageId);
+        collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.METRIC, metrics), messageId);
 
         logger.info("crawled {} accepted apps", acceptedApps.size());
         messageId = new HadoopQueueMessageId(DataType.STREAM, DataSource.RUNNING_APPS, System.currentTimeMillis());
         List<App> entities = new ArrayList<>(acceptedApps);
-        collector.emit(new ValuesArray(DataSource.RUNNING_APPS.name(), DataType.STREAM.name(), entities), messageId);
+        collector.emit(new ValuesArray(DataSource.RUNNING_APPS, DataType.STREAM, entities), messageId);
 
         acceptedApps.clear();
         appMetricEntities.clear();

@@ -87,7 +87,7 @@ public class ClusterMetricsParseListener {
     public void flush() {
         HadoopQueueMessageId messageId = new HadoopQueueMessageId(DataType.METRIC, DataSource.CLUSTER_METRIC, System.currentTimeMillis());
         List<GenericMetricEntity> metrics = new ArrayList<>(clusterMetricEntities.values());
-        this.collector.emit(new ValuesArray(DataSource.CLUSTER_METRIC.name(), DataType.METRIC.name(), metrics), messageId);
+        this.collector.emit(new ValuesArray(DataSource.CLUSTER_METRIC, DataType.METRIC, metrics), messageId);
         reset();
     }
 
