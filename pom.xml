@@ -131,7 +131,7 @@
         <module>eagle-topology-assembly</module>
         <module>eagle-examples</module>
         <module>eagle-gc</module>
-        <module>eagle-hadoop-metric</module>
+        <module>eagle-metric</module>
         <module>eagle-server</module>
         <module>eagle-jpm</module>
         <module>eagle-server-assembly</module>
