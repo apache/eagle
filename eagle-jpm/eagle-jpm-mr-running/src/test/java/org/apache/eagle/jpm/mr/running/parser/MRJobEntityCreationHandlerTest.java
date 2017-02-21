@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -47,6 +48,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({System.class, JobExecutionMetricsCreationListener.class, MRJobEntityCreationHandler.class})
+@PowerMockIgnore({"javax.*", "com.sun.org.apache.xerces.*", "org.xml.sax.*", "org.w3c.dom.*"})
 public class MRJobEntityCreationHandlerTest {
 
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();

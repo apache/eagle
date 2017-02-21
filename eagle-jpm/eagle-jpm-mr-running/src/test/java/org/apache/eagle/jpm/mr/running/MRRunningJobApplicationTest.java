@@ -56,7 +56,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InputStreamUtils.class, MRRunningJobFetchSpout.class, Executors.class, MRRunningJobParseBolt.class})
-@PowerMockIgnore({"javax.*"})
+@PowerMockIgnore({"javax.*", "com.sun.org.apache.xerces.*", "org.xml.sax.*", "org.w3c.dom.*"})
 public class MRRunningJobApplicationTest {
 
     private static final String RM_URL = "http://sandbox.hortonworks.com:50030/ws/v1/cluster/apps?applicationTypes=MAPREDUCE&state=RUNNING&anonymous=true";

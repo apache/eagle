@@ -70,7 +70,7 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest( {CuratorFrameworkFactory.class, HDFSUtil.class, JobCountMetricsGenerator.class, JobHistorySpout.class})
-@PowerMockIgnore( {"javax.*", "com.sun.org.*", "org.apache.hadoop.conf.*"})
+@PowerMockIgnore( {"javax.*", "com.sun.org.*", "org.apache.hadoop.conf.*", "org.xml.sax.*", "org.w3c.dom.*"})
 public class JobHistorySpoutTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobHistorySpoutTest.class);

@@ -52,7 +52,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MRRunningJobManager.class, RunningJobManager.class, LoggerFactory.class})
-@PowerMockIgnore({"javax.*"})
+@PowerMockIgnore({"javax.*", "com.sun.org.apache.xerces.*", "org.xml.sax.*", "org.w3c.dom.*"})
 public class MRRunningJobManagerTest {
     private static TestingServer zk;
     private static com.typesafe.config.Config config = ConfigFactory.load();
