@@ -24,7 +24,7 @@
 		hadoopMetricApp.controller("overviewCtrl", function ($q, $wrapState, $scope, PageConfig, METRIC, Time) {
 			var cache = {};
 			$scope.site = $wrapState.param.siteId;
-			var activeMasterInfo = METRIC.hbaseMaster($scope.site, "active", 1);
+			var activeMasterInfo = METRIC.getHadoopHostByStatusAndRole("HbaseServiceInstance", $scope.site, "active","hmaster", 1);
 
 			PageConfig.title = 'HBase';
 			var storageOption = {
@@ -67,7 +67,7 @@
 							component: "hbasemaster",
 							host: $scope.defaultHostname
 						};
-						return METRIC.aggMetricsToEntities(METRIC.hbaseMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
+						return METRIC.aggMetricsToEntities(METRIC.hadoopMetricsAggregation(jobCond, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
 							._promise.then(function (list) {
 								var metricFlag = $.map(list, function (metrics) {
 									return metrics[0].flag;
@@ -78,37 +78,12 @@
 				return result;
 			}
 
-			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
-				var series = [];
-
-				$.each(metrics, function (i, metricMap) {
-					if (typeof metricMap !== 'undefined') {
-						series.push(METRIC.metricsToSeries(legendName[i], metricMap[0], option));
-					}
-				});
-				return {
-					title: metricTitle,
-					series: series,
-					option: dataOption || {},
-					loading: false
-				};
-			}
-
-			function countHBaseRole(site, status, role, groups, filed, limit) {
-				var jobCond = {
-					site: site,
-					status: status,
-					role: role
-				};
-				return METRIC.aggHBaseInstance(jobCond, groups, filed, limit);
-			}
-
 			function sumAllRegions(site, role, groups, filed, limit) {
 				var jobCond = {
 					site: site,
 					role: role
 				};
-				return METRIC.aggHBaseInstance(jobCond, groups, filed, limit);
+				return METRIC.aggHadoopInstance("HbaseServiceInstance", jobCond, groups, filed, limit);
 			}
 
 			// TODO: Optimize the chart count
@@ -243,28 +218,28 @@
 									series.push(rs);
 								}
 							}
-							$scope.metricList[chartname] = mergeMetricToOneSeries(chartname, series, chart.linename, chart.option);
+							$scope.metricList[chartname] = METRIC.mergeMetricToOneSeries(chartname, series, chart.linename, chart.option);
 						});
 					});
 				});
 
-				countHBaseRole($scope.site, "active", "hmaster", ["site"], "count")._promise.then(function (res) {
+				METRIC.countHadoopRole("HbaseServiceInstance", $scope.site, "active", "hmaster", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.hmasteractivenum = data.value[0];
 					});
 				});
-				countHBaseRole($scope.site, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
+				METRIC.countHadoopRole("HbaseServiceInstance", $scope.site, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.hmasterstandbynum = data.value[0];
 					});
 				});
 
-				countHBaseRole($scope.site, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
+				METRIC.countHadoopRole("HbaseServiceInstance", $scope.site, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.regionserverhealtynum = data.value[0];
 					});
 				});
-				countHBaseRole($scope.site, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
+				METRIC.countHadoopRole("HbaseServiceInstance", $scope.site, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.regionserverunhealtynum = data.value[0];
 					});

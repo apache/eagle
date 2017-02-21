@@ -31,7 +31,7 @@
 	}).route("HadoopMetric_HDFS", {
 		url: "/hadoopService/hdfs",
 		site: true,
-		templateUrl: "partials/hdfs/index.html",
+		templateUrl: "partials/hdfs/overview.html",
 		controller: "hdfsCtrl",
 		resolve: {time: true}
 	}).route("regionDetail", {
@@ -71,10 +71,11 @@
 		METRIC.STATUS_LIVE = "live";
 		METRIC.STATUS_DEAD = "dead";
 		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
-		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]{*}&pageSize=${limit}';
-		METRIC.QUERY_HBASE_INSTANCE_AGG = "${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]<${groups}>{${field}}&pageSize=${limit}";
-		METRIC.QUERY_HBASE_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
+
+		METRIC.QUERY_HADOOP_INSTANCE = '${baseURL}/rest/entities?query=${service}[${condition}]{*}&pageSize=${limit}';
+		METRIC.QUERY_HADOOP_INSTANCE_AGG = "${baseURL}/rest/entities?query=${service}[${condition}]<${groups}>{${field}}&pageSize=${limit}";
+		METRIC.QUERY_HADOOP_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
+
 		/**
 		 * Fetch query content with current site application configuration
 		 * @param {string} queryName
@@ -160,20 +161,6 @@
 			}).join(" AND ");
 		};
 
-
-		METRIC.hbaseMetrics = function (condition, metric, startTime, endTime, limit) {
-			var config = {
-				condition: METRIC.condition(condition),
-				startTime: Time.format(startTime),
-				endTime: Time.format(endTime),
-				metric: metric,
-				limit: limit || 10000
-			};
-
-			var metrics_url = common.template(getQuery("HBASE_METRICS_WITHTIME"), config);
-			return wrapList(METRIC.get(metrics_url));
-		};
-
 		METRIC.hbaseMomentMetric = function (condition, metric, limit) {
 			var config = {
 				condition: METRIC.condition(condition),
@@ -185,7 +172,7 @@
 			return METRIC.get(metrics_url);
 		};
 
-		METRIC.aggHBaseInstance = function (condition, groups, field, limit) {
+		METRIC.aggHadoopInstance = function (service, condition, groups, field, limit) {
 			var fields = field.split(/\s*,\s*/);
 			var fieldStr = $.map(fields, function (field, index) {
 				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
@@ -195,16 +182,26 @@
 				return matches[1];
 			}).join(", ");
 			var config = {
+				service: service,
 				condition: METRIC.condition(condition),
 				groups: toFields(groups),
 				field: fieldStr,
 				limit: limit || 10000
 			};
-			var metrics_url = common.template(getQuery("HBASE_INSTANCE_AGG"), config);
+			var metrics_url = common.template(getQuery("HADOOP_INSTANCE_AGG"), config);
 			return wrapList(METRIC.get(metrics_url));
 		};
 
-		METRIC.hbaseMetricsAggregation = function (condition, metric, groups, field, intervalMin, startTime, endTime, top, limit) {
+		METRIC.countHadoopRole = function(service, site, status, role, groups, filed, limit) {
+			var jobCond = {
+				site: site,
+				status: status,
+				role: role
+			};
+			return METRIC.aggHadoopInstance(service, jobCond, groups, filed, limit);
+		};
+
+		METRIC.hadoopMetricsAggregation = function (condition, metric, groups, field, intervalMin, startTime, endTime, top, limit) {
 			var fields = field.split(/\s*,\s*/);
 			var orderId = -1;
 			var fieldStr = $.map(fields, function (field, index) {
@@ -229,7 +226,7 @@
 				limit: limit || 10000
 			};
 
-			var metrics_url = common.template(getQuery("HBASE_METRICS_INTERVAL"), config);
+			var metrics_url = common.template(getQuery("HADOOP_METRICS_INTERVAL"), config);
 			var _list = wrapList(METRIC.get(metrics_url));
 			_list._aggInfo = {
 				groups: groups,
@@ -276,44 +273,44 @@
 			return _list;
 		};
 
-
-		METRIC.hbasehostStatus = function (condition, limit) {
+		METRIC.hadoopHostStatus = function (service, condition, limit) {
 			var config = {
+				service: service,
 				condition: METRIC.condition(condition),
 				limit: limit || 10000
 			};
 
-			var metrics_url = common.template(getQuery("HBASE_INSTANCE"), config);
+			var metrics_url = common.template(getQuery("HADOOP_INSTANCE"), config);
 			return wrapList(METRIC.get(metrics_url));
 		};
 
-		METRIC.hbaseMaster = function (siteId, status, limit) {
+		METRIC.getHadoopHostByStatusAndRole = function (service, siteId, status,role, limit) {
 			var condition = {
 				site: siteId,
-				role: "hmaster",
+				role: role,
 				status: status
 			};
-			return METRIC.hbasehostStatus(condition, limit);
+			return METRIC.hadoopHostStatus(service, condition, limit);
 		};
 
-		METRIC.regionserverStatus = function (hostname, siteid) {
+		METRIC.getStatusByRoleAndHost = function (service, hostname, role, siteid) {
 			var hoststateinfo;
 			var condition = {
 				site: siteid,
-				role: "regionserver",
+				role: role,
 				hostname: hostname
 			};
-			hoststateinfo = METRIC.hbasehostStatus(condition, 1);
+			hoststateinfo = METRIC.hadoopHostStatus(service, condition);
 			return hoststateinfo;
 		};
 
-		METRIC.regionserverList = function (siteid) {
+		METRIC.getListByRoleName = function (service, role, siteid) {
 			var hoststateinfos;
 			var condition = {
 				site: siteid,
-				role: "regionserver"
+				role: role
 			};
-			hoststateinfos = METRIC.hbasehostStatus(condition);
+			hoststateinfos = METRIC.hadoopHostStatus(service, condition);
 			return hoststateinfos;
 		};
 
@@ -324,6 +321,23 @@
 			});
 			return deferred.promise;
 		};
+
+		METRIC.mergeMetricToOneSeries = function (metricTitle, metrics, legendName, dataOption, option) {
+			var series = [];
+
+			$.each(metrics, function (i, metricMap) {
+				if (typeof metricMap !== 'undefined') {
+					series.push(METRIC.metricsToSeries(legendName[i], metricMap[0], option));
+				}
+			});
+			return {
+				title: metricTitle,
+				series: series,
+				option: dataOption || {},
+				loading: false
+			};
+		};
+
 		return METRIC;
 	});
 
