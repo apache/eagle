@@ -17,37 +17,52 @@
 package org.apache.eagle.hadoop.queue;
 
 import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.messaging.StormStreamSink;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMetricPersistBolt;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueRunningSpout;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HadoopQueueRunningApp extends StormApplication {
     public StormTopology execute(Config config, StormEnvironment environment) {
         HadoopQueueRunningAppConfig appConfig = new HadoopQueueRunningAppConfig(config);
 
+        String spoutName = "runningQueueSpout";
+        String persistBoltName = "persistBolt";
+
         IRichSpout spout = new HadoopQueueRunningSpout(appConfig);
-        HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(appConfig);
-        TopologyBuilder builder = new TopologyBuilder();
+        Map<HadoopClusterConstants.DataSource, String> streamMaps = new HashMap<>();
+
+        String acceptedAppStreamId = persistBoltName + "-to-" + DataSource.RUNNING_APPS.toString();
+        String schedulerStreamId = persistBoltName + "-to-" + DataSource.SCHEDULER.toString();
+        streamMaps.put(DataSource.RUNNING_APPS, acceptedAppStreamId);
+        streamMaps.put(DataSource.SCHEDULER, schedulerStreamId);
 
         int numOfPersistTasks = appConfig.topology.numPersistTasks;
         int numOfSinkTasks = appConfig.topology.numSinkTasks;
         int numOfSpoutTasks = 1;
 
-        String spoutName = "runningQueueSpout";
-        String persistBoltName = "persistBolt";
+        HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(appConfig, streamMaps);
+        TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(spoutName, spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
         builder.setBolt(persistBoltName, bolt, numOfPersistTasks).setNumTasks(numOfPersistTasks).shuffleGrouping(spoutName);
 
-        StormStreamSink queueSinkBolt = environment.getStreamSink("HADOOP_LEAF_QUEUE_STREAM", config);
+        StormStreamSink queueSinkBolt = environment.getStreamSink("HADOOP_QUEUE_STREAM", config);
         builder.setBolt("queueKafkaSink", queueSinkBolt, numOfSinkTasks)
-                .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName);
+                .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName, schedulerStreamId);
+
+        StormStreamSink appSinkBolt = environment.getStreamSink("ACCEPTED_APP_STREAM", config);
+        builder.setBolt("appKafkaSink", appSinkBolt, numOfSinkTasks)
+                .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName, acceptedAppStreamId);
 
         return builder.createTopology();
     }

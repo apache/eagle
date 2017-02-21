@@ -31,6 +31,10 @@ public class HadoopClusterConstants {
         CLUSTER_METRIC, RUNNING_APPS, SCHEDULER
     }
 
+    public enum AppState {
+        RUNNING, ACCEPTED
+    }
+
     public static class MetricName {
 
         // Metrics from running apps
@@ -61,26 +65,9 @@ public class HadoopClusterConstants {
 
     }
 
-    public static class LeafQueueInfo {
-        public static final String TIMESTAMP = "timestamp";
-        public static final String QUEUE_SITE = "site";
-        public static final String QUEUE_NAME = "queue";
-        public static final String QUEUE_STATE = "state";
-        public static final String QUEUE_SCHEDULER = "scheduler";
-        public static final String QUEUE_ABSOLUTE_CAPACITY = "absoluteCapacity";
-        public static final String QUEUE_ABSOLUTE_MAX_CAPACITY = "absoluteMaxCapacity";
-        public static final String QUEUE_ABSOLUTE_USED_CAPACITY = "absoluteUsedCapacity";
-        public static final String QUEUE_MAX_USER_USED_CAPACITY = "maxUserUsedCapacity";
-        public static final String QUEUE_USER_LIMIT_CAPACITY = "userLimitCapacity";
-        public static final String QUEUE_USED_MEMORY = "memory";
-        public static final String QUEUE_USED_VCORES = "vcores";
-        public static final String QUEUE_NUM_ACTIVE_APPS = "numActiveApplications";
-        public static final String QUEUE_NUM_PENDING_APPS = "numPendingApplications";
-        public static final String QUEUE_MAX_ACTIVE_APPS = "maxActiveApplications";
-    }
-
     public static final String RUNNING_QUEUE_SERVICE_NAME = "RunningQueueService";
     public static final String QUEUE_MAPPING_SERVICE_NAME = "QueueMappingService";
+    public static final String ACCEPTED_APP_SERVICE_NAME = "AcceptedAppService";
 
     // tag constants
     public static final String TAG_PARENT_QUEUE = "parentQueue";
@@ -90,6 +77,7 @@ public class HadoopClusterConstants {
     public static final String TAG_CLUSTER = "cluster";
 
     // field constants
+    public static final String FIELD_DATASOURCE = "dataSource";
     public static final String FIELD_DATATYPE = "dataType";
     public static final String FIELD_DATA = "data";
 

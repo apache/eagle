@@ -51,7 +51,9 @@ public class HadoopQueueRunningSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(HadoopClusterConstants.FIELD_DATATYPE, HadoopClusterConstants.FIELD_DATA));
+        declarer.declare(new Fields(HadoopClusterConstants.FIELD_DATASOURCE,
+                HadoopClusterConstants.FIELD_DATATYPE,
+                HadoopClusterConstants.FIELD_DATA));
     }
 
     @Override
