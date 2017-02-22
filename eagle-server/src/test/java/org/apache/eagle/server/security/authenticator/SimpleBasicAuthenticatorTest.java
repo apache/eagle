@@ -23,6 +23,7 @@ import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.security.User;
 import org.apache.eagle.server.security.config.SimpleConfig;
 import org.apache.eagle.server.security.config.UserAccount;
+import org.apache.eagle.server.security.encrypt.EncryptorFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,7 +39,8 @@ public class SimpleBasicAuthenticatorTest {
     private static SimpleConfig config = new SimpleConfig();
 
     static {
-        config.setAccounts(Collections.singletonList(new UserAccount(TEST_USERNAME, TEST_SECRET_PHRASE)));
+        config.setAccounts(Collections.singletonList(new UserAccount(TEST_USERNAME,
+            EncryptorFactory.getPasswordEncryptor().encryptPassword(TEST_SECRET_PHRASE))));
     }
 
     private static SimpleBasicAuthenticator authenticator = new SimpleBasicAuthenticator(config);

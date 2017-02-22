@@ -24,6 +24,7 @@ import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.security.User;
 import org.apache.eagle.server.security.config.SimpleConfig;
 import org.apache.eagle.server.security.config.UserAccount;
+import org.apache.eagle.server.security.encrypt.EncryptorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials,
 
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         if (userAccountRepository.containsKey(credentials.getUsername())
-            && Objects.equals(userAccountRepository.get(credentials.getUsername()).getPassword(), credentials.getPassword())) {
+            && EncryptorFactory.getPasswordEncryptor().checkPassword(credentials.getPassword(), userAccountRepository.get(credentials.getUsername()).getEncryptedPassword())) {
             UserAccount userAccount = userAccountRepository.get(credentials.getUsername());
             return Optional.of(new User(userAccount));
         } else {

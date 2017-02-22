@@ -39,22 +39,23 @@ auth:
   cachePolicy: maximumSize=10000, expireAfterWrite=1m
 
   # for basic authentication, effective only when auth.mode=simple
+  # default password is "secret"
   simple:
     accounts:
       - name: admin
-        password: secret
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
         roles: ADMINISTRATOR
         firstName: Admin
         lastName: Test
         email: mock-admin@eagle.apache.org
       - name: user
-        password: secret
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
         roles: USER
         firstName: User
         lastName: Test
         email: mock-user@eagle.apache.org
       - name: app
-        password: secret
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
         firstName: Application
         lastName: Test
         roles: APPLICATION
