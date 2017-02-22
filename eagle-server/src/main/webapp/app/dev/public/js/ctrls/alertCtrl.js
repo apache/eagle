@@ -54,8 +54,8 @@
 
 		$scope.site = $wrapState.param.siteId;
 
-		var endTime = Time($wrapState.param.timestamp).add(1, 'd');
-		var startTime = Time($wrapState.param.timestamp).subtract(7, 'd');
+		var endTime = new Time($wrapState.param.timestamp).add(1, 'd');
+		var startTime = new Time($wrapState.param.timestamp).subtract(7, 'd');
 		$scope.alertList = CompatibleEntity.query("LIST", {
 			query: "AlertService",
 			condition: {
