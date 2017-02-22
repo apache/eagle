@@ -18,10 +18,10 @@
 package org.apache.eagle.jpm.analyzer.resource;
 
 import com.google.inject.Inject;
+import org.apache.eagle.common.rest.RESTResponse;
 import org.apache.eagle.jpm.analyzer.meta.MetaManagementService;
 import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
 import org.apache.eagle.jpm.analyzer.meta.model.PublisherEntity;
-import org.apache.eagle.metadata.resource.RESTResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

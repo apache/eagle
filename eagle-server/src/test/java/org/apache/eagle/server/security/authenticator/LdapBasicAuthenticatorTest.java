@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.server.authentication.authenticator;
+package org.apache.eagle.server.security.authenticator;
 
 import io.dropwizard.util.Duration;
-import org.apache.eagle.server.authentication.config.LdapSettings;
+import org.apache.eagle.server.security.config.LdapConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -158,11 +158,11 @@ public class LdapBasicAuthenticatorTest {
         }
     }
 
-    private static LdapSettings getNonSSLPreSettings() {
-        return new LdapSettings().setProviderUrl(LDAP_SERVICE_PROVIDER_URL);
+    private static LdapConfig getNonSSLPreSettings() {
+        return new LdapConfig().setProviderUrl(LDAP_SERVICE_PROVIDER_URL);
     }
 
-    private static LdapSettings getSSLPreSettings() {
-        return new LdapSettings().setProviderUrl(LDAP_SERVICE_PROVIDER_SSL_URL);
+    private static LdapConfig getSSLPreSettings() {
+        return new LdapConfig().setProviderUrl(LDAP_SERVICE_PROVIDER_SSL_URL);
     }
 }

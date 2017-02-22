@@ -14,26 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.server.authentication.resource;
+package org.apache.eagle.server.security.config;
 
-import io.dropwizard.auth.Auth;
-import org.apache.eagle.common.authentication.User;
-import org.apache.eagle.metadata.resource.RESTResponse;
-import org.junit.Ignore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.List;
 
-@Ignore
-@Path("/test")
-public class TestBasicAuthenticationResource {
-    @GET
-    @Path("/ba/simple")
-    @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<User> getIt(@Auth User user) {
-        return RESTResponse.<User>builder().data(user).success(true).status(Response.Status.OK).get();
+public class SimpleConfig {
+    private List<UserAccount> accounts;
+
+    @JsonProperty("accounts")
+    public List<UserAccount> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<UserAccount> accounts) {
+        this.accounts = accounts;
     }
 }
