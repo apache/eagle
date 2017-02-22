@@ -36,7 +36,7 @@ public class TestWithHBaseCoprocessor {
     protected static HBaseTestingUtility hbase;
 
     protected static String getZkZnodeParent() {
-        return "/hbase-unsecure";
+        return "/hbase-test";
     }
 
     @BeforeClass
@@ -44,9 +44,10 @@ public class TestWithHBaseCoprocessor {
         System.setProperty("config.resource", "/application-co.conf");
         Configuration conf = HBaseConfiguration.create();
         conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY, AggregateProtocolEndPoint.class.getName());
+        conf.set("zookeeper.znode.parent", getZkZnodeParent());
         conf.setInt("hbase.master.info.port", -1);//avoid port clobbering
         conf.setInt("hbase.regionserver.info.port", -1);//avoid port clobbering
-        hbase = new HBaseTestingUtility();
+        hbase = new HBaseTestingUtility(conf);
         try {
             hbase.startMiniCluster();
         } catch (Exception e) {
