@@ -32,7 +32,8 @@ import org.apache.eagle.log.entity.meta.*;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false),
+        @Index(name = "Index_1_jobIdAndHost", columns = { "jobId", "hostname" }, unique = false)
     })
 public class TaskAttemptErrorCategoryEntity extends JobBaseAPIEntity {
     @Column("a")
