@@ -18,5 +18,6 @@ package org.apache.eagle.server.security.encrypt;
 
 public interface PasswordEncryptor {
     String encryptPassword(String password);
+
     boolean checkPassword(String password, String encryptedPassword);
 }
