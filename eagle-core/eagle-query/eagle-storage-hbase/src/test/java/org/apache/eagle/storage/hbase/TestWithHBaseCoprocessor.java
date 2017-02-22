@@ -37,7 +37,7 @@ public class TestWithHBaseCoprocessor {
     protected static HBaseTestingUtility hbase;
 
     protected static String getZkZnodeParent() {
-        return "/hbase";
+        return "/hbase-unsecure";
     }
 
     @BeforeClass
