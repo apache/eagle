@@ -42,7 +42,7 @@ auth:
   simple:
     accounts:
       - name: admin
-        password: secret
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
         roles: ADMINISTRATOR
         firstName: Admin
         lastName: Admin
