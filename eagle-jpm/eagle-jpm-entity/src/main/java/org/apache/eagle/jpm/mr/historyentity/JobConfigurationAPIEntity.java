@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jconf")
-@Service(Constants.JPA_JOB_CONFIG_SERVICE_NAME)
+@Service(Constants.MR_JOB_CONFIG_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({

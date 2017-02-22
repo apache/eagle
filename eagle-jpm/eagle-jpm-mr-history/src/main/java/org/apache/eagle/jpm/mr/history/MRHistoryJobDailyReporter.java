@@ -208,16 +208,16 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
     private Map<String, Object> buildJobSummery(String site, long startTime, long endTime) {
         Map<String, Object> data = new HashMap<>();
 
-        String query = String.format(STATUS_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
+        String query = String.format(STATUS_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
         Map<String, Long> jobSummery = queryGroupByMetrics(query, startTime, endTime, Integer.MAX_VALUE);
         if (jobSummery == null || jobSummery.isEmpty()) {
             LOG.warn("Result set is empty for query={}", query);
             return data;
         }
         Long totalJobs = jobSummery.values().stream().reduce((a, b) -> a + b).get();
-        String finishedJobQuery = String.format(FINISHED_JOB_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        String failedJobQuery = String.format(FAILED_JOBS_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        String succeededJobQuery = String.format(SUCCEEDED_JOB_QUERY, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, jobOvertimeLimit * DateTimeUtil.ONEHOUR, endTime);
+        String finishedJobQuery = String.format(FINISHED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
+        String failedJobQuery = String.format(FAILED_JOBS_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
+        String succeededJobQuery = String.format(SUCCEEDED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, jobOvertimeLimit * DateTimeUtil.ONEHOUR, endTime);
         data.put(SUMMARY_INFO_KEY, processResult(jobSummery, totalJobs));
         data.put(FAILED_JOB_USERS_KEY, buildJobSummery(failedJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.FAILED.toString())));
         data.put(SUCCEEDED_JOB_USERS_KEY, buildJobSummery(succeededJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.SUCCEEDED.toString())));

@@ -21,6 +21,8 @@ package org.apache.eagle.hadoop.queue.crawler;
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.MetricName;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
 import org.apache.eagle.hadoop.queue.model.scheduler.*;
 import org.apache.eagle.hadoop.queue.model.scheduler.Queue;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
@@ -68,12 +70,12 @@ public class SchedulerInfoParseListener {
         LOG.info("Flushing {} RunningQueue metrics in memory", metricEntities.size());
         HadoopQueueMessageId messageId = new HadoopQueueMessageId(HadoopClusterConstants.DataType.METRIC, HadoopClusterConstants.DataSource.SCHEDULER, System.currentTimeMillis());
         List<GenericMetricEntity> metrics = new ArrayList<>(metricEntities);
-        collector.emit(new ValuesArray(HadoopClusterConstants.DataType.METRIC.name(), metrics), messageId);
+        collector.emit(new ValuesArray(DataSource.SCHEDULER, DataType.METRIC, metrics), messageId);
 
         LOG.info("Flushing {} RunningQueueEntities in memory", runningQueueAPIEntities.size());
-        messageId = new HadoopQueueMessageId(HadoopClusterConstants.DataType.ENTITY, HadoopClusterConstants.DataSource.SCHEDULER, System.currentTimeMillis());
+        messageId = new HadoopQueueMessageId(DataType.ENTITY, DataSource.SCHEDULER, System.currentTimeMillis());
         List<TaggedLogAPIEntity> entities = new ArrayList<>(runningQueueAPIEntities);
-        collector.emit(new ValuesArray(HadoopClusterConstants.DataType.ENTITY.name(), entities), messageId);
+        collector.emit(new ValuesArray(DataSource.SCHEDULER, DataType.ENTITY, entities), messageId);
 
         runningQueueAPIEntities.clear();
         metricEntities.clear();

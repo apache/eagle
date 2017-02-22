@@ -70,9 +70,7 @@ public class ClusterMetricsParseListener {
             entity.setValue(new double[] {0.0});
             clusterMetricEntities.put(key, entity);
         }
-        if (clusterMetricCounts.get(key) == null) {
-            clusterMetricCounts.put(key, 0);
-        }
+        clusterMetricCounts.putIfAbsent(key, 0);
         updateEntityAggValue(entity, aggFunc, value, clusterMetricCounts.get(key));
         clusterMetricCounts.put(key, clusterMetricCounts.get(key) + 1);
     }
@@ -89,7 +87,7 @@ public class ClusterMetricsParseListener {
     public void flush() {
         HadoopQueueMessageId messageId = new HadoopQueueMessageId(DataType.METRIC, DataSource.CLUSTER_METRIC, System.currentTimeMillis());
         List<GenericMetricEntity> metrics = new ArrayList<>(clusterMetricEntities.values());
-        this.collector.emit(new ValuesArray(DataType.METRIC.name(), metrics), messageId);
+        this.collector.emit(new ValuesArray(DataSource.CLUSTER_METRIC, DataType.METRIC, metrics), messageId);
         reset();
     }
 

@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eagleMRRunningJobs")
 @ColumnFamily("f")
 @Prefix("jobs")
-@Service(Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME)
+@Service(Constants.MR_RUNNING_JOB_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
