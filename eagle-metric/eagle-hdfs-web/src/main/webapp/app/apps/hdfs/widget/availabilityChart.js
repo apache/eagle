@@ -21,67 +21,91 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (hdfsMetricApp) {
-		var COLOR_MAPPING = {
-			HDFS: 'orange',
-			HBase: 'yellow',
-			Yarn: 'green',
-		};
-
-		var widgetChartOption = {
-			color: ['#FFFFFF'],
-			grid: {
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0,
-				containLabel: false,
-			},
-			xAxis: {
-				axisLine: {show: false},
-				axisLabel: {show: false},
-			},
-			yAxis: [{
-				axisLine: {show: false},
-				axisLabel: {show: false},
-				axisTick: {show: false},
-				splitLine: {show: false},
-			}],
-		};
-
 		hdfsMetricApp.directive("hdfsMetricWidget", function () {
 			return {
 				restrict: 'AE',
-				controller: function($scope, $attrs) {
+				controller: function ($scope, $attrs, HDFSMETRIC, Application, $interval) {
 					// Get site
 					var site = $scope.site;
+					var refreshInterval;
 
+					if(!site) {
+						$scope.list = $.map(Application.find("HDFS_METRIC_WEB_APP"), function (app) {
+							return {
+								siteId: app.site.siteId,
+								siteName: app.site.siteName || app.site.siteId
+							};
+						});
+					} else {
+						$scope.list = [{
+							siteId: site.siteId,
+							siteName: site.siteName || site.siteId
+						}];
+					}
 					// Get type
 					$scope.type = $attrs.type;
 
 					// Customize chart color
-					$scope.bgColor = COLOR_MAPPING[$scope.type];
+					$scope.bgColor = "orange";
 
-					$scope.chartOption = widgetChartOption;
+					function refresh() {
+						$.each($scope.list, function (i, site) {
 
-					// Mock fetch data
-					var now = +new Date();
-					var data = [];
-					for(var j = 0 ; j < 30 ; j += 1) {
-						data.push({x: now + j * 1000 * 60, y: Math.random() * 100});
+							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "active", "namenode", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.namenodeactivenum = data.value[0];
+								});
+							});
+							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "standby", "namenode", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.namenodestandbynum = data.value[0];
+								});
+							});
+							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "live", "datanode", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.datanodehealtynum = data.value[0];
+								});
+							});
+							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "dead", "datanode", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.datanodeunhealtynum = data.value[0];
+								});
+							});
+						});
 					}
-					$scope.series = [{
-						name: '',
-						type: 'line',
-						data: data,
-						showSymbol: false,
-					}];
 
-					// Ref: jpm widget if need keep refresh the widget
+					refresh();
+					refreshInterval = $interval(refresh, 30 * 1000);
+
+					$scope.$on('$destroy', function () {
+						$interval.cancel(refreshInterval);
+					});
 				},
 				template:
-				'<div class="hadoopMetric-widget bg-{{bgColor}}">' +
-					'<h3>{{type}}</h3>' +
-					'<div chart class="hadoopMetric-chart-container" series="series" option="chartOption"></div>' +
+				'<div class="small-box hadoopMetric-widget bg-{{bgColor}}">' +
+				'<div class="inner">' +
+				'<h3>{{type}}</h3>' +
+				'<div ng-show="namenodeactivenum" class="hadoopMetric-widget-detail">' +
+				'<a ui-sref="namenodeList({siteId: site.siteId})">' +
+				'<span>{{namenodeactivenum+namenodestandbynum}}</span> Namenodes (' +
+				'<span ng-show="namenodeactivenum">{{namenodeactivenum}}</span><span ng-show="!namenodeactivenum">0</span> Active / ' +
+				'<span ng-show="namenodestandbynum">{{namenodestandbynum}}</span><span ng-show="!namenodestandbynum">0</span> Standby)' +
+				'</a>' +
+				'</div>' +
+				'<div ng-show="!namenodeactivenum" class="hadoopMetric-widget-detail">' +
+				'<span class="fa fa-question-circle"></span><span> NO DATA</span>' +
+				'</div>' +
+				'<div ng-show="namenodeactivenum" class="hadoopMetric-widget-detail">' +
+				'<a ui-sref="datanodeList({siteId: site.siteId})">' +
+				'<span>{{datanodehealtynum+datanodeunhealtynum}}</span> Datanodes (' +
+				'<span ng-show="datanodehealtynum">{{datanodehealtynum}}</span><span ng-show="!datanodehealtynum">0</span> Healthy / ' +
+				'<span ng-show="datanodeunhealtynum">{{datanodeunhealtynum}}</span><span ng-show="!datanodeunhealtynum">0</span> Unhealthy)' +
+				'</a>' +
+				'</div>' +
+				'</div>' +
+				'<div class="icon">' +
+				'<i class="fa fa-taxi"></i>' +
+				'</div>' +
 				'</div>',
 				replace: true
 			};
