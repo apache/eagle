@@ -28,12 +28,12 @@
 			<tr>
 				<td width="5%">
 					<span ng-show="hmasteractivenum">{{hmasteractivenum}}</span>
-					<span ng-show="!hmasteractivenum" class="fa fa fa-refresh fa-spin no-animate"></span>
+					<span ng-show="!hmasteractivenum">N/A</span>
 				</td>
 				<th width="45%">Active HBase Master</th>
 				<td width="5%">
 					<span ng-show="regionsnum">{{regionsnum}}</span>
-					<span ng-show="!regionsnum" class="fa fa fa-refresh fa-spin no-animate"></span>
+					<span ng-show="!regionsnum">N/A</span>
 				</td>
 				<th width="45%">Regions
 				</th>
@@ -47,7 +47,7 @@
 				<th>Backup HBase Master</th>
 				<td>
 					<span ng-show="hmasteraverageload !== '-1'">{{common.number.format(hmasteraverageload, 0)}}</span>
-					<span ng-show="hmasteraverageload === '-1'" class="fa fa-refresh fa-spin no-animate"></span>
+					<span ng-show="hmasteraverageload === '-1'">N/A</span>
 				</td>
 				<th>Average Load</th>
 			</tr>
@@ -55,7 +55,7 @@
 				<td>
 					<a ui-sref="regionList({siteId: site})">
 						<span ng-show="regionserverhealtynum || regionserverunhealtynum">{{regionserverhealtynum+regionserverunhealtynum}}</span></a>
-					<span ng-show="!regionserverhealtynum && !regionserverunhealtynum">0</span>
+					<span ng-show="!regionserverhealtynum && !regionserverunhealtynum">N/A</span>
 				</td>
 				<th>RegionServers:
 					<a ui-sref="regionList({siteId: site})">

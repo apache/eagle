@@ -52,6 +52,26 @@
 					}
 				}]
 			};
+			var digitalOption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, false, 0);
+							}).reverse().join("<br/>");
+					}
+				},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, false);
+						}
+					}
+				}]
+			};
 
 			var gctimeoption = {
 				legend: {
@@ -114,12 +134,12 @@
 				{
 					name: "QueueCallTime_num_ops",
 					metrics: ["QueueCallTime_num_ops"],
-					option: {}
+					option: digitalOption
 				},
 				{
 					name: "ProcessCallTime_num_ops",
 					metrics: ["ProcessCallTime_num_ops"],
-					option: {}
+					option: digitalOption
 				},
 				{
 					name: "RegionCount",
@@ -140,21 +160,6 @@
 					name: "StoreFileSize",
 					metrics: ["StoreFileSize"],
 					option: sizeoption
-				},
-				{
-					name: "TotalRequestCount",
-					metrics: ["TotalRequestCount"],
-					option: {}
-				},
-				{
-					name: "ReadRequestCount",
-					metrics: ["ReadRequestCount"],
-					option: {}
-				},
-				{
-					name: "WriteRequestCount",
-					metrics: ["WriteRequestCount"],
-					option: {}
 				},
 				{
 					name: "SlitQueueLength",
@@ -184,7 +189,22 @@
 				{
 					name: "BlockCacheCountHitPercent",
 					metrics: ["BlockCacheCountHitPercent"],
-					option: {}
+					option: digitalOption
+				},
+				{
+					name: "TotalRequestCount",
+					metrics: ["TotalRequestCount"],
+					option: digitalOption
+				},
+				{
+					name: "ReadRequestCount",
+					metrics: ["ReadRequestCount"],
+					option: digitalOption
+				},
+				{
+					name: "WriteRequestCount",
+					metrics: ["WriteRequestCount"],
+					option: digitalOption
 				}
 			];
 

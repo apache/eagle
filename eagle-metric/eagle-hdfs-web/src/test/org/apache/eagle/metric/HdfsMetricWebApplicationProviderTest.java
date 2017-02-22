@@ -94,12 +94,8 @@ public class HdfsMetricWebApplicationProviderTest extends ApplicationTestBase {
 
     private Map<String, Object> getConf() {
         Map<String, Object> conf = new HashMap<>();
-        conf.put("dataSinkConfig.topic", "testTopic");
-        conf.put("dataSinkConfig.brokerList", "broker");
-        conf.put("dataSinkConfig.serializerClass", "serializerClass");
-        conf.put("dataSinkConfig.keySerializerClass", "keySerializerClass");
-        conf.put("spoutNum", 2);
-        conf.put("mode", "LOCAL");
+        conf.put("service.host", "localhost");
+        conf.put("service.port", "9090");
         return conf;
     }
 }
