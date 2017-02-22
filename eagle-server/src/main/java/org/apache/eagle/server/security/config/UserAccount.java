@@ -16,25 +16,28 @@
  */
 package org.apache.eagle.server.security.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import org.apache.eagle.common.security.User;
 
 import java.util.*;
 
 public class UserAccount extends User {
-    public String getPassword() {
-        return password;
+
+    @JsonProperty("password")
+    public String getEncryptedPassword() {
+        return encryptedPassword;
     }
 
-    private String password;
+    private String encryptedPassword;
 
     public UserAccount() {
 
     }
 
-    public UserAccount(String username, String password) {
+    public UserAccount(String username, String encryptedPassword) {
         this.setName(username);
-        this.password = password;
+        this.encryptedPassword = encryptedPassword;
     }
 
     public void setRoles(String roles) {

@@ -186,6 +186,10 @@
             <artifactId>dropwizard-testing</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
