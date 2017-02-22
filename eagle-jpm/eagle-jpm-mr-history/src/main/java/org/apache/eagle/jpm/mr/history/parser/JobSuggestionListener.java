@@ -89,6 +89,14 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
 
     @Override
     public void flush() throws Exception {
+        if (info.getTotalCounters() == null) {
+            LOG.warn("Total counters of Job {} is null", info.getJobId());
+            return;
+        }
+        if (info.getMapCounters() == null && info.getReduceCounters() == null) {
+            LOG.warn("Map/Reduce task counters of Job {} are null", info.getJobId());
+            return;
+        }
         analyzer.analyze(info);
     }
 }
