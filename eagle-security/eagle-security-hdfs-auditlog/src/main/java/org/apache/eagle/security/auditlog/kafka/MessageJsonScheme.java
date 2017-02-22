@@ -22,11 +22,13 @@ import org.apache.storm.spout.Scheme;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.apache.storm.kafka.StringScheme;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -42,12 +44,21 @@ public class MessageJsonScheme  implements Scheme {
         return new Fields(StringScheme.STRING_SCHEME_KEY);
     }
 
+    public static String deserializeString(ByteBuffer buffer) {
+        if (buffer.hasArray()) {
+            int base = buffer.arrayOffset();
+            return new String(buffer.array(), base + buffer.position(), buffer.remaining());
+        } else {
+            return new String(Utils.toByteArray(buffer), StandardCharsets.UTF_8);
+        }
+    }
+
     @Override
     @SuppressWarnings("rawtypes")
     public List<Object> deserialize(ByteBuffer ser) {
         try {
             if (ser != null) {
-                Map map = mapper.readValue(ser.array(), Map.class);
+                Map map = mapper.readValue(deserializeString(ser), Map.class);
                 Object message = map.get(MESSAGE_SCHEME_KEY);
                 if (message != null) {
                     return new Values(map.get(MESSAGE_SCHEME_KEY));

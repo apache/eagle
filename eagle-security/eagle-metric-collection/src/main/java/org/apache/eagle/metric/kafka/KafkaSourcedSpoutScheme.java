@@ -20,6 +20,7 @@ import org.apache.storm.spout.Scheme;
 import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
+import org.apache.storm.utils.Utils;
 
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
@@ -52,7 +53,7 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 
 	@Override
 	public List<Object> deserialize(ByteBuffer ser) {
-		Object tmp = deserializer.deserialize(ser.array());
+		Object tmp = deserializer.deserialize(Utils.toByteArray(ser));
 		Map<String, Object> map = (Map<String, Object>)tmp;
 		if(tmp == null) return null;
 		return Arrays.asList(map.get("user"), map.get("timestamp"));

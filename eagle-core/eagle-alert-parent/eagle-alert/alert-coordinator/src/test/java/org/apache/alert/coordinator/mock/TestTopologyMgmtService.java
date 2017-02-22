@@ -16,6 +16,7 @@
  */
 package org.apache.alert.coordinator.mock;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -62,7 +63,7 @@ public class TestTopologyMgmtService extends TopologyMgmtService {
             TopologyMeta tm = new TopologyMeta();
             tm.topologyId = namePrefix + (i++);
             tm.clusterId = "default-cluster";
-            tm.nimbusHost = "localhost";
+            tm.nimbusSeeds = Arrays.asList("localhost");
             tm.nimbusPort = "3000";
             Pair<Topology, TopologyUsage> pair = createEmptyTopology(tm.topologyId);
             tm.topology = pair.getLeft();
