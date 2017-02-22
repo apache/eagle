@@ -20,7 +20,7 @@ import org.apache.eagle.app.environment.AbstractEnvironment;
 import com.typesafe.config.Config;
 
 /**
- * Storm Execution Environment Context.
+ * Spark Execution Environment Context.
  */
 public class SparkEnvironment extends AbstractEnvironment {
     public SparkEnvironment(Config config) {

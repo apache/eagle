@@ -40,6 +40,7 @@ public class ExecutionRuntimeManager {
         getInstance().register(StormEnvironment.class, new StormExecutionRuntime.Provider());
         getInstance().register(SparkEnvironment.class, new SparkExecutionRuntime.Provider());
         getInstance().register(StaticEnvironment.class, new StaticExecutionRuntime.Provider());
+        getInstance().register(BeamEnviroment.class, new BeamExecutionRuntime.Provider());
     }
 
     private final Map<Class<? extends Environment>, ExecutionRuntimeProvider> executionRuntimeProviders;
