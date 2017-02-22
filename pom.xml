@@ -234,6 +234,7 @@
         <metrics.version>3.1.0</metrics.version>
         <mapdb.version>3.0.0-M6</mapdb.version>
         <asm.version>5.0</asm.version>
+        <jasypt.version>1.9.2</jasypt.version>
 
         <!-- Streaming -->
         <!--<kafka.version>0.10.0.0</kafka.version>-->
@@ -485,6 +486,11 @@
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${reflections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jasypt</groupId>
+                <artifactId>jasypt</artifactId>
+                <version>${jasypt.version}</version>
             </dependency>
 
             <!-- Serialization -->
@@ -1317,6 +1323,11 @@
         </plugins>
     </build>
     <repositories>
+        <repository>
+            <id>maven.central</id>
+            <name>Maven Central Repository</name>
+            <url>http://central.maven.org/maven2</url>
+        </repository>
         <repository>
             <id>maven.repo1</id>
             <name>Maven Repo1 Repository</name>

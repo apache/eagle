@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.server;
 
-import org.apache.eagle.metadata.resource.RESTResponse;
 import io.dropwizard.jersey.errors.LoggingExceptionMapper;
+import org.apache.eagle.common.rest.RESTResponse;
 
 import java.util.concurrent.ThreadLocalRandom;
 import javax.ws.rs.WebApplicationException;

@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.server.authentication.authenticator;
+package org.apache.eagle.server.security.authenticator;
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.basic.BasicCredentials;
-import org.apache.eagle.common.authentication.User;
-import org.apache.eagle.server.authentication.config.SimpleSettings;
+import org.apache.eagle.common.security.User;
+import org.apache.eagle.server.security.config.SimpleConfig;
+import org.apache.eagle.server.security.config.UserAccount;
+import org.apache.eagle.server.security.encrypt.EncryptorFactory;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Collections;
 
 public class SimpleBasicAuthenticatorTest {
 
@@ -31,7 +35,15 @@ public class SimpleBasicAuthenticatorTest {
     private static final String TEST_SECRET_PHRASE = "secret-phrase";
     private static final String TEST_UNEXISTING_USERNAME = "unexisting-username";
     private static final String TEST_WRONG_SECRET_PHRASE = "wrong-secret-phrase";
-    private static SimpleBasicAuthenticator authenticator = new SimpleBasicAuthenticator(new SimpleSettings().setUsername(TEST_USERNAME).setPassword(TEST_SECRET_PHRASE));
+
+    private static SimpleConfig config = new SimpleConfig();
+
+    static {
+        config.setAccounts(Collections.singletonList(new UserAccount(TEST_USERNAME,
+            EncryptorFactory.getPasswordEncryptor().encryptPassword(TEST_SECRET_PHRASE))));
+    }
+
+    private static SimpleBasicAuthenticator authenticator = new SimpleBasicAuthenticator(config);
 
     @Test
     public void testNormal() {
@@ -41,9 +53,8 @@ public class SimpleBasicAuthenticatorTest {
             Assert.assertTrue("result isn't present when passed correct credentials", result.isPresent());
             User user = result.get();
             Assert.assertEquals("authenticated user is not expected", TEST_USERNAME, user.getName());
-        }
-        catch (AuthenticationException e) {
-            Assert.fail("unexpected error occurs: "+e.getMessage());
+        } catch (AuthenticationException e) {
+            Assert.fail("unexpected error occurs: " + e.getMessage());
         }
     }
 
@@ -52,20 +63,19 @@ public class SimpleBasicAuthenticatorTest {
         try {
             Optional<User> result = authenticator.authenticate(new BasicCredentials(TEST_UNEXISTING_USERNAME, TEST_SECRET_PHRASE));
             Assert.assertFalse("result is present when passed unexisting username", result.isPresent());
-        }
-        catch (AuthenticationException e) {
-            Assert.fail("unexpected error occurs: "+e.getMessage());
+        } catch (AuthenticationException e) {
+            Assert.fail("unexpected error occurs: " + e.getMessage());
         }
     }
+
 
     @Test
     public void testWrongPassword() {
         try {
             Optional<User> result = authenticator.authenticate(new BasicCredentials(TEST_USERNAME, TEST_WRONG_SECRET_PHRASE));
             Assert.assertFalse("result is present when passed wrong password", result.isPresent());
-        }
-        catch (AuthenticationException e) {
-            Assert.fail("unexpected error occurs: "+e.getMessage());
+        } catch (AuthenticationException e) {
+            Assert.fail("unexpected error occurs: " + e.getMessage());
         }
     }
 }

@@ -26,7 +26,7 @@ server:
 # ---------------------------------------------
 auth:
   # indicating if authentication is enabled, true for enabled, false for disabled
-  enabled: false
+  enabled: true
 
   # indicating authentication mode, "simple" or "ldap"
   mode: simple
@@ -38,18 +38,28 @@ auth:
   # indicating the cache policy, containing maximumSize and expireAfterWrite, e.g. maximumSize=10000, expireAfterWrite=10m
   cachePolicy: maximumSize=10000, expireAfterWrite=1m
 
-  # indicating whether authorization is needed
-  authorization: false
-
-  # indicating whether @Auth annotation on parameters is needed
-  annotated: true
-
   # for basic authentication, effective only when auth.mode=simple
+  # default password is "secret"
   simple:
-    # username for basic authentication, effective only when auth.mode=simple
-    username: admin
-    # password for basic authentication, effective only when auth.mode=simple
-    password: secret
+    accounts:
+      - name: admin
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
+        roles: ADMINISTRATOR
+        firstName: Admin
+        lastName: Test
+        email: mock-admin@eagle.apache.org
+      - name: user
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
+        roles: USER
+        firstName: User
+        lastName: Test
+        email: mock-user@eagle.apache.org
+      - name: app
+        password: rWV/cdTCr01wTLBQ/rUilkExd2TJKrifXuCCTEwig1o08K8Mi0b1qQAgVXpPqflb
+        firstName: Application
+        lastName: Test
+        roles: APPLICATION
+        email: mock-support@eagle.apache.org
 
   # for ldap authentication, effective only when auth.mode=ldap
   ldap:
@@ -58,7 +68,7 @@ auth:
     providerUrl: ldap://server.address.or.domain:port
 
     # template string containing ${USERNAME} placeholder. This is designed for some orgs who don't use plain usernames
-    # to authenticate, e.g. they may use its members' email address as the username: ${USERNAME}@some.org. When username
+    # to authenticate, e.g. they may use its members' email address as the name: ${USERNAME}@some.org. When name
     # is supposed to be recognized originally, just configure this parameter as ${USERNAME}
     principalTemplate: ${USERNAME}@maybe.email.suffix
 

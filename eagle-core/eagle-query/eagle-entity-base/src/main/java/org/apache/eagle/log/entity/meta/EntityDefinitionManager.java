@@ -278,7 +278,7 @@ public class EntityDefinitionManager {
 	}
 
 	/**
-	 * User can register their own field SerDeser
+	 * UserPrincipal can register their own field SerDeser
 	 * @param clazz class of the the SerDeser 
 	 * @param entitySerDeser entity or field SerDeser
 	 * @throws IllegalArgumentException

@@ -25,7 +25,7 @@ import org.apache.eagle.log.entity.meta.*;
 import java.util.Map;
 
 /**
- * User command pattern entity to specify Siddhi pattern, field selector and field modifier
+ * UserPrincipal command pattern entity to specify Siddhi pattern, field selector and field modifier
  */
 @Table("hdfsusercommandpattern")
 @ColumnFamily("f")
