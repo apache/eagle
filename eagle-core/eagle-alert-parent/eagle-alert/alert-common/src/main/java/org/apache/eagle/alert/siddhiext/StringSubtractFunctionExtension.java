@@ -18,16 +18,22 @@
 package org.apache.eagle.alert.siddhiext;
 
 import org.apache.commons.collections.ListUtils;
+import org.codehaus.jettison.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.executor.function.FunctionExecutor;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class StringSubtractFunctionExtension extends FunctionExecutor {
+    private static final Logger LOG = LoggerFactory.getLogger(StringSubtractFunctionExtension.class);
+
     /**
      * The initialization method for StringSubtractFunctionExtension, this method will be called before the other methods.
      *
@@ -52,16 +58,35 @@ public class StringSubtractFunctionExtension extends FunctionExecutor {
     /**
      * The main execution method which will be called upon event arrival.
      * when there are more than one function parameter
-     * This method calculates subtraction of two strings
-     * Each String is a string list that separated by ':'
+     * This method calculates subtraction of two List Of Strings
+     * Each String is a jobs string needs to be loaded
      * @param data the runtime values of function parameters
      * @return the function result
      */
     @Override
     protected Object execute(Object[] data) {
-        List<String> ths = Arrays.asList(((String) data[0]).split(":"));
-        List<String> rhs = Arrays.asList(((String) data[1]).split(":"));
-        return org.apache.commons.lang.StringUtils.join(ListUtils.subtract(rhs, ths), "\n");
+        try {
+            List<String> ths = new ArrayList<>();
+            if (!((String) data[0]).isEmpty()) {
+                JSONArray jsonArray = new JSONArray((String) data[0]);
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    ths.add(jsonArray.getString(i));
+                }
+            }
+
+            List<String> rhs = new ArrayList<>();
+            if (!((String) data[1]).isEmpty()) {
+                JSONArray jsonArray = new JSONArray((String) data[1]);
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    rhs.add(jsonArray.getString(i));
+                }
+            }
+
+            return org.apache.commons.lang.StringUtils.join(ListUtils.subtract(ths, rhs), "\n");
+        } catch (Exception e) {
+            LOG.warn("exception found {}", e);
+            return null;
+        }
     }
 
     @Override

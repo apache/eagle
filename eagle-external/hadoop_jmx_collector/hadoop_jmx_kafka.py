@@ -41,7 +41,6 @@ class NNHAMetric(JmxMetricListener):
 class NameNodeInfo(JmxMetricListener):
     def on_metric(self, metric):
         if metric["metric"] == "hadoop.namenode.namenodeinfo.corruptfiles":
-            metric["value"] = ":".join(json.loads(str(metric["value"])))
             self.collector.collect(metric, "string")
 
 class MemoryUsageMetric(JmxMetricListener):

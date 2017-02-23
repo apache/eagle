@@ -27,13 +27,16 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 
+import java.util.concurrent.Semaphore;
+
 public class StringSubtractFunctionExtensionTest {
     private static final Logger LOG = LoggerFactory.getLogger(StringSubtractFunctionExtensionTest.class);
 
     @Test
     public void testStringSubtract() throws Exception {
+        Semaphore semp = new Semaphore(1);
         String ql = " define stream log(timestamp long, switchLabel string, port string, message string); " +
-                " from log select string:subtract(\"a:b:c:d:e:f:g\", \"g:a:e:d:z:r:s:c\") as alertKey insert into output; ";
+                " from log select string:subtract(switchLabel, message) as alertKey insert into output; ";
         SiddhiManager manager = new SiddhiManager();
         ExecutionPlanRuntime runtime = manager.createExecutionPlanRuntime(ql);
         runtime.addCallback("output", new StreamCallback() {
@@ -41,20 +44,23 @@ public class StringSubtractFunctionExtensionTest {
             public void receive(Event[] events) {
                 EventPrinter.print(events);
                 Assert.assertTrue(events.length == 1);
-                Assert.assertTrue(events[0].getData(0).toString().equals("z\nr\ns"));
+                Assert.assertTrue(events[0].getData(0).toString().equals("a\nc\ne"));
+                semp.release();
             }
         });
 
         runtime.start();
 
         InputHandler logInput = runtime.getInputHandler("log");
-
+        semp.acquire();
         Event e = new Event();
         e.setTimestamp(System.currentTimeMillis());
-        e.setData(new Object[] {System.currentTimeMillis(), "switch-ra-slc-01", "port01", "log-message...."});
+        String ths = "[\"a\", \"b\", \"c\", \"d\", \"e\"]";
+        String rhs = "[\"b\", \"d\"]";
+        e.setData(new Object[] {System.currentTimeMillis(), ths, "port01", rhs});
         logInput.send(e);
 
-        Thread.sleep(1000);
+        semp.acquire();
         runtime.shutdown();
 
     }
