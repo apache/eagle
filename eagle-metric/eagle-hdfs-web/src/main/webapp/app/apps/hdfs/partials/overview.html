@@ -27,16 +27,18 @@
         <table class="table table-striped hadoopMetric-table">
             <tr>
                 <td width="5%">
-                    <a ui-sref="namenodeList({siteId: site})" target="_blank">
-                        <span ng-show="namenodeactivenum">{{namenodeactivenum}}</span></a>
-                    <span ng-show="!namenodeactivenum">N/A</span>
+                    <span ng-show="!namenodeactivenum">0</span>
+                    <span ng-show="namenodeactivenum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'active'})" target="_blank">{{namenodeactivenum}}</a></span>
+                    <span ng-show="namenodeactivenum===-1">N/A</span>
                 </td>
                 <th width="30%">Active Namenode</th>
                 <td>
-                    <span ng-show="capacityNum">{{common.number.format(capacityNum, 0)}} TB</span>
-                    <span ng-show="!capacityNum">N/A</span>
-                    Capacity <span ng-show="usedCapacityNum">{{common.number.format(usedCapacityNum, 0)}} TB</span>
-                    <span ng-show="!usedCapacityNum">N/A</span> usedCapacity
+                    <span ng-show="capacityNum!==-1 && capacityNum">{{common.number.format(capacityNum, 0)}}</span>
+                    <span ng-show="!capacityNum">0</span>
+                    <span ng-show="capacityNum===-1">N/A</span> TB
+                    <strong>Capacity</strong> <span ng-show="usedCapacityNum!==-1 && usedCapacityNum">{{common.number.format(usedCapacityNum, 0)}}</span>
+                    <span ng-show="!usedCapacityNum">0</span>
+                    <span ng-show="usedCapacityNum===-1">N/A</span> TB <strong>usedCapacity</strong>
 
                 </td>
                 <th width="30%">
@@ -44,26 +46,26 @@
             </tr>
             <tr>
                 <td>
-                    <a ui-sref="namenodeList({siteId: site})" target="_blank">
-                        <span ng-show="namenodestandbynum">{{namenodestandbynum}}</span></a>
-                    <span ng-show="!namenodestandbynum">N/A</span>
+                    <span ng-show="namenodestandbynum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'standby'})" target="_blank">{{namenodestandbynum}}</a></span>
+                    <span ng-show="!namenodestandbynum">0</span>
+                    <span ng-show="namenodestandbynum===-1">N/A</span>
                 </td>
                 <th>Backup Namenode</th>
             </tr>
             <tr>
                 <td>
-                    <a ui-sref="datanodeList({siteId: site})">
-                        <span ng-show="datanodehealtynum || datanodeunhealtynum">{{datanodehealtynum+datanodeunhealtynum}}</span></a>
-                    <span ng-show="!datanodehealtynum && !datanodeunhealtynum">N/A</span>
+                    <span ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1"><a ui-sref="datanodeList({siteId: site})">{{datanodehealtynum+datanodeunhealtynum}}</a></span>
+                    <span ng-show="!datanodehealtynum && !datanodeunhealtynum">0</span>
+                    <span ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1">N/A</span>
                 </td>
                 <th>Datanodes:
-                    <span ng-show="datanodehealtynum">{{datanodehealtynum}}</span>
-                    <span ng-show="!datanodehealtynum">N/A</span>
-                    <span
-                            class="label label-success">Good Health</span> /
-                    <a ui-sref="datanodeList({siteId: site})">
-                        <span ng-show="datanodeunhealtynum">{{datanodeunhealtynum}}</span></a>
+                    <span ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1 && datanodehealtynum"><a ui-sref="datanodeList({siteId: site, status: 'live'})">{{datanodehealtynum || 0}}</a></span>
+                    <span ng-show="!datanodehealtynum">0</span>
+                    <span ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1">N/A</span>
+                    <span class="label label-success">Good Health</span> /
+                    <span ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1 && datanodeunhealtynum"><a ui-sref="datanodeList({siteId: site, status: 'dead'})">{{datanodeunhealtynum || 0}}</a></span>
                     <span ng-show="!datanodeunhealtynum">0</span>
+                    <span ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1">N/A</span>
                     <span class="label label-danger">Bad Health</span>
                 </th>
                 <td></td>
@@ -95,17 +97,26 @@
                         <div class="col-sm-6 col-md-4 col-lg-6" ng-repeat="chart in chartList track by $index">
                             <div class="hadoopMetric-chart">
                                 <h3>{{metricList[chart.name].title}}</h3>
-                                <div ng-show="metricList[chart.name].loading"
-                                     class="fa fa-refresh fa-spin no-animate"></div>
-                                <div ng-show="metricList[chart.name].series.length" chart
-                                     class="hadoopMetric-chart-container"
+                                <div ng-show="activeNamenodeList && metricList[chart.name].loading" chart class="hadoopMetric-chart-container"></div>
+                                <div ng-show="activeNamenodeList && metricList[chart.name].loading" class="overlay-wrapper">
+                                    <div class="overlay">
+                                        <i class="fa fa-refresh fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div ng-show="activeNamenodeList && metricList[chart.name].series.length" chart class="hadoopMetric-chart-container"
                                      series="metricList[chart.name].series"
                                      option="metricList[chart.name].option"></div>
-                                <div ng-show="!metricList[chart.name].series.length && !metricList[chart.name].loading"
-                                     class="hadoopMetric-chart-container">
+                                <div ng-show="activeNamenodeList && !metricList[chart.name].series.length && !metricList[chart.name].loading" class="hadoopMetric-chart-container">
                                     <div class="hadoopMetric-chart-container-withborder">
                                         <div class="hadoopMetric-no-chart-data">
                                             <span class="fa fa-question-circle"></span><span> NO DATA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="!activeNamenodeList" class="hadoopMetric-chart-container">
+                                    <div class="hadoopMetric-chart-container-withborder">
+                                        <div class="hadoopMetric-no-chart-data">
+                                            <span class="fa fa-question-circle"></span><span> N/A</span>
                                         </div>
                                     </div>
                                 </div>

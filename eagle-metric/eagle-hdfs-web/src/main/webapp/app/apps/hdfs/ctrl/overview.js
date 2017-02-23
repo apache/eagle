@@ -87,15 +87,19 @@
 					}
 				}]
 			};
-			var startTime = Time.startTime();
-			var endTime = Time.endTime();
-			var interval = Time.diffInterval(startTime, endTime);
-			var intervalMin = interval / 1000 / 60;
-			var trendStartTime = Time.align(startTime, interval);
-			var trendEndTime = Time.align(endTime, interval);
-			$scope.site = $wrapState.param.siteId;
+
 			function generateHdfsMetric(name, flag) {
+				var startTime = Time.startTime();
+				var endTime = Time.endTime();
+				var interval = Time.diffInterval(startTime, endTime);
+				var intervalMin = interval / 1000 / 60;
+				var trendStartTime = Time.align(startTime, interval);
+				var trendEndTime = Time.align(endTime, interval);
+				$scope.site = $wrapState.param.siteId;
 				var result = cache[name] || namenodeInfo._promise.then(function (res) {
+						if(typeof res[0].tags === 'undefined') {
+							return;
+						}
 						$scope.activeNamenodeList = res;
 						$scope.type = $wrapState.param.hostname || $scope.namenode || res[0].tags.hostname;
 						var hostname = $scope.namenode || res[0].tags.hostname;
@@ -250,36 +254,59 @@
 					$.map(res, function (data) {
 						$scope.namenodeactivenum = data.value[0];
 					});
-				});
+				}, function () {
+                    $scope.namenodeactivenum = -1;
+                });
 				HDFSMETRIC.countHadoopRole("HdfsServiceInstance", $scope.site, "standby", "namenode", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.namenodestandbynum = data.value[0];
 					});
-				});
+				}, function () {
+                    $scope.namenodestandbynum = -1;
+                });
 				HDFSMETRIC.countHadoopRole("HdfsServiceInstance", $scope.site, "live", "datanode", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.datanodehealtynum = data.value[0];
 					});
-				});
+				}, function () {
+                    $scope.datanodehealtynum = -1;
+                });
 				HDFSMETRIC.countHadoopRole("HdfsServiceInstance", $scope.site, "dead", "datanode", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.datanodeunhealtynum = data.value[0];
 					});
-				});
+				}, function () {
+                    $scope.datanodeunhealtynum = -1;
+                });
 				sumMetrics($scope.site, "datanode", ["site"], "sum(configuredCapacityTB)")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.capacityNum = data.value[0];
 					});
-				});
+				}, function () {
+                    $scope.capacityNum = -1;
+                });
 				sumMetrics($scope.site, "datanode", ["site"], "sum(usedCapacityTB)")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.usedCapacityNum = data.value[0];
 					});
-				});
+				}, function () {
+                    $scope.usedCapacityNum = -1;
+                });
 			};
 
 			Time.onReload(function () {
 				cache = {};
+				$.each($scope.chartList, function (i) {
+					var chart = $scope.chartList[i];
+					var chartname = chart.name;
+					$scope.metricList[chartname] = {
+						title: chartname,
+						series: {},
+						option: {},
+						loading: true,
+						promises: []
+					};
+				});
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();

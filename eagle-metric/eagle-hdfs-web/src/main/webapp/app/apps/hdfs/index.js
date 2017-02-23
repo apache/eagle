@@ -35,12 +35,12 @@
 		controller: "datanodeDetailCtrl",
 		resolve: {time: true}
 	}).route("datanodeList", {
-		url: "/hadoopService/hdfs/datanodeList",
+		url: "/hadoopService/hdfs/datanodeList?status",
 		site: true,
 		templateUrl: "partials/datanodeList.html",
 		controller: "datanodeListCtrl"
 	}).route("namenodeList", {
-		url: "/hadoopService/hdfs/namenodeList",
+		url: "/hadoopService/hdfs/namenodeList?status",
 		site: true,
 		templateUrl: "partials/namenodeList.html",
 		controller: "namenodeListCtrl"
@@ -265,13 +265,13 @@
 			return wrapList(HDFSMETRIC.get(metrics_url));
 		};
 
-		HDFSMETRIC.getHadoopHostByStatusAndRole = function (service, siteId, status,role, limit) {
+		HDFSMETRIC.getHadoopHostByStatusAndRole = function (service, siteId, status,role) {
 			var condition = {
 				site: siteId,
 				role: role,
 				status: status
 			};
-			return HDFSMETRIC.hadoopHostStatus(service, condition, limit);
+			return HDFSMETRIC.hadoopHostStatus(service, condition);
 		};
 
 		HDFSMETRIC.getStatusByRoleAndHost = function (service, hostname, role, siteid) {

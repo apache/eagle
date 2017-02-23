@@ -30,8 +30,10 @@
 			$scope.live = HDFSMETRIC.STATUS_LIVE;
 			$scope.dead = HDFSMETRIC.STATUS_DEAD;
 			$scope.site = $wrapState.param.siteId;
+			$scope.status = $wrapState.param.status;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-			$scope.datanodeList = HDFSMETRIC.getListByRoleName("HdfsServiceInstance", "datanode", $scope.site);
+			$scope.datanodeList = (typeof $scope.status === 'undefined') ? HDFSMETRIC.getListByRoleName("HdfsServiceInstance", "datanode", $scope.site)
+			   : HDFSMETRIC.getHadoopHostByStatusAndRole("HdfsServiceInstance", $scope.site, $scope.status, "datanode");
 
 		});
 	});

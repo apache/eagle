@@ -59,7 +59,10 @@
 
 				$scope.site = $wrapState.param.siteId;
 				var result = cache[name] || activeMasterInfo._promise.then(function (res) {
-						var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
+						if(typeof res[0].tags === 'undefined') {
+							return;
+						}
+						var hostname = res[0].tags.hostname;
 						$scope.defaultHostname = $wrapState.param.hostname || hostname;
 
 						var jobCond = {
@@ -252,44 +255,72 @@
 					$.map(res, function (data) {
 						$scope.hmasteractivenum = data.value[0];
 					});
+				}, function () {
+					$scope.hmasteractivenum = -1;
 				});
 				countHBaseRole($scope.site, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.hmasterstandbynum = data.value[0];
 					});
+				}, function () {
+					$scope.hmasterstandbynum = -1;
 				});
-
 				countHBaseRole($scope.site, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.regionserverhealtynum = data.value[0];
 					});
+				}, function () {
+					$scope.regionserverhealtynum = -1;
 				});
 				countHBaseRole($scope.site, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.regionserverunhealtynum = data.value[0];
 					});
+				}, function () {
+					$scope.regionserverunhealtynum = -1;
 				});
 				sumAllRegions($scope.site, "regionserver", ["site"], "sum(numRegions)")._promise.then(function (res) {
 					$.map(res, function (data) {
 						$scope.regionsnum = data.value[0];
 					});
+				}, function () {
+					$scope.regionsnum = -1;
 				});
 
 				activeMasterInfo._promise.then(function (res) {
-					var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
-					$scope.defaultHostname = $wrapState.param.hostname || hostname;
-					var jobCond = {
-						site: $scope.site,
-						component: "hbasemaster",
-						host: $scope.defaultHostname
-					};
-					METRIC.hbaseMomentMetric(jobCond, "hadoop.hbase.master.server.averageload", 1).then(function (res) {
-						$scope.hmasteraverageload = (typeof res.data.obj[0] !== 'undefined') ? res.data.obj[0].value[0] : "-1";
-					});
+					if(typeof res[0].tags === 'undefined') {
+						$scope.hmasteraverageload = -1;
+					} else {
+						var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
+						$scope.defaultHostname = $wrapState.param.hostname || hostname;
+						var jobCond = {
+							site: $scope.site,
+							component: "hbasemaster",
+							host: $scope.defaultHostname
+						};
+						METRIC.hbaseMomentMetric(jobCond, "hadoop.hbase.master.server.averageload", 1).then(function (res) {
+							$scope.hmasteraverageload = (typeof res.data.obj[0] !== 'undefined') ? res.data.obj[0].value[0] : -1;
+						}, function () {
+							$scope.hmasteraverageload = -1;
+						});
+					}
+				}, function () {
+					$scope.hmasteraverageload = -1;
 				});
 			};
 			Time.onReload(function () {
 				cache = {};
+                $.each($scope.chartList, function (i) {
+                    var chart = $scope.chartList[i];
+                    var chartname = chart.name;
+                    $scope.metricList[chartname] = {
+                        title: chartname,
+                        series: {},
+                        option: {},
+                        loading: true,
+                        promises: []
+                    };
+                });
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();

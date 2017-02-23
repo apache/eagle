@@ -55,21 +55,29 @@
 								$.map(res, function (data) {
 									$scope.namenodeactivenum = data.value[0];
 								});
+							}, function () {
+								$scope.namenodeactivenum = -1;
 							});
 							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "standby", "namenode", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.namenodestandbynum = data.value[0];
 								});
+							}, function () {
+								$scope.namenodestandbynum = -1;
 							});
 							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "live", "datanode", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.datanodehealtynum = data.value[0];
 								});
+							}, function () {
+								$scope.datanodehealtynum = -1;
 							});
 							HDFSMETRIC.countHadoopRole("HdfsServiceInstance", site.siteId, "dead", "datanode", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.datanodeunhealtynum = data.value[0];
 								});
+							}, function () {
+								$scope.datanodeunhealtynum = -1;
 							});
 						});
 					}
@@ -85,22 +93,29 @@
 				'<div class="small-box hadoopMetric-widget bg-{{bgColor}}">' +
 				'<div class="inner">' +
 				'<h3>{{type}}</h3>' +
-				'<div ng-show="namenodeactivenum" class="hadoopMetric-widget-detail">' +
+				'<div ng-show="namenodeactivenum!==-1 && namenodestandbynum!==-1" class="hadoopMetric-widget-detail">' +
 				'<a ui-sref="namenodeList({siteId: site.siteId})">' +
 				'<span>{{namenodeactivenum+namenodestandbynum}}</span> Namenodes (' +
-				'<span ng-show="namenodeactivenum">{{namenodeactivenum}}</span><span ng-show="!namenodeactivenum">0</span> Active / ' +
-				'<span ng-show="namenodestandbynum">{{namenodestandbynum}}</span><span ng-show="!namenodestandbynum">0</span> Standby)' +
+				'<span>{{namenodeactivenum||0}}</span> Active / ' +
+				'<span>{{namenodestandbynum||0}}</span> Standby)' +
 				'</a>' +
 				'</div>' +
-				'<div ng-show="!namenodeactivenum" class="hadoopMetric-widget-detail">' +
-				'<span class="fa fa-question-circle"></span><span> NO DATA</span>' +
+				'<div ng-show="namenodeactivenum===-1 || namenodestandbynum===-1" class="hadoopMetric-widget-detail">' +
+				'<span>N/A</span> Namenodes (' +
+				'<span>N/A</span> Active / ' +
+				'<span>N/A</span> Standby)' +
 				'</div>' +
-				'<div ng-show="namenodeactivenum" class="hadoopMetric-widget-detail">' +
+				'<div ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1" class="hadoopMetric-widget-detail">' +
 				'<a ui-sref="datanodeList({siteId: site.siteId})">' +
 				'<span>{{datanodehealtynum+datanodeunhealtynum}}</span> Datanodes (' +
-				'<span ng-show="datanodehealtynum">{{datanodehealtynum}}</span><span ng-show="!datanodehealtynum">0</span> Healthy / ' +
-				'<span ng-show="datanodeunhealtynum">{{datanodeunhealtynum}}</span><span ng-show="!datanodeunhealtynum">0</span> Unhealthy)' +
+				'<span>{{datanodehealtynum||0}}</span> Healthy / ' +
+				'<span>{{datanodeunhealtynum||0}}</span> Unhealthy)' +
 				'</a>' +
+				'</div>' +
+				'<div ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1" class="hadoopMetric-widget-detail">' +
+				'<span>N/A</span> Datanodes (' +
+				'<span>N/A</span> Healthy / ' +
+				'<span>N/A</span> Unhealthy)' +
 				'</div>' +
 				'</div>' +
 				'<div class="icon">' +

@@ -30,9 +30,9 @@
 			$scope.live = METRIC.STATUS_LIVE;
 			$scope.dead = METRIC.STATUS_DEAD;
 			$scope.site = $wrapState.param.siteId;
+			$scope.status = $wrapState.param.status;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-			$scope.regionserverList = METRIC.regionserverList($scope.site);
-
+			$scope.regionserverList = METRIC.regionserverList($scope.site, $scope.status);
 		});
 	});
 })();

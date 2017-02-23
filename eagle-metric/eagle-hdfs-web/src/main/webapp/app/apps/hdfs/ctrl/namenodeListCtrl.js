@@ -28,8 +28,10 @@
 			PageConfig.title = "HDFS Namenode List";
 			$scope.tableScope = {};
 			$scope.site = $wrapState.param.siteId;
+			$scope.status = $wrapState.param.status;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-			$scope.namenodeList = HDFSMETRIC.getListByRoleName("HdfsServiceInstance", "namenode", $scope.site);
+			$scope.namenodeList = (typeof $scope.status === 'undefined') ? HDFSMETRIC.getListByRoleName("HdfsServiceInstance", "namenode", $scope.site)
+				: HDFSMETRIC.getHadoopHostByStatusAndRole("HdfsServiceInstance", $scope.site, $scope.status, "namenode");
 		});
 	});
 })();
