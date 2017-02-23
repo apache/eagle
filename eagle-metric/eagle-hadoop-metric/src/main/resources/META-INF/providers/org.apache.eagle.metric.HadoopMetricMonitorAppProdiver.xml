@@ -29,6 +29,13 @@
             <required>true</required>
         </property>
         <property>
+            <name>dataSinkConfig.HADOOP_JMX_RESOURCE_STREAM.topic</name>
+            <displayName>JMX Resource Kafka Topic</displayName>
+            <value>hadoop_jmx_resource_${siteId}</value>
+            <description>Hadoop JMX resource kafka topic name for stream: HADOOP_JMX_RESOURCE_STREAM</description>
+            <required>true</required>
+        </property>
+        <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>Kafka Brokers</displayName>
             <value>localhost:6667</value>
@@ -123,6 +130,37 @@
                     <name>value</name>
                     <type>double</type>
                     <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>HADOOP_JMX_RESOURCE_STREAM</streamId>
+            <description>Hadoop JMX Resource Stream including name node, resource manager, etc.</description>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>resource</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>component</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>string</type>
+                    <defaultValue>""</defaultValue>
                 </column>
             </columns>
         </stream>
