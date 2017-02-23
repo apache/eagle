@@ -19,32 +19,26 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
+        <artifactId>eagle-security-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
-        <artifactId>eagle-parent</artifactId>
         <version>0.5.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>eagle-security-parent</artifactId>
-    <name>Eagle::App::Security::Parent</name>
-    <description>eagle security data activity monitoring project</description>
-    <packaging>pom</packaging>
+    <modelVersion>4.0.0</modelVersion>
 
-    <modules>
-        <module>eagle-security-common</module>
-        <module>eagle-security-hdfs-auditlog</module>
-        <module>eagle-security-maprfs-auditlog</module>
-        <module>eagle-security-hive</module>
-        <module>eagle-security-hive-web</module>
-        <module>eagle-security-hdfs-web</module>
-        <module>eagle-security-maprfs-web</module>
-        <module>eagle-security-hdfs-authlog</module>
-        <module>eagle-security-hbase-auditlog</module>
-        <module>eagle-security-hbase-web</module>
-        <module>eagle-metric-collection</module>
-        <module>eagle-security-oozie-auditlog</module>
-        <module>eagle-security-oozie-beam-auditlog</module>
-        <module>eagle-security-oozie-web</module>
-    </modules>
+    <artifactId>eagle-security-oozie-beam-auditlog</artifactId>
+    <name>Eagle::App::Security::OozieBeamAuditLog</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-app-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
