@@ -18,6 +18,7 @@
 package org.apache.eagle.alert.siddhiext;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.eagle.alert.utils.JsonUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,21 +67,8 @@ public class StringSubtractFunctionExtension extends FunctionExecutor {
     @Override
     protected Object execute(Object[] data) {
         try {
-            List<String> ths = new ArrayList<>();
-            if (!((String) data[0]).isEmpty()) {
-                JSONArray jsonArray = new JSONArray((String) data[0]);
-                for (int i = 0; i < jsonArray.length(); ++i) {
-                    ths.add(jsonArray.getString(i));
-                }
-            }
-
-            List<String> rhs = new ArrayList<>();
-            if (!((String) data[1]).isEmpty()) {
-                JSONArray jsonArray = new JSONArray((String) data[1]);
-                for (int i = 0; i < jsonArray.length(); ++i) {
-                    rhs.add(jsonArray.getString(i));
-                }
-            }
+            List<String> ths = JsonUtils.jsonStringToList((String) data[0]);
+            List<String> rhs = JsonUtils.jsonStringToList((String) data[1]);
 
             return org.apache.commons.lang.StringUtils.join(ListUtils.subtract(ths, rhs), "\n");
         } catch (Exception e) {
