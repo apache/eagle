@@ -38,6 +38,11 @@ class NNHAMetric(JmxMetricListener):
             else:
                 self.collector.on_bean_kv(self.PREFIX, component, "hastate", 1)
 
+class NameNodeInfo(JmxMetricListener):
+    def on_metric(self, metric):
+        if metric["metric"] == "hadoop.namenode.namenodeinfo.corruptfiles":
+            metric["value"] = ":".join(json.loads(str(metric["value"])))
+            self.collector.collect(metric, "string")
 
 class MemoryUsageMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.jvm"
@@ -102,6 +107,7 @@ if __name__ == '__main__':
         NNCapacityUsageMetric(),
         JournalTransactionInfoMetric(),
         DatanodeFSDatasetState(),
-        HBaseRegionServerMetric()
+        HBaseRegionServerMetric(),
+        NameNodeInfo()
     )
     Runner.run(collector)
