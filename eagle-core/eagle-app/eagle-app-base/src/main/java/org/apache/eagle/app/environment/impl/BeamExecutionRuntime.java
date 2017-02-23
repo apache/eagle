@@ -28,7 +28,8 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
     @Override
     public void start(Application<BeamEnviroment, Pipeline> executor, Config config) {
         Pipeline pipeline  = executor.execute(config, environment);
-        pipeline.run();
+        // Run the pipeline.
+        pipeline.run().waitUntilFinish();
     }
 
     @Override

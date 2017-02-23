@@ -183,7 +183,7 @@
         <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
 
         <spark.core.version>1.4.0</spark.core.version>
-        <beam.version>0.6.0-SNAPSHOT</beam.version>
+        <beam.version>0.5.0</beam.version>
         <!--  Client -->
         <!--<kafka-client.version>0.9.0.0</kafka-client.version>-->
         <!-- Reflection -->

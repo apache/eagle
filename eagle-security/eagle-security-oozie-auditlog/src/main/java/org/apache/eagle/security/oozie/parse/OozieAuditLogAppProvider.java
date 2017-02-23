@@ -23,9 +23,9 @@ import org.apache.eagle.app.spi.AbstractApplicationProvider;
 /**
  * @Since 10/25/16.
  */
-public class OozieAuditLogAppProvider extends AbstractApplicationProvider<OozieAuditLogApplication> {
+public class OozieAuditLogAppProvider extends AbstractApplicationProvider<OozieAuditLogBeamApplication> {
 
-    public OozieAuditLogApplication getApplication() {
-        return new OozieAuditLogApplication();
+    public OozieAuditLogBeamApplication getApplication() {
+        return new OozieAuditLogBeamApplication();
     }
 }

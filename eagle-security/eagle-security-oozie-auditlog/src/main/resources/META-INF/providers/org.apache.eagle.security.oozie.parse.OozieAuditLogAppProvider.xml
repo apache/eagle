@@ -19,7 +19,7 @@
 <application>
     <type>OOZIE_AUDIT_LOG_MONITOR</type>
     <name>Oozie Audit Log Monitor</name>
-    <appClass>org.apache.eagle.security.oozie.parse.OozieAuditLogApplication</appClass>
+    <appClass>org.apache.eagle.security.oozie.parse.OozieAuditLogBeamApplication</appClass>
     <configuration>
         <!-- topology related configurations -->
         <property>
