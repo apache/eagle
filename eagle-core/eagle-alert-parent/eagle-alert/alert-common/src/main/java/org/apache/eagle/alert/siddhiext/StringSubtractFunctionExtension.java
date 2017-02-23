@@ -52,7 +52,6 @@ public class StringSubtractFunctionExtension extends FunctionExecutor {
     /**
      * The main execution method which will be called upon event arrival.
      * when there are more than one function parameter
-     *
      * This method calculates subtraction of two strings
      * Each String is a string list that separated by ':'
      * @param data the runtime values of function parameters
