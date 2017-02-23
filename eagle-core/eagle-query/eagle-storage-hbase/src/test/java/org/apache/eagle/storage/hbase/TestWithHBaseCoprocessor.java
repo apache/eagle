@@ -25,6 +25,7 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class TestWithHBaseCoprocessor {
     protected static HBaseTestingUtility hbase;
 
     protected static String getZkZnodeParent() {
-        return "/hbase";
+        return "/hbase-test";
     }
 
     @BeforeClass
@@ -44,15 +45,29 @@ public class TestWithHBaseCoprocessor {
         System.setProperty("config.resource", "/application-co.conf");
         Configuration conf = HBaseConfiguration.create();
         conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY, AggregateProtocolEndPoint.class.getName());
+        conf.set("zookeeper.znode.parent", getZkZnodeParent());
         conf.setInt("hbase.master.info.port", -1);//avoid port clobbering
         conf.setInt("hbase.regionserver.info.port", -1);//avoid port clobbering
-        hbase = new HBaseTestingUtility();
-        try {
-            hbase.startMiniCluster();
-        } catch (Exception e) {
-            LOG.error("Error to start mini cluster: " + e.getMessage(), e);
-            throw new IllegalStateException(e);
+
+        int attempts = 0;
+        hbase = new HBaseTestingUtility(conf);
+        boolean successToStart = false;
+        while (attempts < 3) {
+            try {
+                attempts ++;
+                hbase.startMiniCluster();
+                successToStart = true;
+            } catch (Exception e) {
+                LOG.error("Error to start mini cluster (tried {} times): {}", attempts, e.getMessage(), e);
+                try {
+                    hbase.shutdownMiniCluster();
+                } catch (Exception e1) {
+                    LOG.warn(e.getMessage(), e);
+                }
+            }
         }
+
+        Assert.assertTrue("Failed to start mini cluster in " + attempts + " attempts", successToStart);
 
         HTable table = hbase.createTable(String.valueOf("unittest"),"f");
         HTableDescriptor descriptor = new HTableDescriptor(table.getTableDescriptor());

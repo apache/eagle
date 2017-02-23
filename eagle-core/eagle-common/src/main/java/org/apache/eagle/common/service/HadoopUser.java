@@ -19,7 +19,7 @@ package org.apache.eagle.common.service;
 import java.util.List;
 
 /**
- * Hadoop User.
+ * Hadoop UserPrincipal.
  * @since : 7/11/14,2014
  */
 public class HadoopUser {

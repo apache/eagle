@@ -26,7 +26,7 @@
 			<div class="btn-group">
 				<button class="btn btn-default fa fa-play" ng-click="startPolicy()" ng-if="policy.policyStatus !== 'ENABLED'"></button>
 				<button class="btn btn-default fa fa-square" ng-click="stopPolicy()" ng-if="policy.policyStatus === 'ENABLED'"></button>
-				<a class="btn btn-default fa fa-pencil" ui-sref="policyEdit({name: policy.name})"></a>
+				<a class="btn btn-default fa fa-pencil" ui-sref="policyEdit({siteId: site, name: policy.name})"></a>
 				<button class="btn btn-danger fa fa-trash" ng-click="deletePolicy()"></button>
 			</div>
 		</div>
@@ -81,7 +81,7 @@
 							{{item.alertSubject}}
 						</td>
 						<td>
-							<a ui-sref="alertDetail({alertId: item.tags.alertId})">Detail</a>
+							<a ui-sref="alertDetail({siteId: site, alertId: item.tags.alertId, timestamp: item.timestamp})">Detail</a>
 						</td>
 					</tr>
 					</tbody>

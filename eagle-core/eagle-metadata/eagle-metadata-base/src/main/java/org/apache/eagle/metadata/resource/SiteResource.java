@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.metadata.resource;
 
+import org.apache.eagle.common.rest.RESTResponse;
 import org.apache.eagle.metadata.exceptions.SiteDeleteException;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;

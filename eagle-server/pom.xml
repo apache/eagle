@@ -181,6 +181,15 @@
             <version>1.6</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -334,6 +343,17 @@
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-hadoop-metric</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hdfs-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hbase-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>

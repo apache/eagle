@@ -435,6 +435,8 @@ class JmxMetricCollector(MetricCollector):
 
     def jmx_reader(self, source):
         host = source["host"]
+        if source.has_key("source_host"):
+            host=source["source_host"]    
         port=source["port"]
         https=source["https"]
         protocol = "https" if https else "http"
