@@ -17,7 +17,7 @@
 #
 
 from metric_collector import MetricCollector, Runner
-import logging, socket, string, os, re, time
+import logging, socket, string, os, re, time, json
 
 
 class SystemMetricCollector(MetricCollector):
@@ -86,7 +86,6 @@ class SystemMetricCollector(MetricCollector):
 
         """
 
-        cpu_metric = self.new_metric()
         cpu_info = os.popen('cat /proc/stat').readlines()
         dimensions = ["cpu", "user", "nice", "system", "idle", "wait", "irq", "softirq", "steal", "guest"]
 
@@ -109,6 +108,7 @@ class SystemMetricCollector(MetricCollector):
             metric_event = dict()
             for i in range(1, demens):
                 metric_event[dimensions[i]] = int(items[i])
+                cpu_metric = self.new_metric()
                 cpu_metric['timestamp'] = int(round(time.time() * 1000))
                 cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + dimensions[i]
                 cpu_metric['device'] = items[0]
@@ -123,6 +123,7 @@ class SystemMetricCollector(MetricCollector):
             total_cpu_usage += per_cpu_usage
 
             # system.cpu.usage
+            cpu_metric = self.new_metric()
             cpu_metric['timestamp'] = int(round(time.time() * 1000))
             cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + "usage"
             cpu_metric['device'] = items[0]
@@ -141,6 +142,7 @@ class SystemMetricCollector(MetricCollector):
             result = re.split("\s+", cpu_stat_pre.rstrip())
             pre_total_cpu_usage = int(result[0])
             pre_total_cpu = int(result[1])
+
         cpu_metric['timestamp'] = int(round(time.time() * 1000))
         cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + "totalusage"
         cpu_metric['device'] = "cpu"
