@@ -108,7 +108,7 @@ class SystemMetricCollector(MetricCollector):
             metric_event = dict()
             for i in range(1, demens):
                 metric_event[dimensions[i]] = int(items[i])
-                cpu_metric = self.new_metric()
+                cpu_metric = self.new_metric("System/CPU")
                 cpu_metric['timestamp'] = int(round(time.time() * 1000))
                 cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + dimensions[i]
                 cpu_metric['device'] = items[0]
@@ -123,7 +123,7 @@ class SystemMetricCollector(MetricCollector):
             total_cpu_usage += per_cpu_usage
 
             # system.cpu.usage
-            cpu_metric = self.new_metric()
+            cpu_metric = self.new_metric("System/CPU")
             cpu_metric['timestamp'] = int(round(time.time() * 1000))
             cpu_metric['metric'] = self.METRIC_PREFIX + "." + 'cpu.' + "usage"
             cpu_metric['device'] = items[0]
@@ -155,7 +155,7 @@ class SystemMetricCollector(MetricCollector):
     # ====================================
 
     def collect_uptime_metric(self):
-        metric = self.new_metric()
+        metric = self.new_metric("System/OS")
         demension = ["uptime.day", "idletime.day"]
         output = os.popen('cat /proc/uptime').readlines()
 
@@ -172,7 +172,7 @@ class SystemMetricCollector(MetricCollector):
     # ====================================
 
     def collect_memory_metric(self):
-        event = self.new_metric()
+        event = self.new_metric("System/Memory")
         event["host"] = self.fqdn
         output = os.popen('cat /proc/meminfo').readlines()
         mem_info = dict()
@@ -210,7 +210,7 @@ class SystemMetricCollector(MetricCollector):
             items = re.split("\s+", item.rstrip())
             demens = min(len(demension), len(items))
             for i in range(demens):
-                event = self.new_metric()
+                event = self.new_metric("System/CPU")
                 event["timestamp"] = int(round(time.time() * 1000))
                 event["metric"] = self.METRIC_PREFIX + "." + demension[i]
                 event["value"] = items[i]
@@ -225,7 +225,7 @@ class SystemMetricCollector(MetricCollector):
         output = os.popen('sudo ipmitool sdr | grep Temp | grep CPU').readlines()
         for item in output:
             items = re.split("^(CPU\d+)\sTemp\.\s+\|\s+(\d+|\d+\.\d+)\s", item.rstrip())
-            event = self.new_metric()
+            event = self.new_metric("System/CPU")
             event["timestamp"] = int(round(time.time() * 1000))
             event["metric"] = DATA_TYPE + "." + 'cpu.temp'
             event["value"] = items[2]
@@ -249,7 +249,7 @@ class SystemMetricCollector(MetricCollector):
             filtered_items = items[1:5] + items[9:13]
 
             for i in range(len(demension)):
-                kafka_dict = self.new_metric()
+                kafka_dict = self.new_metric("System/Network")
                 kafka_dict["timestamp"] = int(round(time.time() * 1000))
                 kafka_dict['metric'] = self.METRIC_PREFIX + "." + 'nic.' + demension[i]
                 kafka_dict["value"] = filtered_items[i]
@@ -272,7 +272,7 @@ class SystemMetricCollector(MetricCollector):
                     continue
                 lineitems = re.split("\s+", line)
                 metric = 'smartdisk.' + lineitems[1]
-                kafka_dict = self.new_metric()
+                kafka_dict = self.new_metric("System/Disk")
                 kafka_dict['metric'] = DATA_TYPE + "." + metric.lower()
                 kafka_dict["timestamp"] = int(round(time.time() * 1000))
                 kafka_dict["value"] = lineitems[-1]
@@ -310,7 +310,7 @@ class SystemMetricCollector(MetricCollector):
         for key, metrics in iostat_dict.iteritems():
             for i in range(len(metrics)):
                 metric = 'disk.' + demension[i]
-                kafka_dict = self.new_metric()
+                kafka_dict = self.new_metric("System/Disk")
                 kafka_dict['metric'] = DATA_TYPE + "." + metric.lower()
                 kafka_dict["timestamp"] = int(round(time.time() * 1000))
                 kafka_dict["value"] = metrics[i]
@@ -328,9 +328,10 @@ class SystemMetricCollector(MetricCollector):
         event["device"] = device
         self.collect(event)
 
-    def new_metric(self):
+    def new_metric(self, group):
         metric = dict()
         metric["host"] = self.fqdn
+        metric["group"] = group
         return metric
 
 
