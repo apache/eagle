@@ -52,22 +52,22 @@
 						<span class="fa fa-search"></span>
 					</div>
 
-					<p ng-hide="getSearchApplication()" class="text-warning">No stream match</p>
-					<div ng-show="getSearchApplication()">
-						<div ng-repeat="(app, streams) in getSearchApplication() track by app" class="policy-app-list">
-							<a data-toggle="collapse" href="[data-id='SP_{{app}}']">
+					<p ng-hide="getSearchStreamGroups()" class="text-warning">No stream match</p>
+					<div ng-show="getSearchStreamGroups()">
+						<div ng-repeat="(group, streams) in getSearchStreamGroups() track by group" class="policy-app-list">
+							<a data-toggle="collapse" href="[data-id='SP_{{group}}']">
 								<strong class="text-break">
 									<span class="fa" ng-class="searchType === 'site' ? 'fa-server' : 'fa-cube'"></span>
-									{{app}}
+									{{group}}
 								</strong>
 							</a>
-							<ul data-id="SP_{{app}}" class="collapse list-unstyled">
+							<ul data-id="SP_{{group}}" class="collapse in list-unstyled">
 								<li ng-repeat="stream in streams track by stream.streamId">
-									<a data-toggle="collapse" href="[data-id='SP_{{app}}_{{stream.streamId}}']"  class="text-break">
+									<a data-toggle="collapse" href="[data-id='SP_{{group}}_{{stream.streamId}}']"  class="text-break">
 										<span class="fa fa-{{isInputStreamSelected(stream.streamId) ? 'check-square' : 'square'}}"></span>
 										{{stream.streamId}}
 									</a>
-									<ul data-id="SP_{{app}}_{{stream.streamId}}" class="collapse">
+									<ul data-id="SP_{{group}}_{{stream.streamId}}" class="collapse">
 										<li ng-repeat="column in stream.columns track by $index">
 											<span class="text-primary">[{{column.type}}]</span>
 											{{column.name}}

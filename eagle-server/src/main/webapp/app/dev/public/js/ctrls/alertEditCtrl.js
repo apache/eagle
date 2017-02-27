@@ -81,10 +81,10 @@
 
 		var cacheSiteId;
 		var cacheSearchSourceKey;
-		var searchApplications;
+		var searchStreamGroups;
 
 		$scope.searchSourceKey = "";
-		$scope.applications = {};
+		$scope.streamGroups = {};
 		$scope.newPolicy = !$scope.policy.name;
 		$scope.autoPolicyDescription = $scope.newPolicy && !$scope.policy.description;
 
@@ -104,7 +104,7 @@
 		// ==============================================================
 		// =                        Input Stream                        =
 		// ==============================================================
-		$scope.getSearchApplication = function() {
+		$scope.getSearchStreamGroups = function() {
 			var siteId = $scope.policy.siteId;
 
 			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSiteId !== siteId) {
@@ -114,10 +114,9 @@
 					cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
 					cacheSiteId = siteId;
 
-					searchApplications = {};
-					$.each($scope.applications, function (appName, streams) {
+					searchStreamGroups = {};
+					$.each($scope.streamGroups, function (groupName, streams) {
 						$.each(streams, function (i, stream) {
-							var groupName = stream.dataSource;
 							if(
 								stream.siteId === siteId && (
 									groupName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0 ||
@@ -125,7 +124,7 @@
 								)
 							) {
 								match = true;
-								var group = searchApplications[groupName] = searchApplications[groupName] || [];
+								var group = searchStreamGroups[groupName] = searchStreamGroups[groupName] || [];
 								group.push(stream);
 							}
 						});
@@ -133,20 +132,21 @@
 				}
 
 				if(!match) {
-					searchApplications = null;
+					searchStreamGroups = null;
 				}
 			}
-			return searchApplications;
+			return searchStreamGroups;
 		};
 
 		$scope.streams = {};
 		$scope.streamList = Entity.queryMetadata("streams");
 		$scope.streamList._then(function () {
-			$scope.applications = {};
+			$scope.streamGroups = {};
 			cacheSearchSourceKey = null;
 
 			$.each($scope.streamList, function (i, stream) {
-				var list = $scope.applications[stream.dataSource] = $scope.applications[stream.dataSource] || [];
+				var streamGroup = stream.group || 'Global';
+				var list = $scope.streamGroups[streamGroup] = $scope.streamGroups[streamGroup] || [];
 				list.push(stream);
 				$scope.streams[stream.streamId] = stream;
 			});

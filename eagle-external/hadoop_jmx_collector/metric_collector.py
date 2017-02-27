@@ -301,13 +301,15 @@ class MetricCollector(threading.Thread):
     def start(self):
         super(MetricCollector, self).start()
 
-    def collect(self, msg):
+    def collect(self, msg, type='float'):
         try:
             self.collected_event_count = self.collected_event_count + 1
             if not msg.has_key("timestamp"):
                 msg["timestamp"] = int(round(time.time() * 1000))
-            if msg.has_key("value"):
+            if msg.has_key("value") and type == 'float':
                 msg["value"] = float(str(msg["value"]))
+            elif msg.has_key("value") and type == 'string':
+                msg["value"] = str(msg["value"])
             if not msg.has_key("host") or len(msg["host"]) == 0:
                 raise Exception("host is null: " + str(msg))
 
@@ -448,6 +450,8 @@ class JmxMetricCollector(MetricCollector):
 
     def jmx_reader(self, source):
         host = source["host"]
+        if source.has_key("source_host"):
+            host=source["source_host"]    
         port=source["port"]
         https=source["https"]
         protocol = "https" if https else "http"

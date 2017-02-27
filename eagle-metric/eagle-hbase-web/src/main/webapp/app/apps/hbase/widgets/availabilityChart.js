@@ -21,12 +21,6 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (hadoopMetricApp) {
-		var COLOR_MAPPING = {
-			HDFS: 'orange',
-			HBase: 'yellow',
-			Yarn: 'green'
-		};
-
 		hadoopMetricApp.directive("hadoopMetricWidget", function () {
 			return {
 				restrict: 'AE',
@@ -52,7 +46,7 @@
 					$scope.type = $attrs.type;
 
 					// Customize chart color
-					$scope.bgColor = COLOR_MAPPING[$scope.type];
+					$scope.bgColor = "yellow";
 
 					function countHBaseRole(site, status, role, groups, filed, limit) {
 						var jobCond = {
