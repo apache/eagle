@@ -199,7 +199,8 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                                 for (Map.Entry<String, List<Variable>> entry : streamGroupBy.entrySet()) {
                                     if (entry.getValue().size() > 0) {
                                         StreamPartition partition = generatePartition(entry.getKey(), null, Arrays.asList(entry.getValue().toArray(new Variable[entry.getValue().size()])));
-                                        if (((StateInputStream) inputStream).getStateType().equals(StateInputStream.Type.PATTERN)) {
+                                        if (((StateInputStream) inputStream).getStateType().equals(StateInputStream.Type.PATTERN)
+                                                || ((StateInputStream) inputStream).getStateType().equals(StateInputStream.Type.SEQUENCE)) {
                                             if (effectivePartitions.containsKey(partition.getStreamId())) {
                                                 StreamPartition existingPartition = effectivePartitions.get(partition.getStreamId());
                                                 if (!existingPartition.equals(partition)
