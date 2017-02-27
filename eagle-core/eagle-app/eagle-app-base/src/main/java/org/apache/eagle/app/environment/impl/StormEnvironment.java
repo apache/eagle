@@ -18,12 +18,11 @@ package org.apache.eagle.app.environment.impl;
 
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.environment.builder.ApplicationBuilder;
-import org.apache.eagle.app.environment.builder.MetricDefinition;
+import org.apache.eagle.app.environment.builder.MetricDescriptor;
 import org.apache.eagle.app.environment.builder.TransformFunction;
 import org.apache.eagle.app.environment.builder.TransformFunctionBolt;
 import org.apache.eagle.app.messaging.*;
 import com.typesafe.config.Config;
-import org.apache.eagle.metadata.model.StreamSourceConfig;
 
 /**
  * Storm Execution Environment Context.
@@ -44,16 +43,16 @@ public class StormEnvironment extends AbstractEnvironment {
         return (StormStreamSource) stream().getSource(streamId,config);
     }
 
-    public MetricStreamPersist getMetricPersist(MetricDefinition metricDefinition, Config config) {
-        return new MetricStreamPersist(metricDefinition, config);
+    public MetricStreamPersist getMetricPersist(MetricDescriptor metricDescriptor, Config config) {
+        return new MetricStreamPersist(metricDescriptor, config);
     }
 
     public EntityStreamPersist getEntityPersist(Config config) {
         return new EntityStreamPersist(config);
     }
 
-    public MetricSchemaGenerator getMetricSchemaGenerator(MetricDefinition metricDefinition, Config config) {
-        return new MetricSchemaGenerator(metricDefinition, config);
+    public MetricSchemaGenerator getMetricSchemaGenerator(MetricDescriptor metricDescriptor, Config config) {
+        return new MetricSchemaGenerator(metricDescriptor, config);
     }
 
     public TransformFunctionBolt getTransformer(TransformFunction function) {

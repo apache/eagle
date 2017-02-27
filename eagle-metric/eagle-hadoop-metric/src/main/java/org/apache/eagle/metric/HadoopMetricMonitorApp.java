@@ -19,7 +19,8 @@ package org.apache.eagle.metric;
 import backtype.storm.generated.StormTopology;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
-import org.apache.eagle.app.environment.builder.MetricDefinition;
+import org.apache.eagle.app.environment.builder.MetricDescriptor;
+import org.apache.eagle.app.environment.builder.MetricDescriptor.MetricGroupSelector;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 
 import java.util.Calendar;
@@ -28,14 +29,30 @@ public class HadoopMetricMonitorApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         return environment.newApp(config)
-            .fromStream("HADOOP_JMX_METRIC_STREAM")
-            .saveAsMetric(MetricDefinition
-                .metricType("HADOOP_JMX_METRICS")
-                .namedByField("metric")
-                .eventTimeByField("timestamp")
-                .dimensionFields("host","component","site")
-                .granularity(Calendar.MINUTE)
-                .valueField("value"))
-            .toTopology();
+                .fromStream("HADOOP_JMX_METRIC_STREAM")
+                .saveAsMetric(
+                        MetricDescriptor.metricGroupAs((MetricGroupSelector) event -> {
+                            if (event.containsKey("component")) {
+                                return String.format("hadoop.%s", ((String) event.get("component")).toLowerCase());
+                            } else {
+                                return "hadoop.metrics";
+                            }
+                        })
+                        .siteByField("site")
+                        .namedByField("metric")
+                        .eventTimeByField("timestamp")
+                        .dimensionFields("host", "component", "site")
+                        .granularity(Calendar.MINUTE)
+                        .valueField("value"))
+                .fromStream("SYSTEM_METRIC_STREAM")
+                .saveAsMetric(MetricDescriptor.metricGroupByField("group")
+                        .siteByField("site")
+                        .namedByField("metric")
+                        .eventTimeByField("timestamp")
+                        .dimensionFields("host", "group", "site", "device")
+                        .granularity(Calendar.MINUTE)
+                        .valueField("value")
+                )
+                .toTopology();
     }
 }

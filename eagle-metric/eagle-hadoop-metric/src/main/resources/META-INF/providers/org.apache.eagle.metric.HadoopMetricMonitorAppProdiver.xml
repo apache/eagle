@@ -20,12 +20,18 @@
     <type>HADOOP_METRIC_MONITOR</type>
     <name>Hadoop Metrics Monitor</name>
     <configuration>
-        <!-- data fromStream configurations -->
         <property>
             <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
             <displayName>JMX Metric Kafka Topic</displayName>
             <value>hadoop_jmx_metric_${siteId}</value>
             <description>Hadoop JMX metric kafka topic name for stream: HADOOP_JMX_METRIC_STREAM</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.SYSTEM_METRIC_STREAM.topic</name>
+            <displayName>System Metric Kafka Topic</displayName>
+            <value>system_metric_${siteId}</value>
+            <description>System JMX metric kafka topic name for stream: SYSTEM_METRIC_STREAM</description>
             <required>true</required>
         </property>
         <property>
@@ -117,6 +123,40 @@
                 </column>
                 <column>
                     <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream><stream>
+            <streamId>SYSTEM_METRIC_STREAM</streamId>
+            <description>System Metrics Stream including CPU, Network, Disk, etc.</description>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>metric</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>group</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>device</name>
                     <type>string</type>
                 </column>
                 <column>

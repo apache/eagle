@@ -210,6 +210,7 @@ class KafkaMetricSender(MetricSender):
         self.default_topic = None
         if kafka_config.has_key("default_topic"):
             self.default_topic = kafka_config["default_topic"].encode('utf-8')
+            logging.info("Using default topic: %s" % self.default_topic)
         self.component_topic_mapping = {}
         if kafka_config.has_key("component_topic_mapping"):
             self.component_topic_mapping = kafka_config["component_topic_mapping"]
@@ -323,7 +324,7 @@ class MetricCollector(threading.Thread):
                         self.emit_event_count = self.emit_event_count + 1
                         self.sender.send(msg)
                         return
-                self.ignored_event_count = self.thrown_event_count + 1
+                self.ignored_event_count = self.ignored_event_count + 1
         except Exception as e:
             logging.error("Failed to emit metric: %s" % msg)
             logging.exception(e)

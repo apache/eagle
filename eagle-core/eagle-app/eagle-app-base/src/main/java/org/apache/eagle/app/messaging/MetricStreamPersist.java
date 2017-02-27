@@ -24,7 +24,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.environment.builder.MetricDefinition;
+import org.apache.eagle.app.environment.builder.MetricDescriptor;
 import org.apache.eagle.app.utils.StreamConvertHelper;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.GenericMetricEntity;
@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,7 @@ import java.util.Map;
 public class MetricStreamPersist extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MetricStreamPersist.class);
     public static final String METRIC_NAME_FIELD = "metricName";
+    public static final String METRIC_EVENT_FIELD = "metricEvent";
 
     private final Config config;
     private final MetricMapper mapper;
@@ -52,9 +54,9 @@ public class MetricStreamPersist extends BaseRichBolt {
     private OutputCollector collector;
     private BatchSender batchSender;
 
-    public MetricStreamPersist(MetricDefinition metricDefinition, Config config) {
+    public MetricStreamPersist(MetricDescriptor metricDescriptor, Config config) {
         this.config = config;
-        this.mapper = new StructuredMetricMapper(metricDefinition);
+        this.mapper = new StructuredMetricMapper(metricDescriptor);
         this.batchSize = config.hasPath("service.batchSize") ? config.getInt("service.batchSize") : 1;
     }
 
@@ -76,8 +78,10 @@ public class MetricStreamPersist extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         GenericMetricEntity metricEntity = null;
+        Map event = null;
         try {
-            metricEntity = this.mapper.map(StreamConvertHelper.tupleToEvent(input).f1());
+            event = StreamConvertHelper.tupleToEvent(input).f1();
+            metricEntity = this.mapper.map(event);
             if (batchSize <= 1) {
                 GenericServiceAPIResponseEntity<String> response = this.client.create(Collections.singletonList(metricEntity));
                 if (!response.isSuccess()) {
@@ -91,8 +95,8 @@ public class MetricStreamPersist extends BaseRichBolt {
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         } finally {
-            if (metricEntity != null) {
-                collector.emit(Collections.singletonList(metricEntity.getPrefix()));
+            if (metricEntity != null && event != null) {
+                collector.emit(Arrays.asList(metricEntity.getPrefix(), event));
             }
             collector.ack(input);
         }
@@ -100,7 +104,7 @@ public class MetricStreamPersist extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(METRIC_NAME_FIELD));
+        declarer.declare(new Fields(METRIC_NAME_FIELD, METRIC_EVENT_FIELD));
     }
 
     @Override
@@ -120,35 +124,35 @@ public class MetricStreamPersist extends BaseRichBolt {
     }
 
     public class StructuredMetricMapper implements MetricMapper {
-        private final MetricDefinition metricDefinition;
+        private final MetricDescriptor metricDescriptor;
 
-        private StructuredMetricMapper(MetricDefinition metricDefinition) {
-            this.metricDefinition = metricDefinition;
+        private StructuredMetricMapper(MetricDescriptor metricDescriptor) {
+            this.metricDescriptor = metricDescriptor;
         }
 
         @Override
         public GenericMetricEntity map(Map event) {
-            String metricName = metricDefinition.getNameSelector().getMetricName(event);
+            String metricName = metricDescriptor.getMetricNameSelector().getMetricName(event);
             Preconditions.checkNotNull(metricName, "Metric name is null");
-            Long timestamp = metricDefinition.getTimestampSelector().getTimestamp(event);
+            Long timestamp = metricDescriptor.getTimestampSelector().getTimestamp(event);
             Preconditions.checkNotNull(timestamp, "Timestamp is null");
             Map<String, String> tags = new HashMap<>();
-            for (String dimensionField : metricDefinition.getDimensionFields()) {
+            for (String dimensionField : metricDescriptor.getDimensionFields()) {
                 Preconditions.checkNotNull(dimensionField, "Dimension field name is null");
                 tags.put(dimensionField, (String) event.get(dimensionField));
             }
 
             double[] values;
-            if (event.containsKey(metricDefinition.getValueField())) {
-                values = new double[] {(double) event.get(metricDefinition.getValueField())};
+            if (event.containsKey(metricDescriptor.getValueField())) {
+                values = new double[] {(double) event.get(metricDescriptor.getValueField())};
             } else {
-                LOG.warn("Event has no value field '{}': {}, use 0 by default", metricDefinition.getValueField(), event);
+                LOG.warn("Event has no value field '{}': {}, use 0 by default", metricDescriptor.getValueField(), event);
                 values = new double[] {0};
             }
 
             GenericMetricEntity entity = new GenericMetricEntity();
             entity.setPrefix(metricName);
-            entity.setTimestamp(DateTimeUtil.roundDown(metricDefinition.getGranularity(), timestamp));
+            entity.setTimestamp(DateTimeUtil.roundDown(metricDescriptor.getGranularity(), timestamp));
             entity.setTags(tags);
             entity.setValue(values);
             return entity;
