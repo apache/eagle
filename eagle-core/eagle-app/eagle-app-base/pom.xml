@@ -45,7 +45,6 @@
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-spark</artifactId>
             <version>${beam.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>

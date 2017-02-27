@@ -388,7 +388,7 @@ public class MetricSystemTest {
     public void makeSureTopic(String zkConnectionString) {
         ZkClient zkClient = new ZkClient(zkConnectionString, 10000, 10000, ZKStringSerializer$.MODULE$);
         Properties topicConfiguration = new Properties();
-        AdminUtils.createTopic(zkClient, TOPIC, 1, 1, topicConfiguration);
+        //AdminUtils.createTopic(zkClient, TOPIC, 1, 1, topicConfiguration);
     }
 
 

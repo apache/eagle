@@ -21,61 +21,18 @@
     <name>Oozie Audit Log Monitor Beam</name>
     <appClass>org.apache.eagle.security.oozie.parse.OozieAuditLogBeamApplication</appClass>
     <configuration>
-        <!-- topology related configurations -->
-        <property>
-            <name>workers</name>
-            <displayName>storm workers</displayName>
-            <value>1</value>
-            <description>number of topology workers</description>
-        </property>
-        <property>
-            <name>topology.numOfJoinTasks</name>
-            <displayName>Topology Join Tasks</displayName>
-            <value>2</value>
-            <description>number of join tasks</description>
-        </property>
-        <property>
-            <name>topology.numOfSpoutTasks</name>
-            <displayName>Topology Spout Tasks</displayName>
-            <value>2</value>
-            <description>number of spout tasks</description>
-        </property>
-        <property>
-            <name>topology.numOfParserTasks</name>
-            <displayName>Topology Parser Tasks</displayName>
-            <value>2</value>
-            <description>number of parser tasks</description>
-        </property>
-        <property>
-            <name>topology.numOfSensitivityJoinTasks</name>
-            <displayName>Topology Sensitivity JoinTasks</displayName>
-            <value>2</value>
-            <description>number of sensitivity join tasks</description>
-        </property>
-        <property>
-            <name>topology.numOfIPZoneJoinTasks</name>
-            <displayName>Topology IPZone JoinTasks</displayName>
-            <value>2</value>
-            <description>number of ip zone join tasks</description>
-        </property>
-        <property>
-            <name>topology.numOfSinkTasks</name>
-            <displayName>Topology Sink Tasks</displayName>
-            <value>2</value>
-            <description>number of sink tasks</description>
-        </property>
-
         <!-- data source configurations -->
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>Kafka Topic for Data Consumption</displayName>
-            <value>oozie_audit_log</value>
+            <value>testTopic3</value>
             <description>data source topic</description>
+            <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.zkConnection</name>
             <displayName>Kafka Zookeeper Connection</displayName>
-            <value>localhost:2181</value>
+            <value>localhost:9092</value>
             <description>kafka broker zk connection</description>
             <required>true</required>
         </property>
@@ -84,12 +41,6 @@
             <displayName>Kafka Zookeeper servers</displayName>
             <value>localhost:2181</value>
             <description>zookeeper server for offset transaction</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.schemeCls</name>
-            <displayName>Kafka Consumer SchemeCls</displayName>
-            <value>storm.kafka.StringScheme</value>
-            <description>scheme class</description>
         </property>
 
         <!-- data enrich configurations -->
@@ -136,22 +87,10 @@
         <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>Kafka BrokerList for Data Sink</displayName>
-            <value>localhost:6667</value>
+            <value>localhost:9092</value>
             <description>kafka broker list</description>
         </property>
-        <property>
-            <name>dataSinkConfig.serializerClass</name>
-            <displayName>Kafka Producer SerializerClass</displayName>
-            <value>kafka.serializer.StringEncoder</value>
-            <description>serializer class Kafka message value</description>
-        </property>
-        <property>
-            <name>dataSinkConfig.keySerializerClass</name>
-            <displayName>Kafka Producer keySerializerClass</displayName>
-            <value>kafka.serializer.StringEncoder</value>
-            <description>serializer class Kafka message key</description>
-        </property>
-
+<!--
         <property>
             <name>dataSinkConfig.producerType</name>
             <displayName>Kafka Producer Type</displayName>
@@ -175,7 +114,7 @@
             <displayName>Kafka Producer RequestRequiredAcks</displayName>
             <value>0</value>
             <description>value controls when a produce request is considered completed</description>
-        </property>
+        </property>-->
     </configuration>
     <streams>
         <stream>
