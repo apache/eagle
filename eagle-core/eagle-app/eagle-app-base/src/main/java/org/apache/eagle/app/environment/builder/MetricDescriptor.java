@@ -17,8 +17,6 @@
 package org.apache.eagle.app.environment.builder;
 
 
-import com.google.common.base.Preconditions;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -131,6 +129,7 @@ public class MetricDescriptor implements Serializable {
         private FixedMetricGroupSelector(String groupName) {
             this.groupName = groupName;
         }
+
         @Override
         public String getMetricGroup(Map event) {
             return groupName;
@@ -156,7 +155,7 @@ public class MetricDescriptor implements Serializable {
 
         @Override
         public String getSiteId(Map event) {
-            return (String) event.getOrDefault(this.siteIdFieldName,"UNKNOWN");
+            return (String) event.getOrDefault(this.siteIdFieldName, "UNKNOWN");
         }
     }
 
