@@ -137,7 +137,8 @@
                     <defaultValue>0.0</defaultValue>
                 </column>
             </columns>
-        </stream><stream>
+        </stream>
+        <stream>
             <streamId>SYSTEM_METRIC_STREAM</streamId>
             <description>System Metrics Stream including CPU, Network, Disk, etc.</description>
             <columns>
