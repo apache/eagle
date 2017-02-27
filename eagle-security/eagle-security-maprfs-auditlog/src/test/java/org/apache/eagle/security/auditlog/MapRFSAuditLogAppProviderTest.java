@@ -19,8 +19,10 @@ package org.apache.eagle.security.auditlog;
 import com.google.inject.Inject;
 import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.app.test.ApplicationTestBase;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class MapRFSAuditLogAppProviderTest extends ApplicationTestBase {
     @Inject
     private
