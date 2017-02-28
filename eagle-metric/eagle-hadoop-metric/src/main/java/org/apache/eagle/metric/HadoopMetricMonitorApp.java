@@ -22,6 +22,7 @@ import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.builder.MetricDescriptor;
 import org.apache.eagle.app.environment.builder.MetricDescriptor.MetricGroupSelector;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.utils.AppConfigUtils;
 
 import java.util.Calendar;
 
@@ -38,7 +39,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
                                 return "hadoop.metrics";
                             }
                         })
-                        .siteByField("site")
+                        .siteAs(AppConfigUtils.getSiteId(config))
                         .namedByField("metric")
                         .eventTimeByField("timestamp")
                         .dimensionFields("host", "component", "site")
@@ -46,7 +47,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
                         .valueField("value"))
                 .fromStream("SYSTEM_METRIC_STREAM")
                 .saveAsMetric(MetricDescriptor.metricGroupByField("group")
-                        .siteByField("site")
+                        .siteAs(AppConfigUtils.getSiteId(config))
                         .namedByField("metric")
                         .eventTimeByField("timestamp")
                         .dimensionFields("host", "group", "site", "device")

@@ -146,6 +146,19 @@ public class MetricDescriptor implements Serializable {
         String getSiteId(Map event);
     }
 
+    public class FixedSiteIdSelector implements SiteIdSelector {
+        private final String siteId;
+
+        private FixedSiteIdSelector(String siteId) {
+            this.siteId = siteId;
+        }
+
+        @Override
+        public String getSiteId(Map event) {
+            return this.siteId;
+        }
+    }
+
     private class FieldSiteIdSelector implements SiteIdSelector {
         private final String siteIdFieldName;
 
@@ -164,8 +177,13 @@ public class MetricDescriptor implements Serializable {
         return this;
     }
 
-    public MetricDescriptor siteAs(MetricNameSelector metricNameSelector) {
-        this.setMetricNameSelector(metricNameSelector);
+    public MetricDescriptor siteAs(SiteIdSelector siteIdSelector) {
+        this.setSiteIdSelector(siteIdSelector);
+        return this;
+    }
+
+    public MetricDescriptor siteAs(String siteId) {
+        this.setSiteIdSelector(new FixedSiteIdSelector(siteId));
         return this;
     }
 
