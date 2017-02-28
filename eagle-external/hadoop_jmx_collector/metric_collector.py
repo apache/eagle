@@ -210,6 +210,7 @@ class KafkaMetricSender(MetricSender):
         self.default_topic = None
         if kafka_config.has_key("default_topic"):
             self.default_topic = kafka_config["default_topic"].encode('utf-8')
+            logging.info("Using default topic: %s" % self.default_topic)
         self.component_topic_mapping = {}
         if kafka_config.has_key("component_topic_mapping"):
             self.component_topic_mapping = kafka_config["component_topic_mapping"]
@@ -266,12 +267,18 @@ class MetricCollector(threading.Thread):
     filters = []
     config = None
     closed = False
+    collected_event_count = 0
+    ignored_event_count = 0
+    emit_event_count = 0
 
     def __init__(self, config=None):
         threading.Thread.__init__(self)
         self.config = None
         self.sender = None
         self.fqdn = socket.getfqdn()
+        self.ignored_event_count = 0
+        self.collected_event_count = 0
+        self.emit_event_count = 0
 
     def init(self, config):
         self.config = config
@@ -296,6 +303,7 @@ class MetricCollector(threading.Thread):
 
     def collect(self, msg, type='float'):
         try:
+            self.collected_event_count = self.collected_event_count + 1
             if not msg.has_key("timestamp"):
                 msg["timestamp"] = int(round(time.time() * 1000))
             if msg.has_key("value") and type == 'float':
@@ -304,21 +312,28 @@ class MetricCollector(threading.Thread):
                 msg["value"] = str(msg["value"])
             if not msg.has_key("host") or len(msg["host"]) == 0:
                 raise Exception("host is null: " + str(msg))
+
             if not msg.has_key("site"):
                 msg["site"] = self.config["env"]["site"]
+
             if len(self.filters) == 0:
+                self.emit_event_count = self.emit_event_count + 1
                 self.sender.send(msg)
                 return
             else:
                 for filter in self.filters:
                     if filter.filter_metric(msg):
+                        self.emit_event_count = self.emit_event_count + 1
                         self.sender.send(msg)
                         return
+                self.ignored_event_count = self.ignored_event_count + 1
         except Exception as e:
             logging.error("Failed to emit metric: %s" % msg)
             logging.exception(e)
 
     def close(self):
+        logging.info("Collected %s events (emitted: %s, ignored: %s)"
+                     % (self.collected_event_count, self.emit_event_count, self.ignored_event_count))
         self.sender.close()
         self.closed = True
 

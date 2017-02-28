@@ -1,16 +1,17 @@
 {
   "env": {
     "site": "sandbox",
-    "log_file": "/tmp/hadoop-jmx-collector.log",
     "cpu_stat_file": "/tmp/eagle_cpu_usage_state"
   },
-  "input": [
-  ],
   "filter": {
+    "bean_group_filter": ["hadoop","java.lang","java.nio"],
+    "metric_name_filter": [
+      "system.*"
+    ]
   },
   "output": {
     "kafka": {
-      "debug": false,
+      "debug": true,
       "default_topic": "system_metric_sandbox",
       "broker_list": [
         "sandbox.hortonworks.com:6667"

@@ -49,6 +49,10 @@ public class ApplicationBuilder {
         public StormTopology toTopology() {
             return topologyBuilder.createTopology();
         }
+
+        public SourcedStream fromStream(String streamId) {
+            return ApplicationBuilder.this.fromStream(streamId);
+        }
     }
 
     public abstract class InitializedStream extends BuilderContext {
@@ -66,11 +70,11 @@ public class ApplicationBuilder {
         /**
          * Persist source data stream as metric.
          */
-        public BuilderContext saveAsMetric(MetricDefinition metricDefinition) {
+        public BuilderContext saveAsMetric(MetricDescriptor metricDescriptor) {
             String metricDataID = generateId("MetricDataSink");
             String metricSchemaID = generateId("MetricSchemaGenerator");
-            topologyBuilder.setBolt(metricDataID, new MetricStreamPersist(metricDefinition, appConfig)).shuffleGrouping(getId());
-            topologyBuilder.setBolt(metricSchemaID, new MetricSchemaGenerator(metricDefinition,appConfig)).fieldsGrouping(metricDataID,new Fields(MetricStreamPersist.METRIC_NAME_FIELD));
+            topologyBuilder.setBolt(metricDataID, new MetricStreamPersist(metricDescriptor, appConfig)).shuffleGrouping(getId());
+            topologyBuilder.setBolt(metricSchemaID, new MetricSchemaGenerator(metricDescriptor,appConfig)).fieldsGrouping(metricDataID,new Fields(MetricStreamPersist.METRIC_NAME_FIELD));
             return this;
         }
 
