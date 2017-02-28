@@ -17,3 +17,4 @@
 
 empty=org.apache.eagle.alert.siddhiext.StringEmptyFunctionExtension
 subtract=org.apache.eagle.alert.siddhiext.StringSubtractFunctionExtension
+listSize=org.apache.eagle.alert.siddhiext.StringListSizeFunctionExtension
