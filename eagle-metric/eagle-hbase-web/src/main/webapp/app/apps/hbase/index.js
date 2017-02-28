@@ -35,7 +35,7 @@
 		controller: "regionDetailCtrl",
 		resolve: {time: true}
 	}).route("regionList", {
-		url: "/hadoopService/HBase/regionList",
+		url: "/hadoopService/HBase/regionList?status",
 		site: true,
 		templateUrl: "partials/region/regionList.html",
 		controller: "regionListCtrl"
@@ -265,6 +265,8 @@
 				});
 				_list.done = true;
 				return _list;
+			}, function () {
+				return [];
 			});
 			return _list;
 		};
@@ -300,12 +302,23 @@
 			return hoststateinfo;
 		};
 
-		METRIC.regionserverList = function (siteid) {
+		METRIC.regionserverList = function (siteid, status) {
 			var hoststateinfos;
-			var condition = {
-				site: siteid,
-				role: "regionserver"
-			};
+			var condition = {};
+			if(typeof status === 'undefined') {
+				condition = {
+					site: siteid,
+					role: "regionserver"
+				};
+			} else {
+				condition = {
+					site: siteid,
+					role: "regionserver",
+					status: status
+				};
+			}
+			console.log(condition);
+
 			hoststateinfos = METRIC.hbasehostStatus(condition);
 			return hoststateinfos;
 		};
