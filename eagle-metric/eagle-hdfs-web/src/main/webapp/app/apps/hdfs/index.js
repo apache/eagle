@@ -250,6 +250,8 @@
 				});
 				_list.done = true;
 				return _list;
+			}, function () {
+				return [];
 			});
 			return _list;
 		};

@@ -97,8 +97,8 @@
 				var trendEndTime = Time.align(endTime, interval);
 				$scope.site = $wrapState.param.siteId;
 				var result = cache[name] || namenodeInfo._promise.then(function (res) {
-						if(typeof res[0].tags === 'undefined') {
-							return;
+						if(typeof res[0] === 'undefined' || res.length === 0) {
+							return [];
 						}
 						$scope.activeNamenodeList = res;
 						$scope.type = $wrapState.param.hostname || $scope.namenode || res[0].tags.hostname;
@@ -241,7 +241,7 @@
 							var series = [];
 							for(var r=0; r < resp.length; r+=1) {
 								var rs = resp[r][1];
-								if(rs.length > 0) {
+								if (typeof rs !== 'undefined' && rs.length > 0) {
 									series.push(rs);
 								}
 							}

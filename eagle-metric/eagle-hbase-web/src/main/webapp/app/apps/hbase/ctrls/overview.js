@@ -59,9 +59,10 @@
 
 				$scope.site = $wrapState.param.siteId;
 				var result = cache[name] || activeMasterInfo._promise.then(function (res) {
-						if(typeof res[0].tags === 'undefined') {
-							return;
+						if(typeof res[0] === 'undefined' || res.length === 0) {
+							return [];
 						}
+
 						var hostname = res[0].tags.hostname;
 						$scope.defaultHostname = $wrapState.param.hostname || hostname;
 
@@ -242,7 +243,7 @@
 							var series = [];
 							for (var r = 0; r < resp.length; r += 1) {
 								var rs = resp[r][1];
-								if (rs.length > 0) {
+								if (typeof rs !== 'undefined' && rs.length > 0) {
 									series.push(rs);
 								}
 							}
@@ -288,9 +289,7 @@
 				});
 
 				activeMasterInfo._promise.then(function (res) {
-					if(typeof res[0].tags === 'undefined') {
-						$scope.hmasteraverageload = -1;
-					} else {
+					if(typeof res[0] !== 'undefined' && res.length > 0) {
 						var hostname = cache[hostname] = cache[hostname] || res[0].tags.hostname;
 						$scope.defaultHostname = $wrapState.param.hostname || hostname;
 						var jobCond = {

@@ -94,11 +94,16 @@
 				'<div class="inner">' +
 				'<h3>{{type}}</h3>' +
 				'<div ng-show="namenodeactivenum!==-1 && namenodestandbynum!==-1" class="hadoopMetric-widget-detail">' +
-				'<a ui-sref="namenodeList({siteId: site.siteId})">' +
+				'<a ng-show="namenodeactivenum || namenodestandbynum" ui-sref="namenodeList({siteId: site.siteId})">' +
 				'<span>{{namenodeactivenum+namenodestandbynum}}</span> Namenodes (' +
 				'<span>{{namenodeactivenum||0}}</span> Active / ' +
 				'<span>{{namenodestandbynum||0}}</span> Standby)' +
 				'</a>' +
+				'<div ng-show="!namenodeactivenum && !namenodestandbynum">' +
+				'<span>0</span> Masters (' +
+				'<span>0</span> Active / ' +
+				'<span>0</span> Standby)' +
+				'</div>' +
 				'</div>' +
 				'<div ng-show="namenodeactivenum===-1 || namenodestandbynum===-1" class="hadoopMetric-widget-detail">' +
 				'<span>N/A</span> Namenodes (' +
@@ -106,11 +111,16 @@
 				'<span>N/A</span> Standby)' +
 				'</div>' +
 				'<div ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1" class="hadoopMetric-widget-detail">' +
-				'<a ui-sref="datanodeList({siteId: site.siteId})">' +
+				'<a ng-show="datanodehealtynum || datanodeunhealtynum" ui-sref="datanodeList({siteId: site.siteId})">' +
 				'<span>{{datanodehealtynum+datanodeunhealtynum}}</span> Datanodes (' +
 				'<span>{{datanodehealtynum||0}}</span> Healthy / ' +
 				'<span>{{datanodeunhealtynum||0}}</span> Unhealthy)' +
 				'</a>' +
+				'<div ng-show="!datanodehealtynum && !datanodehealtynum">' +
+				'<span>0</span> Masters (' +
+				'<span>0</span> Active / ' +
+				'<span>0</span> Standby)' +
+				'</div>' +
 				'</div>' +
 				'<div ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1" class="hadoopMetric-widget-detail">' +
 				'<span>N/A</span> Datanodes (' +
