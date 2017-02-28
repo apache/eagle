@@ -103,7 +103,7 @@
 			});
 		}
 
-		if (!'Notification' in window || !'localStorage' in window) {
+		if (!('Notification' in window) || !('localStorage' in window)) {
 			// Notification not support
 			console.warn('Browser do not support Notification api. Ignore...');
 		} else {
