@@ -17,8 +17,12 @@
 package org.apache.eagle.alert.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.codehaus.jettison.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonUtils {
 
@@ -32,5 +36,21 @@ public class JsonUtils {
             LOG.error("write object as string failed {} !", o);
         }
         return "";
+    }
+
+    public static List<String> jsonStringToList(String message) {
+        List<String> result = new ArrayList<>();
+        try {
+            if (!message.isEmpty()) {
+                JSONArray jsonArray = new JSONArray(message);
+                for (int i = 0; i < jsonArray.length(); ++i) {
+                    result.add(jsonArray.getString(i));
+                }
+            }
+        } catch (Exception e) {
+            LOG.warn("exception found {}", e);
+        }
+
+        return result;
     }
 }

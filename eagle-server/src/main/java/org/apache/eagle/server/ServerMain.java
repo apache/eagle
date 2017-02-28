@@ -29,7 +29,7 @@ public class ServerMain {
         + "\tencrypt\t[text to encrypt]\n";
 
     public static void main(String[] args) {
-        if (args.length > 1) {
+        if (args.length > 0) {
             String cmd = args[0];
 
             switch (cmd) {

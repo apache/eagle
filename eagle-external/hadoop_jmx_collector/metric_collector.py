@@ -294,12 +294,14 @@ class MetricCollector(threading.Thread):
     def start(self):
         super(MetricCollector, self).start()
 
-    def collect(self, msg):
+    def collect(self, msg, type='float'):
         try:
             if not msg.has_key("timestamp"):
                 msg["timestamp"] = int(round(time.time() * 1000))
-            if msg.has_key("value"):
+            if msg.has_key("value") and type == 'float':
                 msg["value"] = float(str(msg["value"]))
+            elif msg.has_key("value") and type == 'string':
+                msg["value"] = str(msg["value"])
             if not msg.has_key("host") or len(msg["host"]) == 0:
                 raise Exception("host is null: " + str(msg))
             if not msg.has_key("site"):

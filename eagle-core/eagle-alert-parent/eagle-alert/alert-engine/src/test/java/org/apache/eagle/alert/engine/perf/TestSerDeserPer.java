@@ -19,14 +19,15 @@ package org.apache.eagle.alert.engine.perf;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,6 +39,9 @@ import java.util.List;
  * Since 5/13/16.
  */
 public class TestSerDeserPer {
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     Object[] data = null;
 
     @Before
@@ -50,14 +54,10 @@ public class TestSerDeserPer {
         data = new Object[] {sb.toString()};
     }
 
-    private String getTmpPath() {
-        return System.getProperty("java.io.tmpdir");
-    }
-
     @Test
     public void testSerDeserPerf() throws Exception {
         Kryo kryo = new Kryo();
-        String outputPath = FilenameUtils.concat(getTmpPath(), "file.bin");
+        String outputPath = temporaryFolder.newFile().toString();
         Output output = new Output(new FileOutputStream(outputPath));
         for (int i = 0; i < 1000; i++) {
             kryo.writeObject(output, constructPE());
@@ -94,7 +94,7 @@ public class TestSerDeserPer {
     @Test
     public void testSerDeserPerf2() throws Exception {
         Kryo kryo = new Kryo();
-        String outputPath = FilenameUtils.concat(getTmpPath(), "file2.bin");
+        String outputPath = temporaryFolder.newFile().toString();
         Output output = new Output(new FileOutputStream(outputPath));
         for (int i = 0; i < 1000; i++) {
             kryo.writeObject(output, constructNewPE());
@@ -126,7 +126,7 @@ public class TestSerDeserPer {
     @Test
     public void testSerDeserPerf3() throws Exception {
         Kryo kryo = new Kryo();
-        String outputPath = FilenameUtils.concat(getTmpPath(), "file3.bin");
+        String outputPath = temporaryFolder.newFile().toString();
         Output output = new Output(new FileOutputStream(outputPath));
         for (int i = 0; i < 1000; i++) {
             kryo.writeObject(output, constructNewPE2());
