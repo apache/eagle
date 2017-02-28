@@ -23,7 +23,8 @@
 	var PREEMPTIVE_TIME_LIMIT = 8 * 1000;
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Notification', function ($rootScope) {
+	serviceModule.service('$notification', function ($q, $rootScope) {
+		var deferred = $q.defer();
 		var promised = false;
 		var id = +new Date();
 		var lastHookTime = +new Date();
@@ -76,6 +77,7 @@
 				var hooker = common.parseJSON(localStorage.getItem('notificationId'), null);
 				if (promised || !hooker || (+new Date()) - (hooker.lastHookTime || 0) > PREEMPTIVE_TIME_LIMIT) {
 					promised = true;
+					deferred.resolve();
 					lastHookTime = +new Date();
 					localStorage.setItem('notificationId', JSON.stringify({
 						id: id,
@@ -110,7 +112,6 @@
 			} else if (Notification.permission !== 'denied') {
 				Notification.requestPermission().then(function(permission) {
 					if (permission === "granted") {
-						// promised = true;
 						uniqueNotification();
 					} else {
 						console.warn('User deny the notification.');
@@ -130,6 +131,10 @@
 				location.href = config.url;
 				if (event) event.preventDefault();
 			}
+		};
+
+		notification.getPromise = function () {
+			return deferred.promise;
 		};
 
 		return notification;

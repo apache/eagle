@@ -113,18 +113,18 @@
 							<li class="hover-dropdown">
 								<a>
 									<i class="fa fa-bell"></i>
-									<span ng-if="Notification.list.length" class="label label-warning">
-										{{Notification.list.length}}
+									<span ng-if="$notification.list.length" class="label label-warning">
+										{{$notification.list.length}}
 									</span>
 								</a>
 
 								<ul class="dropdown-menu">
-									<li ng-repeat="notification in Notification.list track by $index">
-										<a href="{{notification.url}}" ng-click="Notification.trigger(notification, $event)">
+									<li ng-repeat="notification in $notification.list track by $index">
+										<a href="{{notification.url}}" ng-click="$notification.trigger(notification, $event)">
 											{{notification.content}}
 										</a>
 									</li>
-									<li ng-if="!Notification.list.length" class="disabled">
+									<li ng-if="!$notification.list.length" class="disabled">
 										<a class="text-gray">No Notification</a>
 									</li>
 								</ul>
@@ -304,6 +304,7 @@
 		<script src="public/js/services/uiSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/policySrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/notificationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/alertSrv.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Components -->
 		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
