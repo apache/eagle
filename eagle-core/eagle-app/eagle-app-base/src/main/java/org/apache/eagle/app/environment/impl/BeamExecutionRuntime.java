@@ -18,7 +18,6 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
     private static final Logger LOG = LoggerFactory.getLogger(BeamExecutionRuntime.class);
 
     private BeamEnviroment environment;
-    private SparkPipelineResult res;
 
     @Override
     public void prepare(BeamEnviroment environment) {
@@ -32,27 +31,35 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
 
     @Override
     public void start(Application<BeamEnviroment, Pipeline> executor, Config config) {
+        String appId = config.getString("appId");
+        if (BeamRuntimeResultManager.getInstance().isAppRunning(appId)) {
+            return;
+        }
         Pipeline pipeline = executor.execute(config, environment);
         // Run the pipeline.
-        res = (SparkPipelineResult) pipeline.run();
+        SparkPipelineResult res = (SparkPipelineResult) pipeline.run();
+        BeamRuntimeResultManager.getInstance().insertResult(appId, res);
         res.waitUntilFinish();
     }
 
     @Override
     public void stop(Application<BeamEnviroment, Pipeline> executor, Config config) {
+        SparkPipelineResult res = BeamRuntimeResultManager.getInstance().getResult(config.getString("appId"));
         if (res != null) {
             try {
                 res.cancel();
             } catch (IOException ex) {
                 LOG.error("Got an exception when stop, ex: ", ex);
-            }
+            }/*finally {
+                BeamRuntimeResultManager.getInstance().removeResult(config.getString("appId"));
+            }*/
         }
 
     }
 
     @Override
     public ApplicationEntity.Status status(Application<BeamEnviroment, Pipeline> executor, Config config) {
-
+        SparkPipelineResult res = BeamRuntimeResultManager.getInstance().getResult(config.getString("appId"));
         ApplicationEntity.Status status;
         if (res == null) {
             LOG.error("Unknown storm topology  status res is null");
@@ -63,10 +70,8 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
 
         if (state == PipelineResult.State.RUNNING) {
             status = ApplicationEntity.Status.RUNNING;
-        } else if (state == PipelineResult.State.FAILED || state == PipelineResult.State.STOPPED) {
+        } else if (state == PipelineResult.State.FAILED || state == PipelineResult.State.STOPPED || state == PipelineResult.State.CANCELLED) {
             return ApplicationEntity.Status.STOPPED;
-        } else if (state == PipelineResult.State.CANCELLED) {
-            status = ApplicationEntity.Status.STOPPING;
         } else {
             LOG.error("Unknown storm topology  status");
             status = ApplicationEntity.Status.UNKNOWN;
