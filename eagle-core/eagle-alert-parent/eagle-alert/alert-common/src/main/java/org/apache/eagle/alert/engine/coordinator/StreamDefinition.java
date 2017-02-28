@@ -63,7 +63,7 @@ public class StreamDefinition implements Serializable {
     private List<StreamColumn> columns = new ArrayList<>();
 
     public String toString() {
-        return String.format("StreamDefinition[group=%s,streamId=%s, dataSource=%s, description=%s, validate=%s, timeseries=%s, columns=%s",
+        return String.format("StreamDefinition[group=%s, streamId=%s, dataSource=%s, description=%s, validate=%s, timeseries=%s, columns=%s",
             group,
             streamId,
             dataSource,
