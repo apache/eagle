@@ -18,7 +18,7 @@
 export EAGLE_SERVICE_USER=admin
 export EAGLE_SERVICE_PASSWD=secret
 export EAGLE_SERVICE_HOST=localhost
-export EAGLE_SERVICE_PORT=38080
+export EAGLE_SERVICE_PORT=9090
 
 #####################################################################
 #            Import stream metadata for HDFS

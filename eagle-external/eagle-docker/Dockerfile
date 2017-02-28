@@ -15,11 +15,17 @@
 
 # NOTICE: This docker image is built based sequenceiq/ambari which is open sourced under github: https://github.com/sequenceiq/docker-ambari
 FROM sequenceiq/ambari:1.7.0
-
-MAINTAINER dev@eagle.incubator.apache.org
+MAINTAINER dev@eagle.apache.org
 
 # Eagle environment
 ENV EAGLE_HOME=/usr/hdp/current/eagle
+ENV JDK_VERSION 8u121
+ENV JDK_BUILD_VERSION b13
+# for local development
+#ADD resource/jdk-8u121-linux-x64.rpm /tmp/
+#RUN rpm -i /tmp/jdk-8u121-linux-x64.rpm
+RUN curl -LO "http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.rpm" -H 'Cookie: oraclelicense=accept-securebackup-cookie' && rpm -i jdk-$JDK_VERSION-linux-x64.rpm;
+ENV JAVA_HOME /usr/java/default
 
 # Install Eagle Package
 #
@@ -33,15 +39,19 @@ ENV EAGLE_HOME=/usr/hdp/current/eagle
 # `docker build` directly, to prepare the eagle package into build/eagle
 ADD target/eagle-current /usr/hdp/current/eagle
 
+
 # Load External Packages
 RUN yum install -y kafka zookeeper storm hbase tez hadoop snappy snappy-devel hadoop-libhdfs ambari-log4j hive hive-hcatalog hive-webhcat webhcat-tar-hive webhcat-tar-pig mysql-connector-java mysql-server
 
-# Load Static Resources
+ENV SERF_HOME /usr/local/serf
+
 ADD resource/serf /usr/local/serf
+
+# Load Static Resources
 ADD resource/install-cluster.sh /tmp/
 ADD resource/eagle-singlenode.json /tmp/
 ADD resource/eagle-multinode.json /tmp/
 ADD resource/wait-for-eagle.sh /tmp/
 ADD resource/deploy-eagle.sh /usr/hdp/current/eagle/deploy.sh
 
-EXPOSE 9099 8744 8080 2181 2888 6667 60020 60030 60010
+EXPOSE 8744 8080 2181 2888 6667 60020 60030 60010 9090

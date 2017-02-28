@@ -15,24 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-: ${EAGLE_HOST:=$AMBARISERVER_PORT_9099_TCP_ADDR}
+#: ${EAGLE_HOST:=$AMBARISERVER_PORT_9099_TCP_ADDR}
+: ${EAGLE_HOST:=$EAGLE_SERVER_HOST}
 : ${SLEEP:=2}
 : ${DEBUG:=1}
 
-: ${EAGLE_HOST:? eagle server address is mandatory, fallback is a linked containers exposed 9099}
+: ${EAGLE_HOST:? eagle server address is mandatory, fallback is a linked containers exposed 9090}
 
 debug() {
   [ $DEBUG -gt 0 ] && echo [DEBUG] "$@" 1>&2
 }
 
 get-server-state() {
-  curl -s -o /dev/null -w "%{http_code}" $AMBARISERVER_PORT_9099_TCP_ADDR:9099/eagle-service/index.html
+  curl -s -o /dev/null -w "%{http_code}" $EAGLE_HOST:9090
 }
 
-debug waits for eagle to start on: $EAGLE_HOST
+SERF_RPC_ADDR=${EAGLE_SERVER_HOST}:7373
+serf event --rpc-addr=$SERF_RPC_ADDR start-services
+sleep 30
+serf event --rpc-addr=$SERF_RPC_ADDR eagle
+
+debug waiting for eagle to start on: $EAGLE_HOST
 while ! get-server-state | grep 200 &>/dev/null ; do
   [ $DEBUG -gt 0 ] && echo -n .
   sleep $SLEEP
 done
 [ $DEBUG -gt 0 ] && echo
-debug eagle web started: $EAGLE_HOST:9099/eagle-service
+debug eagle web started: $EAGLE_HOST:9090

@@ -18,10 +18,10 @@
 : ${VERSION:=latest}
 : ${IMAGE:="apacheeagle/sandbox:${VERSION}"}
 
-: ${NODE_PREFIX:=sandbox}
+: ${NODE_PREFIX:=server}
 : ${AMBARI_SERVER_NAME:=${NODE_PREFIX}}
-: ${MYDOMAIN:=eagle.incubator.apache.org}
-: ${DOCKER_OPTS:="--dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh -e KEYCHAIN=$KEYCHAIN --env EAGLE_SERVER_HOST=${AMBARI_SERVER_NAME}.${MYDOMAIN}"}
+: ${MYDOMAIN:=eagle.apache.org}
+: ${DOCKER_OPTS:="--dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh -e KEYCHAIN=$KEYCHAIN --env EAGLE_SERVER_HOST=${AMBARI_SERVER_NAME}.${MYDOMAIN} --env SERF_TAG_AMBARI_SERVER=true"}
 : ${CLUSTER_SIZE:=1}
 : ${DEBUG:=1}
 : ${SLEEP_TIME:=2}
@@ -98,7 +98,7 @@ _amb_run_shell() {
   : ${COMMAND:? required}
   get-ambari-server-ip
   NODES=$(docker inspect --format="{{.Config.Image}} {{.Name}}" $(docker ps -q)|grep $IMAGE|grep $NODE_PREFIX|wc -l|xargs)
-  run-command docker run -it --rm -e EXPECTED_HOST_COUNT=$NODES -e BLUEPRINT=$BLUEPRINT --link ${AMBARI_SERVER_NAME}:ambariserver --entrypoint /bin/sh $IMAGE -c $COMMAND
+  run-command docker run -it --rm -e EXPECTED_HOST_COUNT=$NODES -e BLUEPRINT=$BLUEPRINT --env EAGLE_SERVER_HOST=${AMBARI_SERVER_NAME}.${MYDOMAIN} --link ${AMBARI_SERVER_NAME}:ambariserver --entrypoint /bin/sh $IMAGE -c $COMMAND
 }
 
 amb-shell() {
@@ -122,7 +122,7 @@ eagle-deploy-cluster() {
 }
 
 amb-start-first() {
-  run-command docker run -p 9099:9099 -p 8080:8080 -p 8744:8744 -p 2181:2181 -p 2888:2888 -p 6667:6667 -p 60020:60020 -p 60030:60030 -p 60010:60010 -d $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.$MYDOMAIN --privileged=true $IMAGE --tag ambari-server=true
+  run-command docker run --memory=4000M --cpus=0.000 -p 9090:9090 -p 8080:8080 -p 8744:8744 -p 2181:2181 -p 2888:2888 -p 6667:6667 -p 60020:60020 -p 60030:60030 -p 60010:60010 -p 50070:50070 -d $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.$MYDOMAIN --privileged=true $IMAGE --tag ambari-server=true
 }
 
 amb-copy-to-hdfs() {

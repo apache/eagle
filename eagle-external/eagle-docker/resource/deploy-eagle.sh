@@ -35,51 +35,39 @@ echo ""
 echo "Eagle home folder path is $EAGLE_HOME"
 cd $EAGLE_HOME
 
-
+# hbase tables will be autocreated now
 #Initializing Eagle Service ...
-sh ./bin/eagle-service-init.sh
-
-sleep 10
+#sh ./bin/eagle-service-init.sh
+#
+#sleep 10
 
 #Starting Eagle Service ...
-sh ./bin/eagle-service.sh start
+sh ./bin/eagle-server.sh start
 
 sleep 10
 
 echo "Creating kafka topics for eagle ... "
 KAFKA_HOME=/usr/hdp/current/kafka-broker
 EAGLE_ZOOKEEPER_QUORUM=$EAGLE_SERVER_HOST:2181
-topic=`${KAFKA_HOME}/bin/kafka-topics.sh --list --zookeeper $EAGLE_ZOOKEEPER_QUORUM --topic sandbox_hdfs_audit_log`
+KAFKA_TOPIC_NAME=sandbox_hdfs_audit_log
+topic=`${KAFKA_HOME}/bin/kafka-topics.sh --list --zookeeper $EAGLE_ZOOKEEPER_QUORUM --topic $KAFKA_TOPIC_NAME`
 if [ -z $topic ]; then
-        $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper $EAGLE_ZOOKEEPER_QUORUM --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
-fi
-
-if [ $? = 0 ]; then
-echo "==> Create kafka topic successfully for eagle"
+        $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper $EAGLE_ZOOKEEPER_QUORUM --replication-factor 1 --partitions 1 --topic $KAFKA_TOPIC_NAME
+        if [ $? = 0 ]; then
+            echo "==> Created kafka topic: $KAFKA_TOPIC_NAME successfully for eagle"
+        else
+            echo "==> Failed to create required topic: $KAFKA_TOPIC_NAME, exiting"
+            exit 1
+        fi
 else
-echo "==> Failed, exiting"
-exit 1
+    echo "==> Kafka topic:$KAFKA_TOPIC_NAME already exists for eagl"
 fi
 
 EAGLE_NIMBUS_HOST=$EAGLE_SERVER_HOST
 EAGLE_SERVICE_HOST=$EAGLE_SERVER_HOST
-EAGLE_TOPOLOGY_JAR=`ls ${EAGLE_HOME}/lib/topology/eagle-topology-*-assembly.jar`
-
-${EAGLE_HOME}/bin/eagle-topology-init.sh
-[ $? != 0 ] && exit 1
-${EAGLE_HOME}/examples/sample-sensitivity-resource-create.sh
-[ $? != 0 ] && exit 1
-${EAGLE_HOME}/examples/sample-policy-create.sh
-[ $? != 0 ] && exit 1
-storm jar $EAGLE_TOPOLOGY_JAR org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain -D config.file=${EAGLE_HOME}/conf/sandbox-hdfsAuditLog-application.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
-[ $? != 0 ] && exit 1
-storm jar $EAGLE_TOPOLOGY_JAR org.apache.eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain -D config.file=${EAGLE_HOME}/conf/sandbox-hiveQueryLog-application.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
-[ $? != 0 ] && exit 1
-storm jar $EAGLE_TOPOLOGY_JAR org.apache.eagle.security.userprofile.UserProfileDetectionMain -D config.file=${EAGLE_HOME}/conf/sandbox-userprofile-topology.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
-[ $? != 0 ] && exit 1
+EAGLE_TOPOLOGY_JAR=`ls ${EAGLE_HOME}/lib/eagle-topology-*-assembly.jar`
 
 # TODO: More eagle start
 
 echo "Eagle is deployed successfully!"
-
-echo "Please visit http://<container_ip>:9099/eagle-service to play with Eagle!"
+echo "Please visit http://$EAGLE_SERVER_HOST:9090 to play with Eagle!"

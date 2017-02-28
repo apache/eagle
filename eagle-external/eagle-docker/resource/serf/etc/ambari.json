@@ -1,7 +1,8 @@
 {
   "event_handlers": [
     "member-join=/usr/local/serf/handlers/ambari-bootstrap",
-    "user:eagle=/usr/local/serf/handlers/eagle"
+    "user:eagle=/usr/local/serf/handlers/eagle",
+    "user:start-services=/usr/local/serf/handlers/start-services"
   ],
   "tags": {
     "ambari-agent": "true"

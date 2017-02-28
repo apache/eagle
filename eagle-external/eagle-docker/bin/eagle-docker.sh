@@ -18,13 +18,13 @@
 # NOTICE: This script is developed and maintained by Apache Eagle community under Apache Softwarw Foundation but not from official Docker product or community.
 
 EAGLE_DOCKER_VERSION=latest
-EAGLE_DOCKER_NAME=apacheeagle/sandbox
 EAGLE_DOCKER_PREFIX=sandbox
+EAGLE_DOCKER_NAME=apacheeagle/$EAGLE_DOCKER_PREFIX
 
 export NODE_NUM=1
 
 cd `dirname $0`/../
-source bin/eagle-lib.sh	
+source bin/eagle-lib.sh
 
 function check_env(){
 	which docker 1>/dev/null 2>&1
@@ -66,56 +66,57 @@ function usage() {
 
 function build(){
 	check_env
+
+	# bringing it to a parent level
+	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+	cd $DIR/../../../
+
 	# ==========================================
 	# Check Eagle Docker Image
 	# ==========================================
-	echo "[1/3] Validate Environment"
-	# echo "Checking eagle docker image ..."
+	echo "[1/3] Validating Environment"
 	docker images | grep $EAGLE_DOCKER_NAME 1>/dev/null 2>&1
 	if [ $? == 0 ];then
 		echo "Eagle docker image already exists:"
 		echo ""
 		docker images | grep $EAGLE_DOCKER_NAME
 		echo ""
-		echo "Rebuild it now [Y/N]? "
+		echo "do you want to re-build it [Y/N]? "
 		read rebuild
 		if [ $rebuild == "Y" ] || [ $rebuild == "y" ];then
 			echo  "Clean eagle image"
 			clean
 		else
-			echo "Quit now"
+			echo "exiting now, since eagle docker image exists already"
 			exit 1
 		fi
  	else
-		echo "No existing eagle docker images, environment is ready"
+		echo "Building new eagle docker images, environment is also ready"
 	fi	
 
 	# ==========================================
 	# Build Eagle Binary Package 
 	# ==========================================
-	echo "[2/3] Build Eagle Binary Package"
-	# echo "Checking eagle binary package"
-	cd ../../
+	echo "[2/3] Building Eagle Binary Package"
 	ls eagle-assembly/target/eagle-*-bin.tar.gz 1>/dev/null 2>&1
 	if [ $? == 0 ];then
-		eagle_bin_pkg=`ls eagle-assembly/target/eagle-*-bin.tar.gz`
-		echo "Found eagle binary package at $eagle_bin_pkg"	
+		eagle_pkg=`ls eagle-assembly/target/eagle-*-bin.tar.gz`
+		echo "Found eagle binary package at $eagle_pkg"
 	else
-		echo "Eagle binary package is not found"
-		echo "Build eagle binary package now"
-		# ==========================================
+	    # ==========================================
 		# Build Eagle Binary Package with Maven
 		# ==========================================
+		echo "Packaging eagle using CMD: mvn package -DskipTests"
 		echo ""
-		echo "Execute: mvn package -DskipTests "
 		mvn package -DskipTests
 		if [ $? == 0 ];then
-			echo "Built successfully existing with 0"	
-			ls eagle-assembly/target/eagle-*-bin.tar.gz 1>/dev/null 2>&1
+			echo "Eagle built successfully."
+			eagle_pkg_file=$( (basename eagle-assembly/target/eagle-*-bin.tar.gz) 2>/dev/null )
 			if [ $? == 0 ];then
-				eagle_bin_pkg=`ls eagle-assembly/target/eagle-*-bin.tar.gz`
+			    # getting path via ls command may not work in all env
+				eagle_pkg="eagle-assembly/target/$eagle_pkg_file"
 				echo ""
-				echo "[SUCCESS] Successfully build eagle binary package at $eagle_bin_pkg"	
+				echo "[SUCCESS] Successfully build eagle binary package at $eagle_pkg"
 			else
 				echo ""
 				echo "[FAILED] Built eagle binary package exiting with 0, but package is not found"
@@ -131,22 +132,24 @@ function build(){
   	# =====================================
 	# Build Eagle Docker Image
   	# =====================================
-	echo "[3/3] Build Eagle Docker Image: $EAGLE_DOCKER_NAME"
-	echo "Extracting $eagle_bin_pkg" 
+	echo "[3/3] Building Eagle Docker Image: $EAGLE_DOCKER_NAME"
+	echo "Extracting $eagle_pkg"
 	if [ -e eagle-external/eagle-docker/target ];then
 		rm -rf eagle-external/eagle-docker/target
 	fi
 	mkdir -p eagle-external/eagle-docker/target/eagle-current
 
-	out=`tar -xzf $eagle_bin_pkg -C eagle-external/eagle-docker/target/`
+	out=`tar -xzf $eagle_pkg -C eagle-external/eagle-docker/target/`
 	if [ $? != 0 ];then
-		echo "[ERROR] Failed to execute 'tar -xzf $eagle_bin_pkg -C eagle-external/eagle-docker/target/': $out" 1>&2 
+		echo "[ERROR] Failed to execute 'tar -xzf $eagle_pkg -C eagle-external/eagle-docker/target/': $out" 1>&2
 		exit 1
 	fi
 	mv eagle-external/eagle-docker/target/eagle-*/* eagle-external/eagle-docker/target/eagle-current
+	mkdir eagle-external/eagle-docker/target/eagle-current/lib/common
+	cp eagle-external/eagle-log4jkafka/target/eagle-log4jkafka-*.jar eagle-external/eagle-docker/target/eagle-current/lib/common/
 
-	echo "Execute: docker build -t $EAGLE_DOCKER_NAME ."
-        cd eagle-external/eagle-docker
+	echo "Executing: docker build -t $EAGLE_DOCKER_NAME ."
+    cd eagle-external/eagle-docker
 	docker build -t $EAGLE_DOCKER_NAME .
 	
 	if [ $? == 0 ];then
@@ -230,6 +233,8 @@ function clean(){
 
 function deploy(){
 	check_env
+	# TODO: should check if all required ports are not already binded,
+	# so that it does not fail after creating first container.
 	if [ "$NODE_NUM" == "" ];then
 		export NODE_NUM=1
 	fi 
