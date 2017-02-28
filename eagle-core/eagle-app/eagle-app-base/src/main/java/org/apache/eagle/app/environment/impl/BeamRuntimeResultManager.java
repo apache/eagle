@@ -18,23 +18,20 @@ public class BeamRuntimeResultManager {
         sparkPipelineResultCache = new HashMap<>();
     }
 
-    public boolean isAppRunning(String appId) {
-        if (sparkPipelineResultCache.containsKey(appId) && sparkPipelineResultCache.get(appId).getState() == PipelineResult.State.RUNNING) {
-            return true;
-        }
-        return false;
+    synchronized boolean isAppRunning(String appId) {
+        return sparkPipelineResultCache.containsKey(appId) && sparkPipelineResultCache.get(appId).getState() == PipelineResult.State.RUNNING;
     }
 
-    public void insertResult(String appId, SparkPipelineResult rs) {
+    synchronized void insertResult(String appId, SparkPipelineResult rs) {
 
         sparkPipelineResultCache.put(appId, rs);
     }
 
-    public SparkPipelineResult getResult(String appId) {
+    synchronized SparkPipelineResult getResult(String appId) {
         return sparkPipelineResultCache.get(appId);
     }
 
-    public void removeResult(String appId) {
+    public synchronized void removeResult(String appId) {
         sparkPipelineResultCache.remove(appId);
     }
 }

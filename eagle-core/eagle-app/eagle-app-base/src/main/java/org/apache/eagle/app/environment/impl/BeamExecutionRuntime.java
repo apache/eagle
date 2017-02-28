@@ -18,10 +18,12 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
     private static final Logger LOG = LoggerFactory.getLogger(BeamExecutionRuntime.class);
 
     private BeamEnviroment environment;
+    private BeamRuntimeResultManager beamRuntimeResultManager;
 
     @Override
     public void prepare(BeamEnviroment environment) {
         this.environment = environment;
+        this.beamRuntimeResultManager = BeamRuntimeResultManager.getInstance();
     }
 
     @Override
@@ -32,26 +34,26 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
     @Override
     public void start(Application<BeamEnviroment, Pipeline> executor, Config config) {
         String appId = config.getString("appId");
-        if (BeamRuntimeResultManager.getInstance().isAppRunning(appId)) {
+        if (beamRuntimeResultManager.isAppRunning(appId)) {
             return;
         }
         Pipeline pipeline = executor.execute(config, environment);
         // Run the pipeline.
         SparkPipelineResult res = (SparkPipelineResult) pipeline.run();
-        BeamRuntimeResultManager.getInstance().insertResult(appId, res);
+        beamRuntimeResultManager.insertResult(appId, res);
         res.waitUntilFinish();
     }
 
     @Override
     public void stop(Application<BeamEnviroment, Pipeline> executor, Config config) {
-        SparkPipelineResult res = BeamRuntimeResultManager.getInstance().getResult(config.getString("appId"));
+        SparkPipelineResult res = beamRuntimeResultManager.getResult(config.getString("appId"));
         if (res != null) {
             try {
                 res.cancel();
             } catch (IOException ex) {
                 LOG.error("Got an exception when stop, ex: ", ex);
             }/*finally {
-                BeamRuntimeResultManager.getInstance().removeResult(config.getString("appId"));
+                beamRuntimeResultManager.removeResult(config.getString("appId"));
             }*/
         }
 
@@ -59,7 +61,7 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
 
     @Override
     public ApplicationEntity.Status status(Application<BeamEnviroment, Pipeline> executor, Config config) {
-        SparkPipelineResult res = BeamRuntimeResultManager.getInstance().getResult(config.getString("appId"));
+        SparkPipelineResult res = beamRuntimeResultManager.getResult(config.getString("appId"));
         ApplicationEntity.Status status;
         if (res == null) {
             LOG.error("Unknown storm topology  status res is null");
