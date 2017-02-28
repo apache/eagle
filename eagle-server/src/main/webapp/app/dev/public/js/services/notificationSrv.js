@@ -21,6 +21,7 @@
 
 	var REFRESH_TIME_LIMIT = 5 * 1000;
 	var PREEMPTIVE_TIME_LIMIT = 8 * 1000;
+	var MAX_NOTIFICATION_COUNT = 100;
 	var serviceModule = angular.module('eagle.service');
 
 	serviceModule.service('$notification', function ($q, $rootScope) {
@@ -43,6 +44,7 @@
 				id: instanceId,
 			};
 			notification.list.push(config);
+			notification.list = notification.list.slice(0, MAX_NOTIFICATION_COUNT);
 
 			// Popup notification
 			var count = notification.list.length;
