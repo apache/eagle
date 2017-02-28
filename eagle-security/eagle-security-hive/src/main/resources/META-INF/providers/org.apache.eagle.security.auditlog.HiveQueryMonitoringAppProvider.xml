@@ -135,6 +135,7 @@
     <streams>
         <stream>
             <streamId>hdfs_audit_log_stream</streamId>
+            <group>Hadoop Log</group>
             <description>Hdfs Audit Log Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
