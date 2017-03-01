@@ -1074,7 +1074,6 @@
                         <exclude>**/MANIFEST.MF</exclude>
                         <!-- External dependency script -->
                         <exclude>**/resource/serf/etc/ambari.json</exclude>
-
                         <!-- TODO: fix it -->
                         <exclude>**/webapp/**</exclude>
 
