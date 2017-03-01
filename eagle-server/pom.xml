@@ -22,6 +22,7 @@
         <artifactId>eagle-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
         <version>0.5.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-server</artifactId>
@@ -207,7 +208,7 @@
         <profile>
             <id>ui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <build>
                 <plugins>
@@ -351,15 +352,10 @@
                     <version>${project.version}</version>
                 </dependency>
 
+                <!-- add metirc webUI -->
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-hadoop-metric</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.eagle</groupId>
-                    <artifactId>eagle-hdfs-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -367,6 +363,17 @@
                     <artifactId>eagle-hbase-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hdfs-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-system-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>

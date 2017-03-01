@@ -160,7 +160,8 @@ public class HBaseStorage extends DataStorageBase {
         try {
             GenericQuery reader = GenericQueryBuilder
                     .select(query.getSearchCondition().getOutputFields())
-                    .from(query.getServiceName(), query.getRawQuery().getMetricName()).where(query.getSearchCondition())
+                    .from(query.getServiceName(), query.getRawQuery().getMetricName())
+                    .where(query.getSearchCondition())
                     .groupBy(query.isHasAgg(), query.getGroupByFields(), query.getAggregateFunctionTypes(), query.getAggregateFields())
                     .timeSeries(query.getRawQuery().isTimeSeries(), query.getRawQuery().getIntervalmin())
                     .treeAgg(query.getRawQuery().isTreeAgg())

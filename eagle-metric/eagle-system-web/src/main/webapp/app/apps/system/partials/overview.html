@@ -1,0 +1,142 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <span class="fa fa-television"></span>
+        <h3 class="box-title">
+            System Summary Information
+        </h3>
+    </div>
+    <div class="box-body">
+        <table class="table table-striped hadoopMetric-table">
+            <tr>
+                <th width="10%">Status</th>
+                <th width="90%">
+                    <a ui-sref="regionList({siteId: site})">
+                        <span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+                    </a>
+                    <span ng-show="!regionserverhealtynum">N/A</span>
+                    <span class="label label-success">Health</span> /
+                    <a ui-sref="regionList({siteId: site})">
+                        <span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span>
+                    </a>
+                    <span ng-show="!regionserverunhealtynum">N/A</span>
+                    <span class="label label-warning">Warning</span> /
+                    <a ui-sref="regionList({siteId: site})">
+                        <span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span>
+                    </a>
+                    <span ng-show="!regionserverunhealtynum">N/A</span>
+                    <span class="label label-danger">Unhealth</span>
+                </th>
+            </tr>
+            <tr>
+                <th>Cores</th>
+                <th>
+                    <div ng-repeat="portal in Cores.list track by $index" ng-show="Cores.list.length !== 0">
+                        <a ui-sref="regionList({siteId: site})">
+                            <span ng-show="regionserverhealtynum">{{coreServerCount}}</span>
+                        </a>
+                        <span ng-show="!regionserverhealtynum">N/A</span>
+                        <span class="label label-primary">{{coreCount}} cores</span>
+                    </div>
+                    <span ng-show="!regionserverhealtynum">N/A</span>
+                </th>
+            </tr>
+            <tr>
+                <th>Disk</th>
+                <th>
+					<span>
+						<span class="label label-primary">Total:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                    <span>
+						<span class="label label-primary">Average:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                    <span>
+						<span class="label label-primary">Max:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                    <span>
+						<span class="label label-primary">Min:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                </th>
+            </tr>
+            <tr>
+                <th>Memory</th>
+                <th>
+					<span>
+						<span class="label label-primary">Total:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                    <span>
+						<span class="label label-primary">Average:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                    <span>
+						<span class="label label-primary">Max:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                    <span>
+						<span class="label label-primary">Min:</span>
+						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+						<span ng-show="!regionserverhealtynum">N/A</span>
+					</span>
+                </th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <span class="fa fa-line-chart"></span>
+        <h3 class="box-title">
+            Metrics
+        </h3>
+    </div>
+    <div class="box-body no-padding">
+        <div class="row border-split">
+            <div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
+                <div class="hadoopMetric-chart">
+                    <h3>{{metric.title}}</h3>
+                    <div ng-show="metric.series.length" chart class="hadoopMetric-chart-container"
+                         series="metric.series"
+                         option="metric.option"></div>
+                    <div ng-show="!metric.series.length" class="hadoopMetric-chart-container">
+                        <div class="hadoopMetric-chart-container-withborder">
+                            <div class="hadoopMetric-no-chart-data">
+                                <span class="fa fa-question-circle"></span><span> NO DATA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
