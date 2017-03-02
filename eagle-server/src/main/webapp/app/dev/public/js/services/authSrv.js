@@ -23,7 +23,10 @@
 
 	serviceModule.service('Auth', function ($http) {
 		//$http.defaults.withCredentials = true;
-		var Auth = {};
+		var Auth = {
+			login: false,
+			user: {},
+		};
 
 		var _host = "";
 		if(localStorage) {
@@ -31,15 +34,38 @@
 		}
 
 		Auth.login = function (username, password) {
-			console.log('???');
 			var _hash = btoa(username + ':' + password);
 
-			$http.get(_host + "/rest/auth/principal", {
-				headers: {
-					'Authorization': "Basic " + _hash
-				}
-			})
+			Auth.sync(_hash);
 		};
+
+		Auth.sync = function (hash) {
+			return $http.get(_host + "/rest/auth/principal", {
+				headers: {
+					'Authorization': "Basic " + hash
+				}
+			}).then(function (result) {
+				if (result.data.success) {
+					Auth.user = result.data.data;
+					if (localStorage) {
+						localStorage.setItem('auth', hash);
+					}
+				}
+				return result.data.success;
+			});
+		};
+
+		if (localStorage && localStorage.getItem('auth')) {
+			Auth.sync(localStorage.getItem('auth'));
+		}
+
+		Object.defineProperties(Auth, {
+			isAdmin: {
+				get: function () {
+					return (Auth.user.roles || []).indexOf('ADMINISTRATOR') !== -1;
+				}
+			},
+		});
 
 		return Auth;
 	});
