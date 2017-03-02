@@ -193,6 +193,7 @@
     <streams>
         <stream>
             <streamId>hdfs_audit_log_enriched_stream</streamId>
+            <group>Hadoop Log</group>
             <description>Hdfs Audit Log Enriched Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>

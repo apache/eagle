@@ -52,6 +52,8 @@ public class StreamDefinition implements Serializable {
     // Stream data source ID
     private String dataSource;
 
+    private String group = "Default";
+
     //
     private String streamSource;
 
@@ -61,19 +63,22 @@ public class StreamDefinition implements Serializable {
     private List<StreamColumn> columns = new ArrayList<>();
 
     public String toString() {
-        return String.format("StreamDefinition[streamId=%s, dataSource=%s, description=%s, validate=%s, timeseries=%s, columns=%s",
+        return String.format("StreamDefinition[group=%s, streamId=%s, dataSource=%s, description=%s, validate=%s, timeseries=%s, columns=%s",
+            group,
             streamId,
             dataSource,
             description,
             validate,
             timeseries,
-            columns);
+            columns
+        );
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(this.streamId)
+                .append(this.group)
                 .append(this.description)
                 .append(this.validate)
                 .append(this.timeseries)
@@ -94,11 +99,12 @@ public class StreamDefinition implements Serializable {
         }
         StreamDefinition streamDefinition = (StreamDefinition) obj;
         return Objects.equals(this.streamId, streamDefinition.streamId)
+            && Objects.equals(this.group, streamDefinition.group)
             && Objects.equals(this.description, streamDefinition.description)
             && Objects.equals(this.validate, streamDefinition.validate)
             && Objects.equals(this.timeseries, streamDefinition.timeseries)
             && Objects.equals(this.dataSource, streamDefinition.dataSource)
-                && Objects.equals(this.streamSource, streamDefinition.streamSource)
+            && Objects.equals(this.streamSource, streamDefinition.streamSource)
             && Objects.equals(this.siteId, streamDefinition.siteId)
             && CollectionUtils.isEqualCollection(this.columns, streamDefinition.columns);
     }
@@ -187,8 +193,17 @@ public class StreamDefinition implements Serializable {
         copied.setDescription(this.getDescription());
         copied.setSiteId(this.getSiteId());
         copied.setStreamId(this.getStreamId());
+        copied.setGroup(this.getGroup());
         copied.setTimeseries(this.isTimeseries());
         copied.setValidate(this.isValidate());
         return copied;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }
