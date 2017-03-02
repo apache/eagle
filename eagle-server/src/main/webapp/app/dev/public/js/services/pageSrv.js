@@ -39,7 +39,7 @@
 		var cachedGenNavPath = [];
 		PageConfig.getNavPath = function () {
 			if (cachedNavPath !== PageConfig.navPath || cachedGenNavPath.length !== cachedNavPath.length) {
-				cachedNavPath = PageConfig.navPath;
+				cachedNavPath = PageConfig.navPath || [];
 				cachedGenNavPath = $.map(cachedNavPath, function (navPath) {
 					var pathEntity = $.extend({}, navPath);
 

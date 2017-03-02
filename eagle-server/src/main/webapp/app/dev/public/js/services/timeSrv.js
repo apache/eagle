@@ -84,8 +84,16 @@
 						if(!isNaN(+time)) {
 							time = +time;
 						} else {
+							var tempTime = new moment(time);
 							time = new moment(time);
-							time.add(time.utcOffset(), "minutes");
+							time.utcOffset($Time.UTC_OFFSET);
+							time.year(tempTime.year());
+							time.month(tempTime.month());
+							time.date(tempTime.date());
+							time.hour(tempTime.hour());
+							time.minute(tempTime.minute());
+							time.second(tempTime.second());
+							time.millisecond(tempTime.millisecond());
 						}
 					}
 
