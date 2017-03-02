@@ -30,6 +30,7 @@
         <module>eagle-hadoop-metric</module>
         <module>eagle-hdfs-web</module>
         <module>eagle-hbase-web</module>
+        <module>eagle-hadoop-jmx</module>
     </modules>
 
     <dependencies>
