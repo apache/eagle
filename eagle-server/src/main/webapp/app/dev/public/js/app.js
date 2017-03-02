@@ -109,7 +109,7 @@ var app = {};
 		eagleApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $animateProvider) {
 			$urlRouterProvider.otherwise("/");
 			$stateProvider
-			// ================================== Home ==================================
+				// ================================== Home ==================================
 				.state('home', {
 					url: "/",
 					templateUrl: "partials/home.html?_=" + window._TRS(),
@@ -121,6 +121,14 @@ var app = {};
 					templateUrl: "partials/setup.html?_=" + window._TRS(),
 					controller: "setupCtrl",
 					resolve: routeResolve({ site: false, application: false })
+				})
+
+				// ================================== Auth ==================================
+				.state('login', {
+					url: "/login",
+					templateUrl: "partials/login.html?_=" + window._TRS(),
+					controller: "loginCtrl",
+					resolve: routeResolve()
 				})
 
 				// =============================== Integration ==============================
@@ -276,7 +284,7 @@ var app = {};
 		eagleApp.controller('MainCtrl', function (
 			$scope, $wrapState, $urlRouter, $notification,
 			Server, PageConfig, Portal, Widget, Entity, CompatibleEntity,
-			Site, Application, UI, Time, Policy, Alert) {
+			Site, Application, UI, Time, Policy, Alert, Auth) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._Server = $scope.Server = Server;
 			window._PageConfig = $scope.PageConfig = PageConfig;
@@ -291,6 +299,7 @@ var app = {};
 			window._Policy = $scope.Policy = Policy;
 			window._Notification = $scope.$notification = $notification;
 			window._Alert = $scope.Alert = Alert;
+			window._Auth = $scope.Auth = Auth;
 			$scope.common = common;
 
 			$scope._TRS = window._TRS();

@@ -109,6 +109,22 @@
 								</ul>
 							</li>
 
+							<!-- FAQ -->
+							<li>
+								<a data-toggle="dropdown" aria-expanded="false">
+									<i class="glyphicon glyphicon-question-sign"></i>
+								</a>
+
+								<ul class="dropdown-menu">
+									<li><a>How to start using eagle</a></li>
+									<li><a>How to register new site</a></li>
+									<li><a>How to install application</a></li>
+									<li><a>How to manage application</a></li>
+									<li><a>How to develop application</a></li>
+									<li><a ui-sref="metricPreview()">Preview eagle metric</a></li>
+								</ul>
+							</li>
+
 							<!-- Notification -->
 							<li class="hover-dropdown">
 								<a>
@@ -130,21 +146,16 @@
 								</ul>
 							</li>
 
-							<!-- FAQ -->
+							<!-- Auth -->
 							<li>
-								<a data-toggle="dropdown" aria-expanded="false">
-									<i class="glyphicon glyphicon-question-sign"></i>
-								</a>
-
-								<ul class="dropdown-menu">
-									<li><a>How to start using eagle</a></li>
-									<li><a>How to register new site</a></li>
-									<li><a>How to install application</a></li>
-									<li><a>How to manage application</a></li>
-									<li><a>How to develop application</a></li>
-									<li><a ui-sref="metricPreview()">Preview eagle metric</a></li>
-								</ul>
+								<a ui-sref="login">Login</a>
 							</li>
+							<!--li class="dropdown user user-menu">
+								<a class="dropdown-toggle" data-toggle="dropdown">
+									<i class="fa fa-user"></i>
+									Login
+								</a>
+							</li-->
 						</ul>
 					</div>
 				</nav>
@@ -305,6 +316,7 @@
 		<script src="public/js/services/policySrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/notificationSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/alertSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/authSrv.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Components -->
 		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
@@ -323,6 +335,7 @@
 		<script src="public/js/ctrls/integrationCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/siteCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/metricCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/authCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<!-- endref -->
 	</body>
 </html>
