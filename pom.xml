@@ -1074,7 +1074,6 @@
                         <exclude>**/MANIFEST.MF</exclude>
                         <!-- External dependency script -->
                         <exclude>**/resource/serf/etc/ambari.json</exclude>
-
                         <!-- TODO: fix it -->
                         <exclude>**/webapp/**</exclude>
 
@@ -1108,21 +1107,5 @@
                 <updatePolicy>never</updatePolicy>
             </releases>
         </repository>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-Tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-        </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools-maven2-repository</id>
-            <name>Scala-Tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-    </pluginRepositories>
 </project>
