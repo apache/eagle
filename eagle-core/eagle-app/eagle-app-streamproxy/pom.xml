@@ -16,37 +16,24 @@
   ~  limitations under the License.
   ~
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>eagle-core</artifactId>
+        <artifactId>eagle-app-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
         <version>0.5.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>eagle-app-parent</artifactId>
-    <name>Eagle::Core::App::Parent</name>
-    <packaging>pom</packaging>
-    <description>Eagle Applications</description>
 
-    <modules>
-        <module>eagle-app-base</module>
-        <module>eagle-app-utils</module>
-        <module>eagle-app-streamproxy</module>
-    </modules>
+    <artifactId>eagle-app-streamproxy</artifactId>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <failOnViolation>true</failOnViolation>
-                    <failsOnError>true</failsOnError>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-app-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
