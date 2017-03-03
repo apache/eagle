@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 public class TopologyConstants {
 
+    public static final String SYSTEM_INSTANCE_SERVICE_NAME = "SystemServiceInstance";
     public static final String HDFS_INSTANCE_SERVICE_NAME = "HdfsServiceInstance";
     public static final String HBASE_INSTANCE_SERVICE_NAME = "HbaseServiceInstance";
     public static final String MR_INSTANCE_SERVICE_NAME = "MRServiceInstance";
@@ -47,6 +48,7 @@ public class TopologyConstants {
     public static final String HISTORY_SERVER_ROLE = "historyserver";
     public static final String REGIONSERVER_ROLE = "regionserver";
     public static final String HMASTER_ROLE = "hmaster";
+    public static final String SYSTEM_ROLE = "system";
 
     // Status definitions for namenode
     public static final String NAME_NODE_ACTIVE_STATUS = "active";

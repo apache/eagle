@@ -20,18 +20,19 @@
 	/**
 	 * `register` without params will load the module which using require
 	 */
-	register(function (hadoopMetricApp) {
+	register(function (systemMetricApp) {
 
-		hadoopMetricApp.controller("regionListCtrl", function ($wrapState, $scope, PageConfig, METRIC) {
+		systemMetricApp.controller("serverListCtrl", function ($wrapState, $scope, PageConfig, SYSTEMMETRIC) {
 
 			// Initialization
-			PageConfig.title = "HBASE RegionServers";
+			PageConfig.title = "System Server List";
 			$scope.tableScope = {};
-			$scope.live = METRIC.STATUS_LIVE;
-			$scope.dead = METRIC.STATUS_DEAD;
 			$scope.site = $wrapState.param.siteId;
+			$scope.active = SYSTEMMETRIC.STATUS_ACTIVE;
+        	$scope.warning = SYSTEMMETRIC.STATUS_WARNING;
+        	$scope.error = SYSTEMMETRIC.STATUS_ERROR;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-			$scope.regionserverList = METRIC.regionserverList($scope.site);
+			$scope.serverList = SYSTEMMETRIC.serverList($scope.site);
 
 		});
 	});

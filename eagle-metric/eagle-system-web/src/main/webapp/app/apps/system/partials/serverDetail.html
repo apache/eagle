@@ -25,59 +25,51 @@
 	</div>
 	<div class="box-body">
 		<table class="table table-striped">
-			<tbody ng-if="(regionstatus || []).length !== 0">
+			<tbody ng-if="(hostStatus || []).length !== 0">
 			<tr>
 				<th width="20%">Status</th>
 				<td width="80%" class="text-break">
-					<span ng-if="regionstatus[0].status==='live'" class="label label-success">Healthy</span>
-					<span ng-if="regionstatus[0].status==='warn'" class="label label-warning">Warning</span>
-					<span ng-if="regionstatus[0].status==='dead'" class="label label-danger">UnHealthy</span>
+					<span ng-if="hostStatus[0].status==='active'" class="label label-success">Healthy</span>
+					<span ng-if="hostStatus[0].status==='warning'" class="label label-warning">Warning</span>
+					<span ng-if="hostStatus[0].status==='error'" class="label label-danger">UnHealthy</span>
 				</td>
 			</tr>
 			<tr>
-				<th>Roles</th>
-				<td class="text-break">{{regionstatus[0].tags.roles}}</td>
-			</tr>
-			<tr>
 				<th>Rack</th>
-				<td class="text-break">{{regionstatus[0].tags.rack}}</td>
+				<td class="text-break">{{hostStatus[0].tags.rack}}</td>
 			</tr>
 			<tr>
-				<th>Core</th>
-				<td class="text-break">{{regionstatus[0].tags.core}} MB</td>
+				<th>Cores</th>
+				<td class="text-break">{{hostStatus[0].cores}} </td>
 			</tr>
 			<tr>
-				<th>Total Disk</th>
-				<td class="text-break">{{regionstatus[0].tags.core}} MB</td>
+				<th>Disk Usage</th>
+				<td class="text-break">{{hostStatus[0].usedDiskGB}} GB / {{hostStatus[0].totalDiskGB}} GB</td>
 			</tr>
 			<tr>
-				<th>Total Memory</th>
-				<td class="text-break">{{regionstatus[0].usedHeapMB}} MB</td>
+				<th>Memory Usage</th>
+				<td class="text-break">{{hostStatus[0].usedMemoryMB}} MB / {{hostStatus[0].totalMemoryMB}} GB</td>
 			</tr>
 			</tbody>
-			<tbody ng-if="regionstatus.length === 0">
+			<tbody ng-if="hostStatus.length === 0">
 			<tr>
 				<th>Status</th>
 				<td class="text-break"><span class="label label-danger">Unknow</span></td>
 			</tr>
 			<tr>
-				<th>Roles</th>
-				<td class="text-break"><span class="label label-danger">Unknow</span></td>
-			</tr>
-			<tr>
 				<th>Rack</th>
 				<td class="text-break"><span class="label label-danger">Unknow</span></td>
 			</tr>
 			<tr>
-				<th>Core</th>
+				<th>Cores</th>
 				<td class="text-break"><span class="label label-danger">Unknow</span></td>
 			</tr>
 			<tr>
-				<th>Total Disk</th>
+				<th>Disk Usage</th>
 				<td class="text-break"><span class="label label-danger">Unknow</span></td>
 			</tr>
 			<tr>
-				<th>Total Memory</th>
+				<th>Memory Usage</th>
 				<td class="text-break"><span class="label label-danger">Unknow</span></td>
 			</tr>
 			</tbody>
@@ -94,13 +86,19 @@
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">
-			<div class="col-sm-6 hadoopMetric-col-md-6 col-lg-3" ng-repeat="metric in metricList track by $index">
+			<div class="col-sm-6 hadoopMetric-col-md-6 col-lg-6" ng-repeat="chart in chartList track by $index">
 				<div class="hadoopMetric-chart">
-					<h3>{{metric.title}}</h3>
-					<div ng-show="metric.series.length" chart class="hadoopMetric-chart-container"
-						 series="metric.series"
-						 option="metric.option"></div>
-					<div ng-show="!metric.series.length" class="hadoopMetric-chart-container">
+					<h3>{{metricList[chart.name].title}}</h3>
+					<div ng-show="metricList[chart.name].loading" class="hadoopMetric-chart-container"></div>
+					<div ng-show="metricList[chart.name].loading" class="overlay-wrapper">
+						<div class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+					<div ng-show="metricList[chart.name].series.length" chart class="hadoopMetric-chart-container"
+						 series="metricList[chart.name].series"
+						 option="metricList[chart.name].option"></div>
+					<div ng-show="!metricList[chart.name].series.length && !metricList[chart.name].loading" class="hadoopMetric-chart-container">
 						<div class="hadoopMetric-no-chart-data">
 							<span class="fa fa-question-circle"></span><span> NO DATA</span>
 						</div>

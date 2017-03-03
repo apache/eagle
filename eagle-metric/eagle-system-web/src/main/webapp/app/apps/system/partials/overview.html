@@ -26,86 +26,65 @@
     <div class="box-body">
         <table class="table table-striped hadoopMetric-table">
             <tr>
-                <th width="10%">Status</th>
-                <th width="90%">
-                    <a ui-sref="regionList({siteId: site})">
-                        <span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
+                <th width="20%">
+                    Server Node
+                </th>
+                <th width="80%">
+                    <span ng-show="!systemactivenum && !systemwarningnum && !systemerrornum">0</span>
+                    <span ng-show="systemactivenum===-1 || systemwarningnum===-1 || systemerrornum===-1">N/A</span>
+                    <a ui-sref="serverList({siteId: site})">
+                        <span ng-show="systemactivenum!==-1 && systemwarningnum!==-1 && systemerrornum!==-1">{{systemactivenum+systemwarningnum+systemerrornum}}</span>
                     </a>
-                    <span ng-show="!regionserverhealtynum">N/A</span>
+                    <span class="label label-primary">Total</span> /
+                    <a ui-sref="serverList({siteId: site, status:'active'})">
+                        <span ng-show="systemactivenum !== -1">{{systemactivenum || 0}}</span>
+                    </a>
+                    <span ng-show="systemactivenum === -1">N/A</span>
                     <span class="label label-success">Health</span> /
-                    <a ui-sref="regionList({siteId: site})">
-                        <span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span>
+                    <a ui-sref="serverList({siteId: site, status:'warning'})">
+                        <span ng-show="systemwarningnum !== -1">{{systemwarningnum || 0}}</span>
                     </a>
-                    <span ng-show="!regionserverunhealtynum">N/A</span>
+                    <span ng-show="systemwarningnum === -1">N/A</span>
                     <span class="label label-warning">Warning</span> /
-                    <a ui-sref="regionList({siteId: site})">
-                        <span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span>
+                    <a ui-sref="serverList({siteId: site, status:'error'})">
+                        <span ng-show="systemerrornum !== -1">{{systemerrornum || 0}}</span>
                     </a>
-                    <span ng-show="!regionserverunhealtynum">N/A</span>
+                    <span ng-show="systemerrornum === -1">N/A</span>
                     <span class="label label-danger">Unhealth</span>
                 </th>
             </tr>
             <tr>
                 <th>Cores</th>
                 <th>
-                    <div ng-repeat="portal in Cores.list track by $index" ng-show="Cores.list.length !== 0">
-                        <a ui-sref="regionList({siteId: site})">
-                            <span ng-show="regionserverhealtynum">{{coreServerCount}}</span>
+                    <div ng-repeat="core in coresList">
+                        <a ui-sref="serverList({siteId: site, cores: core.key[0]})">
+                            <span>{{core.value[0]}}</span>
                         </a>
-                        <span ng-show="!regionserverhealtynum">N/A</span>
-                        <span class="label label-primary">{{coreCount}} cores</span>
+                        <span class="label label-primary">{{core.key[0]}} cores</span>
                     </div>
-                    <span ng-show="!regionserverhealtynum">N/A</span>
+                    <span ng-show="!coresList">N/A</span>
                 </th>
             </tr>
             <tr>
-                <th>Disk</th>
+                <th>Disk Usage</th>
                 <th>
 					<span>
-						<span class="label label-primary">Total:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
-                    <span>
-						<span class="label label-primary">Average:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
-                    <span>
-						<span class="label label-primary">Max:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
-                    <span>
-						<span class="label label-primary">Min:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
+                        <span ng-show="usedDiskGB !== -1">{{usedDiskGB || 0}} GB / </span> 
+                        <span ng-show="!totalDiskGB === -1">N/A /</span>
+						<span ng-show="totalDiskGB !== -1">{{totalDiskGB || 0}} GB</span>
+                        <span ng-show="!usedDiskGB === -1">N/A</span>
 					</span>
                 </th>
             </tr>
             <tr>
                 <th>Memory</th>
                 <th>
-					<span>
-						<span class="label label-primary">Total:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
                     <span>
-						<span class="label label-primary">Average:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
-                    <span>
-						<span class="label label-primary">Max:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
-                    <span>
-						<span class="label label-primary">Min:</span>
-						<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span>
-						<span ng-show="!regionserverhealtynum">N/A</span>
-					</span>
+                        <span ng-show="usedMemoryMB !== -1">{{usedMemoryMB || 0}} MB / </span> 
+                        <span ng-show="!usedMemoryMB === -1">N/A /</span>
+                        <span ng-show="totalMemoryMB !== -1">{{totalMemoryMB || 0}} MB</span>
+                        <span ng-show="!totalMemoryMB === -1">N/A</span>
+                    </span>
                 </th>
             </tr>
         </table>
@@ -121,13 +100,19 @@
     </div>
     <div class="box-body no-padding">
         <div class="row border-split">
-            <div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="metric in metricList track by $index">
+            <div class="col-sm-6 col-md-4 col-lg-6" ng-repeat="chart in chartList track by $index">
                 <div class="hadoopMetric-chart">
-                    <h3>{{metric.title}}</h3>
-                    <div ng-show="metric.series.length" chart class="hadoopMetric-chart-container"
-                         series="metric.series"
-                         option="metric.option"></div>
-                    <div ng-show="!metric.series.length" class="hadoopMetric-chart-container">
+                    <h3>{{metricList[chart.name].title}}</h3>
+                    <div ng-show="metricList[chart.name].loading" chart class="hadoopMetric-chart-container"></div>
+                    <div ng-show="metricList[chart.name].loading" class="overlay-wrapper">
+                        <div class="overlay">
+                            <i class="fa fa-refresh fa-spin"></i>
+                        </div>
+                    </div>
+                    <div ng-show="metricList[chart.name].series.length" chart class="hadoopMetric-chart-container"
+                         series="metricList[chart.name].series"
+                         option="metricList[chart.name].option"></div>
+                    <div ng-show="!metricList[chart.name].series.length && !metricList[chart.name].loading" class="hadoopMetric-chart-container">
                         <div class="hadoopMetric-chart-container-withborder">
                             <div class="hadoopMetric-no-chart-data">
                                 <span class="fa fa-question-circle"></span><span> NO DATA</span>
@@ -138,5 +123,4 @@
             </div>
         </div>
     </div>
-</div>
 </div>
