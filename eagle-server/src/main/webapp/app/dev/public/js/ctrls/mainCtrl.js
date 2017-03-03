@@ -25,7 +25,7 @@
 	// =                                        Home                                        =
 	// ======================================================================================
 	eagleControllers.controller('homeCtrl', function ($scope, $wrapState, PageConfig) {
-		PageConfig.title = "Home";
+		PageConfig.title = "Overveiw";
 
 		$scope.colorList = [
 			"bg-aqua",

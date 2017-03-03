@@ -80,29 +80,13 @@
 	// ============================================================
 	// =                          Portal                          =
 	// ============================================================
-	serviceModule.service('Portal', function($wrapState, Site, Application) {
+	serviceModule.service('Portal', function($wrapState, Site, Application, Auth) {
 		function checkSite() {
 			return Site.list.length !== 0;
 		}
 
-		function checkApplication() {
-			return checkSite() && Application.list.length !== 0;
-		}
-
 		var defaultPortalList = [
-			{name: "Home", icon: "home", path: "#/"},
-			/* {name: "Alert", icon: "bell", showFunc: checkApplication, list: [
-				{name: "Alerts", path: "#/alerts"},
-				{name: "Policies", path: "#/policies"},
-				{name: "Streams", path: "#/streams"},
-				{name: "Define Policy", path: "#/policy/create"}
-			]} */
-		];
-		var adminPortalList = [
-			{name: "Integration", icon: "puzzle-piece", showFunc: checkSite, list: [
-				{name: "Sites", path: "#/integration/siteList"},
-				{name: "Applications", path: "#/integration/applicationList"}
-			]}
+			{name: "Overview", icon: "home", path: "#/"},
 		];
 
 		var Portal = {};
@@ -117,15 +101,22 @@
 		};
 
 		function getDefaultSitePortal(site) {
+			var alertPortal =  [
+				{name: "Alerts", path: "#/site/" + site.siteId + "/alerts"},
+				{name: "Policies", path: "#/site/" + site.siteId + "/policies"},
+				{name: "Streams", path: "#/site/" + site.siteId + "/streams"},
+			];
+
+			if (Auth.isAdmin) {
+				alertPortal.push(
+					{name: "Define Policy", path: "#/site/" + site.siteId + "/policy/create"}
+				);
+			}
+
 			return[
 				{name: "Back", icon: "arrow-left", path: "#/"},
 				{name: site.siteName || site.siteId + " Home", icon: "home", path: "#/site/" + site.siteId},
-				{name: "Alert", icon: "bell", list: [
-					{name: "Alerts", path: "#/site/" + site.siteId + "/alerts"},
-					{name: "Policies", path: "#/site/" + site.siteId + "/policies"},
-					{name: "Streams", path: "#/site/" + site.siteId + "/streams"},
-					{name: "Define Policy", path: "#/site/" + site.siteId + "/policy/create"}
-				]},
+				{name: "Alert", icon: "bell", list: alertPortal},
 			];
 		}
 
@@ -160,17 +151,8 @@
 		}
 
 		Portal.refresh = function () {
-			// TODO: check admin
-
 			// Main level
-			connectedMainPortalList = defaultPortalList.concat(adminPortalList);
-			var siteList = $.map(Site.list, function (site) {
-				return {
-					name: site.siteName || site.siteId,
-					path: "#/site/" + site.siteId
-				};
-			});
-			connectedMainPortalList.push({name: "Sites", icon: "server", showFunc: checkApplication, list: siteList});
+			connectedMainPortalList = defaultPortalList.concat();
 			connectedMainPortalList = mergePortalList(connectedMainPortalList);
 
 			// Site level

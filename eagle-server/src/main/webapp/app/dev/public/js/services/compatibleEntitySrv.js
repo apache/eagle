@@ -26,7 +26,7 @@
 		_host = localStorage.getItem("host") || "";
 	}
 
-	serviceModule.service('CompatibleEntity', function($http, Time) {
+	serviceModule.service('CompatibleEntity', function($authHttp, Time) {
 		function CompatibleEntity() {}
 
 		function wrapList(list, promise) {
@@ -131,7 +131,7 @@
 				}
 
 				var url = common.template(url_tpl, myParam);
-				return wrapList(list, $http.get(_host + url));
+				return wrapList(list, $authHttp.get(_host + url));
 			};
 
 			return list._refresh();

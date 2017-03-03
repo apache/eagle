@@ -23,7 +23,7 @@
 			{{policy.name}}
 		</h3>
 		<div class="box-tools pull-right">
-			<div class="btn-group">
+			<div class="btn-group" ng-if="Auth.isAdmin">
 				<button class="btn btn-default fa fa-play" ng-click="startPolicy()" ng-if="policy.policyStatus !== 'ENABLED'"></button>
 				<button class="btn btn-default fa fa-square" ng-click="stopPolicy()" ng-if="policy.policyStatus === 'ENABLED'"></button>
 				<a class="btn btn-default fa fa-pencil" ui-sref="policyEdit({siteId: site, name: policy.name})"></a>
