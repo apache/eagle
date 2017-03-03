@@ -24,7 +24,7 @@
 	serviceModule.service('Auth', function ($http) {
 		//$http.defaults.withCredentials = true;
 		var Auth = {
-			login: false,
+			isLogin: false,
 			user: {},
 		};
 
@@ -36,7 +36,15 @@
 		Auth.login = function (username, password) {
 			var _hash = btoa(username + ':' + password);
 
-			Auth.sync(_hash);
+			return Auth.sync(_hash);
+		};
+
+		Auth.logout = function () {
+			Auth.isLogin = false;
+			Auth.user = {};
+			if (localStorage) {
+				localStorage.removeItem('auth');
+			}
 		};
 
 		Auth.sync = function (hash) {
@@ -47,11 +55,14 @@
 			}).then(function (result) {
 				if (result.data.success) {
 					Auth.user = result.data.data;
+					Auth.isLogin = true;
 					if (localStorage) {
 						localStorage.setItem('auth', hash);
 					}
 				}
 				return result.data.success;
+			}, function () {
+				return false;
 			});
 		};
 
@@ -65,8 +76,45 @@
 					return (Auth.user.roles || []).indexOf('ADMINISTRATOR') !== -1;
 				}
 			},
+			hash: {
+				get: function () {
+					if (localStorage && localStorage.getItem('auth')) {
+						return localStorage.getItem('auth');
+					}
+					return null;
+				}
+			},
 		});
 
 		return Auth;
+	});
+
+	serviceModule.service('$authHttp', function ($http, Auth) {
+		function mergeConfig(config) {
+			config = config || {};
+			if (Auth.hash) {
+				config.headers = config.headers || {};
+				config.headers.Authorization = "Basic " + Auth.hash;
+			}
+			return config;
+		}
+
+		var $authHttp = function (config) {
+			return $http(mergeConfig(config));
+		};
+
+		$authHttp.get = function (url, config) {
+			return $http.get(url, mergeConfig(config));
+		};
+
+		$authHttp.post = function (url, data, config) {
+			return $http.post(url, data, mergeConfig(config));
+		};
+
+		$authHttp.delete = function (url, config) {
+			return $http.delete(url, mergeConfig(config));
+		};
+
+		return $authHttp;
 	});
 })();

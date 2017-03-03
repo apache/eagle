@@ -26,7 +26,7 @@
 		_host = localStorage.getItem("host") || "";
 	}
 
-	serviceModule.service('Entity', function($http, $q) {
+	serviceModule.service('Entity', function($authHttp, $q) {
 		function Entity() {}
 
 		function wrapList(list, promise) {
@@ -64,7 +64,7 @@
 			list._refresh = function () {
 				var config = {};
 				if(param) config.params = param;
-				return wrapList(list, $http.get(_host + "/rest/" + url, config));
+				return wrapList(list, $authHttp.get(_host + "/rest/" + url, config));
 			};
 
 			return list._refresh();
@@ -72,7 +72,7 @@
 
 		Entity.create = Entity.post = function (url, entity) {
 			var list = [];
-			return wrapList(list, $http({
+			return wrapList(list, $authHttp({
 				method: 'POST',
 				url: _host + "/rest/" + url,
 				headers: {
@@ -84,7 +84,7 @@
 
 		Entity.delete = function (url, uuid) {
 			var list = [];
-			return wrapList(list, $http({
+			return wrapList(list, $authHttp({
 				method: 'DELETE',
 				url: _host + "/rest/" + url,
 				headers: {
@@ -148,7 +148,7 @@
 
 		Entity.deleteMetadata = function (url) {
 			return {
-				_promise: $http.delete(_host + "/rest/metadata/" + url).then(function (res) {
+				_promise: $authHttp.delete(_host + "/rest/metadata/" + url).then(function (res) {
 					console.log(res);
 				})
 			};

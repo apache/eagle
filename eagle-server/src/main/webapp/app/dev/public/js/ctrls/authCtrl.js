@@ -21,11 +21,29 @@
 
 	var eagleControllers = angular.module('eagleControllers');
 
-	eagleControllers.controller('loginCtrl', function ($scope, Auth) {
+	eagleControllers.controller('loginCtrl', function ($scope, $wrapState, Auth) {
 		$scope.username = '';
 		$scope.password = '';
+
 		$scope.login = function () {
-			Auth.login($scope.username, $scope.password);
+			Auth.login($scope.username, $scope.password).then(function (result) {
+				if (result) {
+					$wrapState.go('home');
+				} else {
+					$.dialog({
+						title: 'OPS',
+						content: 'Username or password not correct.'
+					});
+				}
+			});
 		};
+
+		$scope.onKeyPress = function (event) {
+			if (event.which === 13) {
+				$scope.login();
+			}
+		};
+
+		$('[name="username"]').focus();
 	});
 })();
