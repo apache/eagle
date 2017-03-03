@@ -48,20 +48,16 @@ public class SLAJobEvaluator implements Evaluator, Serializable {
 
     @Override
     public Result.EvaluatorResult evaluate(AnalyzerEntity analyzerJobEntity) {
-        if (!analyzerJobEntity.getCurrentState().equalsIgnoreCase(Constants.JobState.RUNNING.toString())) {
-            return null;
-        }
-
         Result.EvaluatorResult result = new Result.EvaluatorResult();
 
-        List<JobMetaEntity> jobMetaEntities = Utils.getJobMeta(config, analyzerJobEntity.getJobDefId());
+        List<JobMetaEntity> jobMetaEntities = Utils.getJobMeta(config, analyzerJobEntity.getSiteId(), analyzerJobEntity.getJobDefId());
         if (jobMetaEntities.size() == 0
-                || !jobMetaEntities.get(0).getEvaluators().contains(this.getClass().getName())) {
+                || !jobMetaEntities.get(0).getEvaluators().contains(this.getClass().getSimpleName())) {
             LOG.info("SLAJobEvaluator skip job {}", analyzerJobEntity.getJobDefId());
             return result;
         }
 
-        analyzerJobEntity.setJobMeta(jobMetaEntities.get(0).getConfiguration());
+        analyzerJobEntity.setJobMeta(jobMetaEntities.get(0));
 
         for (Processor processor : processors) {
             result.addProcessorResult(processor.getClass(), processor.process(analyzerJobEntity));

@@ -18,17 +18,22 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.service.ApplicationEmailService;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
 import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
 import org.apache.eagle.jpm.analyzer.util.Constants;
+import org.apache.eagle.jpm.analyzer.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +50,7 @@ public class EmailPublisher implements Publisher, Serializable {
     }
 
     @Override
+    //will refactor, just work now
     public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
         if (result.getAlertMessages().size() == 0) {
             return;
@@ -82,8 +88,16 @@ public class EmailPublisher implements Publisher, Serializable {
         alertData.put(Constants.ANALYZER_REPORT_DATA_BASIC_KEY, basic);
         alertData.put(Constants.ANALYZER_REPORT_DATA_EXTEND_KEY, extend);
 
-        //TODO, override email config in job meta data
-        ApplicationEmailService emailService = new ApplicationEmailService(config, Constants.ANALYZER_REPORT_CONFIG_PATH);
+        Config cloneConfig = ConfigFactory.empty().withFallback(config);
+        if (analyzerJobEntity.getUserId() != null) {
+            List<UserEmailEntity> users = Utils.getUserMail(config, analyzerJobEntity.getSiteId(), analyzerJobEntity.getUserId());
+            if (users.size() > 0) {
+                Map<String, String> additionalConfig = Collections.emptyMap();
+                additionalConfig.put(Constants.ANALYZER_REPORT_CONFIG_PATH + "." + AlertEmailConstants.SENDER, users.get(0).getMailAddress());
+                cloneConfig = ConfigFactory.parseMap(additionalConfig).withFallback(cloneConfig);
+            }
+        }
+        ApplicationEmailService emailService = new ApplicationEmailService(cloneConfig, Constants.ANALYZER_REPORT_CONFIG_PATH);
         String subject = String.format(Constants.ANALYZER_REPORT_SUBJECT, analyzerJobEntity.getJobDefId());
         AlertEmailContext alertContext = emailService.buildEmailContext(subject);
         emailService.onAlert(alertContext, alertData);

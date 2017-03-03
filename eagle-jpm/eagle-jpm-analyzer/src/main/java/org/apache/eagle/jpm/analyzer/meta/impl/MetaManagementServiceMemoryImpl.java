@@ -17,94 +17,105 @@
 
 package org.apache.eagle.jpm.analyzer.meta.impl;
 
-import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.meta.MetaManagementService;
+import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
-import org.apache.eagle.jpm.analyzer.meta.model.PublisherEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.*;
 
 public class MetaManagementServiceMemoryImpl implements MetaManagementService, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MetaManagementServiceMemoryImpl.class);
 
-    private final Map<String, JobMetaEntity> jobMetaEntities = new HashMap<>();
-    private final Map<String, List<PublisherEntity>> publisherEntities = new HashMap<>();
+    private final Map<String, Map<String, JobMetaEntity>> jobMetaEntities = new HashMap<>();
+    private final Map<String, Map<String, UserEmailEntity>> publisherEntities = new HashMap<>();
 
     @Inject
     Config config;
 
     @Override
     public boolean addJobMeta(JobMetaEntity jobMetaEntity) {
-        if (jobMetaEntities.containsKey(jobMetaEntity.getJobDefId())) {
-            LOG.warn("contains job {} already, add job meta failed", jobMetaEntity.getJobDefId());
-            return false;
+        if (!jobMetaEntities.containsKey(jobMetaEntity.getSiteId())) {
+            jobMetaEntities.put(jobMetaEntity.getSiteId(), new HashMap<>());
         }
 
-        jobMetaEntities.put(jobMetaEntity.getJobDefId(), jobMetaEntity);
+        jobMetaEntities.get(jobMetaEntity.getSiteId()).put(jobMetaEntity.getJobDefId(), jobMetaEntity);
         LOG.info("Successfully add job {} meta", jobMetaEntity.getJobDefId());
         return true;
     }
 
     @Override
-    public boolean updateJobMeta(String jobDefId, JobMetaEntity jobMetaEntity) {
-        if (!jobMetaEntities.containsKey(jobMetaEntity.getJobDefId())) {
-            LOG.warn("does not contain job {}, update job meta failed", jobDefId);
+    public boolean updateJobMeta(JobMetaEntity jobMetaEntity) {
+        if (!jobMetaEntities.containsKey(jobMetaEntity.getSiteId())) {
+            LOG.warn("does not contain siteId {}, update job meta failed", jobMetaEntity.getSiteId());
             return false;
         }
 
-        jobMetaEntities.put(jobDefId, jobMetaEntity);
-        LOG.info("Successfully update job {} meta", jobDefId);
+        jobMetaEntities.get(jobMetaEntity.getSiteId()).put(jobMetaEntity.getJobDefId(), jobMetaEntity);
+        LOG.info("Successfully update job {} meta", jobMetaEntity.getJobDefId());
         return true;
     }
 
     @Override
-    public List<JobMetaEntity> getJobMeta(String jobDefId) {
-        if (!jobMetaEntities.containsKey(jobDefId)) {
-            LOG.warn("does not contain job {}, get job meta failed", jobDefId);
+    public List<JobMetaEntity> getJobMeta(String siteId, String jobDefId) {
+        if (!jobMetaEntities.containsKey(siteId)) {
+            LOG.warn("does not contain site {}, get job meta failed", siteId);
             return new ArrayList<>();
         }
 
-        return Arrays.asList(jobMetaEntities.get(jobDefId));
+        return Arrays.asList(jobMetaEntities.get(siteId).get(jobDefId));
     }
 
     @Override
-    public boolean deleteJobMeta(String jobDefId) {
-        if (!jobMetaEntities.containsKey(jobDefId)) {
-            LOG.warn("does not contain job {}, delete job meta failed", jobDefId);
+    public boolean deleteJobMeta(String siteId, String jobDefId) {
+        if (!jobMetaEntities.containsKey(siteId)) {
+            LOG.warn("does not contain siteId {}, delete job meta failed", siteId);
             return false;
         }
 
-        jobMetaEntities.remove(jobDefId);
+        jobMetaEntities.get(siteId).remove(jobDefId);
         LOG.info("Successfully delete job {} meta", jobDefId);
         return true;
     }
 
     @Override
-    public boolean addPublisherMeta(PublisherEntity publisherEntity) {
-        if (publisherEntities.containsKey(publisherEntity.getUserId())) {
-            for (PublisherEntity entity : publisherEntities.get(publisherEntity.getUserId())) {
-                if (entity.equals(publisherEntity)) {
+    public boolean addUserEmailMeta(UserEmailEntity userEmailEntity) {
+        if (publisherEntities.containsKey(userEmailEntity.getSiteId())) {
+            for (UserEmailEntity entity : publisherEntities.get(userEmailEntity.getSiteId()).values()) {
+                if (entity.equals(userEmailEntity)) {
                     LOG.warn("contains user {}, mailAddress {} already, add publisher failed", entity.getUserId(), entity.getMailAddress());
                     return false;
                 }
             }
         }
 
-        if (!publisherEntities.containsKey(publisherEntity.getUserId())) {
-            publisherEntities.put(publisherEntity.getUserId(), new ArrayList<>());
+        if (!publisherEntities.containsKey(userEmailEntity.getSiteId())) {
+            publisherEntities.put(userEmailEntity.getSiteId(), new HashMap<>());
         }
 
-        publisherEntities.get(publisherEntity.getUserId()).add(publisherEntity);
-        LOG.info("Successfully add publisher user {}, mailAddress {}", publisherEntity.getUserId(), publisherEntity.getMailAddress());
+        publisherEntities.get(userEmailEntity.getSiteId()).put(userEmailEntity.getUserId(), userEmailEntity);
+        LOG.info("Successfully add publisher user {}, mailAddress {}", userEmailEntity.getUserId(), userEmailEntity.getMailAddress());
         return true;
     }
 
     @Override
-    public boolean deletePublisherMeta(String userId) {
+    public boolean updateUserEmailMeta(UserEmailEntity userEmailEntity) {
+        if (!publisherEntities.containsKey(userEmailEntity.getSiteId())) {
+            LOG.warn("does not contain siteId {}, update user email meta failed", userEmailEntity.getSiteId());
+            return false;
+        }
+
+        publisherEntities.get(userEmailEntity.getSiteId()).put(userEmailEntity.getUserId(), userEmailEntity);
+        LOG.info("Successfully update user {} meta", userEmailEntity.getUserId());
+        return true;
+    }
+
+    @Override
+    public boolean deleteUserEmailMeta(String siteId, String userId) {
         if (!publisherEntities.containsKey(userId)) {
             LOG.warn("does not contain user {}, failed to delete publisher", userId);
             return false;
@@ -116,12 +127,12 @@ public class MetaManagementServiceMemoryImpl implements MetaManagementService, S
     }
 
     @Override
-    public List<PublisherEntity> getPublisherMeta(String userId) {
-        if (!publisherEntities.containsKey(userId)) {
-            LOG.warn("does not contain user {}, failed to get publisher", userId);
+    public List<UserEmailEntity> getUserEmailMeta(String siteId, String userId) {
+        if (!publisherEntities.containsKey(siteId)) {
+            LOG.warn("does not contain siteId {}, failed to get publisher", siteId);
             return new ArrayList<>();
         }
 
-        return publisherEntities.get(userId);
+        return Arrays.asList(publisherEntities.get(siteId).get(userId));
     }
 }

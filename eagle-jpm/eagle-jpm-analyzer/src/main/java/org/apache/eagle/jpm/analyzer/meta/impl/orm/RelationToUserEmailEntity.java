@@ -14,28 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.jpm.analyzer.meta.impl.orm;
 
-package org.apache.eagle.jpm.analyzer.meta;
-
-import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
+import org.apache.eagle.common.function.ThrowableFunction;
 import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public interface MetaManagementService {
-    boolean addJobMeta(JobMetaEntity jobMetaEntity);
-
-    boolean updateJobMeta(JobMetaEntity jobMetaEntity);
-
-    List<JobMetaEntity> getJobMeta(String siteId, String jobDefId);
-
-    boolean deleteJobMeta(String siteId, String jobDefId);
-
-    boolean addUserEmailMeta(UserEmailEntity userEmailEntity);
-
-    boolean updateUserEmailMeta(UserEmailEntity userEmailEntity);
-
-    boolean deleteUserEmailMeta(String siteId, String userId);
-
-    List<UserEmailEntity> getUserEmailMeta(String siteId, String userId);
+public class RelationToUserEmailEntity implements ThrowableFunction<ResultSet, UserEmailEntity, SQLException> {
+    @Override
+    public UserEmailEntity apply(ResultSet resultSet) throws SQLException {
+        UserEmailEntity userEmailEntity = new UserEmailEntity();
+        userEmailEntity.setUuid(resultSet.getString(1));
+        userEmailEntity.setUserId(resultSet.getString(2));
+        userEmailEntity.setSiteId(resultSet.getString(3));
+        userEmailEntity.setMailAddress(resultSet.getString(4));
+        userEmailEntity.setCreatedTime(resultSet.getLong(5));
+        userEmailEntity.setModifiedTime(resultSet.getLong(6));
+        return userEmailEntity;
+    }
 }

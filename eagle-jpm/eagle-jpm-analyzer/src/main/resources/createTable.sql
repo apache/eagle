@@ -16,26 +16,22 @@
 --  *
 --  */
 
-CREATE TABLE IF NOT EXISTS jobs (
-  jobDefId VARCHAR(50) NOT NULL,
-  configuration MEDIUMTEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS analysis_jobs (
+  uuid varchar(50) PRIMARY KEY,
+  jobDefId varchar(50) NOT NULL,
+  siteId varchar(50) NOT NULL,
+  configuration mediumtext NOT NULL,
+  evaluators mediumtext NOT NULL,
   createdtime bigint(20) DEFAULT NULL,
   modifiedtime  bigint(20) DEFAULT NULL,
-  PRIMARY KEY (jobDefId)
+  UNIQUE (jobDefId)
 );
 
-CREATE TABLE IF NOT EXISTS job_evaluators (
-  jobDefId VARCHAR(50) NOT NULL,
-  evaluator VARCHAR(100) NOT NULL,
-  createdtime bigint(20) DEFAULT NULL,
-  modifiedtime  bigint(20) DEFAULT NULL,
-  PRIMARY KEY (jobDefId, evaluator)
-);
-
-CREATE TABLE IF NOT EXISTS job_publishments (
-  userId VARCHAR(100) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS analysis_email (
+  uuid varchar(50) PRIMARY KEY,
+  userId varchar(100) NOT NULL,
   mailAddress mediumtext NOT NULL,
   createdtime bigint(20) DEFAULT NULL,
   modifiedtime  bigint(20) DEFAULT NULL,
-  PRIMARY KEY (userId)
+  UNIQUE (userId)
 );
