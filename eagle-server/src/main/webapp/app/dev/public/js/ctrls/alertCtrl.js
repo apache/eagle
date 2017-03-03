@@ -153,7 +153,7 @@
 		PageConfig.title = "Policy";
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
-			{title: "Policy List", path: "/policies"},
+			{title: "Policy List", path: "/site/" + $wrapState.param.siteId + "/policies"},
 			{title: "Detail"}
 		];
 
@@ -191,7 +191,7 @@
 
 			Entity.queryMetadata("schedulestates")._then(function (res) {
 				var schedule = res.data || {};
-				$scope.assignment = common.array.find(policyName, schedule.assignments, ["policyName"]) || {};
+				$scope.assignment = common.array.find(policyName, schedule.assignments || [], ["policyName"]) || {};
 
 				var queueList = $.map(schedule.monitoredStreams, function (stream) {
 					return stream.queues;
