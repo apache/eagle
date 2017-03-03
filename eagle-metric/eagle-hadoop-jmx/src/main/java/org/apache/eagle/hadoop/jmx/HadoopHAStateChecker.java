@@ -20,6 +20,8 @@ package org.apache.eagle.hadoop.jmx;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.hadoop.jmx.model.HadoopHAResult;
+import org.apache.eagle.hadoop.jmx.model.JmxMetricEntity;
+import org.apache.eagle.hadoop.jmx.model.MetricEntity;
 
 import static org.apache.eagle.hadoop.jmx.HadoopJmxConstant.PLACE_HOLDER;
 
@@ -46,27 +48,25 @@ public abstract class HadoopHAStateChecker {
 
     protected void emit(HadoopHAResult result, String metricStreamId) {
         long timestamp = System.currentTimeMillis();
+        JmxMetricEntity metricEntity = new JmxMetricEntity();
+        metricEntity.setHost(result.host);
+        metricEntity.setTimestamp(timestamp);
+        metricEntity.setSite(site);
 
-        emit(metricStreamId, timestamp, result.host, String.format(HadoopJmxConstant.HA_TOTAL_FORMAT, component),
+        emit(metricStreamId, metricEntity, String.format(HadoopJmxConstant.HA_TOTAL_FORMAT, component),
                 result.total_count);
-        emit(metricStreamId, timestamp, result.host, String.format(HadoopJmxConstant.HA_ACTIVE_FORMAT, component),
+        emit(metricStreamId, metricEntity, String.format(HadoopJmxConstant.HA_ACTIVE_FORMAT, component),
                 result.active_count);
-        emit(metricStreamId, timestamp, result.host, String.format(HadoopJmxConstant.HA_STANDBY_FORMAT, component),
+        emit(metricStreamId, metricEntity, String.format(HadoopJmxConstant.HA_STANDBY_FORMAT, component),
                 result.standby_count);
-        emit(metricStreamId, timestamp, result.host, String.format(HadoopJmxConstant.HA_FAILED_FORMAT, component),
+        emit(metricStreamId, metricEntity, String.format(HadoopJmxConstant.HA_FAILED_FORMAT, component),
                 result.failed_count);
     }
 
-    private void emit(String metricStreamId, long timestamp, String host, String metric, double value) {
-        collector.emit(metricStreamId, new Values(PLACE_HOLDER,
-                new HadoopJmxUtil.JmxMetricBuilder()
-                        .setComponent(component)
-                        .setTimestamp(timestamp)
-                        .setHost(host)
-                        .setSite(site)
-                        .setMetric(metric)
-                        .setValue(value)
-                        .build()));
+    private void emit(String metricStreamId, JmxMetricEntity entity, String metric, double value) {
+        entity.setMetric(metric);
+        entity.setValue(value);
+        collector.emit(metricStreamId, new Values(PLACE_HOLDER, entity.buildStream()));
     }
 
 }

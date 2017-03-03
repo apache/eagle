@@ -27,9 +27,9 @@ public class HadoopJmxConstant {
     public static final String JN_INSTANCE_SERVICE_NAME = "JNServiceInstance";
     public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
 
-    public static final String FSNAMESYSTEM = "Hadoop:service=NameNode,name=FSNamesystem";
-    public static final String NAMENODEINFO = "Hadoop:service=NameNode,name=NameNodeInfo";
-    public static final String FSNAMESYSTEMSTATE = "Hadoop:service=NameNode,name=FSNamesystemState";
+    public static final String FSNAMESYSTEM_BEAN = "Hadoop:service=NameNode,name=FSNamesystem";
+    public static final String NAMENODEINFO_BEAN = "Hadoop:service=NameNode,name=NameNodeInfo";
+    public static final String FSNAMESYSTEMSTATE_BEAN = "Hadoop:service=NameNode,name=FSNamesystemState";
     public static final String FS_HASTATE_TAG = "tag.HAState";
     public static final String FS_HOSTNAME_TAG = "tag.Hostname";
 
@@ -50,6 +50,7 @@ public class HadoopJmxConstant {
     public static final String HOSTNAME_TAG = "hostname";
     public static final String CATEGORY_TAG = "category";
     public static final String ROLE_TAG = "role";
+    public static final String COMPONENT_TAG = "component";
 
     public static final String NAME_NODE_ROLE = "namenode";
     public static final String DATA_NODE_ROLE = "datanode";

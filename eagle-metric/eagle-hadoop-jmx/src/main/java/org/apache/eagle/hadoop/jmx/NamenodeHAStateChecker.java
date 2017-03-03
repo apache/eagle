@@ -49,7 +49,7 @@ public class NamenodeHAStateChecker extends HadoopHAStateChecker {
                 final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(url);
 
                 collector.emit(downStreamId, new Values(jmxBeanMap));
-                JMXBean bean = jmxBeanMap.get(HadoopJmxConstant.FSNAMESYSTEM);
+                JMXBean bean = jmxBeanMap.get(HadoopJmxConstant.FSNAMESYSTEM_BEAN);
                 if (bean.getPropertyMap().containsKey(FS_HASTATE_TAG)) {
                     String haState = (String) bean.getPropertyMap().get(FS_HASTATE_TAG);
                     LOG.debug("{} is found from {}", FS_HASTATE_TAG, url);

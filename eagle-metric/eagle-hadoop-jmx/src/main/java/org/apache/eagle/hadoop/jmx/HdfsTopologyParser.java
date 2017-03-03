@@ -76,7 +76,7 @@ public class HdfsTopologyParser implements TopologyParser {
     @Override
     public TopologyResult parse(Map<String, JMXBean> data) throws IOException {
         final long updateTime = System.currentTimeMillis();
-        final JMXBean bean = data.get(HadoopJmxConstant.FSNAMESYSTEM);
+        final JMXBean bean = data.get(HadoopJmxConstant.FSNAMESYSTEM_BEAN);
         TopologyResult topologyResult = new TopologyResult();
 
         if (bean == null || bean.getPropertyMap() == null) {
@@ -95,7 +95,7 @@ public class HdfsTopologyParser implements TopologyParser {
             namenode.setUsedCapacityTB(Double.toString(capacityUsedGB / FileUtils.ONE_KB));
             namenode.setNumBlocks(Integer.toString(blocksTotal));
 
-            final JMXBean nnBean = data.get(NAMENODEINFO);
+            final JMXBean nnBean = data.get(NAMENODEINFO_BEAN);
             if (nnBean == null || bean.getPropertyMap() == null) {
                 throw new ServiceNotResponseException("Invalid JMX format, NameNodeInfo bean is null!");
             }

@@ -31,6 +31,17 @@ public class HadoopJmxMonitorConfig {
     public Topology topology;
     public DataSourceConfig dataSourceConfig;
 
+    public static final String SPOUT_NAME = "JmxReader";
+    public static final String TOPOLOGY_PARSER_NAME = "topologyParser";
+    public static final String METRIC_GENERATOR_NAME = "metricGenerator";
+
+    public static final String HASTATE_METRIC_STREAM = "haStateMetricStream";
+    public static final String SPOUT_TO_TOPOLGY_STREAM = "reader-to-topologyParser";
+    public static final String SPOUT_TO_METRIC_STREAM= "reader-to-metricParser";
+    public static final String TOPOLOGY_CHECK_STREAM = "topologyCheckStream";
+    public static final String JMX_METRCI_STREAM = "jmxMetricStream";
+    public static final String JMX_RESOURCE_METRIC_STRAEM = "jmxResourceMetricStream";
+
     private HadoopJmxMonitorConfig(Config config) {
         this.config = config;
         init(config);
