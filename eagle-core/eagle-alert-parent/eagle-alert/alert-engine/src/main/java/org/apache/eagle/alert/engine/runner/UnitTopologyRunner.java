@@ -19,12 +19,19 @@
 
 package org.apache.eagle.alert.engine.runner;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.spout.CorrelationSpout;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.alert.utils.StreamIdConversion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -33,16 +40,9 @@ import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
+
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigRenderOptions;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * By default
@@ -106,7 +106,7 @@ public class UnitTopologyRunner {
         }
 
         stormConfig.setNumWorkers(numOfTotalWorkers);
-        StormTopology topology = buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishExecutors, numOfPublishTasks, config);
+        StormTopology topology = buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishExecutors, numOfPublishTasks, config).createTopology();
 
         if (localMode) {
             LOG.info("Submitting as local mode");
@@ -143,7 +143,7 @@ public class UnitTopologyRunner {
     // Build Storm Topology
     // ---------------------------
 
-    public StormTopology buildTopology(String topologyId,
+    public TopologyBuilder buildTopology(String topologyId,
                                        int numOfSpoutTasks,
                                        int numOfRouterBolts,
                                        int numOfAlertBolts,
@@ -208,10 +208,10 @@ public class UnitTopologyRunner {
             boltDeclarer.fieldsGrouping(alertBoltNamePrefix + i, new Fields(AlertConstants.FIELD_0));
         }
 
-        return builder.createTopology();
+        return builder;
     }
 
-    public StormTopology buildTopology(String topologyId, Config config) {
+    public TopologyBuilder buildTopology(String topologyId, Config config) {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
