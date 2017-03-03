@@ -110,7 +110,7 @@
         <stream>
             <streamId>HADOOP_JMX_METRIC_STREAM</streamId>
             <description>Hadoop JMX Metric Stream including name node, resource manager, etc.</description>
-            <group>Hadoop Metric</group>
+            <group>hadoop metrics</group>
             <columns>
                 <column>
                     <name>host</name>
@@ -142,7 +142,7 @@
         <stream>
             <streamId>SYSTEM_METRIC_STREAM</streamId>
             <description>System Metrics Stream including CPU, Network, Disk, etc.</description>
-            <group>System Metric</group>
+            <group>system metrics</group>
             <columns>
                 <column>
                     <name>host</name>
@@ -178,7 +178,7 @@
         <stream>
             <streamId>HADOOP_JMX_RESOURCE_STREAM</streamId>
             <description>Hadoop JMX Resource Stream including name node, resource manager, etc.</description>
-            <group>Hadoop Metric</group>
+            <group>hadoop metrics</group>
             <columns>
                 <column>
                     <name>host</name>

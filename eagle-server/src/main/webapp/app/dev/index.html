@@ -91,40 +91,23 @@
 								<a>
 									<span ng-if="!Site.current()">
 										<span class="fa fa-home"></span>
-										Overview
+										Sites Overview
 									</span>
 									<span ng-if="Site.current()">
 										<span class="fa fa-server"></span>
-										{{Site.current().siteName || Site.current().siteId}}
+										Site: {{Site.current().siteName || Site.current().siteId}}
 									</span>
 								</a>
 
 								<ul class="dropdown-menu">
-									<li><a ng-click="Site.switchSite()"><span class="fa fa-home"></span> Overview</a></li>
+									<li><a ng-click="Site.switchSite()"><span class="fa fa-home"></span> Sites Overview</a></li>
 									<li ng-repeat="site in Site.list track by $index">
 										<a ng-click="Site.switchSite(site)">
-											<span class="fa fa-server"></span> {{site.siteName || site.siteId}}
+											<span class="fa fa-server"></span> Site: {{site.siteName || site.siteId}}
 										</a>
 									</li>
 								</ul>
 							</li>
-
-							<!-- FAQ -->
-							<li>
-								<a data-toggle="dropdown" aria-expanded="false">
-									<i class="glyphicon glyphicon-question-sign"></i>
-								</a>
-
-								<ul class="dropdown-menu">
-									<li><a>How to start using eagle</a></li>
-									<li><a>How to register new site</a></li>
-									<li><a>How to install application</a></li>
-									<li><a>How to manage application</a></li>
-									<li><a>How to develop application</a></li>
-									<li><a ui-sref="metricPreview()">Preview eagle metric</a></li>
-								</ul>
-							</li>
-
 							<!-- Notification -->
 							<li class="hover-dropdown">
 								<a>
@@ -146,6 +129,21 @@
 								</ul>
 							</li>
 
+							<!-- FAQ -->
+							<li>
+								<a data-toggle="dropdown" aria-expanded="false">
+									<i class="glyphicon glyphicon-question-sign"></i>
+								</a>
+
+								<ul class="dropdown-menu">
+									<li><a>How to start using eagle</a></li>
+									<li><a>How to register new site</a></li>
+									<li><a>How to install application</a></li>
+									<li><a>How to manage application</a></li>
+									<li><a>How to develop application</a></li>
+									<li><a ui-sref="metricPreview()">Preview eagle metric</a></li>
+								</ul>
+							</li>
 							<!-- Auth -->
 							<li ng-if="!Auth.isLogin">
 								<a ui-sref="login">Login</a>

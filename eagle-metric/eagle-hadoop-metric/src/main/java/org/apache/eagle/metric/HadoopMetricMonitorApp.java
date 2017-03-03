@@ -43,7 +43,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
                         .namedByField("metric")
                         .eventTimeByField("timestamp")
                         .dimensionFields("host", "component", "site")
-                        .granularity(Calendar.MINUTE)
+                        .granularity(Calendar.SECOND)
                         .valueField("value"))
                 .fromStream("SYSTEM_METRIC_STREAM")
                 .saveAsMetric(MetricDescriptor.metricGroupByField("group")
@@ -51,7 +51,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
                         .namedByField("metric")
                         .eventTimeByField("timestamp")
                         .dimensionFields("host", "group", "site", "device")
-                        .granularity(Calendar.MINUTE)
+                        .granularity(Calendar.SECOND)
                         .valueField("value")
                 )
                 .toTopology();

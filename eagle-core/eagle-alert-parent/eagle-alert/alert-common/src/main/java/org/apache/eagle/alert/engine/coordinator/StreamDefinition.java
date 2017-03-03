@@ -52,7 +52,7 @@ public class StreamDefinition implements Serializable {
     // Stream data source ID
     private String dataSource;
 
-    private String group = "Default";
+    private String group = "global";
 
     //
     private String streamSource;

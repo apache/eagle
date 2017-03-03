@@ -25,7 +25,7 @@
 	// =                                        Alert                                       =
 	// ======================================================================================
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig, CompatibleEntity, Time) {
-		PageConfig.title = "Alerts";
+		PageConfig.title = "Alert Incidents";
 		$scope.site = $wrapState.param.siteId;
 
 		$scope.alertList = [];
@@ -86,7 +86,7 @@
 	// =                                       Stream                                       =
 	// ======================================================================================
 	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application, Entity) {
-		PageConfig.title = "Streams";
+		PageConfig.title = "Alert Streams";
 
 		$scope.streamList = [];
 		$scope.site = $wrapState.param.siteId;
@@ -119,7 +119,7 @@
 	// =                                       Policy                                       =
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
-		PageConfig.title = "Policies";
+		PageConfig.title = "Alert Policies";
 		$scope.loading = false;
 
 		$scope.policyList = [];
