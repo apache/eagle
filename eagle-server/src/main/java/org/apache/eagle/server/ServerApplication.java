@@ -118,9 +118,10 @@ public class ServerApplication extends Application<ServerConfig> {
         // Register authentication provider
         BasicAuthBuilder authBuilder = new BasicAuthBuilder(configuration.getAuthConfig(), environment);
         environment.jersey().register(authBuilder.getBasicAuthProvider());
-        environment.jersey().getResourceConfig().getResourceFilterFactories()
-            .add(new BasicAuthResourceFilterFactory(authBuilder.getBasicAuthenticator()));
-
+        if (configuration.getAuthConfig().isEnabled()) {
+            environment.jersey().getResourceConfig().getResourceFilterFactories()
+                .add(new BasicAuthResourceFilterFactory(authBuilder.getBasicAuthenticator()));
+        }
         registerAppServices(environment);
     }
 

@@ -94,39 +94,50 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
 
     @Override
     public ContainerRequest filter(ContainerRequest containerRequest) {
-        if (!isSecurityDefined) {
-            return containerRequest;
-        }
-        //Access denied for all
+        try {
+            if (!isSecurityDefined) {
+                return containerRequest;
+            }
+            //Access denied for all
 
-        if (hasDenyAllAnnotation) {
-            throw new WebApplicationException(ALL_ACCESS_DENIED);
-        }
+            if (hasDenyAllAnnotation) {
+                throw new WebApplicationException(ALL_ACCESS_DENIED);
+            }
 
-        //Get request headers
-        final MultivaluedMap<String, String> headers = containerRequest.getRequestHeaders();
+            //Get request headers
+            final MultivaluedMap<String, String> headers = containerRequest.getRequestHeaders();
 
-        //Fetch authorization header
-        final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
+            //Fetch authorization header
+            final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
 
-        //If no authorization information present; block access
-        if ((authorization == null || authorization.isEmpty()) && isAuthRequired) {
-            throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
-        }
+            //If no authorization information present; block access
+            if ((authorization == null || authorization.isEmpty()) && isAuthRequired) {
+                throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
+            }
 
-        if (authorization != null) {
-            //Get encoded username and password
-            final String encodedUserPassword = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
+            if (authorization != null) {
+                //Get encoded username and password
+                final String encodedUserPassword = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
 
-            //Decode username and password
-            String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes()));
+                //Decode username and password
+                String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes()));
 
-            //Split username and password tokens
-            final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
-            final String username = tokenizer.nextToken();
-            final String password = tokenizer.nextToken();
+                //Split username and password tokens
+                final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
+                final String username = tokenizer.hasMoreElements() ? tokenizer.nextToken() : null;
+                final String password = tokenizer.hasMoreElements() ? tokenizer.nextToken() : null;
 
-            try {
+                if (username == null || password == null) {
+                    if (this.isSecurityDefined) {
+                        throw new WebApplicationException(RESTResponse.builder()
+                            .status(false, Response.Status.FORBIDDEN)
+                            .message("Access forbidden, invalid username or password")
+                            .build());
+                    } else {
+                        return containerRequest;
+                    }
+                }
+
                 Optional<User> userOptional = this.authenticator.authenticate(new BasicCredentials(username, password));
                 if (userOptional.isPresent()) {
                     User user = userOptional.get();
@@ -166,11 +177,13 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
                 } else {
                     throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
                 }
-            } catch (AuthenticationException e) {
-                LOG.error("Server authentication error: " + e.getMessage(), e);
-                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Server authentication error: " + e.getMessage()).build());
             }
+        } catch (WebApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            LOG.error("Server authentication error: " + e.getMessage(), e);
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Server authentication error: " + e.getMessage()).build());
         }
         return containerRequest;
     }
