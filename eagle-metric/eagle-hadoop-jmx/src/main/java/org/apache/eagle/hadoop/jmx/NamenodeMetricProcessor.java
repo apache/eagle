@@ -22,18 +22,12 @@ import org.apache.eagle.hadoop.jmx.model.JmxMetricEntity;
 import org.apache.eagle.hadoop.jmx.HadoopJmxConstant.MetricType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class NamenodeMetricProcessor extends DefinedMetricProcessor {
     private final Logger LOG = LoggerFactory.getLogger(NamenodeMetricProcessor.class);
-
-    private List<JmxBeanListener> listeners;
     private JmxMetricCollector collector;
 
     public NamenodeMetricProcessor(JmxMetricCollector collector) {
@@ -41,11 +35,10 @@ public class NamenodeMetricProcessor extends DefinedMetricProcessor {
     }
 
     public void registerListener() {
-        listeners = new ArrayList<>();
-        listeners.add(new FsNameSystemBeanListener());
-        listeners.add(new FsNameSystemStateBeanListener());
-        listeners.add(new NameNodeInfoBeanListener());
-        listeners.add(new JvmMetricBeanListener());
+        registerListener(new FsNameSystemBeanListener());
+        registerListener(new FsNameSystemStateBeanListener());
+        registerListener(new NameNodeInfoBeanListener());
+        registerListener(new JvmMetricBeanListener());
     }
 
     public double buildUsageMetric(Map<String, Object> kvs, String first, String second) {
@@ -77,7 +70,6 @@ public class NamenodeMetricProcessor extends DefinedMetricProcessor {
                 if (kvs.containsKey("CapacityUsed") && kvs.containsKey("CapacityTotal")) {
                     collector.emit(baseMetric, PREFIX + ".capacityUsage",
                             buildUsageMetric(kvs, "CapacityUsed", "CapacityTotal"));
-
                 }
             }
         }
