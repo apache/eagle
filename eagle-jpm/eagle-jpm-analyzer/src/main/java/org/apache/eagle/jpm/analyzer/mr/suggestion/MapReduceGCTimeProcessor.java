@@ -68,7 +68,7 @@ public class MapReduceGCTimeProcessor implements Processor<MapReduceAnalyzerEnti
             }
 
             if (sb.length() > 0) {
-                return new Result.ProcessorResult(Result.RuleType.GC_TIME, Result.ResultLevel.INFO, sb.toString(), optSettings);
+                return new Result.ProcessorResult(Result.RuleType.GC_TIME, Result.ResultLevel.NOTICE, sb.toString(), optSettings);
             }
         } catch (NullPointerException e) {
             // When job failed there may not have counters, so just ignore it

@@ -25,6 +25,8 @@ import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +61,7 @@ public class Utils {
         try {
             is = InputStreamUtils.getInputStream(url, null, org.apache.eagle.jpm.util.Constants.CompressionType.NONE);
             LOG.info("get job meta from {}", url);
-            result = (List<JobMetaEntity>)OBJ_MAPPER.readValue(is, RESTResponse.class).getData();
+            result = ((RESTResponse<List<JobMetaEntity>>)OBJ_MAPPER.readValue(is, new TypeReference<RESTResponse<List<JobMetaEntity>>>(){})).getData();
         } catch (Exception e) {
             LOG.warn("failed to get job meta from {}", url, e);
         } finally {
@@ -86,7 +88,7 @@ public class Utils {
         try {
             is = InputStreamUtils.getInputStream(url, null, org.apache.eagle.jpm.util.Constants.CompressionType.NONE);
             LOG.info("get user meta from {}", url);
-            result = (List<UserEmailEntity>)OBJ_MAPPER.readValue(is, RESTResponse.class).getData();
+            result = ((RESTResponse<List<UserEmailEntity>>)OBJ_MAPPER.readValue(is, new TypeReference<RESTResponse<List<UserEmailEntity>>>(){})).getData();
         } catch (Exception e) {
             LOG.warn("failed to get user meta from {}", url, e);
         } finally {

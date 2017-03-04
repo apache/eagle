@@ -47,7 +47,7 @@ public class Result {
                 alertMessages.put(typeName, new ArrayList<>());
                 alertEntities.put(typeName, new ArrayList<>());
             }
-            normalizeResult(processorResult);
+            //normalizeResult(processorResult);
             alertMessages.get(typeName).add(processorResult);
             alertEntities.get(typeName).add(processorEntities.get(processorType));
 
@@ -63,11 +63,11 @@ public class Result {
     }
 
     private void normalizeResult(ProcessorResult processorResult) {
-        String settingList = "";
+        /*String settingList = "";
         if (processorResult.getSettings() != null && !processorResult.getSettings().isEmpty()) {
             settingList = StringUtils.join(processorResult.getSettings(), "\n");
         }
-        processorResult.setSettingList(settingList);
+        processorResult.setSettingList(settingList);*/
     }
 
     /**
@@ -76,7 +76,6 @@ public class Result {
 
     public enum ResultLevel {
         NONE,
-        INFO,
         NOTICE,
         WARNING,
         CRITICAL
@@ -100,20 +99,20 @@ public class Result {
         private ResultLevel resultLevel;
         private String message;
         private List<String> settings;
-        private String settingList;
+        //private String settingList;
 
         public ProcessorResult(RuleType ruleType, ResultLevel resultLevel, String message, List<String> settings) {
             this.ruleType = ruleType;
             this.resultLevel = resultLevel;
             this.message = message;
-            this.settings = settings;
+            //this.settings = settings;
         }
 
         public ProcessorResult(RuleType ruleType, ResultLevel resultLevel, String message) {
             this.ruleType = ruleType;
             this.resultLevel = resultLevel;
             this.message = message;
-            this.settings = new ArrayList<>();
+            //this.settings = new ArrayList<>();
         }
 
         public RuleType getRuleType() {
@@ -148,13 +147,13 @@ public class Result {
             this.settings = settings;
         }
 
-        public String getSettingList() {
+        /*public String getSettingList() {
             return settingList;
         }
 
         public void setSettingList(String settingList) {
             this.settingList = settingList;
-        }
+        }*/
     }
 
     /**

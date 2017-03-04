@@ -17,7 +17,6 @@
 
 package org.apache.eagle.jpm.analyzer.meta.model;
 
-import org.apache.eagle.jpm.analyzer.util.Constants;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 

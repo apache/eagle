@@ -14,11 +14,27 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+    #set ( $alert = $alertList[0] )
+
+## Generate Alert Color
+#set($alertColor = "#337ab7")
+#if($alert["alertSeverity"] == "WARNING")
+    #set($alertColor = "#FF9F00")
+#elseif($alert["alertSeverity"] == "CRITICAL")
+    #set($alertColor = "#d43f3a")
+#elseif ($alert["alertSeverity"] == "NOTICE")
+    #set($alertColor = "#68B90F")
+#end
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>[$alert["alertSeverity"] $alert["alertSubject"]</title>
     <style type="text/css">
         img {
             max-width: 100%;
@@ -62,11 +78,11 @@
             }
 
             h1 {
-                font-size: 22px !important;
+                font-size: 20px !important;
             }
 
             h2 {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
 
             h3 {
@@ -83,7 +99,7 @@
             }
 
             .content-wrap {
-                padding: 10px !important;
+                padding: 0px !important;
             }
 
             .invoice {
@@ -92,44 +108,159 @@
         }
     </style>
 </head>
-<body>
-    #set ( $elem = $alertList[0] )
 
-<p><b>Basic Information: </b></p>
+<body itemscope itemtype="http://schema.org/EmailMessage"
+      style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; margin: 0;">
 
-<ul>
-    <li>Site: ${elem["basic"].get("site")}</li>
-    <li>Job Name: ${elem["basic"].get("name")}</li>
-    <li>User: ${elem["basic"].get("user")}</li>
-    <li>Job Status: ${elem["basic"].get("status")}</li>
-    <li>Start Time: ${elem["basic"].get("start")}</li>
-    <li>End Time: ${elem["basic"].get("end")}</li>
-    <li>Duration Time: ${elem["basic"].get("duration")}</li>
-    <li>Progress: ${elem["basic"].get("progress")}</li>
-    <li>Job Detail: <a href=${elem["basic"].get("detail")}>${elem["basic"].get("detail")}</a></li>
-</ul>
-
-<p><b>Analyzer Results: </b></p>
-
-#foreach($evaluator in ${elem["extend"].keySet()})
-<table class="body-wrap" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #f6f6f6; margin: 0;" bgcolor="#f6f6f6" border="1">
-    <caption><b>Analysis By $evaluator</b></caption>
-    <tr>
-        <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" width="100"><b>type</b></th>
-        <th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" width="250"><b>message</b></th>
-		<th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" width="250"><b>optimizer setting</b></th>
-		<th style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" width="100"><b>level</b></th>
+<table class="body-wrap"
+       style="..."
+       bgcolor="#f6f6f6" align="center">
+    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+        <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+            valign="top"></td>
+        <td class="container" width="600"
+            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;"
+            valign="top">
+            <div class="content"
+                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
+                <table class="main" width="100%" cellpadding="0" cellspacing="0"
+                       style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px solid #e9e9e9;">
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                        <td class="alert alert-warning"
+                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #fff; font-weight: 500; text-align: center; border-radius: 3px 3px 0 0; background-color: $alertColor; margin: 0; padding: 20px;"
+                            align="center" bgcolor="$alertColor" valign="top">
+                            <strong >$alert["alertSeverity"]: </strong>
+                            $alert["alertSubject"]
+                        </td>
+                    </tr>
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                        <td class="content-wrap"
+                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                            valign="top">
+                            <br>
+                            <table class="invoice" cellpadding="1" cellspacing="1"
+                                   style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0; border: 1px solid #e9e9e9" bgcolor="#f6f6f6">
+                                <caption><b>Basic Information</b></caption>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Severity:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> $alert["alertSeverity"]
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Site:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("site")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Name:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("name")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        User:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("user")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Status:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("status")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Progress:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("progress")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Start:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("start")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        End:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("end")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Duration:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> ${alert["basic"].get("duration")}
+                                    </td>
+                                </tr>
+                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top">
+                                        Detail:
+                                    </td>
+                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                                        valign="top"> <a href=${alert["basic"].get("detail")}>${alert["basic"].get("detail")}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                            <table class="invoice" cellpadding="1" cellspacing="1"
+                                   style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0; border: 1px solid #e9e9e9; border-collapse: collapse" bgcolor="#f6f6f6">
+                                <caption><b>Analysis Results</b></caption>
+                                <tr>
+                                    <th style="border: 1px solid #e9e9e9"
+                                        valign="top"><b>level</b></th>
+                                    <th style="border: 1px solid #e9e9e9"
+                                        valign="top" align="center"><b>message</b></th>
+                                </tr>
+                                #foreach($evaluator in ${alert["extend"].keySet()})
+                                    #foreach($result in ${alert["extend"].get($evaluator)})
+                                        <tr style="..."
+                                            valign="top">
+                                            <td style="border: 1px solid #e9e9e9">${result.resultLevel}</td>
+                                            <td style="border: 1px solid #e9e9e9">${result.message}</td>
+                                        </tr>
+                                    #end
+                                #end
+                            </table>
+                            
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+        <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+            valign="top"></td>
     </tr>
-    #foreach($result in ${elem["extend"].get($evaluator)})
-        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-			<td style="...">${result.ruleType}</td>
-            <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">${result.message}</td>
-			<td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">${result.settingList}</td>
-			<td style="...">${result.resultLevel}</td>
-        </tr>
-    #end
 </table>
-#end
-
 </body>
 </html>

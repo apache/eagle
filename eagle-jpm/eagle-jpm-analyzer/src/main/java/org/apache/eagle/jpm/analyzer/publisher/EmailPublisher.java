@@ -19,6 +19,7 @@ package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.app.service.ApplicationEmailService;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.common.mail.AlertEmailConstants;
@@ -77,28 +78,29 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("detail", getJobLink(analyzerJobEntity));
 
         Map<String, List<Result.ProcessorResult>> extend = result.getAlertMessages();
+        Map<String, Object> alertData = new HashMap<>();
         for (String evaluator : extend.keySet()) {
             for (Result.ProcessorResult message : extend.get(evaluator)) {
+                setAlertLevel(alertData, message.getResultLevel());
                 LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
                         analyzerJobEntity.getJobDefId(), message.getMessage(), message.getResultLevel(), evaluator);
             }
         }
 
-        Map<String, Object> alertData = new HashMap<>();
         alertData.put(Constants.ANALYZER_REPORT_DATA_BASIC_KEY, basic);
         alertData.put(Constants.ANALYZER_REPORT_DATA_EXTEND_KEY, extend);
-
         Config cloneConfig = ConfigFactory.empty().withFallback(config);
         if (analyzerJobEntity.getUserId() != null) {
             List<UserEmailEntity> users = Utils.getUserMail(config, analyzerJobEntity.getSiteId(), analyzerJobEntity.getUserId());
-            if (users.size() > 0) {
-                Map<String, String> additionalConfig = Collections.emptyMap();
-                additionalConfig.put(Constants.ANALYZER_REPORT_CONFIG_PATH + "." + AlertEmailConstants.SENDER, users.get(0).getMailAddress());
+            if (users != null && users.size() > 0) {
+                Map<String, String> additionalConfig = new HashMap<>();
+                additionalConfig.put(Constants.ANALYZER_REPORT_CONFIG_PATH + "." + AlertEmailConstants.RECIPIENTS, users.get(0).getMailAddress());
                 cloneConfig = ConfigFactory.parseMap(additionalConfig).withFallback(cloneConfig);
             }
         }
         ApplicationEmailService emailService = new ApplicationEmailService(cloneConfig, Constants.ANALYZER_REPORT_CONFIG_PATH);
         String subject = String.format(Constants.ANALYZER_REPORT_SUBJECT, analyzerJobEntity.getJobDefId());
+        alertData.put(PublishConstants.ALERT_EMAIL_SUBJECT, subject);
         AlertEmailContext alertContext = emailService.buildEmailContext(subject);
         emailService.onAlert(alertContext, alertData);
     }
@@ -112,5 +114,20 @@ public class EmailPublisher implements Publisher, Serializable {
                 + analyzerJobEntity.getSiteId()
                 + "/jpm/detail/"
                 + analyzerJobEntity.getJobId();
+    }
+
+    private void setAlertLevel(Map<String, Object> alertData, Result.ResultLevel level) {
+        if (!alertData.containsKey(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY)) {
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, Result.ResultLevel.NOTICE.toString());
+        }
+
+        if (level.equals(Result.ResultLevel.CRITICAL)) {
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, level.toString());
+        }
+
+        if (level.equals(Result.ResultLevel.WARNING)
+                && !alertData.get(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY).equals(Result.ResultLevel.CRITICAL.toString())) {
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, level.toString());
+        }
     }
 }

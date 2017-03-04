@@ -126,9 +126,9 @@ public class AnalyzerResource {
             userEmailEntity.setUserId(userId);
             userEmailEntity.setModifiedTime(System.currentTimeMillis());
             boolean ret = metaManagementService.updateUserEmailMeta(userEmailEntity);
-            String message = "Successfully add user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
+            String message = "Successfully update user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
             if (!ret) {
-                message = "Failed to add user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
+                message = "Failed to update user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
             }
             response.success(ret).message(message);
         }).get();
