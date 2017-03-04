@@ -17,30 +17,17 @@
 
 package org.apache.eagle.hadoop.jmx;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.tuple.Values;
 import org.apache.eagle.hadoop.jmx.model.JmxMetricEntity;
 
-import static org.apache.eagle.hadoop.jmx.HadoopJmxConstant.PLACE_HOLDER;
+import java.util.Map;
 
-public abstract class JmxMetricListener {
-    private OutputCollector collector;
-    protected HadoopJmxMonitorConfig config;
+public interface JmxBeanListener {
+    //private JmxMetricCollector collector;
 
-    public JmxMetricListener(HadoopJmxMonitorConfig config, OutputCollector collector) {
-        this.collector = collector;
-        this.config = config;
-    }
+    //public JmxBeanListener(JmxMetricCollector collector) {
+      //  this.collector = collector;
+    //}
 
-    public void on_bean(String component, JMXBean bean) {
-        return;
-    }
+    void on_bean(JmxMetricEntity baseMetric, Map.Entry<String, JMXBean> bean);
 
-    public void on_metric(JmxMetricEntity metric) {
-        return;
-    }
-
-    public void emit(String streamId, JmxMetricEntity metricEntity) {
-        collector.emit(streamId, new Values(PLACE_HOLDER, metricEntity.buildStream()));
-    }
 }

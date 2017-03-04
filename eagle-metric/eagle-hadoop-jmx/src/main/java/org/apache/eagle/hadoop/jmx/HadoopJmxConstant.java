@@ -90,5 +90,7 @@ public class HadoopJmxConstant {
     public static final String SERVICE_NAME_FIELD = "serviceName";
     public static final String TOPOLOGY_DATA_FIELD = "topologyData";
 
-
+    public enum MetricType {
+        METRIC, RESOURCE
+    }
 }
