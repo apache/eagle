@@ -64,7 +64,11 @@ public class RelationToJobMetaEntity implements ThrowableFunction<ResultSet, Job
             Iterator<String> keyItemItr = jsonObject.keys();
             while (keyItemItr.hasNext()) {
                 String itemKey = keyItemItr.next();
-                items.put(itemKey, jsonObject.get(itemKey));
+                if (canParseToMap(jsonObject.getString(itemKey))) {
+                    items.put(itemKey, parse(jsonObject.getString(itemKey)));
+                } else {
+                    items.put(itemKey, jsonObject.get(itemKey));
+                }
             }
 
         } catch (Exception e) {
@@ -72,5 +76,18 @@ public class RelationToJobMetaEntity implements ThrowableFunction<ResultSet, Job
         }
 
         return items;
+    }
+
+    private boolean canParseToMap(String field) {
+        try {
+            JSONObject jsonObject = new JSONObject(field);
+            Iterator<String> keyItemItr = jsonObject.keys();
+            while (keyItemItr.hasNext()) {
+                keyItemItr.next();
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

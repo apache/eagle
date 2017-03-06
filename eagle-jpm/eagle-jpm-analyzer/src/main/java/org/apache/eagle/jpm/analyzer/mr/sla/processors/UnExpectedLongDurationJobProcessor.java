@@ -48,14 +48,19 @@ public class UnExpectedLongDurationJobProcessor implements Processor, Serializab
         LOG.info("Job {} In UnExpectedLongDurationJobProcessor", analyzerJobEntity.getJobDefId());
 
         Map<String, Object> jobMetaData = analyzerJobEntity.getJobMeta().getConfiguration();
-        long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaData);
+        //long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaData);
+        long avgDurationTime = (long)(analyzerJobEntity.getDurationTime() * 0.9);
+
         if (avgDurationTime == 0L) {
             return new Result.ProcessorResult(Result.RuleType.LONG_DURATION_JOB, Result.ResultLevel.NONE, Constants.PROCESS_NONE);
         }
 
         Map<Result.ResultLevel, Double> alertThreshold = Constants.DEFAULT_ALERT_THRESHOLD;
         if (jobMetaData.containsKey(Constants.ALERT_THRESHOLD_KEY)) {
-            alertThreshold = (Map<Result.ResultLevel, Double>)jobMetaData.get(Constants.ALERT_THRESHOLD_KEY);
+            Map<String, Double> alertThresholds = (Map<String, Double>)jobMetaData.get(Constants.ALERT_THRESHOLD_KEY);
+            for (String level : alertThresholds.keySet()) {
+                alertThreshold.put(Result.ResultLevel.fromString(level), alertThresholds.get(level));
+            }
         }
         List<Map.Entry<Result.ResultLevel, Double>> sorted = Utils.sortByValue(alertThreshold);
 

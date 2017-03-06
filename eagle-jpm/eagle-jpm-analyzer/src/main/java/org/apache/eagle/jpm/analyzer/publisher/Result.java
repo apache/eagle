@@ -17,7 +17,6 @@
 
 package org.apache.eagle.jpm.analyzer.publisher;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 import java.util.ArrayList;
@@ -78,7 +77,18 @@ public class Result {
         NONE,
         NOTICE,
         WARNING,
-        CRITICAL
+        CRITICAL;
+
+        private static final Map<String, ResultLevel> stringToLevels = new HashMap<>();
+        static {
+            for (ResultLevel level : values()) {
+                stringToLevels.put(level.toString(), level);
+            }
+        }
+
+        public static ResultLevel fromString(String levelString) {
+            return stringToLevels.get(levelString);
+        }
     }
 
     public enum RuleType {

@@ -53,6 +53,11 @@ public class EmailPublisher implements Publisher, Serializable {
     @Override
     //will refactor, just work now
     public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
+        if (!config.hasPath(Constants.ANALYZER_REPORT_CONFIG_PATH)) {
+            LOG.warn("no email configuration, skip send email");
+            return;
+        }
+
         if (result.getAlertMessages().size() == 0) {
             return;
         }

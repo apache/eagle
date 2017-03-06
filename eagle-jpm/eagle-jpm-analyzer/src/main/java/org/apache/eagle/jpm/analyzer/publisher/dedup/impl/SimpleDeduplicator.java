@@ -40,17 +40,13 @@ public class SimpleDeduplicator implements AlertDeduplicator, Serializable {
     public boolean dedup(AnalyzerEntity analyzerJobEntity, Result result) {
         long dedupInterval = Constants.DEFAULT_DEDUP_INTERVAL;
         if (analyzerJobEntity.getJobMeta().getConfiguration().containsKey(Constants.DEDUP_INTERVAL_KEY)) {
-            dedupInterval = (Long)analyzerJobEntity.getJobMeta().getConfiguration().get(Constants.DEDUP_INTERVAL_KEY);
+            dedupInterval = (Integer)analyzerJobEntity.getJobMeta().getConfiguration().get(Constants.DEDUP_INTERVAL_KEY);
         }
 
         dedupInterval = dedupInterval * 1000;
         long currentTimeStamp = System.currentTimeMillis();
         if (lastUpdateTime.containsKey(analyzerJobEntity.getJobDefId())) {
-            if (lastUpdateTime.get(analyzerJobEntity.getJobDefId()) + dedupInterval > currentTimeStamp) {
-                return true;
-            } else {
-                return false;
-            }
+            return lastUpdateTime.get(analyzerJobEntity.getJobDefId()) + dedupInterval > currentTimeStamp;
         } else {
             lastUpdateTime.put(analyzerJobEntity.getJobDefId(), currentTimeStamp);
             return false;
