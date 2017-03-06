@@ -43,11 +43,9 @@ public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
 
     private Config config;
-    private AlertDeduplicator alertDeduplicator;
 
     public EmailPublisher(Config config) {
         this.config = config;
-        this.alertDeduplicator = new SimpleDeduplicator();
     }
 
     @Override
@@ -63,10 +61,6 @@ public class EmailPublisher implements Publisher, Serializable {
         }
 
         LOG.info("EmailPublisher gets job {}", analyzerJobEntity.getJobDefId());
-        if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
-            LOG.info("skip job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
-            return;
-        }
 
         Map<String, String> basic = new HashMap<>();
         basic.put("site", analyzerJobEntity.getSiteId());

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationSimulatorImpl extends ApplicationSimulator {
@@ -95,12 +96,12 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         });
         stopThread.start();
         try {
-            stopThread.join();
-            semp.acquire();
+            stopThread.join(60000L);
+            semp.tryAcquire(60, TimeUnit.SECONDS);
+            applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         } catch (Exception e) {
             throw new IllegalStateException("Application status didn't become STOPPED");
         }
-        applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
     }
 
     @Override

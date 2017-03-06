@@ -27,6 +27,8 @@ import org.apache.eagle.jpm.analyzer.publisher.EagleStorePublisher;
 import org.apache.eagle.jpm.analyzer.publisher.EmailPublisher;
 import org.apache.eagle.jpm.analyzer.publisher.Publisher;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
+import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
+import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
     private List<Publisher> publishers = new ArrayList<>();
 
     private Config config;
+    private AlertDeduplicator alertDeduplicator;
 
     public MRJobPerformanceAnalyzer(Config config) {
         this.config = config;
@@ -49,6 +52,8 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
 
         publishers.add(new EagleStorePublisher(config));
         publishers.add(new EmailPublisher(config));
+
+        this.alertDeduplicator = new SimpleDeduplicator();
     }
 
     @Override
@@ -60,6 +65,11 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
             if (evaluatorResult != null) {
                 result.addEvaluatorResult(evaluator.getClass(), evaluatorResult);
             }
+        }
+
+        if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
+            LOG.info("skip publish job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
+            return;
         }
 
         for (Publisher publisher : publishers) {

@@ -48,7 +48,8 @@ public class UnExpectedLongDurationJobProcessor implements Processor, Serializab
         LOG.info("Job {} In UnExpectedLongDurationJobProcessor", analyzerJobEntity.getJobDefId());
 
         Map<String, Object> jobMetaData = analyzerJobEntity.getJobMeta().getConfiguration();
-        long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaData);
+        //long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaData);
+        long avgDurationTime = (long)(analyzerJobEntity.getDurationTime() * 0.7);
 
         if (avgDurationTime == 0L) {
             return new Result.ProcessorResult(Result.RuleType.LONG_DURATION_JOB, Result.ResultLevel.NONE, Constants.PROCESS_NONE);
