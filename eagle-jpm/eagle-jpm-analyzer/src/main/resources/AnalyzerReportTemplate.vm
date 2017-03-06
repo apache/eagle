@@ -25,7 +25,7 @@
     #set($alertColor = "#FF9F00")
 #elseif($alert["alertSeverity"] == "CRITICAL")
     #set($alertColor = "#d43f3a")
-#elseif ($alert["alertSeverity"] == "NOTICE")
+#elseif ($alert["alertSeverity"] == "INFO")
     #set($alertColor = "#68B90F")
 #end
 

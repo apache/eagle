@@ -75,7 +75,7 @@ public class MapReduceCompressionSettingProcessor implements Processor<MapReduce
         }
 
         if (sb.length() > 0) {
-            return new Result.ProcessorResult(Result.RuleType.COMPRESS, Result.ResultLevel.NOTICE, sb.toString(), optSettings);
+            return new Result.ProcessorResult(Result.RuleType.COMPRESS, Result.ResultLevel.INFO, sb.toString(), optSettings);
         }
         return null;
     }

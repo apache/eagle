@@ -26,8 +26,6 @@ import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-
 /*
  * Criterion: (TimeElapsed / (numTasks / 500 * avgTaskTime)) > 20
  */
@@ -70,7 +68,7 @@ public class MapReduceQueueResourceProcessor implements Processor<MapReduceAnaly
                 }
 
                 if (sb.length() > 0) {
-                    return new Result.ProcessorResult(Result.RuleType.RESOURCE_CONTENTION, Result.ResultLevel.NOTICE, sb.toString());
+                    return new Result.ProcessorResult(Result.RuleType.RESOURCE_CONTENTION, Result.ResultLevel.INFO, sb.toString());
                 }
             }
         } catch (Exception e) {

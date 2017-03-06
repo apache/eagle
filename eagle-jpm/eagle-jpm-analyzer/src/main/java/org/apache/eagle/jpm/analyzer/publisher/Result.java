@@ -75,7 +75,7 @@ public class Result {
 
     public enum ResultLevel {
         NONE,
-        NOTICE,
+        INFO,
         WARNING,
         CRITICAL;
 

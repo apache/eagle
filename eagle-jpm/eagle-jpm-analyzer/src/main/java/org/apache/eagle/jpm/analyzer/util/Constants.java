@@ -50,7 +50,7 @@ public class Constants {
     public static final String ALERT_THRESHOLD_KEY = "alert.threshold";
     public static final Map<Result.ResultLevel, Double> DEFAULT_ALERT_THRESHOLD = new HashMap<Result.ResultLevel, Double>() {
         {
-            put(Result.ResultLevel.NOTICE, 0.1);
+            put(Result.ResultLevel.INFO, 0.1);
             put(Result.ResultLevel.WARNING, 0.3);
             put(Result.ResultLevel.CRITICAL, 0.5);
         }

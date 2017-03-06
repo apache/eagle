@@ -26,15 +26,12 @@ import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
-import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
-import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
 import org.apache.eagle.jpm.analyzer.util.Constants;
 import org.apache.eagle.jpm.analyzer.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +114,7 @@ public class EmailPublisher implements Publisher, Serializable {
 
     private void setAlertLevel(Map<String, Object> alertData, Result.ResultLevel level) {
         if (!alertData.containsKey(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY)) {
-            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, Result.ResultLevel.NOTICE.toString());
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, Result.ResultLevel.INFO.toString());
         }
 
         if (level.equals(Result.ResultLevel.CRITICAL)) {
