@@ -26,6 +26,8 @@ import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +35,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationSimulatorImpl extends ApplicationSimulator {
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationSimulatorImpl.class);
+
     private final Config config;
     private final SiteResource siteResource;
     private final ApplicationResource applicationResource;
@@ -84,6 +88,7 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
                 try {
                     Thread.sleep(1000);
                 } catch (Exception e) {
+                    LOG.warn("{}", e);
                 }
             }
             semp.release();
