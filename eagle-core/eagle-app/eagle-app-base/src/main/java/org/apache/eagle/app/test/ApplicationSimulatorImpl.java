@@ -29,6 +29,7 @@ import org.junit.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationSimulatorImpl extends ApplicationSimulator {
@@ -74,24 +75,25 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         statusUpdateService.updateApplicationEntityStatus(applicationEntity);
-        applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
-        int attempt = 0;
-        while (attempt < 10) {
-            attempt++;
-            statusUpdateService.updateApplicationEntityStatus(applicationEntity);
-            if (applicationEntity.getStatus() == ApplicationEntity.Status.STOPPED
-                    || applicationEntity.getStatus() == ApplicationEntity.Status.INITIALIZED) {
-                break;
-            } else {
+        Semaphore semp = new Semaphore(1);
+        Thread stopThread = new Thread(() -> {
+            applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
+            while (applicationEntity.getStatus() != ApplicationEntity.Status.INITIALIZED
+                    && applicationEntity.getStatus() != ApplicationEntity.Status.STOPPED) {
+                statusUpdateService.updateApplicationEntityStatus(applicationEntity);
                 try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    // Ignore
+                    Thread.sleep(1000);
+                } catch (Exception e) {
                 }
             }
-        }
-        if (attempt >= 10 ) {
-            throw new IllegalStateException("Application status didn't become STOPPED in 10 attempts");
+            semp.release();
+        });
+        stopThread.start();
+        try {
+            stopThread.join();
+            semp.acquire();
+        } catch (Exception e) {
+            throw new IllegalStateException("Application status didn't become STOPPED");
         }
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
     }
