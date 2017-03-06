@@ -47,12 +47,12 @@ public class SimpleDeduplicator implements AlertDeduplicator, Serializable {
             dedupInterval = dedupInterval * 1000;
             long currentTimeStamp = System.currentTimeMillis();
             if (lastUpdateTime.containsKey(analyzerJobEntity.getJobDefId())) {
-                 if (lastUpdateTime.get(analyzerJobEntity.getJobDefId()) + dedupInterval > currentTimeStamp) {
-                     return true;
-                 } else {
-                     lastUpdateTime.put(analyzerJobEntity.getJobDefId(), currentTimeStamp);
-                     return false;
-                 }
+                if (lastUpdateTime.get(analyzerJobEntity.getJobDefId()) + dedupInterval > currentTimeStamp) {
+                    return true;
+                } else {
+                    lastUpdateTime.put(analyzerJobEntity.getJobDefId(), currentTimeStamp);
+                    return false;
+                }
             } else {
                 lastUpdateTime.put(analyzerJobEntity.getJobDefId(), currentTimeStamp);
                 return false;
