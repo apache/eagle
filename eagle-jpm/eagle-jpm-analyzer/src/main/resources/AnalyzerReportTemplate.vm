@@ -228,7 +228,7 @@
                                         Detail:
                                     </td>
                                     <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
-                                        valign="top"> <a href=${alert["basic"].get("detail")}>${alert["basic"].get("detail")}</a>
+                                        valign="top"> <a href=${alert["basic"].get("detail")}>Job Detail</a>
                                     </td>
                                 </tr>
                             </table>
