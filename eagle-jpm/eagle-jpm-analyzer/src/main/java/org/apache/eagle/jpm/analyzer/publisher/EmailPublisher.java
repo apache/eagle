@@ -26,12 +26,14 @@ import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
+import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
 import org.apache.eagle.jpm.analyzer.util.Constants;
 import org.apache.eagle.jpm.analyzer.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +42,12 @@ public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
 
     private Config config;
+    private List<Class<?>> publishResult4Evaluators = new ArrayList<>();
 
     public EmailPublisher(Config config) {
         this.config = config;
+        //TODO
+        publishResult4Evaluators.add(SLAJobEvaluator.class);
     }
 
     @Override
@@ -53,13 +58,14 @@ public class EmailPublisher implements Publisher, Serializable {
             return;
         }
 
-        if (result.getAlertMessages().size() == 0) {
-            return;
-        }
+        Map<String, List<Result.ProcessorResult>> extend = new HashMap<>();
+        publishResult4Evaluators
+                .stream()
+                .filter(item -> result.getAlertMessages().containsKey(item.getName()))
+                .forEach(item -> extend.put(item.getName(), result.getAlertMessages().get(item.getName()))
+                );
 
-        if (analyzerJobEntity.getJobMeta() == null) {
-            //do not need send email
-            //TODO, framework should know which publishers that job should uses. Just work around here
+        if (extend.size() == 0) {
             return;
         }
 
@@ -79,7 +85,6 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("progress", progress + "%");
         basic.put("detail", getJobLink(analyzerJobEntity));
 
-        Map<String, List<Result.ProcessorResult>> extend = result.getAlertMessages();
         Map<String, Object> alertData = new HashMap<>();
         for (String evaluator : extend.keySet()) {
             for (Result.ProcessorResult message : extend.get(evaluator)) {
