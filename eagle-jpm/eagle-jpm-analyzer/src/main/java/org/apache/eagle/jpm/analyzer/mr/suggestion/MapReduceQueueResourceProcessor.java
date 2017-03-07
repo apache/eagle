@@ -26,8 +26,6 @@ import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-
 /*
  * Criterion: (TimeElapsed / (numTasks / 500 * avgTaskTime)) > 20
  */

@@ -37,11 +37,9 @@ public class EagleStorePublisher implements Publisher, Serializable {
 
     private Config config;
     private IEagleServiceClient client;
-    private AlertDeduplicator alertDeduplicator;
 
     public EagleStorePublisher(Config config) {
         this.config = config;
-        this.alertDeduplicator = new SimpleDeduplicator();
     }
 
     @Override
@@ -51,10 +49,6 @@ public class EagleStorePublisher implements Publisher, Serializable {
         }
 
         LOG.info("EagleStorePublisher gets job {}", analyzerJobEntity.getJobDefId());
-        if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
-            LOG.info("skip job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
-            return;
-        }
 
         try {
             this.client = new EagleServiceClientImpl(config);

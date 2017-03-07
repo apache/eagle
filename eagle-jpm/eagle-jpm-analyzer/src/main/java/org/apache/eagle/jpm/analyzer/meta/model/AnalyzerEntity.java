@@ -38,7 +38,7 @@ public class AnalyzerEntity {
 
     private Map<String, Object> jobConfig = new HashMap<>();
 
-    private Map<String, Object> jobMeta = new HashMap<>();
+    private JobMetaEntity jobMeta;
 
     public String getJobDefId() {
         return jobDefId;
@@ -112,11 +112,11 @@ public class AnalyzerEntity {
         this.jobConfig = jobConfig;
     }
 
-    public Map<String, Object> getJobMeta() {
+    public JobMetaEntity getJobMeta() {
         return jobMeta;
     }
 
-    public void setJobMeta(Map<String, Object> jobMeta) {
+    public void setJobMeta(JobMetaEntity jobMeta) {
         this.jobMeta = jobMeta;
     }
 

@@ -18,13 +18,16 @@
 package org.apache.eagle.jpm.analyzer.publisher;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.app.service.ApplicationEmailService;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
-import org.apache.eagle.jpm.analyzer.publisher.dedup.AlertDeduplicator;
-import org.apache.eagle.jpm.analyzer.publisher.dedup.impl.SimpleDeduplicator;
+import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 import org.apache.eagle.jpm.analyzer.util.Constants;
+import org.apache.eagle.jpm.analyzer.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,24 +40,24 @@ public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
 
     private Config config;
-    private AlertDeduplicator alertDeduplicator;
 
     public EmailPublisher(Config config) {
         this.config = config;
-        this.alertDeduplicator = new SimpleDeduplicator();
     }
 
     @Override
+    //will refactor, just work now
     public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
+        if (!config.hasPath(Constants.ANALYZER_REPORT_CONFIG_PATH)) {
+            LOG.warn("no email configuration, skip send email");
+            return;
+        }
+
         if (result.getAlertMessages().size() == 0) {
             return;
         }
 
         LOG.info("EmailPublisher gets job {}", analyzerJobEntity.getJobDefId());
-        if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
-            LOG.info("skip job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
-            return;
-        }
 
         Map<String, String> basic = new HashMap<>();
         basic.put("site", analyzerJobEntity.getSiteId());
@@ -71,20 +74,29 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("detail", getJobLink(analyzerJobEntity));
 
         Map<String, List<Result.ProcessorResult>> extend = result.getAlertMessages();
+        Map<String, Object> alertData = new HashMap<>();
         for (String evaluator : extend.keySet()) {
             for (Result.ProcessorResult message : extend.get(evaluator)) {
+                setAlertLevel(alertData, message.getResultLevel());
                 LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
                         analyzerJobEntity.getJobDefId(), message.getMessage(), message.getResultLevel(), evaluator);
             }
         }
 
-        Map<String, Object> alertData = new HashMap<>();
         alertData.put(Constants.ANALYZER_REPORT_DATA_BASIC_KEY, basic);
         alertData.put(Constants.ANALYZER_REPORT_DATA_EXTEND_KEY, extend);
-
-        //TODO, override email config in job meta data
-        ApplicationEmailService emailService = new ApplicationEmailService(config, Constants.ANALYZER_REPORT_CONFIG_PATH);
+        Config cloneConfig = ConfigFactory.empty().withFallback(config);
+        if (analyzerJobEntity.getUserId() != null) {
+            List<UserEmailEntity> users = Utils.getUserMail(config, analyzerJobEntity.getSiteId(), analyzerJobEntity.getUserId());
+            if (users != null && users.size() > 0) {
+                Map<String, String> additionalConfig = new HashMap<>();
+                additionalConfig.put(Constants.ANALYZER_REPORT_CONFIG_PATH + "." + AlertEmailConstants.RECIPIENTS, users.get(0).getMailAddress());
+                cloneConfig = ConfigFactory.parseMap(additionalConfig).withFallback(cloneConfig);
+            }
+        }
+        ApplicationEmailService emailService = new ApplicationEmailService(cloneConfig, Constants.ANALYZER_REPORT_CONFIG_PATH);
         String subject = String.format(Constants.ANALYZER_REPORT_SUBJECT, analyzerJobEntity.getJobDefId());
+        alertData.put(PublishConstants.ALERT_EMAIL_SUBJECT, subject);
         AlertEmailContext alertContext = emailService.buildEmailContext(subject);
         emailService.onAlert(alertContext, alertData);
     }
@@ -98,5 +110,20 @@ public class EmailPublisher implements Publisher, Serializable {
                 + analyzerJobEntity.getSiteId()
                 + "/jpm/detail/"
                 + analyzerJobEntity.getJobId();
+    }
+
+    private void setAlertLevel(Map<String, Object> alertData, Result.ResultLevel level) {
+        if (!alertData.containsKey(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY)) {
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, Result.ResultLevel.INFO.toString());
+        }
+
+        if (level.equals(Result.ResultLevel.CRITICAL)) {
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, level.toString());
+        }
+
+        if (level.equals(Result.ResultLevel.WARNING)
+                && !alertData.get(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY).equals(Result.ResultLevel.CRITICAL.toString())) {
+            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, level.toString());
+        }
     }
 }
