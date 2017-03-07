@@ -57,6 +57,11 @@ public class EmailPublisher implements Publisher, Serializable {
             return;
         }
 
+        if (analyzerJobEntity.getJobMeta() == null) {
+            //do not need send email
+            return;
+        }
+
         LOG.info("EmailPublisher gets job {}", analyzerJobEntity.getJobDefId());
 
         Map<String, String> basic = new HashMap<>();
