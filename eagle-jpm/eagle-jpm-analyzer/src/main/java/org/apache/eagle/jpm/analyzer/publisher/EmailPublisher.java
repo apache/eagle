@@ -62,8 +62,7 @@ public class EmailPublisher implements Publisher, Serializable {
         publishResult4Evaluators
                 .stream()
                 .filter(item -> result.getAlertMessages().containsKey(item.getName()))
-                .forEach(item -> extend.put(item.getName(), result.getAlertMessages().get(item.getName()))
-                );
+                .forEach(item -> extend.put(item.getName(), result.getAlertMessages().get(item.getName())));
 
         if (extend.size() == 0) {
             return;
