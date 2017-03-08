@@ -26,7 +26,8 @@
 			$scope.aggregationMap = {
 				job: "jobId",
 				user: "user",
-				jobType: "jobType"
+				jobType: "jobType",
+				queue: "queue",
 			};
 
 			$scope.site = $wrapState.param.siteId;
