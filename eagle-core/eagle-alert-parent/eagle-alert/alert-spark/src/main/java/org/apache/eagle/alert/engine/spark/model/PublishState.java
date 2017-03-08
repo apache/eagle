@@ -17,12 +17,14 @@
 
 package org.apache.eagle.alert.engine.spark.model;
 
+import kafka.message.MessageAndMetadata;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
-
 import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToSetAccum;
 import org.apache.spark.Accumulator;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,15 +48,20 @@ public class PublishState implements Serializable {
     private Accumulator<Map<String, Set<PublishPartition>>> cachedPublishPartitionsAccum;
 
 
-    public PublishState(JavaStreamingContext jssc) {
-        Accumulator<Map<PublishPartition, Map<String, Publishment>>> cachedPublishmentsAccum = jssc.sparkContext().accumulator(new HashMap<>(), "cachedPublishmentsAccum", new MapToMapAccum());
-        Accumulator<Map<String, Set<PublishPartition>>> cachedPublishPartitionsAccum = jssc.sparkContext().accumulator(new HashMap<>(), "cachedPublishPartitionsAccum", new MapToSetAccum());
+    public PublishState() {
+    }
 
+    public void initailPublishState(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        Accumulator<Map<PublishPartition, Map<String, Publishment>>> cachedPublishmentsAccum =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "cachedPublishmentsAccum", new MapToMapAccum());
+        Accumulator<Map<String, Set<PublishPartition>>> cachedPublishPartitionsAccum =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "cachedPublishPartitionsAccum", new MapToSetAccum());
         this.cachedPublishmentsAccum = cachedPublishmentsAccum;
         this.cachedPublishPartitionsAccum = cachedPublishPartitionsAccum;
     }
 
-    public void recover() {
+    public void recover(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        initailPublishState(rdd);
         cachedPublishmentsRef.set(cachedPublishmentsAccum.value());
         LOG.debug("---------cachedPublishmentsRef----------" + cachedPublishmentsRef.get());
 

@@ -17,10 +17,13 @@
 
 package org.apache.eagle.alert.engine.spark.model;
 
+import kafka.message.MessageAndMetadata;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.evaluator.CompositePolicyHandler;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +49,24 @@ public class PolicyState implements Serializable {
 
     private Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler;
 
-    public PolicyState(JavaStreamingContext jssc) {
-        Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies = jssc.sparkContext().accumulator(new HashMap<>(), "policyAccum", new MapToMapAccum());
-        Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition = jssc.sparkContext().accumulator(new HashMap<>(), "policyDefinitionAccum", new MapToMapAccum());
-        Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler = jssc.sparkContext().accumulator(new HashMap<>(), "policyStreamHandlerAccum", new MapToMapAccum());
+    public PolicyState() {
+    }
+
+    public void initailPolicyState(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        Accumulator<Map<String, Map<String, PolicyDefinition>>> cachedPolicies =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "policyAccum", new MapToMapAccum());
+        Accumulator<Map<String, Map<String, PolicyDefinition>>> policyDefinition =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "policyDefinitionAccum", new MapToMapAccum());
+        Accumulator<Map<String, Map<String, CompositePolicyHandler>>> policyStreamHandler =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "policyStreamHandlerAccum", new MapToMapAccum());
         this.cachedPolicies = cachedPolicies;
         this.policyDefinition = policyDefinition;
         this.policyStreamHandler = policyStreamHandler;
     }
 
 
-    public void recover() {
+    public void recover(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        initailPolicyState(rdd);
         cachedPoliciesRef.set(cachedPolicies.value());
         policyDefinitionRef.set(policyDefinition.value());
         policyStreamHandlerRef.set(policyStreamHandler.value());

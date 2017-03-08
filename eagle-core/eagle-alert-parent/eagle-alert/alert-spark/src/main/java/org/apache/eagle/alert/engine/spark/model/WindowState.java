@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.model;
 
+import kafka.message.MessageAndMetadata;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.router.StreamSortHandler;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
@@ -24,6 +25,8 @@ import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,20 +45,18 @@ public class WindowState implements Serializable {
     private Accumulator<Map<Integer, Map<String, StreamTimeClock>>> streamIdClockAccum;
     private Accumulator<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowAccum;
     private Accumulator<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersAccum;
-
     private static final Logger LOG = LoggerFactory.getLogger(WindowState.class);
 
-    public WindowState(JavaStreamingContext jssc) {
-        Accumulator<Map<Integer, Map<String, StreamTimeClock>>> streamIdClockAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamIdClock", new MapToMapAccum());
-        Accumulator<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamWindow", new MapToMapAccum());
-        Accumulator<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersAccum = jssc.sparkContext().accumulator(new HashMap<>(), "streamSortHandlers", new MapToMapAccum());
-        this.streamIdClockAccum = streamIdClockAccum;
-        this.streamWindowAccum = streamWindowAccum;
-        this.streamSortHandlersAccum = streamSortHandlersAccum;
+    public WindowState() {
     }
 
-    public WindowState(Accumulator<Map<Integer, Map<String, StreamTimeClock>>> streamIdClockAccum, Accumulator<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowAccum,
-                       Accumulator<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersAccum) {
+    public void initailWindowState(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        Accumulator<Map<Integer, Map<String, StreamTimeClock>>> streamIdClockAccum =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "streamIdClock", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamTimeClockListener, String>>> streamWindowAccum =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "streamWindow", new MapToMapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamSortHandler>>> streamSortHandlersAccum =
+            StateInstance.getInstance(new JavaSparkContext(rdd.context()), "streamSortHandlers", new MapToMapAccum());
         this.streamIdClockAccum = streamIdClockAccum;
         this.streamWindowAccum = streamWindowAccum;
         this.streamSortHandlersAccum = streamSortHandlersAccum;
@@ -69,7 +70,10 @@ public class WindowState implements Serializable {
         return streamWindowRef.get();
     }
 
-    public void recover() {
+    public void recover(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+
+        initailWindowState(rdd);
+
         streamTimeClockRef.set(streamIdClockAccum.value());
         streamWindowRef.set(streamWindowAccum.value());
         streamSortHandlersRef.set(streamSortHandlersAccum.value());

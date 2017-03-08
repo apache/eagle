@@ -185,11 +185,11 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
             message -> message
         );
 
-        WindowState winstate = new WindowState(jssc);
-        RouteState routeState = new RouteState(jssc);
-        PolicyState policyState = new PolicyState(jssc);
-        PublishState publishState = new PublishState(jssc);
-        SiddhiState siddhiState = new SiddhiState(jssc);
+        WindowState winstate = new WindowState();
+        RouteState routeState = new RouteState();
+        PolicyState policyState = new PolicyState();
+        PublishState publishState = new PublishState();
+        SiddhiState siddhiState = new SiddhiState();
 
         JavaPairDStream<String, String> pairDStream = inputDStream
             .transform(new ProcessSpecFunction4MultiKafka(

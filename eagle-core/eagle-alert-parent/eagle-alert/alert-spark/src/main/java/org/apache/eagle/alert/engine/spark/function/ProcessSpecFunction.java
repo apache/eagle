@@ -106,17 +106,17 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
 
         loadTopics(spoutSpec);
         updateOffsetRanges(rdd);
-        recoverState();
+        recoverState(rdd);
 
         return rdd;
     }
 
-    private void recoverState() {
-        winstate.recover();
-        routeState.recover();
-        policyState.recover();
-        publishState.recover();
-        siddhiState.recover();
+    private void recoverState(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        winstate.recover(rdd);
+        routeState.recover(rdd);
+        policyState.recover(rdd);
+        publishState.recover(rdd);
+        siddhiState.recover(rdd);
     }
 
     private void updateOffsetRanges(JavaRDD<MessageAndMetadata<String, String>> rdd) {

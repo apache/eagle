@@ -17,8 +17,11 @@
 
 package org.apache.eagle.alert.engine.spark.model;
 
+import kafka.message.MessageAndMetadata;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +37,16 @@ public class SiddhiState implements Serializable {
     private AtomicReference<Map<Integer, Map<String, byte[]>>> siddhiSnapshot = new AtomicReference<>();
     private Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum;
 
-    public SiddhiState(JavaStreamingContext jssc) {
-        Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum = jssc.sparkContext().accumulator(new HashMap<>(), "siddhiSnapShotState", new MapToMapAccum());
+    public SiddhiState() {
+    }
+
+    public void initailSiddhiState(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        Accumulator<Map<Integer, Map<String, byte[]>>> siddhiSnapShotAccum = StateInstance.getInstance(new JavaSparkContext(rdd.context()), "siddhiSnapShotState", new MapToMapAccum());
         this.siddhiSnapShotAccum = siddhiSnapShotAccum;
     }
 
-    public void recover() {
+    public void recover(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        initailSiddhiState(rdd);
         siddhiSnapshot.set(siddhiSnapShotAccum.value());
         LOG.debug("---------siddhiSnapshot----------" + siddhiSnapshot.get());
     }

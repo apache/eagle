@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.model;
 
+import kafka.message.MessageAndMetadata;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
@@ -24,6 +25,8 @@ import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterBoltOutputCollector;
 import org.apache.eagle.alert.engine.spark.accumulator.MapToMapAccum;
 import org.apache.spark.Accumulator;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,20 +51,22 @@ public class RouteState implements Serializable {
     private Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum;
     private Accumulator<Map<Integer, Map<StreamPartition, List<StreamRouterSpec>>>> routeSpecMapAccum;
 
-    public RouteState(JavaStreamingContext jssc) {
+    public RouteState() {
+    }
+
+    public void initailRouteState(JavaRDD<MessageAndMetadata<String, String>> rdd) {
         Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum
-                = jssc.sparkContext().accumulator(new HashMap<>(), "routePartitionerAccum", new MapToMapAccum());
+            = StateInstance.getInstance(new JavaSparkContext(rdd.context()), "routePartitionerAccum", new MapToMapAccum());
         this.routePartitionerAccum = routePartitionerAccum;
         Accumulator<Map<Integer, Map<StreamPartition, List<StreamRouterSpec>>>> routeSpecMapAccum
-                = jssc.sparkContext().accumulator(new HashMap<>(), "routeSpecAccum", new MapToMapAccum());
+            = StateInstance.getInstance(new JavaSparkContext(rdd.context()), "routeSpecAccum", new MapToMapAccum());
         this.routeSpecMapAccum = routeSpecMapAccum;
         Accumulator<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSAccm
-                = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSSSAccm", new MapToMapAccum());
+            = StateInstance.getInstance(new JavaSparkContext(rdd.context()), "cachedSSSAccm", new MapToMapAccum());
         this.cachedSSSAccm = cachedSSSAccm;
         Accumulator<Map<Integer, Map<StreamPartition, List<StreamRouterSpec>>>> cachedSRSAccm
-                = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSRSAccm", new MapToMapAccum());
+            = StateInstance.getInstance(new JavaSparkContext(rdd.context()), "cachedSRSAccm", new MapToMapAccum());
         this.cachedSRSAccm = cachedSRSAccm;
-
     }
 
     public RouteState(Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum,
@@ -70,7 +75,9 @@ public class RouteState implements Serializable {
         this.routeSpecMapAccum = routeSpecMapAccum;
     }
 
-    public void recover() {
+    public void recover(JavaRDD<MessageAndMetadata<String, String>> rdd) {
+        initailRouteState(rdd);
+
         routeSpecMapRef.set(routeSpecMapAccum.value());
         routePartitionerMapRef.set(routePartitionerAccum.value());
         cachedSSSRef.set(cachedSSSAccm.value());
