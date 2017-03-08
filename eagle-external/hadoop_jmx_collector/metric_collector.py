@@ -66,8 +66,8 @@ class Helper:
                                 datefmt='%m-%d %H:%M')
         else:
             logging.basicConfig(level=logging.INFO,
-                            format='%(asctime)s %(name)s %(threadName)s %(levelname)s %(message)s',
-                            datefmt='%m-%d %H:%M')
+                                format='%(asctime)s %(name)s %(threadName)s %(levelname)s %(message)s',
+                                datefmt='%m-%d %H:%M')
 
         logging.info("Loaded config from %s", abs_file_path)
         return config
@@ -192,7 +192,7 @@ class MetricSender(object):
     def open(self):
         pass
 
-    def send(self, msg):
+    def send(self, msg, converter = None):
         raise Exception("should be overrode")
 
     def close(self):
@@ -210,10 +210,13 @@ class KafkaMetricSender(MetricSender):
         self.default_topic = None
         if kafka_config.has_key("default_topic"):
             self.default_topic = kafka_config["default_topic"].encode('utf-8')
-            logging.info("Using default topic: %s" % self.default_topic)
         self.component_topic_mapping = {}
         if kafka_config.has_key("component_topic_mapping"):
             self.component_topic_mapping = kafka_config["component_topic_mapping"]
+
+        self.metric_topic_mapping = {}
+        if kafka_config.has_key("metric_topic_mapping"):
+            self.metric_topic_mapping = kafka_config["metric_topic_mapping"]
 
         if not self.default_topic and not bool(self.component_topic_mapping):
             raise Exception("both kafka config 'topic' and 'component_topic_mapping' are empty")
@@ -229,6 +232,11 @@ class KafkaMetricSender(MetricSender):
             logging.info("Overrode output.kafka.debug: " + str(self.debug_enabled))
 
     def get_topic_id(self, msg):
+        if msg.has_key("metric"):
+            metric = msg["metric"]
+            if self.metric_topic_mapping.has_key(metric):
+                return self.metric_topic_mapping[metric]
+
         if msg.has_key("component"):
             component = msg["component"]
             if self.component_topic_mapping.has_key(component):
@@ -247,11 +255,14 @@ class KafkaMetricSender(MetricSender):
                                              batch_send_every_t=30)
         self.start_time = time.time()
 
-    def send(self, msg):
+    def send(self, msg, converter = None):
         if self.debug_enabled:
             logging.info("Send message: " + str(msg))
         self.sent_count += 1
-        self.kafka_producer.send_messages(self.get_topic_id(msg), json.dumps(msg))
+        topic = self.get_topic_id(msg)
+        if converter is not None:
+            converter.convert_metric(msg)
+        self.kafka_producer.send_messages(topic, json.dumps(msg))
 
     def close(self):
         logging.info("Closing kafka connection and producer")
@@ -267,18 +278,12 @@ class MetricCollector(threading.Thread):
     filters = []
     config = None
     closed = False
-    collected_event_count = 0
-    ignored_event_count = 0
-    emit_event_count = 0
 
     def __init__(self, config=None):
         threading.Thread.__init__(self)
         self.config = None
         self.sender = None
         self.fqdn = socket.getfqdn()
-        self.ignored_event_count = 0
-        self.collected_event_count = 0
-        self.emit_event_count = 0
 
     def init(self, config):
         self.config = config
@@ -301,39 +306,29 @@ class MetricCollector(threading.Thread):
     def start(self):
         super(MetricCollector, self).start()
 
-    def collect(self, msg, type='float'):
-        try:
-            self.collected_event_count = self.collected_event_count + 1
-            if not msg.has_key("timestamp"):
-                msg["timestamp"] = int(round(time.time() * 1000))
-            if msg.has_key("value") and type == 'float':
-                msg["value"] = float(str(msg["value"]))
-            elif msg.has_key("value") and type == 'string':
-                msg["value"] = str(msg["value"])
-            if not msg.has_key("host") or len(msg["host"]) == 0:
-                raise Exception("host is null: " + str(msg))
-
-            if not msg.has_key("site"):
-                msg["site"] = self.config["env"]["site"]
-
-            if len(self.filters) == 0:
-                self.emit_event_count = self.emit_event_count + 1
-                self.sender.send(msg)
-                return
-            else:
-                for filter in self.filters:
-                    if filter.filter_metric(msg):
-                        self.emit_event_count = self.emit_event_count + 1
-                        self.sender.send(msg)
-                        return
-                self.ignored_event_count = self.ignored_event_count + 1
-        except Exception as e:
-            logging.error("Failed to emit metric: %s" % msg)
-            logging.exception(e)
+    def collect(self, msg, type = 'float', converter = None):
+        if not msg.has_key("timestamp"):
+            msg["timestamp"] = int(round(time.time() * 1000))
+        if msg.has_key("value") and type == 'float':
+            msg["value"] = float(str(msg["value"]))
+        elif msg.has_key("value") and type == 'string':
+            msg["value"] = str(msg["value"])
+        if not msg.has_key("host") or len(msg["host"]) == 0:
+            raise Exception("host is null: " + str(msg))
+        if not msg.has_key("site"):
+            msg["site"] = self.config["env"]["site"]
+        if len(self.filters) == 0:
+            self.sender.send(msg, converter)
+            return
+        else:
+            for filter in self.filters:
+                if filter.filter_metric(msg):
+                    self.sender.send(msg, converter)
+                    return
+        if self.sender.debug_enabled:
+            logging.info("Drop metric: " + str(msg))
 
     def close(self):
-        logging.info("Collected %s events (emitted: %s, ignored: %s)"
-                     % (self.collected_event_count, self.emit_event_count, self.ignored_event_count))
         self.sender.close()
         self.closed = True
 
@@ -451,7 +446,7 @@ class JmxMetricCollector(MetricCollector):
     def jmx_reader(self, source):
         host = source["host"]
         if source.has_key("source_host"):
-            host=source["source_host"]    
+            host=source["source_host"]
         port=source["port"]
         https=source["https"]
         protocol = "https" if https else "http"
@@ -582,3 +577,21 @@ class MetricNameFilter(MetricFilter):
                 if fnmatch.fnmatch(metric["metric"], name_filter):
                     return True
         return False
+
+
+# ========================
+#  Metric Converter
+# ========================
+
+class MetricConverter:
+    def convert_metric(self, metric):
+        """
+        Convert metric
+        """
+        return True
+
+class MetricNameConverter(MetricConverter):
+    def convert_metric(self, metric):
+        metric["resource"] = metric["metric"]
+        del metric["metric"]
+        return True

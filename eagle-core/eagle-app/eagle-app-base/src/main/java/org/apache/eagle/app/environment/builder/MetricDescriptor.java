@@ -29,6 +29,18 @@ public class MetricDescriptor implements Serializable {
      * Support simple and complex name format, by default using "metric" field.
      */
     private MetricNameSelector metricNameSelector = new FieldMetricNameSelector("metric");
+    private MetricGroupSelector metricGroupSelector = new FixedMetricGroupSelector(DEFAULT_METRIC_GROUP_NAME);
+    private SiteIdSelector siteIdSelector = new FieldSiteIdSelector("site");
+
+    private static final String DEFAULT_METRIC_GROUP_NAME = "Default";
+
+    public MetricNameSelector getMetricNameSelector() {
+        return metricNameSelector;
+    }
+
+    public void setMetricNameSelector(MetricNameSelector metricNameSelector) {
+        this.metricNameSelector = metricNameSelector;
+    }
 
     public MetricGroupSelector getMetricGroupSelector() {
         return metricGroupSelector;
@@ -37,12 +49,6 @@ public class MetricDescriptor implements Serializable {
     public void setMetricGroupSelector(MetricGroupSelector metricGroupSelector) {
         this.metricGroupSelector = metricGroupSelector;
     }
-
-
-    private static final String DEFAULT_METRIC_GROUP_NAME = "Default";
-
-    private MetricGroupSelector metricGroupSelector = new FixedMetricGroupSelector(DEFAULT_METRIC_GROUP_NAME);
-    private SiteIdSelector siteIdSelector = new FieldSiteIdSelector("site");
 
     /**
      * Support event/system time, by default using system time.
@@ -59,17 +65,15 @@ public class MetricDescriptor implements Serializable {
      */
     private int granularity = Calendar.MINUTE;
 
-    /**
-     * Metric value field name.
-     */
     private String valueField = "value";
+    private String resourceField = "resource";
 
-    public MetricNameSelector getMetricNameSelector() {
-        return metricNameSelector;
+    public String getResourceField() {
+        return resourceField;
     }
 
-    public void setMetricNameSelector(MetricNameSelector metricNameSelector) {
-        this.metricNameSelector = metricNameSelector;
+    public void setResourceField(String resourceField) {
+        this.resourceField = resourceField;
     }
 
     public String getValueField() {
