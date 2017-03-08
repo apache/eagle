@@ -101,7 +101,9 @@ public class TrafficParserBolt extends BaseRichBolt {
 
     private void generateMetric(TopWindowResult.Op op, int windowLen, long timestamp) {
         List<GenericMetricEntity> metrics = new ArrayList<>();
-        metrics.add(buildMetricEntity(timestamp, DEFAULT_USER, op.getTotalCount(), windowLen));
+        GenericMetricEntity clusterMetric = buildMetricEntity(timestamp, DEFAULT_USER, op.getTotalCount(), windowLen);
+        metrics.add(clusterMetric);
+        collector.emit(new Values("", buildStreamEvent(clusterMetric)));
         for (TopWindowResult.User user : op.getTopUsers()) {
             GenericMetricEntity metric = buildMetricEntity(timestamp, user.getUser(), user.getCount(), windowLen);
             metrics.add(metric);

@@ -85,7 +85,7 @@
         </property>
         <property>
             <name>dataSourceConfig.topic</name>
-            <displayName>Kafka Topic for Audit Log Consumption</displayName>
+            <displayName>Kafka Topic for Auditlog Consumption</displayName>
             <value>hdfs_audit_log_${siteId}</value>
             <description>kafka topic for data consumption</description>
             <required>true</required>
@@ -267,10 +267,6 @@
             <description>Hadoop JMX Metric Stream including name node, resource manager, etc.</description>
             <columns>
                 <column>
-                    <name>host</name>
-                    <type>string</type>
-                </column>
-                <column>
                     <name>timestamp</name>
                     <type>long</type>
                 </column>
@@ -279,11 +275,11 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>component</name>
+                    <name>site</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>site</name>
+                    <name>user</name>
                     <type>string</type>
                 </column>
                 <column>
