@@ -7,7 +7,7 @@
   "input": [
     {
       "component": "namenode",
-      "host": "apollo-phx-nn-2.vip.ebay.com",
+      "host": "sandbox.hortonworks.com",
       "port": "50070",
       "https": true
     }

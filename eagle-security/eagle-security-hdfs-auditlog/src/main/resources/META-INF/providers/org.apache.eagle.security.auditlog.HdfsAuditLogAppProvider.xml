@@ -79,13 +79,13 @@
         <!-- data source configurations -->
         <property>
             <name>dataSourceConfig.HADOOP_JMX_RESOURCE_STREAM.topic</name>
-            <displayName>Kafka Topic for Jmx Metric Consumption</displayName>
+            <displayName>Kafka Consumer Topic for HDFS Traffic Monitor</displayName>
             <value>hadoop_jmx_resource_${siteId}</value>
             <description>kafka topic for data consumption</description>
         </property>
         <property>
             <name>dataSourceConfig.topic</name>
-            <displayName>Kafka Topic for Auditlog Consumption</displayName>
+            <displayName>Kafka Consumer Topic for HDFS Auditlog</displayName>
             <value>hdfs_audit_log_${siteId}</value>
             <description>kafka topic for data consumption</description>
             <required>true</required>
@@ -99,14 +99,14 @@
         </property>
         <property>
             <name>dataSourceConfig.schemeCls</name>
-            <displayName>Kafka Auditlog Consumer SchemeCls</displayName>
+            <displayName>Kafka Consumer SchemeCls for Auditlog</displayName>
             <value>storm.kafka.StringScheme</value>
             <description>Kafka spout scheme class</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.HADOOP_JMX_RESOURCE_STREAM.schemeCls</name>
-            <displayName>Kafka Traffic Consumer SchemeCls</displayName>
+            <displayName>Kafka Consumer SchemeCls for Traffic Data</displayName>
             <value>org.apache.eagle.app.messaging.JsonSchema</value>
             <description>Kafka spout scheme class</description>
         </property>
