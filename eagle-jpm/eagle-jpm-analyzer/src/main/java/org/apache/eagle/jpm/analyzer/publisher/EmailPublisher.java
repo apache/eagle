@@ -22,6 +22,7 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.app.service.ApplicationEmailService;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.common.mail.AlertEmailConstants;
 import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
@@ -33,21 +34,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
 
     private Config config;
     private List<Class<?>> publishResult4Evaluators = new ArrayList<>();
+    private TimeZone timeZone;
 
     public EmailPublisher(Config config) {
         this.config = config;
         //TODO
         publishResult4Evaluators.add(SLAJobEvaluator.class);
+        timeZone = TimeZone.getTimeZone((config.hasPath(EagleConfigConstants.EAGLE_TIME_ZONE)
+                ? config.getString(EagleConfigConstants.EAGLE_TIME_ZONE)
+                : EagleConfigConstants.DEFAULT_EAGLE_TIME_ZONE));
     }
 
     @Override
@@ -76,10 +78,10 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("user", analyzerJobEntity.getUserId());
         basic.put("status", analyzerJobEntity.getCurrentState());
         basic.put("duration", analyzerJobEntity.getDurationTime() * 1.0 / 1000 + "s");
-        basic.put("start", DateTimeUtil.millisecondsToHumanDateWithSeconds(analyzerJobEntity.getStartTime()));
+        basic.put("start", DateTimeUtil.secondsToHumanDate(analyzerJobEntity.getStartTime() / 1000, timeZone));
         basic.put("end", analyzerJobEntity.getEndTime() == 0
                 ? "0"
-                : DateTimeUtil.millisecondsToHumanDateWithSeconds(analyzerJobEntity.getEndTime()));
+                : DateTimeUtil.secondsToHumanDate(analyzerJobEntity.getEndTime() / 1000, timeZone));
         double progress = analyzerJobEntity.getCurrentState().equalsIgnoreCase(org.apache.eagle.jpm.util.Constants.JobState.RUNNING.toString()) ? analyzerJobEntity.getProgress() : 100;
         basic.put("progress", progress + "%");
         basic.put("detail", getJobLink(analyzerJobEntity));
