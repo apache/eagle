@@ -79,7 +79,7 @@
         <!-- data source configurations -->
         <property>
             <name>dataSourceConfig.HADOOP_JMX_RESOURCE_STREAM.topic</name>
-            <displayName>Kafka Consumer Topic for HDFS Traffic Monitor</displayName>
+            <displayName>Kafka Consumer Topic for HDFS Traffic Data</displayName>
             <value>hadoop_jmx_resource_${siteId}</value>
             <description>kafka topic for data consumption</description>
         </property>
@@ -136,7 +136,7 @@
         </property>
         <property>
             <name>dataSinkConfig.HDFS_AUDIT_LOG_TRAFFIC_STREAM.topic</name>
-            <displayName>Kafka Topic for Traffic Stream Sink</displayName>
+            <displayName>Kafka Topic for Traffic Data Sink</displayName>
             <value>hdfs_traffic_event_${site}</value>
             <description>topic for kafka data sink</description>
         </property>

@@ -31,7 +31,6 @@ import org.apache.eagle.app.utils.StreamConvertHelper;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.security.util.LogParseUtil;
-import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -48,8 +47,8 @@ public class TrafficParserBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficParserBolt.class);
 
     private static final String TARGET_METRIC_NAME = "hadoop.namenode.fsnamesystemstate.topuseropcounts";
-    private static final String METRIC_FORMAT = "hadoop.hdfs.auditlog.%sm.count";
-    private static final String DEFAULT_USER = "cluster";
+    private static final String USER_METRIC_FORMAT = "hadoop.hdfs.auditlog.user.%sm.count";
+    private static final String CLUSTER_METRIC_FORMAT = "hadoop.hdfs.auditlog.cluster.%sm.count";
 
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
@@ -101,11 +100,11 @@ public class TrafficParserBolt extends BaseRichBolt {
 
     private void generateMetric(TopWindowResult.Op op, int windowLen, long timestamp) {
         List<GenericMetricEntity> metrics = new ArrayList<>();
-        GenericMetricEntity clusterMetric = buildMetricEntity(timestamp, DEFAULT_USER, op.getTotalCount(), windowLen);
+        GenericMetricEntity clusterMetric = buildMetricEntity(timestamp, CLUSTER_METRIC_FORMAT, null, op.getTotalCount(), windowLen);
         metrics.add(clusterMetric);
         collector.emit(new Values("", buildStreamEvent(clusterMetric)));
         for (TopWindowResult.User user : op.getTopUsers()) {
-            GenericMetricEntity metric = buildMetricEntity(timestamp, user.getUser(), user.getCount(), windowLen);
+            GenericMetricEntity metric = buildMetricEntity(timestamp, USER_METRIC_FORMAT, user.getUser(), user.getCount(), windowLen);
             metrics.add(metric);
             collector.emit(new Values("", buildStreamEvent(metric)));
         }
@@ -117,11 +116,11 @@ public class TrafficParserBolt extends BaseRichBolt {
         }
     }
 
-    private GenericMetricEntity buildMetricEntity(long timestamp, String user, long count, int windowLen) {
+    private GenericMetricEntity buildMetricEntity(long timestamp, String metricFormat, String user, long count, int windowLen) {
         GenericMetricEntity entity = new GenericMetricEntity();
         entity.setTimestamp(timestamp);
         entity.setValue(new double[]{Double.valueOf(count)});
-        entity.setPrefix(String.format(METRIC_FORMAT, windowLen / 60000));
+        entity.setPrefix(String.format(metricFormat, windowLen / 60000));
         Map<String, String> tags = new HashMap<>();
         tags.put("site", config.getString("siteId"));
         tags.put("user", LogParseUtil.parseUserFromUGI(user));
