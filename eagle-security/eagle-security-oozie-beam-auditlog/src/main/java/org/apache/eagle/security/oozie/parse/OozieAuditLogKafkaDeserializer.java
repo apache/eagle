@@ -21,6 +21,7 @@ import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,7 +45,7 @@ public class OozieAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserial
         }
         if (entity == null) {
             LOG.warn("Event ignored as it can't be correctly parsed, the log is ", logLine);
-            return null;
+            return new HashMap<>();
         }
         Map<String, Object> map = new TreeMap<String, Object>();
         map.put("timestamp", entity.timestamp);

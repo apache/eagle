@@ -6,24 +6,21 @@ import org.apache.beam.runners.spark.SparkPipelineOptions;
 import org.apache.beam.runners.spark.SparkPipelineResult;
 import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.MapCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.io.kafka.KafkaIO;
+import org.apache.beam.sdk.io.kafka8.Kafka8IO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Distinct;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.windowing.FixedWindows;
-import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.eagle.app.BeamApplication;
 import org.apache.eagle.app.environment.impl.BeamEnviroment;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.joda.time.Duration;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 public class OozieAuditLogBeamApplication extends BeamApplication {
@@ -43,10 +40,10 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
             context = config.getConfig(configPrefix);
         }
 
-        Map<String, Object> consumerProps = ImmutableMap.of(
-                "auto.offset.reset", "earliest",
+        Map<String, String> consumerProps = ImmutableMap.<String, String>of(
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "smallest"
                 //"partition.assignment.strategy", "range",
-                "group.id", context.hasPath("consumerGroupId") ? context.getString("consumerGroupId") : DEFAULT_CONSUMER_GROUP_ID
+                //"group.id", context.hasPath("consumerGroupId") ? context.getString("consumerGroupId") : DEFAULT_CONSUMER_GROUP_ID
         );
         // Kafka topic
         String topic = context.getString("topic");
@@ -56,30 +53,31 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
         // Kafka sink broker zk connection
         String sinkBrokerList = config.getString("dataSinkConfig.brokerList");
         String sinkTopic = config.getString("dataSinkConfig.topic");
-        Duration batchIntervalDuration = Duration.standardSeconds(5);
+        Duration batchIntervalDuration = Duration.standardSeconds(10);
 
-        KafkaIO.Read<String, String> read = KafkaIO.<String, String>read()
-                .withBootstrapServers(zkConnString)
-                .withTopics(Arrays.asList(topic))
+        Kafka8IO.Read<String, String> read = Kafka8IO.<String, String>read()
+                .withBootstrapServers("sandbox.hortonworks.com:6667")
+                .withTopics(Collections.singletonList("test"))
                 .withKeyCoder(StringUtf8Coder.of())
                 .withValueCoder(StringUtf8Coder.of())
-                .updateConsumerProperties(consumerProps);
+                .updateKafkaClusterProperties(consumerProps);
 
         SparkPipelineOptions options = PipelineOptionsFactory.as(SparkPipelineOptions.class);
         options.setRunner(SparkRunner.class);
-        options.setCheckpointDir("/tmp");
+        options.setMaxRecordsPerBatch(5L);
+        //options.setCheckpointDir("/tmp");
         Pipeline p = Pipeline.create(options);
 
         PCollection<KV<String, Map<String, String>>> deduped =
-                p.apply(read.withoutMetadata()).setCoder(
-                        KvCoder.of(StringUtf8Coder.of(), StringUtf8Coder.of()))
-                        .apply(Window.<KV<String, String>>into(FixedWindows.of(batchIntervalDuration)))
-                        .apply(Distinct.create())
+                p.apply(read.withoutMetadata())/*.setCoder(
+                        KvCoder.of(StringUtf8Coder.of(), StringUtf8Coder.of()))*/
+                        //.apply(Window.<KV<String, String>>into(FixedWindows.of(batchIntervalDuration)))
+                        //.apply(Distinct.create())
                         .apply(ParDo.of(new ExtractLogFn()));
 
-        deduped.apply(KafkaIO.<String, Map<String, String>>write()
-                .withBootstrapServers(sinkBrokerList)
-                .withTopic(sinkTopic)
+        deduped.apply(Kafka8IO.<String, Map<String, String>>write()
+                .withBootstrapServers("sandbox.hortonworks.com:6667")
+                .withTopic("oozie_audit_log_enriched")
                 .withKeyCoder(StringUtf8Coder.of())
                 .withValueCoder(MapCoder.of(StringUtf8Coder.of(), StringUtf8Coder.of()))
         );

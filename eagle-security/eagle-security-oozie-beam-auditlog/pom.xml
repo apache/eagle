@@ -40,5 +40,24 @@
             <artifactId>eagle-app-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- KafkaIO -->
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-sdks-java-io-kafka8</artifactId>
+            <version>1.0</version>
+            <systemPath>/usr/apache-eagle-beam/beam/sdks/java/io/kafka8/target/beam-sdks-java-io-kafka8-0.7.0-SNAPSHOT.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <version>${spark.core.version}</version>
+        </dependency>
+      <!--  <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-8_2.10</artifactId>
+            <version>${spark.core.version}</version>
+        </dependency>-->
+        <!-- KafkaIO -->
     </dependencies>
 </project>

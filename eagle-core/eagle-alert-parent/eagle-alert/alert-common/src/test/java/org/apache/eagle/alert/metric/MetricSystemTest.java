@@ -390,10 +390,7 @@ public class MetricSystemTest {
     public void makeSureTopic(String zkConnectionString) {
         ZkClient zkClient = new ZkClient(zkConnectionString, 10000, 10000, ZKStringSerializer$.MODULE$);
         Properties topicConfiguration = new Properties();
-        boolean isSecureKafkaCluster = false;
-        // ZkUtils for Kafka was used in Kafka 0.9.0.0 for the AdminUtils API
-        ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zkConnectionString), isSecureKafkaCluster);
-        AdminUtils.createTopic(zkUtils, TOPIC, 1, 1, topicConfiguration);
+        AdminUtils.createTopic(zkClient, TOPIC, 1, 1, topicConfiguration);
     }
 
 

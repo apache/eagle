@@ -25,21 +25,21 @@
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>Kafka Topic for Data Consumption</displayName>
-            <value>testTopic3</value>
+            <value>test</value>
             <description>data source topic</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.zkConnection</name>
             <displayName>Kafka Zookeeper Connection</displayName>
-            <value>localhost:9092</value>
+            <value>sandbox.hortonworks:6667</value>
             <description>kafka broker zk connection</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSourceConfig.txZkServers</name>
             <displayName>Kafka Zookeeper servers</displayName>
-            <value>localhost:2181</value>
+            <value>sandbox.hortonworks:2181</value>
             <description>zookeeper server for offset transaction</description>
         </property>
 
@@ -87,7 +87,7 @@
         <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>Kafka BrokerList for Data Sink</displayName>
-            <value>localhost:9092</value>
+            <value>sandbox.hortonworks:6667</value>
             <description>kafka broker list</description>
         </property>
 <!--

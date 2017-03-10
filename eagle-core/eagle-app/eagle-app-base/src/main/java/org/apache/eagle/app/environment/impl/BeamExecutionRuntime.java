@@ -52,9 +52,7 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
                 res.cancel();
             } catch (IOException ex) {
                 LOG.error("Got an exception when stop, ex: ", ex);
-            }/*finally {
-                beamRuntimeResultManager.removeResult(config.getString("appId"));
-            }*/
+            }
         }
 
     }

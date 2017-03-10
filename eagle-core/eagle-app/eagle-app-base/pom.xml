@@ -36,22 +36,18 @@
             <artifactId>spark-core_${scala.version}</artifactId>
             <version>${spark.core.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_${scala.version}</artifactId>
-            <version>${spark.core.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-spark</artifactId>
             <version>${beam.version}</version>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-direct-java</artifactId>
             <version>${beam.version}</version>
             <scope>runtime</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-sdks-java-core</artifactId>
@@ -71,13 +67,7 @@
             <scope>runtime</scope>
         </dependency>
         <!-- beam end -->
-        <!-- KafkaIO -->
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-io-kafka</artifactId>
-            <version>${beam.version}</version>
-        </dependency>
-        <!-- KafkaIO -->
+
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
