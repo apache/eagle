@@ -67,7 +67,10 @@ class StreamMetadataUpdateServiceImpl implements StreamMetadataUpdateService {
     private void updateStreamMetadata() {
         synchronized (lock) {
             LOGGER.debug("Loading stream metadata ...");
-            int added = 0, changed = 0, removed = 0, total = 0;
+            int added = 0;
+            int changed = 0;
+            int removed = 0;
+            int total = 0;
             Map<String, StreamDesc> latestStreamIdDescMap = new HashMap<>();
             for (ApplicationEntity appEntity : applicationEntityService.findAll()) {
                 List<StreamDesc> streamDescList = appEntity.getStreams();
