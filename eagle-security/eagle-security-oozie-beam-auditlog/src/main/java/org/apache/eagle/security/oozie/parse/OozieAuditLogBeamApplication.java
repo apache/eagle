@@ -56,28 +56,25 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
         Duration batchIntervalDuration = Duration.standardSeconds(10);
 
         Kafka8IO.Read<String, String> read = Kafka8IO.<String, String>read()
-                .withBootstrapServers("sandbox.hortonworks.com:6667")
-                .withTopics(Collections.singletonList("test"))
+                .withBootstrapServers(zkConnString)
+                .withTopics(Collections.singletonList(topic))
                 .withKeyCoder(StringUtf8Coder.of())
                 .withValueCoder(StringUtf8Coder.of())
                 .updateKafkaClusterProperties(consumerProps);
 
         SparkPipelineOptions options = PipelineOptionsFactory.as(SparkPipelineOptions.class);
         options.setRunner(SparkRunner.class);
-        options.setMaxRecordsPerBatch(5L);
+        //options.setMaxRecordsPerBatch(5L);
         //options.setCheckpointDir("/tmp");
         Pipeline p = Pipeline.create(options);
 
         PCollection<KV<String, Map<String, String>>> deduped =
-                p.apply(read.withoutMetadata())/*.setCoder(
-                        KvCoder.of(StringUtf8Coder.of(), StringUtf8Coder.of()))*/
-                        //.apply(Window.<KV<String, String>>into(FixedWindows.of(batchIntervalDuration)))
-                        //.apply(Distinct.create())
+                p.apply(read.withoutMetadata())
                         .apply(ParDo.of(new ExtractLogFn()));
 
         deduped.apply(Kafka8IO.<String, Map<String, String>>write()
-                .withBootstrapServers("sandbox.hortonworks.com:6667")
-                .withTopic("oozie_audit_log_enriched")
+                .withBootstrapServers(sinkBrokerList)
+                .withTopic(sinkTopic)
                 .withKeyCoder(StringUtf8Coder.of())
                 .withValueCoder(MapCoder.of(StringUtf8Coder.of(), StringUtf8Coder.of()))
         );
