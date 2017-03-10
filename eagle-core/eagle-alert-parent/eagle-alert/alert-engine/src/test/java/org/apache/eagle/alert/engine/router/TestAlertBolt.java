@@ -364,7 +364,7 @@ public class TestAlertBolt {
         GeneralTopologyContext context = mock(GeneralTopologyContext.class);
         int taskId = 1;
         when(context.getComponentId(taskId)).thenReturn("comp1");
-        when(context.getComponentOutputFields("comp1", "default")).thenReturn(new Fields("f0"));
+        when(context.getComponentOutputFields("comp1", TEST_STREAM)).thenReturn(new Fields("f0"));
         // case 1: bolt prepared but metadata not initialized (no bolt.onAlertBoltSpecChange)
         PartitionedEvent pe = new PartitionedEvent();
         pe.setPartitionKey(1);
@@ -377,7 +377,7 @@ public class TestAlertBolt {
 
         PartitionedEventSerializerImpl peSer = new PartitionedEventSerializerImpl(bolt);
         byte[] serializedEvent = peSer.serialize(pe);
-        return new TupleImpl(context, Collections.singletonList(serializedEvent), taskId, "default");
+        return new TupleImpl(context, Collections.singletonList(serializedEvent), taskId, TEST_STREAM);
     }
 
     private StreamPartition createPartition() {

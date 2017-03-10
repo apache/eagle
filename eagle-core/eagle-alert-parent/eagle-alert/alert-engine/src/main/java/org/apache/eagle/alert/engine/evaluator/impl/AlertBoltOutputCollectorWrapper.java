@@ -16,18 +16,16 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
+import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.router.StreamOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 
 public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
@@ -53,24 +51,26 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     public void emit(AlertStreamEvent event) {
         Set<PublishPartition> clonedPublishPartitions = new HashSet<>(publishPartitions);
         for (PublishPartition publishPartition : clonedPublishPartitions) {
-            // skip the publish partition which is not belong to this policy
+            // skip the publish partition which is not belong to this policy and also check streamId
             PublishPartition cloned = publishPartition.clone();
-            if (!cloned.getPolicyId().equalsIgnoreCase(event.getPolicyId())) {
-                continue;
-            }
-            for (String column : cloned.getColumns()) {
-                int columnIndex = event.getSchema().getColumnIndex(column);
-                if (columnIndex < 0) {
-                    LOG.warn("Column {} is not found in stream {}", column, cloned.getStreamId());
-                    continue;
-                }
-                cloned.getColumnValues().add(event.getData()[columnIndex]);
-            }
-
-            synchronized (outputLock) {
-                streamContext.counter().incr("alert_count");
-                delegate.emit(Arrays.asList(cloned, event));
-            }
+            Optional.ofNullable(event)
+                .filter(x -> x != null
+                    && x.getSchema() != null
+                    && cloned.getPolicyId().equalsIgnoreCase(x.getPolicyId())
+                    && (cloned.getStreamId().equalsIgnoreCase(x.getSchema().getStreamId())
+                    || cloned.getStreamId().equalsIgnoreCase(Publishment.STREAM_NAME_DEFAULT)))
+                .ifPresent(x -> {
+                    cloned.getColumns().stream()
+                        .filter(y -> event.getSchema().getColumnIndex(y) >= 0
+                            && event.getSchema().getColumnIndex(y) < event.getSchema().getColumns().size())
+                        .map(y -> event.getData()[event.getSchema().getColumnIndex(y)])
+                        .filter(y -> y != null)
+                        .forEach(y -> cloned.getColumnValues().add(y));
+                    synchronized (outputLock) {
+                        streamContext.counter().incr("alert_count");
+                        delegate.emit(Arrays.asList(cloned, event));
+                    }
+                });
         }
     }
 
