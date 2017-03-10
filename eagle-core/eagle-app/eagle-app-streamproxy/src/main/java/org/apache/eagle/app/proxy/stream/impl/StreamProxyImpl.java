@@ -17,6 +17,8 @@
 package org.apache.eagle.app.proxy.stream.impl;
 
 import com.google.common.base.Preconditions;
+import org.apache.eagle.alert.utils.StreamValidationException;
+import org.apache.eagle.alert.utils.StreamValidator;
 import org.apache.eagle.app.messaging.StreamRecord;
 import org.apache.eagle.app.proxy.stream.StreamProxy;
 import org.apache.eagle.app.proxy.stream.StreamProxyProducer;
@@ -32,9 +34,13 @@ public class StreamProxyImpl implements StreamProxy {
     private StreamProxyProducer proxyProducer;
     private volatile boolean opened;
     private String streamId;
+    private StreamValidator validator;
 
     @Override
     public void open(StreamDesc streamDesc) {
+        if (streamDesc.getSchema().isValidate()) {
+            this.validator = new StreamValidator(streamDesc.getSchema());
+        }
         this.streamId = streamDesc.getStreamId();
         if (streamDesc.getSinkConfig() != null) {
             this.proxyProducer = new KafkaStreamProxyProducerImpl(streamDesc.getStreamId(), streamDesc.getSinkConfig());
@@ -57,6 +63,15 @@ public class StreamProxyImpl implements StreamProxy {
     public void send(List<StreamRecord> events) throws IOException {
         Preconditions.checkArgument(this.opened, "Stream proxy not opened for " + streamId);
         Preconditions.checkNotNull(this.proxyProducer, "Stream proxy producer not initialized for " + streamId);
+        if (this.validator != null) {
+            for (StreamRecord event : events) {
+                try {
+                    this.validator.validateMap(event);
+                } catch (StreamValidationException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
         this.proxyProducer.send(events);
     }
 }

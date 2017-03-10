@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
+import org.apache.eagle.alert.utils.StreamValidator;
 import org.apache.eagle.app.messaging.KafkaStreamSinkConfig;
 import org.apache.eagle.app.messaging.StreamRecord;
 import org.apache.eagle.app.proxy.stream.StreamProxyProducer;

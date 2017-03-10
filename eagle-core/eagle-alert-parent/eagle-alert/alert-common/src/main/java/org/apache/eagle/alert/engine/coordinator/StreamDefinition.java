@@ -42,7 +42,7 @@ public class StreamDefinition implements Serializable {
     private String description;
 
     // Is validateable or not
-    private boolean validate;
+    private boolean validate = true;
 
     // Is timeseries-based stream or not
     private boolean timeseries;
