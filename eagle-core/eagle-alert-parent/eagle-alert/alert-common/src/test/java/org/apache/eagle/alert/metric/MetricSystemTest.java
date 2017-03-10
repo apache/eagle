@@ -16,7 +16,15 @@
  */
 package org.apache.eagle.alert.metric;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.JvmAttributeGaugeSet;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.typesafe.config.Config;
@@ -32,9 +40,7 @@ import kafka.javaapi.OffsetResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
 import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.io.FileUtils;
 import org.apache.eagle.alert.metric.entity.MetricEvent;
 import org.apache.eagle.alert.metric.sink.ConsoleSink;
@@ -43,7 +49,10 @@ import org.apache.eagle.alert.metric.source.JVMMetricSource;
 import org.apache.eagle.alert.metric.source.MetricSource;
 import org.apache.eagle.alert.utils.JsonUtils;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
