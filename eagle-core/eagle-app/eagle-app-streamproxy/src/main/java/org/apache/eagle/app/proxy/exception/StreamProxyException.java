@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.proxy.impl;
+package org.apache.eagle.app.proxy.exception;
 
-import org.apache.eagle.app.proxy.StreamProxy;
-import org.apache.eagle.app.proxy.StreamProxyProducer;
-import org.apache.eagle.metadata.model.StreamSinkConfig;
-
-import java.io.IOException;
-
-public class StreamProxyImpl implements StreamProxy {
-    private final StreamProxyProducer proxyProducer;
-    public StreamProxyImpl(String streamId, StreamSinkConfig sinkConfig) {
-        this.proxyProducer = new StreamProxyProducerImpl(streamId, sinkConfig);
+public class StreamProxyException  extends Exception {
+    public StreamProxyException() {
+        super();
     }
 
-    @Override
-    public StreamProxyProducer getProducer() {
-        return proxyProducer;
+    public StreamProxyException(String message) {
+        super(message);
     }
 
-    @Override
-    public void close() throws IOException {
-        this.proxyProducer.close();
+    public StreamProxyException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public StreamProxyException(Throwable cause) {
+        super(cause);
+    }
+
+    protected StreamProxyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

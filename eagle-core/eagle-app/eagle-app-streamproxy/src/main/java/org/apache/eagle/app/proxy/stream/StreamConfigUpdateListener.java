@@ -14,10 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.proxy;
+package org.apache.eagle.app.proxy.stream;
 
-import java.io.Closeable;
+import org.apache.eagle.metadata.model.StreamDesc;
 
-public interface StreamProxy extends Closeable {
-    StreamProxyProducer getProducer();
+public interface StreamConfigUpdateListener {
+    /**
+     * onStreamAdded listener callback method.
+     */
+    void onStreamAdded(StreamDesc streamDesc);
+
+    /**
+     * onStreamChanged listener callback method.
+     */
+    void onStreamChanged(StreamDesc streamDesc);
+
+    /**
+     * onStreamRemoved listener callback method.
+     */
+    void onStreamRemoved(StreamDesc streamDesc);
 }

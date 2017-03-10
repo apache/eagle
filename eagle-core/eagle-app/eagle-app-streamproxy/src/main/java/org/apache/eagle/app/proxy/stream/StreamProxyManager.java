@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.proxy;
+package org.apache.eagle.app.proxy.stream;
 
-import org.apache.eagle.app.messaging.StreamRecord;
+import com.google.inject.ImplementedBy;
+import org.apache.eagle.app.proxy.exception.StreamProxyException;
+import org.apache.eagle.app.proxy.stream.impl.StreamProxyManagerImpl;
+import org.apache.eagle.metadata.model.StreamDesc;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Collection;
 
-public interface StreamProxyProducer extends Closeable {
-    Future<Boolean> send(List<StreamRecord> events) throws IOException;
+@ImplementedBy(StreamProxyManagerImpl.class)
+public interface StreamProxyManager {
+    StreamProxy getStreamProxy(String streamId) throws StreamProxyException;
+
+    Collection<StreamDesc> getAllStreamDesc();
 }

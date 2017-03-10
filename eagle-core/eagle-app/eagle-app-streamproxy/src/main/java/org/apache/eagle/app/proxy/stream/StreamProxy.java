@@ -14,26 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.proxy;
+package org.apache.eagle.app.proxy.stream;
 
-import com.google.inject.Inject;
-import org.apache.eagle.app.messaging.StreamRecord;
-import org.apache.eagle.common.rest.RESTResponse;
+import org.apache.eagle.metadata.model.StreamDesc;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
+import java.io.IOException;
 
-@Path("/stream")
-public class StreamProxyResource {
-    @Inject
-    private StreamProxyManager proxyManager;
+public interface StreamProxy extends StreamProxyProducer {
+    void open(StreamDesc streamDesc);
 
-    @POST
-    @Path("/{streamId}/")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse produceEvent(List<StreamRecord> records, @PathParam("streamId") String streamId) {
-        return RESTResponse.async(() -> proxyManager.getStreamProxy(streamId).getProducer().send(records).get()).get();
-    }
+    void close() throws IOException;
 }

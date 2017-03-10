@@ -14,8 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.proxy;
+package org.apache.eagle.app.test;
 
-public interface StreamConfigUpdateService extends Runnable {
-    void shutdown();
+import java.io.File;
+import java.io.IOException;
+
+public interface KafkaTestServer {
+    void start() throws Exception;
+
+    void stop() throws IOException;
+
+    int getZookeeperPort();
+
+    int getKafkaBrokerPort();
+
+    static KafkaTestServer create(File logDir) {
+        return new KafkaTestServerImpl(logDir);
+    }
 }

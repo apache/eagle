@@ -14,21 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.proxy;
+package org.apache.eagle.app.proxy.stream;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.metadata.model.StreamDesc;
 
-import java.util.List;
 import java.util.Map;
 
-public interface StreamConfigUpdateListener {
-    /**
-     * onStreamMetadataChanged listener callback method.
-     */
-    void onStreamMetadataChanged(
-        Map<String, Pair<StreamDefinition, Kafka2TupleMetadata>> updatedStreamMetadata,
-        List<String> deletedStreamIds
-    );
+public interface StreamMetadataUpdateService extends Runnable {
+    Map<String, StreamDesc> getStreamDescSnapshot();
+
+    void shutdown();
 }

@@ -18,7 +18,13 @@ package org.apache.eagle.app.messaging;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class StreamRecord extends HashMap<String,Object> implements Serializable {
+    public StreamRecord() {
+    }
 
+    public StreamRecord(Map<String,Object> event) {
+        this.putAll(event);
+    }
 }
