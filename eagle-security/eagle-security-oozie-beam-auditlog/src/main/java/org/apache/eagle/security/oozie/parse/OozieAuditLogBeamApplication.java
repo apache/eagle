@@ -18,13 +18,15 @@ import org.apache.eagle.app.BeamApplication;
 import org.apache.eagle.app.environment.impl.BeamEnviroment;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.joda.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Map;
 
 public class OozieAuditLogBeamApplication extends BeamApplication {
-
+  private static Logger LOG = LoggerFactory.getLogger(OozieAuditLogBeamApplication.class);
     private static final String DEFAULT_CONFIG_PREFIX = "dataSourceConfig";
     private static final String DEFAULT_CONSUMER_GROUP_ID = "eagleConsumer";
     private static final String DEFAULT_TRANSACTION_ZK_ROOT = "/consumers";
@@ -53,7 +55,6 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
         // Kafka sink broker zk connection
         String sinkBrokerList = config.getString("dataSinkConfig.brokerList");
         String sinkTopic = config.getString("dataSinkConfig.topic");
-        Duration batchIntervalDuration = Duration.standardSeconds(10);
 
         Kafka8IO.Read<String, String> read = Kafka8IO.<String, String>read()
                 .withBootstrapServers(zkConnString)
@@ -63,9 +64,14 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
                 .updateKafkaClusterProperties(consumerProps);
 
         SparkPipelineOptions options = PipelineOptionsFactory.as(SparkPipelineOptions.class);
+      Duration batchIntervalDuration = Duration.standardSeconds(5);
+      // provide a generous enough batch-interval to have everything fit in one micro-batch.
+      options.setBatchIntervalMillis(batchIntervalDuration.getMillis());
+      // provide a very generous read time bound, we rely on num records bound here.
+      options.setMinReadTimeMillis(batchIntervalDuration.minus(1).getMillis());
+      // bound the read on the number of messages - 2 topics of 4 messages each.
+      options.setMaxRecordsPerBatch(8L);
         options.setRunner(SparkRunner.class);
-        //options.setMaxRecordsPerBatch(5L);
-        //options.setCheckpointDir("/tmp");
         Pipeline p = Pipeline.create(options);
 
         PCollection<KV<String, Map<String, String>>> deduped =
@@ -77,6 +83,7 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
                 .withTopic(sinkTopic)
                 .withKeyCoder(StringUtf8Coder.of())
                 .withValueCoder(MapCoder.of(StringUtf8Coder.of(), StringUtf8Coder.of()))
+                .updateProducerProperties(ImmutableMap.of("bootstrap.servers", sinkBrokerList))
         );
 
         return p;
@@ -95,6 +102,7 @@ public class OozieAuditLogBeamApplication extends BeamApplication {
         @ProcessElement
         public void processElement(ProcessContext c) throws UnsupportedEncodingException {
             String log = c.element().getValue();
+            LOG.info("--------------log "+log);
             Map<String, String> map = (Map<String, String>) new OozieAuditLogKafkaDeserializer().deserialize(log.getBytes("UTF-8"));
             c.output(KV.of("f1", map));
         }

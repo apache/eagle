@@ -50,14 +50,28 @@
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.10</artifactId>
+            <artifactId>spark-core_${scala.version}</artifactId>
             <version>${spark.core.version}</version>
         </dependency>
-      <!--  <dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming-kafka-0-8_2.10</artifactId>
+            <artifactId>spark-streaming_${scala.version}</artifactId>
             <version>${spark.core.version}</version>
-        </dependency>-->
-        <!-- KafkaIO -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-8_${scala.version}</artifactId>
+            <version>${spark.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>${fasterxml-jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-sdks-common-fn-api</artifactId>
+            <version>${beam.version}</version>
+        </dependency>
     </dependencies>
 </project>
