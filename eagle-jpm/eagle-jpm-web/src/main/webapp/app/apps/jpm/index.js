@@ -327,6 +327,12 @@
 			return _list;
 		};
 
+		/**
+		 *
+		 * @param list
+		 * @param flatten {bool|[]} bool will set merge result. array will pick only contains value
+		 * @return {Array}
+		 */
 		JPM.aggMetricsToEntities = function (list, flatten) {
 			var _list = [];
 			_list.done = false;
@@ -351,14 +357,21 @@
 							};
 						});
 
-						if(flatten) {
-							_list.push.apply(_list, _subList);
+						if ($.isArray(flatten)) {
+							if (flatten.indexOf(j) !== -1) {
+								_list.push(_subList);
+							}
 						} else {
-							_list.push(_subList);
+							if(flatten) {
+								_list.push.apply(_list, _subList);
+							} else {
+								_list.push(_subList);
+							}
 						}
 					});
 				});
 				_list.done = true;
+
 				return _list;
 			});
 			return _list;
