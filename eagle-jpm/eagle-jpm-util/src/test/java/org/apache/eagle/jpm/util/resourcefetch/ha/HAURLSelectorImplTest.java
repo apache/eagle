@@ -73,7 +73,7 @@ public class HAURLSelectorImplTest {
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
         when(InputStreamUtils.getInputStream("http://www.yyy.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(null);
-        haurlSelector.reSelectUrl();
+        haurlSelector.checkUrl();
         Assert.assertEquals(rmBasePaths[1], haurlSelector.getSelectedUrl());
     }
 
@@ -84,7 +84,7 @@ public class HAURLSelectorImplTest {
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(null);
         when(InputStreamUtils.getInputStream("http://www.yyy.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
-        haurlSelector.reSelectUrl();
+        haurlSelector.checkUrl();
         Assert.assertEquals(rmBasePaths[0], haurlSelector.getSelectedUrl());
     }
 
@@ -97,6 +97,6 @@ public class HAURLSelectorImplTest {
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
         when(InputStreamUtils.getInputStream("http://www.yyy.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
-        haurlSelector.reSelectUrl();
+        haurlSelector.checkUrl();
     }
 }

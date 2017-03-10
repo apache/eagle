@@ -182,7 +182,7 @@ public class MRJobParser implements Runnable {
             LOG.info("fetch mr job from {}", jobURL);
             mrJobs = OBJ_MAPPER.readValue(is, MRJobsWrapper.class).getJobs().getJob();
         } catch (Exception e) {
-            LOG.warn("fetch mr job from {} failed, {}", jobURL, e);
+            LOG.warn("fetch mr job from {} failed, {}", jobURL, e.getMessage());
             return false;
         } finally {
             Utils.closeInputStream(is);

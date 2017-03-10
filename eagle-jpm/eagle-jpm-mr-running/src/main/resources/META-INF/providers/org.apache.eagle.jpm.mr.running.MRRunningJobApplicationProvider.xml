@@ -40,9 +40,15 @@
         </property>
         <property>
             <name>endpointConfig.fetchRunningJobInterval</name>
-            <displayName>Interval of Fetch Running Job From Resource Manager</displayName>
+            <displayName>Interval of Fetching Running Jobs in Seconds</displayName>
             <description>interval of fetch map reduce running jobs from resource manager</description>
-            <value>60</value>
+            <value>300</value>
+        </property>
+        <property>
+            <name>endpointConfig.fetchRunningJobRequests</name>
+            <displayName>Request Number of Fetching Running Jobs</displayName>
+            <description>number of requests separated by time ranges</description>
+            <value>1</value>
         </property>
         <property>
             <name>endpointConfig.parseJobThreadPoolSize</name>
@@ -80,7 +86,113 @@
             <description>User use -Dkey=value to specify name of a job when submit. use this to extract job name from job configuration</description>
             <value>eagle.job.name</value>
         </property>
+
+        <!-- Accepted App Stream -->
+        <property>
+            <name>dataSinkConfig.ACCEPTED_APP_STREAM.topic</name>
+            <displayName>Destination(Kafka Topic) Of App Stream Data</displayName>
+            <value>yarn_accepted_app_{site}</value>
+            <description>topic for kafka data sink</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.brokerList</name>
+            <displayName>dataSinkConfig.brokerList</displayName>
+            <value>localhost:6667</value>
+            <description>kafka broker list</description>
+            <required>true</required>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.serializerClass</name>
+            <displayName>dataSinkConfig.serializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message value</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.keySerializerClass</name>
+            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message key</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.producerType</name>
+            <displayName>dataSinkConfig.producerType</displayName>
+            <value>async</value>
+            <description>whether the messages are sent asynchronously in a background thread</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.numBatchMessages</name>
+            <displayName>dataSinkConfig.numBatchMessages</displayName>
+            <value>4096</value>
+            <description>number of messages to send in one batch when using async mode</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.maxQueueBufferMs</name>
+            <displayName>dataSinkConfig.maxQueueBufferMs</displayName>
+            <value>5000</value>
+            <description>maximum time to buffer data when using async mode</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.requestRequiredAcks</name>
+            <displayName>dataSinkConfig.requestRequiredAcks</displayName>
+            <value>0</value>
+            <description>value controls when a produce request is considered completed</description>
+        </property>
     </configuration>
+    <streams>
+        <stream>
+            <streamId>ACCEPTED_APP_STREAM</streamId>
+            <description>Accepted App Info Stream</description>
+            <validate>true</validate>
+            <columns>
+                <column>
+                    <name>id</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>appName</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>queue</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>state</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>user</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>trackingUrl</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>elapsedTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>startedTime</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>queueUsagePercentage</name>
+                    <type>double</type>
+                </column>
+                <column>
+                    <name>clusterUsagePercentage</name>
+                    <type>double</type>
+                </column>
+            </columns>
+        </stream>
+    </streams>
     <docs>
         <install>
             # Step 1: Create source kafka topic named "${site}_example_source_topic"

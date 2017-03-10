@@ -86,8 +86,9 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                 LOG.info("recover {} mr yarn apps from zookeeper", apps.size());
                 this.init = true;
             } else {
-                apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
+                apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB, endpointConfig.fetchRunningJobRequests);
                 LOG.info("get {} apps from resource manager", apps.size());
+                collector.emit(MRRunningJobConfig.APP_TO_METRIC_STREAM, new Values(apps));
 
                 Set<String> runningAppIdsAtThisTime = runningAppIdsAtThisTime(apps);
                 Set<String> runningAppIdsAtPreviousTime = this.runningYarnApps;
@@ -121,13 +122,14 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                 AppInfo appInfo = apps.get(i);
                 if (mrApps != null && mrApps.containsKey(appInfo.getId())) {
                     //emit (AppInfo, Map<String, JobExecutionAPIEntity>)
-                    collector.emit(new Values(appInfo.getId(), appInfo, mrApps.get(appInfo.getId())));
+                    collector.emit(MRRunningJobConfig.APP_TO_JOB_STREAM,
+                            new Values(appInfo.getId(), appInfo, mrApps.get(appInfo.getId())));
                 } else {
-                    collector.emit(new Values(appInfo.getId(), appInfo, null));
+                    collector.emit(MRRunningJobConfig.APP_TO_JOB_STREAM, new Values(appInfo.getId(), appInfo, null));
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("An fetal exception is caught: {}", e.getMessage(), e);
         } finally {
             Utils.sleep(endpointConfig.fetchRunningJobInterval);
         }
@@ -159,7 +161,9 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("appId", "appInfo", "mrJobEntity"));
+        outputFieldsDeclarer.declareStream(MRRunningJobConfig.APP_TO_JOB_STREAM,
+                new Fields("appId", "appInfo", "mrJobEntity"));
+        outputFieldsDeclarer.declareStream(MRRunningJobConfig.APP_TO_METRIC_STREAM, new Fields("apps"));
     }
 
     @Override

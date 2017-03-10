@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.hadoop.queue.model.applications;
+package org.apache.eagle.jpm.mr.runningentity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -23,7 +23,6 @@ import org.apache.eagle.log.entity.meta.*;
 
 import static org.apache.eagle.jpm.util.Constants.ACCEPTED_APP_SERVICE_NAME;
 
-@Deprecated
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("yarn_app")
 @ColumnFamily("f")

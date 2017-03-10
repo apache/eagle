@@ -20,9 +20,9 @@ import java.io.IOException;
 
 public interface HAURLSelector {
 
-    boolean checkUrl(String url);
+    void checkUrl() throws IOException;
 
-    void reSelectUrl() throws IOException;
+    boolean checkUrl(String urlString);
 
     String getSelectedUrl();
 }

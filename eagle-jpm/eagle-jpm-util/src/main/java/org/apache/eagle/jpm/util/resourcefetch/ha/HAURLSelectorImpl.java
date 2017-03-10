@@ -44,12 +44,18 @@ public class HAURLSelectorImpl implements HAURLSelector {
         this.builder = builder;
     }
 
+    public void checkUrl() throws IOException {
+        if (!checkUrl(builder.build(getSelectedUrl(), Constants.JobState.RUNNING.name()))) {
+            reSelectUrl();
+        }
+    }
+
     public boolean checkUrl(String urlString) {
         InputStream is = null;
         try {
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
         } catch (Exception ex) {
-            LOG.info("get inputstream from url: " + urlString + " failed. ");
+            LOG.info("get inputStream from url: " + urlString + " failed. ");
             return false;
         } finally {
             if (is != null) {
@@ -71,8 +77,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
         return selectedUrl;
     }
 
-    @Override
-    public void reSelectUrl() throws IOException {
+    private void reSelectUrl() throws IOException {
         if (reselectInProgress) {
             return;
         }

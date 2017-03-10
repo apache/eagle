@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class RunningAppParseListener {
 
     private static final Logger logger = LoggerFactory.getLogger(RunningAppParseListener.class);

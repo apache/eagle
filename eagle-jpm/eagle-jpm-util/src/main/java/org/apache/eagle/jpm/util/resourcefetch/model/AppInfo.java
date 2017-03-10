@@ -43,9 +43,12 @@ public class AppInfo implements Serializable {
     private long elapsedTime;
     private String amContainerLogs;
     private String amHostHttpAddress;
-    private long allocatedMB;
+    private int allocatedMB;
     private int allocatedVCores;
     private int runningContainers;
+    // for HDP 2.7
+    private double queueUsagePercentage;
+    private double clusterUsagePercentage;
 
     public String getId() {
         return id;
@@ -183,11 +186,11 @@ public class AppInfo implements Serializable {
         this.amHostHttpAddress = amHostHttpAddress;
     }
 
-    public long getAllocatedMB() {
+    public int getAllocatedMB() {
         return allocatedMB;
     }
 
-    public void setAllocatedMB(long allocatedMB) {
+    public void setAllocatedMB(int allocatedMB) {
         this.allocatedMB = allocatedMB;
     }
 
@@ -205,6 +208,22 @@ public class AppInfo implements Serializable {
 
     public void setRunningContainers(int runningContainers) {
         this.runningContainers = runningContainers;
+    }
+
+    public double getQueueUsagePercentage() {
+        return queueUsagePercentage;
+    }
+
+    public void setQueueUsagePercentage(double queueUsagePercentage) {
+        this.queueUsagePercentage = queueUsagePercentage;
+    }
+
+    public double getClusterUsagePercentage() {
+        return clusterUsagePercentage;
+    }
+
+    public void setClusterUsagePercentage(double clusterUsagePercentage) {
+        this.clusterUsagePercentage = clusterUsagePercentage;
     }
 
     @Override

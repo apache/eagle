@@ -34,6 +34,9 @@ public class MRRunningJobConfig implements Serializable {
 
     private static final String JOB_SYMBOL = "/jobs";
 
+    public static final String APP_TO_JOB_STREAM = "appStream";
+    public static final String APP_TO_METRIC_STREAM = "appMetricStream";
+
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -73,6 +76,7 @@ public class MRRunningJobConfig implements Serializable {
         public String site;
         public String[] rmUrls;
         public int fetchRunningJobInterval;
+        public int fetchRunningJobRequests;
         public int parseJobThreadPoolSize;
     }
 
@@ -127,6 +131,11 @@ public class MRRunningJobConfig implements Serializable {
         this.endpointConfig.site = config.getString("siteId");
         this.endpointConfig.fetchRunningJobInterval = config.getInt("endpointConfig.fetchRunningJobInterval");
         this.endpointConfig.parseJobThreadPoolSize = config.getInt("endpointConfig.parseJobThreadPoolSize");
+        if (config.hasPath("endpointConfig.fetchRunningJobRequests")) {
+            this.endpointConfig.fetchRunningJobRequests = config.getInt("endpointConfig.fetchRunningJobRequests");
+        } else {
+            this.endpointConfig.fetchRunningJobRequests = 1;
+        }
 
         LOG.info("Successfully initialized MRRunningJobConfig");
         LOG.info("site: " + this.endpointConfig.site);

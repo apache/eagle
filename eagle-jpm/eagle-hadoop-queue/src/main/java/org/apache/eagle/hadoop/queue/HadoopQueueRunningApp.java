@@ -39,18 +39,17 @@ public class HadoopQueueRunningApp extends StormApplication {
         String persistBoltName = "persistBolt";
 
         IRichSpout spout = new HadoopQueueRunningSpout(appConfig);
-        Map<HadoopClusterConstants.DataSource, String> streamMaps = new HashMap<>();
 
-        String acceptedAppStreamId = persistBoltName + "-to-" + DataSource.RUNNING_APPS.toString();
-        String schedulerStreamId = persistBoltName + "-to-" + DataSource.SCHEDULER.toString();
-        streamMaps.put(DataSource.RUNNING_APPS, acceptedAppStreamId);
-        streamMaps.put(DataSource.SCHEDULER, schedulerStreamId);
+        //String acceptedAppStreamId = persistBoltName + "-to-" + DataSource.RUNNING_APPS.toString();
+        //String schedulerStreamId = persistBoltName + "-to-" + DataSource.SCHEDULER.toString();
+        //streamMaps.put(DataSource.RUNNING_APPS, acceptedAppStreamId);
+        //streamMaps.put(DataSource.SCHEDULER, schedulerStreamId);
 
         int numOfPersistTasks = appConfig.topology.numPersistTasks;
         int numOfSinkTasks = appConfig.topology.numSinkTasks;
         int numOfSpoutTasks = 1;
 
-        HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(appConfig, streamMaps);
+        HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(appConfig);
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(spoutName, spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
@@ -58,11 +57,11 @@ public class HadoopQueueRunningApp extends StormApplication {
 
         StormStreamSink queueSinkBolt = environment.getStreamSink("HADOOP_QUEUE_STREAM", config);
         builder.setBolt("queueKafkaSink", queueSinkBolt, numOfSinkTasks)
-                .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName, schedulerStreamId);
+                .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName);
 
-        StormStreamSink appSinkBolt = environment.getStreamSink("ACCEPTED_APP_STREAM", config);
-        builder.setBolt("appKafkaSink", appSinkBolt, numOfSinkTasks)
-                .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName, acceptedAppStreamId);
+        //StormStreamSink appSinkBolt = environment.getStreamSink("ACCEPTED_APP_STREAM", config);
+        //builder.setBolt("appKafkaSink", appSinkBolt, numOfSinkTasks)
+        //        .setNumTasks(numOfSinkTasks).shuffleGrouping(persistBoltName, acceptedAppStreamId);
 
         return builder.createTopology();
     }

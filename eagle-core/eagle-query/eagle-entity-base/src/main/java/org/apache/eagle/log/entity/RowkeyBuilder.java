@@ -108,7 +108,7 @@ public class RowkeyBuilder {
 	 * hash code values. 
 	 */
 	private static byte[] buildRowkey(int prefixHash, List<Integer> partitionHashValues, long timestamp, SortedMap<Integer, Integer> tags){
-		// alloacate byte array for rowkey
+		// allocate byte array for rowkey
 		final int len = 4 + 8 + tags.size() * (4 + 4) + (partitionHashValues.size() * 4);
 		final byte[] rowkey = new byte[len];
 		int offset = 0;

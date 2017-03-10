@@ -61,12 +61,6 @@
             <description>topic for kafka data sink</description>
         </property>
         <property>
-            <name>dataSinkConfig.ACCEPTED_APP_STREAM.topic</name>
-            <displayName>Destination(Kafka Topic) Of App Stream Data</displayName>
-            <value>yarn_accepted_app</value>
-            <description>topic for kafka data sink</description>
-        </property>
-        <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>dataSinkConfig.brokerList</displayName>
             <value>localhost:6667</value>
@@ -175,57 +169,6 @@
                 <column>
                     <name>maxActiveApplications</name>
                     <type>int</type>
-                </column>
-            </columns>
-        </stream>
-        <stream>
-            <streamId>ACCEPTED_APP_STREAM</streamId>
-            <description>Accepted App Info Stream</description>
-            <validate>true</validate>
-            <columns>
-                <column>
-                    <name>id</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>site</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>appName</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>queue</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>state</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>user</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>trackingUrl</name>
-                    <type>string</type>
-                </column>
-                <column>
-                    <name>elapsedTime</name>
-                    <type>long</type>
-                </column>
-                <column>
-                    <name>startedTime</name>
-                    <type>long</type>
-                </column>
-                <column>
-                    <name>queueUsagePercentage</name>
-                    <type>double</type>
-                </column>
-                <column>
-                    <name>clusterUsagePercentage</name>
-                    <type>double</type>
                 </column>
             </columns>
         </stream>
