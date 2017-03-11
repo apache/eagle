@@ -41,7 +41,7 @@ public class StreamProxyTest extends ApplicationTestBase {
     private StreamDesc streamDesc;
 
     @Before
-    public void before () throws Exception {
+    public void before() throws Exception {
         kafkaTestServer = KafkaTestServer.create(temporaryFolder.newFolder());
         kafkaTestServer.start();
         this.streamDesc = new StreamDesc();
@@ -64,11 +64,13 @@ public class StreamProxyTest extends ApplicationTestBase {
     public void testStreamProxyProduce() throws IOException {
         StreamProxy streamProxy = new StreamProxyImpl();
         streamProxy.open(streamDesc);
-        streamProxy.send(Collections.singletonList(new StreamRecord() {{
-            put("metric", "DiskUsage");
-            put("host", "localhost");
-            put("value", 98);
-        }}));
+        streamProxy.send(Collections.singletonList(new StreamRecord() {
+            {
+                put("metric", "DiskUsage");
+                put("host", "localhost");
+                put("value", 98);
+            }
+        }));
         streamProxy.close();
     }
 }
