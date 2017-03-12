@@ -42,7 +42,7 @@ public class StreamDefinition implements Serializable {
     private String description;
 
     // Is validateable or not
-    private boolean validate;
+    private boolean validate = true;
 
     // Is timeseries-based stream or not
     private boolean timeseries;
@@ -52,7 +52,7 @@ public class StreamDefinition implements Serializable {
     // Stream data source ID
     private String dataSource;
 
-    private String group = "Default";
+    private String group = "global";
 
     //
     private String streamSource;
@@ -125,6 +125,7 @@ public class StreamDefinition implements Serializable {
         this.description = description;
     }
 
+    @Deprecated
     public boolean isValidate() {
         return validate;
     }

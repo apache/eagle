@@ -18,6 +18,8 @@ package org.apache.eagle.alert.engine.model;
 
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.utils.StreamValidationException;
+import org.apache.eagle.alert.utils.StreamValidator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -127,6 +129,17 @@ public class StreamEventTest {
         streamEvent.setData(new Object[]{"namevalue", "hostvalue", "1", 10.0, 1, -0.2, "{\"name\":\"heap.COMMITTED\", \"Value\":\"175636480\"}\""});
         streamEvent.getData(streamDefinition, "salary", "int");
 
+    }
+
+    @Test
+    public void testStreamValidator() throws StreamValidationException {
+        StreamDefinition streamDefinition = mockStreamDefinition("TEST_STREAM");
+        StreamValidator validator = new StreamValidator(streamDefinition);
+        thrown.expect(StreamValidationException.class);
+        validator.validateMap(new HashMap<String, Object>() {{
+            put("name", "cpu");
+            put("value", 60.0);
+        }});
     }
 
     @Test

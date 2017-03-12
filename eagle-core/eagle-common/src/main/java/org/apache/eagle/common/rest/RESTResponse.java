@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -212,7 +213,7 @@ public class RESTResponse<T> {
             return this;
         }
 
-        private void runAsync(CompletableFuture future) {
+        private void runAsync(Future future) {
             try {
                 future.get();
             } catch (InterruptedException ex) {
