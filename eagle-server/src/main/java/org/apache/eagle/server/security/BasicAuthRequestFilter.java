@@ -24,7 +24,6 @@ import com.sun.jersey.core.util.Priority;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import io.dropwizard.auth.Auth;
-import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.rest.RESTResponse;
@@ -87,7 +86,12 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
         .status(false, Response.Status.UNAUTHORIZED)
         .build();
 
-    private static final Response ALL_ACCESS_DENIED = RESTResponse.builder()
+    private static final Response INVALID_ACCESS_FORBIDDEN = RESTResponse.builder()
+        .message("Access denied, invalid username or password")
+        .status(false, Response.Status.FORBIDDEN)
+        .build();
+
+    private static final Response ALL_ACCESS_FORBIDDEN = RESTResponse.builder()
         .message("Access denied")
         .status(false, Response.Status.FORBIDDEN)
         .build();
@@ -101,7 +105,7 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
             //Access denied for all
 
             if (hasDenyAllAnnotation) {
-                throw new WebApplicationException(ALL_ACCESS_DENIED);
+                throw new WebApplicationException(ALL_ACCESS_FORBIDDEN);
             }
 
             //Get request headers
@@ -175,8 +179,10 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
                         }
                     }
                 } else {
-                    throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
+                    throw new WebApplicationException(INVALID_ACCESS_FORBIDDEN);
                 }
+            } else {
+                throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
             }
         } catch (WebApplicationException e) {
             throw e;

@@ -20,6 +20,8 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.apache.eagle.app.messaging.StreamRecord;
 import org.apache.eagle.common.rest.RESTResponse;
+import org.apache.eagle.common.security.RolesAllowed;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +36,9 @@ import java.util.Optional;
 
 @Path("/streams")
 public class StreamProxyResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamProxyResource.class);
     @Inject
     private StreamProxyManager proxyManager;
-    private static final Logger LOGGER = LoggerFactory.getLogger(StreamProxyResource.class);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -48,6 +50,7 @@ public class StreamProxyResource {
     @Path("/{streamId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed( {User.Role.ADMINISTRATOR, User.Role.APPLICATION})
     public RESTResponse produceEvent(@NotNull List<StreamRecord> records, @PathParam("streamId") String streamId) {
         return RESTResponse.async((builder) -> {
             try {
@@ -67,7 +70,7 @@ public class StreamProxyResource {
     @GET
     @Path("/{streamId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse getSingleStreamDesc( @PathParam("streamId") String streamId) {
+    public RESTResponse getSingleStreamDesc(@PathParam("streamId") String streamId) {
         return RESTResponse.async((builder) -> {
             Optional<StreamDesc> streamDesc = proxyManager.getAllStreamDesc()
                 .stream().filter((desc) -> desc.getStreamId().equalsIgnoreCase(streamId)).findAny();
