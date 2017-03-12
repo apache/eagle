@@ -125,6 +125,7 @@ public class StreamDefinition implements Serializable {
         this.description = description;
     }
 
+    @Deprecated
     public boolean isValidate() {
         return validate;
     }

@@ -38,7 +38,7 @@ public class StreamProxyImpl implements StreamProxy {
 
     @Override
     public void open(StreamDesc streamDesc) {
-        if (streamDesc.getSchema() != null && streamDesc.getSchema().isValidate()) {
+        if (streamDesc.getSchema() != null) {
             this.validator = new StreamValidator(streamDesc.getSchema());
         }
         this.streamId = streamDesc.getStreamId();
