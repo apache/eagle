@@ -54,6 +54,7 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(BasicAuthRequestFilter.class);
     private boolean isSecurityDefined = false;
     private boolean isAuthRequired = false;
+    private boolean isAuthDefined = false;
     private boolean hasPermitAllAnnotation = false;
     private boolean hasDenyAllAnnotation = false;
     private boolean hasRolesAllowedAnnotation = false;
@@ -66,15 +67,16 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
         this.hasRolesAllowedAnnotation = method.isAnnotationPresent(RolesAllowed.class);
         this.isSecurityDefined = this.hasPermitAllAnnotation || this.hasDenyAllAnnotation || this.hasRolesAllowedAnnotation;
         for (Parameter parameter : method.getMethod().getParameters()) {
-            if (isSecurityDefined && isAuthRequired) {
+            if (isAuthRequired && isAuthDefined) {
                 break;
             }
             Auth[] authAnnotations = parameter.getAnnotationsByType(Auth.class);
-            this.isSecurityDefined = this.isSecurityDefined || authAnnotations.length > 0;
+            this.isAuthDefined = authAnnotations.length > 0 || this.isAuthDefined;
             for (Auth auth : authAnnotations) {
-                this.isAuthRequired = this.isAuthRequired || auth.required();
+                this.isAuthRequired = auth.required() || this.isAuthRequired;
             }
         }
+        this.isSecurityDefined = this.isAuthDefined || this.isSecurityDefined;
         Preconditions.checkArgument(!(this.hasDenyAllAnnotation && this.hasPermitAllAnnotation), "Conflict @DenyAll and @PermitAll on method " + this.method.toString());
     }
 
@@ -182,7 +184,9 @@ public class BasicAuthRequestFilter implements ContainerRequestFilter {
                     throw new WebApplicationException(INVALID_ACCESS_FORBIDDEN);
                 }
             } else {
-                throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
+                if (!this.isAuthDefined) {
+                    throw new WebApplicationException(UNAUTHORIZED_ACCESS_DENIED);
+                }
             }
         } catch (WebApplicationException e) {
             throw e;
