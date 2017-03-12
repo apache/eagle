@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -59,16 +61,20 @@ public class KafkaStreamProxyProducerImpl implements StreamProxyProducer {
 
     @Override
     public void send(List<StreamRecord> events) throws IOException {
+        List<KeyedMessage> messages = new ArrayList<>(events.size());
+
         for (StreamRecord record : events) {
-            try {
-                String output = new ObjectMapper().writeValueAsString(record);
-                // partition key may cause data skew
-                //producer.send(new KeyedMessage(this.topicId, key, output));
-                producer.send(new KeyedMessage(this.config.getTopicId(), output));
-            } catch (Exception ex) {
-                LOGGER.error(ex.getMessage(), ex);
-                throw ex;
-            }
+            String output = new ObjectMapper().writeValueAsString(record);
+            messages.add(new KeyedMessage(this.config.getTopicId(), output));
+        }
+
+        try {
+            // partition key may cause data skew
+            //producer.send(new KeyedMessage(this.topicId, key, output));
+            producer.send(messages);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            throw ex;
         }
     }
 
