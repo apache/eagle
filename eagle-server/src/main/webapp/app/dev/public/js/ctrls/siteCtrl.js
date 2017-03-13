@@ -25,7 +25,7 @@
 	// ======================================================================================
 	// =                                        Main                                        =
 	// ======================================================================================
-	eagleControllers.controller('siteCtrl', function ($scope, PageConfig, Site) {
+	eagleControllers.controller('siteCtrl', function ($scope, $wrapState, PageConfig, Site) {
 		var site = Site.current();
 		PageConfig.title = site.siteName || site.siteId;
 		PageConfig.subTitle = "home";

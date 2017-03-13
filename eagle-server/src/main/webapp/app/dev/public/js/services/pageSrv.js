@@ -81,10 +81,6 @@
 	// =                          Portal                          =
 	// ============================================================
 	serviceModule.service('Portal', function($wrapState, Site, Application, Auth) {
-		function checkSite() {
-			return Site.list.length !== 0;
-		}
-
 		var defaultPortalList = [
 			{name: "Overview", icon: "home", path: "#/"},
 		];
@@ -114,7 +110,6 @@
 			}
 
 			return[
-				{name: "Back", icon: "arrow-left", path: "#/"},
 				{name: site.siteName || site.siteId + " Home", icon: "home", path: "#/site/" + site.siteId},
 				{name: "Alert", icon: "bell", list: alertPortal},
 			];

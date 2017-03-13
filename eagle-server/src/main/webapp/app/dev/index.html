@@ -152,6 +152,9 @@
 							<li ng-if="!Auth.isLogin">
 								<a ui-sref="login">Login</a>
 							</li>
+							<li ng-if="Auth.isLogin">
+								<a ui-sref="integration.siteList()"><i class="fa fa-cog"></i></a>
+							</li>
 							<li ng-if="Auth.isLogin" class="dropdown user user-menu">
 								<a class="dropdown-toggle" data-toggle="dropdown">
 									<i class="fa fa-user"></i>
@@ -167,9 +170,6 @@
 										</p>
 									</li>
 									<li class="user-footer">
-										<div class="pull-left" ng-if="Auth.isAdmin">
-											<a ui-sref="integration.siteList()" class="btn btn-default btn-flat">Integration</a>
-										</div>
 										<div class="pull-right">
 											<a class="btn btn-default btn-flat" ng-click="Auth.logout()">Sign out</a>
 										</div>
