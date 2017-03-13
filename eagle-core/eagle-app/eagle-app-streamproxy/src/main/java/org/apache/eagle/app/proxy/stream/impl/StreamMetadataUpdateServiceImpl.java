@@ -76,17 +76,18 @@ class StreamMetadataUpdateServiceImpl implements StreamMetadataUpdateService {
                 List<StreamDesc> streamDescList = appEntity.getStreams();
                 if (streamDescList != null && streamDescList.size() > 0) {
                     for (StreamDesc streamDesc : streamDescList) {
+                        total++;
                         latestStreamIdDescMap.put(streamDesc.getStreamId(), streamDesc);
-                        if (streamIdDescMap.containsKey(streamDesc.getStreamId()) && !Objects.equals(streamDesc, streamIdDescMap.get(streamDesc.getStreamId()))) {
-                            this.listener.onStreamChanged(streamDesc);
+                        if (streamIdDescMap.containsKey(streamDesc.getStreamId())
+                            && !streamDesc.equals(streamIdDescMap.get(streamDesc.getStreamId()))) {
                             changed++;
+                            this.listener.onStreamChanged(streamDesc);
                         } else if (!streamIdDescMap.containsKey(streamDesc.getStreamId())) {
                             added++;
                             this.listener.onStreamAdded(streamDesc);
                         }
                     }
                 }
-                total++;
             }
 
             for (String streamId : streamIdDescMap.keySet()) {
@@ -95,12 +96,12 @@ class StreamMetadataUpdateServiceImpl implements StreamMetadataUpdateService {
                     this.listener.onStreamRemoved(streamIdDescMap.get(streamId));
                 }
             }
-            this.streamIdDescMap = latestStreamIdDescMap;
             if (added > 0 || changed > 0 || removed > 0) {
                 LOGGER.info("Loaded stream metadata: total = {}, added = {}, changed = {}, removed = {}", total, added, changed, removed);
             } else {
                 LOGGER.debug("Loaded stream metadata: total = {}, added = {}, changed = {}, removed = {}", total, added, changed, removed);
             }
+            this.streamIdDescMap = latestStreamIdDescMap;
         }
     }
 

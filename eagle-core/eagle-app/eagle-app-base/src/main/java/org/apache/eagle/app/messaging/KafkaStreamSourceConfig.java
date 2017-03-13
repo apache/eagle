@@ -148,4 +148,69 @@ public class KafkaStreamSourceConfig implements StreamSourceConfig {
     public void setTopicId(String topicId) {
         this.topicId = topicId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof KafkaStreamSourceConfig)) {
+            return false;
+        }
+
+        KafkaStreamSourceConfig that = (KafkaStreamSourceConfig) o;
+
+        if (getFetchSize() != that.getFetchSize()) {
+            return false;
+        }
+        if (getTransactionStateUpdateMS() != that.getTransactionStateUpdateMS()) {
+            return false;
+        }
+        if (getStartOffsetTime() != that.getStartOffsetTime()) {
+            return false;
+        }
+        if (isForceFromStart() != that.isForceFromStart()) {
+            return false;
+        }
+        if (getTopicId() != null ? !getTopicId().equals(that.getTopicId()) : that.getTopicId() != null) {
+            return false;
+        }
+        if (getBrokerZkQuorum() != null ? !getBrokerZkQuorum().equals(that.getBrokerZkQuorum()) : that.getBrokerZkQuorum() != null) {
+            return false;
+        }
+        if (getBrokerZkBasePath() != null ? !getBrokerZkBasePath().equals(that.getBrokerZkBasePath()) : that.getBrokerZkBasePath() != null) {
+            return false;
+        }
+        if (getTransactionZkServers() != null ? !getTransactionZkServers().equals(that.getTransactionZkServers()) : that.getTransactionZkServers() != null) {
+            return false;
+        }
+        if (getTransactionZKRoot() != null ? !getTransactionZKRoot().equals(that.getTransactionZKRoot()) : that.getTransactionZKRoot() != null) {
+            return false;
+        }
+        if (getConsumerGroupId() != null ? !getConsumerGroupId().equals(that.getConsumerGroupId()) : that.getConsumerGroupId() != null) {
+            return false;
+        }
+        if (getBrokerZkPath() != null ? !getBrokerZkPath().equals(that.getBrokerZkPath()) : that.getBrokerZkPath() != null) {
+            return false;
+        }
+        return getSchemaClass() != null ? getSchemaClass().equals(that.getSchemaClass()) : that.getSchemaClass() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getTopicId() != null ? getTopicId().hashCode() : 0;
+        result = 31 * result + (getBrokerZkQuorum() != null ? getBrokerZkQuorum().hashCode() : 0);
+        result = 31 * result + (getBrokerZkBasePath() != null ? getBrokerZkBasePath().hashCode() : 0);
+        result = 31 * result + (getTransactionZkServers() != null ? getTransactionZkServers().hashCode() : 0);
+        result = 31 * result + getFetchSize();
+        result = 31 * result + (getTransactionZKRoot() != null ? getTransactionZKRoot().hashCode() : 0);
+        result = 31 * result + (getConsumerGroupId() != null ? getConsumerGroupId().hashCode() : 0);
+        result = 31 * result + (getBrokerZkPath() != null ? getBrokerZkPath().hashCode() : 0);
+        result = 31 * result + (int) (getTransactionStateUpdateMS() ^ (getTransactionStateUpdateMS() >>> 32));
+        result = 31 * result + getStartOffsetTime();
+        result = 31 * result + (isForceFromStart() ? 1 : 0);
+        result = 31 * result + (getSchemaClass() != null ? getSchemaClass().hashCode() : 0);
+        return result;
+    }
 }
