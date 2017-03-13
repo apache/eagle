@@ -48,7 +48,7 @@ public class OozieAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserial
             return new HashMap<>();
         }
         Map<String, Object> map = new TreeMap<String, Object>();
-        map.put("timestamp", entity.timestamp);
+        map.put("timestamp", String.valueOf(entity.timestamp));
         map.put("level", entity.level);
         map.put("ip", entity.ip);
         map.put("user", entity.user);

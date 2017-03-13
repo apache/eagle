@@ -63,7 +63,7 @@ public class BeamExecutionRuntime implements ExecutionRuntime<BeamEnviroment, Pi
         ApplicationEntity.Status status;
         if (res == null) {
             LOG.error("Unknown storm topology  status res is null");
-            status = ApplicationEntity.Status.UNKNOWN;
+            status = ApplicationEntity.Status.INITIALIZED;
             return status;
         }
         PipelineResult.State state = res.getState();

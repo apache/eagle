@@ -73,5 +73,10 @@
             <artifactId>beam-sdks-common-fn-api</artifactId>
             <version>${beam.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
     </dependencies>
 </project>
