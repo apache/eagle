@@ -18,6 +18,7 @@ package org.apache.eagle.metadata.store.jdbc;
 
 
 import com.google.inject.Inject;
+import org.apache.eagle.common.function.ThrowableConsumer;
 import org.apache.eagle.common.function.ThrowableConsumer2;
 import org.apache.eagle.common.function.ThrowableFunction;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import java.sql.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQueryService {
@@ -180,6 +182,49 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
             return result;
         } catch (SQLException e) {
             LOGGER.error("Error to query cond: {}", sqlQuery, e);
+            throw e;
+        } finally {
+            if (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (SQLException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public <T, E extends Throwable> List<T> queryWithCond(String querySql, ThrowableConsumer<PreparedStatement, SQLException> preparer, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(querySql);
+            preparer.accept(statement);
+            resultSet = statement.executeQuery();
+            List<T> result = new LinkedList<>();
+            while (resultSet.next()) {
+                result.add(mapper.apply(resultSet));
+            }
+            return result;
+        } catch (SQLException e) {
+            LOGGER.error("Error to query cond: {}", querySql, e);
             throw e;
         } finally {
             if (resultSet != null) {
