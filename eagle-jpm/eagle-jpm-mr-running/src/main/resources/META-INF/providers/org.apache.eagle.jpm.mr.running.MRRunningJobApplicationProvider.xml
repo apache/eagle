@@ -45,11 +45,24 @@
             <value>300</value>
         </property>
         <property>
-            <name>endpointConfig.fetchRunningJobRequests</name>
+            <name>endpointConfig.requestsNum</name>
             <displayName>Request Number of Fetching Running Jobs</displayName>
             <description>number of requests separated by time ranges</description>
             <value>1</value>
         </property>
+        <property>
+            <name>endpointConfig.requestLimit</name>
+            <displayName>Application Number Limit of Each Request</displayName>
+            <description>limit of applications in each request</description>
+            <value></value>
+        </property>
+        <property>
+            <name>endpointConfig.requestTimeInHour</name>
+            <displayName>Time Span Between the First and the Last Request in Hours</displayName>
+            <description>time span between the first and the last request in hours if request number > 1</description>
+            <value>6</value>
+        </property>
+
         <property>
             <name>endpointConfig.parseJobThreadPoolSize</name>
             <displayName>Parse Job ThreadPool Size in Each Parse Task</displayName>

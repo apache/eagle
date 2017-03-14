@@ -86,8 +86,13 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                 LOG.info("recover {} mr yarn apps from zookeeper", apps.size());
                 this.init = true;
             } else {
-                apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB, endpointConfig.fetchRunningJobRequests);
-                LOG.info("get {} apps from resource manager", apps.size());
+                LOG.info("going to fetch all mapReduce running applications");
+                apps = resourceFetcher.getResource(
+                        Constants.ResourceType.RUNNING_MR_JOB,
+                        endpointConfig.requestLimit,
+                        endpointConfig.requestsNum,
+                        endpointConfig.requestTimeInHour);
+                LOG.info("get {} running apps from resource manager", apps.size());
                 collector.emit(MRRunningJobConfig.APP_TO_METRIC_STREAM, new Values(apps));
 
                 Set<String> runningAppIdsAtThisTime = runningAppIdsAtThisTime(apps);
@@ -118,7 +123,7 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
             }
 
             for (int i = 0; i < apps.size(); i++) {
-                LOG.info("emit mr yarn application " + apps.get(i).getId());
+                LOG.debug("emit mr yarn application " + apps.get(i).getId());
                 AppInfo appInfo = apps.get(i);
                 if (mrApps != null && mrApps.containsKey(appInfo.getId())) {
                     //emit (AppInfo, Map<String, JobExecutionAPIEntity>)

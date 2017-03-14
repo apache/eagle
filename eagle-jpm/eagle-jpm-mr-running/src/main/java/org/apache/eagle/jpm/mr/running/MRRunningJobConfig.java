@@ -76,7 +76,9 @@ public class MRRunningJobConfig implements Serializable {
         public String site;
         public String[] rmUrls;
         public int fetchRunningJobInterval;
-        public int fetchRunningJobRequests;
+        public int requestsNum;
+        public String requestLimit;
+        public int requestTimeInHour;
         public int parseJobThreadPoolSize;
     }
 
@@ -131,15 +133,29 @@ public class MRRunningJobConfig implements Serializable {
         this.endpointConfig.site = config.getString("siteId");
         this.endpointConfig.fetchRunningJobInterval = config.getInt("endpointConfig.fetchRunningJobInterval");
         this.endpointConfig.parseJobThreadPoolSize = config.getInt("endpointConfig.parseJobThreadPoolSize");
-        if (config.hasPath("endpointConfig.fetchRunningJobRequests")) {
-            this.endpointConfig.fetchRunningJobRequests = config.getInt("endpointConfig.fetchRunningJobRequests");
-        } else {
-            this.endpointConfig.fetchRunningJobRequests = 1;
-        }
+        this.endpointConfig.requestsNum = getConfigValue(config, "endpointConfig.requestsNum", 1);
+        this.endpointConfig.requestLimit = getConfigValue(config, "endpointConfig.requestLimit", "");
+        this.endpointConfig.requestTimeInHour = getConfigValue(config, "endpointConfig.requestTimeInHour", 6);
 
         LOG.info("Successfully initialized MRRunningJobConfig");
         LOG.info("site: " + this.endpointConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
         LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);
+    }
+
+    private int getConfigValue(Config config, String key, int defaultValue) {
+        if (config.hasPath(key)) {
+            return config.getInt(key);
+        } else {
+            return defaultValue;
+        }
+    }
+
+    private String getConfigValue(Config config, String key, String defaultValue) {
+        if (config.hasPath(key)) {
+            return config.getString(key);
+        } else {
+            return defaultValue;
+        }
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.apache.eagle.jpm.util.resourcefetch;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,11 +64,11 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         return selector;
     }
 
-    private List<AppInfo> doFetchApplicationsList(String urlString, Constants.CompressionType compressionType) throws Exception {
-        List<AppInfo> result = new ArrayList<>(0);
+    private List<AppInfo> doFetchApplicationsList(String urlString, Constants.CompressionType compressionType) {
+        List<AppInfo> result = new ArrayList<>();
         InputStream is = null;
         try {
-            LOG.info("Going to call yarn api to fetch finished application list: " + urlString);
+            LOG.info("Going to query cluster applications list: " + urlString);
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
             final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
             if (appWrapper != null && appWrapper.getApps() != null
@@ -74,7 +76,8 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 result = appWrapper.getApps().getApp();
             }
             LOG.info("Successfully fetched {} AppInfos from url {}", result.size(), urlString);
-            return result;
+        } catch (Exception e) {
+            LOG.error("Fail to query {} due to {}", urlString, e.getMessage());
         } finally {
             if (is != null) {
                 try {
@@ -84,19 +87,20 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 }
             }
         }
+        return result;
     }
 
-    public String getRunningJobURL(Constants.JobType jobType, String startTime, String endTime) {
+    public String getRunningJobURL(Constants.JobType jobType, String startTime, String endTime, String limit) {
         String condition = "";
         if (startTime == null && endTime == null) {
-            condition = String.format("applicationTypes=%s&", jobType);
-        } else if (startTime == null && endTime != null) {
-            condition = String.format("applicationTypes=%s&startedTimeEnd=%s&", jobType, endTime);
-        } else if (startTime != null && endTime == null) {
-            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&", jobType, startTime);
+            condition = String.format("applicationTypes=%s&limit=%s&", jobType, limit);
+        } else if (startTime == null) {
+            condition = String.format("applicationTypes=%s&startedTimeEnd=%s&limit=%s&", jobType, endTime, limit);
+        } else if (endTime == null) {
+            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&limit=%s&", jobType, startTime, limit);
         } else {
-            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&startedTimeEnd=%s&",
-                    jobType, startTime, endTime);
+            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&startedTimeEnd=%s&limit=%s&",
+                    jobType, startTime, endTime, limit);
         }
         String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
         return String.format("%s/%s?%sstate=RUNNING&%s", url, Constants.V2_APPS_URL, condition,
@@ -110,7 +114,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 + lastFinishedTime + "&" + Constants.ANONYMOUS_PARAMETER;
     }
 
-    private String getAccepedAppURL() {
+    private String getAcceptedAppURL() {
         String baseUrl = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
         return String.format("%s/%s?state=ACCEPTED&%s", baseUrl, Constants.V2_APPS_URL, Constants.ANONYMOUS_PARAMETER);
     }
@@ -122,31 +126,57 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         List<AppInfo> apps = new ArrayList<>();
         try {
             selector.checkUrl();
-            String urlString = getRunningJobURL(jobType, null, null);
-            if (parameter.length == 0) {
-                return doFetchApplicationsList(urlString, compressionType);
+
+            String limit = "";
+            int requests = 1;
+            int requestTimeInHour = 6;
+
+            switch (parameter.length) {
+                case 0 :
+                    String urlString = getRunningJobURL(jobType, null, null, null);
+                    return doFetchApplicationsList(urlString, compressionType);
+                case 1 :
+                    limit = String.valueOf(parameter[0]);
+                    break;
+                case 2 :
+                    limit = String.valueOf(parameter[0]);
+                    requests = (int) parameter[1];
+                    break;
+                case 3 :
+                    limit = String.valueOf(parameter[0]);
+                    requests = (int) parameter[1];
+                    requestTimeInHour = (int) parameter[2];
+                    break;
+                default :
+                    throw new InvalidParameterException("parameter list: limit, requests, requestTimeRange");
             }
 
-            int requests = (int) parameter[0];
             if (requests <= 1) {
+                String urlString = getRunningJobURL(jobType, null, null, limit);
                 return doFetchApplicationsList(urlString, compressionType);
             }
 
-            long interval = DateTimeUtil.ONEHOUR * 6 / (requests - 1);
+            long requestTimeSpan = requestTimeInHour * DateTimeUtil.ONEHOUR;
+            long interval =  requestTimeSpan / (requests - 1);
             long currentTime = System.currentTimeMillis();
-            long earliestTime = currentTime - DateTimeUtil.ONEHOUR * 6;
-            String firstUrl = getRunningJobURL(jobType, null, String.valueOf(earliestTime));
-            doFetchApplicationsList(firstUrl, compressionType).forEach(app -> result.put(app.getId(), app));
+            long earliestTime = currentTime - requestTimeSpan;
+            List<String> requestUrls = new ArrayList<>();
+
+            requestUrls.add(getRunningJobURL(jobType, null, String.valueOf(earliestTime), limit));
 
             long start = earliestTime;
             long end = earliestTime + interval;
             for (; end < currentTime; start = end, end += interval) {
-                String url = getRunningJobURL(jobType, String.valueOf(start), String.valueOf(end));
-                doFetchApplicationsList(url, compressionType).forEach(app -> result.put(app.getId(), app));
+                requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), String.valueOf(end), limit));
             }
 
-            String lastUrl = getRunningJobURL(jobType, String.valueOf(start), null);
-            doFetchApplicationsList(lastUrl, compressionType).forEach(app -> result.put(app.getId(), app));
+            requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), null, limit));
+            LOG.info("{} requests to fetch running MapReduce applications: \n{}", requestUrls.size(),
+                    StringUtils.join(requestUrls, "\n"));
+
+            requestUrls.forEach(query ->
+                doFetchApplicationsList(query, compressionType).forEach(app -> result.put(app.getId(), app))
+            );
         } catch (Exception e) {
             LOG.error("Catch an exception when query url{} : {}", selector.getSelectedUrl(), e.getMessage(), e);
             return apps;
@@ -160,10 +190,10 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         List<AppInfo> apps = new ArrayList<>();
         try {
             selector.checkUrl();
-            String url = getAccepedAppURL();
+            String url = getAcceptedAppURL();
             return doFetchApplicationsList(url, compressionType);
         } catch (Exception e) {
-            LOG.error("Catch an exception when query url{} : {}", selector.getSelectedUrl(), e.getMessage(), e);
+            LOG.error("Catch an exception when query {} : {}", selector.getSelectedUrl(), e.getMessage(), e);
         }
         return apps;
     }
