@@ -128,7 +128,7 @@
             <value></value>
         </property>
 
-        <!-- system health check properties-->
+        <!-- system instance properties-->
         <property>
             <name>dataSourceConfig.system.enabled</name>
             <displayName>System Topology Check Enabled</displayName>
@@ -138,27 +138,27 @@
         </property>
         <property>
             <name>dataSourceConfig.system.topic</name>
-            <displayName>Topic For System Topology Collector</displayName>
-            <description>Topic For System Topology Collector</description>
+            <displayName>System Topology Source Topic</displayName>
+            <description>System Topology Source Topic</description>
             <value>topology_system_${siteId}</value>
         </property>
         <property>
             <name>dataSourceConfig.system.zkConnection</name>
-            <displayName>Kafka Zookeeper Quorum For System Collector</displayName>
+            <displayName>System Topology Source Kafka Zookeeper Quorum</displayName>
             <value>localhost:2181</value>
-            <description>Kafka Zookeeper Quorum For System Collector</description>
+            <description>System Topology Source Kafka Zookeeper Quorum</description>
         </property>
         <property>
             <name>dataSourceConfig.system.schemeCls</name>
-            <displayName>Kafka schemeCls For System Collector</displayName>
+            <displayName>System Topology Source Kafka schemeCls</displayName>
             <value>storm.kafka.StringScheme</value>
-            <description>Kafka schemeCls For System Collector</description>
+            <description>System Topology Source Kafka schemeCls</description>
         </property>
         <property>
             <name>dataSourceConfig.system.dataSendBatchSize</name>
-            <displayName>Data Send Batch Size For System Collector</displayName>
-            <value>20</value>
-            <description>Data Send Batch Size For System Collector</description>
+            <displayName>System Topology Data Send Batch Size </displayName>
+            <value>1</value>
+            <description>System Topology Data Send Batch Size</description>
         </property>
 
         <!-- data sink configurations -->
