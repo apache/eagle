@@ -193,7 +193,7 @@
 	</div>
 	<div class="box-body">
 		<div sort-table="taskAttemptList" is-sorting="isSorting" class="table-responsive" max-size="7" ng-show="taskAttemptList._done">
-			<table class="table table-bordered">
+			<table class="table table-bordered table-hover">
 				<thead>
 				<tr>
 					<th sortpath="startTime">Start Time</th>
@@ -205,13 +205,21 @@
 				</tr>
 				</thead>
 				<tbody>
-				<tr>
+				<tr class="row-clickable" ng-click="loadAttemptDetail(item.tags.taskAttemptId)">
 					<td>{{Time.format(item.startTime)}}</td>
 					<td>{{Time.format(item.endTime)}}</td>
 					<td>{{item.tags.hostname || "-"}}</td>
 					<td>{{item.tags.taskType || "-"}}</td>
 					<td>{{item.tags.taskAttemptId || "-"}}</td>
-					<td>{{item.tags.errorCategory || "-"}}</td>
+					<td class="text-no-break">
+						{{item.tags.errorCategory || "-"}}
+						<span
+								ng-if="errorMapping[item.tags.taskAttemptId]"
+								class="fa fa-info-circle" tooltip-placement="left"
+								uib-tooltip-html="errorMapping[item.tags.taskAttemptId]"
+						>
+						</span>
+					</td>
 				</tr>
 				</tbody>
 			</table>
