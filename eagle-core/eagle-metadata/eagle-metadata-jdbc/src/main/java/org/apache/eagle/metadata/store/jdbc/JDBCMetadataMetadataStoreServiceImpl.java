@@ -67,6 +67,35 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
     }
 
     @Override
+    public <T, E extends Throwable> boolean execute(String sql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws SQLException, E {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            mapper.accept(statement,entity);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean dropTable(String tableName) throws SQLException {
         LOGGER.debug("Dropping table {}", tableName);
         return execute(String.format("DROP TABLE %s", tableName));

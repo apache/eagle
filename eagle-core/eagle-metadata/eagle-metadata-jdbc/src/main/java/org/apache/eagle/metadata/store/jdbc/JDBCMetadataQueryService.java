@@ -30,6 +30,8 @@ import java.util.function.Consumer;
 public interface JDBCMetadataQueryService {
     boolean execute(String sql) throws SQLException;
 
+    <T, E extends Throwable> boolean execute(String sql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws SQLException, E;
+
     boolean dropTable(String tableName) throws SQLException;
 
     <T, E extends Throwable> int insert(String insertSql, Collection<T> entities, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws E, SQLException;
