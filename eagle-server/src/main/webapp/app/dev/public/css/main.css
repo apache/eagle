@@ -163,6 +163,10 @@ table.table .btn-group .btn.opt {
 	width: 22px;
 }
 
+table.table .row-clickable {
+	cursor: pointer;
+}
+
 table.table.table-sm th,
 table.table.table-sm td {
 	padding: 3px 5px;

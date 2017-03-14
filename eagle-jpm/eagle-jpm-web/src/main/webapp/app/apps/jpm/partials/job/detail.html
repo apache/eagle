@@ -193,7 +193,7 @@
 	</div>
 	<div class="box-body">
 		<div sort-table="taskAttemptList" is-sorting="isSorting" class="table-responsive" max-size="7" ng-show="taskAttemptList._done">
-			<table class="table table-bordered">
+			<table class="table table-bordered table-hover">
 				<thead>
 				<tr>
 					<th sortpath="startTime">Start Time</th>
@@ -205,13 +205,53 @@
 				</tr>
 				</thead>
 				<tbody>
-				<tr ng-repeat="item in jobList">
+				<tr class="row-clickable" ng-click="loadAttemptDetail(item.tags.taskAttemptId)">
 					<td>{{Time.format(item.startTime)}}</td>
 					<td>{{Time.format(item.endTime)}}</td>
 					<td>{{item.tags.hostname || "-"}}</td>
 					<td>{{item.tags.taskType || "-"}}</td>
 					<td>{{item.tags.taskAttemptId || "-"}}</td>
-					<td>{{item.tags.errorCategory || "-"}}</td>
+					<td class="text-no-break">
+						{{item.tags.errorCategory || "-"}}
+						<span
+								ng-if="errorMapping[item.tags.taskAttemptId]"
+								class="fa fa-info-circle" tooltip-placement="left"
+								uib-tooltip-html="errorMapping[item.tags.taskAttemptId]"
+						>
+						</span>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Job Suggestion -->
+<div class="box box-primary collapsed-box" ng-if="jobSuggestionList.length">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Job Suggestion ({{jobSuggestionList.length}})
+		</h3>
+		<div class="box-tools pull-right">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse">
+				<i class="fa fa-plus"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<div sort-table="jobSuggestionList" class="table-responsive" max-size="7">
+			<table class="table table-bordered">
+				<thead>
+				<tr>
+					<th sortpath="tags.ruleType">Rule Type</th>
+					<th>Optimizer Suggestion</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>{{item.tags.ruleType}}</td>
+					<td><pre class="inline">{{item.optimizerSuggestion}}</pre></td>
 				</tr>
 				</tbody>
 			</table>
