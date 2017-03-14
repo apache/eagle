@@ -141,6 +141,14 @@
 					});
 				}
 
+				// ============================== job suggestion ==============================
+				$scope.jobSuggestionList = JPM.list('JobOptimizerSuggestionService', {
+						site: $scope.job.tags.site,
+						jobId: $scope.job.tags.jobId
+					},
+					Time($scope.startTimestamp).subtract(1, 'day'),
+					Time($scope.endTimestamp).add(1, 'day'));
+
 				// ================================ dashboards ================================
 				// Dashboard 1: Allocated MB
 				metric_allocatedMB = JPM.metrics(jobCond, "hadoop.job.allocatedmb", startTime, endTime);

@@ -205,13 +205,45 @@
 				</tr>
 				</thead>
 				<tbody>
-				<tr ng-repeat="item in jobList">
+				<tr>
 					<td>{{Time.format(item.startTime)}}</td>
 					<td>{{Time.format(item.endTime)}}</td>
 					<td>{{item.tags.hostname || "-"}}</td>
 					<td>{{item.tags.taskType || "-"}}</td>
 					<td>{{item.tags.taskAttemptId || "-"}}</td>
 					<td>{{item.tags.errorCategory || "-"}}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Job Suggestion -->
+<div class="box box-primary collapsed-box" ng-if="jobSuggestionList.length">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Job Suggestion ({{jobSuggestionList.length}})
+		</h3>
+		<div class="box-tools pull-right">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse">
+				<i class="fa fa-plus"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<div sort-table="jobSuggestionList" class="table-responsive" max-size="7">
+			<table class="table table-bordered">
+				<thead>
+				<tr>
+					<th sortpath="tags.ruleType">Rule Type</th>
+					<th>Optimizer Suggestion</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>{{item.tags.ruleType}}</td>
+					<td><pre class="inline">{{item.optimizerSuggestion}}</pre></td>
 				</tr>
 				</tbody>
 			</table>
