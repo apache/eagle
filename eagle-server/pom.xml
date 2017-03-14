@@ -132,6 +132,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-alert-spark-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <exclusions>

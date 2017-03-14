@@ -21,34 +21,70 @@ import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.spark.streaming.StreamingContextState;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,Object> {
+public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment, JavaStreamingContext> {
+
+
+    private static final Logger LOG = LoggerFactory.getLogger(SparkExecutionRuntime.class);
+    private SparkEnvironment environment;
+    private JavaStreamingContext jssc;
+
     @Override
     public void prepare(SparkEnvironment environment) {
-        throw new RuntimeException("Not implemented yet");
+        this.environment = environment;
     }
 
     @Override
     public SparkEnvironment environment() {
-        throw new RuntimeException("Not implemented yet");
+        return this.environment;
     }
 
     @Override
-    public void start(Application executor, Config config) {
-        throw new RuntimeException("Not implemented yet");
+    public void start(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
+        jssc = executor.execute(config, environment);
+        LOG.info("Starting Spark Streaming");
+        jssc.start();
+        LOG.info("Spark Streaming is running");
+        try {
+            jssc.awaitTermination();
+        } catch (InterruptedException e) {
+            LOG.error("SparkExecutionRuntime  jssc.awaitTermination throw exception", e);
+        }
     }
 
     @Override
-    public void stop(Application executor, Config config) {
-        throw new RuntimeException("Not implemented yet");
+    public void stop(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
+        jssc.stop();
     }
 
     @Override
-    public ApplicationEntity.Status status(Application executor, Config config) {
-        throw new RuntimeException("Not implemented yet");
+    public ApplicationEntity.Status status(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
+        ApplicationEntity.Status status = null;
+        if (status == null) {
+            LOG.error("Unknown storm topology  status res is null");
+            status = ApplicationEntity.Status.INITIALIZED;
+            return status;
+        }
+        StreamingContextState state = jssc.getState();
+
+        if (state == StreamingContextState.ACTIVE) {
+            status = ApplicationEntity.Status.RUNNING;
+        } else if (state == StreamingContextState.STOPPED) {
+            return ApplicationEntity.Status.STOPPED;
+        } else if (state == StreamingContextState.INITIALIZED) {
+            return ApplicationEntity.Status.INITIALIZED;
+        } else {
+            LOG.error("Unknown storm topology  status");
+            status = ApplicationEntity.Status.UNKNOWN;
+        }
+        return status;
     }
 
-    public static class Provider implements ExecutionRuntimeProvider<SparkEnvironment,Object> {
+    public static class Provider implements ExecutionRuntimeProvider<SparkEnvironment, JavaStreamingContext> {
         @Override
         public SparkExecutionRuntime get() {
             return new SparkExecutionRuntime();

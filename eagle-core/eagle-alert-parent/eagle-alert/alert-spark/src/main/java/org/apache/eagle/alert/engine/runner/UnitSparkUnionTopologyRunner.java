@@ -113,16 +113,7 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     }
 
     public void run() throws InterruptedException {
-
-        final String checkpointDirectory = config.getString(CHECKPOINT_PATH);
-        JavaStreamingContext jssc;
-        if (!StringUtils.isEmpty(checkpointDirectory)) {
-            Function0<JavaStreamingContext> createContextFunc = (Function0<JavaStreamingContext>) () -> buildTopology(config, checkpointDirectory);
-            jssc = JavaStreamingContext.getOrCreate(checkpointDirectory, createContextFunc);
-        } else {
-            jssc = buildTopology(config, checkpointDirectory);
-        }
-
+        JavaStreamingContext jssc = this.buildTopology();
         LOG.info("Starting Spark Streaming");
         jssc.start();
         LOG.info("Spark Streaming is running");
@@ -158,7 +149,21 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
         this.sparkConf = sparkConf;
     }
 
-    private JavaStreamingContext buildTopology(Config config, String checkpointDirectory) {
+    public JavaStreamingContext buildTopology() {
+
+        final String checkpointDirectory = config.getString(CHECKPOINT_PATH);
+        JavaStreamingContext jssc;
+        if (!StringUtils.isEmpty(checkpointDirectory)) {
+            Function0<JavaStreamingContext> createContextFunc = (Function0<JavaStreamingContext>) () -> buildAllTopology(config, checkpointDirectory);
+            jssc = JavaStreamingContext.getOrCreate(checkpointDirectory, createContextFunc);
+        } else {
+            jssc = buildAllTopology(config, checkpointDirectory);
+        }
+
+        return jssc;
+    }
+
+    private JavaStreamingContext buildAllTopology(Config config, String checkpointDirectory) {
         int windowDurations = config.getInt(WINDOW_DURATIONS_SECOND);
         int slideDurations = config.getInt(SLIDE_DURATION_SECOND);
         int numOfRouter = config.getInt(ROUTER_TASK_NUM);
