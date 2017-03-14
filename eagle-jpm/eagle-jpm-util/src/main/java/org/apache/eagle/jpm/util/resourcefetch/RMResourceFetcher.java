@@ -92,14 +92,15 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 
     public String getRunningJobURL(Constants.JobType jobType, String startTime, String endTime, String limit) {
         String condition = "";
+        limit = ((limit == null || limit.isEmpty()) ? "" : "&limit=" + limit);
         if (startTime == null && endTime == null) {
-            condition = String.format("applicationTypes=%s&limit=%s&", jobType, limit);
+            condition = String.format("applicationTypes=%s%s&", jobType, limit);
         } else if (startTime == null) {
-            condition = String.format("applicationTypes=%s&startedTimeEnd=%s&limit=%s&", jobType, endTime, limit);
+            condition = String.format("applicationTypes=%s&startedTimeEnd=%s%s&", jobType, endTime, limit);
         } else if (endTime == null) {
-            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&limit=%s&", jobType, startTime, limit);
+            condition = String.format("applicationTypes=%s&startedTimeBegin=%s%s&", jobType, startTime, limit);
         } else {
-            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&startedTimeEnd=%s&limit=%s&",
+            condition = String.format("applicationTypes=%s&startedTimeBegin=%s&startedTimeEnd=%s%s&",
                     jobType, startTime, endTime, limit);
         }
         String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
