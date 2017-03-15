@@ -58,6 +58,7 @@ public class SiteEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
     public void testInsertSiteEntityWithNullValues() throws SQLException {
         SiteEntity siteEntity = new SiteEntity();
         siteEntity.setSiteId("test-null-site");
+        siteEntity.setSiteName("Test Site Name");
 
         siteEntityService.create(siteEntity);
         String uuid = siteEntity.getUuid();
@@ -69,7 +70,7 @@ public class SiteEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         SiteEntity siteEntityFromDB = results.iterator().next();
         Assert.assertEquals(uuid, siteEntityFromDB.getUuid());
         Assert.assertEquals("test-null-site", siteEntityFromDB.getSiteId());
-        Assert.assertNull(siteEntityFromDB.getSiteName());
+        Assert.assertEquals("Test Site Name",siteEntityFromDB.getSiteName());
         Assert.assertNull(siteEntityFromDB.getDescription());
         Assert.assertEquals(createdTime, siteEntityFromDB.getCreatedTime());
         Assert.assertEquals(modifiedTime, siteEntityFromDB.getModifiedTime());
