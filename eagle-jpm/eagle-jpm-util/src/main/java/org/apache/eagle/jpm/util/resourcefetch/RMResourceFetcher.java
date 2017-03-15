@@ -48,7 +48,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     private static final Logger LOG = LoggerFactory.getLogger(RMResourceFetcher.class);
     private final HAURLSelector selector;
     //private final ServiceURLBuilder jobListServiceURLBuilder;
-    private final ServiceURLBuilder sparkCompleteJobServiceURLBuilder;
+    //private final ServiceURLBuilder sparkCompleteJobServiceURLBuilder;
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 
     static {
@@ -57,7 +57,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 
     public RMResourceFetcher(String[] rmBasePaths) {
         //this.jobListServiceURLBuilder = new JobListServiceURLBuilderImpl();
-        this.sparkCompleteJobServiceURLBuilder = new SparkCompleteJobServiceURLBuilderImpl();
+        //this.sparkCompleteJobServiceURLBuilder = new SparkCompleteJobServiceURLBuilderImpl();
         this.selector = new HAURLSelectorImpl(
                 rmBasePaths,
                 new RmActiveTestURLBuilderImpl(),
@@ -120,13 +120,19 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             limit = (String) parameter[1];
         }
         limit = ((limit == null || limit.isEmpty()) ? "" : "&limit=" + limit);
-        return String.format("%s/%s?applicationTypes=%s%s&state=FINISHED&finishedTimeBegin=%s&",
+        return String.format("%s/%s?applicationTypes=%s%s&state=FINISHED&finishedTimeBegin=%s&%s",
                 url, Constants.V2_APPS_URL, jobType, limit, lastFinishedTime, Constants.ANONYMOUS_PARAMETER);
     }
 
-    private String getAcceptedAppURL() {
+    private String getAcceptedAppURL(Object... parameter) {
+        String limit = "";
+        if (parameter.length > 0) {
+            limit = (String) parameter[0];
+        }
+        limit = ((limit == null || limit.isEmpty()) ? "" : "&limit=" + limit);
+
         String baseUrl = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
-        return String.format("%s/%s?state=ACCEPTED&%s", baseUrl, Constants.V2_APPS_URL, Constants.ANONYMOUS_PARAMETER);
+        return String.format("%s/%s?state=ACCEPTED%s&%s", baseUrl, Constants.V2_APPS_URL, limit, Constants.ANONYMOUS_PARAMETER);
     }
 
     private List<AppInfo> doFetchRunningApplicationsList(Constants.JobType jobType,
@@ -195,7 +201,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                                                          Object... parameter) throws Exception {
         List<AppInfo> apps = new ArrayList<>();
         try {
-            String url = getAcceptedAppURL();
+            String url = getAcceptedAppURL(parameter);
             return doFetchApplicationsList(url, compressionType);
         } catch (Exception e) {
             LOG.error("Catch an exception when query {} : {}", selector.getSelectedUrl(), e.getMessage(), e);
