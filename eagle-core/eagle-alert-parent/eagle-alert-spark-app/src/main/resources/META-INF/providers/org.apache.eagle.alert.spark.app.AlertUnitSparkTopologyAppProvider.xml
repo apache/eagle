@@ -67,22 +67,22 @@
         <property>
             <name>topology.slideDurations</name>
             <displayName>Spark streaming slideDurations</displayName>
-            <value>1</value>
+            <value>2</value>
             <description>Spark streaming slideDurations(unit second)</description>
             <required>true</required>
         </property>
         <property>
             <name>topology.windowDurations</name>
             <displayName>Spark streaming windowDurations</displayName>
-            <value>1</value>
+            <value>2</value>
             <description>Spark streaming windowDurations(unit second)</description>
             <required>true</required>
         </property>
         <property>
             <name>topology.master</name>
             <displayName>Spark streaming master</displayName>
-            <value>locat[4]</value>
-            <description>Spark streaming master(locat[4],locat[*],yarn,spark://HOST:PORT)</description>
+            <value>local[4]</value>
+            <description>Spark streaming master(local[4],local[*],yarn,spark://HOST:PORT)</description>
             <required>true</required>
         </property>
         <property>
