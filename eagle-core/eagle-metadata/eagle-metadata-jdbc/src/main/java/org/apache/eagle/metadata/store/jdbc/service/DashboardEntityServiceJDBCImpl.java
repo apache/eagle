@@ -162,7 +162,7 @@ public class DashboardEntityServiceJDBCImpl implements DashboardEntityService {
             current.setName(entity.getName());
         }
         if (entity.getDescription() != null) {
-            current.setName(entity.getDescription());
+            current.setDescription(entity.getDescription());
         }
         if (entity.getAuthor() != null) {
             current.setAuthor(entity.getAuthor());

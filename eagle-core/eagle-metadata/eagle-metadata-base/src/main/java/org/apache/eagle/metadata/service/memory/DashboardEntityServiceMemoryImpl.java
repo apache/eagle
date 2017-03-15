@@ -65,13 +65,15 @@ public class DashboardEntityServiceMemoryImpl implements DashboardEntityService 
         Preconditions.checkNotNull(entity, "Entity should not be null");
         Preconditions.checkNotNull(entity.getUuid(), "uuid should not be null");
         DashboardEntity current = getByUUID(entity.getUuid());
+
         Preconditions.checkArgument(user.isInRole(User.Role.ADMINISTRATOR)
             || current.getAuthor().equals(user.getName()), "UPDATE operation is not allowed");
+
         if (entity.getName() != null) {
             current.setName(entity.getName());
         }
         if (entity.getDescription() != null) {
-            current.setName(entity.getDescription());
+            current.setDescription(entity.getDescription());
         }
         if (entity.getAuthor() != null) {
             current.setAuthor(entity.getAuthor());
