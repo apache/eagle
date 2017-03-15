@@ -129,8 +129,6 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         Map<String, AppInfo> result = new HashMap();
         List<AppInfo> apps = new ArrayList<>();
         try {
-            selector.checkUrl();
-
             String limit = "";
             int requests = 1;
             int timeRangePerRequestInMin = 60;
@@ -191,7 +189,6 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                                                          Object... parameter) throws Exception {
         List<AppInfo> apps = new ArrayList<>();
         try {
-            selector.checkUrl();
             String url = getAcceptedAppURL();
             return doFetchApplicationsList(url, compressionType);
         } catch (Exception e) {
@@ -201,6 +198,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     }
 
     private List<AppInfo> getResource(Constants.ResourceType resourceType, Constants.CompressionType compressionType, Object... parameter) throws Exception {
+        selector.checkUrl();
         switch (resourceType) {
             case COMPLETE_SPARK_JOB:
                 final String urlString = sparkCompleteJobServiceURLBuilder.build(selector.getSelectedUrl(), (String) parameter[0]);

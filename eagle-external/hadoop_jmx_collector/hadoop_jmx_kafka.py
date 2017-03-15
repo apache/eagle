@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-from metric_collector import JmxMetricCollector,JmxMetricListener,Runner
+from metric_collector import JmxMetricCollector,JmxMetricListener,Runner,MetricNameConverter
 import json, logging, fnmatch, sys
 
 class NNSafeModeMetric(JmxMetricListener):
@@ -38,10 +38,16 @@ class NNHAMetric(JmxMetricListener):
             else:
                 self.collector.on_bean_kv(self.PREFIX, component, "hastate", 1)
 
-class NameNodeInfo(JmxMetricListener):
+class corruptfilesMetric(JmxMetricListener):
     def on_metric(self, metric):
         if metric["metric"] == "hadoop.namenode.namenodeinfo.corruptfiles":
-            self.collector.collect(metric, "string")
+            self.collector.collect(metric, "string", MetricNameConverter())
+
+class TopUserOpCountsMetric(JmxMetricListener):
+    def on_metric(self, metric):
+        if metric["metric"] == "hadoop.namenode.fsnamesystemstate.topuseropcounts":
+            self.collector.collect(metric, "string", MetricNameConverter())
+
 
 class MemoryUsageMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.jvm"
@@ -107,6 +113,7 @@ if __name__ == '__main__':
         JournalTransactionInfoMetric(),
         DatanodeFSDatasetState(),
         HBaseRegionServerMetric(),
-        NameNodeInfo()
+        corruptfilesMetric(),
+        TopUserOpCountsMetric()
     )
     Runner.run(collector)
