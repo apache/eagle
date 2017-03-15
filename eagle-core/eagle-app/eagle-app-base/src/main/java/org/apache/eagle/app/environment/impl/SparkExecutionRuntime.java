@@ -30,12 +30,15 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
 
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkExecutionRuntime.class);
+    public static final String APPNAME = "topology.name";
     private SparkEnvironment environment;
-    private JavaStreamingContext jssc;
+
+    private SparkRuntimeResultManager sparkRuntimeResultManager;
 
     @Override
     public void prepare(SparkEnvironment environment) {
         this.environment = environment;
+        this.sparkRuntimeResultManager = SparkRuntimeResultManager.getInstance();
     }
 
     @Override
@@ -45,9 +48,10 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
 
     @Override
     public void start(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
-        jssc = executor.execute(config, environment);
+        JavaStreamingContext jssc = executor.execute(config, environment);
         LOG.info("Starting Spark Streaming");
         jssc.start();
+        sparkRuntimeResultManager.insertResult(jssc.sparkContext().appName(), jssc);
         LOG.info("Spark Streaming is running");
         try {
             jssc.awaitTermination();
@@ -58,22 +62,26 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
 
     @Override
     public void stop(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
-        jssc.stop();
+        String appName = config.getString(APPNAME);
+        JavaStreamingContext jssc = sparkRuntimeResultManager.getResult(appName);
+        if (jssc != null) {
+            jssc.stop();
+        }
     }
 
     @Override
     public ApplicationEntity.Status status(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
-        ApplicationEntity.Status status = null;
-        if (status == null) {
-            LOG.error("Unknown storm topology  status res is null");
-            status = ApplicationEntity.Status.INITIALIZED;
-            return status;
+        String appName = config.getString(APPNAME);
+        JavaStreamingContext jssc = sparkRuntimeResultManager.getResult(appName);
+        if (jssc == null) {
+            return ApplicationEntity.Status.UNKNOWN;
         }
         StreamingContextState state = jssc.getState();
-
+        ApplicationEntity.Status status;
         if (state == StreamingContextState.ACTIVE) {
             status = ApplicationEntity.Status.RUNNING;
         } else if (state == StreamingContextState.STOPPED) {
+            sparkRuntimeResultManager.removeResult(appName);
             return ApplicationEntity.Status.STOPPED;
         } else if (state == StreamingContextState.INITIALIZED) {
             return ApplicationEntity.Status.INITIALIZED;
