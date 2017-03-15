@@ -44,7 +44,7 @@ public class HAURLSelectorImplTest {
     @Test
     public void testCheckUrl() throws Exception {
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
-        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP);
+        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP, Constants.JobState.RUNNING);
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088", null, Constants.CompressionType.GZIP)).thenReturn(null);
         Assert.assertTrue(haurlSelector.checkUrl("http://www.xxx.com:8088"));
@@ -53,7 +53,7 @@ public class HAURLSelectorImplTest {
     @Test
     public void testCheckUrl1() throws Exception {
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
-        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP);
+        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP, Constants.JobState.RUNNING);
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
         Assert.assertFalse(haurlSelector.checkUrl("http://www.xxx.com:8088"));
@@ -62,14 +62,14 @@ public class HAURLSelectorImplTest {
     @Test
     public void testGetSelectedUrl() {
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
-        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP);
+        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP, Constants.JobState.RUNNING);
         Assert.assertEquals(rmBasePaths[0], haurlSelector.getSelectedUrl());
     }
 
     @Test
     public void testReSelectUrl() throws Exception {
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
-        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP);
+        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP, Constants.JobState.RUNNING);
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
         when(InputStreamUtils.getInputStream("http://www.yyy.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(null);
@@ -80,7 +80,7 @@ public class HAURLSelectorImplTest {
     @Test
     public void testReSelectUrl1() throws Exception {
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
-        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP);
+        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP, Constants.JobState.RUNNING);
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(null);
         when(InputStreamUtils.getInputStream("http://www.yyy.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
@@ -93,7 +93,7 @@ public class HAURLSelectorImplTest {
     public void testReSelectUrl2() throws Exception {
         thrown.expect(IOException.class);
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
-        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP);
+        HAURLSelectorImpl haurlSelector = new HAURLSelectorImpl(rmBasePaths, new JobListServiceURLBuilderImpl(), Constants.CompressionType.GZIP, Constants.JobState.RUNNING);
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());
         when(InputStreamUtils.getInputStream("http://www.yyy.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenThrow(new Exception());

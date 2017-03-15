@@ -50,7 +50,7 @@
             <name>dataSourceConfig.fetchIntervalSec</name>
             <displayName>Fetching Metric Interval in Seconds</displayName>
             <description>interval seconds of fetching metric from resource manager</description>
-            <value>10</value>
+            <value>30</value>
         </property>
 
         <!-- sink to kafka -->

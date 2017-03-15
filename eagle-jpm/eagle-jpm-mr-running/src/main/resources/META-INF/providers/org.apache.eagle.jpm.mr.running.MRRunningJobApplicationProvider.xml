@@ -51,16 +51,16 @@
             <value>1</value>
         </property>
         <property>
-            <name>endpointConfig.requestLimit</name>
+            <name>endpointConfig.limitPerRequest</name>
             <displayName>Application Number Limit of Each Request</displayName>
             <description>limit of applications in each request</description>
             <value></value>
         </property>
         <property>
-            <name>endpointConfig.requestTimeInHour</name>
-            <displayName>Time Span Between the First and the Last Request in Hours</displayName>
-            <description>time span between the first and the last request in hours if request number > 1</description>
-            <value>6</value>
+            <name>endpointConfig.timeRangePerRequestInMin</name>
+            <displayName>StartedTime Range for Each Request in Minutes</displayName>
+            <description>time range for each request in minutes if request number > 1</description>
+            <value>60</value>
         </property>
 
         <property>

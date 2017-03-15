@@ -89,9 +89,9 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                 LOG.info("going to fetch all mapReduce running applications");
                 apps = resourceFetcher.getResource(
                         Constants.ResourceType.RUNNING_MR_JOB,
-                        endpointConfig.requestLimit,
+                        endpointConfig.limitPerRequest,
                         endpointConfig.requestsNum,
-                        endpointConfig.requestTimeInHour);
+                        endpointConfig.timeRangePerRequestInMin);
                 LOG.info("get {} running apps from resource manager", apps.size());
                 collector.emit(MRRunningJobConfig.APP_TO_METRIC_STREAM, new Values(apps));
 

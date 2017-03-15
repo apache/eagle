@@ -77,8 +77,8 @@ public class MRRunningJobConfig implements Serializable {
         public String[] rmUrls;
         public int fetchRunningJobInterval;
         public int requestsNum;
-        public String requestLimit;
-        public int requestTimeInHour;
+        public String limitPerRequest;
+        public int timeRangePerRequestInMin;
         public int parseJobThreadPoolSize;
     }
 
@@ -134,8 +134,8 @@ public class MRRunningJobConfig implements Serializable {
         this.endpointConfig.fetchRunningJobInterval = config.getInt("endpointConfig.fetchRunningJobInterval");
         this.endpointConfig.parseJobThreadPoolSize = config.getInt("endpointConfig.parseJobThreadPoolSize");
         this.endpointConfig.requestsNum = getConfigValue(config, "endpointConfig.requestsNum", 1);
-        this.endpointConfig.requestLimit = getConfigValue(config, "endpointConfig.requestLimit", "");
-        this.endpointConfig.requestTimeInHour = getConfigValue(config, "endpointConfig.requestTimeInHour", 6);
+        this.endpointConfig.limitPerRequest = getConfigValue(config, "endpointConfig.limitPerRequest", "");
+        this.endpointConfig.timeRangePerRequestInMin = getConfigValue(config, "endpointConfig.timeRangePerRequestInMin", 60);
 
         LOG.info("Successfully initialized MRRunningJobConfig");
         LOG.info("site: " + this.endpointConfig.site);

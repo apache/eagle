@@ -57,7 +57,10 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     public RMResourceFetcher(String[] rmBasePaths) {
         //this.jobListServiceURLBuilder = new JobListServiceURLBuilderImpl();
         this.sparkCompleteJobServiceURLBuilder = new SparkCompleteJobServiceURLBuilderImpl();
-        this.selector = new HAURLSelectorImpl(rmBasePaths, new RmActiveTestURLBuilderImpl(), Constants.CompressionType.NONE);
+        this.selector = new HAURLSelectorImpl(
+                rmBasePaths,
+                new RmActiveTestURLBuilderImpl(),
+                Constants.CompressionType.NONE, null);
     }
 
     public HAURLSelector getSelector() {
@@ -130,7 +133,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 
             String limit = "";
             int requests = 1;
-            int requestTimeInHour = 6;
+            int timeRangePerRequestInMin = 60;
 
             switch (parameter.length) {
                 case 0 :
@@ -146,7 +149,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 case 3 :
                     limit = String.valueOf(parameter[0]);
                     requests = (int) parameter[1];
-                    requestTimeInHour = (int) parameter[2];
+                    timeRangePerRequestInMin = (int) parameter[2];
                     break;
                 default :
                     throw new InvalidParameterException("parameter list: limit, requests, requestTimeRange");
@@ -157,21 +160,19 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 return doFetchApplicationsList(urlString, compressionType);
             }
 
-            long requestTimeSpan = requestTimeInHour * DateTimeUtil.ONEHOUR;
-            long interval =  requestTimeSpan / (requests - 1);
-            long currentTime = System.currentTimeMillis();
-            long earliestTime = currentTime - requestTimeSpan;
+            long interval =  timeRangePerRequestInMin * DateTimeUtil.ONEMINUTE;
+            long currentTime = System.currentTimeMillis() - interval;
+
             List<String> requestUrls = new ArrayList<>();
+            requestUrls.add(getRunningJobURL(jobType, String.valueOf(currentTime), null, limit));
 
-            requestUrls.add(getRunningJobURL(jobType, null, String.valueOf(earliestTime), limit));
-
-            long start = earliestTime;
-            long end = earliestTime + interval;
-            for (; end < currentTime; start = end, end += interval) {
-                requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), String.valueOf(end), limit));
+            for (int cnt = 2; cnt < requests; cnt++) {
+                long start = currentTime - interval;
+                requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), String.valueOf(currentTime), limit));
+                currentTime -= interval;
             }
 
-            requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), null, limit));
+            requestUrls.add(getRunningJobURL(jobType, null, String.valueOf(currentTime), limit));
             LOG.info("{} requests to fetch running MapReduce applications: \n{}", requestUrls.size(),
                     StringUtils.join(requestUrls, "\n"));
 

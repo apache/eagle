@@ -20,25 +20,17 @@ import org.apache.eagle.jpm.util.Constants;
 
 public class JobListServiceURLBuilderImpl implements ServiceURLBuilder {
 
-    public String build(String... parameters) {
+    public String build(String url, String... parameters) {
         /**
          * {rmUrl}/ws/v1/cluster/apps?state=RUNNING.
          * We need to remove tailing slashes to avoid "url//ws/v1"
          * because it would not be found and would be redirected to
          * history server ui.
          */
-        String rmUrl = URLUtil.removeTrailingSlash(parameters[0]);
+        String rmUrl = URLUtil.removeTrailingSlash(url);
 
-        String restApi = null;
-        String jobState = parameters[1];
+        String restApi = parameters[0];
 
-        if (jobState.equals(Constants.JobState.RUNNING.name())) {
-            restApi = Constants.V2_APPS_RUNNING_URL;
-        } else if (jobState.equals(Constants.JobState.FINISHED.name())) {
-            restApi = Constants.V2_APPS_COMPLETED_URL;
-        } else if (jobState.equals(Constants.JobState.ALL.name())) {
-            restApi = Constants.V2_APPS_URL;
-        }
         if (restApi == null) {
             return null;
         }

@@ -21,8 +21,8 @@ import org.apache.eagle.jpm.util.Constants;
 
 public class RmActiveTestURLBuilderImpl implements ServiceURLBuilder {
     @Override
-    public String build(String... parameters) {
-        String rmUrl = URLUtil.removeTrailingSlash(parameters[0]);
+    public String build(String url, String... parameters) {
+        String rmUrl = URLUtil.removeTrailingSlash(url);
         return String.format("%s/%s&limit=1&%s", rmUrl, Constants.V2_APPS_COMPLETED_URL, Constants.ANONYMOUS_PARAMETER);
     }
 }

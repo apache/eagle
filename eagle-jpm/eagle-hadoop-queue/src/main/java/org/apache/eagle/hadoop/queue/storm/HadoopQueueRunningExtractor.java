@@ -55,7 +55,7 @@ public class HadoopQueueRunningExtractor {
             throw new IllegalArgumentException(site + ".baseUrl is null");
         }
         String[] urls = urlBases.split(",");
-        urlSelector = new HAURLSelectorImpl(urls, new RmActiveTestURLBuilderImpl(), Constants.CompressionType.NONE);
+        urlSelector = new HAURLSelectorImpl(urls, new RmActiveTestURLBuilderImpl(), Constants.CompressionType.NONE, null);
         executorService = Executors.newFixedThreadPool(MAX_NUM_THREADS);
         this.collector = collector;
     }
@@ -64,7 +64,7 @@ public class HadoopQueueRunningExtractor {
         try {
             urlSelector.checkUrl();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("{}", e.getMessage(), e);
         }
         String selectedUrl = urlSelector.getSelectedUrl();
         LOGGER.info("Current RM base url is " + selectedUrl);
@@ -77,11 +77,9 @@ public class HadoopQueueRunningExtractor {
             try {
                 future.get(MAX_WAIT_TIME * 1000, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
-                LOGGER.info("Caught an overtime exception with message" + e.getMessage());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+                LOGGER.error("Caught an overtime exception with message" + e.getMessage());
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("{}", e.getMessage(), e);
             }
         });
     }
