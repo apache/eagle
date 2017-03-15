@@ -28,6 +28,7 @@ import java.util.Map;
  * Dashboard Config Entity.
  */
 public class DashboardEntity extends PersistenceEntity {
+
     private String name;
     private String description;
     private String author;
@@ -93,5 +94,42 @@ public class DashboardEntity extends PersistenceEntity {
             this.charts = new ArrayList<>(0);
         }
         super.ensureDefault();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DashboardEntity entity = (DashboardEntity) o;
+
+        if (name != null ? !name.equals(entity.name) : entity.name != null) {
+            return false;
+        }
+        if (description != null ? !description.equals(entity.description) : entity.description != null) {
+            return false;
+        }
+        if (author != null ? !author.equals(entity.author) : entity.author != null) {
+            return false;
+        }
+        if (settings != null ? !settings.equals(entity.settings) : entity.settings != null) {
+            return false;
+        }
+        return charts != null ? charts.equals(entity.charts) : entity.charts == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (settings != null ? settings.hashCode() : 0);
+        result = 31 * result + (charts != null ? charts.hashCode() : 0);
+        return result;
     }
 }

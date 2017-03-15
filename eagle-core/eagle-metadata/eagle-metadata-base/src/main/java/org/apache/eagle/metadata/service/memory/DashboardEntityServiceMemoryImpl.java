@@ -20,13 +20,17 @@ import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.DashboardEntity;
 import org.apache.eagle.metadata.service.DashboardEntityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DashboardEntityServiceMemoryImpl implements DashboardEntityService {
     private final Map<String, DashboardEntity> dashboardEntityMap = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardEntityServiceMemoryImpl.class);
 
     @Override
     public synchronized Collection<DashboardEntity> findAll() {
@@ -57,15 +61,34 @@ public class DashboardEntityServiceMemoryImpl implements DashboardEntityService 
     }
 
     @Override
-    public synchronized DashboardEntity update(DashboardEntity dashboardEntity) throws EntityNotFoundException {
-        Preconditions.checkNotNull(dashboardEntity, "Dashboard Entity is null");
-        Preconditions.checkNotNull(dashboardEntity.getUuid(), "Dashboard Entity uuid should not be null");
-        if (!dashboardEntityMap.containsKey(dashboardEntity.getUuid())) {
-            throw new EntityNotFoundException("Dashboard (uuid: " + dashboardEntity.getUuid() + ") not exist");
+    public synchronized DashboardEntity update(DashboardEntity entity) throws EntityNotFoundException {
+        Preconditions.checkNotNull(entity, "Entity should not be null");
+        Preconditions.checkNotNull(entity.getUuid(), "uuid should not be null");
+        DashboardEntity current = getByUUID(entity.getUuid());
+        if (entity.getName() != null) {
+            current.setName(entity.getName());
         }
-        dashboardEntity.ensureDefault();
-        dashboardEntityMap.put(dashboardEntity.getUuid(), dashboardEntity);
-        return dashboardEntity;
+        if (entity.getDescription() != null) {
+            current.setName(entity.getDescription());
+        }
+        if (entity.getAuthor() != null) {
+            current.setAuthor(entity.getAuthor());
+        }
+        if (entity.getCharts() != null) {
+            current.setCharts(entity.getCharts());
+        }
+        if (entity.getSettings() != null) {
+            current.setSettings(entity.getSettings());
+        }
+        if (entity.getCreatedTime() > 0) {
+            LOGGER.warn("createdTime  is not updatable but provided: {}, ignore", current.getCreatedTime());
+        }
+        if (entity.getModifiedTime() > 0) {
+            LOGGER.warn("modifiedTime is not updatable but provided: {}, ignore", current.getModifiedTime());
+        }
+        current.ensureDefault();
+        dashboardEntityMap.put(current.getUuid(), current);
+        return current;
     }
 
     @Override

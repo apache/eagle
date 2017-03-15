@@ -18,7 +18,7 @@
 
 CREATE TABLE IF NOT EXISTS applications (
   uuid varchar(50) PRIMARY KEY,
-  appid varchar(100) DEFAULT NULL,
+  appid varchar(100) NOT NULL,
   siteid varchar(100) DEFAULT NULL,
   apptype varchar(30) DEFAULT NULL,
   appmode varchar(10) DEFAULT NULL,
@@ -26,16 +26,31 @@ CREATE TABLE IF NOT EXISTS applications (
   appstatus  varchar(20) DEFAULT NULL,
   configuration mediumtext DEFAULT NULL,
   context mediumtext DEFAULT NULL,
-  createdtime bigint(20) DEFAULT NULL,
-  modifiedtime  bigint(20) DEFAULT NULL
-);
+  createdtime bigint(20) NOT NULL,
+  modifiedtime  bigint(20) NOT NULL,
+  UNIQUE INDEX `appid_UNIQUE` (`appid` ASC))
+COMMENT = 'eagle application metadata';
 
 CREATE TABLE IF NOT EXISTS sites (
   uuid varchar(50) PRIMARY KEY,
-  siteid varchar(100) DEFAULT NULL,
-  sitename varchar(100) DEFAULT NULL,
+  siteid varchar(100) NOT NULL,
+  sitename varchar(100) NOT NULL,
   description varchar(255) DEFAULT NULL,
-  createdtime bigint(20) DEFAULT NULL,
-  modifiedtime  bigint(20) DEFAULT NULL,
-  UNIQUE (siteid)
-);
+  createdtime bigint(20) NOT NULL,
+  modifiedtime  bigint(20) NOT NULL,
+  UNIQUE INDEX `siteid_UNIQUE` (`siteid` ASC))
+COMMENT = 'eagle site metadata';
+
+CREATE TABLE IF NOT EXISTS `dashboards` (
+  `uuid` VARCHAR(50) NOT NULL,
+  `name` VARCHAR(200) NOT NULL,
+  `description` VARCHAR(500) NOT NULL,
+  `settings` mediumtext NULL,
+  `charts` longtext NULL,
+  `modifiedtime` BIGINT(20) NOT NULL,
+  `createdtime` BIGINT(20) NOT NULL,
+  `author` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`uuid`),
+  UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+COMMENT = 'eagle dashboard metadata';
