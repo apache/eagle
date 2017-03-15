@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+@Deprecated
 public class RunningAppsCrawler implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RunningAppsCrawler.class);

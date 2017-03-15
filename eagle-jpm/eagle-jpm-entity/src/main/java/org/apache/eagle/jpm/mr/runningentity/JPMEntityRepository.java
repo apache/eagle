@@ -27,6 +27,7 @@ public class JPMEntityRepository extends EntityRepository {
         entitySet.add(JobExecutionAPIEntity.class);
         entitySet.add(TaskExecutionAPIEntity.class);
         entitySet.add(TaskAttemptExecutionAPIEntity.class);
+        entitySet.add(YarnAppAPIEntity.class);
         serDeserMap.put(JobConfig.class, new JobConfigSerDeser());
         serDeserMap.put(JobCounters.class, new JobCountersSerDeser());
     }

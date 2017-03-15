@@ -67,6 +67,13 @@ public class Constants {
 
     public static final String YARN_API_CLUSTER_INFO = "ws/v1/cluster/info";
 
+    public static class MetricName {
+        // Metrics from running apps
+        public static final String HADOOP_APPS_ALLOCATED_MB = "hadoop.%s.allocatedmb";
+        public static final String HADOOP_APPS_ALLOCATED_VCORES = "hadoop.%s.allocatedvcores";
+        public static final String HADOOP_APPS_RUNNING_CONTAINERS = "hadoop.%s.runningcontainers";
+    }
+
     public enum CompressionType {
         GZIP, NONE
     }
@@ -93,7 +100,7 @@ public class Constants {
 
     public enum ResourceType {
         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO, JOB_CONFIGURATION,
-        COMPLETE_MR_JOB
+        COMPLETE_MR_JOB, ACCEPTED_JOB
     }
 
     public static enum SuggestionType {
@@ -119,6 +126,7 @@ public class Constants {
     public static final String MR_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
     public static final String MR_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
     public static final String MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME = "JobOptimizerSuggestionService";
+    public static final String ACCEPTED_APP_SERVICE_NAME = "AcceptedAppService";
 
     public static final String JOB_TASK_TYPE_TAG = "taskType";
 
@@ -141,6 +149,7 @@ public class Constants {
 
     public enum JobType {
         CASCADING("CASCADING"),HIVE("HIVE"),PIG("PIG"),SCOOBI("SCOOBI"),
+        SPARK("SPARK"), MAPREDUCE("MAPREDUCE"),
         NOTAVALIABLE("N/A")
         ;
         private String value;

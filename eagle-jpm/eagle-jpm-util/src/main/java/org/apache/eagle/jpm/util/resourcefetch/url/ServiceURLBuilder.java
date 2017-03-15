@@ -17,5 +17,5 @@
 package org.apache.eagle.jpm.util.resourcefetch.url;
 
 public interface ServiceURLBuilder {
-    String build(String... parameters);
+    String build(String url, String... parameters);
 }

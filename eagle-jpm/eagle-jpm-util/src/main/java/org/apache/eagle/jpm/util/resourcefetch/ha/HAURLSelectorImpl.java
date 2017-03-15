@@ -32,16 +32,38 @@ public class HAURLSelectorImpl implements HAURLSelector {
     private final String[] urls;
     private volatile String selectedUrl;
     private final ServiceURLBuilder builder;
+    private final Constants.JobState jobState;
 
     private volatile boolean reselectInProgress;
     private final Constants.CompressionType compressionType;
     private static final long MAX_RETRY_TIME = 2;
     private static final Logger LOG = LoggerFactory.getLogger(HAURLSelectorImpl.class);
 
-    public HAURLSelectorImpl(String[] urls, ServiceURLBuilder builder, Constants.CompressionType compressionType) {
+    public HAURLSelectorImpl(String[] urls, ServiceURLBuilder builder, Constants.CompressionType compressionType, Constants.JobState jobState) {
         this.urls = urls;
         this.compressionType = compressionType;
         this.builder = builder;
+        this.jobState = jobState;
+    }
+
+    private String convertRestApi(Constants.JobState jobState) {
+        if (jobState == null) {
+            return null;
+        }
+        switch (jobState) {
+            case RUNNING : return Constants.V2_APPS_RUNNING_URL;
+            case FINISHED : return Constants.V2_APPS_COMPLETED_URL;
+            case ALL : return Constants.V2_APPS_URL;
+            default :
+                LOG.error("Unsupported JobState={}", jobState);
+                return null;
+        }
+    }
+
+    public void checkUrl() throws IOException {
+        if (!checkUrl(builder.build(getSelectedUrl(), convertRestApi(jobState)))) {
+            reSelectUrl();
+        }
     }
 
     public boolean checkUrl(String urlString) {
@@ -49,7 +71,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
         try {
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
         } catch (Exception ex) {
-            LOG.info("get inputstream from url: " + urlString + " failed. ");
+            LOG.info("get inputStream from url: " + urlString + " failed. ");
             return false;
         } finally {
             if (is != null) {
@@ -71,8 +93,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
         return selectedUrl;
     }
 
-    @Override
-    public void reSelectUrl() throws IOException {
+    private void reSelectUrl() throws IOException {
         if (reselectInProgress) {
             return;
         }
@@ -87,7 +108,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
                     String urlToCheck = urls[i];
                     LOG.info("Going to try url :" + urlToCheck);
                     for (int time = 0; time < MAX_RETRY_TIME; time++) {
-                        if (checkUrl(builder.build(urlToCheck, Constants.JobState.RUNNING.name()))) {
+                        if (checkUrl(builder.build(urlToCheck, convertRestApi(jobState)))) {
                             selectedUrl = urls[i];
                             LOG.info("Successfully switch to new url : " + selectedUrl);
                             return;

@@ -15,12 +15,11 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.hadoop.queue.model.applications;
+package org.apache.eagle.jpm.mr.runningentity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Deprecated
 public class AppStreamInfo {
     public static final String SITE = "site";
     public static final String ID = "id";

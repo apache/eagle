@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 /**
  * App model for Yarn Resource http://[rm http address:port]/ws/v1/cluster/apps.
  */
+@Deprecated
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class App {

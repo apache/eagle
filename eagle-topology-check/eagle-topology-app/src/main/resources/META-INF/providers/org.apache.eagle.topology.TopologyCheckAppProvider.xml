@@ -59,16 +59,16 @@
             <description>number of sinks connected to alert engine</description>
         </property>
         <property>
-            <name>topology.resolverAPIUrl</name>
-            <displayName>Rack Resolver APIUrl</displayName>
-            <description>Use the URL to obtain a Node Object, from a node identified by the nodeid value.</description>
-            <value>http://sandbox.hortonworks.com:8088/ws/v1/cluster/nodes</value>
-        </property>
-        <property>
             <name>topology.rackResolverCls</name>
             <displayName>Rack Resolver Class</displayName>
             <description>rack resolver class</description>
             <value>org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver</value>
+        </property>
+        <property>
+            <name>topology.resolverAPIUrl</name>
+            <displayName>Rack Resolver APIUrl Required by ClusterNodeAPITopologyRackResolver</displayName>
+            <description>Use the URL to obtain a Node Object, from a node identified by the nodeid value.</description>
+            <value>http://sandbox.hortonworks.com:8088/ws/v1/cluster/nodes</value>
         </property>
 
         <property>

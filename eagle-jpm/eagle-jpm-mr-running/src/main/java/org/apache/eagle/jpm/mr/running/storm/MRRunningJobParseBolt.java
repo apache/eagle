@@ -77,7 +77,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         AppInfo appInfo = (AppInfo) tuple.getValue(1);
         Map<String, JobExecutionAPIEntity> mrJobs = (Map<String, JobExecutionAPIEntity>) tuple.getValue(2);
 
-        LOG.info("get mr yarn application " + appInfo.getId());
+        LOG.debug("get mr yarn application " + appInfo.getId());
 
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {

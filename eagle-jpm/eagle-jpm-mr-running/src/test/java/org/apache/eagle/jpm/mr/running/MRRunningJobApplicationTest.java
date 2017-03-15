@@ -194,9 +194,9 @@ public class MRRunningJobApplicationTest {
 
         init = (boolean) initField.get(mrRunningJobFetchSpout);
         Assert.assertTrue(init);
-        Assert.assertEquals(2, tuples.size());
-        Assert.assertEquals(TUPLE_1, tuples.get(0).toString());
-        Assert.assertEquals(TUPLE_2, tuples.get(1).toString());
+        Assert.assertEquals(3, tuples.size());
+        Assert.assertEquals(TUPLE_1, tuples.get(1).toString());
+        Assert.assertEquals(TUPLE_2, tuples.get(2).toString());
         runningYarnApps = (Set<String>) runningYarnAppsField.get(mrRunningJobFetchSpout);
         Assert.assertEquals(2, runningYarnApps.size());
         Assert.assertEquals(RUNNING_YARNAPPS, runningYarnApps.toString());
@@ -208,9 +208,9 @@ public class MRRunningJobApplicationTest {
         mrRunningJobFetchSpout.nextTuple();
 
         Assert.assertTrue(init);
-        Assert.assertEquals(2, tuples.size());
-        Assert.assertEquals(TUPLE_1, tuples.get(0).toString());
-        Assert.assertEquals(TUPLE_2, tuples.get(1).toString());
+        Assert.assertEquals(3, tuples.size());
+        Assert.assertEquals(TUPLE_1, tuples.get(1).toString());
+        Assert.assertEquals(TUPLE_2, tuples.get(2).toString());
         runningYarnApps = (Set<String>) runningYarnAppsField.get(mrRunningJobFetchSpout);
         Assert.assertEquals(2, runningYarnApps.size());
         Assert.assertEquals(RUNNING_YARNAPPS, runningYarnApps.toString());
@@ -222,9 +222,9 @@ public class MRRunningJobApplicationTest {
         mrRunningJobFetchSpout.nextTuple();
 
         Assert.assertTrue(init);
-        Assert.assertEquals(2, tuples.size());
-        Assert.assertEquals(TUPLE_1, tuples.get(0).toString());
-        Assert.assertEquals("[application_1479206441898_35341, AppInfo{id='application_1479206441898_35341', user='yyy', name='insert overwrite table inter...a.xxx(Stage-3)', queue='yyy', state='FINISHED', finalStatus='UNDEFINED', progress=59.545456, trackingUI='ApplicationMaster', trackingUrl='http://host.domain.com:8088/proxy/application_1479206441898_35341/', diagnostics='', clusterId='1479206441898', applicationType='MAPREDUCE', startedTime=1479341511477, finishedTime=0, elapsedTime=77619, amContainerLogs='http://host.domain.com:8042/node/containerlogs/container_e11_1479206441898_35341_01_000005/yyy', amHostHttpAddress='host.domain.com:8042', allocatedMB=27648, allocatedVCores=6, runningContainers=6}, {jobId=prefix:null, timestamp:0, humanReadableDate:1970-01-01 00:00:00,000, tags: , encodedRowkey:null}]", tuples.get(1).toString());
+        Assert.assertEquals(3, tuples.size());
+        Assert.assertEquals(TUPLE_1, tuples.get(1).toString());
+        Assert.assertEquals("[application_1479206441898_35341, AppInfo{id='application_1479206441898_35341', user='yyy', name='insert overwrite table inter...a.xxx(Stage-3)', queue='yyy', state='FINISHED', finalStatus='UNDEFINED', progress=59.545456, trackingUI='ApplicationMaster', trackingUrl='http://host.domain.com:8088/proxy/application_1479206441898_35341/', diagnostics='', clusterId='1479206441898', applicationType='MAPREDUCE', startedTime=1479341511477, finishedTime=0, elapsedTime=77619, amContainerLogs='http://host.domain.com:8042/node/containerlogs/container_e11_1479206441898_35341_01_000005/yyy', amHostHttpAddress='host.domain.com:8042', allocatedMB=27648, allocatedVCores=6, runningContainers=6}, {jobId=prefix:null, timestamp:0, humanReadableDate:1970-01-01 00:00:00,000, tags: , encodedRowkey:null}]", tuples.get(2).toString());
 
         runningYarnApps = (Set<String>) runningYarnAppsField.get(mrRunningJobFetchSpout);
         Assert.assertEquals(1, runningYarnApps.size());
