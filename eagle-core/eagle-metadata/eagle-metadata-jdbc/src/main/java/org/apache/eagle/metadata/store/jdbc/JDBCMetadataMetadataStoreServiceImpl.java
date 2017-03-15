@@ -29,7 +29,6 @@ import java.sql.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 
 public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQueryService {
@@ -209,7 +208,9 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
     }
 
     @Override
-    public <T, E extends Throwable> List<T> queryWithCond(String querySql, ThrowableConsumer<PreparedStatement, SQLException> preparer, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E {
+    public <T, E extends Throwable> List<T> queryWithCond(String querySql,
+                                                          ThrowableConsumer<PreparedStatement, SQLException> preparer,
+                                                          ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
