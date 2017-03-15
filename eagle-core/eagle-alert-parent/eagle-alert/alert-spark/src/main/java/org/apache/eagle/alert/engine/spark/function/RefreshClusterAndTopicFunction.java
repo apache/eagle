@@ -17,7 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
-import com.clearspring.analytics.util.Lists;
+import com.google.common.collect.Lists;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.runner.UnitSparkUnionTopologyRunner;
 import org.apache.eagle.alert.engine.spark.model.KafkaClusterInfo;
