@@ -65,6 +65,8 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     private static final long serialVersionUID = 381513979960046346L;
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkUnionTopologyRunner.class);
+
+
     //kafka config
 
     //common config
@@ -78,12 +80,11 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     //Zookeeper server string: host1:port1[,host2:port2,...]
     private String zkServers = null;
     //spark config
-    private static final String BATCH_DURATION = "topology.batchDuration";
     private static final int DEFAULT_BATCH_DURATION_SECOND = 2;
+    private static final String alertPublishBoltName = "alertPublishBolt";
+    private static final String BATCH_DURATION = "topology.batchDuration";
     private static final String SPARK_EXECUTOR_CORES = "topology.core";
     private static final String SPARK_EXECUTOR_MEMORY = "topology.memory";
-    private static final String alertPublishBoltName = "alertPublishBolt";
-    private static final String LOCAL_MODE = "topology.localMode";
     private static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
     private static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
     private static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
@@ -94,10 +95,14 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     private static final String DRIVER_CORES = "topology.driverCores";
     private static final String DEPLOY_MODE = "topology.deployMode";
     private static final String CHECKPOINT_PATH = "topology.checkpointPath";
+    private static final String TOPOLOGY_GROUPID = "topology.groupId";
+    private static final String TOPOLOGY_NAME = "topology.name";
+    private static final String TOPOLOGY_DYNAMICALLOCATION = "topology.dynamicAllocation";
+    private static final String AUTO_OFFSET_RESET = "topology.offsetreset";
 
 
     private final AtomicReference<Map<KafkaClusterInfo, OffsetRange[]>> offsetRangesClusterMapRef = new AtomicReference<>();
-    public static Class<MessageAndMetadata<String, String>> streamClass = (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;
+    private static Class<MessageAndMetadata<String, String>> streamClass = (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;
 
     private SparkConf sparkConf;
 
@@ -121,30 +126,26 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     }
 
     private void prepareKafkaConfig(Config config) {
-        this.groupId = config.getString("topology.groupId");
+        this.groupId = config.getString(TOPOLOGY_GROUPID);
     }
 
     private void prepareSparkConfig(Config config) {
         SparkConf sparkConf = new SparkConf();
-        sparkConf.setAppName(config.getString("topology.name"));
-        boolean localMode = config.getBoolean(LOCAL_MODE);
-        if (localMode) {
-            LOG.info("Submitting as local mode");
-            sparkConf.setMaster("local[*]");
-        } else {
-            sparkConf.setMaster(config.getString(TOPOLOGY_MASTER));
-        }
+        sparkConf.setAppName(config.getString(TOPOLOGY_NAME));
+        String master = config.hasPath(TOPOLOGY_MASTER) ? config.getString(TOPOLOGY_MASTER) : "local[*]";
         String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
         String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
         String driverMemory = config.getString(DRIVER_MEMORY);
         String driverCore = config.getString(DRIVER_CORES);
         String deployMode = config.getString(DEPLOY_MODE);
+        String enable = config.getString(TOPOLOGY_DYNAMICALLOCATION);
+        sparkConf.setMaster(master);
         sparkConf.set("spark.executor.cores", sparkExecutorCores);
         sparkConf.set("spark.executor.memory", sparkExecutorMemory);
         sparkConf.set("spark.driver.memory", driverMemory);
         sparkConf.set("spark.driver.cores", driverCore);
         sparkConf.set("spark.submit.deployMode", deployMode);
-        sparkConf.set("spark.streaming.dynamicAllocation.enable", "true");
+        sparkConf.set("spark.streaming.dynamicAllocation.enable", enable);
 
         this.sparkConf = sparkConf;
     }
@@ -326,7 +327,8 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     private static Map<String, String> buildKafkaParam(KafkaClusterInfo kafkaClusterInfo) {
         Map<String, String> kafkaParam = Maps.newHashMap();
         kafkaParam.put("group.id", groupId);
-        kafkaParam.put("auto.offset.reset", "largest");
+        String reset = config.hasPath(AUTO_OFFSET_RESET) ? config.getString(AUTO_OFFSET_RESET) : "largest";
+        kafkaParam.put("auto.offset.reset", reset);
         kafkaParam.put("metadata.broker.list", kafkaClusterInfo.getBrokerList());
         // Newer version of metadata.broker.list:
         kafkaParam.put("bootstrap.servers", kafkaClusterInfo.getBrokerList());
