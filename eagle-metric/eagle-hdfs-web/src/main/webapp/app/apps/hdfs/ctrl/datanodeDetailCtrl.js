@@ -187,7 +187,7 @@
 
 				var condition = {
 					site: $scope.site,
-					component: "regionserver",
+					component: "datanode",
 					host: $scope.hostname
 				};
 				return HDFSMETRIC.aggMetricsToEntities(HDFSMETRIC.hadoopMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
