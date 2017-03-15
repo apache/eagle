@@ -16,25 +16,43 @@
  */
 package org.apache.eagle.metadata.service;
 
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.DashboardEntity;
 import org.apache.eagle.metadata.service.memory.DashboardEntityServiceMemoryImpl;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class TestDashboardEntityServiceMemoryImpl  {
     private DashboardEntityService dashboardEntityService = new DashboardEntityServiceMemoryImpl();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testDashboardCRUD() throws EntityNotFoundException {
+        User user1 = new User();
+        user1.setName("user1");
+        user1.setRoles(Collections.singleton(User.Role.USER));
+
+        User user2 = new User();
+        user2.setName("user2");
+        user2.setRoles(Collections.singleton(User.Role.USER));
+
+        User admin  = new User();
+        admin.setName("admin");
+        admin.setRoles(Collections.singleton(User.Role.ADMINISTRATOR));
+
         DashboardEntity entity = new DashboardEntity();
         {
             entity.setName("Sample Dashboard");
             entity.setDescription("A sample dashboard for unit test");
-            entity.setAuthor("somebody");
+            entity.setAuthor(user1.getName());
             entity.setSettings(new HashMap<String, Object>() {
                 {
                     put("Stringkey", "SettingValue");
@@ -64,7 +82,7 @@ public class TestDashboardEntityServiceMemoryImpl  {
             DashboardEntity entityToUpdate = new DashboardEntity();
             entityToUpdate.setUuid(createdEntity.getUuid());
             entityToUpdate.setName("Sample Dashboard (Updated)");
-            updatedEntity = dashboardEntityService.update(entityToUpdate);
+            updatedEntity = dashboardEntityService.update(entityToUpdate, user1);
             Assert.assertEquals(createdEntity.getUuid(), updatedEntity.getUuid());
             Assert.assertEquals("Sample Dashboard (Updated)", updatedEntity.getName());
             Assert.assertEquals(createdEntity.getCreatedTime(), updatedEntity.getCreatedTime());
@@ -75,8 +93,15 @@ public class TestDashboardEntityServiceMemoryImpl  {
         }
 
         DashboardEntity deletedEntity;
+
         {
-            deletedEntity = dashboardEntityService.deleteByUUID(updatedEntity.getUuid());
+            expectedException.expect(IllegalArgumentException.class);
+            dashboardEntityService.deleteByUUID(updatedEntity.getUuid(), user2);
+            Assert.assertEquals(1, dashboardEntityService.findAll().size());
+        }
+
+        {
+            deletedEntity = dashboardEntityService.deleteByUUID(updatedEntity.getUuid(), admin);
             Assert.assertEquals(updatedEntity, deletedEntity);
             Assert.assertEquals(0, dashboardEntityService.findAll().size());
         }

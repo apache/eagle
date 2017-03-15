@@ -17,23 +17,26 @@
 package org.apache.eagle.metadata.service;
 
 import com.google.common.base.Preconditions;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.DashboardEntity;
 import org.apache.eagle.metadata.persistence.PersistenceService;
 
 public interface DashboardEntityService extends PersistenceService<DashboardEntity> {
-    DashboardEntity update(DashboardEntity dashboardEntity) throws EntityNotFoundException;
+    DashboardEntity update(DashboardEntity dashboardEntity, User user) throws EntityNotFoundException;
 
     DashboardEntity getByUUIDOrName(String uuid, String name) throws EntityNotFoundException;
 
-    DashboardEntity deleteByUUID(String uuid) throws EntityNotFoundException;
+    DashboardEntity deleteByUUID(String uuid, User user) throws EntityNotFoundException;
 
-    default DashboardEntity createOrUpdate(DashboardEntity dashboardEntity) throws EntityNotFoundException {
+    default DashboardEntity createOrUpdate(DashboardEntity dashboardEntity, User user) throws EntityNotFoundException {
         Preconditions.checkNotNull(dashboardEntity, "DashboardEntity should not be null");
         if (dashboardEntity.getUuid() == null) {
+            Preconditions.checkArgument(dashboardEntity.getAuthor() == null, "author is immutable");
+            dashboardEntity.setAuthor(user.getName());
             return create(dashboardEntity);
         } else {
-            return update(dashboardEntity);
+            return update(dashboardEntity, user);
         }
     }
 }

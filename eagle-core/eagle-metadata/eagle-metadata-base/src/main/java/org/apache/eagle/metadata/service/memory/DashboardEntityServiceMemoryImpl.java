@@ -17,13 +17,13 @@
 package org.apache.eagle.metadata.service.memory;
 
 import com.google.common.base.Preconditions;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.DashboardEntity;
 import org.apache.eagle.metadata.service.DashboardEntityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,10 +61,12 @@ public class DashboardEntityServiceMemoryImpl implements DashboardEntityService 
     }
 
     @Override
-    public synchronized DashboardEntity update(DashboardEntity entity) throws EntityNotFoundException {
+    public synchronized DashboardEntity update(DashboardEntity entity, User user) throws EntityNotFoundException {
         Preconditions.checkNotNull(entity, "Entity should not be null");
         Preconditions.checkNotNull(entity.getUuid(), "uuid should not be null");
         DashboardEntity current = getByUUID(entity.getUuid());
+        Preconditions.checkArgument(user.isInRole(User.Role.ADMINISTRATOR)
+            || current.getAuthor().equals(user.getName()), "UPDATE operation is not allowed");
         if (entity.getName() != null) {
             current.setName(entity.getName());
         }
@@ -104,11 +106,12 @@ public class DashboardEntityServiceMemoryImpl implements DashboardEntityService 
     }
 
     @Override
-    public synchronized DashboardEntity deleteByUUID(String uuid) throws EntityNotFoundException {
+    public synchronized DashboardEntity deleteByUUID(String uuid, User user) throws EntityNotFoundException {
         Preconditions.checkNotNull(uuid, "UUID should not be null");
-        if (dashboardEntityMap.containsKey(uuid)) {
-            return dashboardEntityMap.remove(uuid);
-        }
-        throw new EntityNotFoundException("Dashboard (uuid: " + uuid + ") not found");
+        DashboardEntity current = this.getByUUID(uuid);
+        Preconditions.checkArgument(user.isInRole(User.Role.ADMINISTRATOR)
+            || current.getAuthor().equals(user.getName()), "DELETE operation is not allowed for user " + user.getName());
+        dashboardEntityMap.remove(uuid);
+        return current;
     }
 }

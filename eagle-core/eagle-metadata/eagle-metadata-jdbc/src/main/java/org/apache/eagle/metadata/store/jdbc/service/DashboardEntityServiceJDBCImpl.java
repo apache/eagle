@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.mongodb.util.JSON;
 import org.apache.eagle.common.function.ThrowableConsumer2;
 import org.apache.eagle.common.function.ThrowableFunction;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.DashboardEntity;
 import org.apache.eagle.metadata.service.DashboardEntityService;
@@ -149,10 +150,14 @@ public class DashboardEntityServiceJDBCImpl implements DashboardEntityService {
     }
 
     @Override
-    public DashboardEntity update(DashboardEntity entity) throws EntityNotFoundException {
+    public DashboardEntity update(DashboardEntity entity, User user) throws EntityNotFoundException {
         Preconditions.checkNotNull(entity, "Entity should not be null");
         Preconditions.checkNotNull(entity.getUuid(), "uuid should not be null");
         DashboardEntity current = getByUUID(entity.getUuid());
+
+        Preconditions.checkArgument(user.isInRole(User.Role.ADMINISTRATOR)
+            || current.getAuthor().equals(user.getName()), "UPDATE operation is not allowed");
+
         if (entity.getName() != null) {
             current.setName(entity.getName());
         }
@@ -201,9 +206,13 @@ public class DashboardEntityServiceJDBCImpl implements DashboardEntityService {
     }
 
     @Override
-    public DashboardEntity deleteByUUID(String uuid) throws EntityNotFoundException {
+    public DashboardEntity deleteByUUID(String uuid, User user) throws EntityNotFoundException {
         Preconditions.checkNotNull(uuid, "uuid should not be null");
         DashboardEntity entity = this.getByUUID(uuid);
+
+        Preconditions.checkArgument(user.isInRole(User.Role.ADMINISTRATOR)
+            || entity.getAuthor().equals(user.getName()), "DELETE operation is not allowed");
+
         try {
             queryService.execute(String.format(DELETE_BY_UUID_SQL_FORMAT, uuid));
         } catch (SQLException e) {

@@ -18,7 +18,10 @@ package org.apache.eagle.metadata.resource;
 
 
 import com.google.inject.Inject;
+import io.dropwizard.auth.Auth;
 import org.apache.eagle.common.rest.RESTResponse;
+import org.apache.eagle.common.security.RolesAllowed;
+import org.apache.eagle.common.security.User;
 import org.apache.eagle.metadata.model.DashboardEntity;
 import org.apache.eagle.metadata.service.DashboardEntityService;
 
@@ -49,15 +52,17 @@ public class DashboardResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<DashboardEntity> createDashboard(DashboardEntity dashboardEntity) {
-        return RESTResponse.async(() -> dashboardEntityService.createOrUpdate(dashboardEntity)).get();
+    @RolesAllowed({User.Role.USER, User.Role.ADMINISTRATOR})
+    public RESTResponse<DashboardEntity> createOrUpdateDashboard(DashboardEntity dashboardEntity, @Auth User user) {
+        return RESTResponse.async(() -> dashboardEntityService.createOrUpdate(dashboardEntity, user)).get();
     }
 
     @DELETE
     @Path("/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<DashboardEntity> deleteDashboard(String uuid) {
-        return RESTResponse.async(() -> dashboardEntityService.deleteByUUID(uuid)).get();
+    @RolesAllowed({User.Role.USER, User.Role.ADMINISTRATOR})
+    public RESTResponse<DashboardEntity> deleteDashboard(String uuid, @Auth User user) {
+        return RESTResponse.async(() -> dashboardEntityService.deleteByUUID(uuid, user)).get();
     }
 }
