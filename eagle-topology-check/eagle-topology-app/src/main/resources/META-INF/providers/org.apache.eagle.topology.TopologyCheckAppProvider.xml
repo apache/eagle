@@ -128,6 +128,38 @@
             <value></value>
         </property>
 
+        <!-- system health check properties-->
+        <property>
+            <name>dataSourceConfig.system.enabled</name>
+            <displayName>System Topology Check Enabled</displayName>
+            <description>System topology status check enabled</description>
+            <value>false</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.topic</name>
+            <displayName>Topic For System Topology Collector</displayName>
+            <description>Topic For System Topology Collector</description>
+            <value>topology_system_${siteId}</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.zkConnection</name>
+            <displayName>Kafka Zookeeper Quorum For System Collector</displayName>
+            <value>localhost:2181</value>
+            <description>Kafka Zookeeper Quorum For System Collector</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.schemeCls</name>
+            <displayName>Kafka schemeCls For System Collector</displayName>
+            <value>storm.kafka.StringScheme</value>
+            <description>Kafka schemeCls For System Collector</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.dataSendBatchSize</name>
+            <displayName>Data Send Batch Size For System Collector</displayName>
+            <value>20</value>
+            <description>Data Send Batch Size For System Collector</description>
+        </property>
 
         <!-- data sink configurations -->
         <property>

@@ -1,0 +1,70 @@
+{
+	"totaleverage": {
+
+		"memtotal" : "system.memory.memtotal.kb",
+		"memfree" : "system.memory.memfree.kb",
+
+		"receivedbytes" : "system.nic.receivedbytes",
+		"transmitbytes" : "system.nic.transmitbytes",
+
+		"diskreadrate" : "system.disk.readrate",
+		"diskreadrate" : "system.disk.writerate",
+		"diskreadrate" : "system.disk.disktotal",
+		"diskreadrate" : "system.disk.diskused"
+	},
+	"systemnode": {
+		"cpuuser" : "system.cpu.user",
+		"cpunice" : "system.cpu.nice",
+		"cpusytem" : "system.cpu.system",
+		"cpuidle" : "system.cpu.idle",
+		"cpuwait" : "system.cpu.wait",
+		"cpuirq" : "system.cpu.irq",
+		"cpusoftirq" : "system.cpu.softirq",
+		"cpusteal" : "system.cpu.steal",
+		"cpuguest" : "system.cpu.guest",
+		"cpuusage" : "system.cpu.usage",
+		"cputotalusage" : "system.cpu.totalusage",
+
+		"uptime" : "system.uptime.uptime.day",
+		"idletime" : "system.uptime.idletime.day",
+
+		"memtotal" : "system.memory.memtotal.kb",
+		"momoryusage" : "system.memory.usage",
+		"memfree" : "system.memory.memfree.kb",
+		"memorybuffers" : "system.memory.buffers.kb",
+		"memorycached" : "system.memory.cached.kb",
+		"memoryswapcached" : "system.memory.swapcached.kb",
+		"memoryactive" : "system.memory.active.kb",
+		"memoryinactive" : "system.memory.inactive.kb",
+		"memoryactiveanon" : "system.memory.activeanon.kb",
+		"memoryinactiveanon" : "system.memory.inactiveanon.kb",
+		"memoryactivefile" : "system.memory.activefile.kb",
+		"memoryinactivefile" : "system.memory.inactivefile.kb",
+		"memoryunevictable" : "system.memory.unevictable.kb",
+		"memorymlocked" : "system.memory.mlocked.kb",
+		"memoryswaptotal" : "system.memory.swaptotal.kb",
+		"memoryswapfree" : "system.memory.swapfree.kb",
+		"memorydirty" : "system.memory.dirty.kb",
+		"memorypagetables" : "system.memory.pagetables.kb",
+		"memoryvmalloctotal" : "system.memory.vmalloctotal.kb",
+		"memoryvmallocused" : "system.memory.vmallocused.kb",
+		"memoryvmallocchunk" : "system.memory.vmallocchunk.kb",
+
+		"receivedbytes" : "system.nic.receivedbytes",
+		"receivedpackets" : "system.nic.receivedpackets",
+		"receivederrs" : "system.nic.receivederrs",
+		"receiveddrop" : "system.nic.receiveddrop",
+		"transmitbytes" : "system.nic.transmitbytes",
+		"transmitpackets" : "system.nic.transmitpackets",
+		"transmiterrs" : "system.nic.transmiterrs",
+		"transmitdrop" : "system.nic.transmitdrop",
+
+		"diskreadrate" : "system.disk.readrate",
+		"diskwriterate" : "system.disk.writerate",
+		"diskavgwaittime" : "system.disk.avgwaittime",
+		"diskutilization" : "system.disk.utilization",
+		"diskdisktotal" : "system.disk.disktotal",
+		"diskdiskused" : "system.disk.diskused",
+		"diskusage" : "system.disk.usage"
+	}
+}

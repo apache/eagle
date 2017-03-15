@@ -351,15 +351,10 @@
                     <version>${project.version}</version>
                 </dependency>
 
+                <!-- add metirc webUI -->
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-hadoop-metric</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.eagle</groupId>
-                    <artifactId>eagle-hdfs-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -367,6 +362,17 @@
                     <artifactId>eagle-hbase-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hdfs-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-system-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
