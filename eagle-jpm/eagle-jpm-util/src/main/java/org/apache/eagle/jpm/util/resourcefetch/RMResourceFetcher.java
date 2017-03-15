@@ -19,6 +19,7 @@
  */
 package org.apache.eagle.jpm.util.resourcefetch;
 
+import com.fasterxml.jackson.databind.util.ContainerBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.util.Constants;
@@ -111,11 +112,16 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 Constants.ANONYMOUS_PARAMETER);
     }
 
-    private String getMRFinishedJobURL(String lastFinishedTime) {
+    private String getFinishedJobURL(Constants.JobType jobType, Object... parameter) {
         String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
-        return url + "/" + Constants.V2_APPS_URL
-                + "?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin="
-                + lastFinishedTime + "&" + Constants.ANONYMOUS_PARAMETER;
+        String lastFinishedTime = (String) parameter[0];
+        String limit = "";
+        if (parameter.length > 1) {
+            limit = (String) parameter[1];
+        }
+        limit = ((limit == null || limit.isEmpty()) ? "" : "&limit=" + limit);
+        return String.format("%s/%s?applicationTypes=%s%s&state=FINISHED&finishedTimeBegin=%s&",
+                url, Constants.V2_APPS_URL, jobType, limit, lastFinishedTime, Constants.ANONYMOUS_PARAMETER);
     }
 
     private String getAcceptedAppURL() {
@@ -201,14 +207,13 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         selector.checkUrl();
         switch (resourceType) {
             case COMPLETE_SPARK_JOB:
-                final String urlString = sparkCompleteJobServiceURLBuilder.build(selector.getSelectedUrl(), (String) parameter[0]);
-                return doFetchApplicationsList(urlString, compressionType);
+                return doFetchApplicationsList(getFinishedJobURL(Constants.JobType.SPARK, parameter), compressionType);
             case RUNNING_SPARK_JOB:
                 return doFetchRunningApplicationsList(Constants.JobType.SPARK, compressionType, parameter);
             case RUNNING_MR_JOB:
                 return doFetchRunningApplicationsList(Constants.JobType.MAPREDUCE, compressionType, parameter);
             case COMPLETE_MR_JOB:
-                return doFetchApplicationsList(getMRFinishedJobURL((String) parameter[0]), compressionType);
+                return doFetchApplicationsList(getFinishedJobURL(Constants.JobType.MAPREDUCE, parameter), compressionType);
             case ACCEPTED_JOB:
                 return doFetchAcceptedApplicationList(compressionType, parameter);
             default:
