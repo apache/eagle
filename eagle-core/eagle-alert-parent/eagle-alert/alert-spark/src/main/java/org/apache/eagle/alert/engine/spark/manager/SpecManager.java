@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 public class SpecManager {
 
-    private IMetadataServiceClient mtadataServiceClient;
     private int numOfAlertBolts;
     private List<Kafka2TupleMetadata> kafka2TupleMetadata = new ArrayList<>();
     private List<Publishment> publishments = new ArrayList<>();
@@ -48,7 +47,7 @@ public class SpecManager {
 
         this.numOfAlertBolts = numOfAlertBolts;
         try {
-            this.mtadataServiceClient = new MetadataServiceClientImpl(config);
+            IMetadataServiceClient mtadataServiceClient = new MetadataServiceClientImpl(config);
             this.kafka2TupleMetadata = mtadataServiceClient.listDataSources();
             this.publishments = mtadataServiceClient.listPublishment();
             this.policyDefinitions = mtadataServiceClient.listPolicies().stream().filter((t) -> t.getPolicyStatus() != PolicyDefinition.PolicyStatus.DISABLED)
@@ -73,11 +72,7 @@ public class SpecManager {
         Map<String, List<Publishment>> policyToPub = new HashMap<>();
         for (Publishment pub : publishments) {
             for (String policyId : pub.getPolicyIds()) {
-                List<Publishment> policyPubs = policyToPub.get(policyId);
-                if (policyPubs == null) {
-                    policyPubs = new ArrayList<>();
-                    policyToPub.put(policyId, policyPubs);
-                }
+                List<Publishment> policyPubs = policyToPub.computeIfAbsent(policyId, k -> new ArrayList<>());
                 policyPubs.add(pub);
             }
         }

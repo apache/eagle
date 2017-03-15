@@ -141,6 +141,27 @@
             <description>Auto offset reset config for Kafka(largest,smallest)</description>
             <required>true</required>
         </property>
+        <property>
+            <name>metadataService.context</name>
+            <displayName>MetadataService context</displayName>
+            <value>/rest</value>
+            <description>MetadataService context</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>metadataService.port</name>
+            <displayName>MetadataService port</displayName>
+            <value>9090</value>
+            <description>MetadataService port</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>metadataService.host</name>
+            <displayName>MetadataService host</displayName>
+            <value>localhost</value>
+            <description>MetadataService host</description>
+            <required>true</required>
+        </property>
     </configuration>
     <docs>
         <install>
