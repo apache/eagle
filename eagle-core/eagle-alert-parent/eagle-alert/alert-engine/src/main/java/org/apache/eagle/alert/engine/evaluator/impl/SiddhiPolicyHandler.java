@@ -70,9 +70,9 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         List<String> outputStreams = getOutputStreams(policy);
         for (final String outputStream : outputStreams) {
             if (executionRuntime.getStreamDefinitionMap().containsKey(outputStream)) {
+                StreamDefinition streamDefinition = SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream));
                 this.executionRuntime.addCallback(outputStream,
-                    new AlertStreamCallback(
-                        outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream)),
+                    new AlertStreamCallback(outputStream, streamDefinition,
                         collector, context, currentIndex));
             } else {
                 throw new IllegalStateException("Undefined output stream " + outputStream);
