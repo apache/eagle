@@ -33,3 +33,4 @@ org.apache.eagle.jpm.spark.history.SparkHistoryJobAppProvider
 ## Metric
 org.apache.eagle.metric.HdfsMetricWebApplicationProvider
 org.apache.eagle.metric.HBaseMetricWebApplicationProvider
+org.apache.eagle.metric.SystemMetricWebApplicationProvider
