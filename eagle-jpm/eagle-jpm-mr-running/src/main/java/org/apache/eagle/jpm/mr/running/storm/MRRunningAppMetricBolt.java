@@ -152,26 +152,31 @@ public class MRRunningAppMetricBolt extends BaseRichBolt {
     public List<YarnAppAPIEntity> parseAcceptedApp() {
         List<YarnAppAPIEntity> acceptedApps = new ArrayList<>();
         try {
-            List<AppInfo> apps = fetcher.getResource(Constants.ResourceType.ACCEPTED_JOB);
-            for (AppInfo app : apps) {
-                Map<String, String> tags = new HashMap<>();
-                tags.put(AppStreamInfo.SITE, config.getConfig().getString("siteId"));
-                tags.put(AppStreamInfo.ID, app.getId());
-                tags.put(AppStreamInfo.QUEUE, app.getQueue());
-                tags.put(AppStreamInfo.USER, app.getUser());
+            List<AppInfo> apps = fetcher.getResource(Constants.ResourceType.ACCEPTED_JOB,
+                    config.getEndpointConfig().limitPerRequest);
 
-                YarnAppAPIEntity appAPIEntity = new YarnAppAPIEntity();
-                appAPIEntity.setTags(tags);
-                appAPIEntity.setTrackingUrl(buildAcceptedAppTrackingURL(app.getId()));
-                appAPIEntity.setAppName(app.getName());
-                appAPIEntity.setClusterUsagePercentage(app.getClusterUsagePercentage());
-                appAPIEntity.setQueueUsagePercentage(app.getQueueUsagePercentage());
-                appAPIEntity.setElapsedTime(app.getElapsedTime());
-                appAPIEntity.setStartedTime(app.getStartedTime());
-                appAPIEntity.setState(app.getState());
-                appAPIEntity.setTimestamp(app.getStartedTime());
-                acceptedApps.add(appAPIEntity);
-                collector.emit(new Values("", convertAppToStream(appAPIEntity)));
+            if (apps != null) {
+                LOG.info("successfully fetch {} accepted jobs from {}", apps.size(), fetcher.getSelector().getSelectedUrl());
+                for (AppInfo app : apps) {
+                    Map<String, String> tags = new HashMap<>();
+                    tags.put(AppStreamInfo.SITE, config.getConfig().getString("siteId"));
+                    tags.put(AppStreamInfo.ID, app.getId());
+                    tags.put(AppStreamInfo.QUEUE, app.getQueue());
+                    tags.put(AppStreamInfo.USER, app.getUser());
+
+                    YarnAppAPIEntity appAPIEntity = new YarnAppAPIEntity();
+                    appAPIEntity.setTags(tags);
+                    appAPIEntity.setTrackingUrl(buildAcceptedAppTrackingURL(app.getId()));
+                    appAPIEntity.setAppName(app.getName());
+                    appAPIEntity.setClusterUsagePercentage(app.getClusterUsagePercentage());
+                    appAPIEntity.setQueueUsagePercentage(app.getQueueUsagePercentage());
+                    appAPIEntity.setElapsedTime(app.getElapsedTime());
+                    appAPIEntity.setStartedTime(app.getStartedTime());
+                    appAPIEntity.setState(app.getState());
+                    appAPIEntity.setTimestamp(app.getStartedTime());
+                    acceptedApps.add(appAPIEntity);
+                    collector.emit(new Values("", convertAppToStream(appAPIEntity)));
+                }
             }
         } catch (Exception e) {
             LOG.error("fetch accepted apps failed {}", e.getMessage(), e);

@@ -19,6 +19,7 @@
  */
 package org.apache.eagle.jpm.util.resourcefetch;
 
+import com.fasterxml.jackson.databind.util.ContainerBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.util.Constants;
@@ -47,7 +48,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     private static final Logger LOG = LoggerFactory.getLogger(RMResourceFetcher.class);
     private final HAURLSelector selector;
     //private final ServiceURLBuilder jobListServiceURLBuilder;
-    private final ServiceURLBuilder sparkCompleteJobServiceURLBuilder;
+    //private final ServiceURLBuilder sparkCompleteJobServiceURLBuilder;
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 
     static {
@@ -56,7 +57,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 
     public RMResourceFetcher(String[] rmBasePaths) {
         //this.jobListServiceURLBuilder = new JobListServiceURLBuilderImpl();
-        this.sparkCompleteJobServiceURLBuilder = new SparkCompleteJobServiceURLBuilderImpl();
+        //this.sparkCompleteJobServiceURLBuilder = new SparkCompleteJobServiceURLBuilderImpl();
         this.selector = new HAURLSelectorImpl(
                 rmBasePaths,
                 new RmActiveTestURLBuilderImpl(),
@@ -111,16 +112,27 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 Constants.ANONYMOUS_PARAMETER);
     }
 
-    private String getMRFinishedJobURL(String lastFinishedTime) {
+    private String getFinishedJobURL(Constants.JobType jobType, Object... parameter) {
         String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
-        return url + "/" + Constants.V2_APPS_URL
-                + "?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin="
-                + lastFinishedTime + "&" + Constants.ANONYMOUS_PARAMETER;
+        String lastFinishedTime = (String) parameter[0];
+        String limit = "";
+        if (parameter.length > 1) {
+            limit = (String) parameter[1];
+        }
+        limit = ((limit == null || limit.isEmpty()) ? "" : "&limit=" + limit);
+        return String.format("%s/%s?applicationTypes=%s%s&state=FINISHED&finishedTimeBegin=%s&%s",
+                url, Constants.V2_APPS_URL, jobType, limit, lastFinishedTime, Constants.ANONYMOUS_PARAMETER);
     }
 
-    private String getAcceptedAppURL() {
+    private String getAcceptedAppURL(Object... parameter) {
+        String limit = "";
+        if (parameter.length > 0) {
+            limit = (String) parameter[0];
+        }
+        limit = ((limit == null || limit.isEmpty()) ? "" : "&limit=" + limit);
+
         String baseUrl = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
-        return String.format("%s/%s?state=ACCEPTED&%s", baseUrl, Constants.V2_APPS_URL, Constants.ANONYMOUS_PARAMETER);
+        return String.format("%s/%s?state=ACCEPTED%s&%s", baseUrl, Constants.V2_APPS_URL, limit, Constants.ANONYMOUS_PARAMETER);
     }
 
     private List<AppInfo> doFetchRunningApplicationsList(Constants.JobType jobType,
@@ -189,7 +201,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                                                          Object... parameter) throws Exception {
         List<AppInfo> apps = new ArrayList<>();
         try {
-            String url = getAcceptedAppURL();
+            String url = getAcceptedAppURL(parameter);
             return doFetchApplicationsList(url, compressionType);
         } catch (Exception e) {
             LOG.error("Catch an exception when query {} : {}", selector.getSelectedUrl(), e.getMessage(), e);
@@ -201,14 +213,13 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         selector.checkUrl();
         switch (resourceType) {
             case COMPLETE_SPARK_JOB:
-                final String urlString = sparkCompleteJobServiceURLBuilder.build(selector.getSelectedUrl(), (String) parameter[0]);
-                return doFetchApplicationsList(urlString, compressionType);
+                return doFetchApplicationsList(getFinishedJobURL(Constants.JobType.SPARK, parameter), compressionType);
             case RUNNING_SPARK_JOB:
                 return doFetchRunningApplicationsList(Constants.JobType.SPARK, compressionType, parameter);
             case RUNNING_MR_JOB:
                 return doFetchRunningApplicationsList(Constants.JobType.MAPREDUCE, compressionType, parameter);
             case COMPLETE_MR_JOB:
-                return doFetchApplicationsList(getMRFinishedJobURL((String) parameter[0]), compressionType);
+                return doFetchApplicationsList(getFinishedJobURL(Constants.JobType.MAPREDUCE, parameter), compressionType);
             case ACCEPTED_JOB:
                 return doFetchAcceptedApplicationList(compressionType, parameter);
             default:
