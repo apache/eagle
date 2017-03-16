@@ -20,68 +20,102 @@
 	/**
 	 * `register` without params will load the module which using require
 	 */
-	register(function (hdfsMetricApp) {
-		var COLOR_MAPPING = {
-			HDFS: 'orange',
-			HBase: 'yellow',
-			Yarn: 'green',
-		};
-
-		var widgetChartOption = {
-			color: ['#FFFFFF'],
-			grid: {
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0,
-				containLabel: false,
-			},
-			xAxis: {
-				axisLine: {show: false},
-				axisLabel: {show: false},
-			},
-			yAxis: [{
-				axisLine: {show: false},
-				axisLabel: {show: false},
-				axisTick: {show: false},
-				splitLine: {show: false},
-			}],
-		};
-
-		hdfsMetricApp.directive("hdfsMetricWidget", function () {
+	register(function (systemMetricApp) {
+		systemMetricApp.directive("systemMetricWidget", function () {
 			return {
 				restrict: 'AE',
-				controller: function($scope, $attrs) {
+				controller: function ($scope, $attrs, SYSTEMMETRIC, Application, $interval, Site, $wrapState) {
 					// Get site
 					var site = $scope.site;
+					var refreshInterval;
 
+					if(!site) {
+						$scope.list = $.map(Application.find("SYSTEM_METRIC_WEB_APP"), function (app) {
+							return {
+								siteId: app.site.siteId,
+								siteName: app.site.siteName || app.site.siteId
+							};
+						});
+					} else {
+						$scope.list = [{
+							siteId: site.siteId,
+							siteName: site.siteName || site.siteId
+						}];
+					}
 					// Get type
 					$scope.type = $attrs.type;
 
 					// Customize chart color
-					$scope.bgColor = COLOR_MAPPING[$scope.type];
+					$scope.bgColor = "yellow-active";
 
-					$scope.chartOption = widgetChartOption;
-
-					// Mock fetch data
-					var now = +new Date();
-					var data = [];
-					for(var j = 0 ; j < 30 ; j += 1) {
-						data.push({x: now + j * 1000 * 60, y: Math.random() * 100});
+					function countStatus(site, status, groups, filed, limit) {
+						var jobCond = {
+							site: site,
+							status: status
+						};
+						return SYSTEMMETRIC.aggSystemInstance(jobCond, groups, filed, limit);
 					}
-					$scope.series = [{
-						name: '',
-						type: 'line',
-						data: data,
-						showSymbol: false,
-					}];
 
 					// Ref: jpm widget if need keep refresh the widget
+
+					function refresh() {
+						$.each($scope.list, function (i, site) {
+							// status count
+							countStatus(site.siteId, "active", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.systemactivenum = data.value[0];
+								});
+							}, function () {
+								$scope.systemactivenum = -1;
+							});
+
+							countStatus(site.siteId, "warning", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.systemwarningnum = data.value[0];
+								});
+							}, function () {
+								$scope.systemwarningnum = -1;
+							});
+
+							countStatus(site.siteId, "error", ["site"], "count")._promise.then(function (res) {
+								$.map(res, function (data) {
+									$scope.systemerrornum = data.value[0];
+								});
+							}, function () {
+								$scope.systemerrornum = -1;
+							});
+						});
+					}
+
+					refresh();
+					refreshInterval = $interval(refresh, 30 * 1000);
+
+					$scope.$on('$destroy', function () {
+						$interval.cancel(refreshInterval);
+					});
 				},
 				template:
-				'<div class="hadoopMetric-widget bg-{{bgColor}}">' +
-					'<h3>{{type}}</h3>' +
-					'<div chart class="hadoopMetric-chart-container" series="series" option="chartOption"></div>' +
+				'<div class="small-box hadoopMetric-widget bg-{{bgColor}}">' +
+				    '<div class="inner">' +
+				        '<h3>{{type}}</h3>' +
+				        '<div ng-show="systemactivenum!==-1 && systemwarningnum!==-1 && systemerrornum!==-1" class="hadoopMetric-widget-detail">' +
+				            '<a ui-sref="serverList({siteId: site.siteId})">' +
+				            '<span>{{systemactivenum+systemwarningnum+systemerrornum || 0}}</span> Node (' +
+				            '<span>{{systemactivenum || 0}}</span> Healthy / ' +
+				            '<span>{{systemwarningnum || 0}}</span> Warning / ' +
+				            '<span>{{systemerrornum || 0}}</span> Unhealthy)' +
+				            '</a>' +
+				        '</div>' +
+				        '<div ng-show="systemactivenum===-1 || systemwarningnum===-1 || systemerrornum===-1" class="hadoopMetric-widget-detail">' +
+				        '<span>N/A</span> Node (' +
+				        '<span>N/A</span> Healthy / ' +
+				        '<span>N/A</span> Warning / ' +
+				        '<span>N/A</span> Unhealthy)' +
+				        '</div>' +
+				    '</div>' +
+				    '<div class="icon">' +
+				        '<i class="fa fa-taxi"></i>' +
+				    '</div>' +
 				'</div>',
 				replace: true
 			};
@@ -95,11 +129,10 @@
 			 */
 			return function registerWidget($element) {
 				$element.append(
-					$("<div hdfs-metric-widget data-type='" + serviceType + "'>")
+					$("<div system-metric-widget data-type='" + serviceType + "'>")
 				);
-			}
+			};
 		}
-
-		hdfsMetricApp.widget("availabilityHdfsChart", withType('HDFS'), true);
+		systemMetricApp.widget("availabilitySystemChart", withType('System'), true);
 	});
 })();

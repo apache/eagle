@@ -104,18 +104,27 @@
             }).join(",") : "*";
         }
 
-        SYSTEMMETRIC.metricsToSeries = function (name, metrics, option, rawData) {
+        SYSTEMMETRIC.metricsToSeries = function (name, metrics, option, transflag, rawData) {
             if (arguments.length === 4 && typeof rawData === "object") {
                 option = rawData;
                 rawData = false;
             }
-
-            var data = $.map(metrics, function (metric) {
+            var previous = 0;
+            data = $.map(metrics, function (metric, index) {
+                var temp = metric.value[0];
+                if(transflag){
+                    metric.value[0] = metric.value[0] - previous;
+                }
+                previous = temp;
+                if(transflag && index === 0){
+                    return ;
+                }
                 return rawData ? metric.value[0] : {
                     x: metric.timestamp,
                     y: metric.value[0]
                 };
             });
+           
             return $.extend({
                 name: name,
                 showSymbol: false,
@@ -201,22 +210,30 @@
             _list._promise = list._promise.then(function () {
                 var _startTime = list._aggInfo.startTime;
                 var _interval = list._aggInfo.interval;
-
                 $.each(list, function (i, obj) {
                     var tags = {};
                     $.each(list._aggInfo.groups, function (j, group) {
                         tags[group] = obj.key[j];
                     });
-
-                    var _subList = $.map(obj.value[0], function (value, index) {
+                    var _subList = [];
+                    _subList.group = obj.key.join(",");
+                    $.each(obj.value[0], function (index, value) {
+                        var node = {
+                            timestamp: _startTime + index * _interval,
+                            value: [value],
+                            tags: tags,
+                            flag: param
+                        };
+                        _subList.push(node);
+                    });
+                    /*var _subList = $.map(obj.value[0], function (value, index) {
                         return {
                             timestamp: _startTime + index * _interval,
                             value: [value],
                             tags: tags,
                             flag: param
                         };
-                    });
-
+                    });*/
                     if (flatten) {
                         _list.push.apply(_list, _subList);
                     } else {

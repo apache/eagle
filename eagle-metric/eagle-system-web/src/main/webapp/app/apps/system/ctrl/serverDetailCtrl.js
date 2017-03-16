@@ -29,12 +29,58 @@
 			$scope.metricList = [];
 			Time.autoRefresh = false;
 
+			var sizeoption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, true);
+							}).reverse().join("<br/>");
+					}
+				},
+				legend: {
+					x: 'center', y: 'bottom'
+				},
+				areaStyle: {normal: {}},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, true);
+						}
+					}
+				}],
+				trans: true 
+			};
+			var digitalOption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, false, 0);
+							}).reverse().join("<br/>");
+					}
+				},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, false);
+						}
+					}
+				}]
+			};
+
 			function generateMetric(name, flag) {
-				var result = cache[name] || generateOvewviewMetric(name, flag);
+				var result = cache[name] || generateChartMetric(name, flag);
 				return result;
 			}
 
-			function generateOvewviewMetric(name, flag){
+			function generateChartMetric(name, flag){
 				var startTime = Time.startTime();
 				var endTime = Time.endTime();
 				var interval = Time.diffInterval(startTime, endTime);
@@ -43,9 +89,10 @@
 				var trendEndTime = Time.align(endTime, interval);
 				$scope.site = $wrapState.param.siteId;
 				var jobCond = {
-					site: $scope.site
+					site: $scope.site,
+					host: $scope.hostname
 				};
-				return SYSTEMMETRIC.aggMetricsToEntities(SYSTEMMETRIC.systemMetricsAggregation(jobCond, name, ["site","hostname"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
+				return SYSTEMMETRIC.aggMetricsToEntities(SYSTEMMETRIC.systemMetricsAggregation(jobCond, name, ["device"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
 				._promise.then(function (list) {
 					var metricFlag = $.map(list, function (metrics) {
 						return metrics[0].flag;
@@ -56,10 +103,16 @@
 
 			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
 				var series = [];
-
 				$.each(metrics, function (i, metricMap) {
 					if (typeof metricMap !== 'undefined') {
-						series.push(SYSTEMMETRIC.metricsToSeries(legendName[i], metricMap[0], option));
+						$.each(metricMap, function (j, metriSeries) {
+							var linename = [];
+							if(typeof metriSeries.group !== 'undefined'){
+								linename.push(metriSeries.group);
+							}
+							linename.push(legendName[i]);
+							series.push(SYSTEMMETRIC.metricsToSeries(linename.join("."), metriSeries, option, dataOption.trans));
+						});
 					}
 				});
 				return {
@@ -74,45 +127,27 @@
 				{
 					name: "Cpu Usage",
 					metrics: ["cputotalusage"],
-					linename: ["cputotalusage"],
-					option: {}
+					linename: ["usage"],
+					option: digitalOption
 				},
 				{
 					name: "Memory Usage",
 					metrics: ["momoryusage"],
-					linename: ["momoryusage"],
-					option: {}
+					linename: ["usage"],
+					option: digitalOption
 				},
 				{
 					name: "Network IO",
 					metrics: ["receivedbytes", "transmitbytes"],
-					linename: ["write", "read"],
-					option: {}
+					linename: ["receive", "transmit"],
+					option: sizeoption
 				},
 				{
-					name: "OS Idletime",
-					metrics: ["idletime"],
-					linename: ["idletime"],
-					option: {}
-				},
-				{
-					name: "OS Idletime",
-					metrics: ["idletime"],
-					linename: ["idletime"],
-					option: {}
-				},
-				{
-					name: "Disk Usage",
-					metrics: ["diskused"],
-					linename: ["diskused"],
-					option: {}
-				},
-				{
-					name: "Disk IO",
-					metrics: ["readrate", "writerate"],
-					linename: ["readrate", "writerate"],
-					option: {}
-				},
+					name: "Loadavg",
+					metrics: ["1minloadavg", "5minloadavg", "15minloadavg"],
+					linename: ["1minloadavg", "5minloadavg", "15minloadavg"],
+					option: digitalOption
+				}
 				
 			];
 			$scope.metricList = [];
@@ -134,7 +169,8 @@
 				var metricspromies = [];
 
 				SYSTEMMETRIC.getMetricObj().then(function (res) {
-					var overviewMetricList = res.totaleverage;
+					var overviewMetricList = res.systemnode;
+					console.log(overviewMetricList);
 					$.each($scope.chartList, function (i) {
 						var chart = $scope.chartList[i];
 						var metricList = chart.metrics;
@@ -173,6 +209,17 @@
 			};
 			Time.onReload(function () {
 				cache = {};
+				$.each($scope.chartList, function (i) {
+                    var chart = $scope.chartList[i];
+                    var chartname = chart.name;
+                    $scope.metricList[chartname] = {
+                        title: chartname,
+                        series: {},
+                        option: {},
+                        loading: true,
+                        promises: []
+                    };
+                });
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();

@@ -50,8 +50,8 @@
 						<span ng-if="item.status===error" class="label label-danger">UnHealthy</span>
 					</td>
 					<td>{{item.cores}}</td>
-					<td>{{item.usedDiskGB}} GB / {{item.totalDiskGB}} GB</td>
-					<td>{{item.usedMemoryMB}} MB / {{item.totalMemoryMB}} MB</td>
+					<td>{{item.usedDiskGB | number : 2}} GB / {{item.totalDiskGB | number : 2}} GB</td>
+					<td>{{item.usedMemoryMB | number : 2}} MB / {{item.totalMemoryMB | number : 2}} MB</td>
 				</tr>
 				</tbody>
 			</table>

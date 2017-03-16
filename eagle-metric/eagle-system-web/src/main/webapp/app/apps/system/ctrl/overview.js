@@ -28,6 +28,100 @@
 
 			$scope.coresList = aggGroup($scope.site, ["cores"], "count");
 
+			var digitalKbOption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value / 1024 /1024, false, 0) + "Gb";
+							}).reverse().join("<br/>");
+					}
+				},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value / 1024 /1024, false, 0);
+						}
+					}
+				}]
+			};
+
+			var digitalOption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, false, 0);
+							}).reverse().join("<br/>");
+					}
+				},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, false);
+						}
+					}
+				}]
+			};
+
+			var sizeoption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, true);
+							}).reverse().join("<br/>");
+					}
+				},
+				legend: {
+					x: 'center', y: 'bottom'
+				},
+				areaStyle: {normal: {}},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, true);
+						}
+					}
+				}],
+				trans: true 
+			};
+
+			var averageOption = {
+				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+							$.map(points, function (point) {
+								return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " +
+									common.number.abbr(point.value, false);
+							}).reverse().join("<br/>");
+					}
+				},
+				legend: {
+					x: 'center', y: 'bottom'
+				},
+				areaStyle: {normal: {}},
+				yAxis: [{
+					axisLabel: {
+						formatter: function (value) {
+							return common.number.abbr(value, false);
+						}
+					}
+				}],
+				avg: true
+			};
+
 			function countStatus(site, status, groups, filed, limit) {
 				var jobCond = {
 					site: site,
@@ -59,7 +153,7 @@
 				var jobCond = {
 					site: $scope.site
 				};
-				return SYSTEMMETRIC.aggMetricsToEntities(SYSTEMMETRIC.systemMetricsAggregation(jobCond, name, ["site","hostname"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
+				return SYSTEMMETRIC.aggMetricsToEntities(SYSTEMMETRIC.systemMetricsAggregation(jobCond, name, ["host","device"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)
 				._promise.then(function (list) {
 					var metricFlag = $.map(list, function (metrics) {
 						return metrics[0].flag;
@@ -70,11 +164,21 @@
 
 			function mergeMetricToOneSeries(metricTitle, metrics, legendName, dataOption, option) {
 				var series = [];
-
 				$.each(metrics, function (i, metricMap) {
-					if (typeof metricMap !== 'undefined') {
-						series.push(SYSTEMMETRIC.metricsToSeries(legendName[i], metricMap[0], option));
+					var mergeSeries = metricMap[0];
+					$.each(metricMap, function (j, metriSeries) {
+						if(j > 0){
+							$.each(metriSeries, function(n, dataNode){
+								mergeSeries[n].value[0] = mergeSeries[n].value[0] * 1 + dataNode.value * 1;
+							});
+						}
+					});
+					if(dataOption.avg){
+						$.each(mergeSeries, function(m, item) {
+							item.value[0] = item.value[0] / metricMap.length;
+						});
 					}
+					series.push(SYSTEMMETRIC.metricsToSeries(legendName[i], mergeSeries, option, dataOption.trans));
 				});
 				return {
 					title: metricTitle,
@@ -87,9 +191,27 @@
 			$scope.chartList = [
 				{
 					name: "Memory Usage",
-					metrics: ["memtotal", "memfree"],
-					linename: ["memtotal", "memfree"],
-					option: {}
+					metrics: ["memfree"],
+					linename: ["memfree"],
+					option: digitalKbOption
+				},
+				{
+					name: "Loadavg",
+					metrics: ["1minloadavg", "5minloadavg", "15minloadavg"],
+					linename: ["1minloadavg", "5minloadavg", "15minloadavg"],
+					option: digitalOption
+				},
+				{
+					name: "Cpu Usage",
+					metrics: ["cputotalusage"],
+					linename: ["cputotalusage"],
+					option: averageOption
+				},
+				{
+					name: "Network IO",
+					metrics: ["receivedbytes", "transmitbytes"],
+					linename: ["receive", "transmit"],
+					option: sizeoption
 				}
 			];
 			$scope.metricList = [];
@@ -149,6 +271,7 @@
 				// metric chart
 				SYSTEMMETRIC.getMetricObj().then(function (res) {
 					var overviewMetricList = res.totaleverage;
+					console.log(overviewMetricList);
 					$.each($scope.chartList, function (i) {
 						var chart = $scope.chartList[i];
 						var metricList = chart.metrics;

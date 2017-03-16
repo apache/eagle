@@ -4,13 +4,19 @@
 		"memtotal" : "system.memory.memtotal.kb",
 		"memfree" : "system.memory.memfree.kb",
 
+		"cpuidle" : "system.cpu.idle",
+		"cputotalusage" : "system.cpu.totalusage",
+		"1minloadavg" : "system.cpu.loadavg.1min",
+		"5minloadavg" : "system.cpu.loadavg.5min",
+		"15minloadavg" : "system.cpu.loadavg.15min",
+
 		"receivedbytes" : "system.nic.receivedbytes",
 		"transmitbytes" : "system.nic.transmitbytes",
 
 		"diskreadrate" : "system.disk.readrate",
-		"diskreadrate" : "system.disk.writerate",
-		"diskreadrate" : "system.disk.disktotal",
-		"diskreadrate" : "system.disk.diskused"
+		"diskwriterate" : "system.disk.writerate",
+		"disktotal" : "system.disk.disktotal",
+		"diskused" : "system.disk.diskused"
 	},
 	"systemnode": {
 		"cpuuser" : "system.cpu.user",
@@ -25,11 +31,14 @@
 		"cpuusage" : "system.cpu.usage",
 		"cputotalusage" : "system.cpu.totalusage",
 
+		"1minloadavg" : "system.cpu.loadavg.1min",
+		"5minloadavg" : "system.cpu.loadavg.5min",
+		"15minloadavg" : "system.cpu.loadavg.15min",
+
 		"uptime" : "system.uptime.uptime.day",
 		"idletime" : "system.uptime.idletime.day",
 
 		"memtotal" : "system.memory.memtotal.kb",
-		"momoryusage" : "system.memory.usage",
 		"memfree" : "system.memory.memfree.kb",
 		"memorybuffers" : "system.memory.buffers.kb",
 		"memorycached" : "system.memory.cached.kb",
@@ -49,6 +58,7 @@
 		"memoryvmalloctotal" : "system.memory.vmalloctotal.kb",
 		"memoryvmallocused" : "system.memory.vmallocused.kb",
 		"memoryvmallocchunk" : "system.memory.vmallocchunk.kb",
+		"momoryusage" : "system.memory.usage",
 
 		"receivedbytes" : "system.nic.receivedbytes",
 		"receivedpackets" : "system.nic.receivedpackets",

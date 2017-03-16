@@ -69,9 +69,9 @@
                 <th>Disk Usage</th>
                 <th>
 					<span>
-                        <span ng-show="usedDiskGB !== -1">{{usedDiskGB || 0}} GB / </span> 
+                        <span ng-show="usedDiskGB !== -1">{{usedDiskGB | number : 2 || 0}} GB / </span> 
                         <span ng-show="!totalDiskGB === -1">N/A /</span>
-						<span ng-show="totalDiskGB !== -1">{{totalDiskGB || 0}} GB</span>
+						<span ng-show="totalDiskGB !== -1">{{totalDiskGB | number : 2 || 0}} GB</span>
                         <span ng-show="!usedDiskGB === -1">N/A</span>
 					</span>
                 </th>
@@ -80,9 +80,9 @@
                 <th>Memory</th>
                 <th>
                     <span>
-                        <span ng-show="usedMemoryMB !== -1">{{usedMemoryMB || 0}} MB / </span> 
+                        <span ng-show="usedMemoryMB !== -1">{{usedMemoryMB | number : 2 || 0}} MB / </span> 
                         <span ng-show="!usedMemoryMB === -1">N/A /</span>
-                        <span ng-show="totalMemoryMB !== -1">{{totalMemoryMB || 0}} MB</span>
+                        <span ng-show="totalMemoryMB !== -1">{{totalMemoryMB | number : 2 || 0}} MB</span>
                         <span ng-show="!totalMemoryMB === -1">N/A</span>
                     </span>
                 </th>

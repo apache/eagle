@@ -44,11 +44,11 @@
 			</tr>
 			<tr>
 				<th>Disk Usage</th>
-				<td class="text-break">{{hostStatus[0].usedDiskGB}} GB / {{hostStatus[0].totalDiskGB}} GB</td>
+				<td class="text-break">{{hostStatus[0].usedDiskGB | number : 2}} GB / {{hostStatus[0].totalDiskGB | number : 2}} GB</td>
 			</tr>
 			<tr>
 				<th>Memory Usage</th>
-				<td class="text-break">{{hostStatus[0].usedMemoryMB}} MB / {{hostStatus[0].totalMemoryMB}} MB</td>
+				<td class="text-break">{{hostStatus[0].usedMemoryMB | number : 2}} MB / {{hostStatus[0].totalMemoryMB | number : 2}} MB</td>
 			</tr>
 			</tbody>
 			<tbody ng-if="hostStatus.length === 0">
