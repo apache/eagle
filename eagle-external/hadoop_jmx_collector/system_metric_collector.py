@@ -296,7 +296,7 @@ class SystemMetricCollector(MetricCollector):
             filtered_items = [items[5], items[6], items[9], items[11]]
             iostat_dict[items[0]] = filtered_items
 
-        disk_output = os.popen("df -k | grep ^/dev").readlines()
+        disk_output = os.popen("df -Pk | grep ^/dev").readlines()
         for item in disk_output:
             items = re.split('\s+', item.strip())
             disks = re.split('^\/dev\/(\w+)\d+$', items[0])
