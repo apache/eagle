@@ -45,7 +45,7 @@
 		templateUrl: "partials/namenodeList.html",
 		controller: "namenodeListCtrl"
 	}).route("namenodeDetail", {
-		url: "/hadoopService/hdfs:hostname?startTime&endTime",
+		url: "/hadoopService/hdfs/:hostname?startTime&endTime",
 		site: true,
 		reloadOnSearch: false,
 		templateUrl: "partials/overview.html",

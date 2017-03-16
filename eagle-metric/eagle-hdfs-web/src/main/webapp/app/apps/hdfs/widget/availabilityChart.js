@@ -100,7 +100,7 @@
 				'<span>{{namenodestandbynum||0}}</span> Standby)' +
 				'</a>' +
 				'<div ng-show="!namenodeactivenum && !namenodestandbynum">' +
-				'<span>0</span> Masters (' +
+				'<span>0</span> Namenodes (' +
 				'<span>0</span> Active / ' +
 				'<span>0</span> Standby)' +
 				'</div>' +
@@ -117,7 +117,7 @@
 				'<span>{{datanodeunhealtynum||0}}</span> Unhealthy)' +
 				'</a>' +
 				'<div ng-show="!datanodehealtynum && !datanodehealtynum">' +
-				'<span>0</span> Masters (' +
+				'<span>0</span> Datanodes (' +
 				'<span>0</span> Active / ' +
 				'<span>0</span> Standby)' +
 				'</div>' +
