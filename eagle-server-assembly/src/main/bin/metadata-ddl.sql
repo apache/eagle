@@ -144,6 +144,27 @@ CREATE TABLE IF NOT EXISTS alert_event (
   alertData mediumtext DEFAULT NULL
 );
 
+CREATE TABLE IF NOT EXISTS analysis_jobs (
+  uuid varchar(50) PRIMARY KEY,
+  jobDefId varchar(100) NOT NULL,
+  siteId varchar(50) NOT NULL,
+  configuration mediumtext NOT NULL,
+  evaluators mediumtext NOT NULL,
+  createdtime bigint(20) DEFAULT NULL,
+  modifiedtime  bigint(20) DEFAULT NULL,
+  UNIQUE (siteId, jobDefId)
+);
+
+CREATE TABLE IF NOT EXISTS analysis_email (
+  uuid varchar(50) PRIMARY KEY,
+  userId varchar(100) NOT NULL,
+  siteId varchar(50) NOT NULL,
+  mailAddress mediumtext NOT NULL,
+  createdtime bigint(20) DEFAULT NULL,
+  modifiedtime  bigint(20) DEFAULT NULL,
+  UNIQUE (siteId, userId)
+);
+
 INSERT INTO publishment_type(id, content) VALUES
 ('Kafka', '{"name":"Kafka","type":"org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher","description":null,"fields":[{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]}'),
 ('Email', '{"name":"Email","type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher","description":null,"fields":[{"name":"subject"},{"name":"sender"}, {"name":"recipients"}]}'),
