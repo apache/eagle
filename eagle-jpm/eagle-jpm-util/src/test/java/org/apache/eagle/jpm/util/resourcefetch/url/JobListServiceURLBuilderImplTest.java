@@ -17,7 +17,6 @@
 
 package org.apache.eagle.jpm.util.resourcefetch.url;
 
-import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.Constants.JobState;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,25 +25,14 @@ public class JobListServiceURLBuilderImplTest {
     @Test
     public void testBuild() {
         JobListServiceURLBuilderImpl jobListServiceURLBuilderImpl = new JobListServiceURLBuilderImpl();
-        String finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", convertRestApi(JobState.RUNNING));
+        String finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", JobState.RUNNING.toString());
         Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", finalUrl);
-        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", convertRestApi(JobState.FINISHED));
+        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", JobState.FINISHED.toString());
         Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps?state=FINISHED&anonymous=true", finalUrl);
-        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", convertRestApi(JobState.ALL));
+        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", JobState.ALL.toString());
         Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps&anonymous=true", finalUrl);
-        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", convertRestApi(null));
-        Assert.assertEquals(null, finalUrl);
+        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", null);
+        Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps&anonymous=true", finalUrl);
     }
 
-    private String convertRestApi(Constants.JobState jobState) {
-        if (jobState == null) {
-            return null;
-        }
-        switch (jobState) {
-            case RUNNING : return Constants.V2_APPS_RUNNING_URL;
-            case FINISHED : return Constants.V2_APPS_COMPLETED_URL;
-            case ALL : return Constants.V2_APPS_URL;
-            default : return null;
-        }
-    }
 }

@@ -18,6 +18,7 @@ package org.apache.eagle.jpm.util.resourcefetch.ha;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.url.RmActiveTestURLBuilderImpl;
 import org.apache.eagle.jpm.util.resourcefetch.url.ServiceURLBuilder;
 import org.apache.hadoop.util.StringUtils;
 import org.slf4j.Logger;
@@ -32,36 +33,20 @@ public class HAURLSelectorImpl implements HAURLSelector {
     private final String[] urls;
     private volatile String selectedUrl;
     private final ServiceURLBuilder builder;
-    private final Constants.JobState jobState;
 
     private volatile boolean reselectInProgress;
     private final Constants.CompressionType compressionType;
     private static final long MAX_RETRY_TIME = 2;
     private static final Logger LOG = LoggerFactory.getLogger(HAURLSelectorImpl.class);
 
-    public HAURLSelectorImpl(String[] urls, ServiceURLBuilder builder, Constants.CompressionType compressionType, Constants.JobState jobState) {
+    public HAURLSelectorImpl(String[] urls, Constants.CompressionType compressionType) {
         this.urls = urls;
         this.compressionType = compressionType;
-        this.builder = builder;
-        this.jobState = jobState;
-    }
-
-    private String convertRestApi(Constants.JobState jobState) {
-        if (jobState == null) {
-            return null;
-        }
-        switch (jobState) {
-            case RUNNING : return Constants.V2_APPS_RUNNING_URL;
-            case FINISHED : return Constants.V2_APPS_COMPLETED_URL;
-            case ALL : return Constants.V2_APPS_URL;
-            default :
-                LOG.error("Unsupported JobState={}", jobState);
-                return null;
-        }
+        this.builder = new RmActiveTestURLBuilderImpl();
     }
 
     public void checkUrl() throws IOException {
-        if (!checkUrl(builder.build(getSelectedUrl(), convertRestApi(jobState)))) {
+        if (!checkUrl(builder.build(getSelectedUrl()))) {
             reSelectUrl();
         }
     }
@@ -69,9 +54,10 @@ public class HAURLSelectorImpl implements HAURLSelector {
     public boolean checkUrl(String urlString) {
         InputStream is = null;
         try {
+            LOG.info("checking resource manager HA by {}", urlString);
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
         } catch (Exception ex) {
-            LOG.info("get inputStream from url: " + urlString + " failed. ");
+            LOG.info("fail to get inputStream from {}", urlString);
             return false;
         } finally {
             if (is != null) {
@@ -106,14 +92,13 @@ public class HAURLSelectorImpl implements HAURLSelector {
                 LOG.info("Going to reselect url");
                 for (int i = 0; i < urls.length; i++) {
                     String urlToCheck = urls[i];
-                    LOG.info("Going to try url :" + urlToCheck);
                     for (int time = 0; time < MAX_RETRY_TIME; time++) {
-                        if (checkUrl(builder.build(urlToCheck, convertRestApi(jobState)))) {
+                        if (checkUrl(builder.build(urlToCheck))) {
                             selectedUrl = urls[i];
                             LOG.info("Successfully switch to new url : " + selectedUrl);
                             return;
                         }
-                        LOG.info("try url " + urlToCheck + "fail for " + (time + 1) + " times, sleep 5 seconds before try again. ");
+                        LOG.info("try {} failed for {} times, sleep 5 seconds before try again. ", urlToCheck, time + 1);
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException ex) {

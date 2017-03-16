@@ -58,10 +58,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     public RMResourceFetcher(String[] rmBasePaths) {
         //this.jobListServiceURLBuilder = new JobListServiceURLBuilderImpl();
         //this.sparkCompleteJobServiceURLBuilder = new SparkCompleteJobServiceURLBuilderImpl();
-        this.selector = new HAURLSelectorImpl(
-                rmBasePaths,
-                new RmActiveTestURLBuilderImpl(),
-                Constants.CompressionType.NONE, null);
+        this.selector = new HAURLSelectorImpl(rmBasePaths, Constants.CompressionType.NONE);
     }
 
     public HAURLSelector getSelector() {
@@ -72,14 +69,14 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         List<AppInfo> result = new ArrayList<>();
         InputStream is = null;
         try {
-            LOG.info("Going to query cluster applications list: " + urlString);
+            LOG.info("Going to query {}", urlString);
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
             final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
             if (appWrapper != null && appWrapper.getApps() != null
                 && appWrapper.getApps().getApp() != null) {
                 result = appWrapper.getApps().getApp();
             }
-            LOG.info("Successfully fetched {} AppInfos from url {}", result.size(), urlString);
+            LOG.info("Successfully fetched {} AppInfos from {}", result.size(), urlString);
         } catch (Exception e) {
             LOG.error("Fail to query {} due to {}", urlString, e.getMessage());
         } finally {
