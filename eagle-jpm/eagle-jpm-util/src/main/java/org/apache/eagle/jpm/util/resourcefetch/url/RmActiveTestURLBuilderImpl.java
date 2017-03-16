@@ -23,6 +23,6 @@ public class RmActiveTestURLBuilderImpl implements ServiceURLBuilder {
     @Override
     public String build(String url, String... parameters) {
         String rmUrl = URLUtil.removeTrailingSlash(url);
-        return String.format("%s/%s&limit=1&%s", rmUrl, Constants.V2_APPS_COMPLETED_URL, Constants.ANONYMOUS_PARAMETER);
+        return String.format("%s/%s?%s", rmUrl, Constants.V2_CLUSTER_INFO_URL, Constants.ANONYMOUS_PARAMETER);
     }
 }

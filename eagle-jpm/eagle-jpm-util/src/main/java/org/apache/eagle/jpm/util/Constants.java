@@ -38,11 +38,13 @@ public class Constants {
     public static final String RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "RunningSparkExecutorService";
     public static final String APPLICATION_PREFIX = "application";
     public static final String JOB_PREFIX = "job";
-    public static final String V2_APPS_URL = "ws/v1/cluster/apps";
+
     public static final String ANONYMOUS_PARAMETER = "anonymous=true";
 
+    public static final String V2_APPS_URL = "ws/v1/cluster/apps";
     public static final String V2_APPS_RUNNING_URL = "ws/v1/cluster/apps?state=RUNNING";
     public static final String V2_APPS_COMPLETED_URL = "ws/v1/cluster/apps?state=FINISHED";
+    public static final String V2_CLUSTER_INFO_URL = "ws/v1/cluster";
 
     public static final String SPARK_MASTER_KEY = "spark.master";
     public static final String SPARK_EXECUTOR_MEMORY_KEY = "spark.executor.memory";

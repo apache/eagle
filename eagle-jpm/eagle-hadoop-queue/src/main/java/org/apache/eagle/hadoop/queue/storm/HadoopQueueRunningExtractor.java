@@ -55,7 +55,7 @@ public class HadoopQueueRunningExtractor {
             throw new IllegalArgumentException(site + ".baseUrl is null");
         }
         String[] urls = urlBases.split(",");
-        urlSelector = new HAURLSelectorImpl(urls, new RmActiveTestURLBuilderImpl(), Constants.CompressionType.NONE, null);
+        urlSelector = new HAURLSelectorImpl(urls, Constants.CompressionType.NONE);
         executorService = Executors.newFixedThreadPool(MAX_NUM_THREADS);
         this.collector = collector;
     }
@@ -66,13 +66,12 @@ public class HadoopQueueRunningExtractor {
         } catch (IOException e) {
             LOGGER.error("{}", e.getMessage(), e);
         }
-        String selectedUrl = urlSelector.getSelectedUrl();
-        LOGGER.info("Current RM base url is " + selectedUrl);
+
         List<Future<?>> futures = new ArrayList<>();
-        futures.add(executorService.submit(new ClusterMetricsCrawler(site, selectedUrl, collector)));
+        futures.add(executorService.submit(new ClusterMetricsCrawler(site, urlSelector.getSelectedUrl(), collector)));
         // move RunningAppCrawler into MRRunningJobApp
         //futures.add(executorService.submit(new RunningAppsCrawler(site, selectedUrl, collector)));
-        futures.add(executorService.submit(new SchedulerInfoCrawler(site, selectedUrl, collector)));
+        futures.add(executorService.submit(new SchedulerInfoCrawler(site, urlSelector.getSelectedUrl(), collector)));
         futures.forEach(future -> {
             try {
                 future.get(MAX_WAIT_TIME * 1000, TimeUnit.MILLISECONDS);

@@ -29,11 +29,16 @@ public class JobListServiceURLBuilderImpl implements ServiceURLBuilder {
          */
         String rmUrl = URLUtil.removeTrailingSlash(url);
 
-        String restApi = parameters[0];
-
-        if (restApi == null) {
-            return null;
+        String restApi = Constants.V2_APPS_URL;
+        if (parameters != null && parameters.length > 0) {
+            String jobState = parameters[0];
+            if (jobState.equalsIgnoreCase(Constants.JobState.RUNNING.toString())) {
+                restApi = Constants.V2_APPS_RUNNING_URL;
+            } else if (jobState.equalsIgnoreCase(Constants.JobState.FINISHED.toString())) {
+                restApi = Constants.V2_APPS_COMPLETED_URL;
+            }
         }
+
         // "/ws/v1/cluster/apps?state=RUNNING"
         StringBuilder sb = new StringBuilder();
         sb.append(rmUrl).append("/").append(restApi);
