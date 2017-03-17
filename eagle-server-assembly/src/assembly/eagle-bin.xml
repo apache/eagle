@@ -89,6 +89,7 @@
                 <include>slf4j-api-*.jar</include>
                 <include>jersey-*.jar</include>
                 <include>eagle-storage-hbase-*.jar</include>
+                <include>eagle-storage-jdbc-*.jar</include>
             </includes>
         </fileSet>
 
