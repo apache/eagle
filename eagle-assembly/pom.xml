@@ -23,8 +23,8 @@
         <artifactId>eagle-parent</artifactId>
         <version>0.5.0-SNAPSHOT</version>
     </parent>
-    <artifactId>eagle-server-assembly</artifactId>
-    <name>Eagle::Server::Assembly</name>
+    <artifactId>eagle-assembly</artifactId>
+    <name>Eagle::Assembly</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

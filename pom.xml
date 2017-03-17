@@ -134,7 +134,7 @@
         <module>eagle-metric</module>
         <module>eagle-server</module>
         <module>eagle-jpm</module>
-        <module>eagle-server-assembly</module>
+        <module>eagle-assembly</module>
         <module>eagle-topology-check</module>
     </modules>
     <properties>
