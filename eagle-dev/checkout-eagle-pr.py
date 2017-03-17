@@ -43,13 +43,13 @@ PUSH_REMOTE_NAME = os.environ.get("PUSH_REMOTE_NAME", "apache-git")
 # https://github.com/settings/tokens. This script only requires the "public_repo" scope.
 GITHUB_OAUTH_KEY = os.environ.get("GITHUB_OAUTH_KEY")
 
-GITHUB_BASE = "https://github.com/apache/incubator-eagle/pull"
-GITHUB_API_BASE = "https://api.github.com/repos/apache/incubator-eagle"
+GITHUB_BASE = "https://github.com/apache/eagle/pull"
+GITHUB_API_BASE = "https://api.github.com/repos/apache/eagle"
 JIRA_BASE = "https://issues.apache.org/jira/browse"
 JIRA_API_BASE = "https://issues.apache.org/jira"
 
-PR_REPO = "https://github.com/apache/incubator-eagle.git"
-PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
+PR_REPO = "https://github.com/apache/eagle.git"
+PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/eagle.git"
 
 # Prefix added to temporary branches
 BRANCH_PREFIX = "PR_TOOL"
@@ -116,9 +116,12 @@ def main():
 
     check_init()
 
+    print("%s/branches" % GITHUB_API_BASE)
     branches = get_json("%s/branches" % GITHUB_API_BASE)
+    print(str(branches))
     branch_names = filter(lambda x: x.startswith("branch-"), [x['name'] for x in branches])
     # Assumes branch names can be sorted lexicographically
+    print(str(branch_names))
     latest_branch = sorted(branch_names, reverse=True)[0]
 
     pr_num = raw_input("Which pull request would you like to checkout? (e.g. 34): ")
