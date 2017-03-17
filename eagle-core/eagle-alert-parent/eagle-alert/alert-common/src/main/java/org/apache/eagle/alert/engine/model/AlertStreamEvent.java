@@ -86,10 +86,10 @@ public class AlertStreamEvent extends StreamEvent {
             }
         }
 
-        return String.format("Alert {stream=%S,timestamp=%s,data=%s, policyId=%s, createdBy=%s, metaVersion=%s}",
-            this.getSiteId(), this.getStreamId(),
-            DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
-                this.getDataMap(), this.getPolicyId(), this.getCreatedBy(), this.getMetaVersion());
+        return String.format("Alert {site=%s, stream=%s,timestamp=%s,data=%s, policyId=%s, createdBy=%s, metaVersion=%s}",
+            this.getSiteId(),
+            this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
+            this.getDataMap(), this.getPolicyId(), this.getCreatedBy(), this.getMetaVersion());
     }
 
     public String getCreatedBy() {

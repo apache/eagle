@@ -21,6 +21,7 @@ import java.util.List;
 
 public class AlertContextFields {
     public static final String STREAM_ID = "STREAM_ID";
+    public static final String SITE_ID = "SITE_ID";
     public static final String ALERT_ID = "ALERT_ID";
     public static final String CREATED_BY = "CREATED_BY";
     public static final String POLICY_ID = "POLICY_ID";
