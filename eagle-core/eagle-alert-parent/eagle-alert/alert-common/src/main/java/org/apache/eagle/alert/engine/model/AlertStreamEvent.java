@@ -31,6 +31,7 @@ import java.util.*;
 public class AlertStreamEvent extends StreamEvent {
     private static final long serialVersionUID = 2392131134670106397L;
 
+    private String siteId;
     private String alertId;
     private String policyId;
     private StreamDefinition schema;
@@ -53,6 +54,7 @@ public class AlertStreamEvent extends StreamEvent {
     }
 
     public AlertStreamEvent(AlertStreamEvent event) {
+        this.siteId = event.getSiteId();
         this.alertId = event.getAlertId();
         this.policyId = event.policyId;
         this.schema = event.schema;
@@ -84,9 +86,10 @@ public class AlertStreamEvent extends StreamEvent {
             }
         }
 
-        return String.format("Alert {stream=%S,timestamp=%s,data=%s, policyId=%s, createdBy=%s, metaVersion=%s}",
-                this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
-                this.getDataMap(), this.getPolicyId(), this.getCreatedBy(), this.getMetaVersion());
+        return String.format("Alert {site=%s, stream=%s,timestamp=%s,data=%s, policyId=%s, createdBy=%s, metaVersion=%s}",
+            this.getSiteId(),
+            this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()),
+            this.getDataMap(), this.getPolicyId(), this.getCreatedBy(), this.getMetaVersion());
     }
 
     public String getCreatedBy() {
@@ -175,5 +178,13 @@ public class AlertStreamEvent extends StreamEvent {
 
     public void setSeverity(AlertSeverity severity) {
         this.severity = severity;
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
     }
 }
