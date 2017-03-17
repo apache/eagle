@@ -83,28 +83,19 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     private static final int DEFAULT_BATCH_DURATION_SECOND = 2;
     private static final String alertPublishBoltName = "alertPublishBolt";
     private static final String BATCH_DURATION = "topology.batchDuration";
-    private static final String SPARK_EXECUTOR_CORES = "topology.core";
-    private static final String SPARK_EXECUTOR_MEMORY = "topology.memory";
     private static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
     private static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
     private static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
     private static final String SLIDE_DURATION_SECOND = "topology.slideDurations";
     private static final String WINDOW_DURATIONS_SECOND = "topology.windowDurations";
-    private static final String TOPOLOGY_MASTER = "topology.master";
-    private static final String DRIVER_MEMORY = "topology.driverMemory";
-    private static final String DRIVER_CORES = "topology.driverCores";
-    private static final String DEPLOY_MODE = "topology.deployMode";
     private static final String CHECKPOINT_PATH = "topology.checkpointPath";
     private static final String TOPOLOGY_GROUPID = "topology.groupId";
-    private static final String TOPOLOGY_NAME = "topology.name";
-    private static final String TOPOLOGY_DYNAMICALLOCATION = "topology.dynamicAllocation";
     private static final String AUTO_OFFSET_RESET = "topology.offsetreset";
 
 
     private final AtomicReference<Map<KafkaClusterInfo, OffsetRange[]>> offsetRangesClusterMapRef = new AtomicReference<>();
     private static Class<MessageAndMetadata<String, String>> streamClass = (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;
 
-    private SparkConf sparkConf;
 
     private static Config config;
 
@@ -112,7 +103,6 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     public UnitSparkUnionTopologyRunner(Config config) {
 
         prepareKafkaConfig(config);
-        prepareSparkConfig(config);
         this.config = config;
 
     }
@@ -129,26 +119,6 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
         this.groupId = config.getString(TOPOLOGY_GROUPID);
     }
 
-    private void prepareSparkConfig(Config config) {
-        SparkConf sparkConf = new SparkConf();
-        sparkConf.setAppName(config.getString(TOPOLOGY_NAME));
-        String master = config.hasPath(TOPOLOGY_MASTER) ? config.getString(TOPOLOGY_MASTER) : "local[*]";
-        String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
-        String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
-        String driverMemory = config.getString(DRIVER_MEMORY);
-        String driverCore = config.getString(DRIVER_CORES);
-        String deployMode = config.getString(DEPLOY_MODE);
-        String enable = config.getString(TOPOLOGY_DYNAMICALLOCATION);
-        sparkConf.setMaster(master);
-        sparkConf.set("spark.executor.cores", sparkExecutorCores);
-        sparkConf.set("spark.executor.memory", sparkExecutorMemory);
-        sparkConf.set("spark.driver.memory", driverMemory);
-        sparkConf.set("spark.driver.cores", driverCore);
-        sparkConf.set("spark.submit.deployMode", deployMode);
-        sparkConf.set("spark.streaming.dynamicAllocation.enable", enable);
-
-        this.sparkConf = sparkConf;
-    }
 
     public JavaStreamingContext buildTopology() {
 
@@ -171,9 +141,10 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
         long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
-
+        SparkConf sparkConf = new SparkConf();
         @SuppressWarnings("unchecked")
         JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchDuration));
+        LOG.info("spark.ui.port " + sparkConf.get("spark.ui.port"));
         if (!StringUtils.isEmpty(checkpointDirectory)) {
             jssc.checkpoint(checkpointDirectory);
         }

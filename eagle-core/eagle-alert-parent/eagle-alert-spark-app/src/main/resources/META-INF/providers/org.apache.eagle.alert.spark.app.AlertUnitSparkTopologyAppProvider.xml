@@ -81,7 +81,7 @@
         <property>
             <name>topology.master</name>
             <displayName>Spark streaming master</displayName>
-            <value>local[4]</value>
+            <value>yarn</value>
             <description>Spark streaming master(local[4],local[*],yarn,spark://HOST:PORT)</description>
             <required>true</required>
         </property>
@@ -105,13 +105,6 @@
             <value>client</value>
             <description>spark.submit.deployMode(client,cluster)</description>
             <required>true</required>
-        </property>
-        <property>
-            <name>topology.checkpointPath</name>
-            <displayName>Spark steaming checkpoint directory</displayName>
-            <value></value>
-            <description>Spark steaming checkpoint directory</description>
-            <required>false</required>
         </property>
         <property>
             <name>topology.groupId</name>
@@ -161,6 +154,55 @@
             <value>localhost</value>
             <description>MetadataService host</description>
             <required>true</required>
+        </property>
+        <property>
+            <name>topology.mainclass</name>
+            <displayName>Mainclass</displayName>
+            <value>org.apache.eagle.alert.engine.UnitSparkUnionTopologyMain</value>
+            <description>Mainclass</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.sparkhome</name>
+            <displayName>Spark home</displayName>
+            <value>/opt/cloudera/parcels/CDH-5.2.0-1.cdh5.2.0.p0.36/lib/spark</value>
+            <description>Spark home</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.sparkuiport</name>
+            <displayName>Spark UI port</displayName>
+            <value>4123</value>
+            <description>Spark UI port</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.appresource</name>
+            <displayName>Spark Appresource</displayName>
+            <value>/usr/1hd-eagle/1hd-eagle/eagle-topology-assembly/target/eagle-topology-0.5.0-SNAPSHOT-assembly.jar</value>
+            <description>Spark Appresource</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.yarnqueue</name>
+            <displayName>spark.yarn.queue</displayName>
+            <value>default</value>
+            <description>spark.yarn.queue</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.checkpointPath</name>
+            <displayName>Spark steaming checkpoint directory</displayName>
+            <value></value>
+            <description>Spark steaming checkpoint directory</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>topology.verbose</name>
+            <displayName>Spark verbose</displayName>
+            <value>false</value>
+            <description>Spark verbose</description>
+            <required>false</required>
         </property>
     </configuration>
     <docs>
