@@ -116,12 +116,9 @@ def main():
 
     check_init()
 
-    print("%s/branches" % GITHUB_API_BASE)
     branches = get_json("%s/branches" % GITHUB_API_BASE)
-    print(str(branches))
     branch_names = filter(lambda x: x.startswith("branch-"), [x['name'] for x in branches])
     # Assumes branch names can be sorted lexicographically
-    print(str(branch_names))
     latest_branch = sorted(branch_names, reverse=True)[0]
 
     pr_num = raw_input("Which pull request would you like to checkout? (e.g. 34): ")
