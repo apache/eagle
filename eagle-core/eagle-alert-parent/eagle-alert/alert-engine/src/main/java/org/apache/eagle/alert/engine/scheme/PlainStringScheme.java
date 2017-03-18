@@ -19,12 +19,14 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
+import org.apache.storm.spout.Scheme;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -48,8 +50,13 @@ public class PlainStringScheme implements Scheme {
     private static final Charset UTF8_CHARSET = StandardCharsets.UTF_8;
     public static final String STRING_SCHEME_KEY = "str";
 
-    public static String deserializeString(byte[] buff) {
-        return new String(buff, UTF8_CHARSET);
+    public static String deserializeString(ByteBuffer buffer) {
+        if (buffer.hasArray()) {
+            int base = buffer.arrayOffset();
+            return new String(buffer.array(), base + buffer.position(), buffer.remaining());
+        } else {
+            return new String(Utils.toByteArray(buffer), StandardCharsets.UTF_8);
+        }
     }
 
     public Fields getOutputFields() {
@@ -58,7 +65,7 @@ public class PlainStringScheme implements Scheme {
 
     @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
-    public List<Object> deserialize(byte[] ser) {
+    public List<Object> deserialize(ByteBuffer ser) {
         Map m = new HashMap<>();
         m.put("value", deserializeString(ser));
         m.put("timestamp", System.currentTimeMillis());

@@ -17,7 +17,7 @@
 
 package org.apache.eagle.alert.engine.router.impl;
 
-import backtype.storm.task.OutputCollector;
+import org.apache.storm.task.OutputCollector;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.StreamOutputCollector;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;

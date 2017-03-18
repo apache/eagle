@@ -18,7 +18,7 @@
  */
 package org.apache.eagle.security.auditlog;
 
-import backtype.storm.topology.base.BaseRichBolt;
+import org.apache.storm.topology.base.BaseRichBolt;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

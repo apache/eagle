@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.mr.history.crawler;
 
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
-import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
 
 public class JobHistorySpoutCollectorInterceptor implements EagleOutputCollector {
     private SpoutOutputCollector collector;

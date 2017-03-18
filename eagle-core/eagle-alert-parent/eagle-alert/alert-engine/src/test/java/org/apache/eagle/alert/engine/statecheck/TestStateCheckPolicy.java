@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.alert.engine.statecheck;
 
-import backtype.storm.task.GeneralTopologyContext;
-import backtype.storm.task.IOutputCollector;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.TupleImpl;
+import org.apache.storm.task.GeneralTopologyContext;
+import org.apache.storm.task.IOutputCollector;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.TupleImpl;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
@@ -74,6 +74,11 @@ public class TestStateCheckPolicy {
 
             @Override
             public void fail(Tuple input) {
+            }
+
+            @Override
+            public void resetTimeout(Tuple tuple) {
+
             }
 
             @Override

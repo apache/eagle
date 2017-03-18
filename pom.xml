@@ -242,8 +242,8 @@
         <kafka-clients.version>0.8.2.0</kafka-clients.version>
         <kafka.artifact.id>kafka_2.11</kafka.artifact.id>
         <jgrapht.version>0.9.0</jgrapht.version>
-        <storm-kafka.version>0.10.0</storm-kafka.version>
-        <storm.version>0.9.3</storm.version>
+        <storm-kafka.version>1.0.2</storm-kafka.version>
+        <storm.version>1.0.3</storm.version>
 
         <mapr-kafka.version>0.9.0.0-mapr-1607</mapr-kafka.version>
         <mapr-kafka-clients.version>0.8.3-mapr-1509</mapr-kafka-clients.version>

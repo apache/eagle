@@ -38,14 +38,14 @@ public class TopologyMgmtService {
         public TopologyUsage usage;
 
         public String clusterId;
-        public String nimbusHost;
+        public List<String> nimbusSeeds;
         public String nimbusPort;
 
     }
 
     public static class StormClusterMeta {
         public String clusterId;
-        public String nimbusHost;
+        public List<String> nimbusSeeds;
         public String nimbusPort;
         public String stormVersion;
     }

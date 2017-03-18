@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.jpm.mr.running;
 
-import backtype.storm.Testing;
-import backtype.storm.spout.ISpoutOutputCollector;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
+import org.apache.storm.Testing;
+import org.apache.storm.spout.ISpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
@@ -56,7 +56,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InputStreamUtils.class, MRRunningJobFetchSpout.class, Executors.class, MRRunningJobParseBolt.class})
-@PowerMockIgnore({"javax.*"})
+@PowerMockIgnore({"javax.*", "com.sun.org.apache.xerces.*", "org.xml.sax.*", "org.w3c.dom.*"})
 public class MRRunningJobApplicationTest {
 
     private static final String RM_URL = "http://sandbox.hortonworks.com:50030/ws/v1/cluster/apps?applicationTypes=MAPREDUCE&state=RUNNING&anonymous=true";
@@ -164,6 +164,11 @@ public class MRRunningJobApplicationTest {
             @Override
             public void emitDirect(int taskId, String streamId, List<Object> tuple, Object messageId) {
 
+            }
+
+            @Override
+            public long getPendingCount() {
+                return 0;
             }
 
             @Override

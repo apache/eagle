@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.generated.*;
-import backtype.storm.utils.NimbusClient;
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.generated.*;
+import org.apache.storm.utils.NimbusClient;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.alert.engine.runner.StormMetricTaggedConsumer;
@@ -29,12 +29,13 @@ import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 import org.apache.eagle.app.utils.DynamicJarPathFinder;
 import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.apache.thrift7.TException;
+import org.apache.storm.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Int;
-import storm.trident.spout.RichSpoutBatchExecutor;
+import org.apache.storm.trident.spout.RichSpoutBatchExecutor;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,27 +70,30 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
 
     public static final String TOPOLOGY_MESSAGE_TIMEOUT_SECS = "topology.message.timeout.secs";
 
-    private static final String STORM_NIMBUS_HOST_CONF_PATH = "application.storm.nimbusHost";
-    private static final String STORM_NIMBUS_HOST_DEFAULT = "localhost";
+    private static final String STORM_NIMBUS_SEEDS_CONF_PATH = "application.storm.nimbusSeeds";
+    private static final List<String> STORM_NIMBUS_HOST_DEFAULT = Arrays.asList("localhost");
     private static final Integer STORM_NIMBUS_THRIFT_DEFAULT = 6627;
     private static final String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
 
     private static final String WORKERS = "workers";
 
-    private backtype.storm.Config getStormConfig(com.typesafe.config.Config config) {
-        backtype.storm.Config conf = new backtype.storm.Config();
+    private org.apache.storm.Config getStormConfig(com.typesafe.config.Config config) {
+        org.apache.storm.Config conf = new  org.apache.storm.Config();
         conf.put(RichSpoutBatchExecutor.MAX_BATCH_SIZE_CONF, Int.box(64 * 1024));
-        conf.put(backtype.storm.Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, Int.box(8));
-        conf.put(backtype.storm.Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, Int.box(32));
-        conf.put(backtype.storm.Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, Int.box(16384));
-        conf.put(backtype.storm.Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, Int.box(16384));
-        conf.put(backtype.storm.Config.NIMBUS_THRIFT_MAX_BUFFER_SIZE, Int.box(20480000));
-        String nimbusHost = STORM_NIMBUS_HOST_DEFAULT;
-        if (environment.config().hasPath(STORM_NIMBUS_HOST_CONF_PATH)) {
-            nimbusHost = environment.config().getString(STORM_NIMBUS_HOST_CONF_PATH);
-            LOG.info("Overriding {} = {}",STORM_NIMBUS_HOST_CONF_PATH,nimbusHost);
+        // TOPOLOGY_RECEIVER_BUFFER_SIZE has no effect, and it is removed. ref: STORM-596
+        conf.put(org.apache.storm.Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, Int.box(32));
+        conf.put(org.apache.storm.Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, Int.box(16384));
+        conf.put(org.apache.storm.Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, Int.box(16384));
+        conf.put(org.apache.storm.Config.NIMBUS_THRIFT_MAX_BUFFER_SIZE, Int.box(20480000));
+        conf.put(org.apache.storm.Config.STORM_NIMBUS_RETRY_TIMES, 5);
+        conf.put(org.apache.storm.Config.STORM_NIMBUS_RETRY_INTERVAL, 4000);
+        conf.put(org.apache.storm.Config.STORM_NIMBUS_RETRY_INTERVAL_CEILING, 60000);
+        List<String> nimbusSeeds = STORM_NIMBUS_HOST_DEFAULT;
+        if (environment.config().hasPath(STORM_NIMBUS_SEEDS_CONF_PATH)) {
+            nimbusSeeds = environment.config().getStringList(STORM_NIMBUS_SEEDS_CONF_PATH);
+            LOG.info("Overriding {} = {}", STORM_NIMBUS_SEEDS_CONF_PATH,nimbusSeeds);
         } else {
-            LOG.info("Using default {} = {}",STORM_NIMBUS_HOST_CONF_PATH,STORM_NIMBUS_HOST_DEFAULT);
+            LOG.info("Using default {} = {}", STORM_NIMBUS_SEEDS_CONF_PATH,STORM_NIMBUS_HOST_DEFAULT);
         }
         Integer nimbusThriftPort =  STORM_NIMBUS_THRIFT_DEFAULT;
         if (environment.config().hasPath(STORM_NIMBUS_THRIFT_CONF_PATH)) {
@@ -98,9 +102,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         } else {
             LOG.info("Using default {} = {}",STORM_NIMBUS_THRIFT_CONF_PATH,STORM_NIMBUS_THRIFT_DEFAULT);
         }
-        conf.put(backtype.storm.Config.NIMBUS_HOST, nimbusHost);
-        conf.put(backtype.storm.Config.NIMBUS_THRIFT_PORT, nimbusThriftPort);
-        conf.put(Config.STORM_THRIFT_TRANSPORT_PLUGIN, "backtype.storm.security.auth.SimpleTransportPlugin");
+        conf.put(Config.NIMBUS_SEEDS, nimbusSeeds);
+        conf.put(org.apache.storm.Config.NIMBUS_THRIFT_PORT, nimbusThriftPort);
+        conf.put(Config.STORM_THRIFT_TRANSPORT_PLUGIN, "org.apache.storm.security.auth.SimpleTransportPlugin");
         if (config.hasPath(WORKERS)) {
             conf.setNumWorkers(config.getInt(WORKERS));
         }
@@ -155,7 +159,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
             try {
                 stormClient.killTopologyWithOpts(appId, this.killOptions);
-            } catch (NotAliveException | TException e) {
+            } catch (TException e) {
                 LOG.error("Failed to kill topology named {}, due to: {}",appId,e.getMessage(),e.getCause());
                 throw new RuntimeException(e.getMessage(),e);
             }

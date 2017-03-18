@@ -20,7 +20,7 @@ package org.apache.eagle.alert.app;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import backtype.storm.generated.StormTopology;
+import org.apache.storm.generated.StormTopology;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

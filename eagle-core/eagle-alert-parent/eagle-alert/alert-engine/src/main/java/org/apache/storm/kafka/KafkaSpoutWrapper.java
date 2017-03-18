@@ -16,15 +16,15 @@
  *  * limitations under the License.
  *
  */
-package storm.kafka;
+package org.apache.storm.kafka;
 
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.spout.ISpoutSpecLCM;
 import org.apache.eagle.alert.engine.spout.SpoutOutputCollectorWrapper;
-import backtype.storm.Config;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
+import org.apache.storm.Config;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

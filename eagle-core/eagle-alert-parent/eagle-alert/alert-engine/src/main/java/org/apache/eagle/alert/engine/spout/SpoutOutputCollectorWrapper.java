@@ -18,8 +18,8 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import backtype.storm.spout.ISpoutOutputCollector;
-import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.storm.spout.ISpoutOutputCollector;
+import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;

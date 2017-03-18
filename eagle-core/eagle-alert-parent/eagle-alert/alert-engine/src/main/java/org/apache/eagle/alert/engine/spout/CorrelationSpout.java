@@ -18,14 +18,15 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import backtype.storm.spout.MultiScheme;
-import backtype.storm.spout.Scheme;
-import backtype.storm.spout.SchemeAsMultiScheme;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
+import org.apache.storm.kafka.*;
+import org.apache.storm.spout.MultiScheme;
+import org.apache.storm.spout.Scheme;
+import org.apache.storm.spout.SchemeAsMultiScheme;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichSpout;
+import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.collections.CollectionUtils;
@@ -42,7 +43,6 @@ import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.alert.utils.StreamIdConversion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import storm.kafka.*;
 
 import java.text.MessageFormat;
 import java.util.*;

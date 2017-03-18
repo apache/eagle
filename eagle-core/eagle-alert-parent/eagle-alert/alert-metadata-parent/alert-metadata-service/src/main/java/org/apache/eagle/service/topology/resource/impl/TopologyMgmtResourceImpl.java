@@ -24,21 +24,18 @@ import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-import backtype.storm.Config;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.Nimbus;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.generated.TopologySummary;
-import backtype.storm.utils.NimbusClient;
-import backtype.storm.utils.Utils;
+import org.apache.storm.Config;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.Nimbus;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.generated.TopologySummary;
+import org.apache.storm.utils.NimbusClient;
+import org.apache.storm.utils.Utils;
 import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 public class TopologyMgmtResourceImpl {
@@ -46,7 +43,7 @@ public class TopologyMgmtResourceImpl {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TopologyMgmtResourceImpl.class);
 
-    private static final String DEFAULT_NIMBUS_HOST = "sandbox.hortonworks.com";
+    private static final List<String> DEFAULT_NIMBUS_SEEDS = Arrays.asList("sandbox.hortonworks.com");
     private static final Integer DEFAULT_NIMBUS_THRIFT_PORT = 6627;
     private static final String STORM_JAR_PATH = "topology.stormJarPath";
 
@@ -55,7 +52,7 @@ public class TopologyMgmtResourceImpl {
     private Map getStormConf(List<StreamingCluster> clusters, String clusterId) throws Exception {
         Map<String, Object> stormConf = Utils.readStormConfig();
         if (clusterId == null) {
-            stormConf.put(Config.NIMBUS_HOST, DEFAULT_NIMBUS_HOST);
+            stormConf.put(Config.NIMBUS_SEEDS, DEFAULT_NIMBUS_SEEDS);
             stormConf.put(Config.NIMBUS_THRIFT_PORT, DEFAULT_NIMBUS_THRIFT_PORT);
         } else {
             if (clusters == null) {
@@ -68,8 +65,8 @@ public class TopologyMgmtResourceImpl {
             } else {
                 throw new Exception("Fail to find cluster: " + clusterId);
             }
-            stormConf.put(Config.NIMBUS_HOST, cluster.getDeployments().getOrDefault(StreamingCluster.NIMBUS_HOST, DEFAULT_NIMBUS_HOST));
-            stormConf.put(Config.NIMBUS_THRIFT_PORT, Integer.valueOf(cluster.getDeployments().get(StreamingCluster.NIMBUS_THRIFT_PORT)));
+            stormConf.put(Config.NIMBUS_SEEDS, cluster.getDeployments().getOrDefault(StreamingCluster.NIMBUS_SEEDS, DEFAULT_NIMBUS_SEEDS));
+            stormConf.put(Config.NIMBUS_THRIFT_PORT, Integer.valueOf(String.valueOf(cluster.getDeployments().get(StreamingCluster.NIMBUS_THRIFT_PORT))));
         }
         return stormConf;
     }

@@ -39,7 +39,7 @@ public class StreamingCluster {
      * key - nimbus for storm.
      */
     @JsonProperty
-    private Map<String, String> deployments;
+    private Map<String, Object> deployments;
 
     public String getName() {
         return name;
@@ -73,15 +73,15 @@ public class StreamingCluster {
         this.description = description;
     }
 
-    public Map<String, String> getDeployments() {
+    public Map<String, Object> getDeployments() {
         return deployments;
     }
 
-    public void setDeployments(Map<String, String> deployments) {
+    public void setDeployments(Map<String, Object> deployments) {
         this.deployments = deployments;
     }
 
-    public static final String NIMBUS_HOST = "nimbusHost";
+    public static final String NIMBUS_SEEDS = "nimbusSeeds";
     public static final String NIMBUS_THRIFT_PORT = "nimbusThriftPort";
 
 }

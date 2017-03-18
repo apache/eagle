@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.engine.evaluator;
 
-import backtype.storm.metric.api.MultiCountMetric;
+import org.apache.storm.metric.api.MultiCountMetric;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.StormMultiCountMetric;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;

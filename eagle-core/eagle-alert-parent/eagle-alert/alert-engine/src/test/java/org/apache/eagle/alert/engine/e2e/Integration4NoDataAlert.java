@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import backtype.storm.utils.Utils;
+import org.apache.storm.utils.Utils;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.UnitTopologyMain;

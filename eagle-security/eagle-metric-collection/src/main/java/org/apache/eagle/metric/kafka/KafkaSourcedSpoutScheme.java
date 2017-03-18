@@ -16,12 +16,14 @@
  */
 package org.apache.eagle.metric.kafka;
 
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
+import org.apache.storm.spout.Scheme;
+import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
+import org.apache.storm.utils.Utils;
 
 import java.lang.reflect.Constructor;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +52,8 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 	}
 
 	@Override
-	public List<Object> deserialize(byte[] ser) {
-		Object tmp = deserializer.deserialize(ser);
+	public List<Object> deserialize(ByteBuffer ser) {
+		Object tmp = deserializer.deserialize(Utils.toByteArray(ser));
 		Map<String, Object> map = (Map<String, Object>)tmp;
 		if(tmp == null) return null;
 		return Arrays.asList(map.get("user"), map.get("timestamp"));

@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package storm.kafka;
+package org.apache.storm.kafka;
 
-import backtype.storm.metric.api.IMetric;
+import org.apache.storm.metric.api.IMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class KafkaSpoutMetric implements IMetric {
 
     public void addTopic(String topic, KafkaSpoutMetricContext context) {
         // construct KafkaOffsetMetric
-        KafkaUtils.KafkaOffsetMetric kafkaOffsetMetric = new KafkaUtils.KafkaOffsetMetric(context.spoutConfig.topic, context.connections);
+        KafkaUtils.KafkaOffsetMetric kafkaOffsetMetric = new KafkaUtils.KafkaOffsetMetric(context.connections);
         metricContextMap.put(topic, context);
         offsetMetricMap.put(topic, kafkaOffsetMetric);
     }
@@ -68,7 +68,7 @@ public class KafkaSpoutMetric implements IMetric {
             KafkaUtils.KafkaOffsetMetric offsetMetric = offsetMetricMap.get(entry.getKey());
             offsetMetric.refreshPartitions(latestPartitions);
             for (PartitionManager pm : pms) {
-                offsetMetric.setLatestEmittedOffset(pm.getPartition(), pm.lastCompletedOffset());
+                offsetMetric.setOffsetData(pm.getPartition(), pm.getOffsetData());
             }
             Object o = offsetMetric.getValueAndReset();
             if (o != null) {

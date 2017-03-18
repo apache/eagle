@@ -20,10 +20,10 @@ package org.apache.eagle.security.oozie.parse.sensitivity;
 import org.apache.eagle.security.enrich.AbstractDataEnrichBolt;
 import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

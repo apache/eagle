@@ -21,8 +21,8 @@ import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.jpm.spark.history.storm.SparkHistoryJobParseBolt;
 import org.apache.eagle.jpm.spark.history.storm.SparkHistoryJobSpout;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 
 public class SparkHistoryJobApp extends StormApplication {

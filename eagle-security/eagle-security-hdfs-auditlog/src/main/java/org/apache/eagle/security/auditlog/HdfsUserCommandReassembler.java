@@ -18,7 +18,7 @@
  */
 package org.apache.eagle.security.auditlog;
 
-import backtype.storm.task.OutputCollector;
+import org.apache.storm.task.OutputCollector;
 import com.typesafe.config.Config;
 import org.apache.eagle.security.entity.HdfsUserCommandPatternEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;

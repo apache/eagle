@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.app.messaging;
 
-import backtype.storm.topology.base.BaseRichSpout;
+import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 import org.apache.eagle.metadata.model.StreamSourceConfig;
 

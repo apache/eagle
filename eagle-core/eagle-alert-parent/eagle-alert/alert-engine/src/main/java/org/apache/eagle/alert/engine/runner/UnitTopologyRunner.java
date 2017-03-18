@@ -32,15 +32,13 @@ import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.alert.utils.StreamIdConversion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.BoltDeclarer;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
-import backtype.storm.utils.Utils;
-
+import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.BoltDeclarer;
+import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.utils.Utils;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigRenderOptions;
 
@@ -69,13 +67,13 @@ public class UnitTopologyRunner {
     public static final int DEFAULT_MESSAGE_TIMEOUT_SECS = 3600;
 
     private final IMetadataChangeNotifyService metadataChangeNotifyService;
-    private backtype.storm.Config givenStormConfig = null;
+    private org.apache.storm.Config givenStormConfig = null;
 
     public UnitTopologyRunner(IMetadataChangeNotifyService metadataChangeNotifyService) {
         this.metadataChangeNotifyService = metadataChangeNotifyService;
     }
 
-    public UnitTopologyRunner(ZKMetadataChangeNotifyService changeNotifyService, backtype.storm.Config stormConfig) {
+    public UnitTopologyRunner(ZKMetadataChangeNotifyService changeNotifyService, org.apache.storm.Config stormConfig) {
         this(changeNotifyService);
         this.givenStormConfig = stormConfig;
     }
@@ -94,7 +92,7 @@ public class UnitTopologyRunner {
                      Config config,
                      boolean localMode) {
 
-        backtype.storm.Config stormConfig = givenStormConfig == null ? new backtype.storm.Config() : givenStormConfig;
+        org.apache.storm.Config stormConfig = givenStormConfig == null ? new org.apache.storm.Config() : givenStormConfig;
         // TODO: Configurable metric consumer instance number
 
         int messageTimeoutSecs = config.hasPath(MESSAGE_TIMEOUT_SECS) ? config.getInt(MESSAGE_TIMEOUT_SECS) : DEFAULT_MESSAGE_TIMEOUT_SECS;

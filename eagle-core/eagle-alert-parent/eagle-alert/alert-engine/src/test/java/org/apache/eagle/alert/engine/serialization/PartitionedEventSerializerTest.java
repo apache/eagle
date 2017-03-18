@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.alert.engine.serialization;
 
-import backtype.storm.serialization.DefaultKryoFactory;
-import backtype.storm.serialization.DefaultSerializationDelegate;
+import org.apache.storm.serialization.DefaultKryoFactory;
+import org.apache.storm.serialization.DefaultSerializationDelegate;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -134,7 +134,7 @@ public class PartitionedEventSerializerTest {
         stopWatch.start();
         while (i < count) {
             byte[] javaSerialization = new DefaultSerializationDelegate().serialize(partitionedEvent);
-            PartitionedEvent javaSerializedEvent = (PartitionedEvent) new DefaultSerializationDelegate().deserialize(javaSerialization);
+            PartitionedEvent javaSerializedEvent = new DefaultSerializationDelegate().deserialize(javaSerialization, PartitionedEvent.class);
             Assert.assertEquals(partitionedEvent, javaSerializedEvent);
             i++;
         }

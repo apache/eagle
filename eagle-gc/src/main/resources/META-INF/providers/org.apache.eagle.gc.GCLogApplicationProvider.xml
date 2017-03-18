@@ -78,7 +78,7 @@
         <property>
             <name>dataSourceConfig.schemeCls</name>
             <displayName>dataSourceConfig.schemeCls</displayName>
-            <value>storm.kafka.StringScheme</value>
+            <value>org.apache.storm.kafka.StringScheme</value>
             <description>scheme class</description>
         </property>
 

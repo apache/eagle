@@ -19,8 +19,8 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
-import storm.kafka.KafkaSpoutWrapper;
+import org.apache.storm.kafka.KafkaSpoutWrapper;
 
 import java.util.Arrays;
 import java.util.HashMap;

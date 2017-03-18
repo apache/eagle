@@ -27,10 +27,8 @@ import org.apache.eagle.alert.config.ZKConfig;
 import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
-
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
-
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -70,7 +68,7 @@ public class UnitTopologyMain {
         new UnitTopologyRunner(changeNotifyService).run(topologyId, config);
     }
 
-    public static void runTopology(Config config, backtype.storm.Config stormConfig) {
+    public static void runTopology(Config config, org.apache.storm.Config stormConfig) {
         // load config and start
         String topologyId = getTopologyName(config);
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);

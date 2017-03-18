@@ -21,9 +21,9 @@ import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.jpm.spark.running.storm.SparkRunningJobFetchSpout;
 import org.apache.eagle.jpm.spark.running.storm.SparkRunningJobParseBolt;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
 
 public class SparkRunningJobApp extends StormApplication {
