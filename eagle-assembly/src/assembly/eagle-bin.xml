@@ -54,6 +54,14 @@
             <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/src/main/doc</directory>
+            <outputDirectory>doc/</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/src/main</directory>
             <outputDirectory>.</outputDirectory>
             <includes>

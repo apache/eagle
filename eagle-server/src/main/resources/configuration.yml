@@ -20,6 +20,28 @@ server:
   adminConnectors:
     - type: http
       port: 9091
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: log/eagle-server-access.log
+        threshold: ALL
+        archive: true
+        archivedLogFilenamePattern: log/eagle-server-access-%d.log
+        archivedFileCount: 5
+        timeZone: UTC
+
+logging:
+  level: INFO
+  loggers:
+      org.apache.eagle: INFO
+  appenders:
+    - type: file
+      currentLogFilename: log/eagle-server.log
+      threshold: ALL
+      archive: true
+      archivedLogFilenamePattern: log/eagle-server-%d.log
+      archivedFileCount: 5
+      timeZone: UTC
 
 # ---------------------------------------------
 # Eagle Authentication Configuration
