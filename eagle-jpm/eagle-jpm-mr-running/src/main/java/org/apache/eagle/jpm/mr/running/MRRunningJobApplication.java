@@ -27,7 +27,7 @@ import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
 import com.typesafe.config.Config;
-import storm.trident.planner.SpoutNode;
+import org.apache.storm.trident.planner.SpoutNode;
 
 import java.util.ArrayList;
 import java.util.List;
