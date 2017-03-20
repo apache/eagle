@@ -19,7 +19,6 @@
  */
 package org.apache.eagle.jpm.util.resourcefetch;
 
-import com.fasterxml.jackson.databind.util.ContainerBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.util.Constants;
@@ -65,7 +64,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         return selector;
     }
 
-    private List<AppInfo> doFetchApplicationsList(String urlString, Constants.CompressionType compressionType) {
+    private List<AppInfo> doFetchApplicationsList(String urlString, Constants.CompressionType compressionType) throws Exception {
         List<AppInfo> result = new ArrayList<>();
         InputStream is = null;
         try {
@@ -77,8 +76,6 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 result = appWrapper.getApps().getApp();
             }
             LOG.info("Successfully fetched {} AppInfos from {}", result.size(), urlString);
-        } catch (Exception e) {
-            LOG.error("Fail to query {} due to {}", urlString, e.getMessage());
         } finally {
             if (is != null) {
                 try {
@@ -135,75 +132,64 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     private List<AppInfo> doFetchRunningApplicationsList(Constants.JobType jobType,
                                                          Constants.CompressionType compressionType,
                                                          Object... parameter) throws Exception {
-        Map<String, AppInfo> result = new HashMap();
-        List<AppInfo> apps = new ArrayList<>();
-        try {
-            String limit = "";
-            int requests = 1;
-            int timeRangePerRequestInMin = 60;
+        String limit = "";
+        int requests = 1;
+        int timeRangePerRequestInMin = 60;
 
-            switch (parameter.length) {
-                case 0 :
-                    String urlString = getRunningJobURL(jobType, null, null, null);
-                    return doFetchApplicationsList(urlString, compressionType);
-                case 1 :
-                    limit = String.valueOf(parameter[0]);
-                    break;
-                case 2 :
-                    limit = String.valueOf(parameter[0]);
-                    requests = (int) parameter[1];
-                    break;
-                case 3 :
-                    limit = String.valueOf(parameter[0]);
-                    requests = (int) parameter[1];
-                    timeRangePerRequestInMin = (int) parameter[2];
-                    break;
-                default :
-                    throw new InvalidParameterException("parameter list: limit, requests, requestTimeRange");
-            }
-
-            if (requests <= 1) {
-                String urlString = getRunningJobURL(jobType, null, null, limit);
+        switch (parameter.length) {
+            case 0 :
+                String urlString = getRunningJobURL(jobType, null, null, null);
                 return doFetchApplicationsList(urlString, compressionType);
-            }
-
-            long interval =  timeRangePerRequestInMin * DateTimeUtil.ONEMINUTE;
-            long currentTime = System.currentTimeMillis() - interval;
-
-            List<String> requestUrls = new ArrayList<>();
-            requestUrls.add(getRunningJobURL(jobType, String.valueOf(currentTime), null, limit));
-
-            for (int cnt = 2; cnt < requests; cnt++) {
-                long start = currentTime - interval;
-                requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), String.valueOf(currentTime), limit));
-                currentTime -= interval;
-            }
-
-            requestUrls.add(getRunningJobURL(jobType, null, String.valueOf(currentTime), limit));
-            LOG.info("{} requests to fetch running MapReduce applications: \n{}", requestUrls.size(),
-                    StringUtils.join(requestUrls, "\n"));
-
-            requestUrls.forEach(query ->
-                doFetchApplicationsList(query, compressionType).forEach(app -> result.put(app.getId(), app))
-            );
-        } catch (Exception e) {
-            LOG.error("Catch an exception when query url{} : {}", selector.getSelectedUrl(), e.getMessage(), e);
-            return apps;
+            case 1 :
+                limit = String.valueOf(parameter[0]);
+                break;
+            case 2 :
+                limit = String.valueOf(parameter[0]);
+                requests = (int) parameter[1];
+                break;
+            case 3 :
+                limit = String.valueOf(parameter[0]);
+                requests = (int) parameter[1];
+                timeRangePerRequestInMin = (int) parameter[2];
+                break;
+            default :
+                throw new InvalidParameterException("parameter list: limit, requests, requestTimeRange");
         }
+
+        if (requests <= 1) {
+            String urlString = getRunningJobURL(jobType, null, null, limit);
+            return doFetchApplicationsList(urlString, compressionType);
+        }
+
+        long interval =  timeRangePerRequestInMin * DateTimeUtil.ONEMINUTE;
+        long currentTime = System.currentTimeMillis() - interval;
+
+        List<String> requestUrls = new ArrayList<>();
+        requestUrls.add(getRunningJobURL(jobType, String.valueOf(currentTime), null, limit));
+
+        for (int cnt = 2; cnt < requests; cnt++) {
+            long start = currentTime - interval;
+            requestUrls.add(getRunningJobURL(jobType, String.valueOf(start), String.valueOf(currentTime), limit));
+            currentTime -= interval;
+        }
+
+        requestUrls.add(getRunningJobURL(jobType, null, String.valueOf(currentTime), limit));
+        LOG.info("{} requests to fetch running MapReduce applications: \n{}", requestUrls.size(),
+                StringUtils.join(requestUrls, "\n"));
+
+        Map<String, AppInfo> result = new HashMap();
+        for (String query : requestUrls) {
+            doFetchApplicationsList(query, compressionType).forEach(app -> result.put(app.getId(), app));
+        }
+        List<AppInfo> apps = new ArrayList<>();
         apps.addAll(result.values());
         return apps;
     }
 
     private List<AppInfo> doFetchAcceptedApplicationList(Constants.CompressionType compressionType,
                                                          Object... parameter) throws Exception {
-        List<AppInfo> apps = new ArrayList<>();
-        try {
-            String url = getAcceptedAppURL(parameter);
-            return doFetchApplicationsList(url, compressionType);
-        } catch (Exception e) {
-            LOG.error("Catch an exception when query {} : {}", selector.getSelectedUrl(), e.getMessage(), e);
-        }
-        return apps;
+        String url = getAcceptedAppURL(parameter);
+        return doFetchApplicationsList(url, compressionType);
     }
 
     private List<AppInfo> getResource(Constants.ResourceType resourceType, Constants.CompressionType compressionType, Object... parameter) throws Exception {

@@ -47,7 +47,7 @@ public class RunningAppsCrawler implements Runnable {
     public void run() {
         try {
             logger.info("Start to crawl app metrics from " + this.urlString);
-            AppsWrapper appsWrapper = (AppsWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(urlString, AppsWrapper.class);
+            AppsWrapper appsWrapper = (AppsWrapper) HadoopYarnResourceUtils.getObjectFromUrlStream(urlString, AppsWrapper.class);
             if (appsWrapper == null || appsWrapper.getApps() == null) {
                 logger.error("Failed to crawl running applications with api = " + urlString);
             } else {

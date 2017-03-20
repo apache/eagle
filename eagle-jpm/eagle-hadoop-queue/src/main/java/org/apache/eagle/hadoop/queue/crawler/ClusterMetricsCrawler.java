@@ -43,7 +43,7 @@ public class ClusterMetricsCrawler implements Runnable {
     public void run() {
         try {
             logger.info("Start to crawl cluster metrics from " + this.urlString);
-            ClusterMetricsWrapper metricsWrapper = (ClusterMetricsWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(urlString, ClusterMetricsWrapper.class);
+            ClusterMetricsWrapper metricsWrapper = (ClusterMetricsWrapper) HadoopYarnResourceUtils.getObjectFromUrlStream(urlString, ClusterMetricsWrapper.class);
             ClusterMetrics metrics = metricsWrapper.getClusterMetrics();
             if (metrics == null) {
                 logger.error("Failed to crawl cluster metrics");
