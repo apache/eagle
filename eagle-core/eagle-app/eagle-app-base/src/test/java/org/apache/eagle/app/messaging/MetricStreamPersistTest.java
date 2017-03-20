@@ -22,7 +22,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.environment.builder.MetricDefinition;
+import org.apache.eagle.app.environment.builder.MetricDescriptor;
 import org.apache.eagle.app.utils.StreamConvertHelper;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
@@ -42,18 +42,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MetricStreamPersist.class})
+@PrepareForTest( {MetricStreamPersist.class})
 public class MetricStreamPersistTest {
 
     @Test
     public void testStructuredMetricMapper() throws Exception {
-        MetricDefinition metricDefinition = MetricDefinition
-                .metricType("HADOOP_JMX_METRICS")
-                .namedByField("metric")
-                .eventTimeByField("timestamp")
-                .dimensionFields("host", "component", "site")
-                .granularity(Calendar.MINUTE)
-                .valueField("value");
+        MetricDescriptor metricDefinition = MetricDescriptor
+            .metricGroupByField("group")
+            .siteAs("siteId")
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "component", "site")
+            .granularity(Calendar.MINUTE)
+            .valueField("value");
         Config config = mock(Config.class);
         MetricStreamPersist metricStreamPersist = new MetricStreamPersist(metricDefinition, config);
         Field mapperField = metricStreamPersist.getClass().getDeclaredField("mapper");
@@ -68,7 +69,7 @@ public class MetricStreamPersistTest {
         event.put("host", "xxx-xxx.int.xxx.com");
 
         Tuple tuple = Testing.testTuple(new Values("metric", event));
-        MetricStreamPersist.MetricMapper mapper= (MetricStreamPersist.MetricMapper) mapperField.get(metricStreamPersist);
+        MetricStreamPersist.MetricMapper mapper = (MetricStreamPersist.MetricMapper) mapperField.get(metricStreamPersist);
 
         GenericMetricEntity metricEntity = mapper.map(StreamConvertHelper.tupleToEvent(tuple).f1());
 
@@ -106,13 +107,14 @@ public class MetricStreamPersistTest {
             }
         });
 
-        MetricDefinition metricDefinition = MetricDefinition
-                .metricType("HADOOP_JMX_METRICS")
-                .namedByField("metric")
-                .eventTimeByField("timestamp")
-                .dimensionFields("host", "component", "site")
-                .granularity(Calendar.MINUTE)
-                .valueField("value");
+        MetricDescriptor metricDefinition = MetricDescriptor
+            .metricGroupByField("group")
+            .siteAs("siteId")
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "component", "site")
+            .granularity(Calendar.MINUTE)
+            .valueField("value");
         Config config = mock(Config.class);
         when(config.hasPath("service.batchSize")).thenReturn(false);
 

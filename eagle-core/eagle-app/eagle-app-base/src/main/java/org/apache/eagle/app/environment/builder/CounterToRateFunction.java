@@ -29,10 +29,10 @@ import java.util.concurrent.TimeUnit;
 public class CounterToRateFunction implements TransformFunction {
     private static final Logger LOG = LoggerFactory.getLogger(CounterToRateFunction.class);
     private final Map<String, CounterValue> cache;
-    private MetricDefinition metricDefinition;
+    private MetricDescriptor metricDescriptor;
     private Collector collector;
 
-    public CounterToRateFunction(MetricDefinition metricDefinition, long heartbeat, TimeUnit unit, final Clock clock) {
+    public CounterToRateFunction(MetricDescriptor metricDescriptor, long heartbeat, TimeUnit unit, final Clock clock) {
         final long heartbeatMillis = TimeUnit.MILLISECONDS.convert(heartbeat, unit);
         this.cache = new LinkedHashMap<String, CounterValue>(16, 0.75f, true) {
             protected boolean removeEldestEntry(Map.Entry<String, CounterValue> eldest) {
@@ -45,7 +45,7 @@ public class CounterToRateFunction implements TransformFunction {
                 return expired;
             }
         };
-        this.metricDefinition = metricDefinition;
+        this.metricDescriptor = metricDescriptor;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CounterToRateFunction implements TransformFunction {
             final CounterValue prev = cache.get(metricName);
             if (prev != null) {
                 final double rate = prev.computeRate(metric);
-                event.put(metricDefinition.getValueField(), rate);
+                event.put(metricDescriptor.getValueField(), rate);
                 collector.collect(event.toString(), event);
             } else {
                 CounterValue current = new CounterValue(metric);
@@ -87,22 +87,22 @@ public class CounterToRateFunction implements TransformFunction {
     private Metric toMetric(Map event) {
 
         String metricName = "";
-        for (String dimensionField : metricDefinition.getDimensionFields()) {
+        for (String dimensionField : metricDescriptor.getDimensionFields()) {
             metricName += event.get(dimensionField) + "-";
         }
-        metricName += metricDefinition.getNameSelector().getMetricName(event);
+        metricName += metricDescriptor.getMetricNameSelector().getMetricName(event);
 
-        long timestamp = metricDefinition.getTimestampSelector().getTimestamp(event);
+        long timestamp = metricDescriptor.getTimestampSelector().getTimestamp(event);
 
         return new Metric(metricName, timestamp, getCurrentValue(event));
     }
 
     private double getCurrentValue(Map event) {
         double[] values;
-        if (event.containsKey(metricDefinition.getValueField())) {
-            values = new double[]{(double) event.get(metricDefinition.getValueField())};
+        if (event.containsKey(metricDescriptor.getValueField())) {
+            values = new double[]{(double) event.get(metricDescriptor.getValueField())};
         } else {
-            LOG.warn("Event has no value field '{}': {}, use 0 by default", metricDefinition.getValueField(), event);
+            LOG.warn("Event has no value field '{}': {}, use 0 by default", metricDescriptor.getValueField(), event);
             values = new double[]{0};
         }
         return values[0];
@@ -193,8 +193,8 @@ public class CounterToRateFunction implements TransformFunction {
             }
             Metric m = (Metric) obj;
             return metricName.equals(m.getMetricName())
-                    && timestamp == m.getTimestamp()
-                    && value.equals(m.getValue());
+                && timestamp == m.getTimestamp()
+                && value.equals(m.getValue());
         }
 
         @Override

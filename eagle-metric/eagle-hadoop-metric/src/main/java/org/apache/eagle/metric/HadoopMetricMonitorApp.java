@@ -19,41 +19,47 @@ package org.apache.eagle.metric;
 import backtype.storm.generated.StormTopology;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.builder.CounterToRateFunction;
 import org.apache.eagle.app.environment.builder.MetricDescriptor;
 import org.apache.eagle.app.environment.builder.MetricDescriptor.MetricGroupSelector;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.utils.AppConfigUtils;
+import org.apache.eagle.app.utils.ClockWithOffset;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class HadoopMetricMonitorApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
+
+        MetricDescriptor hadoopMetricDescriptor = MetricDescriptor.metricGroupAs((MetricGroupSelector) event -> {
+            if (event.containsKey("component")) {
+                return String.format("hadoop.%s", ((String) event.get("component")).toLowerCase());
+            } else {
+                return "hadoop.metrics";
+            }
+        })
+            .siteAs(AppConfigUtils.getSiteId(config))
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "component", "site")
+            .granularity(Calendar.SECOND)
+            .valueField("value");
+
+        MetricDescriptor systemMetricDescriptor = MetricDescriptor.metricGroupByField("group")
+            .siteAs(AppConfigUtils.getSiteId(config))
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "group", "site", "device")
+            .granularity(Calendar.SECOND)
+            .valueField("value");
         return environment.newApp(config)
-                .fromStream("HADOOP_JMX_METRIC_STREAM")
-                .saveAsMetric(
-                        MetricDescriptor.metricGroupAs((MetricGroupSelector) event -> {
-                            if (event.containsKey("component")) {
-                                return String.format("hadoop.%s", ((String) event.get("component")).toLowerCase());
-                            } else {
-                                return "hadoop.metrics";
-                            }
-                        })
-                        .siteAs(AppConfigUtils.getSiteId(config))
-                        .namedByField("metric")
-                        .eventTimeByField("timestamp")
-                        .dimensionFields("host", "component", "site")
-                        .granularity(Calendar.SECOND)
-                        .valueField("value"))
-                .fromStream("SYSTEM_METRIC_STREAM")
-                .saveAsMetric(MetricDescriptor.metricGroupByField("group")
-                        .siteAs(AppConfigUtils.getSiteId(config))
-                        .namedByField("metric")
-                        .eventTimeByField("timestamp")
-                        .dimensionFields("host", "group", "site", "device")
-                        .granularity(Calendar.SECOND)
-                        .valueField("value")
-                )
-                .toTopology();
+            .fromStream("HADOOP_JMX_METRIC_STREAM").transformBy(new CounterToRateFunction(hadoopMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
+            .saveAsMetric(hadoopMetricDescriptor)
+            .fromStream("SYSTEM_METRIC_STREAM").transformBy(new CounterToRateFunction(hadoopMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
+            .saveAsMetric(systemMetricDescriptor
+            )
+            .toTopology();
     }
 }

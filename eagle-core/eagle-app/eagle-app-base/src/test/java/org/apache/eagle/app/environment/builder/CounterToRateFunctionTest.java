@@ -72,13 +72,14 @@ public class CounterToRateFunctionTest {
     public void testToMetricAndCounterValue() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         long baseTime = System.currentTimeMillis() + 100000L;
 
-        MetricDefinition metricDefinition = MetricDefinition
-                .metricType("HADOOP_JMX_METRICS")
-                .namedByField("metric")
-                .eventTimeByField("timestamp")
-                .dimensionFields("host", "component", "site")
-                .granularity(Calendar.MINUTE)
-                .valueField("value");
+        MetricDescriptor metricDefinition = MetricDescriptor
+            .metricGroupByField("group")
+            .siteAs("siteId")
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "component", "site")
+            .granularity(Calendar.MINUTE)
+            .valueField("value");
         CounterToRateFunction counterToRateFunction = new CounterToRateFunction(metricDefinition, 3, TimeUnit.MINUTES, ClockWithOffset.INSTANCE);
 
         Map event = mkCountTypeEvent((baseTime + 0), 374042741.0);
@@ -131,13 +132,14 @@ public class CounterToRateFunctionTest {
 
             }
         });
-        MetricDefinition metricDefinition = MetricDefinition
-                .metricType("HADOOP_JMX_METRICS")
-                .namedByField("metric")
-                .eventTimeByField("timestamp")
-                .dimensionFields("host", "component", "site")
-                .granularity(Calendar.MINUTE)
-                .valueField("value");
+        MetricDescriptor metricDefinition = MetricDescriptor
+            .metricGroupByField("group")
+            .siteAs("siteId")
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "component", "site")
+            .granularity(Calendar.MINUTE)
+            .valueField("value");
         CounterToRateFunction counterToRateFunction = new CounterToRateFunction(metricDefinition, 3, TimeUnit.MINUTES, ClockWithOffset.INSTANCE);
         counterToRateFunction.open(new StormOutputCollector(collector));
         long baseTime = System.currentTimeMillis() + 100000L;
@@ -227,13 +229,14 @@ public class CounterToRateFunctionTest {
     @Test
     public void testTransformToRateWithExpiration() throws NoSuchFieldException, IllegalAccessException {
 
-        MetricDefinition metricDefinition = MetricDefinition
-                .metricType("HADOOP_JMX_METRICS")
-                .namedByField("metric")
-                .eventTimeByField("timestamp")
-                .dimensionFields("host", "component", "site")
-                .granularity(Calendar.MINUTE)
-                .valueField("value");
+        MetricDescriptor metricDefinition = MetricDescriptor
+            .metricGroupByField("group")
+            .siteAs("siteId")
+            .namedByField("metric")
+            .eventTimeByField("timestamp")
+            .dimensionFields("host", "component", "site")
+            .granularity(Calendar.MINUTE)
+            .valueField("value");
         List<Map> result = new ArrayList<>();
         OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
