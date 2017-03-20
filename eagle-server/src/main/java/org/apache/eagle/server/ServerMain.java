@@ -17,21 +17,47 @@
 package org.apache.eagle.server;
 
 import org.apache.eagle.common.Version;
+import org.apache.eagle.server.tool.EncryptTool;
 
 import java.util.Date;
 
 public class ServerMain {
+    private static final String USAGE =
+        "Usage: java " + ServerMain.class.getName() + " command [options] \n"
+        + "where options include: \n"
+        + "\tserver\t[path to configuration]\n"
+        + "\tencrypt\t[text to encrypt]\n";
+
     public static void main(String[] args) {
-        System.out.println(
-            "\nApache Eagle™ v" + Version.version + ": "
-            + "built with git revision " + Version.gitRevision + " by " + Version.userName + " on " + new Date(Long.parseLong(Version.timestamp))
-        );
-        System.out.println("\nStarting Eagle Server ...\n");
-        try {
-            new ServerApplication().run(args);
-        } catch (Exception e) {
-            System.err.println("Oops, got error to start eagle server: " + e.getMessage());
-            e.printStackTrace();
+        if (args.length > 0) {
+            String cmd = args[0];
+
+            switch (cmd) {
+                case "server":
+                    System.out.println(
+                        "\nApache Eagle™ v" + Version.version + ": "
+                            + "built with git revision " + Version.gitRevision + " by " + Version.userName + " on " + new Date(Long.parseLong(Version.timestamp))
+                    );
+
+                    System.out.println("\nStarting Eagle Server ...\n");
+                    try {
+                        new ServerApplication().run(args);
+                    } catch (Exception e) {
+                        System.err.println("Oops, got error to start eagle server: " + e.getMessage());
+                        e.printStackTrace();
+                        System.exit(1);
+                    }
+                    break;
+                case "encrypt":
+                    new EncryptTool().execute(args);
+                    break;
+                default:
+                    System.err.println("Invalid command " + cmd);
+                    System.err.print(USAGE);
+                    System.exit(2);
+            }
+        } else {
+            System.err.print(USAGE);
             System.exit(1);
         }
     }

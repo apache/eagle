@@ -18,7 +18,7 @@
 package org.apache.eagle.jpm.analyzer.mr.sla.processors;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.slf4j.Logger;
@@ -38,6 +38,6 @@ public class LongStuckJobProcessor implements Processor, Serializable {
     @Override
     public Result.ProcessorResult process(AnalyzerEntity analyzerJobEntity) {
         LOG.info("Job {} In LongStuckJobProcessor", analyzerJobEntity.getJobDefId());
-        return new Result.ProcessorResult(Result.ResultLevel.NONE, "");
+        return new Result.ProcessorResult(Result.RuleType.LONG_STUCK_JOB, Result.ResultLevel.NONE, "");
     }
 }

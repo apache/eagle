@@ -31,6 +31,10 @@ public class HadoopClusterConstants {
         CLUSTER_METRIC, RUNNING_APPS, SCHEDULER
     }
 
+    public enum AppState {
+        RUNNING, ACCEPTED
+    }
+
     public static class MetricName {
 
         // Metrics from running apps
@@ -62,6 +66,7 @@ public class HadoopClusterConstants {
     }
 
     public static final String RUNNING_QUEUE_SERVICE_NAME = "RunningQueueService";
+    public static final String QUEUE_MAPPING_SERVICE_NAME = "QueueMappingService";
 
     // tag constants
     public static final String TAG_PARENT_QUEUE = "parentQueue";
@@ -71,6 +76,7 @@ public class HadoopClusterConstants {
     public static final String TAG_CLUSTER = "cluster";
 
     // field constants
+    public static final String FIELD_DATASOURCE = "dataSource";
     public static final String FIELD_DATATYPE = "dataType";
     public static final String FIELD_DATA = "data";
 

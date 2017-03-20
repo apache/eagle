@@ -1,0 +1,132 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <span class="fa fa-television"></span>
+        <h3 class="box-title">
+            HDFS Namenode Service Summary Information
+        </h3>
+    </div>
+    <div class="box-body">
+        <table class="table table-striped hadoopMetric-table">
+            <tr>
+                <td width="5%">
+                    <span ng-show="!namenodeactivenum">0</span>
+                    <span ng-show="namenodeactivenum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'active'})" target="_blank">{{namenodeactivenum}}</a></span>
+                    <span ng-show="namenodeactivenum===-1">N/A</span>
+                </td>
+                <th width="30%">Active Namenode</th>
+                <td>
+                    <span ng-show="capacityNum!==-1 && capacityNum">{{common.number.format(capacityNum, 0)}}</span>
+                    <span ng-show="!capacityNum">0</span>
+                    <span ng-show="capacityNum===-1">N/A</span> TB
+                    <strong>Capacity</strong> <span ng-show="usedCapacityNum!==-1 && usedCapacityNum">{{common.number.format(usedCapacityNum, 0)}}</span>
+                    <span ng-show="!usedCapacityNum">0</span>
+                    <span ng-show="usedCapacityNum===-1">N/A</span> TB <strong>usedCapacity</strong>
+
+                </td>
+                <th width="30%">
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <span ng-show="namenodestandbynum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'standby'})" target="_blank">{{namenodestandbynum}}</a></span>
+                    <span ng-show="!namenodestandbynum">0</span>
+                    <span ng-show="namenodestandbynum===-1">N/A</span>
+                </td>
+                <th>Backup Namenode</th>
+            </tr>
+            <tr>
+                <td>
+                    <span ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1"><a ui-sref="datanodeList({siteId: site})">{{datanodehealtynum+datanodeunhealtynum}}</a></span>
+                    <span ng-show="!datanodehealtynum && !datanodeunhealtynum">0</span>
+                    <span ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1">N/A</span>
+                </td>
+                <th>Datanodes:
+                    <span ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1 && datanodehealtynum"><a ui-sref="datanodeList({siteId: site, status: 'live'})">{{datanodehealtynum || 0}}</a></span>
+                    <span ng-show="!datanodehealtynum">0</span>
+                    <span ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1">N/A</span>
+                    <span class="label label-success">Good Health</span> /
+                    <span ng-show="datanodehealtynum!==-1 && datanodeunhealtynum!==-1 && datanodeunhealtynum"><a ui-sref="datanodeList({siteId: site, status: 'dead'})">{{datanodeunhealtynum || 0}}</a></span>
+                    <span ng-show="!datanodeunhealtynum">0</span>
+                    <span ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1">N/A</span>
+                    <span class="label label-danger">Bad Health</span>
+                </th>
+                <td></td>
+                <th></th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <span class="fa fa-line-chart"></span>
+        <h3 class="box-title">
+            Metrics
+        </h3>
+    </div>
+
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li ng-class="{active: type===namenode.tags.hostname}"
+                ng-repeat="namenode in activeNamenodeList track by $index">
+                <a ng-click="switchNamenode(namenode.tags.hostname)" data-toggle="tab" aria-expanded="true">{{namenode.tags.hostname}}({{namenode.status}})</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab_1">
+                <div class="box-body no-padding">
+                    <div class="row border-split">
+                        <div class="col-sm-6 col-md-4 col-lg-6" ng-repeat="chart in chartList track by $index">
+                            <div class="hadoopMetric-chart">
+                                <h3>{{metricList[chart.name].title}}</h3>
+                                <div ng-show="activeNamenodeList && metricList[chart.name].loading" chart class="hadoopMetric-chart-container"></div>
+                                <div ng-show="activeNamenodeList && metricList[chart.name].loading" class="overlay-wrapper">
+                                    <div class="overlay">
+                                        <i class="fa fa-refresh fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div ng-show="activeNamenodeList && metricList[chart.name].series.length" chart class="hadoopMetric-chart-container"
+                                     series="metricList[chart.name].series"
+                                     option="metricList[chart.name].option"></div>
+                                <div ng-show="activeNamenodeList && !metricList[chart.name].series.length && !metricList[chart.name].loading" class="hadoopMetric-chart-container">
+                                    <div class="hadoopMetric-chart-container-withborder">
+                                        <div class="hadoopMetric-no-chart-data">
+                                            <span class="fa fa-question-circle"></span><span> NO DATA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="!activeNamenodeList" class="hadoopMetric-chart-container">
+                                    <div class="hadoopMetric-chart-container-withborder">
+                                        <div class="hadoopMetric-no-chart-data">
+                                            <span class="fa fa-question-circle"></span><span> N/A</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

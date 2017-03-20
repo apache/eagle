@@ -35,8 +35,9 @@ public class PolicyDefinition implements Serializable {
     @Length(min = 1, max = 50, message = "length should between 1 and 50")
     private String name;
     private String description;
-    private List<String> inputStreams = new ArrayList<String>();
-    private List<String> outputStreams = new ArrayList<String>();
+    private List<String> inputStreams = new ArrayList<>();
+    private List<String> outputStreams = new ArrayList<>();
+    private String siteId = "default";
 
     private Definition definition;
     private Definition stateDefinition;
@@ -137,6 +138,7 @@ public class PolicyDefinition implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(siteId)
                 .append(name)
                 .append(inputStreams)
                 .append(outputStreams)
@@ -160,7 +162,8 @@ public class PolicyDefinition implements Serializable {
 
         PolicyDefinition another = (PolicyDefinition) that;
 
-        if (Objects.equals(another.name, this.name)
+        if (Objects.equals(another.siteId, this.siteId)
+                && Objects.equals(another.name, this.name)
                 && Objects.equals(another.description, this.description)
                 && CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams)
                 && CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams)
@@ -189,6 +192,14 @@ public class PolicyDefinition implements Serializable {
 
     public String getAlertCategory() {
         return alertDefinition == null ? null : alertDefinition.getCategory();
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -294,9 +305,8 @@ public class PolicyDefinition implements Serializable {
         ENABLED, DISABLED
     }
 
-
     @Override
     public String toString() {
-        return String.format("{name=\"%s\",definition=%s}", this.getName(), this.getDefinition() == null ? "null" : this.getDefinition().toString());
+        return String.format("{site=\"%s\", name=\"%s\",definition=%s}", this.getSiteId(), this.getName(), this.getDefinition() == null ? "null" : this.getDefinition().toString());
     }
 }

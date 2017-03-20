@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -25,19 +28,21 @@ import org.apache.eagle.alert.engine.interpreter.PolicyInterpreter;
 import org.apache.eagle.alert.engine.interpreter.PolicyParseResult;
 import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
+import org.apache.eagle.alert.engine.publisher.PublishementTypeLoader;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
-
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @since Apr 11, 2016.
@@ -125,14 +130,41 @@ public class MetadataResource {
 
     @Path("/streams")
     @GET
-    public List<StreamDefinition> listStreams() {
-        return dao.listStreams();
+    public List<StreamDefinition> listStreams(@QueryParam("siteId") String siteId) {
+        if (siteId == null) {
+            return dao.listStreams();
+        } else {
+            return dao.listStreams().stream()
+                .filter((streamDefinition -> streamDefinition.getSiteId().equals(siteId)))
+                .collect(Collectors.toList());
+        }
     }
 
     @Path("/streams")
     @POST
     public OpResult createStream(StreamDefinition stream) {
         return dao.createStream(stream);
+    }
+
+    @Path("/streams/create")
+    @POST
+    public OpResult createStream(StreamDefinitionWrapper stream) {
+        Preconditions.checkNotNull(stream.getStreamDefinition(),"Stream definition is null");
+        Preconditions.checkNotNull(stream.getStreamSource(),"Stream source is null");
+        stream.validateAndEnsureDefault();
+        OpResult createStreamResult = dao.createStream(stream.getStreamDefinition());
+        OpResult createDataSourceResult = dao.addDataSource(stream.getStreamSource());
+        // TODO: Check kafka topic exist or not.
+        if (createStreamResult.code == OpResult.SUCCESS
+                && createDataSourceResult.code == OpResult.SUCCESS) {
+            return OpResult.success("Successfully create stream "
+                    + stream.getStreamDefinition().getStreamId()
+                    + ", and datasource "
+                    + stream.getStreamSource().getName());
+        } else {
+            return OpResult.fail("Error: "
+                    + StringUtils.join(new String[]{createDataSourceResult.message, createDataSourceResult.message},","));
+        }
     }
 
     @Path("/streams/batch")
@@ -201,8 +233,12 @@ public class MetadataResource {
 
     @Path("/policies")
     @GET
-    public List<PolicyDefinition> listPolicies() {
-        return dao.listPolicies();
+    public List<PolicyDefinition> listPolicies(@QueryParam("siteId") String siteId) {
+        if (siteId != null) {
+            return dao.getPoliciesBySiteId(siteId);
+        } else {
+            return dao.listPolicies();
+        }
     }
 
     @Path("/policies")
@@ -281,7 +317,7 @@ public class MetadataResource {
         try {
             PolicyDefinition policyDefinition = getPolicyById(policyId);
             policyDefinition.setPolicyStatus(status);
-            OpResult updateResult  = addPolicy(policyDefinition);
+            OpResult updateResult = addPolicy(policyDefinition);
             result.code = updateResult.code;
 
             if (result.code == OpResult.SUCCESS) {
@@ -292,7 +328,7 @@ public class MetadataResource {
                 LOG.error(result.message);
             }
         } catch (Exception e) {
-            LOG.error("Error: " + e.getMessage(),e);
+            LOG.error("Error: " + e.getMessage(), e);
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
         }
@@ -350,17 +386,19 @@ public class MetadataResource {
     @Path("/publishmentTypes")
     @GET
     public List<PublishmentType> listPublishmentType() {
-        return dao.listPublishmentType();
+        return PublishementTypeLoader.loadPublishmentTypes();
     }
 
     @Path("/publishmentTypes")
     @POST
+    @Deprecated
     public OpResult addPublishmentType(PublishmentType publishmentType) {
         return dao.addPublishmentType(publishmentType);
     }
 
     @Path("/publishmentTypes/batch")
     @POST
+    @Deprecated
     public List<OpResult> addPublishmentTypes(List<PublishmentType> publishmentTypes) {
         List<OpResult> results = new LinkedList<>();
         for (PublishmentType pubType : publishmentTypes) {
@@ -371,12 +409,14 @@ public class MetadataResource {
 
     @Path("/publishmentTypes/{name}")
     @DELETE
+    @Deprecated
     public OpResult removePublishmentType(@PathParam("name") String name) {
         return dao.removePublishmentType(name);
     }
 
     @Path("/publishmentTypes")
     @DELETE
+    @Deprecated
     public List<OpResult> removePublishmentTypes(List<String> pubTypes) {
         List<OpResult> results = new LinkedList<>();
         for (String pubType : pubTypes) {

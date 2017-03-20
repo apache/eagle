@@ -36,7 +36,8 @@ public class HadoopQueueRunningAppConfig implements Serializable {
     }
 
     public static class Topology implements Serializable {
-        public int numOfParserTasks;
+        public int numSinkTasks;
+        public int numPersistTasks;
     }
 
     public static class DataSourceConfig implements Serializable {
@@ -67,7 +68,8 @@ public class HadoopQueueRunningAppConfig implements Serializable {
     private void init(Config config) {
         this.config = config;
 
-        this.topology.numOfParserTasks = config.getInt("topology.numOfParserTasks");
+        this.topology.numPersistTasks = config.getInt("topology.numPersistTasks");
+        this.topology.numSinkTasks = config.getInt("topology.numSinkTasks");
 
         this.dataSourceConfig.rMEndPoints = config.getString("dataSourceConfig.rMEndPoints");
         this.dataSourceConfig.fetchIntervalSec = config.getString("dataSourceConfig.fetchIntervalSec");

@@ -30,7 +30,7 @@
 			$scope.tableScope = {};
 
 			$scope.site = $wrapState.param.siteId;
-			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
+			$scope.searchPathList = [["tags", "jobId"],["tags", "jobName"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
 
 			function getCommonOption(left) {
 				return {
@@ -62,6 +62,7 @@
 				 * @property {[]} jobList
 				 * @property {{}} jobList.tags						unique job key
 				 * @property {string} jobList.tags.jobId			Job Id
+				 * @property {string} jobList.tags.jobName			Job Name
 				 * @property {string} jobList.tags.user				Submit user
 				 * @property {string} jobList.tags.queue			Queue
 				 * @property {string} jobList.currentState			Job state
@@ -86,7 +87,8 @@
 					"endTime",
 					"numTotalMaps",
 					"numTotalReduces",
-					"runningContainers"
+					"runningContainers",
+					"durationTime"
 				], 100000));
 				$scope.jobStateList = [];
 
@@ -95,7 +97,6 @@
 					var jobStates = {};
 					$.each($scope.jobList, function (i, job) {
 						jobStates[job.currentState] = (jobStates[job.currentState] || 0) + 1;
-						job.duration = Time.diff(job.startTime, job.endTime || now);
 					});
 
 					$scope.jobStateList = $.map(JOB_STATES, function (state) {

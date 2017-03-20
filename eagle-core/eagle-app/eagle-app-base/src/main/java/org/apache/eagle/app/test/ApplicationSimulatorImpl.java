@@ -26,12 +26,18 @@ import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationSimulatorImpl extends ApplicationSimulator {
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationSimulatorImpl.class);
+
     private final Config config;
     private final SiteResource siteResource;
     private final ApplicationResource applicationResource;
@@ -74,25 +80,28 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         statusUpdateService.updateApplicationEntityStatus(applicationEntity);
-        applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
-        int attempt = 0;
-        while (attempt < 10) {
-            attempt++;
-            statusUpdateService.updateApplicationEntityStatus(applicationEntity);
-            if (applicationEntity.getStatus() == ApplicationEntity.Status.STOPPED) {
-                break;
-            } else {
+        Semaphore semp = new Semaphore(1);
+        Thread stopThread = new Thread(() -> {
+            applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
+            while (applicationEntity.getStatus() != ApplicationEntity.Status.INITIALIZED
+                    && applicationEntity.getStatus() != ApplicationEntity.Status.STOPPED) {
+                statusUpdateService.updateApplicationEntityStatus(applicationEntity);
                 try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    // Ignore
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    LOG.warn("{}", e);
                 }
             }
+            semp.release();
+        });
+        stopThread.start();
+        try {
+            stopThread.join(60000L);
+            semp.tryAcquire(60, TimeUnit.SECONDS);
+            applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
+        } catch (Exception e) {
+            throw new IllegalStateException("Application status didn't become STOPPED");
         }
-        if (attempt >= 10 ) {
-            throw new IllegalStateException("Application status didn't become STOPPED in 10 attempts");
-        }
-        applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
     }
 
     @Override

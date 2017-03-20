@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.analyzer.publisher;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 import java.util.ArrayList;
@@ -27,14 +27,17 @@ import java.util.Map;
 
 public class Result {
     //for EagleStorePublisher
-    private TaggedLogAPIEntity alertEntity = null;//TODO
+    private Map<String, List<TaggedLogAPIEntity>> alertEntities = new HashMap<>();
     //for EmailPublisher
-    private Map<String, List<Pair<ResultLevel, String>>> alertMessages = new HashMap<>();
+    private Map<String, List<ProcessorResult>> alertMessages = new HashMap<>();
 
     public void addEvaluatorResult(Class<?> type, EvaluatorResult result) {
         Map<Class<?>, ProcessorResult> processorResults = result.getProcessorResults();
+        Map<Class<?>, TaggedLogAPIEntity> processorEntities = result.getProcessorEntities();
+
         for (Class<?> processorType : processorResults.keySet()) {
             ProcessorResult processorResult = processorResults.get(processorType);
+
             if (processorResult.resultLevel.equals(ResultLevel.NONE)) {
                 continue;
             }
@@ -42,17 +45,29 @@ public class Result {
             String typeName = type.getName();
             if (!alertMessages.containsKey(typeName)) {
                 alertMessages.put(typeName, new ArrayList<>());
+                alertEntities.put(typeName, new ArrayList<>());
             }
-            alertMessages.get(typeName).add(Pair.of(processorResult.getResultLevel(), processorResult.getMessage()));
+            normalizeResult(processorResult);
+            alertMessages.get(typeName).add(processorResult);
+            alertEntities.get(typeName).add(processorEntities.get(processorType));
+
         }
     }
 
-    public TaggedLogAPIEntity getAlertEntity() {
-        return alertEntity;
+    public Map<String, List<ProcessorResult>> getAlertMessages() {
+        return alertMessages;
     }
 
-    public Map<String, List<Pair<ResultLevel, String>>> getAlertMessages() {
-        return alertMessages;
+    public Map<String, List<TaggedLogAPIEntity>> getAlertEntities() {
+        return alertEntities;
+    }
+
+    private void normalizeResult(ProcessorResult processorResult) {
+        String settingList = "";
+        if (processorResult.getSettings() != null && !processorResult.getSettings().isEmpty()) {
+            settingList = StringUtils.join(processorResult.getSettings(), "\n");
+        }
+        processorResult.setSettingList(settingList);
     }
 
     /**
@@ -61,18 +76,62 @@ public class Result {
 
     public enum ResultLevel {
         NONE,
-        NOTICE,
+        INFO,
         WARNING,
-        CRITICAL
+        CRITICAL;
+
+        private static final Map<String, ResultLevel> stringToLevels = new HashMap<>();
+        static {
+            for (ResultLevel level : values()) {
+                stringToLevels.put(level.toString(), level);
+            }
+        }
+
+        public static ResultLevel fromString(String levelString) {
+            return stringToLevels.get(levelString);
+        }
+    }
+
+    public enum RuleType {
+        COMPRESS,
+        SPLIT,
+        SPILL,
+        TASK_NUMBER,
+        GC_TIME,
+        RESOURCE_CONTENTION,
+        DATA_SKEW,
+
+        LONG_STUCK_JOB,
+        LONG_DURATION_JOB
     }
 
     public static class ProcessorResult {
+        private RuleType ruleType;
         private ResultLevel resultLevel;
         private String message;
+        private List<String> settings;
+        private String settingList;
 
-        public ProcessorResult(ResultLevel resultLevel, String message) {
+        public ProcessorResult(RuleType ruleType, ResultLevel resultLevel, String message, List<String> settings) {
+            this.ruleType = ruleType;
             this.resultLevel = resultLevel;
             this.message = message;
+            this.settings = settings;
+        }
+
+        public ProcessorResult(RuleType ruleType, ResultLevel resultLevel, String message) {
+            this.ruleType = ruleType;
+            this.resultLevel = resultLevel;
+            this.message = message;
+            this.settings = new ArrayList<>();
+        }
+
+        public RuleType getRuleType() {
+            return ruleType;
+        }
+
+        public void setRuleType(RuleType ruleType) {
+            this.ruleType = ruleType;
         }
 
         public ResultLevel getResultLevel() {
@@ -90,6 +149,22 @@ public class Result {
         public void setMessage(String message) {
             this.message = message;
         }
+
+        public List<String> getSettings() {
+            return settings;
+        }
+
+        public void setSettings(List<String> settings) {
+            this.settings = settings;
+        }
+
+        public String getSettingList() {
+            return settingList;
+        }
+
+        public void setSettingList(String settingList) {
+            this.settingList = settingList;
+        }
     }
 
     /**
@@ -97,13 +172,22 @@ public class Result {
      */
     public static class EvaluatorResult {
         private Map<Class<?>, ProcessorResult> processorResults = new HashMap<>();
+        private Map<Class<?>, TaggedLogAPIEntity> processorEntities = new HashMap<>();
 
         public void addProcessorResult(Class<?> type, ProcessorResult result) {
             this.processorResults.put(type, result);
         }
 
+        public void addProcessorEntity(Class<?> type, TaggedLogAPIEntity entity) {
+            this.processorEntities.put(type, entity);
+        }
+
         public Map<Class<?>, ProcessorResult> getProcessorResults() {
             return this.processorResults;
+        }
+
+        public Map<Class<?>, TaggedLogAPIEntity> getProcessorEntities() {
+            return processorEntities;
         }
     }
 }

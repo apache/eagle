@@ -28,11 +28,12 @@ import org.apache.eagle.log.entity.meta.*;
 @Table("eaglejpa_task")
 @ColumnFamily("f")
 @Prefix("taexece")
-@Service(Constants.JPA_TASK_ATTEMPT_ERROR_SERVICE_NAME)
+@Service(Constants.MR_TASK_ATTEMPT_ERROR_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false),
+        @Index(name = "Index_1_jobIdAndHost", columns = { "jobId", "hostname" }, unique = false)
     })
 public class TaskAttemptErrorCategoryEntity extends JobBaseAPIEntity {
     @Column("a")

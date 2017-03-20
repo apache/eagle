@@ -43,6 +43,8 @@ var app = {};
 		// ======================================================================================
 		// =                                   Router config                                    =
 		// ======================================================================================
+		var defaultRouterStates = ['site', 'alertList', 'policyList', 'streamList', 'policyCreate', 'policyEdit', 'alertDetail', 'policyDetail'];
+
 		function routeResolve(config) {
 			var resolve = {};
 			if(config === false) return resolve;
@@ -72,7 +74,7 @@ var app = {};
 			resolve._router = function (Site, $wrapState, $q) {
 				var name = state_next.name;
 				var siteId = param_next.siteId;
-				if (siteId && name !== "site") {
+				if (siteId && defaultRouterStates.indexOf(name) === -1) {
 					return Site.getPromise(config).then(function () {
 						var match =  false;
 						$.each(common.getValueByPath(Site.find(siteId), ["applicationList"]), function (i, app) {
@@ -107,7 +109,7 @@ var app = {};
 		eagleApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $animateProvider) {
 			$urlRouterProvider.otherwise("/");
 			$stateProvider
-			// ================================== Home ==================================
+				// ================================== Home ==================================
 				.state('home', {
 					url: "/",
 					templateUrl: "partials/home.html?_=" + window._TRS(),
@@ -120,48 +122,12 @@ var app = {};
 					controller: "setupCtrl",
 					resolve: routeResolve({ site: false, application: false })
 				})
-				// ================================= Alerts =================================
-				.state('alertList', {
-					url: "/alerts?startTime&endTime",
-					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
-					controller: "alertListCtrl",
-					resolve: routeResolve({ time: { autoRefresh: true } })
-				})
-				.state('policyList', {
-					url: "/policies",
-					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
-					controller: "policyListCtrl",
-					resolve: routeResolve()
-				})
-				.state('streamList', {
-					url: "/streams",
-					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
-					controller: "alertStreamListCtrl",
-					resolve: routeResolve()
-				})
-				.state('policyCreate', {
-					url: "/policy/create",
-					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
-					controller: "policyCreateCtrl",
-					resolve: routeResolve()
-				})
-				.state('policyEdit', {
-					url: "/policy/edit/{name}",
-					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
-					controller: "policyEditCtrl",
-					resolve: routeResolve()
-				})
 
-				.state('alertDetail', {
-					url: "/alert/detail/{alertId}",
-					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
-					controller: "alertDetailCtrl",
-					resolve: routeResolve()
-				})
-				.state('policyDetail', {
-					url: "/policy/detail/{name}",
-					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
-					controller: "policyDetailCtrl",
+				// ================================== Auth ==================================
+				.state('login', {
+					url: "/login",
+					templateUrl: "partials/login.html?_=" + window._TRS(),
+					controller: "loginCtrl",
 					resolve: routeResolve()
 				})
 
@@ -206,6 +172,52 @@ var app = {};
 					url: "/site/:siteId",
 					templateUrl: "partials/site/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
+					resolve: routeResolve()
+				})
+
+				// ============================== Site: Alerts ==============================
+				.state('alertList', {
+					url: "/site/:siteId/alerts?startTime&endTime",
+					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
+					controller: "alertListCtrl",
+					resolve: routeResolve({ time: { autoRefresh: true } })
+				})
+				.state('policyList', {
+					url: "/site/:siteId/policies",
+					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
+					controller: "policyListCtrl",
+					resolve: routeResolve()
+				})
+				.state('streamList', {
+					url: "/site/:siteId/streams",
+					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
+					controller: "alertStreamListCtrl",
+					resolve: routeResolve()
+				})
+
+				.state('policyCreate', {
+					url: "/site/:siteId/policy/create",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
+					controller: "policyCreateCtrl",
+					resolve: routeResolve()
+				})
+				.state('policyEdit', {
+					url: "/site/:siteId/policy/edit/{name}",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
+					controller: "policyEditCtrl",
+					resolve: routeResolve()
+				})
+
+				.state('alertDetail', {
+					url: "/site/:siteId/alert/detail/{alertId}?timestamp",
+					templateUrl: "partials/alert/detail.html?_=" + window._TRS(),
+					controller: "alertDetailCtrl",
+					resolve: routeResolve()
+				})
+				.state('policyDetail', {
+					url: "/site/:siteId/policy/detail/{name}",
+					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
+					controller: "policyDetailCtrl",
 					resolve: routeResolve()
 				})
 			;
@@ -269,7 +281,10 @@ var app = {};
 		// ======================================================================================
 		// =                                   Main Controller                                  =
 		// ======================================================================================
-		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, Server, PageConfig, Portal, Widget, Entity, CompatibleEntity, Site, Application, UI, Time, Policy) {
+		eagleApp.controller('MainCtrl', function (
+			$scope, $wrapState, $urlRouter, $notification, $authHttp,
+			Server, PageConfig, Portal, Widget, Entity, CompatibleEntity,
+			Site, Application, UI, Time, Policy, Alert, Auth) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._Server = $scope.Server = Server;
 			window._PageConfig = $scope.PageConfig = PageConfig;
@@ -282,6 +297,10 @@ var app = {};
 			window._UI = $scope.UI = UI;
 			window._Time = $scope.Time = Time;
 			window._Policy = $scope.Policy = Policy;
+			window._Notification = $scope.$notification = $notification;
+			window._Alert = $scope.Alert = Alert;
+			window._Auth = $scope.Auth = Auth;
+			window._AuthHttp = $scope.$authHttp = $authHttp;
 			$scope.common = common;
 
 			$scope._TRS = window._TRS();
@@ -324,6 +343,22 @@ var app = {};
 			});
 
 			// ================================ Function ================================
+			// Get Page class by submenu
+			$scope.getPageNavClass = function (subportals) {
+				var classname = "";
+				if (typeof subportals === 'undefined') {
+					return "";
+				}
+				$.each(subportals, function (i) {
+					if (classname === "active") {
+						return;
+					}
+					classname = $scope.getNavClass(subportals[i]);
+				});
+				return classname;
+
+			};
+
 			// Get side bar navigation item class
 			$scope.getNavClass = function (portal) {
 				var path = (portal.path || "").replace(/^#/, '');

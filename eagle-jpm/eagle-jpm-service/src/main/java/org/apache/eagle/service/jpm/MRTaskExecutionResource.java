@@ -60,7 +60,7 @@ public class MRTaskExecutionResource {
         List<MRJobTaskCountResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
         List<Long> times = ResourceUtils.parseDistributionList(timeDistInSecs);
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.MR_TASK_EXECUTION_SERVICE_NAME, site, jobId);
         GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> historyRes =
             ResourceUtils.getQueryResult(query, jobStartTime, jobEndTime);
         if (historyRes.isSuccess() && historyRes.getObj() != null && historyRes.getObj().size() > 0) {
@@ -72,7 +72,7 @@ public class MRTaskExecutionResource {
                 counter.entities.add(o);
             }
         } else {
-            query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
+            query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.MR_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
             GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity> runningRes =
                 ResourceUtils.getQueryResult(query, jobStartTime, jobEndTime);
             if (runningRes.isSuccess() && runningRes.getObj() != null) {
@@ -105,7 +105,7 @@ public class MRTaskExecutionResource {
                                                                    @QueryParam("shortJob_id") String shortDurationJobId,
                                                                    @QueryParam("longJob_id") String longDurationJobId) {
         MRTaskExecutionResponse.TaskGroupResponse result = new MRTaskExecutionResponse.TaskGroupResponse();
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, shortDurationJobId);
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.MR_TASK_EXECUTION_SERVICE_NAME, site, shortDurationJobId);
         GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> smallResponse = ResourceUtils.getQueryResult(query, null, null);
         if (!smallResponse.isSuccess() || smallResponse.getObj() == null) {
             result.errMessage = smallResponse.getException();
@@ -117,7 +117,7 @@ public class MRTaskExecutionResource {
                 longestDuration = entity.getDuration();
             }
         }
-        query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, longDurationJobId);
+        query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.MR_TASK_EXECUTION_SERVICE_NAME, site, longDurationJobId);
         GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> largeResponse = ResourceUtils.getQueryResult(query, null, null);
         if (!largeResponse.isSuccess() || largeResponse.getObj() == null) {
             result.errMessage = largeResponse.getException();
@@ -193,7 +193,7 @@ public class MRTaskExecutionResource {
             return result;
         }
 
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{@startTime,@endTime,@taskType}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{@startTime,@endTime,@taskType}", Constants.MR_TASK_EXECUTION_SERVICE_NAME, site, jobId);
         GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> response = ResourceUtils.getQueryResult(query, jobStartTime, jobEndTime);
         if (!response.isSuccess() || response.getObj() == null) {
             result.errMessage = response.getException();
@@ -221,7 +221,7 @@ public class MRTaskExecutionResource {
                                                                               @PathParam("counterName") String counterName,
                                                                               @QueryParam("distRange") String distRange) {
         MRTaskExecutionResponse.TaskDistributionResponse result = new MRTaskExecutionResponse.TaskDistributionResponse();
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\" AND @taskType=\"%s\"]{@jobCounters}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME,
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\" AND @taskType=\"%s\"]{@jobCounters}", Constants.MR_TASK_EXECUTION_SERVICE_NAME,
             site, jobId, Constants.TaskType.MAP.toString());
         GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> response = ResourceUtils.getQueryResult(query, jobStartTime, jobEndTime);
         if (!response.isSuccess() || response.getObj() == null) {

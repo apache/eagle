@@ -48,7 +48,11 @@ public final class JobCounters implements Serializable {
     }
 
     public Long getCounterValue(CounterName counterName) {
-        return counters.get(counterName.group.name).get(counterName.name);
+        if (counters.get(counterName.group.name).containsKey(counterName.name)) {
+            return counters.get(counterName.group.name).get(counterName.name);
+        } else {
+            return 0L;
+        }
     }
 
     public static enum GroupName {

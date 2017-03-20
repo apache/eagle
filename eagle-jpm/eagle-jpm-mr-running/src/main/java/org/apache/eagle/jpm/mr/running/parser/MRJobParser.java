@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.mr.running.parser;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
@@ -77,14 +77,12 @@ public class MRJobParser implements Runnable {
     private Map<String, String> commonTags = new HashMap<>();
     private MRRunningJobManager runningJobManager;
     private ParserStatus parserStatus;
-    private ResourceFetcher rmResourceFetcher;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
     private static final int TOP_BOTTOM_TASKS_BY_ELAPSED_TIME = 10;
     private static final int FLUSH_TASKS_EVERY_TIME = 5;
     private static final int MAX_TASKS_PERMIT = 5000;
     private Config config;
-    private MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -93,10 +91,9 @@ public class MRJobParser implements Runnable {
     public MRJobParser(MRRunningJobConfig.EndpointConfig endpointConfig,
                        MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
-                       MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
+                       MRRunningJobManager runningJobManager,
                        List<String> configKeys,
-                       Config config,
-                       MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer) {
+                       Config config) {
         this.app = app;
         if (mrJobMap == null) {
             this.mrJobEntityMap = new HashMap<>();
@@ -112,11 +109,9 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
         this.parserStatus = ParserStatus.FINISHED;
-        this.rmResourceFetcher = rmResourceFetcher;
         this.finishedTaskIds = new HashSet<>();
         this.configKeys = configKeys;
         this.config = config;
-        this.mrJobPerformanceAnalyzer = mrJobPerformanceAnalyzer;
     }
 
     public void setAppInfo(AppInfo app) {
@@ -135,6 +130,8 @@ public class MRJobParser implements Runnable {
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(mrJobId);
         jobExecutionAPIEntity.setInternalState(Constants.AppState.FINISHED.toString());
         jobExecutionAPIEntity.setCurrentState(Constants.AppState.RUNNING.toString());
+        // set an estimated job finished time because it's hard the get the specific one
+        jobExecutionAPIEntity.setEndTime(System.currentTimeMillis());
         mrJobConfigs.remove(mrJobId);
         if (mrJobConfigs.size() == 0) {
             this.parserStatus = ParserStatus.APP_FINISHED;
@@ -173,7 +170,6 @@ public class MRJobParser implements Runnable {
                     break;
                 }
             }
-            mrJobPerformanceAnalyzer.analysis(convertToAnalysisEntity(mrJobEntityMap.get(jobId)));
         }
     }
 
@@ -186,7 +182,7 @@ public class MRJobParser implements Runnable {
             LOG.info("fetch mr job from {}", jobURL);
             mrJobs = OBJ_MAPPER.readValue(is, MRJobsWrapper.class).getJobs().getJob();
         } catch (Exception e) {
-            LOG.warn("fetch mr job from {} failed, {}", jobURL, e);
+            LOG.warn("fetch mr job from {} failed, {}", jobURL, e.getMessage());
             return false;
         } finally {
             Utils.closeInputStream(is);
@@ -255,7 +251,7 @@ public class MRJobParser implements Runnable {
             LOG.info("fetch mr job counter from {}", jobCounterURL);
             jobCounters = OBJ_MAPPER.readValue(is, JobCountersWrapper.class).getJobCounters();
         } catch (Exception e) {
-            LOG.warn("fetch mr job counter from {} failed, {}", jobCounterURL, e);
+            LOG.warn("fail to fetch mr job counter from {}, {}", jobCounterURL, e.getMessage());
             return false;
         } finally {
             Utils.closeInputStream(is);
@@ -570,7 +566,10 @@ public class MRJobParser implements Runnable {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
             } finally {
                 for (String jobId : mrJobEntityMap.keySet()) {
-                    mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));
+                    JobExecutionAPIEntity entity = mrJobEntityMap.get(jobId);
+                    if (entity.getTags().containsKey(MRJobTagName.JOB_TYPE.toString())) {
+                        mrJobEntityCreationHandler.add(entity);
+                    }
                 }
                 if (mrJobEntityCreationHandler.flush()) { //force flush
                     //we must flush entities before delete from zk in case of missing finish state of jobs

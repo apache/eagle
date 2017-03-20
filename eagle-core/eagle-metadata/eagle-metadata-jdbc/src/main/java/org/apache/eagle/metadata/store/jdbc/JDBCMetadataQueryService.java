@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.metadata.store.jdbc;
 
+import org.apache.eagle.common.function.ThrowableConsumer;
 import org.apache.eagle.common.function.ThrowableConsumer2;
 import org.apache.eagle.common.function.ThrowableFunction;
 
@@ -24,9 +25,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface JDBCMetadataQueryService {
     boolean execute(String sql) throws SQLException;
+
+    <T, E extends Throwable> boolean execute(String sql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws SQLException, E;
 
     boolean dropTable(String tableName) throws SQLException;
 
@@ -36,8 +40,13 @@ public interface JDBCMetadataQueryService {
 
     <T, E extends Throwable> List<T> query(String querySql, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E;
 
+
+    /**
+     * @see #queryWithCond(String, ThrowableConsumer, ThrowableFunction)
+     */
     <T, E extends Throwable> List<T> queryWithCond(String querySql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper1, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E;
 
-    <T, E extends Throwable> int update(String updateSql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws SQLException, E;
+    <T, E extends Throwable> List<T> queryWithCond(String querySql, ThrowableConsumer<PreparedStatement, SQLException> preparer, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E;
 
+    <T, E extends Throwable> int update(String updateSql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws SQLException, E;
 }

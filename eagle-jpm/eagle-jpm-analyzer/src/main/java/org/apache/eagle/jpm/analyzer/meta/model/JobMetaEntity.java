@@ -20,17 +20,14 @@ package org.apache.eagle.jpm.analyzer.meta.model;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JobMetaEntity extends PersistenceEntity {
     private String jobDefId;
     private String siteId;
-    private Map<String, Object> configuration = new HashMap<>();
-    private Set<String> evaluators = new HashSet<>();
+    private Map<String, Object> configuration;
+    private List<String> evaluators;
 
     public JobMetaEntity() {
 
@@ -39,7 +36,7 @@ public class JobMetaEntity extends PersistenceEntity {
     public JobMetaEntity(String jobDefId,
                          String siteId,
                          Map<String, Object> configuration,
-                         Set<String> evaluators) {
+                         List<String> evaluators) {
         this.jobDefId = jobDefId;
         this.siteId = siteId;
         this.configuration = configuration;
@@ -75,11 +72,11 @@ public class JobMetaEntity extends PersistenceEntity {
         this.configuration = configuration;
     }
 
-    public Set<String> getEvaluators() {
+    public List<String> getEvaluators() {
         return evaluators;
     }
 
-    public void setEvaluators(Set<String> evaluators) {
+    public void setEvaluators(List<String> evaluators) {
         this.evaluators = evaluators;
     }
 }

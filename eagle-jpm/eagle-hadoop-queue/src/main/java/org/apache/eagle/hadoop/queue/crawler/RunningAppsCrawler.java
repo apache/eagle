@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+@Deprecated
 public class RunningAppsCrawler implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RunningAppsCrawler.class);
@@ -36,9 +37,10 @@ public class RunningAppsCrawler implements Runnable {
     private String urlString;
 
     public RunningAppsCrawler(String site, String baseUrl, SpoutOutputCollector collector) {
-        this.urlString = YarnClusterResourceURLBuilder.buildRunningAppsURL(baseUrl);
+        this.urlString = YarnClusterResourceURLBuilder.buildAcceptedAndRunningAppsURL(baseUrl);
+        //this.urlString = YarnClusterResourceURLBuilder.buildRunningAppsURL(baseUrl);
         //this.urlString = YarnClusterResourceURLBuilder.buildFinishedAppsURL(baseUrl);
-        listener = new RunningAppParseListener(site, collector);
+        listener = new RunningAppParseListener(site, collector, baseUrl);
     }
 
     @Override

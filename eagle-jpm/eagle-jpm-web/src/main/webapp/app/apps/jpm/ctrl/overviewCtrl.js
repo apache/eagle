@@ -26,7 +26,8 @@
 			$scope.aggregationMap = {
 				job: "jobId",
 				user: "user",
-				jobType: "jobType"
+				jobType: "jobType",
+				queue: "queue",
 			};
 
 			$scope.site = $wrapState.param.siteId;
@@ -88,7 +89,7 @@
 
 					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetricsToEntities(
 						JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "avg(value), sum(value) desc", intervalMin, startTime, endTime, 10)
-					)._promise.then(function (list) {
+					, [0])._promise.then(function (list) {
 						var series = $.map(list, function (metrics) {
 							return JPM.metricsToSeries(metrics[0].tags[aggregation], metrics, {
 								stack: "stack",

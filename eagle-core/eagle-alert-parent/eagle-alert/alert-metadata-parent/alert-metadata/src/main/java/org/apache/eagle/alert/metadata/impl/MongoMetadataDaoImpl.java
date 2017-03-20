@@ -16,6 +16,44 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
+import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
+import org.apache.eagle.alert.coordination.model.PublishSpec;
+import org.apache.eagle.alert.coordination.model.RouterSpec;
+import org.apache.eagle.alert.coordination.model.ScheduleState;
+import org.apache.eagle.alert.coordination.model.SpoutSpec;
+import org.apache.eagle.alert.coordination.model.VersionedPolicyDefinition;
+import org.apache.eagle.alert.coordination.model.VersionedStreamDefinition;
+import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
+import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
+import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
+import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.PublishmentType;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
+import org.apache.eagle.alert.engine.model.AlertPublishEvent;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
+import org.apache.eagle.alert.metadata.resource.Models;
+import org.apache.eagle.alert.metadata.resource.OpResult;
+import org.bson.BsonDocument;
+import org.bson.BsonInt32;
+import org.bson.BsonString;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -32,47 +70,26 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.coordination.model.*;
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
-import org.apache.eagle.alert.coordination.model.internal.Topology;
-import org.apache.eagle.alert.engine.coordinator.*;
-import org.apache.eagle.alert.engine.model.AlertPublishEvent;
-import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.resource.Models;
-import org.apache.eagle.alert.metadata.resource.OpResult;
-
-import org.bson.BsonDocument;
-import org.bson.BsonInt32;
-import org.bson.BsonString;
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @since Apr 11, 2016.
  */
 public class MongoMetadataDaoImpl implements IMetadataDao {
 
-    private static final String DB_NAME = "ump_alert_metadata";
+    private static final String DEFAULT_DB_NAME = "ump_alert_metadata";
     private static final Logger LOG = LoggerFactory.getLogger(MongoMetadataDaoImpl.class);
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final int DEFAULT_CAPPED_MAX_SIZE = 500 * 1024 * 1024;
     private static final int DEFAULT_CAPPED_MAX_DOCUMENTS = 20000;
-    private static final String MANGO_CAPPED_MAX_SIZE = "mongo.cappedMaxSize";
-    private static final String MANGO_CAPPED_MAX_DOCUMENTS = "mongo.cappedMaxDocuments";
+    private static final String MONGO_CAPPED_MAX_SIZE = "mongo.cappedMaxSize";
+    private static final String MONGO_CAPPED_MAX_DOCUMENTS = "mongo.cappedMaxDocuments";
 
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private final String connection;
+    private final String dbname;
     private final MongoClient client;
     private final int cappedMaxSize;
     private final int cappedMaxDocuments;
@@ -101,9 +118,10 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     @Inject
     public MongoMetadataDaoImpl(Config config) {
         this.connection = config.getString(MetadataUtils.MONGO_CONNECTION_PATH);
-        this.cappedMaxSize = config.hasPath(MANGO_CAPPED_MAX_SIZE) ? config.getInt(MANGO_CAPPED_MAX_SIZE) : DEFAULT_CAPPED_MAX_SIZE;
-        this.cappedMaxDocuments = config.hasPath(MANGO_CAPPED_MAX_DOCUMENTS) ? config.getInt(MANGO_CAPPED_MAX_DOCUMENTS) : DEFAULT_CAPPED_MAX_DOCUMENTS;
+        this.cappedMaxSize = config.hasPath(MONGO_CAPPED_MAX_SIZE) ? config.getInt(MONGO_CAPPED_MAX_SIZE) : DEFAULT_CAPPED_MAX_SIZE;
+        this.cappedMaxDocuments = config.hasPath(MONGO_CAPPED_MAX_DOCUMENTS) ? config.getInt(MONGO_CAPPED_MAX_DOCUMENTS) : DEFAULT_CAPPED_MAX_DOCUMENTS;
         this.client = new MongoClient(new MongoClientURI(this.connection));
+        this.dbname = config.hasPath(MetadataUtils.MONGO_DATABASE) ? config.getString(MetadataUtils.MONGO_DATABASE) : DEFAULT_DB_NAME;
         init();
     }
 
@@ -135,7 +153,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     }
 
     private void init() {
-        db = client.getDatabase(DB_NAME);
+        db = client.getDatabase(this.dbname);
         IndexOptions io = new IndexOptions().background(true).name("nameIndex");
         BsonDocument doc = new BsonDocument();
         doc.append("name", new BsonInt32(1));

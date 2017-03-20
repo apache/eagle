@@ -17,8 +17,9 @@
 
 package org.apache.eagle.jpm.analyzer;
 
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 
-public interface Processor {
-    Result.ProcessorResult process(AnalyzerEntity jobAnalysisEntity);
+public interface Processor<T extends AnalyzerEntity> {
+    Result.ProcessorResult process(T jobAnalysisEntity);
 }

@@ -16,9 +16,11 @@
  */
 package org.apache.eagle.server;
 
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 public class ServerDebug {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerDebug.class);
     private static String serverConf = null;

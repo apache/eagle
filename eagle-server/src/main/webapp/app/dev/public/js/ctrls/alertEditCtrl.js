@@ -76,15 +76,15 @@
 			partitionSpec: [],
 			parallelismHint: 5
 		}, $scope.policy);
+		$scope.policy.siteId = $scope.policy.siteId || $wrapState.param.siteId;
 		console.log("[Policy]", $scope.policy);
 
-		var cacheSearchType;
+		var cacheSiteId;
 		var cacheSearchSourceKey;
-		var searchApplications;
+		var searchStreamGroups;
 
-		$scope.searchType = "app";
 		$scope.searchSourceKey = "";
-		$scope.applications = {};
+		$scope.streamGroups = {};
 		$scope.newPolicy = !$scope.policy.name;
 		$scope.autoPolicyDescription = $scope.newPolicy && !$scope.policy.description;
 
@@ -104,42 +104,49 @@
 		// ==============================================================
 		// =                        Input Stream                        =
 		// ==============================================================
-		$scope.getSearchApplication = function() {
-			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSearchType !== $scope.searchType) {
-				var match = false;
-				cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
-				cacheSearchType = $scope.searchType;
+		$scope.getSearchStreamGroups = function() {
+			var siteId = $scope.policy.siteId;
 
-				searchApplications = {};
-				$.each($scope.applications, function (appName, streams) {
-					$.each(streams, function (i, stream) {
-						var groupName = cacheSearchType === "app" ? stream.dataSource : stream.siteId;
-						if(
-							groupName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0 ||
-							stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0
-						) {
-							match = true;
-							var group = searchApplications[groupName] = searchApplications[groupName] || [];
-							group.push(stream);
-						}
+			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase() || cacheSiteId !== siteId) {
+				var match = false;
+
+				if (siteId) {
+					cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
+					cacheSiteId = siteId;
+
+					searchStreamGroups = {};
+					$.each($scope.streamGroups, function (groupName, streams) {
+						$.each(streams, function (i, stream) {
+							if(
+								stream.siteId === siteId && (
+									groupName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0 ||
+									stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0
+								)
+							) {
+								match = true;
+								var group = searchStreamGroups[groupName] = searchStreamGroups[groupName] || [];
+								group.push(stream);
+							}
+						});
 					});
-				});
+				}
 
 				if(!match) {
-					searchApplications = null;
+					searchStreamGroups = null;
 				}
 			}
-			return searchApplications;
+			return searchStreamGroups;
 		};
 
 		$scope.streams = {};
 		$scope.streamList = Entity.queryMetadata("streams");
 		$scope.streamList._then(function () {
-			$scope.applications = {};
+			$scope.streamGroups = {};
 			cacheSearchSourceKey = null;
 
 			$.each($scope.streamList, function (i, stream) {
-				var list = $scope.applications[stream.dataSource] = $scope.applications[stream.dataSource] || [];
+				var streamGroup = stream.group || 'Global';
+				var list = $scope.streamGroups[streamGroup] = $scope.streamGroups[streamGroup] || [];
 				list.push(stream);
 				$scope.streams[stream.streamId] = stream;
 			});
@@ -336,6 +343,7 @@
 				$scope.policy.name &&
 				!$scope.checkPolicyName() &&
 				common.number.parse($scope.policy.parallelismHint) > 0 &&
+				$scope.policy.siteId &&
 				$scope.policy.definition.value &&
 				$scope.policy.outputStreams.length &&
 				$scope.policyPublisherList.length
@@ -381,7 +389,7 @@
 								title: "Done",
 								content: "Close dialog to go to the policy detail page."
 							}, function () {
-								$wrapState.go("policyDetail", {name: $scope.policy.name});
+								$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
 							});
 						}, function (res) {
 							// Link Failed

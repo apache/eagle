@@ -20,13 +20,13 @@ package org.apache.eagle.hadoop.queue.storm;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
-import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
-import org.apache.eagle.hadoop.queue.common.YarnURLSelectorImpl;
 import org.apache.eagle.hadoop.queue.crawler.ClusterMetricsCrawler;
 import org.apache.eagle.hadoop.queue.crawler.RunningAppsCrawler;
 import org.apache.eagle.hadoop.queue.crawler.SchedulerInfoCrawler;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.ha.HAURLSelector;
+import org.apache.eagle.jpm.util.resourcefetch.ha.HAURLSelectorImpl;
+import org.apache.eagle.jpm.util.resourcefetch.url.RmActiveTestURLBuilderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,41 +52,33 @@ public class HadoopQueueRunningExtractor {
         site = eagleConf.eagleProps.site;
         urlBases = eagleConf.dataSourceConfig.rMEndPoints;
         if (urlBases == null) {
-            throw new IllegalArgumentException(site + ".baseurl is null");
+            throw new IllegalArgumentException(site + ".baseUrl is null");
         }
         String[] urls = urlBases.split(",");
-        urlSelector = new YarnURLSelectorImpl(urls, Constants.CompressionType.GZIP);
+        urlSelector = new HAURLSelectorImpl(urls, Constants.CompressionType.NONE);
         executorService = Executors.newFixedThreadPool(MAX_NUM_THREADS);
         this.collector = collector;
     }
 
-    private void checkUrl() throws IOException {
-        if (!urlSelector.checkUrl(YarnClusterResourceURLBuilder.buildRunningAppsURL(urlSelector.getSelectedUrl()))) {
-            urlSelector.reSelectUrl();
-        }
-    }
-
     public void crawl() {
         try {
-            checkUrl();
+            urlSelector.checkUrl();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("{}", e.getMessage(), e);
         }
-        String selectedUrl = urlSelector.getSelectedUrl();
-        LOGGER.info("Current RM base url is " + selectedUrl);
+
         List<Future<?>> futures = new ArrayList<>();
-        futures.add(executorService.submit(new ClusterMetricsCrawler(site, selectedUrl, collector)));
-        futures.add(executorService.submit(new RunningAppsCrawler(site, selectedUrl, collector)));
-        futures.add(executorService.submit(new SchedulerInfoCrawler(site, selectedUrl, collector)));
+        futures.add(executorService.submit(new ClusterMetricsCrawler(site, urlSelector.getSelectedUrl(), collector)));
+        // move RunningAppCrawler into MRRunningJobApp
+        //futures.add(executorService.submit(new RunningAppsCrawler(site, selectedUrl, collector)));
+        futures.add(executorService.submit(new SchedulerInfoCrawler(site, urlSelector.getSelectedUrl(), collector)));
         futures.forEach(future -> {
             try {
                 future.get(MAX_WAIT_TIME * 1000, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
-                LOGGER.info("Caught an overtime exception with message" + e.getMessage());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+                LOGGER.error("Caught an overtime exception with message" + e.getMessage());
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("{}", e.getMessage(), e);
             }
         });
     }

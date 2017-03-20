@@ -49,24 +49,20 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     private Map<String, MRJobParser> runningMRParsers;
     private transient MRRunningJobManager runningJobManager;
     private MRRunningJobConfig.EagleServiceConfig eagleServiceConfig;
-    private ResourceFetcher resourceFetcher;
     private List<String> configKeys;
     private Config config;
-    private MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer;
 
     public MRRunningJobParseBolt(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                                  MRRunningJobConfig.EndpointConfig endpointConfig,
                                  MRRunningJobConfig.ZKStateConfig zkStateConfig,
                                  List<String> configKeys,
-                                 Config config,
-                                 MRJobPerformanceAnalyzer mrJobPerformanceAnalyzer) {
+                                 Config config) {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
         this.runningMRParsers = new HashMap<>();
         this.zkStateConfig = zkStateConfig;
         this.configKeys = configKeys;
         this.config = config;
-        this.mrJobPerformanceAnalyzer = mrJobPerformanceAnalyzer;
     }
 
     @Override
@@ -74,7 +70,6 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         this.executorService = Executors.newFixedThreadPool(endpointConfig.parseJobThreadPoolSize);
 
         this.runningJobManager = new MRRunningJobManager(zkStateConfig);
-        this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 
     @Override
@@ -82,13 +77,12 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         AppInfo appInfo = (AppInfo) tuple.getValue(1);
         Map<String, JobExecutionAPIEntity> mrJobs = (Map<String, JobExecutionAPIEntity>) tuple.getValue(2);
 
-        LOG.info("get mr yarn application " + appInfo.getId());
+        LOG.debug("get mr yarn application " + appInfo.getId());
 
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
             applicationParser = new MRJobParser(endpointConfig, eagleServiceConfig,
-                    appInfo, mrJobs, runningJobManager, this.resourceFetcher, configKeys, this.config,
-                    mrJobPerformanceAnalyzer);
+                    appInfo, mrJobs, runningJobManager, configKeys, this.config);
             runningMRParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {

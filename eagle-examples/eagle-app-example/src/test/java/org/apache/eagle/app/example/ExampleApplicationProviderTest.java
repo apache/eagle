@@ -92,9 +92,12 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase {
         statusUpdateService.updateApplicationEntityStatus(applicationEntity);
         // Stop application
         applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
-        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+
+        awaitApplicationStop(applicationEntity);
+
         // Uninstall application
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
+
         try {
             applicationResource.getApplicationEntityByUUID(applicationEntity.getUuid());
             Assert.fail("Application instance (UUID: " + applicationEntity.getUuid() + ") should have been uninstalled");

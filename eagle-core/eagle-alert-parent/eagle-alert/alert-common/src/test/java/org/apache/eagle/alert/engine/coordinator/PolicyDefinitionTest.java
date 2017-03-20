@@ -76,7 +76,7 @@ public class PolicyDefinitionTest {
         sp.setColumns(Arrays.asList("host"));
         sp.setType(StreamPartition.Type.GROUPBY);
         pd.addPartition(sp);
-        Assert.assertEquals("{name=\"policyName\",definition={type=\"siddhi\",value=\"test\", inputStreams=\"[inputStream]\", outputStreams=\"[outputStream]\" }}", pd.toString());
+        Assert.assertEquals("{site=\"default\", name=\"policyName\",definition={type=\"siddhi\",value=\"test\", inputStreams=\"[inputStream]\", outputStreams=\"[outputStream]\" }}", pd.toString());
 
         PolicyDefinition pd1 = new PolicyDefinition();
         PolicyDefinition.Definition def1 = new PolicyDefinition.Definition();

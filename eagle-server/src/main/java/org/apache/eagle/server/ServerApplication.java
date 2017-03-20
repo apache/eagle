@@ -28,7 +28,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
-import org.apache.eagle.alert.coordinator.CoordinatorListener;
+import org.apache.eagle.alert.coordinator.Coordinator;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.app.service.ApplicationHealthCheckService;
 import org.apache.eagle.app.service.ApplicationProviderService;
@@ -36,8 +36,10 @@ import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.Version;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.entity.repo.EntityRepositoryScanner;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
-import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
+import org.apache.eagle.server.security.BasicAuthBuilder;
+import org.apache.eagle.server.security.BasicAuthResourceFilterFactory;
 import org.apache.eagle.server.task.ManagedService;
 import org.apache.eagle.server.module.GuiceBundleLoader;
 import org.slf4j.Logger;
@@ -48,7 +50,7 @@ import java.util.EnumSet;
 
 import static org.apache.eagle.app.service.impl.ApplicationHealthCheckServiceImpl.HEALTH_CHECK_PATH;
 
-class ServerApplication extends Application<ServerConfig> {
+public class ServerApplication extends Application<ServerConfig> {
     private static final Logger LOG = LoggerFactory.getLogger(ServerApplication.class);
     @Inject
     private ApplicationStatusUpdateService applicationStatusUpdateService;
@@ -72,6 +74,12 @@ class ServerApplication extends Application<ServerConfig> {
 
         LOG.debug("Initializing guice injector context for current ServerApplication");
         guiceBundle.getInjector().injectMembers(this);
+
+        try {
+            EntityRepositoryScanner.scan();
+        } catch (IllegalAccessException | InstantiationException e) {
+            LOG.error("Failed to scan entity repository", e);
+        }
     }
 
     @Override
@@ -108,15 +116,29 @@ class ServerApplication extends Application<ServerConfig> {
             .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
         // Register authentication provider
-        environment.jersey().register(new BasicAuthProviderBuilder(configuration.getAuth(), environment).build());
-
-        // Context listener
-        environment.servlets().addServletListeners(new CoordinatorListener());
-
+        BasicAuthBuilder authBuilder = new BasicAuthBuilder(configuration.getAuthConfig(), environment);
+        environment.jersey().register(authBuilder.getBasicAuthProvider());
+        if (configuration.getAuthConfig().isEnabled()) {
+            environment.jersey().getResourceConfig().getResourceFilterFactories()
+                .add(new BasicAuthResourceFilterFactory(authBuilder.getBasicAuthenticator()));
+        }
         registerAppServices(environment);
     }
 
     private void registerAppServices(Environment environment) {
+        LOG.debug("Registering CoordinatorService");
+        environment.lifecycle().manage(new Managed() {
+            @Override
+            public void start() throws Exception {
+                Coordinator.startSchedule();
+            }
+
+            @Override
+            public void stop() throws Exception {
+
+            }
+        });
+
         // Run application status service in background
         LOG.debug("Registering ApplicationStatusUpdateService");
         Managed updateAppStatusTask = new ManagedService(applicationStatusUpdateService);

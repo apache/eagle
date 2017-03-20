@@ -59,16 +59,16 @@
             <description>number of sinks connected to alert engine</description>
         </property>
         <property>
-            <name>topology.resolverAPIUrl</name>
-            <displayName>Rack Resolver APIUrl</displayName>
-            <description>Use the URL to obtain a Node Object, from a node identified by the nodeid value.</description>
-            <value>http://sandbox.hortonworks.com:8088/ws/v1/cluster/nodes</value>
-        </property>
-        <property>
             <name>topology.rackResolverCls</name>
             <displayName>Rack Resolver Class</displayName>
             <description>rack resolver class</description>
             <value>org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver</value>
+        </property>
+        <property>
+            <name>topology.resolverAPIUrl</name>
+            <displayName>Rack Resolver APIUrl Required by ClusterNodeAPITopologyRackResolver</displayName>
+            <description>Use the URL to obtain a Node Object, from a node identified by the nodeid value.</description>
+            <value>http://sandbox.hortonworks.com:8088/ws/v1/cluster/nodes</value>
         </property>
 
         <property>
@@ -128,12 +128,44 @@
             <value></value>
         </property>
 
+        <!-- system instance properties-->
+        <property>
+            <name>dataSourceConfig.system.enabled</name>
+            <displayName>System Topology Check Enabled</displayName>
+            <description>System topology status check enabled</description>
+            <value>false</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.topic</name>
+            <displayName>System Topology Source Topic</displayName>
+            <description>System Topology Source Topic</description>
+            <value>topology_system_${siteId}</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.zkConnection</name>
+            <displayName>System Topology Source Kafka Zookeeper Quorum</displayName>
+            <value>localhost:2181</value>
+            <description>System Topology Source Kafka Zookeeper Quorum</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.schemeCls</name>
+            <displayName>System Topology Source Kafka schemeCls</displayName>
+            <value>storm.kafka.StringScheme</value>
+            <description>System Topology Source Kafka schemeCls</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.system.dataSendBatchSize</name>
+            <displayName>System Topology Data Send Batch Size </displayName>
+            <value>1</value>
+            <description>System Topology Data Send Batch Size</description>
+        </property>
 
         <!-- data sink configurations -->
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>Topic For Kafka Data Sink</displayName>
-            <value>topology_health_check</value>
+            <value>topology_check</value>
             <description>topic For kafka data sink</description>
         </property>
         <property>

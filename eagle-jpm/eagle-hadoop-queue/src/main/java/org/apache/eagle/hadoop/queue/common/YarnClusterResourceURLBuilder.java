@@ -36,7 +36,19 @@ public class YarnClusterResourceURLBuilder {
     }
 
     public static String buildRunningAppsURL(String urlBase) {
-        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "?state=RUNNING" + "&" + ANONYMOUS_PARAMETER);
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "?state=RUNNING&" + ANONYMOUS_PARAMETER);
+    }
+
+    public static String buildAcceptedAndRunningAppsURL(String urlBase) {
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "?states=ACCEPTED,RUNNING&" + ANONYMOUS_PARAMETER);
+    }
+
+    public static String buildAcceptedAppsURL(String urlBase) {
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "?states=ACCEPTED&" + ANONYMOUS_PARAMETER);
+    }
+
+    public static String buildAcceptedAppTrackingURL(String urlBase, String appId) {
+        return PathResolverHelper.buildUrlPath(urlBase, CLUSTER_APPS_API_URL + "/" + appId);
     }
 
     public static String buildFinishedAppsURL(String urlBase) {

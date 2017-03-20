@@ -23,6 +23,7 @@ import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;
 import org.apache.eagle.storage.DataStorage;
 import org.apache.eagle.storage.DataStorageManager;
+import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
@@ -30,6 +31,7 @@ import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +41,10 @@ import java.util.*;
 
 public class TestHBaseStorage extends TestHBaseBase {
 
-    static final Logger LOG = LoggerFactory.getLogger(TestHBaseStorage.class);
-    EntityDefinition entityDefinition;
-    DataStorage<String> storage;
-    long baseTimestamp;
+    private static final Logger LOG = LoggerFactory.getLogger(TestHBaseStorage.class);
+    private static EntityDefinition entityDefinition;
+    private static DataStorage<String> storage;
+    private long baseTimestamp;
 
     private TestTimeSeriesAPIEntity newInstance() {
         TestTimeSeriesAPIEntity instance = new TestTimeSeriesAPIEntity();
@@ -64,13 +66,17 @@ public class TestHBaseStorage extends TestHBaseBase {
         return instance;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void initialize() throws IllegalAccessException, InstantiationException, IOException, IllegalDataStorageTypeException {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
-        entityDefinition.setTags(new String[] {"cluster", "datacenter", "random"});
-
+        entityDefinition.setTags(new String[] {"cluster", "datacenter", "random"});;
+        hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
         storage = DataStorageManager.getDataStorageByEagleConfig();
         storage.init();
+    }
+
+    @Before
+    public void setUp() throws Exception {
         GregorianCalendar gc = new GregorianCalendar();
         gc.clear();
         gc.set(2014, 1, 6, 1, 40, 12);

@@ -18,7 +18,7 @@
 package org.apache.eagle.jpm.analyzer.mr.sla.processors;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.analyzer.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.eagle.jpm.analyzer.Processor;
 import org.apache.eagle.jpm.analyzer.util.Constants;
@@ -47,27 +47,32 @@ public class UnExpectedLongDurationJobProcessor implements Processor, Serializab
     public Result.ProcessorResult process(AnalyzerEntity analyzerJobEntity) {
         LOG.info("Job {} In UnExpectedLongDurationJobProcessor", analyzerJobEntity.getJobDefId());
 
-        Map<String, Object> jobMetaData = analyzerJobEntity.getJobMeta();
+        Map<String, Object> jobMetaData = analyzerJobEntity.getJobMeta().getConfiguration();
         long avgDurationTime = getAvgDuration(analyzerJobEntity, jobMetaData);
+
         if (avgDurationTime == 0L) {
-            return new Result.ProcessorResult(Result.ResultLevel.NONE, Constants.PROCESS_NONE);
+            return new Result.ProcessorResult(Result.RuleType.LONG_DURATION_JOB, Result.ResultLevel.NONE, Constants.PROCESS_NONE);
         }
 
         Map<Result.ResultLevel, Double> alertThreshold = Constants.DEFAULT_ALERT_THRESHOLD;
         if (jobMetaData.containsKey(Constants.ALERT_THRESHOLD_KEY)) {
-            alertThreshold = (Map<Result.ResultLevel, Double>)jobMetaData.get(Constants.ALERT_THRESHOLD_KEY);
+            Map<String, Double> alertThresholds = (Map<String, Double>)jobMetaData.get(Constants.ALERT_THRESHOLD_KEY);
+            for (String level : alertThresholds.keySet()) {
+                alertThreshold.put(Result.ResultLevel.fromString(level), alertThresholds.get(level));
+            }
         }
         List<Map.Entry<Result.ResultLevel, Double>> sorted = Utils.sortByValue(alertThreshold);
 
         double expirePercent = (analyzerJobEntity.getDurationTime() - avgDurationTime) * 1.0 / avgDurationTime;
         for (Map.Entry<Result.ResultLevel, Double> entry : sorted) {
             if (expirePercent >= entry.getValue()) {
-                return new Result.ProcessorResult(entry.getKey(), String.format("Job duration exceeds average duration by %d%%, average duration is %ds",
+                return new Result.ProcessorResult(Result.RuleType.LONG_DURATION_JOB, entry.getKey(),
+                        String.format("Job duration exceeds average duration(calculated by historical executions of this job) by %d%%, average duration is %ds",
                         (int)(expirePercent * 100), avgDurationTime / 1000));
             }
         }
 
-        return new Result.ProcessorResult(Result.ResultLevel.NONE, Constants.PROCESS_NONE);
+        return new Result.ProcessorResult(Result.RuleType.LONG_DURATION_JOB, Result.ResultLevel.NONE, Constants.PROCESS_NONE);
     }
 
     private long getAvgDuration(AnalyzerEntity mrJobAnalysisEntity, Map<String, Object> jobMetaData) {
@@ -90,7 +95,7 @@ public class UnExpectedLongDurationJobProcessor implements Processor, Serializab
             }
 
             String query = String.format("%s[@site=\"%s\" and @jobDefId=\"%s\"]<@site>{avg(durationTime)}",
-                    org.apache.eagle.jpm.util.Constants.JPA_JOB_EXECUTION_SERVICE_NAME,
+                    org.apache.eagle.jpm.util.Constants.MR_JOB_EXECUTION_SERVICE_NAME,
                     mrJobAnalysisEntity.getSiteId(),
                     URLEncoder.encode(mrJobAnalysisEntity.getJobDefId()));
 

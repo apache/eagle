@@ -23,9 +23,9 @@ import org.apache.eagle.jpm.util.Constants;
 
 public class SparkJobServiceURLBuilderImpl implements ServiceURLBuilder {
 
-    public String build(String... parameters) {
-        String serverAddress = URLUtil.removeTrailingSlash(parameters[0]);
+    public String build(String url, String... parameters) {
+        String serverAddress = URLUtil.removeTrailingSlash(url);
 
-        return serverAddress + Constants.SPARK_APPS_URL + parameters[1];
+        return serverAddress + Constants.SPARK_APPS_URL + parameters[0];
     }
 }

@@ -23,11 +23,11 @@ import org.apache.eagle.jpm.util.Constants;
 
 public class SparkCompleteJobServiceURLBuilderImpl implements ServiceURLBuilder {
 
-    public String build(String... parameters) {
-        String url = URLUtil.removeTrailingSlash(parameters[0]);
+    public String build(String url, String... parameters) {
+        String newUrl = URLUtil.removeTrailingSlash(url);
 
-        return url + "/" + Constants.V2_APPS_URL
+        return newUrl + "/" + Constants.V2_APPS_URL
                 + "?applicationTypes=SPARK&state=FINISHED&finishedTimeBegin="
-                + parameters[1] + "&" + Constants.ANONYMOUS_PARAMETER;
+                + parameters[0] + "&" + Constants.ANONYMOUS_PARAMETER;
     }
 }

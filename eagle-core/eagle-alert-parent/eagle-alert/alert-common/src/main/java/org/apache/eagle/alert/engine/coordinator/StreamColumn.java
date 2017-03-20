@@ -34,7 +34,7 @@ public class StreamColumn implements Serializable {
     private String name;
     private Type type;
     private Object defaultValue;
-    private boolean required;
+    private boolean required = true;
     private String description;
     private String nodataExpression;
 

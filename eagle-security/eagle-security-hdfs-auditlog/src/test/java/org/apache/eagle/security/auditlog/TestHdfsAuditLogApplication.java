@@ -32,18 +32,15 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-@Ignore
 public class TestHdfsAuditLogApplication extends ApplicationTestBase {
 
     @Inject
     private SiteResource siteResource;
     @Inject
     private ApplicationResource applicationResource;
-    @Inject
-    ApplicationStatusUpdateService statusUpdateService;
 
     @Test
-    public void testHdfsAuditLogApplication() {
+    public void testHdfsAuditLogApplication() throws InterruptedException {
         // Create local site
         SiteEntity siteEntity = new SiteEntity();
         siteEntity.setSiteId("test_site");
@@ -52,16 +49,16 @@ public class TestHdfsAuditLogApplication extends ApplicationTestBase {
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
-        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "HdfsAuditLogApplication", ApplicationEntity.Mode.LOCAL);
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "HDFS_AUDIT_LOG_MONITOR_APP", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
         // Install application
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
-        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        awaitApplicationStatus(applicationEntity, ApplicationEntity.Status.RUNNING);
         // Stop application
         applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
-        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
+        awaitApplicationStop(applicationEntity);
         // Uninstall application
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {

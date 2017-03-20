@@ -34,6 +34,7 @@
     <modules>
         <module>eagle-app-base</module>
         <module>eagle-app-utils</module>
+        <module>eagle-app-streamproxy</module>
     </modules>
 
     <build>

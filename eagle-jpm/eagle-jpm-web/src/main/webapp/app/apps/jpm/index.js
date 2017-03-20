@@ -55,18 +55,25 @@
 		reloadOnSearch: false,
 		templateUrl: "partials/job/compare.html",
 		controller: "compareCtrl"
+
+	}).route("jpmQueue", {
+		url: "/jpm/queue?queue&startTime&endTime",
+		site: true,
+		templateUrl: "partials/queue/overview.html",
+		controller: "queueCtrl",
+		resolve: { time: true }
 	});
 
 	jpmApp.portal({name: "YARN Jobs", icon: "taxi", list: [
 		{name: "Overview", path: "jpm/overview"},
 		{name: "Job Statistics", path: "jpm/statistics"},
-		{name: "Job List", path: "jpm/list"}
+		{name: "Job List", path: "jpm/list"},
+		{name: "Queue", path: "jpm/queue"}
 	]}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time, Site, Application) {
 		var JPM = window._JPM = {};
 
-		// TODO: timestamp support
 		JPM.QUERY_LIST = '${baseURL}/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_GROUPS = '${baseURL}/rest/entities?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_GROUPS_INTERVAL = '${baseURL}/rest/entities?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
@@ -142,6 +149,7 @@
 		};
 
 		JPM.condition = function (condition) {
+			if (typeof condition === 'string') return condition;
 			return $.map(condition, function (value, key) {
 				return "@" + key + '="' + value + '"';
 			}).join(" AND ");
@@ -189,7 +197,8 @@
 			_list._aggInfo = {
 				groups: groups,
 				startTime: Time(startTime).valueOf(),
-				interval: intervalMin * 60 * 1000
+				interval: intervalMin * 60 * 1000,
+				order: fields[orderId]
 			};
 			_list._promise.then(function () {
 				if(top) _list.reverse();
@@ -310,7 +319,7 @@
 			_list._aggInfo = {
 				groups: groups,
 				startTime: Time(startTime).valueOf(),
-				interval: intervalMin * 60 * 1000
+				interval: intervalMin * 60 * 1000,
 			};
 			_list._promise.then(function () {
 				_list.reverse();
@@ -318,6 +327,12 @@
 			return _list;
 		};
 
+		/**
+		 *
+		 * @param list
+		 * @param flatten {bool|[]} bool will set merge result. array will pick only contains value
+		 * @return {Array}
+		 */
 		JPM.aggMetricsToEntities = function (list, flatten) {
 			var _list = [];
 			_list.done = false;
@@ -331,21 +346,32 @@
 						tags[group] = obj.key[j];
 					});
 
-					var _subList = $.map(obj.value[0], function (value, index) {
-						return {
-							timestamp: _startTime + index * _interval,
-							value: [value],
-							tags: tags
-						};
-					});
+					$.each(obj.value, function (j, values) {
+						if (list._aggInfo.order && j === list.length - 1) return;
 
-					if(flatten) {
-						_list.push.apply(_list, _subList);
-					} else {
-						_list.push(_subList);
-					}
+						var _subList = $.map(values, function (value, index) {
+							return {
+								timestamp: _startTime + index * _interval,
+								value: [value],
+								tags: tags
+							};
+						});
+
+						if ($.isArray(flatten)) {
+							if (flatten.indexOf(j) !== -1) {
+								_list.push(_subList);
+							}
+						} else {
+							if(flatten) {
+								_list.push.apply(_list, _subList);
+							} else {
+								_list.push(_subList);
+							}
+						}
+					});
 				});
 				_list.done = true;
+
 				return _list;
 			});
 			return _list;
@@ -484,4 +510,5 @@
 	jpmApp.require("ctrl/detailCtrl.js");
 	jpmApp.require("ctrl/jobTaskCtrl.js");
 	jpmApp.require("ctrl/compareCtrl.js");
+	jpmApp.require("ctrl/queueCtrl.js");
 })();

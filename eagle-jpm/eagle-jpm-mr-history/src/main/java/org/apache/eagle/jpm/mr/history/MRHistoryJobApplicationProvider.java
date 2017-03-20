@@ -19,11 +19,14 @@ package org.apache.eagle.jpm.mr.history;
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.util.concurrent.Service;
 import com.typesafe.config.Config;
-import io.dropwizard.lifecycle.Managed;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.jpm.analyzer.meta.MetaManagementService;
+import org.apache.eagle.jpm.analyzer.meta.impl.MetaManagementServiceJDBCImpl;
+import org.apache.eagle.jpm.analyzer.meta.impl.MetaManagementServiceMemoryImpl;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
+import org.apache.eagle.metadata.store.jdbc.JDBCMetadataStore;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -51,5 +54,11 @@ public class MRHistoryJobApplicationProvider extends AbstractApplicationProvider
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    protected void onRegister() {
+        bind(MemoryMetadataStore.class, MetaManagementService.class, MetaManagementServiceMemoryImpl.class);
+        bind(JDBCMetadataStore.class, MetaManagementService.class, MetaManagementServiceJDBCImpl.class);
     }
 }

@@ -80,6 +80,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-app-streamproxy</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -180,6 +191,15 @@
             <artifactId>dumbster</artifactId>
             <version>1.6</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
         </dependency>
     </dependencies>
 
@@ -331,11 +351,28 @@
                     <version>${project.version}</version>
                 </dependency>
 
+                <!-- add metirc webUI -->
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-hadoop-metric</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hbase-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hdfs-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-system-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>

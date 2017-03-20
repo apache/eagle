@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<application>
+    <type>HADOOP_METRIC_MONITOR</type>
+    <name>Hadoop Metrics Monitor</name>
+    <configuration>
+        <property>
+            <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
+            <displayName>JMX Metric Kafka Topic</displayName>
+            <value>hadoop_jmx_metric_${siteId}</value>
+            <description>Hadoop JMX metric kafka topic name for stream: HADOOP_JMX_METRIC_STREAM</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.SYSTEM_METRIC_STREAM.topic</name>
+            <displayName>System Metric Kafka Topic</displayName>
+            <value>system_metric_${siteId}</value>
+            <description>System JMX metric kafka topic name for stream: SYSTEM_METRIC_STREAM</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.HADOOP_JMX_RESOURCE_STREAM.topic</name>
+            <displayName>JMX Resource Kafka Topic</displayName>
+            <value>hadoop_jmx_resource_${siteId}</value>
+            <description>Hadoop JMX resource kafka topic name for stream: HADOOP_JMX_RESOURCE_STREAM</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.brokerList</name>
+            <displayName>Kafka Brokers</displayName>
+            <value>localhost:6667</value>
+            <description>Sourced Kafka Brokers like broker1,broker2,...</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkConnection</name>
+            <displayName>Zookeeper Quorum</displayName>
+            <value>localhost:2181</value>
+            <description>Kafka Zookeeper Quorum</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.fetchSize</name>
+            <displayName>Kafka Fetch Size</displayName>
+            <value>1048576</value>
+            <description>Kafka Fetch Size</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.transactionZKRoot</name>
+            <displayName>Kafka Transaction Root Path</displayName>
+            <value>/consumers</value>
+            <description>Kafka Transaction Root Path</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.consumerGroupId</name>
+            <displayName>Kafka Consumer Group ID</displayName>
+            <value>eagleConsumer</value>
+            <description>Kafka Consumer Group ID</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.brokerZkPath</name>
+            <displayName>Kafka Broker ZkPath</displayName>
+            <description>Kafka Broker ZkPath</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.txZkServers</name>
+            <displayName>Kafka Transaction Zookeeper Servers</displayName>
+            <description>Kafka Transaction Zookeeper Servers</description>
+            <value>localhost:2181</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSourceConfig.transactionStateUpdateMS</name>
+            <value>2000</value>
+            <displayName>Kafka Transaction Status Update MS</displayName>
+            <description>Kafka Transaction Status Update MS</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>service.host</name>
+            <displayName>Eagle Service Host</displayName>
+            <description>Set additional eagle service host, default: using current host</description>
+        </property>
+        <property>
+            <name>service.port</name>
+            <displayName>Eagle Service Port</displayName>
+            <description>Set additional eagle service port, default: using current port</description>
+        </property>
+    </configuration>
+    <streams>
+        <stream>
+            <streamId>HADOOP_JMX_METRIC_STREAM</streamId>
+            <description>Hadoop JMX Metric Stream including name node, resource manager, etc.</description>
+            <group>hadoop metrics</group>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>metric</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>component</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>SYSTEM_METRIC_STREAM</streamId>
+            <description>System Metrics Stream including CPU, Network, Disk, etc.</description>
+            <group>system metrics</group>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>metric</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>group</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>device</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>HADOOP_JMX_RESOURCE_STREAM</streamId>
+            <description>Hadoop JMX Resource Stream including name node, resource manager, etc.</description>
+            <group>hadoop metrics</group>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>resource</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>component</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>string</type>
+                    <defaultValue>""</defaultValue>
+                </column>
+            </columns>
+        </stream>
+    </streams>
+    <docs>
+        <install>
+            <b>How to Install</b>
+            <ol>
+                <li>Create a kafka topic named <code>hadoop_jmx_metric_{SITE_ID}</code></li>
+                <li>Setup metric collector for monitored Hadoop/HBase using <a target="_blank" href="https://github.com/apache/incubator-eagle/tree/master/eagle-external/hadoop_jmx_collector">hadoop_jmx_collector</a></li>
+                <li>Setup <code>Kafka Topic Name</code> and <code>Kafka Broker List </code> in <code>Settings</code> tab</li>
+                <li>Click "Install" button then you will see the <code>HADOOP_JMX_METRIC_STREAM_{SITE_ID}</code> in <a href="/#/alert/streamList">Streams</a></li>
+            </ol>
+        </install>
+        <uninstall>
+            <b>How to Uninstall</b>
+            <ol>
+                <li>Stop and remove installed <code>hadoop_jmx_collector</code></li>
+                <li>Remove kafka topic <code>hadoop_jmx_metric_{SITE_ID}</code></li>
+                <li>Click "Uninstall" button which will remove stream <code>HADOOP_JMX_METRIC_STREAM_{SITE_ID}</code></li>
+            </ol>
+        </uninstall>
+    </docs>
+</application>

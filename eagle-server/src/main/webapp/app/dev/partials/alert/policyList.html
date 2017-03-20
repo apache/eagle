@@ -30,9 +30,8 @@
 					<tr>
 						<th sortpath="policyStatus" width="10"></th>
 						<th sortpath="name" width="10%">Name</th>
-						<th width="150">Input Streams</th>
 						<th>Description</th>
-						<th width="85">Action</th>
+						<th width="85" ng-if="Auth.isAdmin">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -41,17 +40,10 @@
 							<span class="fa fa-square" ng-class="item.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
 						</td>
 						<td>
-							<a ui-sref="policyDetail({name: item.name})">{{item.name}}</a>
-						</td>
-						<td>
-							<ul class="no-margin list-unstyled">
-								<li ng-repeat="stream in item.inputStreams track by $index">
-									{{stream}}
-								</li>
-							</ul>
+							<a ui-sref="policyDetail({siteId: site, name: item.name})">{{item.name}}</a>
 						</td>
 						<td>{{item.description}}</td>
-						<td class="text-center">
+						<td class="text-center" ng-if="Auth.isAdmin">
 							<div class="btn-group btn-group-xs">
 								<button class="btn btn-default opt" ng-if="item.policyStatus !== 'ENABLED'" ng-click="startPolicy(item)">
 									<span class="fa fa-play"></span>
@@ -59,7 +51,7 @@
 								<button class="btn btn-default opt" ng-if="item.policyStatus === 'ENABLED'" ng-click="stopPolicy(item)">
 									<span class="fa fa-stop"></span>
 								</button>
-								<a ui-sref="policyEdit({name: item.name})" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
+								<a ui-sref="policyEdit({siteId: site, name: item.name})" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
 								<button class="btn btn-danger opt" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
 							</div>
 						</td>
@@ -68,17 +60,19 @@
 			</table>
 		</div>
 
-		<div class="callout callout-warning no-margin" ng-show="policyList._done && policyList.length === 0">
+		<div class="callout callout-warning no-margin" ng-show="!loading && policyList.length === 0">
 			<h4>No Policy yet</h4>
-			<p>You have not create policy yet. Click <a ui-sref="policyCreate()">here</a> to create a new policy.</p>
+			<p>You have not create policy yet.
+				<span ng-if="Auth.isAdmin">Click <a ui-sref="policyCreate({ siteId: site })">here</a> to create a new policy.</span>
+			</p>
 		</div>
 	</div>
 
-	<div class="overlay" ng-if="!policyList._done">
+	<div class="overlay" ng-if="loading">
 		<i class="fa fa-refresh fa-spin"></i>
 	</div>
 
-	<div class="box-footer text-right">
-		<a ui-sref="policyCreate()" class="btn btn-primary">New Policy</a>
+	<div class="box-footer text-right" ng-if="Auth.isAdmin">
+		<a ui-sref="policyCreate({ siteId: site })" class="btn btn-primary">New Policy</a>
 	</div>
 </div>

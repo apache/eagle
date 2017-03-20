@@ -19,6 +19,7 @@ package org.apache.eagle.service.client.impl;
 import com.sun.jersey.api.client.WebResource;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
@@ -65,11 +66,13 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
             try {
                 return config.getInt(SERVICE_PORT_KEY);
             } catch (ConfigException.WrongType wrongType) {
-                return Integer.valueOf(config.getString(SERVICE_PORT_KEY));
+                String portStr = config.getString(SERVICE_PORT_KEY);
+                if (StringUtils.isNotBlank(portStr)) {
+                    return Integer.valueOf(portStr);
+                }
             }
-        } else {
-            return 9090;
         }
+        return 9090;
     }
 
     public EagleServiceClientImpl(String host, int port, String username, String password) {

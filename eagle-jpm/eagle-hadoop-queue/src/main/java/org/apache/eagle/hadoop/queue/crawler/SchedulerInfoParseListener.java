@@ -21,8 +21,12 @@ package org.apache.eagle.hadoop.queue.crawler;
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.MetricName;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
 import org.apache.eagle.hadoop.queue.model.scheduler.*;
+import org.apache.eagle.hadoop.queue.model.scheduler.Queue;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 
 import backtype.storm.spout.SpoutOutputCollector;
@@ -41,7 +45,7 @@ public class SchedulerInfoParseListener {
     //private final static long AGGREGATE_INTERVAL = DateTimeUtil.ONEMINUTE;
     //private int MAX_CACHE_COUNT = 1000;
 
-    private final List<RunningQueueAPIEntity> runningQueueAPIEntities = new ArrayList<>();
+    private final List<TaggedLogAPIEntity> runningQueueAPIEntities = new ArrayList<>();
     private final List<GenericMetricEntity> metricEntities = new ArrayList<>();
 
     private String site;
@@ -56,6 +60,7 @@ public class SchedulerInfoParseListener {
         Map<String, String> tags = buildMetricTags(null, null);
         createMetric(MetricName.HADOOP_CLUSTER_CAPACITY, tags, currentTimestamp, scheduler.getCapacity());
         createMetric(MetricName.HADOOP_CLUSTER_USED_CAPACITY, tags, currentTimestamp, scheduler.getUsedCapacity());
+
         for (Queue queue : scheduler.getQueues().getQueue()) {
             createQueues(queue, currentTimestamp, scheduler, null);
         }
@@ -65,12 +70,12 @@ public class SchedulerInfoParseListener {
         LOG.info("Flushing {} RunningQueue metrics in memory", metricEntities.size());
         HadoopQueueMessageId messageId = new HadoopQueueMessageId(HadoopClusterConstants.DataType.METRIC, HadoopClusterConstants.DataSource.SCHEDULER, System.currentTimeMillis());
         List<GenericMetricEntity> metrics = new ArrayList<>(metricEntities);
-        collector.emit(new ValuesArray(HadoopClusterConstants.DataType.METRIC.name(), metrics), messageId);
+        collector.emit(new ValuesArray(DataSource.SCHEDULER, DataType.METRIC, metrics), messageId);
 
         LOG.info("Flushing {} RunningQueueEntities in memory", runningQueueAPIEntities.size());
-        messageId = new HadoopQueueMessageId(HadoopClusterConstants.DataType.ENTITY, HadoopClusterConstants.DataSource.SCHEDULER, System.currentTimeMillis());
-        List<RunningQueueAPIEntity> entities = new ArrayList<>(runningQueueAPIEntities);
-        collector.emit(new ValuesArray(HadoopClusterConstants.DataType.ENTITY.name(), entities), messageId);
+        messageId = new HadoopQueueMessageId(DataType.ENTITY, DataSource.SCHEDULER, System.currentTimeMillis());
+        List<TaggedLogAPIEntity> entities = new ArrayList<>(runningQueueAPIEntities);
+        collector.emit(new ValuesArray(DataSource.SCHEDULER, DataType.ENTITY, entities), messageId);
 
         runningQueueAPIEntities.clear();
         metricEntities.clear();
@@ -97,7 +102,7 @@ public class SchedulerInfoParseListener {
         this.metricEntities.add(e);
     }
 
-    private void createQueues(Queue queue, long currentTimestamp, SchedulerInfo scheduler, String parentQueueName) throws Exception {
+    private List<String> createQueues(Queue queue, long currentTimestamp, SchedulerInfo scheduler, String parentQueueName) throws Exception {
         RunningQueueAPIEntity _entity = new RunningQueueAPIEntity();
         Map<String, String> _tags = buildMetricTags(queue.getQueueName(), parentQueueName);
         _entity.setTags(_tags);
@@ -112,16 +117,17 @@ public class SchedulerInfoParseListener {
         _entity.setNumPendingApplications(queue.getNumPendingApplications());
         _entity.setMaxActiveApplications(queue.getMaxActiveApplications());
         _entity.setTimestamp(currentTimestamp);
+        _entity.setUserLimitFactor(queue.getUserLimitFactor());
 
         List<UserWrapper> userList = new ArrayList<>();
         if (queue.getUsers() != null && queue.getUsers().getUser() != null) {
             for (User user : queue.getUsers().getUser()) {
-                UserWrapper newUser = new UserWrapper(user);
-                userList.add(newUser);
+                userList.add(wrapUser(user));
             }
         }
-        _entity.setUsers(userList);
-
+        UserWrappers users = new UserWrappers();
+        users.setUsers(userList);
+        _entity.setUsers(users);
         runningQueueAPIEntities.add(_entity);
 
         createMetric(MetricName.HADOOP_QUEUE_NUMPENDING_JOBS, _tags, currentTimestamp, queue.getNumPendingApplications());
@@ -143,10 +149,33 @@ public class SchedulerInfoParseListener {
             }
         }
 
+        List<String> subQueues = new ArrayList<>();
+        List<String> allSubQueues = new ArrayList<>();
         if (queue.getQueues() != null && queue.getQueues().getQueue() != null) {
             for (Queue subQueue : queue.getQueues().getQueue()) {
-                createQueues(subQueue, currentTimestamp, scheduler, queue.getQueueName());
+                subQueues.add(subQueue.getQueueName());
+                allSubQueues.add(subQueue.getQueueName());
+                List<String> queues = createQueues(subQueue, currentTimestamp, scheduler, queue.getQueueName());
+                allSubQueues.addAll(queues);
             }
         }
+        QueueStructureAPIEntity queueStructureAPIEntity = new QueueStructureAPIEntity();
+        queueStructureAPIEntity.setTags(_tags);
+        queueStructureAPIEntity.setSubQueues(subQueues);
+        queueStructureAPIEntity.setAllSubQueues(allSubQueues);
+        queueStructureAPIEntity.setLastUpdateTime(currentTimestamp);
+        runningQueueAPIEntities.add(queueStructureAPIEntity);
+
+        return allSubQueues;
+    }
+
+    private UserWrapper wrapUser(User user) {
+        UserWrapper wrapper = new UserWrapper();
+        wrapper.setUsername(user.getUsername());
+        wrapper.setMemory(user.getResourcesUsed().getMemory());
+        wrapper.setvCores(user.getResourcesUsed().getvCores());
+        wrapper.setNumActiveApplications(user.getNumActiveApplications());
+        wrapper.setNumPendingApplications(user.getNumPendingApplications());
+        return wrapper;
     }
 }

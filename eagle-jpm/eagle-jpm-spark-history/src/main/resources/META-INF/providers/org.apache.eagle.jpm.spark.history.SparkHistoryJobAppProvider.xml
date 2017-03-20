@@ -59,6 +59,12 @@
             <value>10000</value>
         </property>
         <property>
+            <name>topology.requestLimit</name>
+            <displayName>limit of applications in each request</displayName>
+            <description>Limit of applications in each request</description>
+            <value>100</value>
+        </property>
+        <property>
             <name>topology.message.timeout.secs</name>
             <displayName>topology message timeout (secs)</displayName>
             <description>default timeout is 300s</description>

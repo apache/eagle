@@ -19,6 +19,7 @@ package org.apache.eagle.jpm.mr.running;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
+import org.apache.eagle.jpm.mr.running.storm.MRRunningAppMetricBolt;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobFetchSpout;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobParseBolt;
 import org.apache.eagle.jpm.util.Constants;
@@ -26,9 +27,13 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
+import storm.trident.planner.SpoutNode;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.eagle.jpm.mr.running.MRRunningJobConfig.APP_TO_JOB_STREAM;
+import static org.apache.eagle.jpm.mr.running.MRRunningJobConfig.APP_TO_METRIC_STREAM;
 
 public class MRRunningJobApplication extends StormApplication {
     @Override
@@ -68,9 +73,15 @@ public class MRRunningJobApplication extends StormApplication {
                 mrRunningJobConfig.getEndpointConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys,
-                config,
-                new MRJobPerformanceAnalyzer(config)),
-                tasks).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
+                config),
+                tasks).setNumTasks(tasks).fieldsGrouping(spoutName, APP_TO_JOB_STREAM, new Fields("appId"));
+
+        // parse running/accepted app metrics
+        topologyBuilder.setBolt("mrRunningJobMetricBolt", new MRRunningAppMetricBolt(mrRunningJobConfig), 1)
+                .setNumTasks(1).shuffleGrouping(spoutName, APP_TO_METRIC_STREAM);
+        topologyBuilder.setBolt("acceptedAppSink", environment.getStreamSink("ACCEPTED_APP_STREAM", config), 1)
+                .setNumTasks(1).shuffleGrouping("mrRunningJobMetricBolt");
+
         return topologyBuilder.createTopology();
     }
 }

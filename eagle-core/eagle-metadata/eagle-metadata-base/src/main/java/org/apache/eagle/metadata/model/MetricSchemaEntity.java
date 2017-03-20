@@ -30,11 +30,12 @@ import java.util.List;
 @Service(MetricSchemaEntity.METRIC_SCHEMA_SERVICE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"metricName","metricType"})
+@Tags({"site","site","group"})
 public class MetricSchemaEntity extends TaggedLogAPIEntity {
     static final String METRIC_SCHEMA_SERVICE = "MetricSchemaService";
-    public static final String METRIC_NAME_TAG = "metricName";
-    public static final String METRIC_TYPE_TAG = "metricType";
+    public static final String METRIC_NAME_TAG = "name";
+    public static final String METRIC_SITE_TAG = "site";
+    public static final String METRIC_GROUP_TAG = "group";
 
     @Column("a")
     private List<String> dimensionFields;

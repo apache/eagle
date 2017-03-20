@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.log.entity.repo;
 
+import org.apache.eagle.log.entity.MetricMetadataEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class TestEntityRepositoryScanner {
 
 	@Test
 	public void testScan() throws InstantiationException, IllegalAccessException {
-		EntityRepositoryScanner.scan();
-		Assert.assertNotNull(EntityDefinitionManager.getEntityByServiceName("MetricMetadataService"));
+		Assert.assertEquals(MetricMetadataEntity.class,
+				EntityDefinitionManager.getEntityByServiceName("MetricMetadataService").getEntityClass());
 	}
 }

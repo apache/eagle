@@ -16,10 +16,11 @@
  */
 package org.apache.eagle.metadata.service;
 
-import junit.framework.Assert;
+
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.memory.SiteEntityEntityServiceMemoryImpl;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

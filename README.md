@@ -34,6 +34,7 @@ You can find the latest Eagle documentation on [https://eagle.apache.org](https:
 
 ## Downloads
 
+* Development Version: [eagle-0.5-SNAPSHOT](https://github.com/apache/eagle/archive/master.zip) (Under development)
 * Latest Release
     * [eagle-0.4.0-incubating](http://eagle.apache.org/docs/download-latest.html)
 * Archived Releases
@@ -44,19 +45,21 @@ You can find the latest Eagle documentation on [https://eagle.apache.org](https:
 
 ### Prerequisites
 
-* [JDK 8](https://jdk8.java.net/): Java Development Tool `Version 1.8`
+* [JDK 8](https://jdk8.java.net/): Java Environment `Version 1.8`
 * [Apache Maven](https://maven.apache.org/): Project management and comprehension tool `Version 3.x`
-* [NPM](https://www.npmjs.com/): Javascript package management tool `Version 3.x`
+* [NPM](https://www.npmjs.com/): Node package management tool `Version 3.x`
 
 ### Building Eagle 
 
-> Since version 0.5, Eagle is only tested on JDK 8.
+> Since version 0.5, Eagle is only built on JDK 8.
 
 Eagle is built using [Apache Maven](https://maven.apache.org/). NPM should be installed (On MAC OS try "brew install node"). To build Eagle, run:
     
     mvn clean package -DskipTests 
 
-After successfully building, you will find eagle binary tarball under _eagle-server-assembly/target/_
+After successfully building, you will find eagle binary tarball at:
+    
+    eagle-assembly/target/eagle-${VERSION}-bin.tar.gz
 
 ### Testing Eagle 
 
@@ -77,8 +80,10 @@ After successfully building, you will find eagle binary tarball under _eagle-ser
 
 ## Getting Help
 
-The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.apache.org](mailto:dev@eagle.apache.org),
+* **Mail**: The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.apache.org](mailto:dev@eagle.apache.org),
 and remember to subscribe our mail list via [dev-subscribe@eagle.apache.org](mailto:dev-subscribe@eagle.apache.org)
+* **Slack**: Join Eagle community on Slack via [https://apacheeagle.slack.com](https://apacheeagle.slack.com)
+* **JIRA**: Report requirements, problems or bugs through apache jira system via [https://issues.apache.org/jira/browse/EAGLE](https://issues.apache.org/jira/browse/EAGLE)
 
 ## FAQ
 

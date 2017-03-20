@@ -142,7 +142,7 @@ public class ApplicationAction implements Serializable {
                 KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSinkConfig();
                 Kafka2TupleMetadata datasource = new Kafka2TupleMetadata();
                 datasource.setType("KAFKA");
-                datasource.setName(metadata.getAppId());
+                datasource.setName(streamDesc.getStreamId());
                 datasource.setTopic(kafkaCfg.getTopicId());
                 datasource.setSchemeCls(JsonScheme.class.getCanonicalName());
                 datasource.setProperties(new HashMap<>());
@@ -164,7 +164,8 @@ public class ApplicationAction implements Serializable {
                 alertMetadataService.addDataSource(datasource);
 
                 StreamDefinition sd = streamDesc.getSchema();
-                sd.setDataSource(metadata.getAppId());
+                sd.setDataSource(streamDesc.getStreamId());
+                sd.setStreamSource(metadata.getAppId());
                 alertMetadataService.createStream(streamDesc.getSchema());
             }
         }
@@ -177,7 +178,7 @@ public class ApplicationAction implements Serializable {
         }
         // iterate each stream descriptor and create alert datasource for each
         for (StreamDesc streamDesc : metadata.getStreams()) {
-            alertMetadataService.removeDataSource(metadata.getAppId());
+            alertMetadataService.removeDataSource(streamDesc.getStreamId());
             alertMetadataService.removeStream(streamDesc.getStreamId());
         }
     }

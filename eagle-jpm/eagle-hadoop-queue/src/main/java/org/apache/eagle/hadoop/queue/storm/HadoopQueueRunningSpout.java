@@ -18,17 +18,14 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
-import org.apache.eagle.hadoop.queue.HadoopQueueRunningApp;
 import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
-import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +48,9 @@ public class HadoopQueueRunningSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(HadoopClusterConstants.FIELD_DATATYPE, HadoopClusterConstants.FIELD_DATA));
+        declarer.declare(new Fields(HadoopClusterConstants.FIELD_DATASOURCE,
+                HadoopClusterConstants.FIELD_DATATYPE,
+                HadoopClusterConstants.FIELD_DATA));
     }
 
     @Override

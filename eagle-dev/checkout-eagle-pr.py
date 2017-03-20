@@ -43,13 +43,13 @@ PUSH_REMOTE_NAME = os.environ.get("PUSH_REMOTE_NAME", "apache-git")
 # https://github.com/settings/tokens. This script only requires the "public_repo" scope.
 GITHUB_OAUTH_KEY = os.environ.get("GITHUB_OAUTH_KEY")
 
-GITHUB_BASE = "https://github.com/apache/incubator-eagle/pull"
-GITHUB_API_BASE = "https://api.github.com/repos/apache/incubator-eagle"
+GITHUB_BASE = "https://github.com/apache/eagle/pull"
+GITHUB_API_BASE = "https://api.github.com/repos/apache/eagle"
 JIRA_BASE = "https://issues.apache.org/jira/browse"
 JIRA_API_BASE = "https://issues.apache.org/jira"
 
-PR_REPO = "https://github.com/apache/incubator-eagle.git"
-PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
+PR_REPO = "https://github.com/apache/eagle.git"
+PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/eagle.git"
 
 # Prefix added to temporary branches
 BRANCH_PREFIX = "PR_TOOL"

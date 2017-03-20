@@ -18,10 +18,11 @@
 package org.apache.eagle.jpm.analyzer.resource;
 
 import com.google.inject.Inject;
+import org.apache.eagle.common.rest.RESTResponse;
 import org.apache.eagle.jpm.analyzer.meta.MetaManagementService;
+import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
-import org.apache.eagle.jpm.analyzer.meta.model.PublisherEntity;
-import org.apache.eagle.metadata.resource.RESTResponse;
+import org.apache.eagle.jpm.analyzer.util.Constants;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -38,16 +39,16 @@ public class AnalyzerResource {
     }
 
     @POST
-    @Path(META_PATH)
+    @Path(JOB_META_ROOT_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> addJobMeta(JobMetaEntity jobMetaEntity) {
         return RESTResponse.<Void>async((response) -> {
             jobMetaEntity.ensureDefault();
             boolean ret = metaManagementService.addJobMeta(jobMetaEntity);
-            String message = "Successfully add job meta for " + jobMetaEntity.getJobDefId();
+            String message = "Successfully add job meta for " + jobMetaEntity.getSiteId() + ": " + jobMetaEntity.getJobDefId();
             if (!ret) {
-                message = "Failed to add job meta for " + jobMetaEntity.getJobDefId();
+                message = "Failed to add job meta for " + jobMetaEntity.getSiteId() + ": " + jobMetaEntity.getJobDefId();
             }
             response.success(ret).message(message);
         }).get();
@@ -56,13 +57,17 @@ public class AnalyzerResource {
     @POST
     @Path(JOB_META_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> updateJobMeta(@PathParam(JOB_DEF_PATH) String jobDefId, JobMetaEntity jobMetaEntity) {
+    public RESTResponse<Void> updateJobMeta(@PathParam(Constants.SITE_ID) String siteId,
+                                            @PathParam(Constants.JOB_DEF_ID) String jobDefId,
+                                            JobMetaEntity jobMetaEntity) {
         return RESTResponse.<Void>async((response) -> {
-            jobMetaEntity.ensureDefault();
-            boolean ret = metaManagementService.updateJobMeta(jobDefId, jobMetaEntity);
-            String message = "Successfully update job meta for " + jobDefId;
+            jobMetaEntity.setModifiedTime(System.currentTimeMillis());
+            jobMetaEntity.setSiteId(siteId);
+            jobMetaEntity.setJobDefId(jobDefId);
+            boolean ret = metaManagementService.updateJobMeta(jobMetaEntity);
+            String message = "Successfully update job meta for " + siteId + ":" + jobDefId;
             if (!ret) {
-                message = "Failed to update job meta for " + jobDefId;
+                message = "Failed to update job meta for " + siteId + ":" + jobDefId;
             }
             response.success(ret).message(message);
         }).get();
@@ -71,20 +76,22 @@ public class AnalyzerResource {
     @GET
     @Path(JOB_META_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<List<JobMetaEntity>> getJobMeta(@PathParam(JOB_DEF_PATH) String jobDefId) {
-        return RESTResponse.async(() -> metaManagementService.getJobMeta(jobDefId)).get();
+    public RESTResponse<List<JobMetaEntity>> getJobMeta(@PathParam(Constants.SITE_ID) String siteId,
+                                                        @PathParam(Constants.JOB_DEF_ID) String jobDefId) {
+        return RESTResponse.async(() -> metaManagementService.getJobMeta(siteId, jobDefId)).get();
     }
 
     @DELETE
     @Path(JOB_META_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> deleteJobMeta(@PathParam(JOB_DEF_PATH) String jobDefId) {
+    public RESTResponse<Void> deleteJobMeta(@PathParam(Constants.SITE_ID) String siteId,
+                                            @PathParam(Constants.JOB_DEF_ID) String jobDefId) {
         return RESTResponse.<Void>async((response) -> {
-            boolean ret = metaManagementService.deleteJobMeta(jobDefId);
-            String message = "Successfully delete job meta for " + jobDefId;
+            boolean ret = metaManagementService.deleteJobMeta(siteId, jobDefId);
+            String message = "Successfully delete job meta for " + siteId + ": " + jobDefId;
             if (!ret) {
-                message = "Failed to delete job meta for " + jobDefId;
+                message = "Failed to delete job meta for " + siteId + ": " + jobDefId;
             }
 
             response.success(ret).message(message);
@@ -92,40 +99,62 @@ public class AnalyzerResource {
     }
 
     @POST
-    @Path(PUBLISHER_PATH)
+    @Path(USER_META_ROOT_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> addPublisherMeta(PublisherEntity publisherEntity) {
+    public RESTResponse<Void> addEmailPublisherMeta(UserEmailEntity userEmailEntity) {
         return RESTResponse.<Void>async((response) -> {
-            publisherEntity.ensureDefault();
-            boolean ret = metaManagementService.addPublisherMeta(publisherEntity);
-            String message = "Successfully add publisher meta for " + publisherEntity.getUserId();
+            userEmailEntity.ensureDefault();
+            boolean ret = metaManagementService.addUserEmailMeta(userEmailEntity);
+            String message = "Successfully add user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
             if (!ret) {
-                message = "Failed to add publisher meta for " + publisherEntity.getUserId();
+                message = "Failed to add user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
+            }
+            response.success(ret).message(message);
+        }).get();
+    }
+
+    @POST
+    @Path(USER_META_PATH)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<Void> updateEmailPublisherMeta(@PathParam(Constants.SITE_ID) String siteId,
+                                                       @PathParam(Constants.USER_ID) String userId,
+                                                       UserEmailEntity userEmailEntity) {
+        return RESTResponse.<Void>async((response) -> {
+            userEmailEntity.setSiteId(siteId);
+            userEmailEntity.setUserId(userId);
+            userEmailEntity.setModifiedTime(System.currentTimeMillis());
+            boolean ret = metaManagementService.updateUserEmailMeta(userEmailEntity);
+            String message = "Successfully update user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
+            if (!ret) {
+                message = "Failed to update user meta for " + userEmailEntity.getSiteId() + ": " + userEmailEntity.getUserId();
             }
             response.success(ret).message(message);
         }).get();
     }
 
     @DELETE
-    @Path(PUBLISHER_META_PATH)
+    @Path(USER_META_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Void> deletePublisherMeta(@PathParam(USER_PATH) String userId) {
+    public RESTResponse<Void> deleteEmailPublisherMeta(@PathParam(Constants.SITE_ID) String siteId,
+                                                       @PathParam(Constants.USER_ID) String userId) {
         return RESTResponse.<Void>async((response) -> {
-            boolean ret = metaManagementService.deletePublisherMeta(userId);
-            String message = "Successfully delete publisher meta for " + userId;
+            boolean ret = metaManagementService.deleteUserEmailMeta(siteId, userId);
+            String message = "Successfully delete user meta for " + siteId + ":" + userId;
             if (!ret) {
-                message = "Failed to delete publisher meta for " + userId;
+                message = "Failed to delete user meta for " + siteId + ":" + userId;
             }
             response.success(ret).message(message);
         }).get();
     }
 
     @GET
-    @Path(PUBLISHER_META_PATH)
+    @Path(USER_META_PATH)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<List<PublisherEntity>> getPublisherMeta(@PathParam(USER_PATH) String userId) {
-        return RESTResponse.async(() -> metaManagementService.getPublisherMeta(userId)).get();
+    public RESTResponse<List<UserEmailEntity>> getEmailPublisherMeta(@PathParam(Constants.SITE_ID) String siteId,
+                                                                     @PathParam(Constants.USER_ID) String userId) {
+        return RESTResponse.async(() -> metaManagementService.getUserEmailMeta(siteId, userId)).get();
     }
 }

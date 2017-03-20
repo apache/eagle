@@ -146,6 +146,7 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
 
     private static VelocityContext buildAlertContext(PolicyDefinition policyDefinition, AlertStreamEvent event) {
         VelocityContext context = new VelocityContext();
+        context.put(AlertContextFields.SITE_ID, event.getSiteId());
         context.put(AlertContextFields.STREAM_ID, event.getStreamId());
         context.put(AlertContextFields.ALERT_ID, event.getAlertId());
         context.put(AlertContextFields.CREATED_BY, event.getCreatedBy());

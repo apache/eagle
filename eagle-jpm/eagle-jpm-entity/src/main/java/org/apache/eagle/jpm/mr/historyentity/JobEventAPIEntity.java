@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jevent")
-@Service(Constants.JPA_JOB_EVENT_SERVICE_NAME)
+@Service(Constants.MR_JOB_EVENT_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 public class JobEventAPIEntity extends JobBaseAPIEntity {

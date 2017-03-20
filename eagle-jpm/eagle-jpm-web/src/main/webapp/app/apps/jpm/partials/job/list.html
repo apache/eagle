@@ -49,11 +49,12 @@
 		</h3>
 	</div>
 	<div class="box-body">
-		<div id="jobList" sort-table="jobList" is-sorting="isSorting" search-path-list="searchPathList" scope="tableScope">
+		<div id="jobList" sort-table="jobList" is-sorting="isSorting" search-path-list="searchPathList" scope="tableScope" class="table-responsive">
 			<table class="table table-bordered">
 				<thead>
 					<tr>
 						<th sortpath="tags.jobId">Job ID</th>
+						<th sortpath="tags.jobName">Job Name</th>
 						<th sortpath="currentState">Status</th>
 						<th sortpath="tags.user" width="10">User</th>
 						<th sortpath="tags.queue">Queue</th>
@@ -71,6 +72,7 @@
 						<td>
 							<a ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})" target="_blank">{{item.tags.jobId}}</a>
 						</td>
+						<td>{{item.tags.jobName}}</td>
 						<td class="text-center">
 							<span class="label label-sm label-{{getStateClass(item.currentState)}}">
 								{{item.currentState}}
@@ -81,7 +83,7 @@
 						<td>{{Time.format(item.submissionTime)}}</td>
 						<td>{{Time.format(item.startTime)}}</td>
 						<td>{{Time.format(item.endTime)}}</td>
-						<td>{{Time.diffStr(item.duration)}}</td>
+						<td>{{Time.diffStr(item.durationTime)}}</td>
 						<td>{{item.numTotalMaps}}</td>
 						<td>{{item.numTotalReduces}}</td>
 						<td>{{item.runningContainers || "-"}}</td>

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Table("eaglejcount")
 @ColumnFamily("f")
 @Prefix("jcount")
-@Service(Constants.JPA_JOB_COUNT_SERVICE_NAME)
+@Service(Constants.MR_JOB_COUNT_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 public class JobCountEntity extends TaggedLogAPIEntity {

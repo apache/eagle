@@ -20,17 +20,15 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.service.hbase.TestHBaseBase;
 import org.apache.eagle.storage.DataStorage;
 import org.apache.eagle.storage.DataStorageManager;
+import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.exception.QueryCompileException;
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
+import org.apache.eagle.storage.hbase.TestWithHBaseCoprocessor;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,20 +39,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 
-public class TestHBaseStorageAggregateWithCoprocessor extends TestHBaseBase {
-    static final Logger LOG = LoggerFactory.getLogger(TestHBaseStorageAggregateWithCoprocessor.class);
-    EntityDefinition entityDefinition;
-    DataStorage<String> storage;
-    long baseTimestamp;
-
-    // This is Bad, It will hide TestHBaseBase.setUpHBase!!!!
-    @BeforeClass
-    public static void setUpHBase() {
-        System.setProperty("config.resource", "/application-co.conf");
-        Configuration conf = new Configuration();
-        conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY, AggregateProtocolEndPoint.class.getName());
-        TestHBaseBase.setupHBaseWithConfig(conf);
-    }
+public class TestHBaseStorageAggregateWithCoprocessor extends TestWithHBaseCoprocessor {
+    private static final Logger LOG = LoggerFactory.getLogger(TestHBaseStorageAggregateWithCoprocessor.class);
+    private static EntityDefinition entityDefinition;
+    private static DataStorage<String> storage;
+    private long baseTimestamp;
 
     private TestTimeSeriesAPIEntity newInstance() {
         TestTimeSeriesAPIEntity instance = new TestTimeSeriesAPIEntity();
@@ -76,13 +65,16 @@ public class TestHBaseStorageAggregateWithCoprocessor extends TestHBaseBase {
         return instance;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void prepare() throws IllegalAccessException, InstantiationException, IllegalDataStorageTypeException, IOException {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
-        entityDefinition.setTags(new String[] {"cluster", "datacenter", "random"});
-
+        entityDefinition.setTags(new String[]{"cluster", "datacenter", "random"});
         storage = DataStorageManager.getDataStorageByEagleConfig();
         storage.init();
+    }
+
+    @Before
+    public void setUp() throws Exception {
         GregorianCalendar gc = new GregorianCalendar();
         gc.clear();
         gc.set(2014, 1, 6, 1, 40, 12);

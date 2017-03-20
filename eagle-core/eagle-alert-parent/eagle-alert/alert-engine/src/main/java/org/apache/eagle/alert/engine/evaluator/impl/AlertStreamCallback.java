@@ -57,12 +57,14 @@ public class AlertStreamCallback extends StreamCallback {
     @Override
     public void receive(Event[] events) {
         String policyName = context.getPolicyDefinition().getName();
+        String siteId = context.getPolicyDefinition().getSiteId();
         CompositePolicyHandler handler = ((PolicyGroupEvaluatorImpl) context.getPolicyEvaluator()).getPolicyHandler(policyName);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Generated {} alerts from policy '{}' in {}, index of definiton {} ", events.length, policyName, context.getPolicyEvaluatorId(), currentIndex);
         }
         for (Event e : events) {
             AlertStreamEvent event = new AlertStreamEvent();
+            event.setSiteId(siteId);
             event.setTimestamp(e.getTimestamp());
             event.setData(e.getData());
             event.setStreamId(outputStream);

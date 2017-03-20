@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private static final Logger LOG = LoggerFactory.getLogger(JHFCrawlerDriverImpl.class);
 
-    private static final int SLEEP_SECONDS_WHILE_QUEUE_IS_EMPTY = 10;
+    private static final int SLEEP_SECONDS_WHILE_QUEUE_IS_EMPTY = 120;
     private static final String FORMAT_JOB_PROCESS_DATE = "%4d%02d%02d";
     private static final Pattern PATTERN_JOB_PROCESS_DATE = Pattern.compile("([0-9]{4})([0-9]{2})([0-9]{2})");
 

@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-from metric_collector import JmxMetricCollector,JmxMetricListener,Runner
+from metric_collector import JmxMetricCollector,JmxMetricListener,Runner,MetricNameConverter
 import json, logging, fnmatch, sys
 
 class NNSafeModeMetric(JmxMetricListener):
@@ -37,6 +37,16 @@ class NNHAMetric(JmxMetricListener):
                 self.collector.on_bean_kv(self.PREFIX, component, "hastate", 0)
             else:
                 self.collector.on_bean_kv(self.PREFIX, component, "hastate", 1)
+
+class corruptfilesMetric(JmxMetricListener):
+    def on_metric(self, metric):
+        if metric["metric"] == "hadoop.namenode.namenodeinfo.corruptfiles":
+            self.collector.collect(metric, "string", MetricNameConverter())
+
+class TopUserOpCountsMetric(JmxMetricListener):
+    def on_metric(self, metric):
+        if metric["metric"] == "hadoop.namenode.fsnamesystemstate.topuseropcounts":
+            self.collector.collect(metric, "string", MetricNameConverter())
 
 
 class MemoryUsageMetric(JmxMetricListener):
@@ -82,6 +92,17 @@ class DatanodeFSDatasetState(JmxMetricListener):
             metric["metric"] = "hadoop.datanode.fsdatasetstate.dfsused"
             self.collector.collect(metric)
 
+class HBaseRegionServerMetric(JmxMetricListener):
+    def on_metric(self, metric):
+        """
+        Rename metric "hadoop.hbase.ipc.ipc.*" to "hadoop.hbase.regionserver.ipc.*" to support different hbase version metric
+        """
+        if fnmatch.fnmatch(metric["metric"],"hadoop.hbase.ipc.ipc.*") and metric["component"] == "regionserver":
+            new_metric_name = metric["metric"].replace("hadoop.hbase.ipc.ipc.","hadoop.hbase.regionserver.ipc.")
+            logging.debug("Rename metric %s to %s" % (metric["metric"], new_metric_name))
+            metric["metric"] = new_metric_name
+            self.collector.collect(metric)
+
 if __name__ == '__main__':
     collector = JmxMetricCollector()
     collector.register(
@@ -90,6 +111,9 @@ if __name__ == '__main__':
         MemoryUsageMetric(),
         NNCapacityUsageMetric(),
         JournalTransactionInfoMetric(),
-        DatanodeFSDatasetState()
+        DatanodeFSDatasetState(),
+        HBaseRegionServerMetric(),
+        corruptfilesMetric(),
+        TopUserOpCountsMetric()
     )
     Runner.run(collector)
