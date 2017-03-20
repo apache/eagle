@@ -62,7 +62,7 @@ public class CounterToRateFunction implements TransformFunction {
     public void transform(Map event) {
         Metric metric = toMetric(event);
         LOG.debug("received {} metrics", metric);
-        if (new DefaultCountMetricFilter().apply(metric.getMetricName())) {
+        if (metric.isCounter()) {
             final String metricName = metric.getMetricName();
             final CounterValue prev = cache.get(metricName);
             if (prev != null) {
