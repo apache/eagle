@@ -19,11 +19,12 @@
 <div class="box box-primary">
 	<div class="box-header with-border">
 		<span class="fa fa-bell"></span>
-		<h3 class="box-title">
-			Alert Incidents
-		</h3>
+		<h3 class="box-title">Alert Trend</h3>
 	</div>
 	<div class="box-body">
+		<div chart style="height: 200px;" series="alertTrend"></div>
+	</div>
+	<div class="box-footer">
 		<div sort-table="alertList" is-sorting="isSorting">
 			<table class="table table-bordered">
 				<thead>
@@ -50,27 +51,8 @@
 							</span>
 						</td>
 						<td>{{item.tags.siteId}}</td>
-						<!--<td>-->
-							<!--<ul class="list-unstyled">-->
-								<!--<li ng-repeat="app in item.appIds track by $index" class="label label-sm label-primary">-->
-									<!--{{Application.findProvider(app).type || app}}-->
-								<!--</li>-->
-							<!--</ul>-->
-						<!--</td>-->
 						<td>{{item.tags.category || "N/A"}}</td>
 						<td><a ui-sref="alertDetail({siteId: site, alertId: item.tags.alertId, timestamp: item.timestamp})" title="{{item.alertBody}}">{{item.alertSubject}}</a></td>
-						<!--td>{{item.streamId}}</td-->
-						<!--td class="text-break">
-							<span ng-if="displayType === 'raw'" na-block="item.alertData"></span>
-							<div ng-if="displayType === 'format'" na-block="!!item.alertData">
-								<ul>
-									<li ng-repeat="(key, value) in item.alertData track by $index">
-										<strong>{{key}}:</strong>
-										{{value}}
-									</li>
-								</ul>
-							</div>
-						</td-->
 						<td>
 							<a ui-sref="policyDetail({siteId: site, name: item.tags.policyId})">{{item.tags.policyId}}</a>
 						</td>
@@ -81,5 +63,8 @@
 				</tbody>
 			</table>
 		</div>
+	</div>
+	<div class="overlay" ng-if="loading">
+		<i class="fa fa-refresh fa-spin"></i>
 	</div>
 </div>
