@@ -62,7 +62,7 @@ public class CounterToRateFunction implements TransformFunction {
     public void transform(Map event) {
         Metric metric = toMetric(event);
         LOG.debug("received {} metrics", metric);
-        if (metric.isCounter()) {
+        if (new DefaultCountMetricFilter().apply(metric.getMetricName())) {
             final String metricName = metric.getMetricName();
             final CounterValue prev = cache.get(metricName);
             if (prev != null) {
@@ -100,10 +100,10 @@ public class CounterToRateFunction implements TransformFunction {
     private double getCurrentValue(Map event) {
         double[] values;
         if (event.containsKey(metricDescriptor.getValueField())) {
-            values = new double[]{(double) event.get(metricDescriptor.getValueField())};
+            values = new double[] {(double) event.get(metricDescriptor.getValueField())};
         } else {
             LOG.warn("Event has no value field '{}': {}, use 0 by default", metricDescriptor.getValueField(), event);
-            values = new double[]{0};
+            values = new double[] {0};
         }
         return values[0];
     }
@@ -205,10 +205,16 @@ public class CounterToRateFunction implements TransformFunction {
             return result;
         }
 
-
         @Override
         public String toString() {
             return "Metric{metricName=" + metricName + ", timestamp=" + timestamp + ", value=" + value + '}';
+        }
+    }
+
+    private class DefaultCountMetricFilter implements CountMetricFilter {
+        @Override
+        public Boolean apply(String metricName) {
+            return metricName.endsWith("*.count");
         }
     }
 }
