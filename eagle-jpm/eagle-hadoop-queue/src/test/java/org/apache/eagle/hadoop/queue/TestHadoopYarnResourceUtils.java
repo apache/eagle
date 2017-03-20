@@ -41,9 +41,9 @@ public class TestHadoopYarnResourceUtils {
         String schedulerUrl = YarnClusterResourceURLBuilder.buildSchedulerInfoURL(baseUrl);
 
         try {
-            ClusterMetricsWrapper clusterMetrics = (ClusterMetricsWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(clusterMetricUrl, ClusterMetricsWrapper.class);
-            AppsWrapper appsWrapper = (AppsWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(finishedAppsUrl, AppsWrapper.class);
-            SchedulerWrapper schedulerWrapper = (SchedulerWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(schedulerUrl, SchedulerWrapper.class);
+            ClusterMetricsWrapper clusterMetrics = (ClusterMetricsWrapper) HadoopYarnResourceUtils.getObjectFromUrlStream(clusterMetricUrl, ClusterMetricsWrapper.class);
+            AppsWrapper appsWrapper = (AppsWrapper) HadoopYarnResourceUtils.getObjectFromUrlStream(finishedAppsUrl, AppsWrapper.class);
+            SchedulerWrapper schedulerWrapper = (SchedulerWrapper) HadoopYarnResourceUtils.getObjectFromUrlStream(schedulerUrl, SchedulerWrapper.class);
             Assert.assertTrue(appsWrapper != null);
             Assert.assertTrue(clusterMetrics != null);
             Assert.assertTrue(schedulerWrapper != null);

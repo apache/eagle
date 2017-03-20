@@ -45,7 +45,7 @@ public class SchedulerInfoCrawler implements Runnable {
         try {
             //https://some.server.address:50030/ws/v1/cluster/scheduler?anonymous=true
             logger.info("Start to crawl cluster scheduler queues from " + this.urlString);
-            SchedulerWrapper schedulerWrapper = (SchedulerWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(urlString, SchedulerWrapper.class);
+            SchedulerWrapper schedulerWrapper = (SchedulerWrapper) HadoopYarnResourceUtils.getObjectFromUrlStream(urlString, SchedulerWrapper.class);
             if (schedulerWrapper == null || schedulerWrapper.getScheduler() == null) {
                 logger.error("Failed to crawl scheduler info with url = " + this.urlString);
             } else {

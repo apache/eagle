@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.jpm.util.resourcefetch.ha;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourcefetch.url.RmActiveTestURLBuilderImpl;
@@ -38,6 +39,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
     private final Constants.CompressionType compressionType;
     private static final long MAX_RETRY_TIME = 2;
     private static final Logger LOG = LoggerFactory.getLogger(HAURLSelectorImpl.class);
+    private static ObjectMapper OBJ_MAPPER = new ObjectMapper();
 
     public HAURLSelectorImpl(String[] urls, Constants.CompressionType compressionType) {
         this.urls = urls;
