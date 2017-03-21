@@ -21,8 +21,6 @@ import org.apache.eagle.jpm.mr.running.parser.metrics.JobExecutionMetricsCreatio
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.Utils;
-import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
-import org.apache.eagle.jpm.util.resourcefetch.connection.URLConnectionUtils;
 import org.apache.eagle.jpm.util.resourcefetch.model.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import com.fasterxml.jackson.core.JsonParser;
