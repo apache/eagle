@@ -118,8 +118,8 @@
 				'</a>' +
 				'<div ng-show="!datanodehealtynum && !datanodehealtynum">' +
 				'<span>0</span> Datanodes (' +
-				'<span>0</span> Active / ' +
-				'<span>0</span> Standby)' +
+				'<span>0</span> Healthy / ' +
+				'<span>0</span> Unhealthy)' +
 				'</div>' +
 				'</div>' +
 				'<div ng-show="datanodehealtynum===-1 || datanodeunhealtynum===-1" class="hadoopMetric-widget-detail">' +

@@ -129,8 +129,8 @@
 				            '</a>' +
 				            '<div ng-show="!regionserverhealtynum && !regionserverunhealtynum">' +
 				            '<span>0</span> Masters (' +
-				            '<span>0</span> Active / ' +
-				            '<span>0</span> Standby)' +
+				            '<span>0</span> Healthy / ' +
+				            '<span>0</span> Unhealthy)' +
 				            '</div>' +
 				        '</div>' +
 				        '<div ng-show="regionserverhealtynum===-1 || regionserverunhealtynum===-1" class="hadoopMetric-widget-detail">' +

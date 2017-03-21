@@ -174,6 +174,17 @@
 			};
 			Time.onReload(function () {
 				cache = {};
+				$.each($scope.chartList, function (i) {
+					var chart = $scope.chartList[i];
+					var chartname = chart.name;
+					$scope.metricList[chartname] = {
+						title: chartname,
+						series: {},
+						option: {},
+						loading: true,
+						promises: []
+					};
+				});
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();
