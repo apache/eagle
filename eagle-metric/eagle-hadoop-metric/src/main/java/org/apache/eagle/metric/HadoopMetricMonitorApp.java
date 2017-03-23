@@ -57,7 +57,7 @@ public class HadoopMetricMonitorApp extends StormApplication {
         return environment.newApp(config)
             .fromStream("HADOOP_JMX_METRIC_STREAM").transformBy(new CounterToRateFunction(hadoopMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
             .saveAsMetric(hadoopMetricDescriptor)
-            .fromStream("SYSTEM_METRIC_STREAM").transformBy(new CounterToRateFunction(hadoopMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
+            .fromStream("SYSTEM_METRIC_STREAM").transformBy(new CounterToRateFunction(systemMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
             .saveAsMetric(systemMetricDescriptor
             )
             .toTopology();
