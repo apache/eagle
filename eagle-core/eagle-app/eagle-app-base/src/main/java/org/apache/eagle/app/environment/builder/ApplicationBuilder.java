@@ -104,7 +104,6 @@ public class ApplicationBuilder {
     public class TransformedStream extends InitializedStream {
         public TransformedStream(String id) {
             super(id);
-            throw new IllegalStateException("TODO: Not implemented yet");
         }
     }
 
