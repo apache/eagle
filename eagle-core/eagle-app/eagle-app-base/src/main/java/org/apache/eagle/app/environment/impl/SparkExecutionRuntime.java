@@ -24,6 +24,7 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.spark.launcher.SparkAppHandle;
 import org.apache.spark.launcher.SparkLauncher;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
     private static final String TOPOLOGY_SPARKUIPORT = "topology.sparkuiport";
     private static final String TOPOLOGY_APPRESOURCE = "topology.appresource";
     private static final String TOPOLOGY_YARNQUEUE = "topology.yarnqueue";
+    private static final String TOPOLOGY_SPARKCONFFILEPATH = "topology.sparkconffilepath";
     private SparkEnvironment environment;
     private static final long TIMEOUT = 120;
     private static final SparkExecutionRuntime INSTANCE = new SparkExecutionRuntime();
@@ -91,12 +93,16 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
         String uiport = config.getString(TOPOLOGY_SPARKUIPORT);
         String appResource = config.getString(TOPOLOGY_APPRESOURCE);
         String yarnqueue = config.getString(TOPOLOGY_YARNQUEUE);
+        String path = config.getString(TOPOLOGY_SPARKCONFFILEPATH);
 
         SparkLauncher sparkLauncher = new SparkLauncher();
         sparkLauncher.setMaster(master);
         sparkLauncher.setMainClass(mainClass);
         sparkLauncher.setSparkHome(sparkHome);
         //sparkLauncher.setJavaHome(TOPOLOGY_JAVAHOME);
+        if (StringUtil.isNotBlank(path)) {
+            sparkLauncher.setPropertiesFile(path);
+        }
         sparkLauncher.setDeployMode(deployMode);
         sparkLauncher.setVerbose(verbose);
         sparkLauncher.setAppResource(appResource);

@@ -165,7 +165,7 @@
         <property>
             <name>topology.sparkhome</name>
             <displayName>Spark home</displayName>
-            <value>/opt/cloudera/parcels/CDH-5.2.0-1.cdh5.2.0.p0.36/lib/spark</value>
+            <value>/opt/cloudera/parcels/YSPARK/lib/spark</value>
             <description>Spark home</description>
             <required>true</required>
         </property>
@@ -177,9 +177,16 @@
             <required>true</required>
         </property>
         <property>
+            <name>topology.sparkconffilepath</name>
+            <displayName>Spark conf file path</displayName>
+            <value>/etc/spark/conf/spark-defaults.conf</value>
+            <description>Spark conf file path</description>
+            <required>true</required>
+        </property>
+        <property>
             <name>topology.appresource</name>
             <displayName>Spark Appresource</displayName>
-            <value>/usr/1hd-eagle/1hd-eagle/eagle-topology-assembly/target/eagle-topology-0.5.0-SNAPSHOT-assembly.jar</value>
+            <value>/home/tandem/eagledlg/eagle/lib/eagle-topology-0.5.0-SNAPSHOT-assembly.jar</value>
             <description>Spark Appresource</description>
             <required>true</required>
         </property>
@@ -193,7 +200,7 @@
         <property>
             <name>topology.checkpointPath</name>
             <displayName>Spark steaming checkpoint directory</displayName>
-            <value></value>
+            <value>/user/denglingang/cp</value>
             <description>Spark steaming checkpoint directory</description>
             <required>false</required>
         </property>
