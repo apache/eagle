@@ -43,12 +43,12 @@ before_deploy:
   - export YHD_FIRST_COMMIT_HASH=$(git rev-list master --committer=Travis-CI --pretty=format:"%H" |tail -1)
   - export APACHE_LAST_COMMIT_HASH=$(git rev-list $YHD_FIRST_COMMIT_HASH^1 -1)
   - echo "deploying eagle-0.5.0-SNAPSHOT-bin-$APACHE_LAST_COMMIT_HASH.tar.gz to GitHub releases"
-  - mv eagle-server-assembly/target/eagle-0.5.0-SNAPSHOT-bin.tar.gz eagle-server-assembly/target/eagle-0.5.0-SNAPSHOT-bin-$APACHE_LAST_COMMIT_HASH.tar.gz
+  - mv eagle-assembly/target/eagle-0.5.0-SNAPSHOT-bin.tar.gz eagle-assembly/target/eagle-0.5.0-SNAPSHOT-bin-$APACHE_LAST_COMMIT_HASH.tar.gz
 deploy:
   provider: releases
   api_key: "${DLG_TOKEN}"
   file_glob: true
-  file: "eagle-server-assembly/target/eagle-0.5.0-SNAPSHOT-bin-${APACHE_LAST_COMMIT_HASH}.tar.gz"
+  file: "eagle-assembly/target/eagle-0.5.0-SNAPSHOT-bin-${APACHE_LAST_COMMIT_HASH}.tar.gz"
   skip_cleanup: true
   overwrite: true
   on:
