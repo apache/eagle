@@ -93,16 +93,13 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
         String uiport = config.getString(TOPOLOGY_SPARKUIPORT);
         String appResource = config.getString(TOPOLOGY_APPRESOURCE);
         String yarnqueue = config.getString(TOPOLOGY_YARNQUEUE);
-        String path = config.getString(TOPOLOGY_SPARKCONFFILEPATH);
+
 
         SparkLauncher sparkLauncher = new SparkLauncher();
         sparkLauncher.setMaster(master);
         sparkLauncher.setMainClass(mainClass);
         sparkLauncher.setSparkHome(sparkHome);
         //sparkLauncher.setJavaHome(TOPOLOGY_JAVAHOME);
-        if (StringUtil.isNotBlank(path)) {
-            sparkLauncher.setPropertiesFile(path);
-        }
         sparkLauncher.setDeployMode(deployMode);
         sparkLauncher.setVerbose(verbose);
         sparkLauncher.setAppResource(appResource);
@@ -114,7 +111,10 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
         sparkLauncher.setConf("spark.driver.cores", driverCore);
         sparkLauncher.setConf("spark.streaming.dynamicAllocation.enable", enable);
         sparkLauncher.setConf("spark.ui.port", uiport);
-
+        String path = config.getString(TOPOLOGY_SPARKCONFFILEPATH);
+        if (StringUtil.isNotBlank(path)) {
+            sparkLauncher.setPropertiesFile(path);
+        }
 
         String batchDuration = config.getString(BATCH_DURATION);
         String routerTasknum = config.getString(ROUTER_TASK_NUM);
