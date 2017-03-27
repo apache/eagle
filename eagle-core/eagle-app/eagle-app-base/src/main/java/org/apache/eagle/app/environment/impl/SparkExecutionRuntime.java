@@ -130,7 +130,7 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
         String restApicontext = config.getString(EAGLE_CORRELATION_CONTEXT);
         sparkLauncher.addAppArgs(batchDuration, routerTasknum, alertTasknum, publishTasknum,
             slideDurationsecond, windowDurationssecond, checkpointPath, topologyGroupid,
-            autoOffsetReset, restApihost, restApiport, restApicontext);
+            autoOffsetReset, restApicontext, restApiport, restApihost);
         return sparkLauncher;
     }
 
