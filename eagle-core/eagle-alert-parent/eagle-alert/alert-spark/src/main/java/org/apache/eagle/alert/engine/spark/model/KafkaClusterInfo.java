@@ -7,6 +7,7 @@ import org.apache.spark.streaming.kafka.KafkaCluster;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ public class KafkaClusterInfo implements Serializable {
     private String brokerList;
     private KafkaCluster kafkaCluster;
     private Map<String, String> kafkaParams = Maps.newHashMap();
-    private Map<TopicAndPartition, Long> offsets;
+    private HashMap<TopicAndPartition, Long> offsets;
 
     public KafkaClusterInfo(String zkQuorum) {
         this.zkQuorum = zkQuorum;
@@ -65,12 +66,12 @@ public class KafkaClusterInfo implements Serializable {
         this.kafkaParams = kafkaParams;
     }
 
-    public Map<TopicAndPartition, Long> getOffsets() {
+    public HashMap<TopicAndPartition, Long> getOffsets() {
         return offsets;
     }
 
     public void setOffsets(Map<TopicAndPartition, Long> offsets) {
-        this.offsets = offsets;
+        this.offsets = new HashMap<>(offsets);
     }
 
     public void addTopic(String topic) {
