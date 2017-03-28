@@ -165,7 +165,8 @@
         <maven-checkstyle.version>2.17</maven-checkstyle.version>
         <checkstyle.version>7.1</checkstyle.version>
         <cobertura-maven.version>2.7</cobertura-maven.version>
-        <coveralls-maven.version>4.3.0</coveralls-maven.version>
+        <coveralls-maven.version>4.3.0</coveralls-maven.version>        
+        <jacoco-maven.version>0.7.7.201606060606</jacoco-maven.version>
 
         <buildnumber-maven.version>1.4</buildnumber-maven.version>
         <templating-maven.version>1.0.0</templating-maven.version>
@@ -1120,6 +1121,7 @@
                     <version>${maven-surefire.version}</version>
                     <configuration>
                         <argLine>-XX:-UseGCOverheadLimit</argLine>
+                        <argLine>${surefireArgLine}</argLine>
                         <forkMode>always</forkMode>
                     </configuration>
                     <dependencies>
@@ -1207,6 +1209,29 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Checkstyle -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
