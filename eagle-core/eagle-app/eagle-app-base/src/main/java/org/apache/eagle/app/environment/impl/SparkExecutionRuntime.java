@@ -29,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment, JavaStreamingContext> {
 
@@ -143,19 +141,14 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
     }
 
     @Override
-    public void start(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        SparkAppListener sparkAppListener = new SparkAppListener(countDownLatch);
+    public synchronized void start(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
+        SparkAppListener sparkAppListener = new SparkAppListener();
         try {
             appHandle = prepareSparkConfig(config).startApplication(sparkAppListener);
             LOG.info("Starting Spark Streaming");
-            appHandle.addListener(new SparkAppListener(countDownLatch));
+            appHandle.addListener(new SparkAppListener());
             Thread sparkAppListenerThread = new Thread(sparkAppListener);
             sparkAppListenerThread.start();
-            countDownLatch.await(TIMEOUT, TimeUnit.SECONDS);
-            LOG.info("Spark Streaming is ended");
-        } catch (InterruptedException e) {
-            LOG.error("SparkExecutionRuntime countDownLatch InterruptedException", e);
         } catch (IOException e) {
             LOG.error("SparkLauncher().startApplication IOException", e);
         }
@@ -163,10 +156,14 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
     }
 
     @Override
-    public void stop(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
+    public synchronized void stop(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
         try {
+            LOG.error("try to call SparkLauncher().stop");
             appHandle.stop();
         } catch (Exception e) {
+            LOG.error("SparkLauncher().stop exception", e);
+        } finally {
+            LOG.error("try to call SparkLauncher().kill");
             appHandle.kill();
         }
     }
@@ -174,10 +171,9 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
     private static class SparkAppListener implements
         SparkAppHandle.Listener, Runnable {
         private static final Logger LOG = LoggerFactory.getLogger(SparkAppListener.class);
-        private final CountDownLatch countDownLatch;
 
-        SparkAppListener(CountDownLatch countDownLatch) {
-            this.countDownLatch = countDownLatch;
+        SparkAppListener() {
+
         }
 
         @Override
@@ -190,7 +186,7 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
                 LOG.info("Spark job's state changed to: " + appState);
             }
             if (appState != null && appState.isFinal()) {
-                countDownLatch.countDown();
+                LOG.info("Spark Streaming is ended");
             }
         }
 
@@ -204,7 +200,7 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
     }
 
     @Override
-    public ApplicationEntity.Status status(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
+    public synchronized ApplicationEntity.Status status(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
 
         if (appHandle == null) {
             return ApplicationEntity.Status.INITIALIZED;
@@ -213,6 +209,7 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
         LOG.info("Alert engine spark topology  status is " + state.name());
         ApplicationEntity.Status status;
         if (state.isFinal()) {
+            LOG.info("Spark Streaming is STOPPED");
             status = ApplicationEntity.Status.STOPPED;
         } else if (state == SparkAppHandle.State.RUNNING) {
             return ApplicationEntity.Status.RUNNING;
