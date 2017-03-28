@@ -30,6 +30,7 @@
 					<tr>
 						<th sortpath="policyStatus" width="10"></th>
 						<th sortpath="name" width="10%">Name</th>
+						<th width="5%">Severity</th>
 						<th>Description</th>
 						<th width="85" ng-if="Auth.isAdmin">Action</th>
 					</tr>
@@ -42,6 +43,7 @@
 						<td>
 							<a ui-sref="policyDetail({siteId: site, name: item.name})">{{item.name}}</a>
 						</td>
+						<td>{{item.alertDefinition.severity}}</td>
 						<td>{{item.description}}</td>
 						<td class="text-center" ng-if="Auth.isAdmin">
 							<div class="btn-group btn-group-xs">
