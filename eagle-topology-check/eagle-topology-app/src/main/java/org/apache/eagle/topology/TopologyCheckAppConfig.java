@@ -123,7 +123,6 @@ public class TopologyCheckAppConfig implements Serializable {
             systemConfig.systemInstanceKafkaSchemeCls = getOptionalConfig("dataSourceConfig.system.schemeCls", null);
             systemConfig.systemInstanceZkQuorum = getOptionalConfig("dataSourceConfig.system.zkConnection", null);
             systemConfig.systemInstanceSendBatchSize = config.getInt("dataSourceConfig.system.dataSendBatchSize");
-            systemConfig.systemInstanceEnable = config.getBoolean("dataSourceConfig.system.enabled");
         }
     }
 
@@ -161,7 +160,6 @@ public class TopologyCheckAppConfig implements Serializable {
         public String systemInstanceZkQuorum;
         public String systemInstanceKafkaSchemeCls;
         public int systemInstanceSendBatchSize;
-        public boolean systemInstanceEnable;
     }
 
     private String getOptionalConfig(String key, String defaultValue) {
