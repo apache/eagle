@@ -168,7 +168,12 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     @Override
     public void nextTuple() {
         for (KafkaSpoutWrapper wrapper : kafkaSpoutList.values()) {
-            wrapper.nextTuple();
+            try {
+                wrapper.nextTuple();
+            } catch (Exception e) {
+                LOG.error("unexpected exception is caught: {}", e.getMessage(), e);
+            }
+
         }
     }
 
