@@ -68,6 +68,7 @@ import static org.apache.eagle.alert.engine.utils.Constants.SLIDE_DURATION_SECON
 import static org.apache.eagle.alert.engine.utils.Constants.TOPOLOGY_GROUPID;
 import static org.apache.eagle.alert.engine.utils.Constants.WINDOW_DURATIONS_SECOND;
 import static org.apache.eagle.alert.engine.utils.Constants.alertPublishBoltName;
+
 /**
  * spark topology runner for multikafka.
  */
@@ -94,13 +95,16 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
 
 
     private static Config config;
-
+    private SparkConf sparkconf = new SparkConf();
 
     public UnitSparkUnionTopologyRunner(Config config) {
-
         prepareKafkaConfig(config);
         this.config = config;
+    }
 
+    public UnitSparkUnionTopologyRunner(Config config, SparkConf sparkconf) {
+        this(config);
+        this.sparkconf = sparkconf;
     }
 
     public void run() throws InterruptedException {
@@ -137,9 +141,8 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
         long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
-        SparkConf sparkConf = new SparkConf();
         @SuppressWarnings("unchecked")
-        JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchDuration));
+        JavaStreamingContext jssc = new JavaStreamingContext(this.sparkconf, Durations.seconds(batchDuration));
         if (!StringUtils.isEmpty(checkpointDirectory)) {
             jssc.checkpoint(checkpointDirectory);
         }

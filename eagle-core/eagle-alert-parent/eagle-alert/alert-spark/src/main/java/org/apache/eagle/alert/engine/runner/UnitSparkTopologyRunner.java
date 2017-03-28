@@ -85,7 +85,7 @@ public class UnitSparkTopologyRunner implements Serializable {
     private String groupId;
     //Zookeeper server string: host1:port1[,host2:port2,...]
     private String zkServers = null;
-
+    private SparkConf sparkConf = new SparkConf();
 
     private final Config config;
 
@@ -95,6 +95,11 @@ public class UnitSparkTopologyRunner implements Serializable {
         prepareKafkaConfig(config);
         this.config = config;
         this.zkServers = config.getString(ZKCONFIG_ZKQUORUM);
+    }
+
+    public UnitSparkTopologyRunner(Config config, SparkConf sparkConf) {
+        this(config);
+        this.sparkConf = sparkConf;
     }
 
     public void run() throws InterruptedException {
@@ -135,7 +140,6 @@ public class UnitSparkTopologyRunner implements Serializable {
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
         long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
-        SparkConf sparkConf = new SparkConf();
         @SuppressWarnings("unchecked")
         Class<MessageAndMetadata<String, String>> streamClass =
             (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;

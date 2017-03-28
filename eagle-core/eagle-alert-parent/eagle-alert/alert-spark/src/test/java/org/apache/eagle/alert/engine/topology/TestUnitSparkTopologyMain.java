@@ -21,10 +21,17 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner;
 import org.apache.eagle.alert.engine.runner.UnitSparkUnionTopologyRunner;
+import org.apache.spark.SparkConf;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestUnitSparkTopologyMain {
+    private static final String SPARK_EXECUTOR_CORES = "topology.core";
+    private static final String SPARK_EXECUTOR_MEMORY = "topology.memory";
+    private static final String TOPOLOGY_MASTER = "topology.master";
+    private static final String DRIVER_MEMORY = "topology.driverMemory";
+    private static final String DRIVER_CORES = "topology.driverCores";
+    private static final String DEPLOY_MODE = "topology.deployMode";
 
     @Ignore
     @Test
@@ -37,7 +44,9 @@ public class TestUnitSparkTopologyMain {
         System.setProperty("config.resource", configResourceName);
         System.out.print("Set config.resource = " + configResourceName);
         Config config = ConfigFactory.load();
-        new UnitSparkUnionTopologyRunner(config).run();
+        SparkConf sparkConf = prepareSparkConfig(config);
+        new UnitSparkUnionTopologyRunner(config, sparkConf).run();
+        //new UnitSparkTopologyRunner(config, sparkConf).run();
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -47,4 +56,23 @@ public class TestUnitSparkTopologyMain {
             new TestUnitSparkTopologyMain().testTopologyRun();
         }
     }
+
+    private SparkConf prepareSparkConfig(Config config) {
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setAppName(config.getString("topology.name"));
+        sparkConf.setMaster(config.getString(TOPOLOGY_MASTER));
+        String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
+        String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
+        String driverMemory = config.getString(DRIVER_MEMORY);
+        String driverCore = config.getString(DRIVER_CORES);
+        String deployMode = config.getString(DEPLOY_MODE);
+        sparkConf.set("spark.executor.cores", sparkExecutorCores);
+        sparkConf.set("spark.executor.memory", sparkExecutorMemory);
+        sparkConf.set("spark.driver.memory", driverMemory);
+        sparkConf.set("spark.driver.cores", driverCore);
+        sparkConf.set("spark.submit.deployMode", deployMode);
+        sparkConf.set("spark.streaming.dynamicAllocation.enable", "true");
+        return sparkConf;
+    }
+
 }
