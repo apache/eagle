@@ -57,12 +57,23 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.apache.eagle.alert.engine.utils.Constants.ALERT_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.AUTO_OFFSET_RESET;
+import static org.apache.eagle.alert.engine.utils.Constants.BATCH_DURATION;
+import static org.apache.eagle.alert.engine.utils.Constants.CHECKPOINT_PATH;
+import static org.apache.eagle.alert.engine.utils.Constants.DEFAULT_BATCH_DURATION_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.PUBLISH_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.ROUTER_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.SLIDE_DURATION_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.TOPOLOGY_GROUPID;
+import static org.apache.eagle.alert.engine.utils.Constants.WINDOW_DURATIONS_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.alertPublishBoltName;
 /**
  * spark topology runner for multikafka.
  */
 public class UnitSparkUnionTopologyRunner implements Serializable {
 
-    private static final long serialVersionUID = 381513979960046346L;
+    private static final long serialVersionUID = 391513979960046346L;
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkUnionTopologyRunner.class);
 
@@ -77,21 +88,6 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
     private final AtomicReference<RouterSpec> routerSpecRef = new AtomicReference<>();
     private final AtomicReference<PublishSpec> publishSpecRef = new AtomicReference<>();
     public static String groupId;
-    //Zookeeper server string: host1:port1[,host2:port2,...]
-    private String zkServers = null;
-    //spark config
-    private static final int DEFAULT_BATCH_DURATION_SECOND = 2;
-    private static final String alertPublishBoltName = "alertPublishBolt";
-    private static final String BATCH_DURATION = "topology.batchDuration";
-    private static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
-    private static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
-    private static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
-    private static final String SLIDE_DURATION_SECOND = "topology.slideDurations";
-    private static final String WINDOW_DURATIONS_SECOND = "topology.windowDurations";
-    private static final String CHECKPOINT_PATH = "topology.checkpointPath";
-    private static final String TOPOLOGY_GROUPID = "topology.groupId";
-    private static final String AUTO_OFFSET_RESET = "topology.offsetreset";
-
 
     private final AtomicReference<Map<KafkaClusterInfo, OffsetRange[]>> offsetRangesClusterMapRef = new AtomicReference<>();
     private static Class<MessageAndMetadata<String, String>> streamClass = (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;
@@ -144,7 +140,6 @@ public class UnitSparkUnionTopologyRunner implements Serializable {
         SparkConf sparkConf = new SparkConf();
         @SuppressWarnings("unchecked")
         JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchDuration));
-        LOG.info("spark.ui.port " + sparkConf.get("spark.ui.port"));
         if (!StringUtils.isEmpty(checkpointDirectory)) {
             jssc.checkpoint(checkpointDirectory);
         }

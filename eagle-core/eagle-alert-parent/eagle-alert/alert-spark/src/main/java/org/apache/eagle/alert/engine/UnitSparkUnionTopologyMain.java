@@ -20,20 +20,24 @@ package org.apache.eagle.alert.engine;
 import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner;
 import org.apache.eagle.alert.engine.runner.UnitSparkUnionTopologyRunner;
 
+import static org.apache.eagle.alert.engine.utils.Constants.ALERT_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.AUTO_OFFSET_RESET;
+import static org.apache.eagle.alert.engine.utils.Constants.BATCH_DURATION;
+import static org.apache.eagle.alert.engine.utils.Constants.CHECKPOINT_PATH;
+import static org.apache.eagle.alert.engine.utils.Constants.PUBLISH_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.ROUTER_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.SLIDE_DURATION_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.SPOUT_KAFKABROKERZKQUORUM;
+import static org.apache.eagle.alert.engine.utils.Constants.TOPOLOGY_GROUPID;
+import static org.apache.eagle.alert.engine.utils.Constants.TOPOLOGY_MULTIKAFKA;
+import static org.apache.eagle.alert.engine.utils.Constants.WINDOW_DURATIONS_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.ZKCONFIG_ZKQUORUM;
 
 public class UnitSparkUnionTopologyMain {
 
-    private static final String BATCH_DURATION = "topology.batchDuration";
-    private static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
-    private static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
-    private static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
-    private static final String SLIDE_DURATION_SECOND = "topology.slideDurations";
-    private static final String WINDOW_DURATIONS_SECOND = "topology.windowDurations";
-    private static final String CHECKPOINT_PATH = "topology.checkpointPath";
-    private static final String TOPOLOGY_GROUPID = "topology.groupId";
-    private static final String AUTO_OFFSET_RESET = "topology.offsetreset";
     private static final String EAGLE_CORRELATION_CONTEXT = "metadataService.context";
     private static final String EAGLE_CORRELATION_SERVICE_PORT = "metadataService.port";
     private static final String EAGLE_CORRELATION_SERVICE_HOST = "metadataService.host";
@@ -41,7 +45,7 @@ public class UnitSparkUnionTopologyMain {
     public static void main(String[] args) throws InterruptedException {
 
         Config config;
-        if (args != null && args.length == 12) {
+        if (args != null && args.length == 15) {
             ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
             ImmutableMap<String, String> argsMap = builder
                 .put(BATCH_DURATION, args[0])
@@ -55,12 +59,20 @@ public class UnitSparkUnionTopologyMain {
                 .put(AUTO_OFFSET_RESET, args[8])
                 .put(EAGLE_CORRELATION_CONTEXT, args[9])
                 .put(EAGLE_CORRELATION_SERVICE_PORT, args[10])
-                .put(EAGLE_CORRELATION_SERVICE_HOST, args[11]).build();
+                .put(EAGLE_CORRELATION_SERVICE_HOST, args[11])
+                .put(TOPOLOGY_MULTIKAFKA, args[12])
+                .put(SPOUT_KAFKABROKERZKQUORUM, args[13])
+                .put(ZKCONFIG_ZKQUORUM, args[14]).build();
             config = ConfigFactory.parseMap(argsMap);
         } else {
             config = ConfigFactory.load();
         }
+        boolean useMultiKafka = config.getBoolean(TOPOLOGY_MULTIKAFKA);
+        if (useMultiKafka) {
+            new UnitSparkUnionTopologyRunner(config).run();
+        } else {
+            new UnitSparkTopologyRunner(config).run();
+        }
 
-        new UnitSparkUnionTopologyRunner(config).run();
     }
 }

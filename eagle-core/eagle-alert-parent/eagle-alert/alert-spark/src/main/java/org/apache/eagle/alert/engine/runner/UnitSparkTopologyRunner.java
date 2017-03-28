@@ -51,6 +51,20 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.apache.eagle.alert.engine.utils.Constants.ALERT_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.AUTO_OFFSET_RESET;
+import static org.apache.eagle.alert.engine.utils.Constants.BATCH_DURATION;
+import static org.apache.eagle.alert.engine.utils.Constants.CHECKPOINT_PATH;
+import static org.apache.eagle.alert.engine.utils.Constants.DEFAULT_BATCH_DURATION_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.PUBLISH_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.ROUTER_TASK_NUM;
+import static org.apache.eagle.alert.engine.utils.Constants.SLIDE_DURATION_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.SPOUT_KAFKABROKERZKQUORUM;
+import static org.apache.eagle.alert.engine.utils.Constants.TOPOLOGY_GROUPID;
+import static org.apache.eagle.alert.engine.utils.Constants.WINDOW_DURATIONS_SECOND;
+import static org.apache.eagle.alert.engine.utils.Constants.ZKCONFIG_ZKQUORUM;
+import static org.apache.eagle.alert.engine.utils.Constants.alertPublishBoltName;
+
 public class UnitSparkTopologyRunner implements Serializable {
 
     private static final long serialVersionUID = 381513979960046346L;
@@ -71,26 +85,7 @@ public class UnitSparkTopologyRunner implements Serializable {
     private String groupId;
     //Zookeeper server string: host1:port1[,host2:port2,...]
     private String zkServers = null;
-    //spark config
-    private static final String BATCH_DURATION = "topology.batchDuration";
-    private static final int DEFAULT_BATCH_DURATION_SECOND = 2;
-    private static final String SPARK_EXECUTOR_CORES = "topology.core";
-    private static final String SPARK_EXECUTOR_MEMORY = "topology.memory";
-    private static final String alertPublishBoltName = "alertPublishBolt";
-    private static final String LOCAL_MODE = "topology.localMode";
-    private static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
-    private static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
-    private static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
-    private static final String SLIDE_DURATION_SECOND = "topology.slideDurations";
-    private static final String WINDOW_DURATIONS_SECOND = "topology.windowDurations";
-    private static final String TOPOLOGY_MASTER = "topology.master";
-    private static final String DRIVER_MEMORY = "topology.driverMemory";
-    private static final String DRIVER_CORES = "topology.driverCores";
-    private static final String DEPLOY_MODE = "topology.deployMode";
-    private static final String CHECKPOINT_PATH = "topology.checkpointPath";
 
-
-    private SparkConf sparkConf;
 
     private final Config config;
 
@@ -98,30 +93,34 @@ public class UnitSparkTopologyRunner implements Serializable {
     public UnitSparkTopologyRunner(Config config) {
 
         prepareKafkaConfig(config);
-        prepareSparkConfig(config);
         this.config = config;
-        this.zkServers = config.getString("zkConfig.zkQuorum");
-
+        this.zkServers = config.getString(ZKCONFIG_ZKQUORUM);
     }
 
     public void run() throws InterruptedException {
 
-        final String checkpointDirectory = config.getString(CHECKPOINT_PATH);
-        JavaStreamingContext jssc;
-        if (!StringUtils.isEmpty(checkpointDirectory)) {
-            Function0<JavaStreamingContext> createContextFunc = (Function0<JavaStreamingContext>) () -> buildTopology(config, checkpointDirectory);
-            jssc = JavaStreamingContext.getOrCreate(checkpointDirectory, createContextFunc);
-        } else {
-            jssc = buildTopology(config, checkpointDirectory);
-        }
-
+        JavaStreamingContext jssc = this.buildTopology();
         LOG.info("Starting Spark Streaming");
         jssc.start();
         LOG.info("Spark Streaming is running");
         jssc.awaitTermination();
     }
 
-    private JavaStreamingContext buildTopology(Config config, String checkpointDirectory) {
+    public JavaStreamingContext buildTopology() {
+
+        final String checkpointDirectory = config.getString(CHECKPOINT_PATH);
+        JavaStreamingContext jssc;
+        if (!StringUtils.isEmpty(checkpointDirectory)) {
+            Function0<JavaStreamingContext> createContextFunc = (Function0<JavaStreamingContext>) () -> buildAllTopology(config, checkpointDirectory);
+            jssc = JavaStreamingContext.getOrCreate(checkpointDirectory, createContextFunc);
+        } else {
+            jssc = buildAllTopology(config, checkpointDirectory);
+        }
+
+        return jssc;
+    }
+
+    private JavaStreamingContext buildAllTopology(Config config, String checkpointDirectory) {
 
         Set<String> topics = getTopicsByConfig(config);
         EagleKafkaUtils.fillInLatestOffsets(topics,
@@ -136,7 +135,7 @@ public class UnitSparkTopologyRunner implements Serializable {
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
         long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
-
+        SparkConf sparkConf = new SparkConf();
         @SuppressWarnings("unchecked")
         Class<MessageAndMetadata<String, String>> streamClass =
             (Class<MessageAndMetadata<String, String>>) (Class<?>) MessageAndMetadata.class;
@@ -191,11 +190,12 @@ public class UnitSparkTopologyRunner implements Serializable {
     }
 
     private void prepareKafkaConfig(Config config) {
-        String inputBroker = config.getString("spout.kafkaBrokerZkQuorum");
+        String inputBroker = config.getString(SPOUT_KAFKABROKERZKQUORUM);
         this.kafkaParams.put("metadata.broker.list", inputBroker);
-        this.groupId = config.getString("topology.groupId");
+        this.groupId = config.getString(TOPOLOGY_GROUPID);
         this.kafkaParams.put("group.id", this.groupId);
-        this.kafkaParams.put("auto.offset.reset", "largest");
+        String reset = config.hasPath(AUTO_OFFSET_RESET) ? config.getString(AUTO_OFFSET_RESET) : "largest";
+        this.kafkaParams.put("auto.offset.reset", reset);
         // Newer version of metadata.broker.list:
         this.kafkaParams.put("bootstrap.servers", inputBroker);
 
@@ -211,30 +211,6 @@ public class UnitSparkTopologyRunner implements Serializable {
         this.kafkaCluster = new KafkaCluster(immutableKafkaParam);
     }
 
-    private void prepareSparkConfig(Config config) {
-        SparkConf sparkConf = new SparkConf();
-        sparkConf.setAppName(config.getString("topology.name"));
-        boolean localMode = config.getBoolean(LOCAL_MODE);
-        if (localMode) {
-            LOG.info("Submitting as local mode");
-            sparkConf.setMaster("local[*]");
-        } else {
-            sparkConf.setMaster(config.getString(TOPOLOGY_MASTER));
-        }
-        String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
-        String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
-        String driverMemory = config.getString(DRIVER_MEMORY);
-        String driverCore = config.getString(DRIVER_CORES);
-        String deployMode = config.getString(DEPLOY_MODE);
-        sparkConf.set("spark.executor.cores", sparkExecutorCores);
-        sparkConf.set("spark.executor.memory", sparkExecutorMemory);
-        sparkConf.set("spark.driver.memory", driverMemory);
-        sparkConf.set("spark.driver.cores", driverCore);
-        sparkConf.set("spark.submit.deployMode", deployMode);
-        sparkConf.set("spark.streaming.dynamicAllocation.enable", "true");
-
-        this.sparkConf = sparkConf;
-    }
 
     private Set<String> getTopicsByConfig(Config config) {
         Set<String> topics = new HashSet<>();

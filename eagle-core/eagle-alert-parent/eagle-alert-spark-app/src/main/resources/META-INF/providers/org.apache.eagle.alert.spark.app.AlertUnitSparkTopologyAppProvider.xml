@@ -198,6 +198,13 @@
             <required>true</required>
         </property>
         <property>
+            <name>topology.multikafka</name>
+            <displayName>Support multikafka</displayName>
+            <value>true</value>
+            <description>Support multikafka</description>
+            <required>true</required>
+        </property>
+        <property>
             <name>topology.checkpointPath</name>
             <displayName>Spark steaming checkpoint directory</displayName>
             <value>/user/denglingang/cp</value>
@@ -209,6 +216,20 @@
             <displayName>Spark verbose</displayName>
             <value>false</value>
             <description>Spark verbose</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>spout.kafkaBrokerZkQuorum</name>
+            <displayName>KafkaBrokerZkQuorum</displayName>
+            <value>localhost:9092</value>
+            <description>KafkaBrokerZkQuorum</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>zkConfig.zkQuorum</name>
+            <displayName>ZkConfig zkQuorum</displayName>
+            <value>localhost:2181</value>
+            <description>ZkConfig zkQuorum</description>
             <required>false</required>
         </property>
     </configuration>

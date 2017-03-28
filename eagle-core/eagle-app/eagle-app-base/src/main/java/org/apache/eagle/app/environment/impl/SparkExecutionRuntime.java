@@ -67,6 +67,9 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
     private static final String EAGLE_CORRELATION_CONTEXT = "metadataService.context";
     private static final String EAGLE_CORRELATION_SERVICE_PORT = "metadataService.port";
     private static final String EAGLE_CORRELATION_SERVICE_HOST = "metadataService.host";
+    private static final String TOPOLOGY_MULTIKAFKA = "topology.multikafka";
+    private static final String SPOUT_KAFKABROKERZKQUORUM = "spout.kafkaBrokerZkQuorum";
+    private static final String ZKCONFIG_ZKQUORUM = "zkConfig.zkQuorum";
 
     @Override
     public void prepare(SparkEnvironment environment) {
@@ -128,9 +131,14 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
         String restApihost = config.getString(EAGLE_CORRELATION_SERVICE_HOST);
         String restApiport = config.getString(EAGLE_CORRELATION_SERVICE_PORT);
         String restApicontext = config.getString(EAGLE_CORRELATION_CONTEXT);
+        String useMultiKafka = config.getString(TOPOLOGY_MULTIKAFKA);
+        String kafkaBrokerZkQuorum = config.getString(SPOUT_KAFKABROKERZKQUORUM);
+        String zkConfigzkQuorum = config.getString(ZKCONFIG_ZKQUORUM);
+
+
         sparkLauncher.addAppArgs(batchDuration, routerTasknum, alertTasknum, publishTasknum,
             slideDurationsecond, windowDurationssecond, checkpointPath, topologyGroupid,
-            autoOffsetReset, restApicontext, restApiport, restApihost);
+            autoOffsetReset, restApicontext, restApiport, restApihost, useMultiKafka, kafkaBrokerZkQuorum, zkConfigzkQuorum);
         return sparkLauncher;
     }
 
@@ -156,7 +164,11 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
 
     @Override
     public void stop(Application<SparkEnvironment, JavaStreamingContext> executor, Config config) {
-        appHandle.stop();
+        try {
+            appHandle.stop();
+        } catch (Exception e) {
+            appHandle.kill();
+        }
     }
 
     private static class SparkAppListener implements
