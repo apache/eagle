@@ -73,7 +73,7 @@ public class TopologyCheckApp extends StormApplication {
         ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numKafkaSinkBolt).shuffleGrouping(parseBoltName);
 
         // system check data collector
-        if (topologyCheckAppConfig.systemConfig.systemInstanceEnable) {
+        if (null != topologyCheckAppConfig.systemConfig) {
             topologyBuilder.setSpout(
                 systemSpoutName,
                 new KafkaSpoutProvider(SYSTEM_COLLECTOR_CONFIG_PREFIX).getSpout(config),
