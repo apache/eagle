@@ -28,102 +28,104 @@ import java.io.IOException;
 import java.util.Date;
 
 public class GenericEntityScanStreamReader extends StreamReader {
-	private static final Logger LOG = LoggerFactory.getLogger(GenericEntityScanStreamReader.class);
-	
-	private EntityDefinition entityDef;
-	private SearchCondition condition;
-	private String prefix;
-	private long lastTimestamp = 0;
-	private long firstTimestamp = 0;
-	
-	public GenericEntityScanStreamReader(String serviceName, SearchCondition condition, String prefix) throws InstantiationException, IllegalAccessException{
-		this.prefix = prefix;
-		checkNotNull(serviceName, "serviceName");
-		this.entityDef = EntityDefinitionManager.getEntityByServiceName(serviceName);
-		checkNotNull(entityDef, "EntityDefinition");
-		this.condition = condition;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(GenericEntityScanStreamReader.class);
 
-	public GenericEntityScanStreamReader(EntityDefinition entityDef, SearchCondition condition, String prefix) throws InstantiationException, IllegalAccessException{
-		this.prefix = prefix;
-		checkNotNull(entityDef, "entityDef");
-		this.entityDef = entityDef;
-		checkNotNull(entityDef, "EntityDefinition");
-		this.condition = condition;
-	}
-	
-	public long getLastTimestamp() {
-		return lastTimestamp;
-	}
-	
-	private void checkNotNull(Object o, String message){
-		if(o == null){
-			throw new IllegalArgumentException(message + " should not be null");
-		}
-	}
+    private EntityDefinition entityDef;
+    private SearchCondition condition;
+    private String prefix;
+    private long lastTimestamp = 0;
+    private long firstTimestamp = 0;
 
-	public EntityDefinition getEntityDefinition() {
-		return entityDef;
-	}
+    public GenericEntityScanStreamReader(String serviceName, SearchCondition condition, String prefix) throws InstantiationException, IllegalAccessException{
+        this.prefix = prefix;
+        checkNotNull(serviceName, "serviceName");
+        this.entityDef = EntityDefinitionManager.getEntityByServiceName(serviceName);
+        checkNotNull(entityDef, "EntityDefinition");
+        this.condition = condition;
+    }
 
-	public SearchCondition getSearchCondition() {
-		return condition;
-	}
+    public GenericEntityScanStreamReader(EntityDefinition entityDef, SearchCondition condition, String prefix) throws InstantiationException, IllegalAccessException{
+        this.prefix = prefix;
+        checkNotNull(entityDef, "entityDef");
+        this.entityDef = entityDef;
+        checkNotNull(entityDef, "EntityDefinition");
+        this.condition = condition;
+    }
 
-	@Override
-	public void readAsStream() throws Exception{
-		Date start = null;
-		Date end = null;
-		// shortcut to avoid read when pageSize=0
-		if(condition.getPageSize() <= 0){
-			return; // return nothing
-		}
-		// Process the time range if needed
-		if(entityDef.isTimeSeries()){
-			start = new Date(condition.getStartTime());
-			end = new Date(condition.getEndTime());
-		}else{
-			start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
-			end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
-		}
-		byte[][] outputQualifiers = null;
-		if(!condition.isOutputAll()) {
-			// Generate the output qualifiers
-			outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
-		}
-		HBaseLogReader2 reader = new HBaseLogReader2(entityDef, condition.getPartitionValues(), start, end, condition.getFilter(), condition.getStartRowkey(), outputQualifiers, this.prefix);
-		try{
-			reader.open();
-			InternalLog log;
-			int count = 0;
-			while ((log = reader.read()) != null) {
-				TaggedLogAPIEntity entity = HBaseInternalLogHelper.buildEntity(log, entityDef);
-				if (lastTimestamp < entity.getTimestamp()) {
-					lastTimestamp = entity.getTimestamp();
-				}
-				if(firstTimestamp > entity.getTimestamp() || firstTimestamp == 0){
-					firstTimestamp = entity.getTimestamp();
-				}
+    public long getLastTimestamp() {
+        return lastTimestamp;
+    }
 
-				entity.setSerializeVerbose(condition.isOutputVerbose());
-				entity.setSerializeAlias(condition.getOutputAlias());
+    private void checkNotNull(Object o, String message){
+        if(o == null){
+            throw new IllegalArgumentException(message + " should not be null");
+        }
+    }
 
-				for(EntityCreationListener l : _listeners){
-					l.entityCreated(entity);
-				}
-				if(++count == condition.getPageSize())
-					break;
-			}
-		}catch(IOException ioe){
-			LOG.error("Fail reading log", ioe);
-			throw ioe;
-		}finally{
-			reader.close();
-		}		
-	}
+    public EntityDefinition getEntityDefinition() {
+        return entityDef;
+    }
 
-	@Override
-	public long getFirstTimestamp() {
-		return this.firstTimestamp;
-	}
+    public SearchCondition getSearchCondition() {
+        return condition;
+    }
+
+    @Override
+    public void readAsStream() throws Exception{
+        Date start = null;
+        Date end = null;
+        // shortcut to avoid read when pageSize=0
+        if(condition.getPageSize() <= 0){
+            return; // return nothing
+        }
+        // Process the time range if needed
+        if(entityDef.isTimeSeries()){
+            start = new Date(condition.getStartTime());
+            end = new Date(condition.getEndTime());
+        }else{
+            //start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
+            //end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
+            start = new Date(EntityConstants.FIXED_READ_START_TIMESTAMP);
+            end = new Date(EntityConstants.FIXED_READ_END_TIMESTAMP);
+        }
+        byte[][] outputQualifiers = null;
+        if(!condition.isOutputAll()) {
+            // Generate the output qualifiers
+            outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
+        }
+        HBaseLogReader2 reader = new HBaseLogReader2(entityDef, condition.getPartitionValues(), start, end, condition.getFilter(), condition.getStartRowkey(), outputQualifiers, this.prefix);
+        try{
+            reader.open();
+            InternalLog log;
+            int count = 0;
+            while ((log = reader.read()) != null) {
+                TaggedLogAPIEntity entity = HBaseInternalLogHelper.buildEntity(log, entityDef);
+                if (lastTimestamp < entity.getTimestamp()) {
+                    lastTimestamp = entity.getTimestamp();
+                }
+                if(firstTimestamp > entity.getTimestamp() || firstTimestamp == 0){
+                    firstTimestamp = entity.getTimestamp();
+                }
+
+                entity.setSerializeVerbose(condition.isOutputVerbose());
+                entity.setSerializeAlias(condition.getOutputAlias());
+
+                for(EntityCreationListener l : _listeners){
+                    l.entityCreated(entity);
+                }
+                if(++count == condition.getPageSize())
+                    break;
+            }
+        }catch(IOException ioe){
+            LOG.error("Fail reading log", ioe);
+            throw ioe;
+        }finally{
+            reader.close();
+        }
+    }
+
+    @Override
+    public long getFirstTimestamp() {
+        return this.firstTimestamp;
+    }
 }
