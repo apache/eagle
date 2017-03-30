@@ -14,9 +14,21 @@
 # limitations under the License.
 
 language: java
-before_install:
-  - echo "MAVEN_OPTS='-Xmx2g -XX:MaxPermSize=512m'" > ~/.mavenrc
-script:
-  - mvn clean test -B
+
 jdk:
   - oraclejdk8
+
+before_install: echo "MAVEN_OPTS='-Xmx2048m -Xms1024m -XX:MaxPermSize=512m'" > ~/.mavenrc
+
+script:
+  - mvn clean test
+
+env:
+  global:
+    - MAVEN_OPTS: "-Xmx1024m -Xms512m -XX:MaxPermSize=256m"
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.m2
