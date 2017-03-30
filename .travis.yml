@@ -17,8 +17,8 @@ language: java
 before_script:
   - export MAVEN_SKIP_RC=true
 script:
-  - export MAVEN_OPTS="-Xmx1024M -Xss128M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled"
-  - mvn clean test -B
+  - export MAVEN_OPTS="-Xmx1024M"
+  - mvn clean test
 jdk:
   - oraclejdk8
 cache:
