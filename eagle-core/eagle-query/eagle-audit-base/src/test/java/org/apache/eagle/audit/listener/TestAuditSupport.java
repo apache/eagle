@@ -54,7 +54,7 @@ public class TestAuditSupport {
     }
 
     @Test
-    public void addAuditProxyHbase() throws Exception {
+    public void addAuditProxyHBase() throws Exception {
         AuditSupport auditSupport = new AuditSupport(this);
         Field mapField = AuditSupport.class.getDeclaredField("map");
         mapField.setAccessible(true);

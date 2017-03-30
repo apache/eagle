@@ -34,7 +34,7 @@ import java.util.*;
 public class HBaseAuditLogParserBolt extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(HBaseAuditLogParserBolt.class);
     private OutputCollector collector;
-    private static final HbaseAuditLogParser parser = new HbaseAuditLogParser();
+    private static final HBaseAuditLogParser parser = new HBaseAuditLogParser();
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -45,7 +45,7 @@ public class HBaseAuditLogParserBolt extends BaseRichBolt {
     public void execute(Tuple input) {
         String logLine = input.getString(0);
         try {
-            HbaseAuditLogObject entity = parser.parse(logLine);
+            HBaseAuditLogObject entity = parser.parse(logLine);
             Map<String, Object> map = new TreeMap<>();
             map.put("action", entity.action);
             map.put("host", entity.host);

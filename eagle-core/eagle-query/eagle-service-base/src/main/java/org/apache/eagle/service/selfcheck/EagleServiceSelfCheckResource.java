@@ -30,8 +30,8 @@ public class EagleServiceSelfCheckResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public EagleServiceSelfCheckAPIEntity selfCheck(){
 		EagleServiceSelfCheckAPIEntity entity = new EagleServiceSelfCheckAPIEntity();
-		entity.setHbaseZookeeperQuorum(EagleConfigFactory.load().getZKQuorum());
-		entity.setHbaseZookeeperClientPort(EagleConfigFactory.load().getZKPort());
+		entity.setHBaseZookeeperQuorum(EagleConfigFactory.load().getZKQuorum());
+		entity.setHBaseZookeeperClientPort(EagleConfigFactory.load().getZKPort());
 		entity.setEnv(EagleConfigFactory.load().getEnv());
 		return entity;
 	}

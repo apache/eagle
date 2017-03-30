@@ -20,13 +20,13 @@ package org.apache.eagle.topology;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;
+import org.apache.eagle.topology.extractor.hbase.HBaseTopologyCrawler;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class TestHbaseTopologyCrawler {
+public class TestHBaseTopologyCrawler {
 
     @Test @Ignore
     public void test() {
@@ -34,7 +34,7 @@ public class TestHbaseTopologyCrawler {
 
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
         TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
-        HbaseTopologyCrawler crawler = new HbaseTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
+        HBaseTopologyCrawler crawler = new HBaseTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
         crawler.extract();
     }
 }

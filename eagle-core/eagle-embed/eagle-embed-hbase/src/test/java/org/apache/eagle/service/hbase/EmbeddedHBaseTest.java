@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class EmbeddedHbaseTest extends TestHBaseBase {
+public class EmbeddedHBaseTest extends TestHBaseBase {
     @Test
     public void testHBaseCreateTable() throws IOException {
         hbase.createTable("test_hbase_table","f");

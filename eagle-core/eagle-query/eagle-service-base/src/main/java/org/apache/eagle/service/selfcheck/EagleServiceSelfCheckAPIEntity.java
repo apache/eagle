@@ -32,16 +32,16 @@ public class EagleServiceSelfCheckAPIEntity {
 	public void setEnv(String env) {
 		this.env = env;
 	}
-	public String getHbaseZookeeperQuorum() {
+	public String getHBaseZookeeperQuorum() {
 		return hbaseZookeeperQuorum;
 	}
-	public void setHbaseZookeeperQuorum(String hbaseZookeeperQuorum) {
+	public void setHBaseZookeeperQuorum(String hbaseZookeeperQuorum) {
 		this.hbaseZookeeperQuorum = hbaseZookeeperQuorum;
 	}
-	public String getHbaseZookeeperClientPort() {
+	public String getHBaseZookeeperClientPort() {
 		return hbaseZookeeperClientPort;
 	}
-	public void setHbaseZookeeperClientPort(String hbaseZookeeperClientPort) {
+	public void setHBaseZookeeperClientPort(String hbaseZookeeperClientPort) {
 		this.hbaseZookeeperClientPort = hbaseZookeeperClientPort;
 	}
 }

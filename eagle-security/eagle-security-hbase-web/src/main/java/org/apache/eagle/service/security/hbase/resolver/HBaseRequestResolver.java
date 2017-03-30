@@ -29,10 +29,10 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class HbaseRequestResolver extends AbstractCommandResolver {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseRequestResolver.class);
+public class HBaseRequestResolver extends AbstractCommandResolver {
+    private final static Logger LOG = LoggerFactory.getLogger(HBaseRequestResolver.class);
 
-    public HbaseRequestResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+    public HBaseRequestResolver(ApplicationEntityService entityService, Config eagleServerConfig){
 
     }
 

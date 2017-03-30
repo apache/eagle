@@ -25,8 +25,8 @@ import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.security.hbase.HbaseMetadataBrowseWebResource;
-import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
+import org.apache.eagle.service.security.hbase.HBaseMetadataBrowseWebResource;
+import org.apache.eagle.service.security.hbase.dao.HBaseMetadataDAOImpl;
 import org.apache.hadoop.conf.Configuration;
 
 import java.io.IOException;
@@ -36,9 +36,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 
-public class HbaseMetadataResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
+public class HBaseMetadataResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     private ApplicationEntityService entityService;
-    public HbaseMetadataResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+    public HBaseMetadataResolver(ApplicationEntityService entityService, Config eagleServerConfig){
         this.entityService = entityService;
     }
 
@@ -62,9 +62,9 @@ public class HbaseMetadataResolver implements AttributeResolvable<GenericAttribu
         String[] subResources = query.split(":");
 
         try {
-            Map<String, Object> config = getAppConfig(site, HbaseMetadataBrowseWebResource.HBASE_APPLICATION);
+            Map<String, Object> config = getAppConfig(site, HBaseMetadataBrowseWebResource.HBASE_APPLICATION);
             Configuration conf = convert(config);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
+            HBaseMetadataDAOImpl dao = new HBaseMetadataDAOImpl(conf);
 
             switch (subResources.length) {
                 case 1:

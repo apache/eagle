@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class HbaseAuditLogParser implements Serializable {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseAuditLogParser.class);
+public class HBaseAuditLogParser implements Serializable {
+    private final static Logger LOG = LoggerFactory.getLogger(HBaseAuditLogParser.class);
 
     private final static int LOGDATE_INDEX = 1;
     private final static int LOGLEVEL_INDEX = 2;
@@ -44,10 +44,10 @@ public class HbaseAuditLogParser implements Serializable {
     private final static Pattern allowedPattern = Pattern.compile(ALLOWED);
 
 
-    public HbaseAuditLogObject parse(String logLine) {
+    public HBaseAuditLogObject parse(String logLine) {
         if(logLine == null || logLine.isEmpty()) return null;
 
-        HbaseAuditLogObject ret = new HbaseAuditLogObject();
+        HBaseAuditLogObject ret = new HBaseAuditLogObject();
         String timestamp = "";
         String user = "";
         String scope = "";

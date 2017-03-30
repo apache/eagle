@@ -30,12 +30,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HbaseMetadataDAOImpl {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseMetadataDAOImpl.class);
+public class HBaseMetadataDAOImpl {
+    private final static Logger LOG = LoggerFactory.getLogger(HBaseMetadataDAOImpl.class);
 
     private Configuration hBaseConfiguration;
 
-    public HbaseMetadataDAOImpl(Configuration config) {
+    public HBaseMetadataDAOImpl(Configuration config) {
         this.hBaseConfiguration = HBaseConfiguration.create();
         this.hBaseConfiguration.addResource(config);
         //this.hBaseConfiguration.set("hbase.zookeeper.quorum", this.config.getZkQuorum());
@@ -54,7 +54,7 @@ public class HbaseMetadataDAOImpl {
         for(NamespaceDescriptor n : ns) {
             ret.add(n.getName());
         }
-        closeHbaseConnection(admin);
+        closeHBaseConnection(admin);
         return ret;
     }
 
@@ -66,7 +66,7 @@ public class HbaseMetadataDAOImpl {
         for(TableName tableName : tables) {
             ret.add(tableName.getQualifierAsString());
         }
-        closeHbaseConnection(admin);
+        closeHBaseConnection(admin);
         return ret;
     }
 
@@ -79,11 +79,11 @@ public class HbaseMetadataDAOImpl {
         for(HColumnDescriptor cf : cfs) {
             ret.add(cf.getNameAsString());
         }
-        closeHbaseConnection(admin);
+        closeHBaseConnection(admin);
         return ret;
     }
 
-    private void closeHbaseConnection(HBaseAdmin admin) {
+    private void closeHBaseConnection(HBaseAdmin admin) {
         if(admin != null) {
             try {
                 admin.close();

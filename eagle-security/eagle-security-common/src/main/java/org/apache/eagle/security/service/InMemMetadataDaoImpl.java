@@ -17,7 +17,6 @@
 package org.apache.eagle.security.service;
 
 import com.google.inject.Inject;
-import com.typesafe.config.Config;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
     @Override
     public synchronized OpResult addHBaseSensitivity(Collection<HBaseSensitivityEntity> h) {
         for (HBaseSensitivityEntity e : h) {
-            Pair p = new ImmutablePair<>(e.getSite(), e.getHbaseResource());
+            Pair p = new ImmutablePair<>(e.getSite(), e.getHBaseResource());
             hBaseSensitivityEntities.put(p, e);
         }
         return new OpResult();
