@@ -14,7 +14,11 @@
 # limitations under the License.
 
 language: java
-script: mvn clean test -B
+before_script:
+  - export MAVEN_SKIP_RC=true
+script:
+  - export MAVEN_OPTS="-Xmx1024M -Xss128M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled"
+  - mvn clean test -B
 jdk:
   - oraclejdk8
 cache:
