@@ -20,6 +20,3 @@ script:
   - mvn clean test -B
 jdk:
   - oraclejdk8
-cache:
-  directories:
-      - $HOME/.m2
