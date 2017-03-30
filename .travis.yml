@@ -14,7 +14,7 @@
 # limitations under the License.
 
 language: java
-before_script:
+before_install:
   - echo "MAVEN_OPTS='-Xmx2g -XX:MaxPermSize=512m'" > ~/.mavenrc
 script:
   - mvn clean test -B
