@@ -15,10 +15,9 @@
 
 language: java
 before_script:
-  - export MAVEN_SKIP_RC=true
+  - echo "MAVEN_OPTS='-Xmx2g -XX:MaxPermSize=512m'" > ~/.mavenrc
 script:
-  - export MAVEN_OPTS="-Xmx1024M"
-  - mvn clean test
+  - mvn clean test -B
 jdk:
   - oraclejdk8
 cache:
