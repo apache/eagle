@@ -28,6 +28,16 @@ echo "Pushing with force ..."
 git push --force origin master > /dev/null 2>&1 || exit 1
 echo "Pushed deployment successfully"
 
+
+touch ${HOME}/apachehash
+yhdfirsthash="`git rev-list master --committer=Travis-CI --pretty=format:"%H" |tail -1`"
+apachelasthash="`git rev-list $yhdfirsthash^1 -1`"
+echo "export APACHE_LAST_COMMIT_HASH=$apachelasthash" >>  ${HOME}/apachehash
+
+echo "show apache last commit hash"
+cat ${HOME}/apachehash
+echo "show apache last commit hash end"
+
 set +e
 
 if [ -z "$TRAVIS_TAG" ]; then
