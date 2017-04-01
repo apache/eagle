@@ -23,7 +23,6 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobFetchSpout;
@@ -53,6 +52,7 @@ import java.util.concurrent.Executors;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InputStreamUtils.class, MRRunningJobFetchSpout.class, Executors.class, MRRunningJobParseBolt.class})
@@ -255,6 +255,8 @@ public class MRRunningJobApplicationTest {
         InputStream jsonstream = this.getClass().getResourceAsStream(mockDataFilePath);
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream(RM_URL, null, Constants.CompressionType.GZIP)).thenReturn(jsonstream);
+        InputStream clusterInfoStream = this.getClass().getResourceAsStream("/clusterinfo.json");
+        when(InputStreamUtils.getInputStream("http://sandbox.hortonworks.com:50030/ws/v1/cluster?anonymous=true", null, Constants.CompressionType.NONE)).thenReturn(clusterInfoStream);
     }
 
 }
