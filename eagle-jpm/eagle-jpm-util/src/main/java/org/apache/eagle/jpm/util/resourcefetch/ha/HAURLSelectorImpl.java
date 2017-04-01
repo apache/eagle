@@ -19,6 +19,7 @@ package org.apache.eagle.jpm.util.resourcefetch.ha;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.model.ClusterInfoWrapper;
 import org.apache.eagle.jpm.util.resourcefetch.url.RmActiveTestURLBuilderImpl;
 import org.apache.eagle.jpm.util.resourcefetch.url.ServiceURLBuilder;
 import org.apache.hadoop.util.StringUtils;
@@ -58,6 +59,10 @@ public class HAURLSelectorImpl implements HAURLSelector {
         try {
             LOG.info("checking resource manager HA by {}", urlString);
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
+            if (null == is) {
+                return false;
+            }
+            OBJ_MAPPER.readValue(is, ClusterInfoWrapper.class);
         } catch (Exception ex) {
             LOG.info("fail to get inputStream from {}", urlString);
             return false;
