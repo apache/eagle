@@ -51,3 +51,21 @@
 		</div>
 	</div>
 </div>
+
+
+<!--region server health chart-->
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Health HeatMap
+		</h3>
+	</div>
+	<div class="box-body no-padding">
+		<div class="hadoopMetric-chart">
+			<div chart class="hadoopMetric-chart-container" series="healthStatusSeries" option="healthStatusOption"></div>
+			<div ng-if="(healthStatusSeries || []).length === 0" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+		</div>
+	</div>
+</div>
