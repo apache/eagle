@@ -83,3 +83,4 @@ logs/
 **/*.pyc
 
 **/*.db
+docs/site
