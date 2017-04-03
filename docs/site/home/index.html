@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>Home - Apache Eagle Documentation</title>
+  
+
+  <link rel="shortcut icon" href="../include/images/favicon.png">
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "home.md";
+    var mkdocs_page_url = "/home/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="./" class="icon icon-home"> Apache Eagle Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Home</a>
+        
+            <ul>
+            
+                
+    
+        <li class="toctree-l3" onclick="select(this)"><a 
+    
+        
+    
+ href="#what-is-eagle">What is Eagle</a></li>
+        
+            <ul>
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 4em;"
+    
+ href="#terminology">Terminology</a></li>
+        
+            <ul>
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#site">Site</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#application">Application</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#stream">Stream</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#data-activity-monitoring">Data Activity Monitoring</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#alert-engine">Alert Engine</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#policy">Policy</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#alert">Alert</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#alert-publisher">Alert Publisher</a></li>
+        
+    
+
+            
+            </ul>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 4em;"
+    
+ href="#key-qualities">Key Qualities</a></li>
+        
+            <ul>
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#extensible">Extensible</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#scalable">Scalable</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#real-time">Real-time</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#dynamic">Dynamic</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#easy-of-use">Easy-of-Use</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 5em;"
+    
+ href="#non-invasive">Non-Invasive</a></li>
+        
+    
+
+            
+            </ul>
+        
+    
+
+            
+            </ul>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l3" onclick="select(this)"><a 
+    
+        
+    
+ href="#use-case-examples">Use Case Examples</a></li>
+        
+            <ul>
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 4em;"
+    
+ href="#data-activity-monitoring_1">Data Activity Monitoring</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 4em;"
+    
+ href="#job-performance-analysis">Job Performance Analysis</a></li>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l4" onclick="select(this)"><a 
+    
+        
+        style="padding-left: 4em;"
+    
+ href="#cluster-performance-analytics">Cluster Performance Analytics</a></li>
+        
+    
+
+            
+            </ul>
+        
+    
+
+            
+                
+    
+        <li class="toctree-l3" onclick="select(this)"><a 
+    
+        
+    
+ href="#disclaimer">Disclaimer</a></li>
+        
+    
+
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 ">
+        <a class="" href="../getting-started/">Getting Started</a>
+        
+    </li>
+<li>
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 ">
+        <a class="" href="../using-eagle/">Using Eagle</a>
+        
+    </li>
+<li>
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 ">
+        <a class="" href="../applications/">Applications</a>
+        
+    </li>
+<li>
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 ">
+        <a class="" href="../developing-application/">Developing Application</a>
+        
+    </li>
+<li>
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 ">
+        <a class="" href="../underlying-design/">Underlying Design</a>
+        
+    </li>
+<li>
+          
+            <li><script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+
+    <li class="toctree-l1 ">
+        <a class="" href="../reference/">Reference</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="./">Apache Eagle Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="./">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="what-is-eagle">What is Eagle</h1>
+<p><strong> Apache Eagle </strong> (incubating) is a highly extensible, scalable monitoring and alerting platform, designed with its flexible application framework and proven big data technologies, such as Kafka, Spark and Storm. It ships a rich set of applications for big data platform monitoring, e.g. HDFS/HBase/YARN service health check, JMX metrics, daemon logs, audit logs and yarn applications. External Eagle developers can define applications to monitoring their NoSQLs or Web Servers, and publish to Eagle application repository at your own discretion. It also provides the state-of-art alert engine to report security breaches, service failures, and application anomalies, highly customizable by the alert policy definition. </p>
+<p><img alt="overview" src="../include/images/overview.png" /></p>
+<h2 id="terminology">Terminology</h2>
+<h3 id="site">Site</h3>
+<ul>
+<li>A virtual concept in Apache Eagle. You can use it to manage a group of application instances, and distinguish the applications if you have a certain application installed for multiple times.</li>
+</ul>
+<h3 id="application">Application</h3>
+<ul>
+<li>Application(or Monitoring Application) is the first-class citizen in Apache Eagle, it stands for an end-to-end monitoring/alerting solution, which usually contains the monitoring source onboarding, source schema specification, alerting policy and dashboard definition.</li>
+</ul>
+<h3 id="stream">Stream</h3>
+<ul>
+<li>Stream is the input for Alert Engine, each Application should have its own stream to be defined by the developer. Usually, it will have a POJO-like structure included in the stream definition. Once it's defined, Application should have the logic to write data into Kafka.</li>
+</ul>
+<h3 id="data-activity-monitoring">Data Activity Monitoring</h3>
+<ul>
+<li>A built-in monitoring application to monitor HDFS/HBase/Hive operations, and allow users to define certain policies to detect sensitive data access and malicious data operations in real-time.</li>
+</ul>
+<h3 id="alert-engine">Alert Engine</h3>
+<ul>
+<li>A specific built-in application shared for all other monitoring applications, it reads data from Kafka, and processes the data by applying the policy in real-time manner, and generates alert notification. So we call this application as the Alert Engine.</li>
+</ul>
+<h3 id="policy">Policy</h3>
+<ul>
+<li>A rule used by Alert Engine to match the data input from Kafka. Policy is defined in <a href="https://docs.wso2.com/display/CEP300/Siddhi+Language+Specification">SiddhiQL</a> format.</li>
+</ul>
+<h3 id="alert">Alert</h3>
+<ul>
+<li>If any data input to Alert Engine meets the policy, the Alert Engine will generate a message and publish it through alert publisher. We call such messages as the alerts.</li>
+</ul>
+<h3 id="alert-publisher">Alert Publisher</h3>
+<ul>
+<li>It will publish the alert to external channels which can be the SMTP channel, the Kafka channel, Slack channel or other storage systems.</li>
+</ul>
+<h2 id="key-qualities">Key Qualities</h2>
+<h3 id="extensible">Extensible</h3>
+<ul>
+<li>Apache Eagle built its core framework around the application concept, application itself includes the logic for monitoring source data collection, pre-processing and normalization. Developer can easily develop his own out-of-box monitoring applications using Eagle's application framework, and deploy into Eagle.</li>
+</ul>
+<h3 id="scalable">Scalable</h3>
+<ul>
+<li>The Eagle core team has chosen the proven big data technologies to build its fundamental runtime, and apply a scalable core to make it adaptive according to the throughput of data stream as well as the number of monitored applications.</li>
+</ul>
+<h3 id="real-time">Real-time</h3>
+<ul>
+<li>Storm or Spark Streaming based computing engine allow us to apply the policy to data stream and generate alerts in real-time manner.</li>
+</ul>
+<h3 id="dynamic">Dynamic</h3>
+<ul>
+<li>The user can freely enable or disable a monitoring application without restarting the service. Eagle user can dynamically add/delet/change their alert policies without any impact to the underlying runtime.</li>
+</ul>
+<h3 id="easy-of-use">Easy-of-Use</h3>
+<ul>
+<li>User can enable the monitoring for a service within minutes effort by just choosing the corresponding monitoring application and configuring few parameters for the service.</li>
+</ul>
+<h3 id="non-invasive">Non-Invasive</h3>
+<ul>
+<li>Apache Eagle uses the out-of-box applications to monitor services, you don't need any change to your existing services.</li>
+</ul>
+<hr />
+<h1 id="use-case-examples">Use Case Examples</h1>
+<h2 id="data-activity-monitoring_1">Data Activity Monitoring</h2>
+<ul>
+<li>
+<p>Data activity represents how user explores data provided by big data platforms. Analyzing data activity and alerting for insecure access are fundamental requirements for securing enterprise data. As data volume is increasing exponentially with Hadoop, Hive, Spark technology, understanding data activities for every user becomes extremely hard, let alone to alert for a single malicious event in real time among petabytes streaming data per day.</p>
+</li>
+<li>
+<p>Securing enterprise data starts from understanding data activities for every user. Apache Eagle (incubating, called Eagle in the following) has integrated with many popular big data platforms e.g. Hadoop, Hive, Spark, Cassandra etc. With Eagle user can browse data hierarchy, mark sensitive data and then create comprehensive policy to alert for insecure data access.</p>
+</li>
+</ul>
+<h2 id="job-performance-analysis">Job Performance Analysis</h2>
+<ul>
+<li>
+<p>Running map/reduce job is the most popular way people use to analyze data in Hadoop system. Analyzing job performance and providing tuning suggestions are critical for Hadoop system stability, job SLA and resource usage etc.</p>
+</li>
+<li>
+<p>Eagle analyzes job performance with two complementing approaches. First Eagle periodically takes snapshots for all running jobs with YARN API, secondly Eagle continuously reads job lifecycle events immediately after the job is completed. With the two approaches, Eagle can analyze single job's trend, data skew problem, failure reasons etc. More interestingly, Eagle can analyze whole Hadoop cluster's performance by taking into account all jobs.</p>
+</li>
+</ul>
+<h2 id="cluster-performance-analytics">Cluster Performance Analytics</h2>
+<ul>
+<li>
+<p>It is critical to understand why a cluster performs bad. Is that because of some crazy jobs recently on-boarded, or huge amount of tiny files, or namenode performance degrading?</p>
+</li>
+<li>
+<p>Eagle in realtime calculates resource usage per minute out of individual jobs, e.g. CPU, memory, HDFS IO bytes, HDFS IO numOps etc. and also collects namenode JMX metrics. Correlating them together will easily help system administrator find root cause for cluster slowness.</p>
+</li>
+</ul>
+<hr />
+<h1 id="disclaimer">Disclaimer</h1>
+<ul>
+<li>Apache Eagle now is being incubated, and therefore, across the whole documentation site, all appearances of case-insensitive word <code>eagle</code> and <code>apache eagle</code> represent <code>Apache Eagle (incubating)</code>. This could be seen as a part of disclaimer.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../getting-started/" class="btn btn-neutral float-right" title="Getting Started">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="../getting-started/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

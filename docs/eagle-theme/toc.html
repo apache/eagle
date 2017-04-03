@@ -1,0 +1,83 @@
+<script>
+    function select(elem) {
+        var selectedClassName = "selected";
+        $(".wy-menu-vertical li.selected").removeClass(selectedClassName);
+        $(elem).addClass(selectedClassName);
+    }
+</script>
+
+<!-- 
+    this macro is to fetch the first child element that has url and return the url as the default one of the section
+    arguemnt:
+      ni: nav_item, corresponding to navigation item configured in mkdocs.yml's "pages"
+ -->
+{% macro fetchDefaultUrl(ni) %}
+    {% if ni.url %}
+        {{ ni.url }}
+    {% elif ni.children %}
+        {{ fetchDefaultUrl(ni.children|first()) }}
+    {% else %}
+        {{ "" }}
+    {% endif %}
+{% endmacro %}
+
+<!-- 
+    this macro generates the style for indentation on sub tocs in side nav
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+{% macro getIndentationStyle(current_level, max_level) %}
+    {% if current_level != 0 %}
+        {% set indentation = 1 * current_level + 3 %}
+        {{ "style=\"padding-left: "~indentation~"em;\""}}
+    {% else %}
+        {{ "" }}
+    {% endif %}
+{% endmacro %}
+
+<!-- 
+    this macro shows toc items including nested tocs, toc nesting level would depending on arguments described below
+    argument:
+      current_level: the level number of current toc item
+      max_level: a number indicating how many toc item levels should show up
+ -->
+{% macro showNestedToc(toc_item, current_level, max_level) %}
+    {% if current_level < max_level %}
+        <li class="{%if current_level == 0%}toctree-l3{%else%}toctree-l4{%endif%}" onclick="select(this)"><a {{getIndentationStyle(current_level, max_level)}} href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+        {% if toc_item.children %}
+            <ul>
+            {% for toc_i in toc_item.children %}
+                {{ showNestedToc(toc_i, current_level+1, max_level) }}
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% else %}
+        {{""}}
+    {% endif %}
+{% endmacro %}
+
+<!-- generate side nav based on navigation configured in mkdocs.yml -->
+{% if nav_item.children %}
+    {% if nav_item.active %}
+        <ul class="subnav">
+            <li><a class="current" href="{{ fetchDefaultUrl(nav_item) }}">{{ nav_item.title }}</a></li>
+            {% for nav_item in nav_item.children %}
+                {% include 'toc.html' %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <li><a href="{{ fetchDefaultUrl(nav_item) }}">{{ nav_item.title }}</a></li>
+    {% endif %}
+{% else %}
+    <li class="toctree-l1 {% if nav_item.active%}current{%endif%}">
+        <a class="{% if nav_item.active%}current{%endif%}" href="{{ nav_item.url }}">{{ nav_item.title }}</a>
+        {% if nav_item == current_page %}
+            <ul>
+            {% for toc_item in toc %}
+                {{ showNestedToc(toc_item, 0, 3) }}
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endif %}

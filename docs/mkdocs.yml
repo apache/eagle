@@ -1,0 +1,18 @@
+site_name: Apache Eagle Documentation
+
+site_url: 
+
+site_favicon: include/images/favicon.png
+
+pages:
+  - 'Home': 'home.md'
+  - 'Getting Started': 'getting-started.md'
+  - 'Using Eagle': 'using-eagle.md'
+  - 'Applications': 'applications.md'
+  - 'Developing Application': 'developing-application.md'
+  - 'Underlying Design': 'underlying-design.md'
+  - 'Reference': 'reference.md'
+
+theme: readthedocs
+
+theme_dir: eagle-theme
