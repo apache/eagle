@@ -40,6 +40,7 @@ import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
 import org.apache.hadoop.hbase.protobuf.ResponseConverter;
 import org.apache.hadoop.hbase.regionserver.HRegion;
 import org.apache.hadoop.hbase.regionserver.InternalScanner;
+import org.apache.hadoop.hbase.regionserver.Region;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +84,7 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
         // do nothing
     }
 
-    protected HRegion getCurrentRegion() {
+    protected Region getCurrentRegion() {
         return this.env.getRegion();
     }
 
@@ -97,9 +98,9 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
      * </pre>
      */
     protected String getLogHeader() {
-        HRegion region = this.getCurrentRegion();
-        return LOG.isDebugEnabled() ? String.format("Region-%s", region.getRegionNameAsString()) :
-            String.format("Region-%s,%d", region.getTableDesc().getNameAsString(), region.getRegionId());
+        Region region = this.getCurrentRegion();
+        return LOG.isDebugEnabled() ? String.format("Region-%s", region.getRegionInfo().getRegionNameAsString()) :
+            String.format("Region-%s,%d", region.getTableDesc().getNameAsString(), region.getRegionInfo().getRegionId());
     }
 
     protected class InternalReadReport {

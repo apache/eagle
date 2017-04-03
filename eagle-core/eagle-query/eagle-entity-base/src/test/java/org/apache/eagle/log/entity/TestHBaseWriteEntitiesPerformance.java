@@ -20,6 +20,7 @@ import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;
+import org.apache.hadoop.hbase.TableName;
 import org.junit.*;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException, IOException {
         EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
-        hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
+        hbase.createTable(TableName.valueOf(entityDefinition.getTable()), entityDefinition.getColumnFamily());
 
         EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
         try {

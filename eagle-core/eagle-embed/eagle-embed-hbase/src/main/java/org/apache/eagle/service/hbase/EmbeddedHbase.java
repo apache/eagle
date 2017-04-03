@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.MiniHBaseCluster;
+import org.apache.hadoop.hbase.TableName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,7 +118,7 @@ public class EmbeddedHbase {
 
     public void createTable(String tableName, String cf) {
         try {
-            util.createTable(tableName, cf);
+            util.createTable(TableName.valueOf(tableName), cf);
         } catch (IOException ex) {
             LOG.warn("Create table failed, probably table already existed, table name: " + tableName);
         }

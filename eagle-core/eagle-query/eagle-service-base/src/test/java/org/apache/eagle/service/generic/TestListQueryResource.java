@@ -31,6 +31,7 @@ import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.TableName;
 import org.junit.*;
 
 import java.io.IOException;
@@ -52,10 +53,10 @@ public class TestListQueryResource extends TestHBaseBase {
 	@Before
 	public void setUp() throws IllegalAccessException, InstantiationException, IOException {
 		entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(GenericMetricEntity.class);
-		hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
+		hbase.createTable(TableName.valueOf(entityDefinition.getTable()), entityDefinition.getColumnFamily());
 
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
-        hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
+        hbase.createTable(TableName.valueOf(entityDefinition.getTable()), entityDefinition.getColumnFamily());
 
 		table = EagleConfigFactory.load().getHTable("unittest");
 		startTime = System.currentTimeMillis();
