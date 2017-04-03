@@ -1,7 +1,0 @@
-/bin/
-/target/
-/src/main/webapp/app/dev/apps
-grunt.json
-node_modules
-ui
-tmp
