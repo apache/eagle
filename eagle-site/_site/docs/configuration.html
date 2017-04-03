@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - Application Configuration</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/configuration.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/configuration.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/configuration.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/configuration.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/configuration.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/configuration.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/configuration.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/configuration.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/configuration.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/configuration.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">Application Configuration</h1>
+        <p>Apache Eagle (called Eagle in the following) requires you to create a configuration file under <code>$EAGLE_HOME/conf/</code> for each application. Basically, there are some common properties shared, e.g., envContextConfig, eagleProps, and dynamicConfigSource. While dataSourceConfig differs from application to application.</p>
+
+<p>In this page we take the following two application as examples</p>
+
+<ul>
+  <li>HDFS Audit Log Configuration</li>
+  <li>Hive<sup id="fnref:HIVE"><a href="#fn:HIVE" class="footnote">1</a></sup> Query Log Configuration</li>
+</ul>
+
+<h3 id="hdfs-audit-log-configuration">HDFS Audit Log Configuration</h3>
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th> </th>
+      <th> </th>
+      <th>Property Name</th>
+      <th> </th>
+      <th> </th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>envContextConfig</td>
+      <td> </td>
+      <td> </td>
+      <td>env</td>
+      <td> </td>
+      <td> </td>
+      <td>currently only Storm<sup id="fnref:STORM"><a href="#fn:STORM" class="footnote">2</a></sup> is supported.</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>mode</td>
+      <td> </td>
+      <td> </td>
+      <td>local or cluster</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>topologyName</td>
+      <td> </td>
+      <td> </td>
+      <td>in the format {site}-{topology-name}</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>stormConfigFile</td>
+      <td> </td>
+      <td> </td>
+      <td>a storm configuration file for overriding some Storm properties</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>parallelismConfig</td>
+      <td> </td>
+      <td> </td>
+      <td>parallelism for both Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">3</a></sup> consumer and alert executors</td>
+    </tr>
+    <tr>
+      <td>dataSourceConfig</td>
+      <td> </td>
+      <td> </td>
+      <td><strong>topic</strong></td>
+      <td> </td>
+      <td> </td>
+      <td>Kafka topic for audit log streaming, make sure it exists</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>zkConnection</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper<sup id="fnref:ZOOKEEPER"><a href="#fn:ZOOKEEPER" class="footnote">4</a></sup> connection string, you can also specify multiple hosts in the form hostname1:port1,hostname2:port2, …</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>zkConnectionTimeoutMS</td>
+      <td> </td>
+      <td> </td>
+      <td>zookeeper connection timeout</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>fetchSize</td>
+      <td> </td>
+      <td> </td>
+      <td>kafka maximal message fetching size, default value is 1048586</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>deserializerClass</td>
+      <td> </td>
+      <td> </td>
+      <td>org.apache.eagle.security.auditlog.HdfsAuditLogKafkaDeserializer</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>transactionZKServers</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper servers, you can also specify multiple hosts in the form hostname1,hostname2,hostname3</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>transactionZKPort</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper connection port</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>transactionZKRoot</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper chroot path for Eagle</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>consumerGroupId</td>
+      <td> </td>
+      <td> </td>
+      <td>only for hdfsAuditLog</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>transactionStateUpdateMS</td>
+      <td> </td>
+      <td> </td>
+      <td>default is 2000</td>
+    </tr>
+    <tr>
+      <td>alertExecutorConfigs</td>
+      <td> </td>
+      <td> </td>
+      <td>parallelism</td>
+      <td> </td>
+      <td> </td>
+      <td>default is 1</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>partitioner</td>
+      <td> </td>
+      <td> </td>
+      <td>default value is eagle.alert.policy.DefaultPolicyPartitioner</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>needValidation</td>
+      <td> </td>
+      <td> </td>
+      <td>true or false</td>
+    </tr>
+    <tr>
+      <td>eagleProps</td>
+      <td> </td>
+      <td> </td>
+      <td><strong>site</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>site name, such as sandbox, datacenter1, datacenter2</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>dataSource</td>
+      <td> </td>
+      <td> </td>
+      <td>hdfsAuditLog</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>dataJoinPollIntervalSec</td>
+      <td> </td>
+      <td> </td>
+      <td>time interval for retrieving data from HBase<sup id="fnref:HBASE"><a href="#fn:HBASE" class="footnote">5</a></sup></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>mailHost</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>SMTP server</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>mailSmtpPort</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>SMTP server port, default is 25</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>mailDebug</td>
+      <td> </td>
+      <td> </td>
+      <td>true or false</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>eagleService.host</td>
+      <td> </td>
+      <td> </td>
+      <td>Tomcat<sup id="fnref:TOMCAT"><a href="#fn:TOMCAT" class="footnote">6</a></sup> server host, default is localhost</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>eagleService.port</td>
+      <td> </td>
+      <td> </td>
+      <td>9099</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>eagleService.username</td>
+      <td> </td>
+      <td> </td>
+      <td>admin</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>eagleService.password</td>
+      <td> </td>
+      <td> </td>
+      <td>secret</td>
+    </tr>
+    <tr>
+      <td>dynamicConfigSource</td>
+      <td> </td>
+      <td> </td>
+      <td>enabled</td>
+      <td> </td>
+      <td> </td>
+      <td>true or false, default is true</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>initDelayMillis</td>
+      <td> </td>
+      <td> </td>
+      <td>default is 0</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>delayMillis</td>
+      <td> </td>
+      <td> </td>
+      <td>default is 30000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<h3 id="hive-query-log-configuration">Hive Query Log Configuration</h3>
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th> </th>
+      <th> </th>
+      <th>Property Name</th>
+      <th> </th>
+      <th> </th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>envContextConfig</td>
+      <td> </td>
+      <td> </td>
+      <td>same as HDF</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>dataSourceConfig</td>
+      <td> </td>
+      <td> </td>
+      <td>flavor</td>
+      <td> </td>
+      <td> </td>
+      <td>stormrunning</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>zkQuorum</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper connection string,  you can also specify multiple hosts in the form hostname1:port1,hostname2:port2,hostname3:port3</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>zkRoot</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper chroot path for Eagle to store data, default is /jobrunning</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>zkSessionTimeoutMs</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper session timeout, default is 15000</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>zkRetryTimes</td>
+      <td> </td>
+      <td> </td>
+      <td>ZooKeeper retry times, default is 3</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>zkRetryInterval</td>
+      <td> </td>
+      <td> </td>
+      <td>default is 2000</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>RMEndPoints</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>yarn.resourcemanager.webapp.address. Default value is http://localhost:8088/</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td><strong>HSEndPoint</strong>*</td>
+      <td> </td>
+      <td> </td>
+      <td>mapreduce.jobhistory.webapp.address. Default values is http://localhost:19888/</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>partitionerCls</td>
+      <td> </td>
+      <td> </td>
+      <td>eagle.job.DefaultJobPartitionerImpl</td>
+    </tr>
+    <tr>
+      <td>alertExecutorConfigs</td>
+      <td> </td>
+      <td> </td>
+      <td>same as HDFS</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>eagleProps</td>
+      <td> </td>
+      <td> </td>
+      <td>same as HDFS</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>dynamicConfigSource</td>
+      <td> </td>
+      <td> </td>
+      <td>same as HDFS</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<h4 id="footnotes"><em>Footnotes</em></h4>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:HIVE">
+      <p><em>All mentions of “hive” on this page represent Apache Hive.</em> <a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:STORM">
+      <p><em>All mentions of “storm” on this page represent Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:KAFKA">
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:ZOOKEEPER">
+      <p><em>All mentions of “zookeeper” on this page represent Apache ZooKeeper.</em> <a href="#fnref:ZOOKEEPER" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:HBASE">
+      <p><em>Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:TOMCAT">
+      <p><em>Apache Tomcat.</em> <a href="#fnref:TOMCAT" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

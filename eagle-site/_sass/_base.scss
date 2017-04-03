@@ -1,0 +1,94 @@
+/**
+ * Set `margin-bottom` to maintain vertical rhythm
+ */
+%vertical-rhythm {
+    margin-bottom: $spacing-unit / 4;
+}
+
+
+/**
+ * Code formatting
+ */
+pre,
+code {
+    font-size: 15px;
+    border: 1px solid $grey-color-light;
+    border-radius: 3px;
+    background-color: #eef;
+}
+
+code {
+    padding: 1px 5px;
+}
+
+pre {
+    padding: 8px 12px;
+    overflow-x: scroll;
+
+    > code {
+        border: 0;
+        padding-right: 0;
+        padding-left: 0;
+    }
+}
+
+/**
+ * Clearfix
+ */
+%clearfix {
+
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+
+
+/**
+ * Icons
+ */
+.icon {
+
+    > svg {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+
+        path {
+            fill: $grey-color;
+        }
+    }
+}
+
+/**
+ * Documentations
+ */
+.docs-sidenav.nav > li {
+    > a {
+        display: block;
+        padding: 4px 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #146fd1;
+
+        &:hover {
+            /*padding-left: 19px;*/
+            /*color: #1756a9;*/
+            text-decoration: none;
+            /**background-color: transparent;*/
+        }
+    }
+
+    ul li {
+        a {
+            display: block;
+            padding: 4px 20px;
+            font-size: 16px;
+            font-weight: 300;
+            color: #146fd1;
+        }
+    }
+}

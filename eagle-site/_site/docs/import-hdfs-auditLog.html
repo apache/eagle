@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - How to stream hdfs log data into Kafka</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/import-hdfs-auditLog.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/import-hdfs-auditLog.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">How to stream hdfs log data into Kafka</h1>
+        <p>As Apache Eagle consumes the data via Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">1</a></sup> topics in some topologies, such as HDFS audit log. To enable the full function of monitoring, a user needs to stream its data into a Kafka topic.</p>
+
+<p>There are two ways to do that. The first one is <strong>Logstash</strong>, which naturally supports Kafka as the output plugin; the second one is to
+install a <strong>namenode log4j Kafka appender</strong>.</p>
+
+<h3 id="logstash-kafka">Logstash-kafka</h3>
+
+<ul>
+  <li>
+    <p><strong>Step 1</strong>: Create a Kafka topic as the streaming input.</p>
+
+    <p>Here is an sample Kafka command to create topic ‘sandbox_hdfs_audit_log’</p>
+
+    <pre><code>cd &lt;kafka-home&gt;
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
+</code></pre>
+  </li>
+  <li>
+    <p><strong>Step 2</strong>: Install Logstash-kafka plugin</p>
+
+    <ul>
+      <li>
+        <p>For Logstash 1.5.x, logstash-kafka has been intergrated into <a href="https://github.com/logstash-plugins/logstash-input-kafka">logstash-input-kafka</a> and <a href="https://github.com/logstash-plugins/logstash-output-kafka">logstash-output-kafka</a>,
+  and released with the 1.5 version of Logstash. So you can directly use it.</p>
+      </li>
+      <li>
+        <p>For Logstash 1.4.x, a user should install <a href="https://github.com/joekiller/logstash-kafka">logstash-kafka</a> firstly. Notice that this version <strong>does not support partition_key_format</strong>.</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Step 3</strong>: Create a Logstash configuration file under ${LOGSTASH_HOME}/conf. Here is a sample.</p>
+
+    <pre><code>  input {
+      file {
+          type =&gt; "hdp-nn-audit"
+          path =&gt; "/path/to/audit.log"
+          start_position =&gt; end
+          sincedb_path =&gt; "/var/log/logstash/"
+       }
+  }
+
+  filter{
+      if [type] == "hdp-nn-audit" {
+  	   grok {
+  	       match =&gt; ["message", "ugi=(?&lt;user&gt;([\w\d\-]+))@|ugi=(?&lt;user&gt;([\w\d\-]+))/[\w\d\-.]+@|ugi=(?&lt;user&gt;([\w\d.\-_]+))[\s(]+"]
+  	   }
+      }
+  }
+
+  output {
+      if [type] == "hdp-nn-audit" {
+          kafka {
+              codec =&gt; plain {
+                  format =&gt; "%{message}"
+              }
+              broker_list =&gt; "localhost:9092"
+              topic_id =&gt; "sandbox_hdfs_audit_log"
+              request_required_acks =&gt; 0
+              request_timeout_ms =&gt; 10000
+              producer_type =&gt; "async"
+              message_send_max_retries =&gt; 3
+              retry_backoff_ms =&gt; 100
+              queue_buffering_max_ms =&gt; 5000
+              queue_enqueue_timeout_ms =&gt; 5000
+              batch_num_messages =&gt; 200
+              send_buffer_bytes =&gt; 102400
+              client_id =&gt; "hdp-nn-audit"
+              partition_key_format =&gt; "%{user}"
+          }
+          # stdout { codec =&gt; rubydebug }
+      }
+  }
+</code></pre>
+  </li>
+  <li>
+    <p><strong>Step 4</strong>: Start Logstash</p>
+
+    <pre><code>bin/logstash -f conf/sample.conf
+</code></pre>
+  </li>
+  <li>
+    <p><strong>Step 5</strong>: Check whether logs are flowing into the kafka topic specified by <code>topic_id</code></p>
+  </li>
+</ul>
+
+<h3 id="log4j-kafka-appender">Log4j Kafka Appender</h3>
+
+<blockquote>
+  <p>Notice that if you use Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">2</a></sup>, such as in sandbox, you <strong>must</strong> follow below steps via Ambari UI. In addition, restarting namenode is required.</p>
+</blockquote>
+
+<ul>
+  <li>
+    <p><strong>Step 1</strong>: Create a Kafka topic. Here is a example Kafka command for creating topic “sandbox_hdfs_audit_log”</p>
+
+    <pre><code>cd &lt;kafka-home&gt;
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
+</code></pre>
+  </li>
+  <li>
+    <p><strong>Step 2</strong>: Configure $HADOOP_CONF_DIR/log4j.properties, and add a log4j appender “KAFKA_HDFS_AUDIT” to hdfs audit logging</p>
+
+    <pre><code>log4j.appender.KAFKA_HDFS_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
+log4j.appender.KAFKA_HDFS_AUDIT.Topic=sandbox_hdfs_audit_log
+log4j.appender.KAFKA_HDFS_AUDIT.BrokerList=sandbox.hortonworks.com:6667
+log4j.appender.KAFKA_HDFS_AUDIT.KeyClass=org.apache.eagle.log4j.kafka.hadoop.AuditLogKeyer
+log4j.appender.KAFKA_HDFS_AUDIT.Layout=org.apache.log4j.PatternLayout
+log4j.appender.KAFKA_HDFS_AUDIT.Layout.ConversionPattern=%d{ISO8601} %p %c{2}: %m%n
+log4j.appender.KAFKA_HDFS_AUDIT.ProducerType=async
+#log4j.appender.KAFKA_HDFS_AUDIT.BatchSize=1
+#log4j.appender.KAFKA_HDFS_AUDIT.QueueSize=1
+</code></pre>
+
+    <p><img src="/images/docs/hdfs-log4j-conf.png" alt="HDFS LOG4J Configuration" title="hdfslog4jconf" /></p>
+  </li>
+  <li>
+    <p><strong>Step 3</strong>: Edit $HADOOP_CONF_DIR/hadoop-env.sh, and add the reference to KAFKA_HDFS_AUDIT to HADOOP_NAMENODE_OPTS.</p>
+
+    <pre><code>-Dhdfs.audit.logger=INFO,DRFAAUDIT,KAFKA_HDFS_AUDIT
+</code></pre>
+
+    <p><img src="/images/docs/hdfs-env-conf.png" alt="HDFS Environment Configuration" title="hdfsenvconf" /></p>
+  </li>
+  <li>
+    <p><strong>Step 4</strong>: Edit $HADOOP_CONF_DIR/hadoop-env.sh, and append the following command to it.</p>
+
+    <pre><code>export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:/path/to/eagle/lib/log4jkafka/lib/*
+</code></pre>
+
+    <p><img src="/images/docs/hdfs-env-conf2.png" alt="HDFS Environment Configuration" title="hdfsenvconf2" /></p>
+  </li>
+  <li>
+    <p><strong>Step 5</strong>: save the changes and restart the namenode.</p>
+  </li>
+  <li>
+    <p><strong>Step 6</strong>: Check whether logs are flowing into Topic sandbox_hdfs_audit_log</p>
+
+    <pre><code>$ /usr/hdp/current/kafka-broker/bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic sandbox_hdfs_audit_log
+</code></pre>
+  </li>
+</ul>
+
+<hr />
+
+<h4 id="footnotes"><em>Footnotes</em></h4>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:KAFKA">
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:AMBARI">
+      <p><em>all mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

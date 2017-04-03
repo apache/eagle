@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - Policy API</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/metadata-api.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/metadata-api.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/metadata-api.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/metadata-api.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/metadata-api.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/metadata-api.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/metadata-api.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/metadata-api.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/metadata-api.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/metadata-api.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">Policy API</h1>
+        <p>Apache Eagle Provide RESTful APIs for create/update/query/delete policy for alert</p>
+
+<ul>
+  <li>Policy Definition API</li>
+  <li>Stream Definition API</li>
+</ul>
+
+<hr />
+
+<h3 id="policy-definition-api">Policy Definition API</h3>
+
+<hr />
+
+<h4 id="createupdate-policy-example"><strong>Create/Update Policy Example</strong></h4>
+
+<table>
+  <tbody>
+    <tr>
+      <td>URL</td>
+      <td> </td>
+      <td> </td>
+      <td>http://host:port/eagle-service/rest/entities?serviceName=AlertDefinitionService</td>
+    </tr>
+    <tr>
+      <td>METHOD</td>
+      <td> </td>
+      <td> </td>
+      <td>POST</td>
+    </tr>
+    <tr>
+      <td>HEADERS</td>
+      <td> </td>
+      <td> </td>
+      <td>“Content-Type:application/json”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“Authorization:Basic encodedusrpwd”  (encodedusrpwd is base64 encoded string for “user:password”)</td>
+    </tr>
+    <tr>
+      <td>DATA</td>
+      <td> </td>
+      <td> </td>
+      <td>[{</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “tags”: {</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “site”: “sandbox”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “dataSource”: “hdfsAuditLog”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “policyId”: “testPolicy”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “alertExecutorId”: “hdfsAuditLogAlertExecutor”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “policyType”: “siddhiCEPEngine”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>    },</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “desc”: “test alert policy”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “policyDef”: “{"type":"siddhiCEPEngine","expression":"from hdfsAuditLogEventStream[src ==’/tmp/private’] select * insert into outputStream;"}”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “notificationDef”: “[{</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “sender”:”noreply-eagle@company.com”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “recipients”:”user@company.com”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “subject”:”test alert policy”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “flavor”:”email”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “id”:”email_1”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>    }]”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “enabled”: true</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>}]</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Field Specification</strong></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Tags</td>
+      <td> </td>
+      <td> </td>
+      <td>All Tags form the key for alert policy</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>1) site: Which site is the policy for? e.g. sandbox</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>2) dataSource: From which dataSource the policy consume from; e.g. hdfsAuditLog</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>3) policyId</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>4) alertExecutorId: Within which executor will the policy be executed e.g. hdfsAuditLog</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>5) policyType: Which engine should the policy be executed with e.g. siddhiCEPEngine</td>
+    </tr>
+    <tr>
+      <td>policyDef</td>
+      <td> </td>
+      <td> </td>
+      <td>Definition for the policy, tell</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>1) which engine the policy should be executed with</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>2) The policy expression to be evaluated</td>
+    </tr>
+    <tr>
+      <td>notificationDef</td>
+      <td> </td>
+      <td> </td>
+      <td>Currently we only support email notification for alert, below are fields of alert definition</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>1) sender: Email Sender</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>2) recipients: Email Receipent</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>3) subject: Email Subject</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>4) flavor: way of notification, currently only supprot “email”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>5) id: notification id</td>
+    </tr>
+    <tr>
+      <td>enabled</td>
+      <td> </td>
+      <td> </td>
+      <td>If the alert is enabled, true/false</td>
+    </tr>
+    <tr>
+      <td>desc</td>
+      <td> </td>
+      <td> </td>
+      <td>Description of the policy</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Response Body</strong><br />
+{<br />
+     “meta”: {<br />
+             “elapsedms”: 11,<br />
+             “totalResults”: 1<br />
+     },<br />
+     “success”: true,<br />
+     “obj”: [<br />
+             “YEktKX_____62aP_6x97yoSv3B0ANd9Hby–xyCZKe1hk6BkS9hcZXeJk1Je-7-Mrq0lGQ”<br />
+     ],<br />
+     “type”: “java.lang.String”<br />
+}</p>
+
+<hr />
+
+<h4 id="get-policy-example"><strong>Get Policy Example</strong></h4>
+
+<table>
+  <tbody>
+    <tr>
+      <td>URL</td>
+      <td> </td>
+      <td> </td>
+      <td>http://host:port/eagle-service/rest/list?query=AlertDefinitionService[@dataSource=”hdfsAuditLog” AND @site=”sandbox”]{*}&amp;pageSize=100</td>
+    </tr>
+    <tr>
+      <td>METHOD</td>
+      <td> </td>
+      <td> </td>
+      <td>GET</td>
+    </tr>
+    <tr>
+      <td>HEADERS</td>
+      <td> </td>
+      <td> </td>
+      <td>“Content-Type:application/json”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“Authorization:Basic encodedusrpwd”  (encodedusrpwd is base64 encoded string for “user:password”)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Response Body</strong> <br />
+{<br />
+     prefix: “alertdef”,<br />
+     tags: {<br />
+        site: “sandbox”,<br />
+        dataSource: “hdfsAuditLog”,<br />
+        policyId: “testPolicy”,<br />
+        alertExecutorId: “hdfsAuditLogAlertExecutor”,<br />
+        policyType: “siddhiCEPEngine”<br />
+     },<br />
+     encodedRowkey: “YEktKX_____62aP_6x97yoSv3B0ANd9Hby–xyCZKe1hk6BkS9hcZXeJk1Je-7-Mrq0lGQ”,<br />
+     desc: “nope alert for test”,<br />
+     policyDef: “{“type”:”siddhiCEPEngine”,”expression”:”from hdfsAuditLogEventStream[src==’/tmp/private’] select * into outputStream;”}”,<br />
+     notificationDef: “[{“sender”:”noreplay-eagle@company.com”,”recipients”:”user@company.com”,”subject”:”testPolicy”,”flavor”:”email”,”id”:”email_1”}]”,<br />
+     enabled: true<br />
+}</p>
+
+<hr />
+
+<h4 id="delete-policy-example"><strong>Delete Policy Example</strong></h4>
+
+<p>Delete policy by encodedRowkey</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>URL</td>
+      <td> </td>
+      <td> </td>
+      <td>http://host:port/eagle-service/rest/entities/delete?serviceName=AlertDefinitionService&amp;byId=true</td>
+    </tr>
+    <tr>
+      <td>METHOD</td>
+      <td> </td>
+      <td> </td>
+      <td>POST</td>
+    </tr>
+    <tr>
+      <td>HEADERS</td>
+      <td> </td>
+      <td> </td>
+      <td>“Content-Type:application/json”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“Authorization:Basic encodedusrpwd”  (encodedusrpwd is base64 encoded string for “user:password”)</td>
+    </tr>
+    <tr>
+      <td>DATA</td>
+      <td> </td>
+      <td> </td>
+      <td>[</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“YEktKX_____62aP_6x97yoSv3B0ANd9Hby–xyCZKe1hk6BkS9hcZXeJk1Je-7-Mrq0lGQ”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>]</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Delete Request Response Body</strong></p>
+
+<p>The folloing is the response body of a sucessfully delete request<br />
+{<br />
+     “meta”: {<br />
+             “elapsedms”: 5,<br />
+             “totalResults”: 1<br />
+     },<br />
+     “success”: true,<br />
+     “obj”: [<br />
+             “YEktKX_____62aP_6x97yoSv3B0ANd9Hby–xyCZKe1hk6BkS9hcZXeJk1Je-7-Mrq0lGQ”<br />
+     ],<br />
+     “type”: “java.lang.String”<br />
+}</p>
+
+<hr />
+
+<h3 id="stream-definition-api">Stream Definition API</h3>
+
+<p>In the policy defintion, if the policyType is “siddhiCEPEngine” we need specify from which stream the query is against , like “from hdfsAuditLogEventStream”</p>
+
+<p>So we need further define the stream schema along with the policy</p>
+
+<p>The response body of stream schema api is similar to policy api, we don’t duplicate it in stream definition api</p>
+
+<hr />
+
+<h4 id="createupdate-stream-shceme-example"><strong>Create/Update Stream Shceme Example</strong></h4>
+
+<table>
+  <tbody>
+    <tr>
+      <td>URL</td>
+      <td> </td>
+      <td> </td>
+      <td>http://host:port/eagle-service/rest/entities?serviceName=AlertStreamSchemaService</td>
+    </tr>
+    <tr>
+      <td>METHOD</td>
+      <td> </td>
+      <td> </td>
+      <td>POST</td>
+    </tr>
+    <tr>
+      <td>HEADERS</td>
+      <td> </td>
+      <td> </td>
+      <td>“Content-Type:application/json”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“Authorization:Basic encodedusrpwd”  (encodedusrpwd is base64 encoded string for “user:password”)</td>
+    </tr>
+    <tr>
+      <td>DATA</td>
+      <td> </td>
+      <td> </td>
+      <td>[{</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “tags”: {</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “dataSource”: “hiveQueryLog”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “attrName”: “user”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     “streamName”: “hiveAccessLogStream”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>     },</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “attrType”: “string”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>  “attrDescription”: “process user”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>}]</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Field Specification</strong></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Tags</td>
+      <td> </td>
+      <td> </td>
+      <td>All Tags form the key for alert policy</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>1) dataSource: From which dataSource the policy consume from, e.g. “hdfsAuditLog”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>2) attrName: Attribute’s name, e.g. “user”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>3) streamName: Stream’s name, e.g.  “hiveAccessLogStream”</td>
+    </tr>
+    <tr>
+      <td>attrType</td>
+      <td> </td>
+      <td> </td>
+      <td>Attribute’s type, e.g. string, boolean, int, long</td>
+    </tr>
+    <tr>
+      <td>attrDescription</td>
+      <td> </td>
+      <td> </td>
+      <td>Description for the attribute</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h4 id="get-stream-shceme-example"><strong>Get Stream Shceme Example</strong></h4>
+
+<table>
+  <tbody>
+    <tr>
+      <td>URL</td>
+      <td> </td>
+      <td> </td>
+      <td>http://host:port/eagle-service/rest/list?query=AlertStreamSchemaService[@dataSource=”hdfsAuditLog” AND @streamName=”hiveAccessLogStream”]{*}&amp;pageSize=100</td>
+    </tr>
+    <tr>
+      <td>METHOD</td>
+      <td> </td>
+      <td> </td>
+      <td>GET</td>
+    </tr>
+    <tr>
+      <td>HEADERS</td>
+      <td> </td>
+      <td> </td>
+      <td>“Content-Type:application/json”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“Authorization:Basic encodedusrpwd”  (encodedusrpwd is base64 encoded string for “user:password”)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h4 id="delete-stream-shceme-example"><strong>Delete Stream Shceme Example</strong></h4>
+
+<p>Delete stream shceme by encodedRowkey</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>URL</td>
+      <td> </td>
+      <td> </td>
+      <td>http://host:port/eagle-service/rest/entities/delete?serviceName=AlertStreamSchemaService&amp;byId=true</td>
+    </tr>
+    <tr>
+      <td>METHOD</td>
+      <td> </td>
+      <td> </td>
+      <td>POST</td>
+    </tr>
+    <tr>
+      <td>HEADERS</td>
+      <td> </td>
+      <td> </td>
+      <td>“Content-Type:application/json”</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>“Authorization:Basic encodedusrpwd”  (encodedusrpwd is base64 encoded string for “user:password”)</td>
+    </tr>
+    <tr>
+      <td>DATA</td>
+      <td> </td>
+      <td> </td>
+      <td>[ “YEktKX_____62aP_6x97yoSv3B0ANd9Hby–xyCZKe1hk6BkS9hcZXeJk1Je-7-Mrq0lGQ” ]</td>
+    </tr>
+  </tbody>
+</table>
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

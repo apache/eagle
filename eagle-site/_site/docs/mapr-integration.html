@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - MapR Integration</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/mapr-integration.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/mapr-integration.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/mapr-integration.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/mapr-integration.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/mapr-integration.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/mapr-integration.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/mapr-integration.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/mapr-integration.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/mapr-integration.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/mapr-integration.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">MapR Integration</h1>
+        <p><em>Since Apache Eagle 0.4.0-incubating. Apache Eagle will be called Eagle in the following.</em></p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>To get maprFSAuditLog monitoring started, we need to:</p>
+
+<ul>
+  <li>Enable audit logs on MapR from MapR’s terminal</li>
+  <li>Created logstash conf file to send audit logs to Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">1</a></sup></li>
+  <li>Initialize metadata for mapFSAuditLog and enabled the application</li>
+</ul>
+
+<p>Here are the steps to follow:</p>
+
+<h4 id="step1-enable-audit-logs-for-filesystem-operations-and-table-operations-in-mapr">Step1: Enable audit logs for FileSystem Operations and Table Operations in MapR</h4>
+<p>First we need to enable data auditing at all three levels: cluster level, volume level and directory,file or table level. 
+##### Cluster level:</p>
+
+<pre><code>       $ maprcli audit data -cluster &lt;cluster name&gt; -enabled true 
+                           [ -maxsize &lt;GB, defaut value is 32. When size of audit logs exceed this number, an alarm will be sent to the dashboard in the MapR Control Service &gt; ]
+                           [ -retention &lt;number of Days&gt; ]
+</code></pre>
+<p>Example:</p>
+
+<pre><code>        $ maprcli audit data -cluster mapr.cluster.com -enabled true -maxsize 30 -retention 30
+</code></pre>
+
+<h5 id="volume-level">Volume level:</h5>
+
+<pre><code>       $ maprcli volume audit -cluster &lt;cluster name&gt; -enabled true 
+                            -name &lt;volume name&gt;
+                            [ -coalesce &lt;interval in minutes, the interval of time during which READ, WRITE, or GETATTR operations on one file from one client IP address are logged only once, if auditing is enabled&gt; ]
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>        $ maprcli volume audit -cluster mapr.cluster.com -name mapr.tmp -enabled true
+</code></pre>
+
+<p>To verify that auditing is enabled for a particular volume, use this command:</p>
+
+<pre><code>        $ maprcli volume info -name &lt;volume name&gt; -json | grep -i 'audited\|coalesce'
+</code></pre>
+<p>and you should see something like this:</p>
+
+<pre><code>                        "audited":1,
+                        "coalesceInterval":60
+</code></pre>
+<p>If “audited” is ‘1’ then auditing is enabled for this volume.</p>
+
+<h5 id="directory-file-or-mapr-db-table-level">Directory, file, or MapR-DB table level:</h5>
+
+<pre><code>        $ hadoop mfs -setaudit on &lt;directory|file|table&gt;
+</code></pre>
+
+<p>To check whether Auditing is Enabled for a Directory, File, or MapR-DB Table, use <code>$ hadoop mfs -ls</code>
+Example:
+Before enable the audit log on file <code>/tmp/dir</code>, try <code>$ hadoop mfs -ls /tmp/dir</code>, you should see something like this:</p>
+
+<pre><code>drwxr-xr-x Z U U   - root root          0 2016-03-02 15:02  268435456 /tmp/dir
+               p 2050.32.131328  mapr2.da.dg:5660 mapr1.da.dg:5660
+</code></pre>
+
+<p>The second <code>U</code> means auditing on this file is not enabled. 
+Enable auditing with this command:</p>
+
+<pre><code>$ hadoop mfs -setaudit on /tmp/dir
+</code></pre>
+
+<p>Then check the auditing bit with :</p>
+
+<pre><code>$ hadoop mfs -ls /tmp/dir
+</code></pre>
+
+<p>you should see something like this:</p>
+
+<pre><code>drwxr-xr-x Z U A   - root root          0 2016-03-02 15:02  268435456 /tmp/dir
+               p 2050.32.131328  mapr2.da.dg:5660 mapr1.da.dg:5660
+</code></pre>
+
+<p>We can see the previous <code>U</code> has been changed to <code>A</code> which indicates auditing on this file is enabled.</p>
+
+<p><code>Important</code>:
+When a directory has been enabled auditing,  directories/files located in this dir won’t inherit auditing, but a newly created file/dir (after enabling the auditing on this dir) in this directory will.</p>
+
+<h4 id="step2-stream-log-data-into-kafka-by-using-logstash">Step2: Stream log data into Kafka by using Logstash</h4>
+<p>As MapR do not have name node, instead it use CLDB service, we have to use logstash to stream log data into Kafka.
+- First find out the nodes that have CLDB service
+- Then find out the location of audit log files, eg: <code>/mapr/mapr.cluster.com/var/mapr/local/mapr1.da.dg/audit/</code>, file names should be in this format: <code>FSAudit.log-2016-05-04-001.json</code> 
+- Created a logstash conf file and run it, following this doc<a href="https://github.com/apache/eagle/blob/master/eagle-assembly/src/main/docs/logstash-kafka-conf.md">Logstash-kafka</a></p>
+
+<h4 id="step3-set-up-maprfsauditlog-applicaiton-in-eagle-service">Step3: Set up maprFSAuditLog applicaiton in Eagle Service</h4>
+<p>After Eagle Service gets started, create mapFSAuditLog application using:  <code>$ ./maprFSAuditLog-init.sh</code>. By default it will create maprFSAuditLog in site “sandbox”, you may need to change it to your own site.
+After these steps you are good to go.</p>
+
+<p>Have fun!!! :)</p>
+
+<h3 id="reference-links">Reference Links</h3>
+<ol>
+  <li><a href="http://doc.mapr.com/display/MapR/Enabling+Auditing">Enable Auditing in MapR</a></li>
+  <li><a href="http://doc.mapr.com/display/MapR/Audit+Logs+for+Filesystem+Operations+and+Table+Operations">MapR audit logs</a></li>
+</ol>
+
+<hr />
+
+<h4 id="footnotes"><em>Footnotes</em></h4>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:KAFKA">
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+/* latin-ext */
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Titillium WebLight'), local('TitilliumWeb-Light'), url(https://fonts.gstatic.com/s/titilliumweb/v4/anMUvcNT0H1YN4FII8wpr30ibtJ3ueB9Z81J478WEJQ.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Titillium WebLight'), local('TitilliumWeb-Light'), url(https://fonts.gstatic.com/s/titilliumweb/v4/anMUvcNT0H1YN4FII8wpr6YfJ4wTnNoNUCmOpdh16Tg.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Titillium Web'), local('TitilliumWeb-Regular'), url(https://fonts.gstatic.com/s/titilliumweb/v4/7XUFZ5tgS-tD6QamInJTcSGR3J8a2Jm30YJvJ3tIMOY.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Titillium Web'), local('TitilliumWeb-Regular'), url(https://fonts.gstatic.com/s/titilliumweb/v4/7XUFZ5tgS-tD6QamInJTceHuglUR2dhBxWD-q_ehMME.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Titillium WebSemiBold'), local('TitilliumWeb-SemiBold'), url(https://fonts.gstatic.com/s/titilliumweb/v4/anMUvcNT0H1YN4FII8wpr1Tcxd1fGlbIJMCb5Y260Wk.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Titillium WebSemiBold'), local('TitilliumWeb-SemiBold'), url(https://fonts.gstatic.com/s/titilliumweb/v4/anMUvcNT0H1YN4FII8wpr6d1JQt-lS5nD-1TJX2NNl0.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}

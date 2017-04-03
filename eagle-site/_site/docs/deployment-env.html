@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - Deploy Environment</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/deployment-env.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/deployment-env.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/deployment-env.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/deployment-env.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/deployment-env.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/deployment-env.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/deployment-env.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/deployment-env.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/deployment-env.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/deployment-env.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">Deploy Environment</h1>
+        <h3 id="setup-environment">Setup Environment</h3>
+
+<p>Apache Eagle (called Eagle in the following) as an analytics solution for identifying security and performance issues instantly, relies on streaming platform <code>Storm</code><sup id="fnref:STORM"><a href="#fn:STORM" class="footnote">1</a></sup> + <code>Kafka</code><sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">2</a></sup> to meet the realtime criteria, and persistence storage to store metadata and some metrics. As for the persistence storage, it supports three types of database: <code>HBase</code><sup id="fnref:HBASE"><a href="#fn:HBASE" class="footnote">3</a></sup>, <code>Derby</code><sup id="fnref:DERBY"><a href="#fn:DERBY" class="footnote">4</a></sup>, and <code>Mysql</code></p>
+
+<p>To run monitoring applications, Eagle requires the following dependencies.</p>
+
+<ul>
+  <li>
+    <p>For streaming platform dependencies</p>
+
+    <ul>
+      <li>Storm: 0.9.3 or later</li>
+      <li>Kafka: 0.8.x or later</li>
+      <li>Java: 1.7.x</li>
+      <li>NPM (On MAC OS try “brew install node”)</li>
+    </ul>
+  </li>
+  <li>
+    <p>For database dependencies (Choose one of them)</p>
+
+    <ul>
+      <li>HBase: 0.98 or later
+        <ul>
+          <li>Hadoop<sup id="fnref:HADOOP"><a href="#fn:HADOOP" class="footnote">5</a></sup>: 2.6.x is required</li>
+        </ul>
+      </li>
+      <li>Mysql
+        <ul>
+          <li>Installation is required</li>
+        </ul>
+      </li>
+      <li>Derby
+        <ul>
+          <li>No installation</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="setup-cluster-in-sandbox">Setup Cluster in Sandbox</h3>
+<p>To make thing easier you can try Eagle with an <strong>all-in-one</strong> sandbox VM, like <a href="http://hortonworks.com/downloads/#sandbox">HDP sandbox</a>(HDP 2.2.4 is recommended). Next we will go with Hortonworks Sandbox 2.2.4 to setup a minimal requirement cluster with Storm and Kafka.</p>
+
+<ol>
+  <li>Launch Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">6</a></sup>
+    <ul>
+      <li>Enable Ambari in sandbox http://127.0.0.1:8000 (Click on Enable Button)</li>
+      <li>Login to Ambari UI http://127.0.0.1:8080/ with user:admin and password:admin</li>
+    </ul>
+  </li>
+  <li>
+    <p>Start Storm and Kafka via Ambari. Showing Storm as an example below.
+<img src="/images/docs/start-storm.png" alt="Restart Services" title="Services" /></p>
+  </li>
+  <li>
+    <p>(Optional) Start HBase via Ambari with root as HBase superuser
+<img src="/images/docs/hbase-superuser.png" alt="add superuser" />
+<img src="/images/docs/hbase-superuser2.png" alt="add superuser" /></p>
+  </li>
+  <li>Add Eagle service port. If the NAT network is used in a virtual machine, add port 9099 to “Port Forwarding”
+  <img src="/images/docs/eagle-service.png" alt="Port Forwarding" /></li>
+</ol>
+
+<hr />
+
+<h4 id="footnotes"><em>Footnotes</em></h4>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:STORM">
+      <p><em>All mentions of “storm” on this page represent Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:KAFKA">
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:HBASE">
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:DERBY">
+      <p><em>All mentions of “derby” on this page represent Apache Derby.</em> <a href="#fnref:DERBY" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:HADOOP">
+      <p><em>Apache Hadoop.</em> <a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:AMBARI">
+      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

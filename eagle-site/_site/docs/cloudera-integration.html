@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - Cloudera Integration</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/cloudera-integration.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/cloudera-integration.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/cloudera-integration.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/cloudera-integration.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/cloudera-integration.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/cloudera-integration.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/cloudera-integration.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/cloudera-integration.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/cloudera-integration.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/cloudera-integration.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">Cloudera Integration</h1>
+        <p><em>Since Eagle 0.4.0</em></p>
+
+<p>Configuring Apache Eagle on Cloudera is very similar to configuring it on Hortonworks, but still there are some difference. 
+This tutorial is to address these issues before you continue to follow the tutorials originally prepared for Hortonworks.</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>To get Apache Eagle works on Cloudera, we need:</p>
+
+<ul>
+  <li>Zookeeper (installed through Cloudera Manager)</li>
+  <li>Kafka (installed through Cloudera Manager)</li>
+  <li>Storm (<code>0.9.x</code> or <code>0.10.x</code>, installed manually)</li>
+  <li>Logstash (<code>2.X</code>, installed manually on NameNode)</li>
+</ul>
+
+<h3 id="kafka">Kafka</h3>
+
+<h4 id="configuration">Configuration</h4>
+
+<p>There are two configurations needed to be mentioned:</p>
+
+<ul>
+  <li>
+    <p>Open Cloudera Manager and open “kafka” configuration, then set <code>“zookeeper Root”</code> to <code>“/”</code>.</p>
+  </li>
+  <li>
+    <p>If Kafka cannot be started successfully, check kafka’s log. If stack trace shows: <code>“java.lang.OutOfMemoryError: Java heap space”</code>. Increase heap size by setting <code>"KAFKA_HEAP_OPTS"</code>in <code>/bin/kafka-server-start.sh</code>.</p>
+  </li>
+</ul>
+
+<p>Example:</p>
+
+<pre><code>                  export KAFKA_HEAP_OPTS="-Xmx2G -Xms2G"
+</code></pre>
+
+<h4 id="verification">Verification</h4>
+
+<ul>
+  <li>Step1: create a kafka topic (here I created a topic called “test”, which will be used in  logstash configuration file to receive hdfsAudit log messages from Cloudera.</li>
+</ul>
+
+<pre><code>bin/kafka-topics.sh --create --zookeeper 127.0.0.1:2181 --replication-factor 1 --partitions 1 --topic test
+</code></pre>
+
+<ul>
+  <li>Step2: check if topic has been created successfully.</li>
+</ul>
+
+<pre><code>bin/kafka-topics.sh --list --zookeeper 127.0.0.1:2181
+</code></pre>
+
+<p>this command will show all created topics.</p>
+
+<ul>
+  <li>Step3: open two terminals, start “producer” and “consumer” separately.</li>
+</ul>
+
+<pre><code>/usr/bin/kafka-console-producer --broker-list hostname:9092 --topic test
+/usr/bin/kafka-console-consumer --zookeeper hostname:2181 --topic test
+</code></pre>
+
+<ul>
+  <li>Step4: type in some message in producer. If consumer can receive the messages sent from producer, then kafka is working fine. Otherwise please check the configuration and logs to identify the root cause of issues.</li>
+</ul>
+
+<h3 id="logstash">Logstash</h3>
+
+<h4 id="installation">Installation</h4>
+
+<p>You can follow <a href="https://www.elastic.co/downloads/logstash">logstash online doc</a> to download and install logstash on your machine:</p>
+
+<p>Or you can install it through <code>yum</code> if you are using centos:</p>
+
+<ul>
+  <li>download and install the public signing key:</li>
+</ul>
+
+<pre><code>rpm --import  https://packages.elastic.co/GPG-KEY-elasticsearch
+</code></pre>
+
+<ul>
+  <li>Add the following lines in <code>/etc/yum.repos.d/</code> directory in a file with a <code>.repo</code> suffix, for example <code>logstash.repo</code>.</li>
+</ul>
+
+<pre><code>[logstash-2.3]
+name=Logstash repository for 2.3.x packages
+baseurl=https://packages.elastic.co/logstash/2.3/centos
+gpgcheck=1
+gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+</code></pre>
+
+<ul>
+  <li>Then install it using <code>yum</code>:</li>
+</ul>
+
+<pre><code>yum install logstash
+</code></pre>
+
+<h4 id="create-conf-file">Create conf file</h4>
+
+<p>Follow <a href="https://github.com/apache/incubator-eagle/blob/branch-0.4/eagle-assembly/src/main/docs/logstash-kafka-conf.md">Apache Eagle online documentation</a> to create logstash configuration file for Apache Eagle.</p>
+
+<h4 id="start-logstash">Start logstash</h4>
+
+<pre><code>bin/logstash -f conf/first-pipeline.conf
+</code></pre>
+
+<h4 id="verification-1">Verification</h4>
+
+<p>Open a terminal and start a kafka consumer to see if it can receive the messages sent by logstash, if there is no message, double check the configuration parameters in conf file. Otherwise logstash is all set.</p>
+
+<h3 id="apache-storm">Apache Storm</h3>
+<p>As Apache Storm is not in Cloudera’s stack, we need to install Storm manually.</p>
+
+<h4 id="installation-1">Installation</h4>
+
+<p>Download Apache Storm from <a href="http://storm.apache.org/downloads.html">here</a>, the version you choose should be <code>0.10.x</code> or <code>0.9.x</code> release.
+Then follow <a href="http://storm.apache.org/releases/0.10.0/Setting-up-a-Storm-cluster.html">Apache Storm online doc</a>) to install Apache Storm on your cluster.</p>
+
+<p>In <code>/etc/profile</code>, add this:</p>
+
+<pre><code>export PATH=$PATH:/opt/apache-storm-0.10.1/bin/
+</code></pre>
+
+<p>save the profile and then type:</p>
+
+<pre><code>source /etc/profile 
+</code></pre>
+
+<p>to make it work.</p>
+
+<h4 id="configuration-1">Configuration</h4>
+
+<p>In <code>storm/conf/storm.yaml</code>, change the hostname to your own host.</p>
+
+<h4 id="start-apache-storm">Start Apache Storm</h4>
+
+<p>In Termial, type:</p>
+
+<pre><code>$: storm nimbus
+$: storm supervisor
+$: storm UI
+</code></pre>
+
+<h4 id="verification-2">Verification</h4>
+
+<p>Open storm UI in your browser, default URL is : <code>http://hostname:8080/index.html</code>.</p>
+
+<h3 id="apache-eagle">Apache Eagle</h3>
+
+<p>To download and install Apache Eagle, please refer to  <a href="http://eagle.incubator.apache.org/docs/quick-start.html">Get Started with Sandbox.</a> .</p>
+
+<p>One thing need to mention is: in <code>“/bin/eagle-topology.sh”</code>, line 102:</p>
+
+<pre><code>			storm_ui=http://localhost:8080
+</code></pre>
+
+<p>If you are not using the default port number, change this to your own Storm UI url.</p>
+
+<p>I know it takes time to finish these configuration, but now it is time to have fun! 
+Just try <code>HDFS Data Activity Monitoring</code> with <code>Demo</code> listed in <a href="http://eagle.incubator.apache.org/docs/hdfs-data-activity-monitoring.html">HDFS Data Activity Monitoring.</a></p>
+
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

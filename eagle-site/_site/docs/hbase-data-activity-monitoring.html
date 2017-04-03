@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+ 	<title>Eagle - HBase Data Activity Monitoring</title>
+ 	<meta name="description" content="Eagle - Analyze Big Data Platforms for Security and Performance">
+
+	<meta name="keywords" content="Eagle, Hadoop, Security, Real Time">
+	<meta name="author" content="eBay Inc.">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
+
+	<link rel="stylesheet" href="/css/animate.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="/css/misc.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/styles.css">
+  	<link rel="stylesheet" href="/css/main.css">
+  	<link rel="alternate" type="application/rss+xml" title="Eagle" href="http://goeagle.io/feed.xml" />
+  	<link rel="shortcut icon" href="/images/favicon.png">
+
+  	<!-- Baidu Analytics Tracking-->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	
+	<!-- Google Analytics Tracking -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-68929805-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="/"><img src="/images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="/#home_page">HOME</a></li>
+                <li><a class="menu" href="/docs/">DOCS</a></li>
+                <li><a class="menu" href="/#about_page">ABOUT</a></li>
+                <li><a class="menu" href="/#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="/#modules_page">MODULES</a></li>
+                <li><a class="menu" href="/#usecase_page">USE CASES</a></li>
+                <li>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="/images/slider/4.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="/">
+          <img src="/images/feather.png" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Analyze Big Data Platforms For Security and Performance</h2>
+        <div class="social-buttons">
+          <a href="https://github.com/apache/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a>
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+<div class="container-fluid page-content">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1"> 
+      <!-- sidebar -->
+      <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+        <ul class="nav" id="adminnav">
+         
+        <li class="heading">Getting Started</li>
+        
+          <li class="sidenavli  "><a href="/docs/index.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Introduction</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/usecases.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Use Cases</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/terminology.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Terminology</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/ecosystem.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Ecosystem</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/community.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Community</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/FAQ.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">FAQ</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Documentations</li>
+        
+          <li class="sidenavli  "><a href="/docs/latest/" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Latest version (v0.5.0)</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Download</li>
+        
+          <li class="sidenavli  "><a href="/docs/download-latest.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Latest version (v0.5.0)</a></li>
+        
+          <li class="sidenavli  "><a href="/docs/download.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Archived</a></li>
+        
+        <li class="divider"></li>
+       
+        <li class="heading">Supplement</li>
+        
+          <li class="sidenavli  "><a href="/docs/security.html" data-permalink="/docs/hbase-data-activity-monitoring.html" id="">Security</a></li>
+        
+        <li class="divider"></li>
+      
+        <li class="sidenavli">
+          <a href="mailto:dev@eagle.apache.org" target="_blank">Need Help?</a>
+        </li>
+        </ul>
+      </div>
+      <div class="col-xs-6 col-sm-9 page-main-content" style="margin-left: -15px" id="loadcontent">
+        <h1 class="page-header" style="margin-top: 0px">HBase Data Activity Monitoring</h1>
+        <p><em>On this page, any mention of Eagle points to Apache Eagle.</em></p>
+
+<p>This page will introduce how to monitoring HBase data activity in the following aspects:</p>
+
+<ul>
+  <li>How to enable HBase<sup id="fnref:HBASE"><a href="#fn:HBASE" class="footnote">1</a></sup> security audit log</li>
+  <li>How to add a Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">2</a></sup> log4j appender</li>
+  <li>How to enable Eagle HBase monitoring</li>
+</ul>
+
+<h3 id="how-to-enable-hbase-security-audit-log">How to enable HBase security audit log</h3>
+
+<blockquote>
+  <p>Notice: if you are willing to use sample logs under eagle-security-hbase-security/test/resources/securityAuditLog, please skip this part.</p>
+</blockquote>
+
+<ol>
+  <li>
+    <p>edit Advanced hbase-log4j via Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">3</a></sup> UI, and append below sentence to <code>Security audit appender</code></p>
+
+    <pre><code> log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE,RFAS
+</code></pre>
+  </li>
+  <li>
+    <p>edit Advanced hbase-site.xml</p>
+
+    <pre><code> &lt;property&gt;
+   &lt;name&gt;hbase.security.authorization&lt;/name&gt;
+   &lt;value&gt;true&lt;/value&gt;
+ &lt;/property&gt;
+
+ &lt;property&gt;
+   &lt;name&gt;hbase.coprocessor.master.classes&lt;/name&gt;
+   &lt;value&gt;org.apache.hadoop.hbase.security.access.AccessController&lt;/value&gt;
+ &lt;/property&gt;
+
+ &lt;property&gt;
+   &lt;name&gt;hbase.coprocessor.region.classes&lt;/name&gt;
+   &lt;value&gt;org.apache.hadoop.hbase.security.access.AccessController&lt;/value&gt;
+ &lt;/property&gt;
+</code></pre>
+  </li>
+  <li>
+    <p>Save and restart HBase</p>
+  </li>
+</ol>
+
+<p>Now you can check /var/log/hbase/SecurityAudit.log whether the log appears.</p>
+
+<h3 id="how-to-add-a-kafka-log4j-appender">How to add a Kafka log4j appender</h3>
+
+<blockquote>
+  <p>Notice: if you are willing to use sample logs under <code>eagle-security-hbase-security/test/resources/securityAuditLog</code>, please skip this part.</p>
+</blockquote>
+
+<ol>
+  <li>
+    <p>create Kafka topic <code>sandbox_hbase_security_log</code></p>
+
+    <pre><code> $ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hbase_security_log
+</code></pre>
+  </li>
+  <li>
+    <p>add below “KAFKA_HBASE_AUDIT” log4j appender to <code>Security audit appender</code>
+Please refer to http://goeagle.io/docs/import-hdfs-auditLog.html.</p>
+
+    <pre><code> log4j.appender.KAFKA_HBASE_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
+ log4j.appender.KAFKA_HBASE_AUDIT.Topic=sandbox_hbase_security_log
+ log4j.appender.KAFKA_HBASE_AUDIT.BrokerList=sandbox.hortonworks.com:6667
+ log4j.appender.KAFKA_HBASE_AUDIT.Layout=org.apache.log4j.PatternLayout
+ log4j.appender.KAFKA_HBASE_AUDIT.Layout.ConversionPattern=%d{ISO8601} %p %c: %m%n
+ log4j.appender.KAFKA_HBASE_AUDIT.ProducerType=async
+ log4j.appender.KAFKA_HDFS_AUDIT.KeyClass=org.apache.eagle.log4j.kafka.hadoop.GenericLogKeyer
+ log4j.appender.KAFKA_HDFS_AUDIT.KeyPattern=user=(\\w+),\\s+
+</code></pre>
+  </li>
+  <li>
+    <p>add the reference to KAFKA_HBASE_AUDIT to log4j appender</p>
+
+    <pre><code> log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE,RFAS,KAFKA_HBASE_AUDIT
+</code></pre>
+  </li>
+  <li>
+    <p>add Eagle log4j appender jars into HBASE_CLASSPATH BY editing Advanced hbase-env via Ambari UI</p>
+
+    <pre><code> export HBASE_CLASSPATH=${HBASE_CLASSPATH}:/usr/hdp/current/eagle/lib/log4jkafka/lib/*
+</code></pre>
+  </li>
+  <li>
+    <p>Save and restart HBase</p>
+  </li>
+</ol>
+
+<h3 id="how-to-enable-eagle-hbase-monitoring">How to enable Eagle hBase monitoring</h3>
+
+<ol>
+  <li>
+    <p>create tables (<code>skip if you do not use hbase</code>)</p>
+
+    <pre><code> bin/eagle-service-init.sh 
+</code></pre>
+  </li>
+  <li>
+    <p>start Eagle service</p>
+
+    <pre><code> bin/eagle-service.sh start
+</code></pre>
+  </li>
+  <li>
+    <p>import metadata</p>
+
+    <pre><code> bin/eagle-topology-init.sh
+</code></pre>
+  </li>
+  <li>
+    <p>submit topology</p>
+
+    <pre><code> bin/eagle-topology.sh --main org.apache.eagle.security.hbase.HbaseAuditLogProcessorMain --config conf/sandbox-hbaseSecurityLog-application.conf start
+</code></pre>
+  </li>
+</ol>
+
+<p>(sample sensitivity data at <code>examples/sample-sensitivity-resource-create.sh</code>)</p>
+
+<h3 id="q--a">Q &amp; A</h3>
+
+<p>Q1: found “java.lang.ClassNotFoundException: org.apache.eagle.log4j.kafka.KafkaLog4jAppender” in /var/log/hbase/hbase-hbase-master-sandbox.hortonworks.com.out</p>
+
+<p>A1: 1) make sure the jars have been included in HBASE_CLASSPATH (run hbase classpath in the shell). 2) make sure this jars can be executed by other users. 3) check /etc/hbase/conf/hbase-site.xml whether there is newline between two properties.</p>
+
+<hr />
+
+<h4 id="footnotes"><em>Footnotes</em></h4>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:HBASE">
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:KAFKA">
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:AMBARI">
+      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+      </div><!--end of loadcontent-->  
+    </div>
+    <!--end of centered content--> 
+  </div>
+</div>
+<!--end of container-->
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size: 12px">
+<div>
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache Hadoop, Hadoop, Apache HBase, HBase, Apache Hive, Hive, Apache Ambari, Ambari, Apache Spark, Spark, Apache Kafka, Kafka, Apache Storm, Storm, Apache Maven, Maven, Apache Tomcat, Tomcat, Apache Derby, Derby, Apache Cassandra, Cassandra, Apache ZooKeeper, ZooKeeper, Apache, the Apache feather logo, and the Apache project logo are trademarks of The Apache Software Foundation.
+</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/jquery.singlePageNav.js"></script>
+<script src="/js/jquery.flexslider.js"></script>
+<script src="/js/modernizr.min.js"></script>
+<script src="/js/svg.js"></script>
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>

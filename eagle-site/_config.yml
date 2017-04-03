@@ -1,0 +1,108 @@
+# Site settings
+title: Eagle
+email: cn.haochen@gmail.com
+description: Eagle - Analyze Big Data Platforms for Security and Performance 
+
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://goeagle.io" # the base hostname & protocol for your site
+# twitter_username: eagle
+# github_username:  eagle
+
+# Build settings
+markdown: kramdown
+permalink: date
+
+#host: 10.254.190.228
+#port: 4000
+
+documentations:
+  - category: Getting Started
+    links:
+      - title: Introduction
+        url: /docs/index.html
+      - title: Use Cases
+        url: /docs/usecases.html
+      - title: Terminology
+        url: /docs/terminology.html
+      - title: Ecosystem
+        url: /docs/ecosystem.html
+      - title: Community
+        url: /docs/community.html
+      - title: FAQ
+        url: /docs/FAQ.html
+  - category: Documentations
+    links:
+      - title: Latest version (v0.5.0)
+        url: /docs/latest/
+  - category: Download
+    links:
+      - title: Latest version (v0.5.0)
+        url: /docs/download-latest.html
+      - title: Archived
+        url: /docs/download.html
+
+  # - category: Installation
+  #   links:
+  #     - title: Get Started with Sandbox
+  #       url: /docs/quick-start.html
+  #     - title: Get Started with Docker
+  #       url: /docs/deployment-in-docker.html
+  #     - title: Setup Environment
+  #       url: /docs/deployment-env.html
+  #     - title: Setup Eagle in Production
+  #       url: /docs/deployment-in-production.html
+  #     - title: Eagle Application Configuration
+  #       url: /docs/configuration.html
+  #     - title: Eagle Service Configuration
+  #       url: /docs/serviceconfiguration.html
+  #     - title: Eagle LDAP Authentication
+  #       url: /docs/tutorial/ldap.html
+  # - category: Tutorial
+  #   links: 
+  #     - title: Site Management
+  #       url: /docs/tutorial/site.html
+  #     - title: Policy Management
+  #       url: /docs/tutorial/policy.html
+  #     - title: Policy Engine Capabilities 
+  #       url: /docs/tutorial/policy-capabilities.html
+  #     - title: HDFS Data Activity Monitoring
+  #       url: /docs/hdfs-data-activity-monitoring.html
+  #     - title: HIVE Query Activity Monitoring
+  #       url: /docs/hive-query-activity-monitoring.html
+  #     - title: HBASE Data Activity Monitoring
+  #       url: /docs/hbase-data-activity-monitoring.html
+  #     - title: MapR FS Data Activity Monitoring
+  #       url: /docs/mapr-integration.html
+  #     - title: Cloudera FS Data Activity Monitoring
+  #       url: /docs/cloudera-integration.html
+  #     - title: Hadoop JMX Metrics Monitoring
+  #       url: /docs/jmx-metric-monitoring.html
+  #     - title: Stream HDFS audit logs into Kafka
+  #       url: /docs/import-hdfs-auditLog.html
+  #     - title: User Profile Feature
+  #       url: /docs/tutorial/userprofile.html
+  #     - title: Data Classification Feature
+  #       url: /docs/tutorial/classification.html
+  #     - title: Topology Management Feature
+  #       url: /docs/tutorial/topologymanagement.html
+  #     - title: Alert Notification Plugin
+  #       url: /docs/tutorial/notificationplugin.html
+  #     - title: Metadata RESTful API
+  #       url: /docs/metadata-api.html
+  # - category: Development Guide
+  #   links: 
+  #     - title: Development Quick Guide
+  #       url: /docs/development-quick-guide.html
+  #     - title: Development in Mac OSX
+  #       url: /docs/development-in-macosx.html
+  #     - title: Development in Intellij 
+  #       url: /docs/development-in-intellij.html
+  # - category: Advanced
+  #   links: 
+  #     - title: User Profile Machine Learning
+  #       url: /docs/user-profile-ml.html
+
+  - category: Supplement
+    links:
+      - title: Security
+        url: /docs/security.html

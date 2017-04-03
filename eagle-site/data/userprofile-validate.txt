@@ -1,0 +1,8 @@
+2015-10-11 00:52:56,601 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=setPermission	src=/dir1/dir2/dir3/2015/10/08/02/00/00/xxx2b01c-b089/_SUCCESS	dst=null	perm=null
+2015-10-11 00:52:57,367 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=setTimes	src=/dir1/dir2/dir3/2015/10/08/01/00/00/xyx8b03c-34bd/header	dst=null	perm=null
+2015-10-11 00:52:58,011 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=delete	src=/dir1/dir2/dir3/2015/10/08/01/00/00/xyx4b03c-40ee/part-00000	dst=null	perm=null
+2015-10-11 00:52:59,371 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=fsck	src=/dir1/dir2/dir3/2015/10/08/02/00/00/xxx2b02c-ec44/_SUCCESS	dst=null	perm=null
+2015-10-11 00:53:00,371 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=fsck	src=/dir1/dir2/dir3/2015/10/08/02/00/00/xxx2b02c-ec44/_SUCCESS	dst=null	perm=null
+2015-10-11 00:53:01,371 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=fsck	src=/dir1/dir2/dir3/2015/10/08/02/00/00/xxx2b02c-ec44/_SUCCESS	dst=null	perm=null
+2015-10-11 00:53:02,371 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=fsck	src=/dir1/dir2/dir3/2015/10/08/02/00/00/xxx2b02c-ec44/_SUCCESS	dst=null	perm=null
+2015-10-11 00:53:03,371 INFO FSNamesystem.audit: allowed=true	ugi=user1 (auth:KERBEROS)	ip=/10.10.10.01	cmd=fsck	src=/dir1/dir2/dir3/2015/10/08/02/00/00/xxx2b02c-ec44/_SUCCESS	dst=null	perm=null
