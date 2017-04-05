@@ -19,6 +19,7 @@ package org.apache.eagle.jpm.util.resourcefetch;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.ha.HAURLSelectorImpl;
 import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.eagle.jpm.util.resourcefetch.model.ClusterInfo;
 import org.junit.Assert;
@@ -36,12 +37,15 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InputStreamUtils.class)
 public class RMResourceFetcherTest {
+    private InputStream clusterInfoStream = this.getClass().getResourceAsStream("/clusterinfo.json");
+
     @Test
     public void testCompleteMrJob() throws Exception {
         String[] rmBasePaths = new String[]{"http://www.xxx.com:8088", "http://www.yyy.com:8088"};
         RMResourceFetcher rmResourceFetcher = new RMResourceFetcher(rmBasePaths);
         InputStream jsonstream = this.getClass().getResourceAsStream("/mrcompleteapp.json");
         mockStatic(InputStreamUtils.class);
+        when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster?anonymous=true", null, Constants.CompressionType.NONE)).thenReturn(clusterInfoStream);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin=1479244718794&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(jsonstream);
         String lastFinishedTime = "1479244718794";
         List<AppInfo> appInfos = rmResourceFetcher.getResource(Constants.ResourceType.COMPLETE_MR_JOB, lastFinishedTime);
@@ -56,6 +60,7 @@ public class RMResourceFetcherTest {
         RMResourceFetcher rmResourceFetcher = new RMResourceFetcher(rmBasePaths);
         InputStream jsonstream = this.getClass().getResourceAsStream("/mrrunningapp.json");
         mockStatic(InputStreamUtils.class);
+        when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster?anonymous=true", null, Constants.CompressionType.NONE)).thenReturn(clusterInfoStream);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?applicationTypes=MAPREDUCE&state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(jsonstream);
         List<AppInfo> appInfos = rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
         Assert.assertEquals(2, appInfos.size());
@@ -70,6 +75,7 @@ public class RMResourceFetcherTest {
         InputStream jsonstream = this.getClass().getResourceAsStream("/sparkrunningapp.json");
         mockStatic(InputStreamUtils.class);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?applicationTypes=SPARK&state=RUNNING&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(jsonstream);
+        when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster?anonymous=true", null, Constants.CompressionType.NONE)).thenReturn(clusterInfoStream);
 
         List<AppInfo> appInfos = rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
         Assert.assertEquals(2, appInfos.size());
@@ -84,6 +90,7 @@ public class RMResourceFetcherTest {
         InputStream jsonstream = this.getClass().getResourceAsStream("/sparkcompleteapp.json");
         mockStatic(InputStreamUtils.class);
         long finishedTimeBegin = 1479244718794l;
+        when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster?anonymous=true", null, Constants.CompressionType.NONE)).thenReturn(clusterInfoStream);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/apps?applicationTypes=SPARK&state=FINISHED&finishedTimeBegin=1479244718794&anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(jsonstream);
         List<AppInfo> appInfos = rmResourceFetcher.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, String.valueOf(finishedTimeBegin));
         Assert.assertEquals(2, appInfos.size());
@@ -98,6 +105,7 @@ public class RMResourceFetcherTest {
         RMResourceFetcher rmResourceFetcher = new RMResourceFetcher(rmBasePaths);
         mockStatic(InputStreamUtils.class);
         InputStream jsonstream = this.getClass().getResourceAsStream("/clusterinfo.json");
+        when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster?anonymous=true", null, Constants.CompressionType.NONE)).thenReturn(clusterInfoStream);
         when(InputStreamUtils.getInputStream("http://www.xxx.com:8088/ws/v1/cluster/info?anonymous=true", null, Constants.CompressionType.GZIP)).thenReturn(jsonstream);
         ClusterInfo clusterInfo = rmResourceFetcher.getClusterInfo();
         Assert.assertEquals("ClusterInfo{id=1324053971963, startedOn=1324053971963, state='STARTED', haState='ACTIVE', resourceManagerVersion='0.23.1-SNAPSHOT', resourceManagerBuildVersion='0.23.1-SNAPSHOT from 1214049 by user1 source checksum 050cd664439d931c8743a6428fd6a693', resourceManagerVersionBuiltOn='Tue Dec 13 22:12:48 CST 2011', hadoopVersion='0.23.1-SNAPSHOT', hadoopBuildVersion='0.23.1-SNAPSHOT from 1214049 by user1 source checksum 11458df3bb77342dca5f917198fad328', hadoopVersionBuiltOn='Tue Dec 13 22:12:26 CST 2011'}", clusterInfo.toString());
