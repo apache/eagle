@@ -70,6 +70,69 @@ The example policy monitors the 'delete' operation on hosts in 'SECURITY' zone.
 ## Questions on this application
 
 ---
+# OOZIE Data Activity Monitoring
+ 
+## Monitor Requirements
+
+This application aims to monitor user activities on OOZIE via the oozie audit log. Once any abnormal user activity is detected, an alert is sent in several seconds. The whole pipeline of this application is
+
+* Kafka ingest: this application consumes data from Kafka. In other words, users have to stream the log into Kafka first. 
+
+* Data re-procesing, which includes raw log parser, sensitivity information joiner. 
+
+* Kafka sink: parsed data will flows into Kafka again, which will be consumed by the alert engine. 
+
+* Policy evaluation: the alert engine (hosted in Alert Engine app) evaluates each data event to check if the data violate the user defined policy. An alert is generated if the data matches the policy.
+
+![OOZIEAUDITLOG](include/images/oozie_audit_log.png)
+
+
+## Setup & Installation
+
+* Choose a site to install this application. For example 'sandbox'
+
+* Install "Oozie Audit Log Monitor" app step by step
+
+    ![Install Step 2](include/images/oozie_install_1.png)
+
+    ![Install Step 3](include/images/oozie_install_2.png)
+
+    ![Install Step 4](include/images/oozie_install_3.png)
+
+
+## How to collect the log
+
+To collect the raw audit log on namenode servers, a log collector is needed. Users can choose any tools they like. There are some common solutions available: [logstash](https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.html), [filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-getting-started.html), log4j appender, etcs. 
+
+For detailed instruction, refer to: [How to stream audit log into Kafka](using-eagle/#how-to-stream-audit-log-into-kafka)
+
+## Sample policies
+
+### 1. monitor file/folder operations 
+
+Delete a file/folder on HDFS. 
+
+```
+from OOZIE_AUDIT_LOG_STREAM_SANDBOX[ip=='localhost'] select * insert into oozie_audit_log_enriched_stream_out
+```
+
+OOZIE_AUDIT_LOG_STREAM_SANDBOX is the input stream name, and oozie_audit_log_enriched_stream_out is the output stream name, the content between [] is the monitoring conditions. `user`, `ip`, `jobId`, `operation` and `timestamp` is the fields of oozie audit logs.
+
+   ![Policy 1](include/images/oozie_policy_1.png)
+
+### 2. classify the file/folder on OOZIE
+
+Users may want to mark some jobId on OOZIE as sensitive job. For example, by marking '0000101-161115152703493-oozie-oozi-C' as "BASE", users can monitor any operations they care about on these jobId.
+
+```
+from OOZIE_AUDIT_LOG_STREAM_SANDBOX[sensitivityType=='BASE' and cmd=='kill')] select * group by user insert into oozie_audit_log_enriched_stream_out
+```
+The example policy monitors the 'kill' operation on jobId under "BASE". 
+
+# Questions on this application
+
+---
+
 
 # JMX Monitoring
 
