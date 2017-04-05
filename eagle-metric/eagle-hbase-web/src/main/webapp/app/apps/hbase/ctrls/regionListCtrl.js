@@ -38,8 +38,11 @@
 			function getCommonHeatMapSeries(name, data) {
 				return {
 					name: name,
-					type: "heatmap",
-					data: data,
+					type: 'heatmap',
+					data: [
+						[1,1,1,1],
+						[2,1,1,1]
+					],
 					itemStyle: { //
 						normal: {
 							borderColor: "#FFF"
@@ -51,28 +54,32 @@
 			function getCommonHeatMapOption() {
 				return {
 					animation: false,
-					tooltip: {
-						trigger: 'item'
-					},
+					xAxis: {
+				        splitLine: {
+				            show: true
+				        }
+				    },
+				    yAxis: {
+				        splitLine: {
+				            show: true
+				        }
+				    },
 					grid: { bottom: "50" },
 					visualMap: {
-						categories: ['live', 'dead'],
-						calculable: true,
+						categories: [1,2],
 						orient: 'horizontal',
-						left: 'right',
-						inRange: {
-							color: ["#00a65a", "#ffdc62", "#dd4b39"]
-						}
+						left: 'right'
 					}
 				};
 			}
+
 
 			// region server heatmap chart
 			$scope.regionserverList._promise.then(function () {
 				var regionServer_status = [];
 				var regionServer_status_maxCount = 0;
-				var x = 0;
-				var y = 1;
+				var x = -1;
+				var y = 0;
 				var split = 5;
 				$.each($scope.regionserverList,
 					/**
@@ -86,9 +93,8 @@
 					 	}else{
 					 		x = x +1;
 					 	}
-					 	regionServer_status.push([x, y, regionServer.tags.hostname, regionServer.status || "-"])
+					 	regionServer_status.push([x, y, 1, regionServer.tags.hostname, regionServer.status || "-"])
 					 });
-				console.log(regionServer_status);
 				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", regionServer_status)];
 				console.log($scope.healthStatusSeries);
 				$scope.healthStatusOption = getHealthHeatMapOption();
@@ -96,17 +102,17 @@
 
 				function getHealthHeatMapOption() {
 					var option = getCommonHeatMapOption();
-					return [common.merge(option, {
+					return common.merge(option, {
 						tooltip: {
 							formatter: function (point) {
 								if(point.data) {
-									return point.data[0] + ': <span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
-									point.data[1];
+									return point.data[2] + ': <span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.data[3];
 								}
 								return "";
 							}
 						}
-					})];
+					});
 				}
 
 			});

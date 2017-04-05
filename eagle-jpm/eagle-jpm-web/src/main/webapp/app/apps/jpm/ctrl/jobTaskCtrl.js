@@ -452,6 +452,7 @@
 
 				$scope.durationStatusSeries = bucketToDurationSeries(TASK_STATUS, duration_status, "Task Status");
 				$scope.durationStatusOption = getDurationHeatMapOption(TASK_STATUS, duration_status_maxCount);
+				console.log($scope.durationStatusSeries);
 				console.log($scope.durationStatusOption);
 
 				// ===================== Map / Reduce Statistic =====================
