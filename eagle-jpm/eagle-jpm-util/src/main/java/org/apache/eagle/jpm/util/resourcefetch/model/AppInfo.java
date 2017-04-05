@@ -43,7 +43,7 @@ public class AppInfo implements Serializable {
     private long elapsedTime;
     private String amContainerLogs;
     private String amHostHttpAddress;
-    private int allocatedMB;
+    private long allocatedMB;
     private int allocatedVCores;
     private int runningContainers;
     // for HDP 2.7
@@ -186,11 +186,11 @@ public class AppInfo implements Serializable {
         this.amHostHttpAddress = amHostHttpAddress;
     }
 
-    public int getAllocatedMB() {
+    public long getAllocatedMB() {
         return allocatedMB;
     }
 
-    public void setAllocatedMB(int allocatedMB) {
+    public void setAllocatedMB(long allocatedMB) {
         this.allocatedMB = allocatedMB;
     }
 
