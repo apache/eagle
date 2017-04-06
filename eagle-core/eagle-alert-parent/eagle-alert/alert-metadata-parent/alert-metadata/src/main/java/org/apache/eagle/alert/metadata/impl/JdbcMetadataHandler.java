@@ -455,6 +455,36 @@ public class JdbcMetadataHandler {
         return result;
     }
 
+    public OpResult removePolicyById(String clzName, String policyId) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        OpResult result = new OpResult();
+        try {
+            String tb = getTableName(clzName);
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(String.format(DELETE_STATEMENT, tb));
+            statement.setString(1, policyId);
+            int status = statement.executeUpdate();
+            LOG.info("delete {} policy {} from {}", status, policyId, tb);
+            closeResource(null, statement, null);
+
+            statement = connection.prepareStatement(DELETE_PUBLISHMENT_STATEMENT);
+            statement.setString(1, policyId);
+            status = statement.executeUpdate();
+            LOG.info("delete {} records from policy_publishment", status);
+
+            connection.commit();
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeResource(null, statement, connection);
+        }
+        LOG.info(result.message);
+        return result;
+    }
+
     public OpResult removeById(String clzName, String key) {
         Connection connection = null;
         PreparedStatement statement = null;
