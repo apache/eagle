@@ -227,7 +227,7 @@ public class JdbcMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult removePolicy(String policyId) {
-        return handler.removeById(PolicyDefinition.class.getSimpleName(), policyId);
+        return handler.removePolicyById(PolicyDefinition.class.getSimpleName(), policyId);
     }
 
     @Override
