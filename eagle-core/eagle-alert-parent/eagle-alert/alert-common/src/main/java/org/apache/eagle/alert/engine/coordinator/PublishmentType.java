@@ -26,17 +26,6 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublishmentType {
     private String name;
-
-    @Override
-    public String toString() {
-        return "PublishmentType{"
-                + "name='" + name + '\''
-                + ", type='" + type + '\''
-                + ", description='" + description + '\''
-                + ", fields=" + fields
-                + '}';
-    }
-
     private String type;
     private String description;
     private List<Map<String, String>> fields = new LinkedList<>();
@@ -73,7 +62,15 @@ public class PublishmentType {
         this.fields = fields;
     }
 
-
+    @Override
+    public String toString() {
+        return "PublishmentType{"
+                + "name='" + name + '\''
+                + ", type='" + type + '\''
+                + ", description='" + description + '\''
+                + ", fields=" + fields
+                + '}';
+    }
 
     @Override
     public boolean equals(Object obj) {
