@@ -44,7 +44,10 @@
 			// ==================================================================
 			// =                         Fetch Job List                         =
 			// ==================================================================
-			var jobList = $scope.jobList = JPM.findMRHistoryJobs($scope.site, $scope.jobDefId);
+            var endTime = new Time();
+            var startTime = endTime.clone().subtract(365,'day');
+            var condition = JPM.condition({site: $scope.site, jobDefId:$scope.jobDefId});
+			var jobList = $scope.jobList = JPM.list("JobExecutionService", condition, startTime, endTime, [], 10000);
 			jobList._promise.then(function () {
 				if(jobList.length <= 1) {
 					$.dialog({

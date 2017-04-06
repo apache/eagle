@@ -404,20 +404,6 @@
 			return JPM.get(url);
 		};
 
-		JPM.findMRHistoryJobs = function (site, jobDefId) {
-		    var endTime = new Time();
-		    var config = {
-        				query: "JobExecutionService",
-        				condition: JPM.condition({site: site, jobDefId:jobDefId}),
-        				fields: "*",
-                        startTime: Time.format(endTime.clone().subtract(365,'day')),
-                        endTime: Time.format(endTime),
-                        limit: 10000
-        			};
-             var findMRJobs_url = common.template(getQuery("LIST"), config);
-             return wrapList(JPM.get(findMRJobs_url));
-        }
-
 		/**
 		 * Get job list by sam jobDefId
 		 * @param {string} site
