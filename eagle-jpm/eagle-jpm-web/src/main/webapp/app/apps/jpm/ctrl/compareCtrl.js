@@ -44,7 +44,7 @@
 			// ==================================================================
 			// =                         Fetch Job List                         =
 			// ==================================================================
-			var jobList = $scope.jobList = JPM.findMRJobs($scope.site, $scope.jobDefId);
+			var jobList = $scope.jobList = JPM.findMRHistoryJobs($scope.site, $scope.jobDefId);
 			jobList._promise.then(function () {
 				if(jobList.length <= 1) {
 					$.dialog({

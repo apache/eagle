@@ -81,6 +81,7 @@
 		JPM.QUERY_METRICS_AGG = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		JPM.QUERY_MR_JOBS = '${baseURL}/rest/mrJobs/search';
+		JPM.QUERY_MR_HISTORY_JOBS = '${baseURL}/rest/entities?query=JobExecutionService[${condition}]{*}';
 		JPM.QUERY_JOB_LIST = '${baseURL}/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_JOB_STATISTIC = '${baseURL}/rest/mrJobs/jobCountsByDuration?site=${site}&timeDistInSecs=${times}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_TASK_STATISTIC = '${baseURL}/rest/mrTasks/taskCountsByDuration?jobId=${jobId}&site=${site}&timeDistInSecs=${times}&top=${top}';
@@ -403,6 +404,11 @@
 			});
 			return JPM.get(url);
 		};
+
+		JPM.findMRHistoryJobs = function (site, jobDefId) {
+             var findMRJobs_url = common.template(getQuery("MR_HISTORY_JOBS"), {condition: JPM.condition({site: site, jobDefId: jobDefId})});
+             return wrapList(JPM.get(findMRJobs_url));
+        };
 
 		/**
 		 * Get job list by sam jobDefId
