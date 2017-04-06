@@ -45,7 +45,7 @@
 			// =                         Fetch Job List                         =
 			// ==================================================================
             var endTime = new Time();
-            var startTime = endTime.clone().subtract(365,'day');
+            var startTime = endTime.clone().subtract(30, 'day');
             var condition = JPM.condition({site: $scope.site, jobDefId:$scope.jobDefId});
 			var jobList = $scope.jobList = JPM.list("JobExecutionService", condition, startTime, endTime, [], 10000);
 			jobList._promise.then(function () {
