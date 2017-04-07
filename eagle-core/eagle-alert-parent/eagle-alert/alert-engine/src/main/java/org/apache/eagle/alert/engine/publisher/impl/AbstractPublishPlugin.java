@@ -29,6 +29,7 @@ import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.apache.eagle.alert.engine.publisher.dedup.ExtendedDeduplicator;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +72,14 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
                 getLogger().error(String.format("initialize extended deduplicator %s failed", spec.getClassName()), t);
             }
         } else {
-            this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(),
-                publishment.getDedupFields(), publishment.getDedupStateField(), publishment.getDedupStateCloseValue(), dedupCache);
+            if (publishment.getDedupIntervalMin() != null && !publishment.getDedupIntervalMin().isEmpty()) {
+                this.deduplicator = new DefaultDeduplicator(
+                        publishment.getDedupIntervalMin(),
+                        publishment.getDedupFields(),
+                        publishment.getDedupStateField(),
+                        publishment.getDedupStateCloseValue(),
+                        dedupCache);
+            }
             this.pubName = publishment.getName();
         }
         String serializerClz = publishment.getSerializer();
@@ -98,7 +105,11 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
 
     @Override
     public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
-        return deduplicator.dedup(event);
+        if (null != deduplicator) {
+            return deduplicator.dedup(event);
+        } else {
+            return Collections.singletonList(event);
+        }
     }
 
     @Override
