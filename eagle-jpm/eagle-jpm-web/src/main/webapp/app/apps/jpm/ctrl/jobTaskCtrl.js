@@ -44,8 +44,7 @@
 				tooltip: {
 					trigger: 'item'
 				},
-				xAxis: {
-					splitArea: {show: true}},
+				xAxis: {splitArea: {show: true}},
 				yAxis: [{
 					type: 'category',
 					data: categoryList,
@@ -61,7 +60,7 @@
 					left: 'right',
 					inRange: {
 						color: ["#00a65a", "#ffdc62", "#dd4b39"]
-					}                   
+					}
 				}
 			};
 		}
@@ -453,9 +452,6 @@
 
 				$scope.durationStatusSeries = bucketToDurationSeries(TASK_STATUS, duration_status, "Task Status");
 				$scope.durationStatusOption = getDurationHeatMapOption(TASK_STATUS, duration_status_maxCount);
-				console.log($scope.durationStatusSeries);
-				console.log($scope.durationStatusOption);
-				console.log($scope.bucketScheduleCategory);
 
 				// ===================== Map / Reduce Statistic =====================
 				var mapReduce_status = {};

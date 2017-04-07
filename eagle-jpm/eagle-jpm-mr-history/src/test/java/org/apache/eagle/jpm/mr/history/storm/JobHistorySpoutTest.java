@@ -149,8 +149,8 @@ public class JobHistorySpoutTest {
         when(hdfs.listStatus(any(Path.class), any(PathFilter.class))).thenReturn(new FileStatus[] {filePartitionStatus});
         Path historyFilePath = mock(Path.class);
         Path historyConfPath = mock(Path.class);
-        PowerMockito.whenNew(Path.class).withArguments("/mr-history/done/2017/04/07/000508/job_1479206441898_508949-1481299030929-testhistory.jhist").thenReturn(historyFilePath);
-        PowerMockito.whenNew(Path.class).withArguments("/mr-history/done/2017/04/07/000508/job_1479206441898_508949_conf.xml").thenReturn(historyConfPath);
+        PowerMockito.whenNew(Path.class).withArguments("/mr-history/done/2016/12/12/000508/job_1479206441898_508949-1481299030929-testhistory.jhist").thenReturn(historyFilePath);
+        PowerMockito.whenNew(Path.class).withArguments("/mr-history/done/2016/12/12/000508/job_1479206441898_508949_conf.xml").thenReturn(historyConfPath);
 
         when((InputStream) hdfs.open(historyFilePath)).thenReturn(this.getClass().getResourceAsStream("job_1479206441898_508949-1481299030929-testhistory.jhist"));
         when((InputStream) hdfs.open(historyConfPath)).thenReturn(this.getClass().getResourceAsStream("job_1479206441898_508949_conf.xml"));
