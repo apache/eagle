@@ -1,18 +1,164 @@
-<!--
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
--->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><configuration>
+    <property>
+        <name>hive.optimize.skewjoin.compiletime</name>
+        <value>false</value>
+        <source>programatically</source>
+        <source>
+            org.apache.hadoop.hive.conf.LoopingByteArrayInputStream@67236f24
+        </source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>hive.query.string</name>
+        <value>
+            select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number
+        </value>
+        <source>programatically</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>dfs.blockreport.initialDelay</name>
+        <value>120</value>
+        <source>hdfs-site.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>mapreduce.reduce.markreset.buffer.percent</name>
+        <value>0.0</value>
+        <source>mapred-default.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>file.client-write-packet-size</name>
+        <value>65536</value>
+        <source>core-default.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>
+            hadoop.http.authentication.simple.anonymous.allowed
+        </name>
+        <value>true</value>
+        <source>core-site.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>hive.querylog.location</name>
+        <value>/tmp/hive</value>
+        <source>programatically</source>
+        <source>
+            org.apache.hadoop.hive.conf.LoopingByteArrayInputStream@67236f24
+        </source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>yarn.timeline-service.leveldb-timeline-store.path</name>
+        <value>/hadoop/yarn/timeline</value>
+        <source>yarn-site.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.proxy-user-privileges.enabled</name>
+        <value>false</value>
+        <source>yarn-default.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>hive.exec.script.allow.partial.consumption</name>
+        <value>false</value>
+        <source>programatically</source>
+        <source>
+            org.apache.hadoop.hive.conf.LoopingByteArrayInputStream@67236f24
+        </source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>hive.server2.global.init.file.location</name>
+        <value>/etc/hive/conf</value>
+        <source>programatically</source>
+        <source>
+            org.apache.hadoop.hive.conf.LoopingByteArrayInputStream@67236f24
+        </source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>
+            yarn.resourcemanager.work-preserving-recovery.scheduling-wait-ms
+        </name>
+        <value>10000</value>
+        <source>yarn-site.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>dfs.datanode.slow.io.warning.threshold.ms</name>
+        <value>300</value>
+        <source>hdfs-default.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>hive.support.concurrency</name>
+        <value>true</value>
+        <source>file:/etc/hive/conf/hive-site.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>mapreduce.reduce.shuffle.merge.percent</name>
+        <value>0.66</value>
+        <source>mapred-site.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
+    <property>
+        <name>mapreduce.task.skip.start.attempts</name>
+        <value>2</value>
+        <source>mapred-default.xml</source>
+        <source>job.xml</source>
+        <source>
+            hdfs://sandbox.hortonworks.com:8020/mr-history/done/2017/04/07/000000/job_1491539903031_0002_conf.xml
+        </source>
+    </property>
 </configuration>
