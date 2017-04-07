@@ -33,20 +33,33 @@
 			$scope.status = $wrapState.param.status;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
 			$scope.regionserverList = METRIC.regionserverList($scope.site, $scope.status);
+			$scope.regionserverAll = METRIC.regionserverList($scope.site);
 
 
 			function getCommonHeatMapSeries(name, data) {
 				return {
 					name: name,
 					type: 'heatmap',
-					data: [
-						[1,1,1,1],
-						[2,1,1,1]
-					],
-					itemStyle: { //
+					data: data,
+					label: {
+						normal: {
+							show: true,
+							formatter: function (point) {
+			                    if(point.data) {
+			                    	return point.data[3];
+			                    }
+			                    return "";
+			                }
+						}
+					},
+					itemStyle: {
 						normal: {
 							borderColor: "#FFF"
-						}
+						},
+						emphasis: {
+			                shadowBlur: 10,
+			                shadowColor: 'rgba(0, 0, 0, 0.5)'
+			            }
 					}
 				};
 			}
@@ -54,51 +67,68 @@
 			function getCommonHeatMapOption() {
 				return {
 					animation: false,
+					tooltip: {
+						trigger: 'item'
+					},
 					xAxis: {
-				        splitLine: {
-				            show: true
-				        }
+						show: false,
+						splitArea: {show: true}
 				    },
-				    yAxis: {
-				        splitLine: {
-				            show: true
-				        }
-				    },
-					grid: { bottom: "50" },
+				    yAxis: [{
+				    	show: false,
+				    	splitArea: {show: true},
+						axisTick: {show: false}
+				    }],
+					grid: {
+						left: "1%",
+						right: "1%",
+						top: "100",
+						bottom: "100"
+					},
 					visualMap: {
-						categories: [1,2],
+						categories: ['live', 'dead'],
+						calculable: true,
 						orient: 'horizontal',
-						left: 'right'
+						right: "2%",
+						inRange: {
+				            color: ['#00a65a', '#dd4b39']
+				        }
 					}
 				};
 			}
 
 
 			// region server heatmap chart
-			$scope.regionserverList._promise.then(function () {
+			$scope.regionserverAll._promise.then(function () {
 				var regionServer_status = [];
-				var regionServer_status_maxCount = 0;
+				var regionServer_status_category = [];
+				var regionServer_level = [];
 				var x = -1;
 				var y = 0;
-				var split = 5;
-				$.each($scope.regionserverList,
-					/**
-					 * @param {number} i
-					 * @param {RegionServer} regionServer
-					 */
-					 function (i, regionServer) {
-					 	if(x === split){
-					 		x = 0;
-					 		y = y + 1;
-					 	}else{
-					 		x = x +1;
-					 	}
-					 	regionServer_status.push([x, y, 1, regionServer.tags.hostname, regionServer.status || "-"])
-					 });
+				var split = 4;
+				$.each($scope.regionserverAll,
+				/**
+				 * @param {number} i
+				 * @param {RegionServer} regionServer
+				 */
+				 function (i, regionServer) {
+				 	if(x === split){
+				 		x = 0;
+				 		y = y - 1;
+				 	}else{
+				 		x = x +1;
+				 	}
+				 	regionServer_status.push([x, y, 0, regionServer.tags.hostname, regionServer.tags.rack, regionServer.usedHeapMB, regionServer.maxHeapMB, regionServer.status || "-"]);
+				 });
+				
+				for(var i = 0;i < split; i++){
+					regionServer_status_category.push(i);
+				}
 				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", regionServer_status)];
 				console.log($scope.healthStatusSeries);
 				$scope.healthStatusOption = getHealthHeatMapOption();
 				console.log($scope.healthStatusOption);
+				$scope.healthStatusCategory = regionServer_status_category;
 
 				function getHealthHeatMapOption() {
 					var option = getCommonHeatMapOption();
@@ -106,8 +136,10 @@
 						tooltip: {
 							formatter: function (point) {
 								if(point.data) {
-									return point.data[2] + ': <span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
-									point.data[3];
+									return point.data[3] + '<br/>'
+									+ 'status: <span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' + point.data[7] + '<br/>'
+									+ 'rack: ' +  point.data[4] + '<br/>'
+									+ 'heap used: ' +  point.data[5] + '/' +  point.data[6] + ' MB<br/>';
 								}
 								return "";
 							}

@@ -283,11 +283,19 @@
 		};
 
 		METRIC.hbaseMaster = function (siteId, status, limit) {
-			var condition = {
-				site: siteId,
-				role: "hmaster",
-				status: status
-			};
+			var condition = {};
+			if(typeof status === 'undefined') {
+				condition = {
+					site: siteId,
+					role: "hmaster"
+				};
+			} else {
+				condition = {
+					site: siteId,
+					role: "hmaster",
+					status: status
+				};
+			}
 			return METRIC.hbasehostStatus(condition, limit);
 		};
 
