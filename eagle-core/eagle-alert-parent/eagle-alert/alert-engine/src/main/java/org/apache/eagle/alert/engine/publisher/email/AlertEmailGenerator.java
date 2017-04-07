@@ -139,7 +139,9 @@ public class AlertEmailGenerator {
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DATA_DESC, generateAlertDataDesc(event));
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_CATEGORY, event.getCategory());
         alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, event.getSeverity().toString());
-        alertContext.put(PublishConstants.ALERT_EMAIL_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()));
+        alertContext.put(PublishConstants.ALERT_EMAIL_TIME, String.format("%s %s",
+                DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()),
+                DateTimeUtil.CURRENT_TIME_ZONE.getID()));
         alertContext.put(PublishConstants.ALERT_EMAIL_STREAM_ID, event.getStreamId());
         alertContext.put(PublishConstants.ALERT_EMAIL_CREATOR, event.getCreatedBy());
         alertContext.put(PublishConstants.ALERT_EMAIL_VERSION, Version.version);

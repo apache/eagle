@@ -33,6 +33,7 @@ import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.AlertStreamFilter;
 import org.apache.eagle.alert.engine.publisher.PipeStreamFilter;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
+import org.apache.eagle.alert.engine.publisher.impl.DefaultDeduplicator;
 import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
 import org.apache.eagle.alert.engine.publisher.template.AlertTemplateProvider;
 import org.apache.eagle.alert.utils.AlertConstants;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPublishSpecListener {
@@ -51,6 +53,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private volatile Map<String, Publishment> cachedPublishments = new HashMap<>();
     private volatile Map<String, PolicyDefinition> policyDefinitionMap;
     private volatile Map<String, StreamDefinition> streamDefinitionMap;
+    private volatile Map<String, DefaultDeduplicator> deduplicatorMap = new ConcurrentHashMap<>();
     private AlertTemplateEngine alertTemplateEngine;
 
     private boolean logEventEnabled;
@@ -86,6 +89,12 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             AlertStreamEvent event = (AlertStreamEvent) input.getValueByField(AlertConstants.FIELD_1);
             if (logEventEnabled) {
                 LOG.info("Alert publish bolt {}/{} with partition {} received event: {}", this.getBoltId(), this.context.getThisTaskId(), partition, event);
+            }
+            if (deduplicatorMap != null && deduplicatorMap.containsKey(event.getPolicyId())) {
+                List<AlertStreamEvent> eventList = deduplicatorMap.get(event.getPolicyId()).dedup(event);
+                if (eventList == null || eventList.isEmpty()) {
+                    return;
+                }
             }
             AlertStreamEvent filteredEvent = alertFilter.filter(event);
             if (filteredEvent != null) {
@@ -139,7 +148,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     }
 
     @Override
-    public void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
+    public synchronized void onAlertPolicyChange(Map<String, PolicyDefinition> pds, Map<String, StreamDefinition> sds) {
         List<String> policyToRemove = new ArrayList<>();
         if (this.policyDefinitionMap != null) {
             policyToRemove.addAll(this.policyDefinitionMap.keySet().stream().filter(policyId -> !pds.containsKey(policyId)).collect(Collectors.toList()));
@@ -151,6 +160,9 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         for (Map.Entry<String, PolicyDefinition> entry : pds.entrySet()) {
             try {
                 this.alertTemplateEngine.register(entry.getValue());
+                if (entry.getValue().getDeduplication() != null) {
+                    this.deduplicatorMap.put(entry.getKey(), new DefaultDeduplicator(entry.getValue().getDeduplication()));
+                }
             } catch (Throwable throwable) {
                 LOG.error("Failed to register policy {} in template engine", entry.getKey(), throwable);
             }
@@ -159,6 +171,9 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         for (String policyId : policyToRemove) {
             try {
                 this.alertTemplateEngine.unregister(policyId);
+                if (deduplicatorMap != null && deduplicatorMap.containsKey(policyId)) {
+                    deduplicatorMap.remove(policyId);
+                }
             } catch (Throwable throwable) {
                 LOG.error("Failed to unregister policy {} from template engine", policyId, throwable);
             }

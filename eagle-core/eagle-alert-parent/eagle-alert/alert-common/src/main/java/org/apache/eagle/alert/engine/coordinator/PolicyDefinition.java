@@ -43,6 +43,7 @@ public class PolicyDefinition implements Serializable {
     private Definition stateDefinition;
     private PolicyStatus policyStatus = PolicyStatus.ENABLED;
     private AlertDefinition alertDefinition;
+    private AlertDeduplication deduplication;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -147,6 +148,7 @@ public class PolicyDefinition implements Serializable {
                 .append(policyStatus)
                 .append(parallelismHint)
                 .append(alertDefinition)
+                .append(deduplication)
                 .build();
     }
 
@@ -172,7 +174,8 @@ public class PolicyDefinition implements Serializable {
                 && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
                 && another.policyStatus.equals(this.policyStatus)
                 && another.parallelismHint == this.parallelismHint
-                && Objects.equals(another.alertDefinition, alertDefinition)) {
+                && Objects.equals(another.alertDefinition, alertDefinition)
+                && Objects.equals(another.deduplication, deduplication)) {
             return true;
         }
         return false;
@@ -200,6 +203,14 @@ public class PolicyDefinition implements Serializable {
 
     public void setSiteId(String siteId) {
         this.siteId = siteId;
+    }
+
+    public AlertDeduplication getDeduplication() {
+        return deduplication;
+    }
+
+    public void setDeduplication(AlertDeduplication deduplication) {
+        this.deduplication = deduplication;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
