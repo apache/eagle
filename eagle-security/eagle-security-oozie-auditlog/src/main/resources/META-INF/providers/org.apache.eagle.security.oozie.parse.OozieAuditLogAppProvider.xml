@@ -69,7 +69,7 @@
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>Kafka Topic for Data Consumption</displayName>
-            <value>oozie_audit_log</value>
+            <value>oozie_audit_log_${siteId}</value>
             <description>data source topic</description>
         </property>
         <property>
