@@ -17,7 +17,7 @@
   -->
 <div class="nav-tabs-custom" style="cursor: move;">
 	<ul class="nav nav-tabs pull-right ui-sortable-handle">
-      <li><a href="#heatmap" data-toggle="tab" aria-expanded="false">HeatMap</a></li>
+      <li><a href="#heatmap" data-toggle="tab" aria-expanded="false" ng-click="healthHeatMap.resize()">HeatMap</a></li>
       <li class="active"><a href="#list" data-toggle="tab" aria-expanded="true">List</a></li>
     </ul>
 
@@ -59,7 +59,7 @@
 		<div class="box box-primary no-margin tab-pane fade" id="heatmap">
 			<div class="box-body">
 				<div class="hadoopMetric-chart">
-					<div chart class="hadoopMetric-chart-container" series="healthStatusSeries" category="healthStatusCategory" option="healthStatusOption"></div>
+					<div chart="healthHeatMap" ng-style="heatmapHeight" series="healthStatusSeries" category="healthStatusCategory" option="healthStatusOption"></div>
 					<div ng-if="(healthStatusSeries || []).length === 0" class="overlay">
 						<i class="fa fa-refresh fa-spin"></i>
 					</div>

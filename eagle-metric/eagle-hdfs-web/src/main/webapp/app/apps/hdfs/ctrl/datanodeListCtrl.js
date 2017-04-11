@@ -84,6 +84,8 @@
 					grid: {
 						left: "1%",
 						right: "1%",
+						top: "60",
+						bottom: "60"
 					},
 					visualMap: {
 						categories: ['live', 'dead'],
@@ -127,6 +129,12 @@
 				$scope.healthStatusOption = getHealthHeatMapOption();
 				console.log($scope.healthStatusOption);
 				$scope.healthStatusCategory = datanode_status_category;
+				$scope.heatmapHeight = {
+					'height': getHeight(y)
+				};
+				function getHeight(x){
+					return (Math.abs(x-1)*30 + 140) + "px"
+				}
 
 				function getHealthHeatMapOption() {
 					var option = getCommonHeatMapOption();

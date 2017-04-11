@@ -82,8 +82,8 @@
 					grid: {
 						left: "1%",
 						right: "1%",
-						top: "100",
-						bottom: "100"
+						top: "60",
+						bottom: "60"
 					},
 					visualMap: {
 						categories: ['active', 'standby'],
@@ -104,7 +104,7 @@
 				var namenode_status_category = [];
 				var x = -1;
 				var y = 0;
-				var split = 4;
+				var split = 5;
 				$.each($scope.namenodeAll,
 					/**
 					 * @param {number} i
@@ -127,6 +127,12 @@
 				$scope.healthStatusOption = getHealthHeatMapOption();
 				console.log($scope.healthStatusOption);
 				$scope.healthStatusCategory = namenode_status_category;
+				$scope.heatmapHeight = {
+					'height': getHeight(y)
+				};
+				function getHeight(x){
+					return (Math.abs(x-1)*30 + 140) + "px"
+				}
 
 				function getHealthHeatMapOption() {
 					var option = getCommonHeatMapOption();

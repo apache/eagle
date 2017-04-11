@@ -70,6 +70,12 @@
 					tooltip: {
 						trigger: 'item'
 					},
+					grid: {
+							left: "1%",
+							right: "1%",
+							top: "60",
+							bottom: "60"
+					},
 					xAxis: {
 						show: false,
 						splitArea: {show: true}
@@ -79,12 +85,6 @@
 				    	splitArea: {show: true},
 						axisTick: {show: false}
 				    }],
-					grid: {
-						left: "1%",
-						right: "1%",
-						top: "100",
-						bottom: "100"
-					},
 					visualMap: {
 						categories: ['live', 'dead'],
 						calculable: true,
@@ -105,7 +105,7 @@
 				var regionServer_level = [];
 				var x = -1;
 				var y = 0;
-				var split = 4;
+				var split = 5;
 				$.each($scope.regionserverAll,
 				/**
 				 * @param {number} i
@@ -129,6 +129,13 @@
 				$scope.healthStatusOption = getHealthHeatMapOption();
 				console.log($scope.healthStatusOption);
 				$scope.healthStatusCategory = regionServer_status_category;
+				$scope.heatmapHeight = {
+					'height': getHeight(y)
+				};
+
+				function getHeight(x){
+					return (Math.abs(x-1)*30 + 140) + "px"
+				}
 
 				function getHealthHeatMapOption() {
 					var option = getCommonHeatMapOption();
