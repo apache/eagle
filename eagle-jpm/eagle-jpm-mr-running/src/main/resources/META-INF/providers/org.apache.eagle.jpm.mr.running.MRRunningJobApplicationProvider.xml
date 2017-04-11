@@ -104,7 +104,7 @@
         <property>
             <name>dataSinkConfig.ACCEPTED_APP_STREAM.topic</name>
             <displayName>Destination(Kafka Topic) Of App Stream Data</displayName>
-            <value>yarn_accepted_app_{site}</value>
+            <value>yarn_accepted_app_{siteId}</value>
             <description>topic for kafka data sink</description>
             <required>true</required>
         </property>

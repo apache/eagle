@@ -130,14 +130,14 @@
         <property>
             <name>dataSinkConfig.HDFS_AUDIT_LOG_ENRICHED_STREAM.topic</name>
             <displayName>Kafka Topic for Auditlog Event Sink</displayName>
-            <value>hdfs_audit_event_${site}</value>
+            <value>hdfs_audit_event_${siteId}</value>
             <description>topic for kafka data sink</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.HDFS_AUDIT_LOG_TRAFFIC_STREAM.topic</name>
             <displayName>Kafka Topic for Traffic Data Sink</displayName>
-            <value>hdfs_traffic_event_${site}</value>
+            <value>hdfs_traffic_event_${siteId}</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>

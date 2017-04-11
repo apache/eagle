@@ -19,45 +19,26 @@
 package org.apache.eagle.jpm.mr.historyentity;
 
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
-import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.eagle.log.entity.meta.MapSerDeser;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
+
 
 public class JobConfigSerDeser implements EntitySerDeser<JobConfig> {
 
+    private static final MapSerDeser INSTANCE = new MapSerDeser();
+
     @Override
     public JobConfig deserialize(byte[] bytes) {
-        JobConfig jc = new JobConfig();
-        Map<String, String> map = new TreeMap<String, String>();
-        jc.setConfig(map);
-        String sb = Bytes.toString(bytes);
-        String[] keyValue = sb.split(",");
-        for (String pair : keyValue) {
-            String[] str = pair.split(":");
-            if (pair.equals("") || str[0].equals("")) {
-                continue;
-            }
-            String key = str[0];
-            String value = "";
-            if (str.length == 2) {
-                value = str[1];
-            }
-            map.put(key, value);
-        }
-        return jc;
+        Map map = INSTANCE.deserialize(bytes);
+        JobConfig config = new JobConfig();
+        config.setConfig(map);
+        return config;
     }
-    
+
     @Override
-    public byte[] serialize(JobConfig conf) {
-        Map<String, String> map = conf.getConfig();
-        StringBuilder sb = new StringBuilder();
-        for (Entry<String, String> entry : map.entrySet()) {
-            sb.append(entry.getKey() + ":" + entry.getValue() + ",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString().getBytes();
+    public byte[] serialize(JobConfig jobConfig) {
+        return INSTANCE.serialize(jobConfig.getConfig());
     }
 
     @Override
