@@ -1308,6 +1308,10 @@
                                 <exclude>**/webapp/**</exclude>
                                 <exclude>**/*.pid</exclude>
                                 <exclude>**/buildNumber.properties</exclude>
+
+                                <!-- Docs related -->
+                                <exclude>docs/eagle-theme/**</exclude>
+                                <exclude>docs/**/*.txt</exclude>
                             </excludes>
                         </configuration>
                     </execution>
