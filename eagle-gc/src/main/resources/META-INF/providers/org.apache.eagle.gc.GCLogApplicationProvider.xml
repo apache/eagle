@@ -54,7 +54,7 @@
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>dataSourceConfig.topic</displayName>
-            <value>gc_log</value>
+            <value>gc_log_${siteId}</value>
             <description>data source topic</description>
         </property>
         <property>
@@ -112,7 +112,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hbase_audit_log_parsed</value>
+            <value>gc_log_event_${siteId}</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>

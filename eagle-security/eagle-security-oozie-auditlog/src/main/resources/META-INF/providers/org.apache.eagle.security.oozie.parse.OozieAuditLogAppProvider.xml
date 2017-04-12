@@ -130,7 +130,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>Kafka Topic for Parsed Data Sink</displayName>
-            <value>oozie_audit_log_enriched</value>
+            <value>oozie_audit_event_${siteId}</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>

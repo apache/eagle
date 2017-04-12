@@ -24,7 +24,7 @@
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>dataSourceConfig.topic</displayName>
-            <value>hbase_audit_log</value>
+            <value>hbase_audit_log_${siteId}</value>
             <description>data source topic</description>
         </property>
         <property>
@@ -104,7 +104,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hbase_audit_log_parsed</value>
+            <value>hbase_audit_event_${siteId}</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
