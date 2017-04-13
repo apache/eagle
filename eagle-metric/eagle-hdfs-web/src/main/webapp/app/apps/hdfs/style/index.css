@@ -32,11 +32,6 @@
 	position: relative;
 }
 
-.hadoopMetric-chart .hadoopMetric-heatmap-container {
-	height: 1500px;
-	position: relative;
-}
-
 .hadoopMetric-chart .hadoopMetric-no-chart-data {
 	position:absolute;
 	left: 38%;
