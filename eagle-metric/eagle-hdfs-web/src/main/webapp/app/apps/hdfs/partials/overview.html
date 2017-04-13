@@ -28,7 +28,7 @@
             <tr>
                 <td width="5%">
                     <span ng-show="!namenodeactivenum">0</span>
-                    <span ng-show="namenodeactivenum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'active'})" target="_blank">{{namenodeactivenum}}</a></span>
+                    <span ng-show="namenodeactivenum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'active'})">{{namenodeactivenum}}</a></span>
                     <span ng-show="namenodeactivenum===-1">N/A</span>
                 </td>
                 <th width="30%">Active Namenode</th>
@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td>
-                    <span ng-show="namenodestandbynum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'standby'})" target="_blank">{{namenodestandbynum}}</a></span>
+                    <span ng-show="namenodestandbynum!==-1"><a ui-sref="namenodeList({siteId: site, status: 'standby'})">{{namenodestandbynum}}</a></span>
                     <span ng-show="!namenodestandbynum">0</span>
                     <span ng-show="namenodestandbynum===-1">N/A</span>
                 </td>
