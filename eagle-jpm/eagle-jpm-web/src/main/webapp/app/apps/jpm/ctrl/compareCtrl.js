@@ -54,11 +54,11 @@
 						title: "No statistic info",
 						content: "Current job do not have enough statistic info. Please check 'jobDefId' if your job have run many times."
 					});
-                } else {
-                    jobList.sort(function (a, b) {
-                        return a.startTime - b.startTime;
-                    });
-                }
+				} else {
+				    jobList.sort(function (a, b) {
+					return a.startTime - b.startTime;
+				    });
+				}
 
 				function findJob(jobId) {
 					return common.array.find(jobId, jobList, "tags.jobId");
