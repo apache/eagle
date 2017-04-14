@@ -1312,6 +1312,10 @@
                                 <!-- Docs related -->
                                 <exclude>docs/eagle-theme/**</exclude>
                                 <exclude>docs/**/*.txt</exclude>
+
+                                <!-- Java Object serial file -->
+                                <exclude>**/test/resources/appinfobyteint</exclude>
+                                <exclude>**/test/resources/appinfobytelong</exclude>
                             </excludes>
                         </configuration>
                     </execution>
