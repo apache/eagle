@@ -87,6 +87,8 @@
 
 						wrapChart();
 					};
+
+					refreshEventHandler();
 				}
 
 				function refreshChart() {
@@ -170,29 +172,31 @@
 
 				// Event handle
 				var chartClick = false;
-				chart.on("click", function (e) {
-					if($scope.click) {
-						if($scope.click(e)) {
-							refreshChart();
+				function refreshEventHandler() {
+					chart.on("click", function (e) {
+						if($scope.click) {
+							if($scope.click(e)) {
+								refreshChart();
+							}
 						}
-					}
-					chartClick = true;
-				});
+						chartClick = true;
+					});
 
-				chart.getZr().on('click', function () {
-					if(!chartClick && $scope.click) {
-						if($scope.click($.extend({
-							componentType: "tooltip"
-						}, lastTooltipEvent))) {
-							refreshChart();
+					chart.getZr().on('click', function () {
+						if(!chartClick && $scope.click) {
+							if($scope.click($.extend({
+									componentType: "tooltip"
+								}, lastTooltipEvent))) {
+								refreshChart();
+							}
 						}
-					}
-					chartClick = false;
-				});
+						chartClick = false;
+					});
 
-				chart.on('showtip', function (e) {
-					lastTooltipEvent = e;
-				});
+					chart.on('showtip', function (e) {
+						lastTooltipEvent = e;
+					});
+				}
 
 				// Insert chart object to parent scope
 				if($attrs.chart) {
