@@ -14,6 +14,20 @@
 # limitations under the License.
 
 language: java
-script: mvn clean test
+
 jdk:
   - oraclejdk8
+
+before_install: sudo echo "MAVEN_OPTS='-Xmx2048m -Xms1024m'" > ~/.mavenrc
+
+script: mvn clean test
+
+env:
+  global:
+    - MAVEN_OPTS: "-Xmx2048m -Xms1024m"
+
+sudo: required
+
+cache:
+  directories:
+    - $HOME/.m2
