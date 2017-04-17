@@ -123,6 +123,13 @@
             <organization>Apache Software Foundation</organization>
             <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
+        <developer>
+            <id>jaysen</id>
+            <name>Jayesh Senjaliya</name>
+            <email>jaysen@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
+        </developer>
     </developers>
     <modules>
         <module>eagle-core</module>
