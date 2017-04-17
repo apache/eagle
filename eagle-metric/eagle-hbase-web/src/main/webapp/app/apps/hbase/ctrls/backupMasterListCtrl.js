@@ -118,13 +118,11 @@
 						}
 						master_status.push([x, y, 0, master.tags.hostname, master.tags.rack, master.status || "-"])
 					});
-				for(var i = 0;i < split; i++){
+				for(var i = 0;i <= split; i++){
 					master_status_category.push(i);
 				}
 				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", master_status)];
-				console.log($scope.healthStatusSeries);
 				$scope.healthStatusOption = getHealthHeatMapOption();
-				console.log($scope.healthStatusOption);
 				$scope.healthStatusCategory = master_status_category;
 				$scope.heatmapHeight = {
 					'height': getHeight(y)
