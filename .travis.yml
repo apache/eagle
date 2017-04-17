@@ -13,7 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-language: java
-script: mvn clean test
+env:
+  global:
+  - GH_REF: github.com/1haodian/eagle.git
+node_js:
+  - "4"
+install:
+  - sudo rm /etc/mavenrc
+  - export MAVEN_OPTS="-Xmx2469m -XX:MaxPermSize=512m"
+  - nvm install 4
+  - chmod ugo+x build.sh
+script:
+  - '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./build.sh'
 jdk:
   - oraclejdk8
+notifications:
+  email:
+    recipients:
+      - denglingang@yhd.com
+      - luokun@yhd.com
+      - chenchang@yhd.com
+      - tangjijun@yhd.com
+      - zhangqihui@yhd.com
+    on_success: change
+    on_failure: always
+cache:
+  directories:
+     - $HOME/.m2

@@ -76,14 +76,14 @@
         <property>
             <name>dataSinkConfig.MAP_REDUCE_JOB_STREAM.topic</name>
             <displayName>Destination(Kafka Topic) Of Job Stream Data</displayName>
-            <value>sandbox-map_reduce_job</value>
+            <value>map_reduce_job_${siteId}</value>
             <description>application emits job stream data to this kafka topic</description>
             <required>true</required>
         </property>
         <property>
             <name>dataSinkConfig.MAP_REDUCE_TASK_ATTEMPT_STREAM.topic</name>
             <displayName>Destination(Kafka Topic) Of Task Attempt Stream Data</displayName>
-            <value>sandbox-map_reduce_task_attempt</value>
+            <value>map_reduce_task_attempt_${siteId}</value>
             <description>application emits task attempt stream data to this kafka topic</description>
             <required>true</required>
         </property>

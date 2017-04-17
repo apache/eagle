@@ -29,6 +29,7 @@ import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
     private final StreamGroup partitionGroup;
     private final TopologyMgmtService mgmtService;
 
-    //    private final int numOfPoliciesBoundPerBolt;
+    private final int numOfPoliciesBoundPerBolt;
     private final double topoLoadUpbound;
     private final boolean reuseBoltInStreams;
     private final int streamsPerBolt;
@@ -62,7 +63,7 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
         this.mgmtService = mgmtService;
 
         Config config = ConfigFactory.load().getConfig(CoordinatorConstants.CONFIG_ITEM_COORDINATOR);
-        // numOfPoliciesBoundPerBolt = config.getInt(CoordinatorConstants.POLICIES_PER_BOLT);
+        numOfPoliciesBoundPerBolt = config.getInt(CoordinatorConstants.POLICIES_PER_BOLT);
         topoLoadUpbound = config.getDouble(CONFIG_ITEM_TOPOLOGY_LOAD_UPBOUND);
         if (config.hasPath(CoordinatorConstants.REUSE_BOLT_IN_STREAMS)) {
             reuseBoltInStreams = config.getBoolean(CoordinatorConstants.REUSE_BOLT_IN_STREAMS);
@@ -162,12 +163,15 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
         if (!reuseBoltInStreams && alertUsage.getQueueSize() > 0) {
             return false;
         }
-        if (reuseBoltInStreams && alertUsage.getQueueSize() >= streamsPerBolt) {
-            return false;
+        if (reuseBoltInStreams) {
+            if (alertUsage.getQueueSize() >= streamsPerBolt) {
+                return false;
+            }
+            if (alertUsage.getPartitions().contains(partitionGroup)) {
+                return false;
+            }
         }
-        // actually it's now 0;
-        return true;
-        //  return alertUsage.getPolicies().size() < numOfPoliciesBoundPerBolt;
+        return alertUsage.getPolicies().size() < numOfPoliciesBoundPerBolt;
     }
 
 }

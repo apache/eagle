@@ -17,7 +17,6 @@
 package org.apache.eagle.alert.engine.model;
 
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import backtype.storm.tuple.Tuple;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
@@ -39,7 +38,7 @@ public class PartitionedEvent implements Serializable {
      * Used for bolt-internal but not inter-bolts,
      * will not pass across bolts.
      */
-    private transient Tuple anchor;
+    private transient Object anchor;
 
     public PartitionedEvent() {
         this.event = null;
@@ -138,15 +137,15 @@ public class PartitionedEvent implements Serializable {
         return copied;
     }
 
-    public Tuple getAnchor() {
+    public Object getAnchor() {
         return anchor;
     }
 
-    public void setAnchor(Tuple anchor) {
+    public void setAnchor(Object anchor) {
         this.anchor = anchor;
     }
 
-    public PartitionedEvent withAnchor(Tuple tuple) {
+    public PartitionedEvent withAnchor(Object tuple) {
         this.setAnchor(tuple);
         return this;
     }

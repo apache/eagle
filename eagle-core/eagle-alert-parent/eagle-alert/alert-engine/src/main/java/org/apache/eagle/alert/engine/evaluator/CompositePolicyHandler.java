@@ -18,11 +18,13 @@ package org.apache.eagle.alert.engine.evaluator;
 
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +32,9 @@ import java.util.Map;
 /**
  * Created on 7/27/16.
  */
-public class CompositePolicyHandler implements PolicyStreamHandler {
+public class CompositePolicyHandler implements PolicyStreamHandler, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(CompositePolicyHandler.class);
+    private static final long serialVersionUID = 1675264959401583336L;
 
     private PolicyStreamHandler policyHandler;
     private PolicyStreamHandler stateHandler;
@@ -93,4 +96,17 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
         }
     }
 
+    public void clearHandlers() {
+        this.handlers = new ArrayList<>();
+    }
+
+    public void restoreSiddhiSnapshot(byte[] siddhiSnapshot) {
+        SiddhiPolicyHandler siddhiPolicyHandler = (SiddhiPolicyHandler) policyHandler;
+        siddhiPolicyHandler.restoreSiddhiSnapshot(siddhiSnapshot);
+    }
+
+    public byte[] closeAndSnapShot() {
+        SiddhiPolicyHandler siddhiPolicyHandler = (SiddhiPolicyHandler) policyHandler;
+        return siddhiPolicyHandler.closeAndSnapShot();
+    }
 }

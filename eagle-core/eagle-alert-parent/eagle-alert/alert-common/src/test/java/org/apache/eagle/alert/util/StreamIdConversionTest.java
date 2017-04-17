@@ -43,4 +43,16 @@ public class StreamIdConversionTest {
 
     }
 
+    @Test
+    public void testGetTargetPartitionNum() {
+        int result = StreamIdConversion.getPartitionNumByTargetId("stream_source1_to_target1");
+        Assert.assertEquals(1, result);
+
+        result = StreamIdConversion.getPartitionNumByTargetId("stream_source1_to_target121");
+        Assert.assertEquals(121, result);
+
+        result = StreamIdConversion.getPartitionNumByTargetId("stream_source1_to_target");
+        Assert.assertEquals(-1, result);
+    }
+
 }

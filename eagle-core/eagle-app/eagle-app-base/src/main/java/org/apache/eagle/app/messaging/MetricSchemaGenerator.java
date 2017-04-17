@@ -24,7 +24,7 @@ import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metadata.model.MetricSchemaEntity;
-import org.apache.eagle.app.environment.builder.MetricDefinition;
+import org.apache.eagle.app.environment.builder.MetricDescriptor;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -40,14 +40,14 @@ public class MetricSchemaGenerator extends BaseRichBolt {
     public static final String GENERIC_METRIC_VALUE_NAME = "value";
 
     private final HashSet<String> metricNameCache = new HashSet<>(MAX_CACHE_LENGTH);
-    private final MetricDefinition metricDefinition;
+    private final MetricDescriptor metricDescriptor;
     private final Config config;
 
     private OutputCollector collector;
     private IEagleServiceClient client;
 
-    public MetricSchemaGenerator(MetricDefinition metricDefinition, Config config) {
-        this.metricDefinition = metricDefinition;
+    public MetricSchemaGenerator(MetricDescriptor metricDescriptor, Config config) {
+        this.metricDescriptor = metricDescriptor;
         this.config = config;
     }
 
@@ -63,7 +63,7 @@ public class MetricSchemaGenerator extends BaseRichBolt {
             String metricName = input.getStringByField(MetricStreamPersist.METRIC_NAME_FIELD);
             synchronized (metricNameCache) {
                 if (!metricNameCache.contains(metricName)) {
-                    createMetricSchemaEntity(metricName, this.metricDefinition);
+                    createMetricSchemaEntity(metricName, (Map) input.getValueByField(MetricStreamPersist.METRIC_EVENT_FIELD),this.metricDescriptor);
                     metricNameCache.add(metricName);
                 }
                 if (metricNameCache.size() > MAX_CACHE_LENGTH) {
@@ -93,14 +93,15 @@ public class MetricSchemaGenerator extends BaseRichBolt {
         }
     }
 
-    private void createMetricSchemaEntity(String metricName, MetricDefinition metricDefinition) throws IOException, EagleServiceClientException {
+    private void createMetricSchemaEntity(String metricName, Map event, MetricDescriptor metricDescriptor) throws IOException, EagleServiceClientException {
         MetricSchemaEntity schemaEntity = new MetricSchemaEntity();
         Map<String, String> schemaTags = new HashMap<>();
         schemaEntity.setTags(schemaTags);
+        schemaTags.put(MetricSchemaEntity.METRIC_SITE_TAG, metricDescriptor.getSiteIdSelector().getSiteId(event));
         schemaTags.put(MetricSchemaEntity.METRIC_NAME_TAG, metricName);
-        schemaTags.put(MetricSchemaEntity.METRIC_TYPE_TAG, metricDefinition.getMetricType());
-        schemaEntity.setGranularityByField(metricDefinition.getGranularity());
-        schemaEntity.setDimensionFields(metricDefinition.getDimensionFields());
+        schemaTags.put(MetricSchemaEntity.METRIC_GROUP_TAG, metricDescriptor.getMetricGroupSelector().getMetricGroup(event));
+        schemaEntity.setGranularityByField(metricDescriptor.getGranularity());
+        schemaEntity.setDimensionFields(metricDescriptor.getDimensionFields());
         schemaEntity.setMetricFields(Collections.singletonList(GENERIC_METRIC_VALUE_NAME));
         schemaEntity.setModifiedTimestamp(System.currentTimeMillis());
         GenericServiceAPIResponseEntity<String> response = this.client.create(Collections.singletonList(schemaEntity));

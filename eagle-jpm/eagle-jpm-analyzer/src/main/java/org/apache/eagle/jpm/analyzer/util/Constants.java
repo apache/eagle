@@ -31,14 +31,16 @@ public class Constants {
     public static final String CONTEXT_PATH = "service.context";
     public static final String READ_TIMEOUT_PATH = "service.readTimeOutSeconds";
 
-    public static final String META_PATH = "/metadata";
-    public static final String ANALYZER_PATH = "/job/analyzer";
-    public static final String JOB_DEF_PATH = "jobDefId";
-    public static final String JOB_META_PATH = META_PATH + "/{" + JOB_DEF_PATH + "}";
+    public static final String ANALYZER_PATH = "/analyzer";
 
-    public static final String PUBLISHER_PATH = "/publisher";
-    public static final String USER_PATH = "userId";
-    public static final String PUBLISHER_META_PATH = PUBLISHER_PATH + "/{" + USER_PATH + "}";
+    public static final String SITE_ID = "siteId";
+    public static final String JOB_META_ROOT_PATH = "/jobmeta";
+    public static final String JOB_DEF_ID = "jobDefId";
+    public static final String JOB_META_PATH = JOB_META_ROOT_PATH + "/{" + SITE_ID + "}/" + "{" + JOB_DEF_ID + "}";
+
+    public static final String USER_META_ROOT_PATH = "/usermeta";
+    public static final String USER_ID = "userId";
+    public static final String USER_META_PATH = USER_META_ROOT_PATH + "/{" + SITE_ID + "}/" + "{" + USER_ID + "}";
 
     public static final String PROCESS_NONE = "PROCESS_NONE";
 
@@ -48,7 +50,7 @@ public class Constants {
     public static final String ALERT_THRESHOLD_KEY = "alert.threshold";
     public static final Map<Result.ResultLevel, Double> DEFAULT_ALERT_THRESHOLD = new HashMap<Result.ResultLevel, Double>() {
         {
-            put(Result.ResultLevel.NOTICE, 0.1);
+            put(Result.ResultLevel.INFO, 0.1);
             put(Result.ResultLevel.WARNING, 0.3);
             put(Result.ResultLevel.CRITICAL, 0.5);
         }
@@ -58,7 +60,7 @@ public class Constants {
     public static final int DEFAULT_DEDUP_INTERVAL = 300;
 
     public static final String ANALYZER_REPORT_CONFIG_PATH = "application.analyzerReport";
-    public static final String ANALYZER_REPORT_SUBJECT = "Job Performance Alert For Job: %s";
+    public static final String ANALYZER_REPORT_SUBJECT = "Performance Insights For %s";
 
     public static final String ANALYZER_REPORT_DATA_BASIC_KEY = "basic";
     public static final String ANALYZER_REPORT_DATA_EXTEND_KEY = "extend";

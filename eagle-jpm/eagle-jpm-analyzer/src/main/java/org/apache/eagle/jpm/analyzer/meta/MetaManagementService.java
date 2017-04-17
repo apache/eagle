@@ -18,22 +18,24 @@
 package org.apache.eagle.jpm.analyzer.meta;
 
 import org.apache.eagle.jpm.analyzer.meta.model.JobMetaEntity;
-import org.apache.eagle.jpm.analyzer.meta.model.PublisherEntity;
+import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 
 import java.util.List;
 
 public interface MetaManagementService {
     boolean addJobMeta(JobMetaEntity jobMetaEntity);
 
-    boolean updateJobMeta(String jobDefId, JobMetaEntity jobMetaEntity);
+    boolean updateJobMeta(JobMetaEntity jobMetaEntity);
 
-    List<JobMetaEntity> getJobMeta(String jobDefId);
+    List<JobMetaEntity> getJobMeta(String siteId, String jobDefId);
 
-    boolean deleteJobMeta(String jobDefId);
+    boolean deleteJobMeta(String siteId, String jobDefId);
 
-    boolean addPublisherMeta(PublisherEntity publisherEntity);
+    boolean addUserEmailMeta(UserEmailEntity userEmailEntity);
 
-    boolean deletePublisherMeta(String userId);
+    boolean updateUserEmailMeta(UserEmailEntity userEmailEntity);
 
-    List<PublisherEntity> getPublisherMeta(String userId);
+    boolean deleteUserEmailMeta(String siteId, String userId);
+
+    List<UserEmailEntity> getUserEmailMeta(String siteId, String userId);
 }

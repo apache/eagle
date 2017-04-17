@@ -38,11 +38,13 @@ public class Constants {
     public static final String RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "RunningSparkExecutorService";
     public static final String APPLICATION_PREFIX = "application";
     public static final String JOB_PREFIX = "job";
-    public static final String V2_APPS_URL = "ws/v1/cluster/apps";
+
     public static final String ANONYMOUS_PARAMETER = "anonymous=true";
 
+    public static final String V2_APPS_URL = "ws/v1/cluster/apps";
     public static final String V2_APPS_RUNNING_URL = "ws/v1/cluster/apps?state=RUNNING";
     public static final String V2_APPS_COMPLETED_URL = "ws/v1/cluster/apps?state=FINISHED";
+    public static final String V2_CLUSTER_INFO_URL = "ws/v1/cluster";
 
     public static final String SPARK_MASTER_KEY = "spark.master";
     public static final String SPARK_EXECUTOR_MEMORY_KEY = "spark.executor.memory";
@@ -66,6 +68,13 @@ public class Constants {
     public static final String MR_CONF_URL = "conf";
 
     public static final String YARN_API_CLUSTER_INFO = "ws/v1/cluster/info";
+
+    public static class MetricName {
+        // Metrics from running apps
+        public static final String HADOOP_APPS_ALLOCATED_MB = "hadoop.%s.allocatedmb";
+        public static final String HADOOP_APPS_ALLOCATED_VCORES = "hadoop.%s.allocatedvcores";
+        public static final String HADOOP_APPS_RUNNING_CONTAINERS = "hadoop.%s.runningcontainers";
+    }
 
     public enum CompressionType {
         GZIP, NONE
@@ -93,7 +102,7 @@ public class Constants {
 
     public enum ResourceType {
         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO, JOB_CONFIGURATION,
-        COMPLETE_MR_JOB
+        COMPLETE_MR_JOB, ACCEPTED_JOB
     }
 
     public static enum SuggestionType {
@@ -119,6 +128,7 @@ public class Constants {
     public static final String MR_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
     public static final String MR_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
     public static final String MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME = "JobOptimizerSuggestionService";
+    public static final String ACCEPTED_APP_SERVICE_NAME = "AcceptedAppService";
 
     public static final String JOB_TASK_TYPE_TAG = "taskType";
 
@@ -141,6 +151,7 @@ public class Constants {
 
     public enum JobType {
         CASCADING("CASCADING"),HIVE("HIVE"),PIG("PIG"),SCOOBI("SCOOBI"),
+        SPARK("SPARK"), MAPREDUCE("MAPREDUCE"),
         NOTAVALIABLE("N/A")
         ;
         private String value;

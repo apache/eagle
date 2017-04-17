@@ -21,7 +21,7 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
-		jpmApp.controller("detailCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+		jpmApp.controller("detailCtrl", function ($q, $wrapState, $element, $rootScope, $scope, $sce, PageConfig, Time, Entity, JPM, UI) {
 			var TASK_BUCKET_TIMES = [0, 30, 60, 120, 300, 600, 1800, 3600, 7200, 18000];
 			var i;
 			var startTime, endTime;
@@ -125,21 +125,68 @@
 
 
 				// =============================== task attempt ===============================
-				if ($scope.job.currentState === 'FAILED') {
-					$scope.taskAttemptList = JPM.list('TaskAttemptErrorCategoryService', {
+				(function () {
+					if ($scope.job.currentState === 'FAILED') {
+						// Attempt List
+						$scope.taskAttemptList = JPM.list('TaskAttemptErrorCategoryService', {
+							site: $scope.job.tags.site,
+							jobId: $scope.job.tags.jobId
+						},
+							Time($scope.startTimestamp).subtract(1, 'day'),
+							Time($scope.endTimestamp).add(1, 'day'));
+						$scope.taskAttemptCategories = {};
+						$scope.taskAttemptList._promise.then(function () {
+							$.each($scope.taskAttemptList, function (i, attempt) {
+								$scope.taskAttemptCategories[attempt.tags.errorCategory] =
+									($scope.taskAttemptCategories[attempt.tags.errorCategory] || 0) + 1;
+							});
+						});
+
+						// Error Mapping
+						$scope.errorMapping = {};
+						var errorMappingList = JPM.list('JobErrorMappingService', {
+							site: $scope.job.tags.site,
+							jobId: $scope.job.tags.jobId
+						},
+							Time($scope.startTimestamp).subtract(1, 'day'),
+							Time($scope.endTimestamp).add(1, 'day'));
+						errorMappingList._promise.then(function () {
+							$.each(errorMappingList, function (i, entity) {
+								var errorTooltip = $sce.trustAsHtml('<div class="text-break">' + entity.error + '</div>');
+
+								$.each(entity.taskAttempts, function (j, attempt) {
+									$scope.errorMapping[attempt] = errorTooltip;
+								});
+							});
+						});
+					}
+				})();
+
+				$scope.loadAttemptDetail = function (taskAttemptId) {
+					var scope = $rootScope.$new(true);
+					scope.content = 'Loading...';
+
+					var attemptList = JPM.list('TaskAttemptExecutionService', {
+							site: $scope.job.tags.site,
+							taskAttemptId: taskAttemptId
+						},
+						Time($scope.startTimestamp).subtract(1, 'day'),
+						Time($scope.endTimestamp).add(1, 'day'));
+					attemptList._promise.then(function () {
+						scope.content = common.getValueByPath(attemptList, [0, 'error'], '(No Data)');
+						scope.$apply();
+					});
+
+					UI.dialog(taskAttemptId, '<pre>{{content}}</pre>', scope);
+				};
+
+				// ============================== job suggestion ==============================
+				$scope.jobSuggestionList = JPM.list('JobOptimizerSuggestionService', {
 						site: $scope.job.tags.site,
 						jobId: $scope.job.tags.jobId
 					},
-						Time($scope.startTimestamp).subtract(1, 'day'),
-						Time($scope.endTimestamp).add(1, 'day'));
-					$scope.taskAttemptCategories = {};
-					$scope.taskAttemptList._promise.then(function () {
-						$.each($scope.taskAttemptList, function (i, attempt) {
-							$scope.taskAttemptCategories[attempt.tags.errorCategory] =
-								($scope.taskAttemptCategories[attempt.tags.errorCategory] || 0) + 1;
-						});
-					});
-				}
+					Time($scope.startTimestamp).subtract(1, 'day'),
+					Time($scope.endTimestamp).add(1, 'day'));
 
 				// ================================ dashboards ================================
 				// Dashboard 1: Allocated MB

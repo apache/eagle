@@ -53,7 +53,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>alert-spark</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- package test cases -->
         <dependency>
             <groupId>org.apache.eagle</groupId>

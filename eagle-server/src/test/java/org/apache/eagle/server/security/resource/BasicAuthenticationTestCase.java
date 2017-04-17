@@ -55,6 +55,18 @@ public class BasicAuthenticationTestCase {
     }
 
     @Test
+    public void testAuthUserOnlyWithoutKey() {
+        try {
+            Client client = new Client();
+            client.resource(String.format("http://localhost:%d/rest/testAuth/userOnly", RULE.getLocalPort()))
+                .get(User.class);
+            Assert.fail();
+        } catch (UniformInterfaceException e) {
+            Assert.assertEquals(401, e.getResponse().getStatus());
+        }
+    }
+
+    @Test
     public void testAuthAdminOnly() {
         Client client = new Client();
         client.resource(String.format("http://localhost:%d/rest/testAuth/adminOnly", RULE.getLocalPort()))
@@ -142,7 +154,7 @@ public class BasicAuthenticationTestCase {
     }
 
     @Test
-    public void testAuthPermitAllWithBadKeyShouldAccept401() {
+    public void testAuthPermitAllWithBadKeyShouldAccept403() {
         Client client = new Client();
         try {
             client.resource(String.format("http://localhost:%d/rest/testAuth/permitAll", RULE.getLocalPort()))
@@ -150,7 +162,7 @@ public class BasicAuthenticationTestCase {
                 .get(User.class);
             Assert.fail();
         } catch (UniformInterfaceException e) {
-            Assert.assertEquals(401, e.getResponse().getStatus());
+            Assert.assertEquals(403, e.getResponse().getStatus());
         }
     }
 

@@ -20,12 +20,15 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PolicyWorkerQueue {
+public class PolicyWorkerQueue implements Serializable {
 
+    private static final long serialVersionUID = 7131985778900576114L;
     private StreamPartition partition;
     private List<WorkSlot> workers;
 

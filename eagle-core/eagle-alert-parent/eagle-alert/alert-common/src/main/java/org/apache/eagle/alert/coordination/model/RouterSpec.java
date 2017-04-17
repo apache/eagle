@@ -20,13 +20,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class RouterSpec {
+public class RouterSpec implements Serializable {
+    private static final long serialVersionUID = 4222310571582403820L;
     private String version;
     private String topologyName;
 

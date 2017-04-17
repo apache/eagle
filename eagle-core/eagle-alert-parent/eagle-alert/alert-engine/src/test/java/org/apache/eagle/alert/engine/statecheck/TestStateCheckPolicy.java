@@ -58,7 +58,7 @@ public class TestStateCheckPolicy {
             @Override
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 verified.set(true);
-                Assert.assertEquals("perfmon_latency_stream", ((PublishPartition) tuple.get(0)).getStreamId());
+                Assert.assertEquals("perfmon_latency_check_output2", ((PublishPartition) tuple.get(0)).getStreamId());
                 AlertStreamEvent event = (AlertStreamEvent) tuple.get(1);
                 System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", ((PublishPartition) tuple.get(0)).getStreamId(), tuple));
                 return null;
@@ -92,7 +92,7 @@ public class TestStateCheckPolicy {
         List<StreamDefinition> streams = mapper.readValue(TestStateCheckPolicy.class.getResourceAsStream("/statecheck/streamdefinitions.json"),
                 new TypeReference<List<StreamDefinition>>() {
                 });
-        spec.addPublishPartition(streams.get(0).getStreamId(), policies.get(0).getName(), "testPublishBolt", null);
+        spec.addPublishPartition("perfmon_latency_check_output2", policies.get(0).getName(), "testPublishBolt", null);
         
         alertBolt.onAlertBoltSpecChange(spec, definitionMap);
 

@@ -53,7 +53,6 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher<SparkA
         this.historyServerURL = historyServerURL;
         this.sparkDetailJobServiceURLBuilder = new SparkJobServiceURLBuilderImpl();
         this.auth = "Basic " + new String(new Base64().encode(String.format("%s:%s", userName, pwd).getBytes()));
-        ;
     }
 
     private List<SparkApplication> doFetchSparkApplicationDetail(String appId) throws Exception {

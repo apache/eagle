@@ -23,12 +23,14 @@ import org.apache.eagle.alert.engine.router.StreamRoute;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
+public class BasicStreamRoutePartitioner implements StreamRoutePartitioner, Serializable {
+    private static final long serialVersionUID = 196127527722598918L;
     private final List<String> outputComponentIds;
     private final StreamDefinition streamDefinition;
     private final StreamPartition streamPartition;

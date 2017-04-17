@@ -19,13 +19,19 @@
 (function() {
 	'use strict';
 
+	var colorMapping = {
+		WARNING: '#f39c12',
+		CRITICAL: '#dd4b39',
+		FATAL: '#dd4b39',
+		OK: '#00a65a'
+	};
 	var eagleControllers = angular.module('eagleControllers');
 
 	// ======================================================================================
 	// =                                        Alert                                       =
 	// ======================================================================================
-	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig, CompatibleEntity, Time) {
-		PageConfig.title = "Alerts";
+	eagleControllers.controller('alertListCtrl', function ($q, $scope, $wrapState, PageConfig, CompatibleEntity, Time) {
+		PageConfig.title = "Alert Incidents";
 		$scope.site = $wrapState.param.siteId;
 
 		$scope.alertList = [];
@@ -33,6 +39,7 @@
 
 		function loadAlerts() {
 			$scope.loading = true;
+			// Alert List
 			var list = CompatibleEntity.query("LIST", {
 				query: "AlertService",
 				condition: {siteId: $scope.site},
@@ -41,6 +48,36 @@
 			});
 			list._then(function () {
 				$scope.alertList = list;
+			});
+
+			// Alert Trend
+			$scope.alertTrend = [];
+			var alertTrend = CompatibleEntity.timeSeries({
+				condition: { siteId: $scope.site },
+				groups: 'severity',
+				fields: ['count'],
+				query: 'AlertService',
+				startTime: new Time('startTime'),
+				endTime: new Time('endTime'),
+				limit: 100000,
+			});
+			alertTrend._promise.then(function () {
+				$scope.alertTrend = $.map(alertTrend, function (series) {
+					var type = series.group.key[0];
+					return $.extend({}, series, {
+						name: type,
+						type: 'bar',
+						stack: 'severity',
+						itemStyle: {
+							normal: {
+								color: colorMapping[type],
+							},
+						},
+					});
+				});
+			});
+
+			$q.all([list._promise, alertTrend._promise]).then(function () {
 				$scope.loading = false;
 			});
 		}
@@ -86,7 +123,7 @@
 	// =                                       Stream                                       =
 	// ======================================================================================
 	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application, Entity) {
-		PageConfig.title = "Streams";
+		PageConfig.title = "Alert Streams";
 
 		$scope.streamList = [];
 		$scope.site = $wrapState.param.siteId;
@@ -119,7 +156,7 @@
 	// =                                       Policy                                       =
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, Policy) {
-		PageConfig.title = "Policies";
+		PageConfig.title = "Alert Policies";
 		$scope.loading = false;
 
 		$scope.policyList = [];
@@ -153,7 +190,7 @@
 		PageConfig.title = "Policy";
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
-			{title: "Policy List", path: "/policies"},
+			{title: "Policy List", path: "/site/" + $wrapState.param.siteId + "/policies"},
 			{title: "Detail"}
 		];
 
@@ -191,7 +228,7 @@
 
 			Entity.queryMetadata("schedulestates")._then(function (res) {
 				var schedule = res.data || {};
-				$scope.assignment = common.array.find(policyName, schedule.assignments, ["policyName"]) || {};
+				$scope.assignment = common.array.find(policyName, schedule.assignments || [], ["policyName"]) || {};
 
 				var queueList = $.map(schedule.monitoredStreams, function (stream) {
 					return stream.queues;

@@ -17,7 +17,7 @@
 
 package org.apache.eagle.jpm.util.resourcefetch.url;
 
-import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.Constants.JobState;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,13 +25,14 @@ public class JobListServiceURLBuilderImplTest {
     @Test
     public void testBuild() {
         JobListServiceURLBuilderImpl jobListServiceURLBuilderImpl = new JobListServiceURLBuilderImpl();
-        String finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", Constants.JobState.RUNNING.name());
+        String finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", JobState.RUNNING.toString());
         Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps?state=RUNNING&anonymous=true", finalUrl);
-        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", Constants.JobState.FINISHED.name());
+        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", JobState.FINISHED.toString());
         Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps?state=FINISHED&anonymous=true", finalUrl);
-        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", Constants.JobState.ALL.name());
+        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", JobState.ALL.toString());
         Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps&anonymous=true", finalUrl);
-        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", "");
-        Assert.assertEquals(null, finalUrl);
+        finalUrl = jobListServiceURLBuilderImpl.build("http://www.xxx.com:8088/", null);
+        Assert.assertEquals("http://www.xxx.com:8088/ws/v1/cluster/apps&anonymous=true", finalUrl);
     }
+
 }

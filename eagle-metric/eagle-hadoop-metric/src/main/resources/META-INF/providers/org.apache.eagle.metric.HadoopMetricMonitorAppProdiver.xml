@@ -20,12 +20,24 @@
     <type>HADOOP_METRIC_MONITOR</type>
     <name>Hadoop Metrics Monitor</name>
     <configuration>
-        <!-- data fromStream configurations -->
         <property>
             <name>dataSinkConfig.HADOOP_JMX_METRIC_STREAM.topic</name>
             <displayName>JMX Metric Kafka Topic</displayName>
             <value>hadoop_jmx_metric_${siteId}</value>
             <description>Hadoop JMX metric kafka topic name for stream: HADOOP_JMX_METRIC_STREAM</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>dataSinkConfig.SYSTEM_METRIC_STREAM.topic</name>
+            <displayName>System Metric Kafka Topic</displayName>
+            <value>system_metric_${siteId}</value>
+            <description>System JMX metric kafka topic name for stream: SYSTEM_METRIC_STREAM</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.HADOOP_JMX_RESOURCE_STREAM.topic</name>
+            <displayName>JMX Resource Kafka Topic</displayName>
+            <value>hadoop_jmx_resource_${siteId}</value>
+            <description>Hadoop JMX resource kafka topic name for stream: HADOOP_JMX_RESOURCE_STREAM</description>
             <required>true</required>
         </property>
         <property>
@@ -98,6 +110,7 @@
         <stream>
             <streamId>HADOOP_JMX_METRIC_STREAM</streamId>
             <description>Hadoop JMX Metric Stream including name node, resource manager, etc.</description>
+            <group>hadoop metrics</group>
             <columns>
                 <column>
                     <name>host</name>
@@ -123,6 +136,74 @@
                     <name>value</name>
                     <type>double</type>
                     <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>SYSTEM_METRIC_STREAM</streamId>
+            <description>System Metrics Stream including CPU, Network, Disk, etc.</description>
+            <group>system metrics</group>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>metric</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>group</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>device</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>HADOOP_JMX_RESOURCE_STREAM</streamId>
+            <description>Hadoop JMX Resource Stream including name node, resource manager, etc.</description>
+            <group>hadoop metrics</group>
+            <columns>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>resource</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>component</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>site</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>string</type>
+                    <defaultValue>""</defaultValue>
                 </column>
             </columns>
         </stream>

@@ -31,6 +31,8 @@ import java.util.List;
 public class TopologyCheckAppConfig implements Serializable {
 
     public static final String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
+    public static final String SYSTEM_DATA_FETCH_SPOUT_NAME = "systemDataFetcherSpout";
+    public static final String SYSTEM_ENTITY_PERSIST_BOLT_NAME = "systemEntityPersistBolt";
     public static final String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
     public static final String PARSE_BOLT_NAME = "parserBolt";
     public static final String SINK_BOLT_NAME = "sinkBolt";
@@ -44,6 +46,7 @@ public class TopologyCheckAppConfig implements Serializable {
     public HBaseConfig hBaseConfig;
     public HdfsConfig hdfsConfig;
     public MRConfig mrConfig;
+    public SystemConfig systemConfig;
     public List<TopologyConstants.TopologyType> topologyTypes;
 
     private Config config;
@@ -113,6 +116,14 @@ public class TopologyCheckAppConfig implements Serializable {
             hdfsConfig = new HdfsConfig();
             hdfsConfig.namenodeUrls = config.getString("dataSourceConfig.hdfs.namenodeUrl").split(",\\s*");
         }
+
+        if (config.hasPath("dataSourceConfig.system.enabled") && config.getBoolean("dataSourceConfig.system.enabled")) {
+            systemConfig = new SystemConfig();
+            systemConfig.systemInstanceKafkaTopic = getOptionalConfig("dataSourceConfig.system.topic", null);
+            systemConfig.systemInstanceKafkaSchemeCls = getOptionalConfig("dataSourceConfig.system.schemeCls", null);
+            systemConfig.systemInstanceZkQuorum = getOptionalConfig("dataSourceConfig.system.zkConnection", null);
+            systemConfig.systemInstanceSendBatchSize = config.getInt("dataSourceConfig.system.dataSendBatchSize");
+        }
     }
 
     public static class DataExtractorConfig implements Serializable {
@@ -142,6 +153,13 @@ public class TopologyCheckAppConfig implements Serializable {
 
     public static class HdfsConfig implements Serializable {
         public String[] namenodeUrls;
+    }
+
+    public static class SystemConfig implements Serializable {
+        public String systemInstanceKafkaTopic;
+        public String systemInstanceZkQuorum;
+        public String systemInstanceKafkaSchemeCls;
+        public int systemInstanceSendBatchSize;
     }
 
     private String getOptionalConfig(String key, String defaultValue) {

@@ -30,8 +30,9 @@
 					<tr>
 						<th sortpath="policyStatus" width="10"></th>
 						<th sortpath="name" width="10%">Name</th>
+						<th width="5%">Severity</th>
 						<th>Description</th>
-						<th width="85">Action</th>
+						<th width="85" ng-if="Auth.isAdmin">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -42,8 +43,9 @@
 						<td>
 							<a ui-sref="policyDetail({siteId: site, name: item.name})">{{item.name}}</a>
 						</td>
+						<td>{{item.alertDefinition.severity}}</td>
 						<td>{{item.description}}</td>
-						<td class="text-center">
+						<td class="text-center" ng-if="Auth.isAdmin">
 							<div class="btn-group btn-group-xs">
 								<button class="btn btn-default opt" ng-if="item.policyStatus !== 'ENABLED'" ng-click="startPolicy(item)">
 									<span class="fa fa-play"></span>
@@ -62,7 +64,9 @@
 
 		<div class="callout callout-warning no-margin" ng-show="!loading && policyList.length === 0">
 			<h4>No Policy yet</h4>
-			<p>You have not create policy yet. Click <a ui-sref="policyCreate({ siteId: site })">here</a> to create a new policy.</p>
+			<p>You have not create policy yet.
+				<span ng-if="Auth.isAdmin">Click <a ui-sref="policyCreate({ siteId: site })">here</a> to create a new policy.</span>
+			</p>
 		</div>
 	</div>
 
@@ -70,7 +74,7 @@
 		<i class="fa fa-refresh fa-spin"></i>
 	</div>
 
-	<div class="box-footer text-right">
+	<div class="box-footer text-right" ng-if="Auth.isAdmin">
 		<a ui-sref="policyCreate({ siteId: site })" class="btn btn-primary">New Policy</a>
 	</div>
 </div>

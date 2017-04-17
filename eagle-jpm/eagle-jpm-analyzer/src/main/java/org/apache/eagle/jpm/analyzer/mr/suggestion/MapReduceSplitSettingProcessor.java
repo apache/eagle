@@ -22,9 +22,6 @@ import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.publisher.Result;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MapReduceSplitSettingProcessor implements Processor<MapReduceAnalyzerEntity> {
 
     private MapReduceJobSuggestionContext context;

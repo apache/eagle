@@ -27,6 +27,7 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
     private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamProvider.class);
     private static final String DEFAULT_SHARED_SINK_TOPIC_CONF_KEY = "dataSinkConfig.topic";
     private static final String DEFAULT_SHARED_SOURCE_TOPIC_CONF_KEY = "dataSourceConfig.topic";
+    private static final String DEFAULT_SHARED_SOURCE_SCHEME_CLS_KEY = "dataSourceConfig.schemeCls";
 
     private String getSinkTopicName(String streamId, Config config) {
         String streamSpecificTopicConfigKey = String.format("dataSinkConfig.%s.topic",streamId);
@@ -43,7 +44,7 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
     }
 
     private String getSourceTopicName(String streamId, Config config) {
-        String streamSpecificTopicConfigKey = String.format("dataSourceConfig.%s.topic",streamId);;
+        String streamSpecificTopicConfigKey = String.format("dataSourceConfig.%s.topic",streamId);
         if (config.hasPath(streamSpecificTopicConfigKey)) {
             return config.getString(streamSpecificTopicConfigKey);
         } else if (config.hasPath(DEFAULT_SHARED_SOURCE_TOPIC_CONF_KEY)) {
@@ -53,6 +54,17 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
             LOG.debug("Neither stream specific topic: {} nor default shared topic: {} found in config, try sink config instead", streamSpecificTopicConfigKey, DEFAULT_SHARED_SINK_TOPIC_CONF_KEY);
             return getSinkTopicName(streamId,config);
         }
+    }
+
+    private String getSourceSchemeCls(String streamId, Config config) {
+        String streamSpecificSchemeClsKey = String.format("dataSourceConfig.%s.schemeCls", streamId);
+        if (config.hasPath(streamSpecificSchemeClsKey) ) {
+            return config.getString(streamSpecificSchemeClsKey);
+        } else if (config.hasPath(DEFAULT_SHARED_SOURCE_SCHEME_CLS_KEY)) {
+            LOG.warn("Using default shared source topic {}: {}", DEFAULT_SHARED_SOURCE_SCHEME_CLS_KEY, config.getString(DEFAULT_SHARED_SOURCE_SCHEME_CLS_KEY));
+            return config.getString(DEFAULT_SHARED_SOURCE_SCHEME_CLS_KEY);
+        }
+        return null;
     }
 
     @Override
@@ -118,11 +130,12 @@ public class KafkaStreamProvider implements StreamProvider<KafkaStreamSink, Kafk
         if (hasNonBlankConfigPath(config, "dataSourceConfig.forceFromStart")) {
             sourceConfig.setForceFromStart(config.getBoolean("dataSourceConfig.forceFromStart"));
         }
-        if (hasNonBlankConfigPath(config, "dataSourceConfig.schemeCls")) {
+        String schemeCls = getSourceSchemeCls(streamId, config);
+        if (schemeCls != null && StringUtils.isNotBlank(schemeCls)) {
             try {
-                sourceConfig.setSchemaClass((Class<? extends Scheme>) Class.forName(config.getString("dataSourceConfig.schemeCls")));
+                sourceConfig.setSchemaClass((Class<? extends Scheme>) Class.forName(schemeCls));
             } catch (ClassNotFoundException e) {
-                LOG.error("Class not found error, dataSourceConfig.schemeCls = {}",config.getString("dataSourceConfig.schemeCls"),e);
+                LOG.error("Class not found error, dataSourceConfig.schemeCls = {}", schemeCls, e);
             }
         }
         return sourceConfig;

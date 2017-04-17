@@ -72,9 +72,12 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
             calendar.setTimeInMillis(this.lastFinishAppTime);
             if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
                 LOG.info("Last finished time = {}", calendar.getTime());
-                List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, Long.toString(lastFinishAppTime));
+                List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB,
+                        Long.toString(lastFinishAppTime),
+                        config.stormConfig.requestLimit);
                 if (appInfos != null) {
-                    LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
+                    LOG.info("Get {} applications with limit {} from yarn resource manager", appInfos.size(),
+                            config.stormConfig.requestLimit);
                     for (AppInfo app : appInfos) {
                         String appId = app.getId();
                         if (!zkState.hasApplication(appId)) {

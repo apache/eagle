@@ -64,6 +64,7 @@
 
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
+							<!-- Time Picker -->
 							<li class="dropdown time-picker" ng-if="Time.pickerType === Time.TIME_RANGE_PICKER">
 								<a data-toggle="dropdown" aria-expanded="false">
 									<span class="fa fa-{{Time.autoRefresh ? 'refresh' : 'calendar'}}"></span>
@@ -84,27 +85,51 @@
 									</li>
 								</ul>
 							</li>
+
+							<!-- Site -->
 							<li class="hover-dropdown">
 								<a>
 									<span ng-if="!Site.current()">
 										<span class="fa fa-home"></span>
-										Overview
+										Sites Overview
 									</span>
 									<span ng-if="Site.current()">
 										<span class="fa fa-server"></span>
-										{{Site.current().siteName || Site.current().siteId}}
+										Site: {{Site.current().siteName || Site.current().siteId}}
 									</span>
 								</a>
 
 								<ul class="dropdown-menu">
-									<li><a ng-click="Site.switchSite()"><span class="fa fa-home"></span> Overview</a></li>
+									<li><a ng-click="Site.switchSite()"><span class="fa fa-home"></span> Sites Overview</a></li>
 									<li ng-repeat="site in Site.list track by $index">
 										<a ng-click="Site.switchSite(site)">
-											<span class="fa fa-server"></span> {{site.siteName || site.siteId}}
+											<span class="fa fa-server"></span> Site: {{site.siteName || site.siteId}}
 										</a>
 									</li>
 								</ul>
 							</li>
+							<!-- Notification -->
+							<li class="hover-dropdown">
+								<a>
+									<i class="fa fa-bell"></i>
+									<span ng-if="$notification.list.length" class="label label-warning">
+										{{$notification.list.length}}
+									</span>
+								</a>
+
+								<ul class="dropdown-menu">
+									<li ng-repeat="notification in $notification.list track by $index">
+										<a href="{{notification.url}}" ng-click="$notification.trigger(notification, $event)">
+											{{notification.content}}
+										</a>
+									</li>
+									<li ng-if="!$notification.list.length" class="disabled">
+										<a class="text-gray">No Notification</a>
+									</li>
+								</ul>
+							</li>
+
+							<!-- FAQ -->
 							<li>
 								<a data-toggle="dropdown" aria-expanded="false">
 									<i class="glyphicon glyphicon-question-sign"></i>
@@ -117,6 +142,34 @@
 									<li><a>How to manage application</a></li>
 									<li><a>How to develop application</a></li>
 									<li><a ui-sref="metricPreview()">Preview eagle metric</a></li>
+								</ul>
+							</li>
+							<!-- Auth -->
+							<li ng-if="!Auth.isLogin">
+								<a ui-sref="login">Login</a>
+							</li>
+							<li ng-if="Auth.isLogin">
+								<a ui-sref="integration.siteList()"><i class="fa fa-cog"></i></a>
+							</li>
+							<li ng-if="Auth.isLogin" class="dropdown user user-menu">
+								<a class="dropdown-toggle" data-toggle="dropdown">
+									<i class="fa fa-user"></i>
+									{{Auth.user.name}}
+								</a>
+								<ul class="dropdown-menu">
+									<li class="user-header">
+										<div class="portrait fa fa-user">
+										</div>
+										<p>
+											{{Auth.user.name}}
+											<small>{{Auth.user.roles.join(', ')}}</small>
+										</p>
+									</li>
+									<li class="user-footer">
+										<div class="pull-right">
+											<a class="btn btn-default btn-flat" ng-click="Auth.logout()">Sign out</a>
+										</div>
+									</li>
 								</ul>
 							</li>
 						</ul>
@@ -277,6 +330,9 @@
 		<script src="public/js/services/applicationSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/uiSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/policySrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/notificationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/alertSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/authSrv.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Components -->
 		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
@@ -295,6 +351,7 @@
 		<script src="public/js/ctrls/integrationCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/siteCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/metricCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/authCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<!-- endref -->
 	</body>
 </html>

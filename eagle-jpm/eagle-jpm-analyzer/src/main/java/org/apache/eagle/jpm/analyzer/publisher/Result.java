@@ -77,9 +77,19 @@ public class Result {
     public enum ResultLevel {
         NONE,
         INFO,
-        NOTICE,
         WARNING,
-        CRITICAL
+        CRITICAL;
+
+        private static final Map<String, ResultLevel> stringToLevels = new HashMap<>();
+        static {
+            for (ResultLevel level : values()) {
+                stringToLevels.put(level.toString(), level);
+            }
+        }
+
+        public static ResultLevel fromString(String levelString) {
+            return stringToLevels.get(levelString);
+        }
     }
 
     public enum RuleType {

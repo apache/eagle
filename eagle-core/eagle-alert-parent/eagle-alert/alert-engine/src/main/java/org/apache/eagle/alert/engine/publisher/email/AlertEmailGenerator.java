@@ -148,15 +148,15 @@ public class AlertEmailGenerator {
             : String.format("http://%s:%s", this.getServerHost(), this.getServerPort());
         try {
             alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DETAIL_URL,
-                String.format("%s/#/alert/detail/%s", rootUrl, URIUtil.encodeQuery(event.getAlertId(), "UTF-8")));
+                String.format("%s/#/site/%s/alert/detail/%s", rootUrl, event.getSiteId(), URIUtil.encodeQuery(event.getAlertId(), "UTF-8")));
             alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_DETAIL_URL,
-                String.format("%s/#/policy/detail/%s", rootUrl, URIUtil.encodeQuery(event.getPolicyId(), "UTF-8")));
+                String.format("%s/#/site/%s/policy/detail/%s", rootUrl, event.getSiteId(), URIUtil.encodeQuery(event.getPolicyId(), "UTF-8")));
         } catch (URIException e) {
             LOG.warn(e.getMessage(), e);
             alertContext.put(PublishConstants.ALERT_EMAIL_ALERT_DETAIL_URL,
-                String.format("%s/#/alert/detail/%s", rootUrl, event.getAlertId()));
+                String.format("%s/#/site/%s/alert/detail/%s?timestamp=%s", event.getSiteId(), rootUrl, event.getAlertId(), event.getTimestamp()));
             alertContext.put(PublishConstants.ALERT_EMAIL_POLICY_DETAIL_URL,
-                String.format("%s/#/policy/detail/%s", rootUrl, event.getPolicyId()));
+                String.format("%s/#/site/%s/policy/detail/%s", event.getSiteId(), rootUrl, event.getPolicyId()));
         }
         alertContext.put(PublishConstants.ALERT_EMAIL_HOME_URL, rootUrl);
         return alertContext;

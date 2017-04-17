@@ -23,7 +23,7 @@
 
 	eagleComponents.directive('widget', function($compile, Site) {
 		return {
-			restrict: 'AE',
+			restrict: 'E',
 			priority: 1001,
 
 			controller: function($scope, $element, $attrs) {

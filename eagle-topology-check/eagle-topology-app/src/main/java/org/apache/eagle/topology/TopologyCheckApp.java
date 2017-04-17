@@ -24,6 +24,8 @@ import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.messaging.StormStreamSink;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
+import org.apache.eagle.topology.extractor.system.SystemCheckPersistBolt;
 import org.apache.eagle.topology.storm.HealthCheckParseBolt;
 import org.apache.eagle.topology.storm.TopologyCheckAppSpout;
 import org.apache.eagle.topology.storm.TopologyDataPersistBolt;
@@ -31,12 +33,15 @@ import org.apache.eagle.topology.storm.TopologyDataPersistBolt;
 public class TopologyCheckApp extends StormApplication {
 
     private static final String TOPOLOGY_HEALTH_CHECK_STREAM = "topology_health_check_stream";
+    private static final String SYSTEM_COLLECTOR_CONFIG_PREFIX = "dataSourceConfig.system";
 
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.newInstance(config);
 
         String spoutName = TopologyCheckAppConfig.TOPOLOGY_DATA_FETCH_SPOUT_NAME;
+        String systemSpoutName = TopologyCheckAppConfig.SYSTEM_DATA_FETCH_SPOUT_NAME;
+        String systemPersistBoltName = TopologyCheckAppConfig.SYSTEM_ENTITY_PERSIST_BOLT_NAME;
         String persistBoltName = TopologyCheckAppConfig.TOPOLOGY_ENTITY_PERSIST_BOLT_NAME;
         String parseBoltName = TopologyCheckAppConfig.PARSE_BOLT_NAME;
         String kafkaSinkBoltName = TopologyCheckAppConfig.SINK_BOLT_NAME;
@@ -62,10 +67,26 @@ public class TopologyCheckApp extends StormApplication {
 
         StormStreamSink<?> sinkBolt = environment.getStreamSink(TOPOLOGY_HEALTH_CHECK_STREAM, config);
         topologyBuilder.setBolt(
-                kafkaSinkBoltName,
-                sinkBolt,
-                topologyCheckAppConfig.dataExtractorConfig.numKafkaSinkBolt
+            kafkaSinkBoltName,
+            sinkBolt,
+            topologyCheckAppConfig.dataExtractorConfig.numKafkaSinkBolt
         ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numKafkaSinkBolt).shuffleGrouping(parseBoltName);
+
+        // system check data collector
+        if (null != topologyCheckAppConfig.systemConfig) {
+            topologyBuilder.setSpout(
+                systemSpoutName,
+                new KafkaSpoutProvider(SYSTEM_COLLECTOR_CONFIG_PREFIX).getSpout(config),
+                topologyCheckAppConfig.dataExtractorConfig.numDataFetcherSpout
+            ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numDataFetcherSpout);
+
+            // system check data persist
+            topologyBuilder.setBolt(
+                systemPersistBoltName,
+                new SystemCheckPersistBolt(topologyCheckAppConfig),
+                topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt
+            ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(systemSpoutName);
+        }
 
         return topologyBuilder.createTopology();
     }

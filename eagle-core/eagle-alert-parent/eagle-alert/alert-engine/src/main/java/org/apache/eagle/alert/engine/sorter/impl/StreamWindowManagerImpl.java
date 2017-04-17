@@ -30,12 +30,14 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class StreamWindowManagerImpl implements StreamWindowManager {
+public class StreamWindowManagerImpl implements StreamWindowManager, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(StreamWindowManagerImpl.class);
+    private static final long serialVersionUID = 1138105723533579373L;
     private final TreeMap<Long, StreamWindow> windowBuckets;
-    private final PartitionedEventCollector collector;
+    private transient PartitionedEventCollector collector;
     private final Period windowPeriod;
     private final long windowMargin;
     @SuppressWarnings("unused")
@@ -62,8 +64,8 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
                 return window;
             } else {
                 throw new IllegalStateException("Failed to create new window, as "
-                    + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(initialTime) + " is too late, only allow timestamp after "
-                    + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(rejectTime));
+                        + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(initialTime) + " is too late, only allow timestamp after "
+                        + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(rejectTime));
             }
         }
     }
@@ -171,6 +173,13 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
             windowBuckets.clear();
             stopWatch.stop();
             LOG.info("Closed {} windows in {} ms", count, stopWatch.getTime());
+        }
+    }
+
+    public void updateOutputCollector(PartitionedEventCollector outputCollector) {
+        this.collector = outputCollector;
+        if (windowBuckets != null && !windowBuckets.isEmpty()) {
+            windowBuckets.forEach((windowStartTime, streamWindow) -> streamWindow.register(outputCollector));
         }
     }
 }

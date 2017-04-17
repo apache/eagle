@@ -34,11 +34,11 @@ public class HadoopYarnResourceUtils {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public static Object getObjectFromStreamWithGzip(String urlString, Class<?> clazz) throws Exception {
+    public static Object getObjectFromUrlStream(String urlString, Class<?> clazz) throws Exception {
         InputStream is = null;
         Object o = null;
         try {
-            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+            is = readStream(urlString);
             o = OBJ_MAPPER.readValue(is, clazz);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Fetch resource %s failed", urlString), e);
@@ -48,6 +48,14 @@ public class HadoopYarnResourceUtils {
             }
         }
         return o;
+    }
+
+    private static InputStream readStream(String urlString) throws Exception {
+        try {
+            return InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+        } catch (java.util.zip.ZipException ex) {
+            return InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.NONE);
+        }
     }
 
     public static String getConfigValue(Config eagleConf, String key, String defaultValue) {

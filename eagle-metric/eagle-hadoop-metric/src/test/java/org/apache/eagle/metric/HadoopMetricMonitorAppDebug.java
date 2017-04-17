@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.metric;
 
+import org.junit.Ignore;
+
+@Ignore
 public class HadoopMetricMonitorAppDebug {
     public static void main(String[] args) {
         new HadoopMetricMonitorApp().run(args);

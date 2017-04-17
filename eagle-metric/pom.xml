@@ -24,12 +24,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-metric-parent</artifactId>
-    <name>Eagle::App::HadoopMetric</name>
+    <name>Eagle::App::HadoopMetric::Parent</name>
     <packaging>pom</packaging>
     <modules>
         <module>eagle-hadoop-metric</module>
         <module>eagle-hdfs-web</module>
         <module>eagle-hbase-web</module>
+        <module>eagle-system-web</module>
     </modules>
 
     <dependencies>

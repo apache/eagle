@@ -66,21 +66,29 @@
 								$.map(res, function (data) {
 									$scope.hmasteractivenum = data.value[0];
 								});
+							}, function () {
+								$scope.hmasteractivenum = -1;
 							});
 							countHBaseRole(site.siteId, "standby", "hmaster", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.hmasterstandbynum = data.value[0];
 								});
+							}, function () {
+								$scope.hmasterstandbynum = -1;
 							});
 							countHBaseRole(site.siteId, "live", "regionserver", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.regionserverhealtynum = data.value[0];
 								});
+							}, function () {
+								$scope.regionserverhealtynum = -1;
 							});
 							countHBaseRole(site.siteId, "dead", "regionserver", ["site"], "count")._promise.then(function (res) {
 								$.map(res, function (data) {
 									$scope.regionserverunhealtynum = data.value[0];
 								});
+							}, function () {
+								$scope.regionserverunhealtynum = -1;
 							});
 						});
 					}
@@ -96,22 +104,39 @@
 				'<div class="small-box hadoopMetric-widget bg-{{bgColor}}">' +
 				    '<div class="inner">' +
 				        '<h3>{{type}}</h3>' +
-				        '<div ng-show="hmasteractivenum" class="hadoopMetric-widget-detail">' +
-					        '<a ui-sref="HBaseMetric({siteId: site.siteId})">' +
+				        '<div ng-show="hmasteractivenum!==-1 && hmasterstandbynum!==-1" class="hadoopMetric-widget-detail">' +
+					        '<a ng-show="hmasteractivenum || hmasterstandbynum" ui-sref="HBaseMetric({siteId: site.siteId})">' +
 				            '<span>{{hmasteractivenum+hmasterstandbynum}}</span> Masters (' +
-				            '<span ng-show="hmasteractivenum">{{hmasteractivenum}}</span><span ng-show="!hmasteractivenum">0</span> Active / ' +
-				            '<span ng-show="hmasterstandbynum">{{hmasterstandbynum}}</span><span ng-show="!hmasterstandbynum">0</span> Standby)' +
+				            '<span>{{hmasteractivenum || 0}}</span> Active / ' +
+				            '<span>{{hmasterstandbynum || 0}}</span> Standby)' +
 					        '</a>' +
+				            '<div ng-show="!hmasteractivenum && !hmasterstandbynum">' +
+				            '<span>0</span> Masters (' +
+				            '<span>0</span> Active / ' +
+				            '<span>0</span> Standby)' +
+				            '</div>' +
 				        '</div>' +
-				        '<div ng-show="!hmasteractivenum" class="hadoopMetric-widget-detail">' +
-				           '<span class="fa fa-question-circle"></span><span> NO DATA</span>' +
+				        '<div ng-show="hmasteractivenum===-1 || hmasterstandbynum===-1" class="hadoopMetric-widget-detail">' +
+				        '<span>N/A</span> Masters (' +
+				        '<span>N/A</span> Active / ' +
+				        '<span>N/A</span> Standby)' +
 				        '</div>' +
-				        '<div ng-show="hmasteractivenum" class="hadoopMetric-widget-detail">' +
-				            '<a ui-sref="regionList({siteId: site.siteId})">' +
+				        '<div ng-show="regionserverhealtynum!==-1 && regionserverunhealtynum!==-1" class="hadoopMetric-widget-detail">' +
+				            '<a ng-show="regionserverhealtynum || regionserverunhealtynum" ui-sref="regionList({siteId: site.siteId})">' +
 				            '<span>{{regionserverhealtynum+regionserverunhealtynum}}</span> RegionServers (' +
-				            '<span ng-show="regionserverhealtynum">{{regionserverhealtynum}}</span><span ng-show="!regionserverhealtynum">0</span> Healthy / ' +
-				            '<span ng-show="regionserverunhealtynum">{{regionserverunhealtynum}}</span><span ng-show="!regionserverunhealtynum">0</span> Unhealthy)' +
+				            '<span>{{regionserverhealtynum || 0}}</span> Healthy / ' +
+				            '<span>{{regionserverunhealtynum || 0}}</span> Unhealthy)' +
 				            '</a>' +
+				            '<div ng-show="!regionserverhealtynum && !regionserverunhealtynum">' +
+				            '<span>0</span> Masters (' +
+				            '<span>0</span> Healthy / ' +
+				            '<span>0</span> Unhealthy)' +
+				            '</div>' +
+				        '</div>' +
+				        '<div ng-show="regionserverhealtynum===-1 || regionserverunhealtynum===-1" class="hadoopMetric-widget-detail">' +
+				        '<span>N/A</span> RegionServers (' +
+				        '<span>N/A</span> Healthy / ' +
+				        '<span>N/A</span> Unhealthy)' +
 				        '</div>' +
 				    '</div>' +
 				    '<div class="icon">' +

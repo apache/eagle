@@ -95,7 +95,7 @@
 				var promiseList = [];
 				// Load sub queue trend
 				promiseList.push(JPM.aggMetricsToEntities(
-					JPM.groups('RunningQueueService', condition, ['queue', 'parentQueue'], 'max(absoluteUsedCapacity)', intervalMin, startTime, endTime)
+					JPM.groups('RunningQueueService', condition, ['queue', 'parentQueue'], 'avg(absoluteUsedCapacity)', intervalMin, startTime, endTime)
 				)._promise.then(function (list) {
 					$scope.subQueueList = [];
 

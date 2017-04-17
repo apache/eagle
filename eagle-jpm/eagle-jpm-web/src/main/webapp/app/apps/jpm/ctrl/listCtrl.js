@@ -87,7 +87,8 @@
 					"endTime",
 					"numTotalMaps",
 					"numTotalReduces",
-					"runningContainers"
+					"runningContainers",
+					"durationTime"
 				], 100000));
 				$scope.jobStateList = [];
 
@@ -96,7 +97,6 @@
 					var jobStates = {};
 					$.each($scope.jobList, function (i, job) {
 						jobStates[job.currentState] = (jobStates[job.currentState] || 0) + 1;
-						job.duration = Time.diff(job.startTime, job.endTime || now);
 					});
 
 					$scope.jobStateList = $.map(JOB_STATES, function (state) {

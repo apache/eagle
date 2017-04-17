@@ -18,15 +18,17 @@
 package org.apache.eagle.hadoop.queue.model.applications;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 
+import static org.apache.eagle.jpm.util.Constants.ACCEPTED_APP_SERVICE_NAME;
+
+@Deprecated
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("yarn_app")
 @ColumnFamily("f")
 @Prefix("accepted")
-@Service(HadoopClusterConstants.ACCEPTED_APP_SERVICE_NAME)
+@Service(ACCEPTED_APP_SERVICE_NAME)
 @TimeSeries(true)
 @Partition( {"site"})
 @Tags({"site","id","user","queue"})

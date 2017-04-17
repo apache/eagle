@@ -189,7 +189,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
                         StreamDefinition sd = alertPublisherBolt.streamDefinitionMap.get(inputStreamId);
                         if (sd != null) {
                             extraData.put(AlertPublishEvent.SITE_ID_KEY, sd.getSiteId());
-                            appIds.add(sd.getDataSource());
+                            appIds.add(sd.getStreamSource());
                         }
                     }
                     extraData.put(AlertPublishEvent.APP_IDS_KEY, appIds);

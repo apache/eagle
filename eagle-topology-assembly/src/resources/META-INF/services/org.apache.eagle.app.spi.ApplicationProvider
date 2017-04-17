@@ -14,6 +14,7 @@
 # limitations under the License.
 
 org.apache.eagle.alert.app.AlertUnitTopologyAppProvider
+org.apache.eagle.alert.spark.app.AlertUnitSparkTopologyAppProvider
 
 ## DAM
 org.apache.eagle.security.hbase.HBaseAuditLogAppProvider
@@ -34,3 +35,4 @@ org.apache.eagle.jpm.spark.history.SparkHistoryJobAppProvider
 ## Metric
 org.apache.eagle.metric.HdfsMetricWebApplicationProvider
 org.apache.eagle.metric.HBaseMetricWebApplicationProvider
+org.apache.eagle.metric.SystemMetricWebApplicationProvider

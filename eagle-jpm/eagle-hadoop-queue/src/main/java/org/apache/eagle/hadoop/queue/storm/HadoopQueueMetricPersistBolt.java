@@ -48,15 +48,12 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
 
     private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueMetricPersistBolt.class);
 
-    private Map<HadoopClusterConstants.DataSource, String> streamMap;
     private HadoopQueueRunningAppConfig config;
     private IEagleServiceClient client;
     private OutputCollector collector;
 
-    public HadoopQueueMetricPersistBolt(HadoopQueueRunningAppConfig config,
-                                        Map<HadoopClusterConstants.DataSource, String> streamMap) {
+    public HadoopQueueMetricPersistBolt(HadoopQueueRunningAppConfig config) {
         this.config = config;
-        this.streamMap = streamMap;
     }
 
     @Override
@@ -88,31 +85,18 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
                     RunningQueueAPIEntity queue = (RunningQueueAPIEntity) entity;
                     if (queue.getUsers() != null && !queue.getUsers().getUsers().isEmpty() && queue.getMemory() != 0) {
                         String queueName = queue.getTags().get(HadoopClusterConstants.TAG_QUEUE);
-                        collector.emit(streamMap.get(dataSource),
-                                new Values(queueName, QueueStreamInfo.convertEntityToStream(queue)));
+                        collector.emit(new Values(queueName, QueueStreamInfo.convertEntityToStream(queue)));
                     }
-                } else if (entity instanceof YarnAppAPIEntity) {
-                    YarnAppAPIEntity appAPIEntity = (YarnAppAPIEntity) entity;
-                    collector.emit(streamMap.get(dataSource),
-                            new Values(appAPIEntity.getAppName(), AppStreamInfo.convertAppToStream(appAPIEntity)));
                 }
             }
-            if (!dataSource.equals(DataSource.RUNNING_APPS)) {
-                writeEntities(entities, dataType, dataSource);
-            }
+            writeEntities(entities, dataType, dataSource);
         }
         this.collector.ack(input);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        if (streamMap != null) {
-            for (String stormStreamId : streamMap.values()) {
-                declarer.declareStream(stormStreamId, new Fields("f1", "message"));
-            }
-        } else {
-            declarer.declare(new Fields("f1", "message"));
-        }
+        declarer.declare(new Fields("f1", "message"));
     }
 
     @Override

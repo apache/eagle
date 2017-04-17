@@ -98,6 +98,11 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.stormConfig.numOfSpoutTasks = config.getInt("topology.numOfSpoutTasks");
         this.stormConfig.numOfParserBoltExecutors = config.getInt("topology.numOfParseBoltExecutors");
         this.stormConfig.numOfParserBoltTasks = config.getInt("topology.numOfParserBoltTasks");
+        this.stormConfig.requestLimit = "";
+        if (config.hasPath("topology.requestLimit")) {
+            this.stormConfig.requestLimit = config.getString("topology.requestLimit");
+        }
+
     }
 
     public static class ZKStateConfig implements Serializable {
@@ -117,6 +122,7 @@ public class SparkHistoryJobAppConfig implements Serializable {
     public static class StormConfig implements Serializable {
         public String siteId;
         public int spoutCrawlInterval;
+        public String requestLimit;
         public int numOfSpoutExecutors;
         public int numOfSpoutTasks;
         public int numOfParserBoltExecutors;

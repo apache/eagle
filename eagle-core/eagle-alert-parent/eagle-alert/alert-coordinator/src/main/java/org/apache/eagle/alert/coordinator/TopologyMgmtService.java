@@ -56,7 +56,7 @@ public class TopologyMgmtService {
 
     public TopologyMgmtService() {
         Config config = ConfigFactory.load().getConfig(CONFIG_ITEM_COORDINATOR);
-        boltParallelism = config.getInt(CoordinatorConstants.BOLT_PARALLELISM);
+        //boltParallelism = config.getInt(CoordinatorConstants.BOLT_PARALLELISM);
         numberOfBoltsPerTopology = config.getInt(NUM_OF_ALERT_BOLTS_PER_TOPOLOGY);
     }
 

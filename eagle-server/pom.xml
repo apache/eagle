@@ -80,6 +80,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-app-streamproxy</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -117,6 +128,12 @@
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-alert-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-alert-spark-app</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -346,15 +363,10 @@
                     <version>${project.version}</version>
                 </dependency>
 
+                <!-- add metirc webUI -->
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-hadoop-metric</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.eagle</groupId>
-                    <artifactId>eagle-hdfs-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -362,6 +374,17 @@
                     <artifactId>eagle-hbase-web</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-hdfs-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-system-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>

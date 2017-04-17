@@ -26,7 +26,7 @@
 		_host = localStorage.getItem("host") || "";
 	}
 
-	serviceModule.service('CompatibleEntity', function($http, Time) {
+	serviceModule.service('CompatibleEntity', function($authHttp, Time) {
 		function CompatibleEntity() {}
 
 		function wrapList(list, promise) {
@@ -109,6 +109,7 @@
 
 		CompatibleEntity.QUERY_LIST = '/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}';
 		CompatibleEntity.QUERY_GROUPS = '/rest/entities?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}';
+		CompatibleEntity.QUERY_GROUPS_INTERVAL = '/rest/entities?query=${query}[${condition}]<${groups}>{${fields}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		CompatibleEntity.QUERY_METRICS_INTERVAL = '/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${fields}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 
 		CompatibleEntity.query = function (queryName, param) {
@@ -131,7 +132,7 @@
 				}
 
 				var url = common.template(url_tpl, myParam);
-				return wrapList(list, $http.get(_host + url));
+				return wrapList(list, $authHttp.get(_host + url));
 			};
 
 			return list._refresh();
@@ -175,7 +176,7 @@
 			var intervalMin = param.intervalMin ? param.intervalMin : Time.diffInterval(startTime, endTime) / 1000 / 60;
 			var interval = intervalMin * 1000 * 60;
 
-			var innerList = CompatibleEntity.query('METRICS_INTERVAL', $.extend({}, param, {
+			var innerList = CompatibleEntity.query(param.metric ? 'METRICS_INTERVAL' : 'GROUPS_INTERVAL', $.extend({}, param, {
 				groups: parseFields(param.groups).fields,
 				order: fields.order,
 				top: param.top ? "&top=" + param.top : "",
@@ -204,7 +205,9 @@
 									x: startTimestamp + interval * index,
 									y: value
 								};
-							})
+							}),
+
+							group: group,
 						};
 					});
 				});

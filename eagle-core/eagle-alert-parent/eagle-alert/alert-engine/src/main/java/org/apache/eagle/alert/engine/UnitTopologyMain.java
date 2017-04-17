@@ -19,17 +19,20 @@
 
 package org.apache.eagle.alert.engine;
 
-import org.apache.eagle.alert.config.ZKConfig;
-import org.apache.eagle.alert.config.ZKConfigBuilder;
-import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
-import backtype.storm.generated.StormTopology;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.eagle.alert.config.ZKConfig;
+import org.apache.eagle.alert.config.ZKConfigBuilder;
+import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
+
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 
 /**
@@ -81,6 +84,19 @@ public class UnitTopologyMain {
     }
 
     public static StormTopology createTopology(Config config) {
+        String topologyId = getTopologyName(config);
+        ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
+
+        return new UnitTopologyRunner(changeNotifyService).buildTopology(topologyId, config).createTopology();
+    }
+    
+    /**
+     * Returns a builder instead of topology itself. This make it possible to run storm-flink conversion.
+     * 
+     * @param config
+     * @return
+     */
+    public static TopologyBuilder createTopologyBuilder(Config config) {
         String topologyId = getTopologyName(config);
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
 

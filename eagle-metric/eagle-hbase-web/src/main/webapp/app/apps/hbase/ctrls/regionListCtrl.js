@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,9 +30,131 @@
 			$scope.live = METRIC.STATUS_LIVE;
 			$scope.dead = METRIC.STATUS_DEAD;
 			$scope.site = $wrapState.param.siteId;
+			$scope.status = $wrapState.param.status;
 			$scope.searchPathList = [["tags", "hostname"], ["tags", "rack"], ["tags", "site"], ["status"]];
-			$scope.regionserverList = METRIC.regionserverList($scope.site);
+			$scope.regionserverList = METRIC.regionserverList($scope.site, $scope.status);
+			$scope.regionserverAll = METRIC.regionserverList($scope.site);
 
+
+			function getCommonHeatMapSeries(name, data) {
+				return {
+					name: name,
+					type: 'heatmap',
+					data: data,
+					label: {
+						normal: {
+							show: true,
+							formatter: function (point) {
+								if(point.data) {
+									return point.data[3];
+								}
+								return "";
+							}
+						}
+					},
+					itemStyle: {
+						normal: {
+							borderColor: "#FFF"
+						},
+						emphasis: {
+							shadowBlur: 10,
+							shadowColor: 'rgba(0, 0, 0, 0.5)'
+						}
+					}
+				};
+			}
+
+			function getCommonHeatMapOption() {
+				return {
+					animation: false,
+					tooltip: {
+						trigger: 'item'
+					},
+					grid: {
+							left: "1%",
+							right: "1%",
+							top: "60",
+							bottom: "60"
+					},
+					xAxis: {
+						show: false,
+						splitArea: {show: true}
+					},
+					yAxis: [{
+						show: false,
+						splitArea: {show: true},
+						axisTick: {show: false}
+					}],
+					visualMap: {
+						categories: ['live', 'dead'],
+						calculable: true,
+						orient: 'horizontal',
+						right: "2%",
+						inRange: {
+							color: ['#00a65a', '#dd4b39']
+						}
+					}
+				};
+			}
+
+
+			// region server heatmap chart
+			$scope.regionserverAll._promise.then(function () {
+				var regionServer_status = [];
+				var regionServer_status_category = [];
+				var regionServer_level = [];
+				var x = -1;
+				var y = 0;
+				var split = 5;
+				$.each($scope.regionserverAll,
+				/**
+				 * @param {number} i
+				 * @param {RegionServer} regionServer
+				 */
+				function (i, regionServer) {
+					if(x === split){
+						x = 0;
+						y = y - 1;
+					}else{
+						x = x +1;
+					}
+					regionServer_status.push([x, y, 0, regionServer.tags.hostname, regionServer.tags.rack, regionServer.usedHeapMB, regionServer.maxHeapMB, regionServer.status || "-"]);
+				});
+				
+				for(var i = 0;i < split; i++){
+					regionServer_status_category.push(i);
+				}
+				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", regionServer_status)];
+				$scope.healthStatusOption = getHealthHeatMapOption();
+				$scope.healthStatusCategory = regionServer_status_category;
+				$scope.heatmapHeight = {
+					'height': getHeight(y)
+				};
+
+				function getHeight(x){
+					return (Math.abs(x-1)*30 + 140) + "px"
+				}
+
+				function getHealthHeatMapOption() {
+					var option = getCommonHeatMapOption();
+					return common.merge(option, {
+						tooltip: {
+							formatter: function (point) {
+								if(point.data) {
+									return point.data[3] + '<br/>'
+									+ 'status: <span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' + point.data[7] + '<br/>'
+									+ 'rack: ' +  point.data[4] + '<br/>'
+									+ 'heap used: ' +  point.data[5] + '/' +  point.data[6] + ' MB<br/>';
+								}
+								return "";
+							}
+						}
+					});
+				}
+
+			});
 		});
+
+
 	});
 })();

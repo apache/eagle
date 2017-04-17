@@ -169,7 +169,7 @@ public class JHFSparkEventReader {
             // the second argument of getNormalizeName() is changed to null because the original code contains sensitive text
             // original second argument looks like: this.app.getConfig().getConfig().get("xxx"), "xxx" is the sensitive text
             entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtils.getString(event, "App Name"), null));
-            entity.getTags().put(SparkJobTagName.SPARK_USER.toString(), JSONUtils.getString(event, "UserPrincipal"));
+            entity.getTags().put(SparkJobTagName.SPARK_USER.toString(), JSONUtils.getString(event, "User"));
 
             entity.setTimestamp(appStartTime);
         }

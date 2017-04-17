@@ -34,6 +34,9 @@ public class MRRunningJobConfig implements Serializable {
 
     private static final String JOB_SYMBOL = "/jobs";
 
+    public static final String APP_TO_JOB_STREAM = "appStream";
+    public static final String APP_TO_METRIC_STREAM = "appMetricStream";
+
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -73,6 +76,9 @@ public class MRRunningJobConfig implements Serializable {
         public String site;
         public String[] rmUrls;
         public int fetchRunningJobInterval;
+        public int requestsNum;
+        public String limitPerRequest;
+        public int timeRangePerRequestInMin;
         public int parseJobThreadPoolSize;
     }
 
@@ -127,10 +133,29 @@ public class MRRunningJobConfig implements Serializable {
         this.endpointConfig.site = config.getString("siteId");
         this.endpointConfig.fetchRunningJobInterval = config.getInt("endpointConfig.fetchRunningJobInterval");
         this.endpointConfig.parseJobThreadPoolSize = config.getInt("endpointConfig.parseJobThreadPoolSize");
+        this.endpointConfig.requestsNum = getConfigValue(config, "endpointConfig.requestsNum", 1);
+        this.endpointConfig.limitPerRequest = getConfigValue(config, "endpointConfig.limitPerRequest", "");
+        this.endpointConfig.timeRangePerRequestInMin = getConfigValue(config, "endpointConfig.timeRangePerRequestInMin", 60);
 
         LOG.info("Successfully initialized MRRunningJobConfig");
         LOG.info("site: " + this.endpointConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
         LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);
+    }
+
+    private int getConfigValue(Config config, String key, int defaultValue) {
+        if (config.hasPath(key)) {
+            return config.getInt(key);
+        } else {
+            return defaultValue;
+        }
+    }
+
+    private String getConfigValue(Config config, String key, String defaultValue) {
+        if (config.hasPath(key)) {
+            return config.getString(key);
+        } else {
+            return defaultValue;
+        }
     }
 }

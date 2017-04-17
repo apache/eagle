@@ -174,6 +174,17 @@
 			};
 			Time.onReload(function () {
 				cache = {};
+				$.each($scope.chartList, function (i) {
+					var chart = $scope.chartList[i];
+					var chartname = chart.name;
+					$scope.metricList[chartname] = {
+						title: chartname,
+						series: {},
+						option: {},
+						loading: true,
+						promises: []
+					};
+				});
 				$scope.refresh();
 			}, $scope);
 			$scope.refresh();
@@ -187,7 +198,7 @@
 
 				var condition = {
 					site: $scope.site,
-					component: "regionserver",
+					component: "datanode",
 					host: $scope.hostname
 				};
 				return HDFSMETRIC.aggMetricsToEntities(HDFSMETRIC.hadoopMetricsAggregation(condition, name, ["site"], "avg(value)", intervalMin, trendStartTime, trendEndTime), flag)

@@ -55,13 +55,17 @@
 		}
 
 		// Load sites
+		function notifyListener() {
+			$.each(reloadListenerList, function (i, listener) {
+				listener(Site);
+			});
+		}
+
 		Site.reload = function () {
 			var list = Site.list = Entity.query('sites');
 			list._promise.then(function () {
 				linkApplications(list, Application.list);
-				$.each(reloadListenerList, function (i, listener) {
-					listener(Site);
-				});
+				notifyListener();
 			});
 			return Site;
 		};
@@ -111,11 +115,22 @@
 		};
 
 		// Initialization
-		Application.onReload(function () {
-			Site.reload();
-		});
-
 		Site.reload();
+
+		(function () {
+			Application.getPromise().then(function () {
+				Application.onReload(function () {
+					Site.reload();
+				});
+			});
+
+			// Call listener at first time when site & application is ready
+			var siteList = Site.list;
+			$q.all([siteList._promise, Application.getPromise()]).then(function() {
+				linkApplications(siteList, Application.list);
+				notifyListener();
+			});
+		})();
 
 		return Site;
 	});

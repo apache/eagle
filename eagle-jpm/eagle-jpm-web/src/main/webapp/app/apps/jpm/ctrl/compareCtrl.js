@@ -44,13 +44,20 @@
 			// ==================================================================
 			// =                         Fetch Job List                         =
 			// ==================================================================
-			var jobList = $scope.jobList = JPM.findMRJobs($scope.site, $scope.jobDefId);
+            var endTime = new Time();
+            var startTime = endTime.clone().subtract(30, 'day');
+            var condition = JPM.condition({site: $scope.site, jobDefId:$scope.jobDefId});
+			var jobList = $scope.jobList = JPM.list("JobExecutionService", condition, startTime, endTime, [], 10000);
 			jobList._promise.then(function () {
 				if(jobList.length <= 1) {
 					$.dialog({
 						title: "No statistic info",
 						content: "Current job do not have enough statistic info. Please check 'jobDefId' if your job have run many times."
 					});
+				} else {
+				    jobList.sort(function (a, b) {
+					return a.startTime - b.startTime;
+				    });
 				}
 
 				function findJob(jobId) {

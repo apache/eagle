@@ -165,8 +165,10 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
             start = new Date(searchCondition.getStartTime());
             end = new Date(searchCondition.getEndTime());
         } else {
-            start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
-            end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
+            //start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
+            //end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
+            start = new Date(EntityConstants.FIXED_READ_START_TIMESTAMP);
+            end = new Date(EntityConstants.FIXED_READ_END_TIMESTAMP);
         }
         // Generate the output qualifiers
         final byte[][] outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, searchCondition.getOutputFields());
@@ -281,8 +283,10 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
                     this.start = new Date(searchCondition.getStartTime());
                     this.end = new Date(searchCondition.getEndTime());
                 } else {
-                    start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
-                    end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
+                    //start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
+                    //end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
+                    start = new Date(EntityConstants.FIXED_READ_START_TIMESTAMP);
+                    end = new Date(EntityConstants.FIXED_READ_END_TIMESTAMP);
                 }
                 this.pointsNum = (int) ((end.getTime() - 1 - start.getTime()) / this.query.aggregateCondition.getIntervalMS() + 1);
                 this.aggFuncNum = this.query.aggFuncNum;
