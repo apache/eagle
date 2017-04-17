@@ -62,6 +62,16 @@ public abstract class AbstractEnvironment implements Environment {
             .append(this.config()).build();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AbstractEnvironment) {
+            Environment environment = (Environment) obj;
+            return this.getClass().equals(obj.getClass())
+                    && this.config.equals(environment.config());
+        }
+        return false;
+    }
+
     public StreamProvider stream() {
         return streamProvider;
     }
