@@ -1119,7 +1119,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire.version}</version>
                     <configuration>
-                        <argLine>-XX:-UseGCOverheadLimit</argLine>
+                        <argLine>-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -XX:-UseGCOverheadLimit</argLine>
                         <forkMode>always</forkMode>
                     </configuration>
                     <dependencies>
