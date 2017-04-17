@@ -44,6 +44,7 @@
         <module>eagle-security-hbase-web</module>
         <module>eagle-metric-collection</module>
         <module>eagle-security-oozie-auditlog</module>
+        <module>eagle-security-oozie-beam-auditlog</module>
         <module>eagle-security-oozie-web</module>
     </modules>
 </project>

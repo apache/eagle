@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<application>
+    <type>ALERT_UNIT_SPARK_TOPOLOGY_APP</type>
+    <name>Alert Engine Spark</name>
+    <description>Real-time Alert Engine On Spark Streaming</description>
+    <configuration>
+        <property>
+            <name>topology.core</name>
+            <displayName>Spark executor core</displayName>
+            <value>1</value>
+            <description>spark.executor.cores</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.memory</name>
+            <displayName>Spark executor memory</displayName>
+            <value>5g</value>
+            <description>spark.executor.memory(1g,2g,8g)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.numOfRouterBolts</name>
+            <displayName>RouterBolt num</displayName>
+            <value>4</value>
+            <description>RouterBolt num</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.numOfAlertBolts</name>
+            <displayName>AlertBolt num</displayName>
+            <value>10</value>
+            <description>AlertBolt num</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.numOfPublishTasks</name>
+            <displayName>PublishTasks num</displayName>
+            <value>4</value>
+            <description>PublishTasks num</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.batchDuration</name>
+            <displayName>Spark streaming batchDuration</displayName>
+            <value>2</value>
+            <description>Spark streaming batchDuration(unit second)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.slideDurations</name>
+            <displayName>Spark streaming slideDurations</displayName>
+            <value>2</value>
+            <description>Spark streaming slideDurations(unit second)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.windowDurations</name>
+            <displayName>Spark streaming windowDurations</displayName>
+            <value>2</value>
+            <description>Spark streaming windowDurations(unit second)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.master</name>
+            <displayName>Spark streaming master</displayName>
+            <value>yarn</value>
+            <description>Spark streaming master(local[4],local[*],yarn,spark://HOST:PORT)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.driverMemory</name>
+            <displayName>Spark driver memory</displayName>
+            <value>5g</value>
+            <description>spark.driver.memory(1b,1k,1m,1g,1t,1p)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.driverCores</name>
+            <displayName>Spark driver cores number</displayName>
+            <value>4</value>
+            <description>spark.driver.cores</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.deployMode</name>
+            <displayName>Spark steaming deployMode</displayName>
+            <value>client</value>
+            <description>spark.submit.deployMode(client,cluster)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.groupId</name>
+            <displayName>Kafka Consumer ID</displayName>
+            <value>eagle_consumer</value>
+            <description>Kafka Consumer ID(group.id)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.name</name>
+            <displayName>Spark steaming app name</displayName>
+            <value>Eagle Alert Engine On SparkStreaming</value>
+            <description>Spark steaming app name</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.dynamicAllocation</name>
+            <displayName>Spark streaming dynamicAllocation config</displayName>
+            <value>true</value>
+            <description>spark.streaming.dynamicAllocation.enable</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.offsetreset</name>
+            <displayName>Kafka auto offset reset config</displayName>
+            <value>largest</value>
+            <description>Auto offset reset config for Kafka(largest,smallest)</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>metadataService.context</name>
+            <displayName>MetadataService context</displayName>
+            <value>/rest</value>
+            <description>MetadataService context</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>metadataService.port</name>
+            <displayName>MetadataService port</displayName>
+            <value>9090</value>
+            <description>MetadataService port</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>metadataService.host</name>
+            <displayName>MetadataService host</displayName>
+            <value>localhost</value>
+            <description>MetadataService host</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.mainclass</name>
+            <displayName>Mainclass</displayName>
+            <value>org.apache.eagle.alert.engine.UnitSparkUnionTopologyMain</value>
+            <description>Mainclass</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.sparkhome</name>
+            <displayName>Spark home</displayName>
+            <value>/opt/cloudera/parcels/YSPARK/lib/spark</value>
+            <description>Spark home</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.sparkuiport</name>
+            <displayName>Spark UI port</displayName>
+            <value>4123</value>
+            <description>Spark UI port</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.sparkconffilepath</name>
+            <displayName>Spark conf file path</displayName>
+            <value>/etc/spark/conf/spark-defaults.conf</value>
+            <description>Spark conf file path</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.appresource</name>
+            <displayName>Spark Appresource</displayName>
+            <value>/home/tandem/eagledlg/eagle/lib/eagle-topology-0.5.0-SNAPSHOT-assembly.jar</value>
+            <description>Spark Appresource</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.yarnqueue</name>
+            <displayName>spark.yarn.queue</displayName>
+            <value>default</value>
+            <description>spark.yarn.queue</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.multikafka</name>
+            <displayName>Support multikafka</displayName>
+            <value>true</value>
+            <description>Support multikafka</description>
+            <required>true</required>
+        </property>
+        <property>
+            <name>topology.checkpointPath</name>
+            <displayName>Spark steaming checkpoint directory</displayName>
+            <value>/user/denglingang/cp</value>
+            <description>Spark steaming checkpoint directory</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>topology.verbose</name>
+            <displayName>Spark verbose</displayName>
+            <value>false</value>
+            <description>Spark verbose</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>spout.kafkaBrokerZkQuorum</name>
+            <displayName>KafkaBrokerZkQuorum</displayName>
+            <value>localhost:9092</value>
+            <description>KafkaBrokerZkQuorum</description>
+            <required>false</required>
+        </property>
+        <property>
+            <name>zkConfig.zkQuorum</name>
+            <displayName>ZkConfig zkQuorum</displayName>
+            <value>localhost:2181</value>
+            <description>ZkConfig zkQuorum</description>
+            <required>false</required>
+        </property>
+    </configuration>
+    <docs>
+        <install>
+            <div>
+                <label>Perquisites</label>
+                <ol>
+                    <li>Require permission to READ/WRITE/CREATE on kafka topic</li>
+                </ol>
+                <label>Usage Steps</label>
+                <ol>
+                    <li>Configure kafka connection in <b>settings</b></li>
+                    <li>Install and start alert engine</li>
+                    <li>Integrate streams and define policy</li>
+                </ol>
+            </div>
+        </install>
+        <uninstall>
+            <div>
+                <label>After uninstalled</label>
+                <ol>
+                    <li>Clean up kafka topics automatically created by alert engine</li>
+                </ol>
+            </div>
+        </uninstall>
+    </docs>
+</application>

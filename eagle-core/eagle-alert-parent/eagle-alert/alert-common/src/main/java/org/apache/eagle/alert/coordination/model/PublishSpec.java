@@ -18,13 +18,16 @@ package org.apache.eagle.alert.coordination.model;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PublishSpec {
+public class PublishSpec implements Serializable {
 
+    private static final long serialVersionUID = -8393697498219611661L;
     private String topologyName;
     // actually only publish spec for one topology
     private String boltId;

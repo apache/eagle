@@ -21,7 +21,6 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 

@@ -18,7 +18,6 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import com.google.common.collect.Lists;
 import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
@@ -55,6 +54,17 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         this.outputCollector = outputCollector;
         this.routeSpecMap = new HashMap<>();
         this.routePartitionerMap = new HashMap<>();
+        // this.outputStreamIds = outputStreamIds;
+        this.streamContext = streamContext;
+    }
+
+    public StreamRouterBoltOutputCollector(String sourceId, StreamOutputCollector outputCollector, StreamContext streamContext,
+                                           Map<StreamPartition, List<StreamRouterSpec>> routeSpecMap,
+                                           Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap) {
+        this.sourceId = sourceId;
+        this.outputCollector = outputCollector;
+        this.routeSpecMap = routeSpecMap;
+        this.routePartitionerMap = routePartitionerMap;
         // this.outputStreamIds = outputStreamIds;
         this.streamContext = streamContext;
     }
@@ -194,9 +204,14 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         if (routePartitioners == null) {
             routePartitioners = new ArrayList<>();
         }
+
         for (PolicyWorkerQueue pwq : streamRouterSpec.getTargetQueue()) {
+            List<String> bolts = new ArrayList<>();
+            for (WorkSlot work : pwq.getWorkers()) {
+                bolts.add(work.getBoltId());
+            }
             routePartitioners.add(StreamRoutePartitionFactory.createRoutePartitioner(
-                    Lists.transform(pwq.getWorkers(), WorkSlot::getBoltId),
+                    bolts,
                     sds.get(streamRouterSpec.getPartition().getStreamId()),
                     streamRouterSpec.getPartition()));
         }
@@ -210,12 +225,24 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
             if (event.getAnchor() != null) {
                 this.outputCollector.ack(event);
             } else {
-                throw new IllegalStateException(event.toString() + " was not acked as anchor is null");
+                LOG.warn(event.toString() + " was not acked as anchor is null");
             }
         }
     }
 
-    public void flush() {
+    public List flush() {
+        if (this.outputCollector instanceof SparkOutputCollector) {
+            SparkOutputCollector sparkOutputCollector = (SparkOutputCollector) outputCollector;
+            return sparkOutputCollector.flushPartitionedEvent();
+        }
+        return Collections.emptyList();
+    }
 
+    public Map<StreamPartition, List<StreamRouterSpec>> getRouteSpecMap() {
+        return this.routeSpecMap;
+    }
+
+    public Map<StreamPartition, List<StreamRoutePartitioner>> getRoutePartitionerMap() {
+        return this.routePartitionerMap;
     }
 }

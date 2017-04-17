@@ -32,6 +32,7 @@
         <module>eagle-alert</module>
         <module>eagle-alert-service</module>
         <module>eagle-alert-app</module>
+        <module>eagle-alert-spark-app</module>
     </modules>
 
     <build>

@@ -18,6 +18,7 @@
 package org.apache.eagle.alert.engine.router.impl;
 
 import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Tuple;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.StreamOutputCollector;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
@@ -42,9 +43,9 @@ public class StormOutputCollector implements StreamOutputCollector {
     @Override
     public void emit(String streamId, PartitionedEvent partitionedEvent) throws Exception {
         if (this.serializer == null) {
-            outputCollector.emit(streamId, Collections.singletonList(partitionedEvent.getAnchor()), Collections.singletonList(partitionedEvent));
+            outputCollector.emit(streamId, Collections.singletonList((Tuple) partitionedEvent.getAnchor()), Collections.singletonList(partitionedEvent));
         } else {
-            outputCollector.emit(streamId, Collections.singletonList(partitionedEvent.getAnchor()), Collections.singletonList(serializer.serialize(partitionedEvent)));
+            outputCollector.emit(streamId, Collections.singletonList((Tuple) partitionedEvent.getAnchor()), Collections.singletonList(serializer.serialize(partitionedEvent)));
         }
     }
 
@@ -55,11 +56,11 @@ public class StormOutputCollector implements StreamOutputCollector {
 
     @Override
     public void ack(PartitionedEvent partitionedEvent) {
-        outputCollector.ack(partitionedEvent.getAnchor());
+        outputCollector.ack((Tuple) partitionedEvent.getAnchor());
     }
 
     @Override
     public void fail(PartitionedEvent partitionedEvent) {
-        this.outputCollector.fail(partitionedEvent.getAnchor());
+        this.outputCollector.fail((Tuple) partitionedEvent.getAnchor());
     }
 }

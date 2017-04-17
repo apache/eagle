@@ -132,6 +132,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-alert-spark-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <exclusions>
@@ -266,6 +272,12 @@
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-security-hbase-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-security-oozie-beam-auditlog</artifactId>
                     <version>${project.version}</version>
                 </dependency>
 

@@ -56,6 +56,33 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         Thread.currentThread().setName(policyEvaluatorId);
     }
 
+    public void init(StreamContext context, AlertStreamCollector collector, Map<String, PolicyDefinition> policyDefinitionMap,
+                     Map<String, CompositePolicyHandler> policyStreamHandlerMap, byte[] siddhiSnapshot) {
+        this.collector = collector;
+        this.policyStreamHandlerMap = policyStreamHandlerMap;
+        this.policyDefinitionMap = policyDefinitionMap;
+        this.context = context;
+        this.policyStreamHandlerMap.forEach((policyName, compositePolicyHandler) -> {
+            PolicyHandlerContext policyHandlerContext = new PolicyHandlerContext();
+            policyHandlerContext.setPolicyCounter(this.context.counter());
+            PolicyDefinition policyDefinition = policyDefinitionMap.get(policyName);
+            policyHandlerContext.setPolicyDefinition(policyDefinition);
+            policyHandlerContext.setPolicyEvaluator(this);
+            policyHandlerContext.setPolicyEvaluatorId(policyEvaluatorId);
+            try {
+                compositePolicyHandler.clearHandlers();
+                compositePolicyHandler.prepare(this.collector, policyHandlerContext);
+                if (siddhiSnapshot != null) {
+                    compositePolicyHandler.restoreSiddhiSnapshot(siddhiSnapshot);
+                }
+            } catch (Exception e) {
+                LOG.error("Initialized policy handler for policy error: {}", policyDefinition);
+            }
+            LOG.info("Initialized policy handler for policy end : {}", policyDefinition);
+        });
+        Thread.currentThread().setName(policyEvaluatorId);
+    }
+
     public void nextEvent(PartitionedEvent event) {
         this.context.counter().incr("receive_count");
         dispatch(event);
@@ -74,6 +101,19 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
                 LOG.error("Failed to close handler {}", handler.toString(), e);
             }
         }
+    }
+
+    public byte[] closeAndSnapShot() {
+        byte[] snapshot = null;
+        for (PolicyStreamHandler handler : policyStreamHandlerMap.values()) {
+            try {
+                CompositePolicyHandler compositePolicyHandler = (CompositePolicyHandler) handler;
+                snapshot = compositePolicyHandler.closeAndSnapShot();
+            } catch (Exception e) {
+                LOG.error("Failed to closeAndSnapShot handler {}", handler.toString(), e);
+            }
+        }
+        return snapshot;
     }
 
     /**
@@ -175,6 +215,14 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
 
     public CompositePolicyHandler getPolicyHandler(String policy) {
         return policyStreamHandlerMap.get(policy);
+    }
+
+    public Map<String, PolicyDefinition> getPolicyDefinitionMap() {
+        return this.policyDefinitionMap;
+    }
+
+    public Map<String, CompositePolicyHandler> getPolicyStreamHandlerMap() {
+        return this.policyStreamHandlerMap;
     }
 
 }

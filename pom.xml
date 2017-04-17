@@ -189,7 +189,9 @@
         <maprfs.version>5.1.0-mapr</maprfs.version>
         <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
 
-        <spark.core.version>1.4.0</spark.core.version>
+
+        <spark.core.version>1.6.3</spark.core.version>
+        <beam.version>0.5.0</beam.version>
 
         <!--  Client -->
         <!--<kafka-client.version>0.9.0.0</kafka-client.version>-->
@@ -219,7 +221,11 @@
         <!-- Serialization -->
         <gson.version>2.2.2</gson.version>
         <guava.version>15.0</guava.version>
-        <fasterxml-jackson.version>2.5.4</fasterxml-jackson.version>
+
+        <fasterxml-jackson.version>2.7.4</fasterxml-jackson.version>
+
+        <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
+
         <jsoup.version>1.7.3</jsoup.version>
         <io.netty.version>3.6.7.Final</io.netty.version>
         <org.json.version>20131018</org.json.version>
@@ -533,6 +539,11 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
                 <artifactId>jackson-jaxrs-base</artifactId>
+                <version>${fasterxml-jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-afterburner</artifactId>
                 <version>${fasterxml-jackson.version}</version>
             </dependency>
             <dependency>
