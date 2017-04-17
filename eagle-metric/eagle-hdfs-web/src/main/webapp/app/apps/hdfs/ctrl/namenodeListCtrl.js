@@ -119,7 +119,7 @@
 						}
 						namenode_status.push([x, y, 0, namenode.tags.hostname, namenode.tags.rack, namenode.usedCapacityTB, namenode.status || "-"])
 					});
-				for(var i = 0;i < split; i++){
+				for(var i = 0;i <= split; i++){
 					namenode_status_category.push(i);
 				}
 				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", namenode_status)];

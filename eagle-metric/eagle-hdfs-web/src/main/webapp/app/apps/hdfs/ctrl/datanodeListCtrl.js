@@ -121,7 +121,7 @@
 						}
 						datanode_status.push([x, y, 0, datanode.tags.hostname, datanode.tags.rack, datanode.status || "-"])
 					});
-				for(var i = 0;i < split; i++){
+				for(var i = 0;i <= split; i++){
 					datanode_status_category.push(i);
 				}
 				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", datanode_status)];

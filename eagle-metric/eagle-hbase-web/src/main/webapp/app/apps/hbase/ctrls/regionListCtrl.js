@@ -121,7 +121,7 @@
 					regionServer_status.push([x, y, 0, regionServer.tags.hostname, regionServer.tags.rack, regionServer.usedHeapMB, regionServer.maxHeapMB, regionServer.status || "-"]);
 				});
 				
-				for(var i = 0;i < split; i++){
+				for(var i = 0;i <= split; i++){
 					regionServer_status_category.push(i);
 				}
 				$scope.healthStatusSeries = [getCommonHeatMapSeries("Health", regionServer_status)];
