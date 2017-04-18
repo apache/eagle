@@ -26,30 +26,30 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 @Deprecated
-public class EmbeddedHbase {
+public class EmbeddedHBase {
     private HBaseTestingUtility util;
     private MiniHBaseCluster hbaseCluster;
-    private static EmbeddedHbase hbase;
+    private static EmbeddedHBase hbase;
     private int port;
     private String znode;
     private static int DEFAULT_PORT = 2181;
     private static String DEFAULT_ZNODE = "/hbase-unsecure";
-    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedHbase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedHBase.class);
 
-    private EmbeddedHbase(int port, String znode) {
+    private EmbeddedHBase(int port, String znode) {
         this.port = port;
         this.znode = znode;
     }
 
-    private EmbeddedHbase(int port) {
+    private EmbeddedHBase(int port) {
         this(port, DEFAULT_ZNODE);
     }
 
-    public static EmbeddedHbase getInstance(Configuration conf) {
+    public static EmbeddedHBase getInstance(Configuration conf) {
         if (hbase == null) {
-            synchronized (EmbeddedHbase.class) {
+            synchronized (EmbeddedHBase.class) {
                 if (hbase == null) {
-                    hbase = new EmbeddedHbase();
+                    hbase = new EmbeddedHBase();
                     hbase.start(conf);
                 }
             }
@@ -57,11 +57,11 @@ public class EmbeddedHbase {
         return hbase;
     }
 
-    public static EmbeddedHbase getInstance() {
+    public static EmbeddedHBase getInstance() {
         return getInstance(null);
     }
 
-    public EmbeddedHbase() {
+    public EmbeddedHBase() {
         this(DEFAULT_PORT, DEFAULT_ZNODE);
     }
 
@@ -132,7 +132,7 @@ public class EmbeddedHbase {
     }
 
     public static void main(String[] args) {
-        EmbeddedHbase hbase = new EmbeddedHbase(12181);
+        EmbeddedHBase hbase = new EmbeddedHBase(12181);
         hbase.start();
         for (String table : new Tables().getTables()) {
             hbase.createTable(table, "f");

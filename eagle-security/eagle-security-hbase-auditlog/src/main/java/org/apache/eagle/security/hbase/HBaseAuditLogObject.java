@@ -17,7 +17,7 @@
 package org.apache.eagle.security.hbase;
 
 
-public class HbaseAuditLogObject {
+public class HBaseAuditLogObject {
     public long timestamp;
     public String user = "";
     public String scope = "";

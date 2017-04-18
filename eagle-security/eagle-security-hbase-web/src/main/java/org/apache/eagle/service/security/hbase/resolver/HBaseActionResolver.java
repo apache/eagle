@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 
 
-public class HbaseActionResolver extends AbstractCommandResolver {
-    public HbaseActionResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+public class HBaseActionResolver extends AbstractCommandResolver {
+    public HBaseActionResolver(ApplicationEntityService entityService, Config eagleServerConfig){
         
     }
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseActionResolver.class);
+    private final static Logger LOG = LoggerFactory.getLogger(HBaseActionResolver.class);
     private final String [] cmdStrs = {"ADMIN", "READ", "WRITE", "CREATE", "EXECUTE"};
 
     @Override

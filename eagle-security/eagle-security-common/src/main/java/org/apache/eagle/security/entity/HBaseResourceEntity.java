@@ -22,7 +22,7 @@ import com.google.common.base.Objects;
 import java.io.Serializable;
 import java.util.Set;
 
-public class HbaseResourceEntity implements Serializable {
+public class HBaseResourceEntity implements Serializable {
     private String resource;
     private String namespace;
     private String table;
@@ -32,7 +32,7 @@ public class HbaseResourceEntity implements Serializable {
 
 
 
-    public HbaseResourceEntity(String resource, String ns, String table, String cf, String sensitiveType, Set<String> childSensitiveTypes) {
+    public HBaseResourceEntity(String resource, String ns, String table, String cf, String sensitiveType, Set<String> childSensitiveTypes) {
         this.resource = resource;
         this.namespace = ns;
         this.table = table;
@@ -94,7 +94,7 @@ public class HbaseResourceEntity implements Serializable {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final HbaseResourceEntity other = (HbaseResourceEntity) obj;
+        final HBaseResourceEntity other = (HBaseResourceEntity) obj;
         return Objects.equal(this.resource, other.resource)
                 && this.namespace.equals(other.namespace)
                 && this.table.equals(other.table)

@@ -68,7 +68,7 @@ download logstash 2.3.x
 #### 2.3 run eagle webservice
 find eagle-webservice project, run it
 #### 2.4 run eagle-security-hdfs-authlog topology
-find org.apache.eagle.security.hbase.HbaseAuditLogMonitoringMain, run it
+find org.apache.eagle.security.hbase.HBaseAuditLogMonitoringMain, run it
 
 ### Step 3: alert engine: consume parsed log
 #### 3.1 run alert engine

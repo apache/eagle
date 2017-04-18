@@ -81,17 +81,17 @@
         <property>
             <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>HBase Zookeeper Quorum</displayName>
-            <description>hbase zookeeper quorum (optional)</description>
+            <description>hBase zookeeper quorum (optional)</description>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkZnodeParent</name>
-            <displayName>Hbase Zookeeper Znode Parent Root</displayName>
-            <description>hbase zookeeper znode parent root (optional)</description>
+            <displayName>HBase Zookeeper Znode Parent Root</displayName>
+            <description>hBase zookeeper znode parent root (optional)</description>
         </property>
         <property>
             <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
-            <displayName>Hbase Zookeeper Client Port</displayName>
-            <description>hbase zookeeper client port (optional)</description>
+            <displayName>HBase Zookeeper Client Port</displayName>
+            <description>hBase zookeeper client port (optional)</description>
         </property>
 
         <property>

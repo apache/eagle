@@ -22,13 +22,12 @@ import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
-import org.apache.eagle.security.entity.HbaseResourceEntity;
-import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
+import org.apache.eagle.security.entity.HBaseResourceEntity;
 import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
 import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
-import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
+import org.apache.eagle.service.security.hbase.dao.HBaseMetadataDAOImpl;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +38,15 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Path("/hbaseResource")
-public class HbaseMetadataBrowseWebResource {
-    private static Logger LOG = LoggerFactory.getLogger(HbaseMetadataBrowseWebResource.class);
+public class HBaseMetadataBrowseWebResource {
+    private static Logger LOG = LoggerFactory.getLogger(HBaseMetadataBrowseWebResource.class);
     final public static String HBASE_APPLICATION = "HBaseAuditLogApplication";
 
     private ApplicationEntityService entityService;
     private ISecurityMetadataDAO dao;
 
     @Inject
-    public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
+    public HBaseMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
         this.entityService = entityService;
         this.dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
     }
@@ -59,7 +58,7 @@ public class HbaseMetadataBrowseWebResource {
             if(!all.containsKey(entity.getSite())){
                 all.put(entity.getSite(), new HashMap<>());
             }
-            all.get(entity.getSite()).put(entity.getHbaseResource(), entity.getSensitivityType());
+            all.get(entity.getSite()).put(entity.getHBaseResource(), entity.getSensitivityType());
         }
         return all;
     }
@@ -82,14 +81,14 @@ public class HbaseMetadataBrowseWebResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public HbaseMetadataBrowseWebResponse getNamespace(@QueryParam("site") String site) {
+    public HBaseMetadataBrowseWebResponse getNamespace(@QueryParam("site") String site) {
         List<String> namespaces = null;
-        List<HbaseResourceEntity> values = new ArrayList<>();
-        HbaseMetadataBrowseWebResponse response = new HbaseMetadataBrowseWebResponse();
+        List<HBaseResourceEntity> values = new ArrayList<>();
+        HBaseMetadataBrowseWebResponse response = new HBaseMetadataBrowseWebResponse();
         try {
             Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
             Configuration conf = convert(config);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
+            HBaseMetadataDAOImpl dao = new HBaseMetadataDAOImpl(conf);
             namespaces = dao.getNamespaces();
 
         } catch (Exception e) {
@@ -99,7 +98,7 @@ public class HbaseMetadataBrowseWebResource {
             for (String ns : namespaces) {
                 Set<String> childSensitiveTypes = new HashSet<>();
                 String senstiveType = checkSensitivity(site, ns, childSensitiveTypes);
-                values.add(new HbaseResourceEntity(ns, ns, null, null, senstiveType, childSensitiveTypes));
+                values.add(new HBaseResourceEntity(ns, ns, null, null, senstiveType, childSensitiveTypes));
             }
         }
         response.setObj(values);
@@ -110,15 +109,15 @@ public class HbaseMetadataBrowseWebResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public HbaseMetadataBrowseWebResponse getTables(@QueryParam("site") String site, @QueryParam("namespace") String namespace){
+    public HBaseMetadataBrowseWebResponse getTables(@QueryParam("site") String site, @QueryParam("namespace") String namespace){
         // delegate to HiveMetadataDAO
-        HbaseMetadataBrowseWebResponse response = new HbaseMetadataBrowseWebResponse();
+        HBaseMetadataBrowseWebResponse response = new HBaseMetadataBrowseWebResponse();
         List<String> tables = null;
-        List<HbaseResourceEntity> values = new ArrayList<>();
+        List<HBaseResourceEntity> values = new ArrayList<>();
         try {
             Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
             Configuration conf = convert(config);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
+            HBaseMetadataDAOImpl dao = new HBaseMetadataDAOImpl(conf);
             tables = dao.getTables(namespace);
         }catch(Exception ex){
             LOG.error("fail getting databases", ex);
@@ -129,7 +128,7 @@ public class HbaseMetadataBrowseWebResource {
                 String resource = String.format("%s:%s", namespace, table);
                 Set<String> childSensitiveTypes = new HashSet<>();
                 String sensitiveType = checkSensitivity(site, resource, childSensitiveTypes);
-                values.add(new HbaseResourceEntity(resource, namespace, table, null, sensitiveType, childSensitiveTypes));
+                values.add(new HBaseResourceEntity(resource, namespace, table, null, sensitiveType, childSensitiveTypes));
             }
         }
         response.setObj(values);
@@ -140,15 +139,15 @@ public class HbaseMetadataBrowseWebResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public HbaseMetadataBrowseWebResponse getColumns(@QueryParam("site") String site, @QueryParam("namespace") String namespace, @QueryParam("table") String table){
+    public HBaseMetadataBrowseWebResponse getColumns(@QueryParam("site") String site, @QueryParam("namespace") String namespace, @QueryParam("table") String table){
         // delegate to HiveMetadataDAO
-        HbaseMetadataBrowseWebResponse response = new HbaseMetadataBrowseWebResponse();
+        HBaseMetadataBrowseWebResponse response = new HBaseMetadataBrowseWebResponse();
         List<String> columns = null;
-        List<HbaseResourceEntity> values = new ArrayList<>();
+        List<HBaseResourceEntity> values = new ArrayList<>();
         try {
             Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
             Configuration conf = convert(config);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
+            HBaseMetadataDAOImpl dao = new HBaseMetadataDAOImpl(conf);
             String tableName = String.format("%s:%s", namespace, table);
             columns = dao.getColumnFamilies(tableName);
         }catch(Exception ex){
@@ -160,7 +159,7 @@ public class HbaseMetadataBrowseWebResource {
                 String resource = String.format("%s:%s:%s", namespace, table, col);
                 Set<String> childSensitiveTypes = new HashSet<>();
                 String sensitiveType = checkSensitivity(site, resource, childSensitiveTypes);
-                values.add(new HbaseResourceEntity(resource, namespace, table, col, sensitiveType, childSensitiveTypes));
+                values.add(new HBaseResourceEntity(resource, namespace, table, col, sensitiveType, childSensitiveTypes));
             }
         }
         response.setObj(values);

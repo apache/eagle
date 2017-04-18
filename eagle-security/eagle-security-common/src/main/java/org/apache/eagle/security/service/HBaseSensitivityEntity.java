@@ -32,11 +32,11 @@ public class HBaseSensitivityEntity {
         this.site = site;
     }
 
-    public String getHbaseResource() {
+    public String getHBaseResource() {
         return hbaseResource;
     }
 
-    public void setHbaseResource(String hbaseResource) {
+    public void setHBaseResource(String hbaseResource) {
         this.hbaseResource = hbaseResource;
     }
 

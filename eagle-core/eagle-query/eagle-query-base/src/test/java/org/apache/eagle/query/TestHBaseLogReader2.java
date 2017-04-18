@@ -24,7 +24,7 @@ import org.apache.eagle.log.entity.SearchCondition;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.service.hbase.EmbeddedHbase;
+import org.apache.eagle.service.hbase.EmbeddedHBase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,7 +35,7 @@ import java.util.*;
 
 public class TestHBaseLogReader2 {
 	private final static Logger LOG = LoggerFactory.getLogger(TestHBaseLogReader2.class);
-    private static EmbeddedHbase hbase = EmbeddedHbase.getInstance();
+    private static EmbeddedHBase hbase = EmbeddedHBase.getInstance();
 	
 	@SuppressWarnings("serial")
 	@Test

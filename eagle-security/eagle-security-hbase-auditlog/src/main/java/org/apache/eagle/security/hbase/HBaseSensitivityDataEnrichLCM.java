@@ -38,6 +38,6 @@ public class HBaseSensitivityDataEnrichLCM extends AbstractDataEnrichLCM<HBaseSe
 
     @Override
     public String getCacheKey(HBaseSensitivityEntity entity) {
-        return entity.getHbaseResource();
+        return entity.getHBaseResource();
     }
 }

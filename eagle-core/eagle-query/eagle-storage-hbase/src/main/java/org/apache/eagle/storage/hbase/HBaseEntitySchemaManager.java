@@ -60,7 +60,7 @@ public class HBaseEntitySchemaManager {
             LOG.debug("Auto create table disabled, skip creating table");
             return;
         }
-        Configuration conf = EagleConfigFactory.load().getHbaseConf();
+        Configuration conf = EagleConfigFactory.load().getHBaseConf();
 
         try {
             admin = new HBaseAdmin(conf);

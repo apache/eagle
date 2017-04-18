@@ -55,7 +55,7 @@ public class JDBCSecurityMetadataDAOTest {
     public void testJDBCSecurityMetadataDAO(){
         HBaseSensitivityEntity entity = new HBaseSensitivityEntity();
         entity.setSite("test_site");
-        entity.setHbaseResource("test_hbaseResource");
+        entity.setHBaseResource("test_hbaseResource");
         metadataDAO.addHBaseSensitivity(Collections.singletonList(entity));
         Collection<HBaseSensitivityEntity> entities = metadataDAO.listHBaseSensitivities();
         Assert.assertEquals(1,entities.size());

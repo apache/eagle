@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-public class HbaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<HBaseSensitivityEntity, String> {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseResourceSensitivityDataJoinBolt.class);
+public class HBaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<HBaseSensitivityEntity, String> {
+    private final static Logger LOG = LoggerFactory.getLogger(HBaseResourceSensitivityDataJoinBolt.class);
 
-    public HbaseResourceSensitivityDataJoinBolt(Config config) {
+    public HBaseResourceSensitivityDataJoinBolt(Config config) {
         super(config, new HBaseSensitivityDataEnrichLCM(config));
     }
 

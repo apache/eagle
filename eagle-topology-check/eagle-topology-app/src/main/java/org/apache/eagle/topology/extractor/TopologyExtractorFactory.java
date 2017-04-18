@@ -21,12 +21,11 @@ package org.apache.eagle.topology.extractor;
 import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;
+import org.apache.eagle.topology.extractor.hbase.HBaseTopologyCrawler;
 
 import org.apache.eagle.topology.extractor.hdfs.HdfsTopologyCrawler;
 import org.apache.eagle.topology.extractor.mr.MRTopologyCrawler;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
-import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -69,7 +68,7 @@ public class TopologyExtractorFactory {
     }
 
     static {
-        registerTopologyExtractor(TopologyConstants.TopologyType.HBASE.name(), HbaseTopologyCrawler.class);
+        registerTopologyExtractor(TopologyConstants.TopologyType.HBASE.name(), HBaseTopologyCrawler.class);
         registerTopologyExtractor(TopologyConstants.TopologyType.HDFS.name(), HdfsTopologyCrawler.class);
         registerTopologyExtractor(TopologyConstants.TopologyType.MR.name(), MRTopologyCrawler.class);
     }

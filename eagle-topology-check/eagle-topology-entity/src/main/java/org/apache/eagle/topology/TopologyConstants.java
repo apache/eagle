@@ -24,7 +24,7 @@ public class TopologyConstants {
 
     public static final String SYSTEM_INSTANCE_SERVICE_NAME = "SystemServiceInstance";
     public static final String HDFS_INSTANCE_SERVICE_NAME = "HdfsServiceInstance";
-    public static final String HBASE_INSTANCE_SERVICE_NAME = "HbaseServiceInstance";
+    public static final String HBASE_INSTANCE_SERVICE_NAME = "HBaseServiceInstance";
     public static final String MR_INSTANCE_SERVICE_NAME = "MRServiceInstance";
     public static final String JN_INSTANCE_SERVICE_NAME = "JNServiceInstance";
     public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";

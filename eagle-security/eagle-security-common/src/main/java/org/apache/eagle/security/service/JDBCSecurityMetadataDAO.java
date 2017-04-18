@@ -124,7 +124,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
             try {
                 HBaseSensitivityEntity entity = new HBaseSensitivityEntity();
                 entity.setSite(rs.getString(1));
-                entity.setHbaseResource(rs.getString(2));
+                entity.setHBaseResource(rs.getString(2));
                 entity.setSensitivityType(rs.getString(3));
                 return entity;
             }catch(Exception ex){ throw new IllegalStateException(ex);}
@@ -138,7 +138,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
             HBaseSensitivityEntity e = (HBaseSensitivityEntity)entity;
             try {
                 statement.setString(1, e.getSite());
-                statement.setString(2, e.getHbaseResource());
+                statement.setString(2, e.getHBaseResource());
                 statement.setString(3, e.getSensitivityType());
             }catch(Exception ex){
                 throw new IllegalStateException(ex);

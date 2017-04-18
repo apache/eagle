@@ -18,7 +18,7 @@
 
 <application>
     <type>HBASE_AUDIT_LOG_MONITOR</type>
-    <name>Hbase Audit Log Monitor</name>
+    <name>HBase Audit Log Monitor</name>
     <appClass>org.apache.eagle.security.hbase.HBaseAuditLogApplication</appClass>
     <configuration>
         <property>
@@ -150,7 +150,7 @@
     <streams>
         <stream>
             <streamId>hbase_audit_log_stream</streamId>
-            <description>Hbase Audit Log Stream</description>
+            <description>HBase Audit Log Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>

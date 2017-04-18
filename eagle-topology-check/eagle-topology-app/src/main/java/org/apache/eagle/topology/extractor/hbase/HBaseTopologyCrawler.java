@@ -26,23 +26,20 @@ import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.apache.eagle.topology.resolver.TopologyRackResolver;
-import org.apache.eagle.topology.utils.EntityBuilderHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+public class HBaseTopologyCrawler implements TopologyCrawler {
 
-public class HbaseTopologyCrawler implements TopologyCrawler {
+    private static final Logger LOG = LoggerFactory.getLogger(HBaseTopologyCrawler.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(HbaseTopologyCrawler.class);
-
-    private HbaseTopologyEntityParser parser;
+    private HBaseTopologyEntityParser parser;
     private SpoutOutputCollector collector;
     private String site;
 
-    public HbaseTopologyCrawler(TopologyCheckAppConfig config, TopologyRackResolver rackResolver, SpoutOutputCollector collector) {
+    public HBaseTopologyCrawler(TopologyCheckAppConfig config, TopologyRackResolver rackResolver, SpoutOutputCollector collector) {
         this.site = config.dataExtractorConfig.site;
-        this.parser = new HbaseTopologyEntityParser(this.site, config.hBaseConfig, rackResolver);
+        this.parser = new HBaseTopologyEntityParser(this.site, config.hBaseConfig, rackResolver);
         this.collector = collector;
     }
 
