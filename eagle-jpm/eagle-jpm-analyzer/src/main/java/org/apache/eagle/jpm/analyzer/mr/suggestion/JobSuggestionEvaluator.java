@@ -63,7 +63,6 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
             return null;
         }
 
-
         if (analyzerEntity.getTotalCounters() == null) {
             LOG.warn("Total counters of Job {} is null", analyzerEntity.getJobId());
             return null;
