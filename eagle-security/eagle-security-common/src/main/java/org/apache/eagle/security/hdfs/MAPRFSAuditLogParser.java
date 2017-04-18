@@ -22,19 +22,16 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
-
-
 public final class MAPRFSAuditLogParser {
     private final static Logger LOG = LoggerFactory.getLogger(MAPRFSAuditLogParser.class);
 
-    public MAPRFSAuditLogParser(){
+    public MAPRFSAuditLogParser() {
     }
 
     public MAPRFSAuditLogObject parse(String log) throws JSONException {
         JSONObject jsonObject = new JSONObject(log);
         MAPRFSAuditLogObject entity = new MAPRFSAuditLogObject();
-        try{
+        try {
             String timestamp = jsonObject.getJSONObject("timestamp").getString("$date");
             String cmd = jsonObject.getString("operation");
             String user = jsonObject.getString("uid");
@@ -43,15 +40,15 @@ public final class MAPRFSAuditLogParser {
             String volumeID = jsonObject.getString("volumeId");
             String src;
             String dst;
-            if(jsonObject.has("srcFid")){
+            if (jsonObject.has("srcFid")) {
                 src = jsonObject.getString("srcFid");
-            }else{
+            } else {
                 src = "null";
             }
 
-            if(jsonObject.has("dstFid")){
+            if (jsonObject.has("dstFid")) {
                 dst = jsonObject.getString("dstFid");
-            }else{
+            } else {
                 dst = "null";
             }
             entity.user = user;
@@ -62,10 +59,9 @@ public final class MAPRFSAuditLogParser {
             entity.status = status;
             entity.volume = volumeID;
             entity.timestamp = DateTimeUtil.maprhumanDateToMilliseconds(timestamp);
-        } catch (Exception e){
+        } catch (Exception e) {
             LOG.error("Failed to parse mapr audit log message", e);
-        } finally {
-            return entity;
         }
+        return entity;
     }
 }
