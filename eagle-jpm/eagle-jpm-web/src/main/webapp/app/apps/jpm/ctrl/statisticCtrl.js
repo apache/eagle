@@ -303,7 +303,7 @@
 				$scope.topUserJobCountTrendSeries = [];
 				JPM.aggMetricsToEntities(
 					JPM.groups("JobExecutionService", {site: $scope.site, currentState: $scope.distributionSelectedType}, ["user"], "count desc", intervalMin, startTime, endTime, 10, 1000000)
-				)._promise.then(function (list) {
+				, [0])._promise.then(function (list) {
 					$scope.topUserJobCountTrendSeries = $.map(list, function (subList) {
 						return JPM.metricsToSeries(subList[0].tags.user, subList, {
 							stack: "user",
@@ -321,7 +321,7 @@
 				$scope.topTypeJobCountTrendSeries = [];
 				JPM.aggMetricsToEntities(
 					JPM.groups("JobExecutionService", {site: $scope.site, currentState: $scope.distributionSelectedType}, ["jobType"], "count desc", intervalMin, startTime, endTime, 10, 1000000)
-				)._promise.then(function (list) {
+				, [0])._promise.then(function (list) {
 					$scope.topTypeJobCountTrendSeries = $.map(list, function (subList) {
 						return JPM.metricsToSeries(subList[0].tags.jobType, subList, {
 							stack: "type",
@@ -376,6 +376,11 @@
 						});
 					});
 				}
+
+				// UI refresh
+				setTimeout(function () {
+					$(window).resize();
+				}, 100);
 
 				return true;
 			};

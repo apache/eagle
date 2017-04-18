@@ -165,7 +165,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>Topic For Kafka Data Sink</displayName>
-            <value>topology_check</value>
+            <value>topology_check_${siteId}</value>
             <description>topic For kafka data sink</description>
         </property>
         <property>

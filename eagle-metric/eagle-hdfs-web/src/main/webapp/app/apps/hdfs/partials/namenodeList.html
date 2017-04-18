@@ -15,38 +15,58 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<div class="box box-primary">
-	<div class="box-header with-border">
-		<h3 class="box-title">
-			<span ng-show="!namenodeList._done || isSorting" class="fa fa-refresh fa-spin no-animate"></span>
-		</h3>
-	</div>
-	<div class="box-body">
-		<div id="namenodeList" sort-table="namenodeList" is-sorting="isSorting"
-			 search-path-list="searchPathList"
-			 scope="tableScope">
-			<table class="table table-bordered">
-				<thead>
-				<tr>
-					<th sortpath="tags.hostname">Namenode</th>
-					<th sortpath="tags.rack">Rack</th>
-					<th sortpath="tags.site">SiteId</th>
-					<th sortpath="status">Status</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr ng-repeat="item in namenodeList">
-					<td>
-						<a ui-sref="namenodeDetail({siteId: site, hostname: item.tags.hostname})" target="_blank">{{item.tags.hostname}}</a>
-					</td>
-					<td>{{item.tags.rack}}</td>
-					<td>{{item.tags.site}}</td>
-					<td>
-						<span>{{item.status}}</span>
-					</td>
-				</tr>
-				</tbody>
-			</table>
+
+<div class="nav-tabs-custom" style="cursor: move;">
+	<ul class="nav nav-tabs pull-right ui-sortable-handle">
+      <li><a href="#heatmap" data-toggle="tab" aria-expanded="false" ng-click="healthHeatMap.resize()">HeatMap</a></li>
+      <li class="active"><a href="#list" data-toggle="tab" aria-expanded="true">List</a></li>
+    </ul>
+
+    <div class="tab-content no-padding keepContent">
+    	<div class="box box-primary no-margin tab-pane fade in active" id="list">
+			<div class="box-body">
+				<div id="namenodeList" sort-table="namenodeList" is-sorting="isSorting"
+					 search-path-list="searchPathList"
+					 scope="tableScope">
+					<table class="table table-bordered">
+						<thead>
+						<tr>
+							<th sortpath="tags.hostname">Namenode</th>
+							<th sortpath="tags.rack">Rack</th>
+							<th sortpath="tags.site">SiteId</th>
+							<th sortpath="status">Status</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in namenodeList">
+							<td>
+								<a ui-sref="namenodeDetail({siteId: site, hostname: item.tags.hostname})" target="_blank">{{item.tags.hostname}}</a>
+							</td>
+							<td>{{item.tags.rack}}</td>
+							<td>{{item.tags.site}}</td>
+							<td>
+								<span>{{item.status}}</span>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
-	</div>
+
+
+		<!--region server health chart-->
+		<div class="box box-primary no-margin tab-pane fade" id="heatmap">
+			<div class="box-body">
+				<div class="hadoopMetric-chart">
+					<div chart="healthHeatMap" ng-style="heatmapHeight" series="healthStatusSeries" category="healthStatusCategory" option="healthStatusOption"></div>
+					<div ng-if="(healthStatusSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+
+    </div>
+
 </div>

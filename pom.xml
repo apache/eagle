@@ -123,6 +123,13 @@
             <organization>Apache Software Foundation</organization>
             <organizationUrl>https://eagle.apache.org</organizationUrl>
         </developer>
+        <developer>
+            <id>jaysen</id>
+            <name>Jayesh Senjaliya</name>
+            <email>jaysen@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.apache.org</organizationUrl>
+        </developer>
     </developers>
     <modules>
         <module>eagle-core</module>
@@ -1119,7 +1126,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire.version}</version>
                     <configuration>
-                        <argLine>-XX:-UseGCOverheadLimit</argLine>
+                        <argLine>-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -XX:-UseGCOverheadLimit</argLine>
                         <forkMode>always</forkMode>
                     </configuration>
                     <dependencies>
@@ -1308,6 +1315,14 @@
                                 <exclude>**/webapp/**</exclude>
                                 <exclude>**/*.pid</exclude>
                                 <exclude>**/buildNumber.properties</exclude>
+
+                                <!-- Docs related -->
+                                <exclude>docs/eagle-theme/**</exclude>
+                                <exclude>docs/**/*.txt</exclude>
+
+                                <!-- Java Object serial file -->
+                                <exclude>**/test/resources/appinfobyteint</exclude>
+                                <exclude>**/test/resources/appinfobytelong</exclude>
                             </excludes>
                         </configuration>
                     </execution>
