@@ -5,11 +5,21 @@ This Eagle Parcel and CSD greatly simplifies setting up a Eagle cluster on your 
 ## Table of Contents
 
 - [Eagle Parcel and CSD for Cloudera's CDH 5](#eagle-parcel-and-csd-for-clouderas-cdh-5)
+    - [Preparation](#preparation)
+      - [1. Create Eagle Parcel](#1-create-eagle-parcel)
     - [Installation](#installation)
       - [1. Install the CSD](#1-install-the-csd)
       - [2. Downloading and Distributing Eagle Parcel](#2-downloading-and-distributing-eagle-parcel)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+### Preparation
+
+#### 1. Create Eagle Parcel
+
+1. Download the eagle realse and decompression it.
+2. Modify "eagle.conf" to "eagle.properties" in eagle-server.sh.Modify log path to specified path in server.yml.
+3. Build the eagle parcel, please refer to [Building-a-parcel](https://github.com/cloudera/cm_ext/wiki/Building-a-parcel).
 
 ### Installation
 
@@ -24,7 +34,7 @@ service cloudera-scm-server restart
 ```
 #### 2. Downloading and Distributing Eagle Parcel
 
-1. Build the eagle parcel, please refer to [Building-a-parcel](https://github.com/cloudera/cm_ext/wiki/Building-a-parcel).
+1. Download your parcel file,generate .sha, and mainfest.json.
 2. Copy your parcel files(.parcel, .sha, mainfest.json) to host /var/www/html/eagle
 3. Go to your Cloudera Manager: http://cloudera_host:7180 and login with your admin credentials
 4. Click on the parcels icon on the top right corner (next to the search bar)

@@ -19,10 +19,6 @@ CMD=$1
 
 cp -r /opt/cloudera/parcels/EAGLE/* $CONF_DIR
 mv -f $CONF_DIR/eagle.properties $CONF_DIR/conf
-# Use eagle.properties instead of eagle.conf, configFormat only support hadoop_xml,properties,gflags
-cp -f $CONF_DIR/aux/eagle-server.sh $CONF_DIR/bin
-# Redirect log path
-cp -r $CONF_DIR/aux/server.yml $CONF_DIR/conf
 
 case $CMD in
   (start)
