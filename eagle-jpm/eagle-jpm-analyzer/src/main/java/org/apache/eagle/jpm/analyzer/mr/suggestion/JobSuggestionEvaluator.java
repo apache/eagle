@@ -63,7 +63,6 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
             return null;
         }
 
-
         if (analyzerEntity.getTotalCounters() == null) {
             LOG.warn("Total counters of Job {} is null", analyzerEntity.getJobId());
             return null;
@@ -73,13 +72,14 @@ public class JobSuggestionEvaluator implements Evaluator<MapReduceAnalyzerEntity
             return null;
         }
 
-        MapReduceJobSuggestionContext jobContext = new MapReduceJobSuggestionContext(analyzerEntity);
-        if (jobContext.getNumMaps() == 0) {
-            return null;
-        }
-
         try {
             Result.EvaluatorResult result = new Result.EvaluatorResult();
+
+            MapReduceJobSuggestionContext jobContext = new MapReduceJobSuggestionContext(analyzerEntity);
+            if (jobContext.getNumMaps() == 0) {
+                return null;
+            }
+
             for (Processor processor : loadProcessors(jobContext)) {
                 Result.ProcessorResult processorResult = processor.process(analyzerEntity);
                 if (processorResult != null) {
