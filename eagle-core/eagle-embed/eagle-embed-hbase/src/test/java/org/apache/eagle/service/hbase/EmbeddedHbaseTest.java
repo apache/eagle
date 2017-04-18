@@ -19,10 +19,11 @@ package org.apache.eagle.service.hbase;
 import org.junit.Test;
 
 import java.io.IOException;
+import org.apache.hadoop.hbase.TableName;
 
 public class EmbeddedHbaseTest extends TestHBaseBase {
     @Test
     public void testHBaseCreateTable() throws IOException {
-        hbase.createTable("test_hbase_table","f");
+        hbase.createTable(TableName.valueOf("test_hbase_table"),"f");
     }
 }

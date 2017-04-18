@@ -28,6 +28,7 @@ import org.apache.eagle.storage.operation.QueryStatement;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
+import org.apache.hadoop.hbase.TableName;
 import org.junit.*;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class TestHBaseStatement extends TestHBaseBase {
     @BeforeClass
     public static void setUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
-        hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
+        hbase.createTable(TableName.valueOf(entityDefinition.getTable()), entityDefinition.getColumnFamily());
     }
 
     @Test

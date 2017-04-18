@@ -19,10 +19,13 @@ package org.apache.eagle.log.entity.filter;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.KeyValue;
+import org.apache.hadoop.hbase.KeyValueUtil;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterBase;
+import org.apache.hadoop.hbase.filter.Filter.ReturnCode;
 import org.apache.hadoop.io.WritableComparable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +122,15 @@ public class RowValueFilter extends FilterBase {
     }
 
     @Override
-    public void filterRow(List<KeyValue> row) {
-        filterOutRow = (this.comparator.compareTo(row) == 0);
+    public void filterRowCells(List<Cell> lst) {
+        filterOutRow = (this.comparator.compareTo(KeyValueUtil.ensureKeyValues(lst)) == 0);
     }
+    @Override
+    public ReturnCode filterKeyValue(Cell v) {
+      if (filterOutRow) return ReturnCode.NEXT_ROW;
+	    return ReturnCode.INCLUDE;
+     }
+
 
     @Override
     public void reset() {

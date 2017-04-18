@@ -25,6 +25,7 @@ import org.apache.eagle.log.entity.old.GenericDeleter;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.query.parser.EagleQueryParser;
 import org.apache.eagle.service.hbase.TestHBaseBase;
+import org.apache.hadoop.hbase.TableName;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class TestGenericEntityIndexStreamReader extends TestHBaseBase {
     @BeforeClass
     public static void createTable() throws IOException, IllegalAccessException, InstantiationException {
         EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
-        hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
+        hbase.createTable(TableName.valueOf(entityDefinition.getTable()), entityDefinition.getColumnFamily());
     }
 
     @Test

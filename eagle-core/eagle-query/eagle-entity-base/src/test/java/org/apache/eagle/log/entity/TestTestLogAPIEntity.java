@@ -25,6 +25,7 @@ import org.apache.eagle.log.entity.meta.IndexDefinition;
 import org.apache.eagle.log.entity.old.GenericDeleter;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;
+import org.apache.hadoop.hbase.TableName;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -41,7 +42,7 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
     @BeforeClass
     public static void createTable() throws IllegalAccessException, InstantiationException, IOException {
         EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
-        hbase.createTable(ed.getTable(), ed.getColumnFamily());
+        hbase.createTable(TableName.valueOf(ed.getTable()), ed.getColumnFamily());
     }
 
     @Test
