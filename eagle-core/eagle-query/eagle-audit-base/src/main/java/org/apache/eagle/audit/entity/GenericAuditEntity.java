@@ -28,6 +28,8 @@ import org.apache.eagle.log.entity.meta.TimeSeries;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.Objects;
+
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_COLUMN_OPERATION;
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_COLUMN_SERVICE_NAME;
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_COLUMN_TIMESTAMP;
@@ -51,16 +53,14 @@ public class GenericAuditEntity extends TaggedLogAPIEntity {
 		if(!(obj instanceof GenericAuditEntity))
 			return false;
 		GenericAuditEntity that = (GenericAuditEntity) obj;
-		if(compare(that.getTags().get(AUDIT_COLUMN_SERVICE_NAME), this.getTags().get(AUDIT_COLUMN_SERVICE_NAME)) &&
-				compare(that.getTags().get(AUDIT_COLUMN_USER_ID), this.getTags().get(AUDIT_COLUMN_USER_ID)) &&
-				compare(that.getTags().get(AUDIT_COLUMN_OPERATION), this.getTags().get(AUDIT_COLUMN_OPERATION)) &&
-				compare(that.getTags().get(AUDIT_COLUMN_TIMESTAMP), this.getTags().get(AUDIT_COLUMN_TIMESTAMP)))
-			return true;
-		return false;
+		return compare(that.getTags().get(AUDIT_COLUMN_SERVICE_NAME), this.getTags().get(AUDIT_COLUMN_SERVICE_NAME)) &&
+					 compare(that.getTags().get(AUDIT_COLUMN_USER_ID), this.getTags().get(AUDIT_COLUMN_USER_ID)) &&
+					 compare(that.getTags().get(AUDIT_COLUMN_OPERATION), this.getTags().get(AUDIT_COLUMN_OPERATION)) &&
+					 compare(that.getTags().get(AUDIT_COLUMN_TIMESTAMP), this.getTags().get(AUDIT_COLUMN_TIMESTAMP));
 	}
 	
 	private boolean compare(String a, String b){
-		if(a == b)
+		if(Objects.equals(a, b))
 			return true;
 		if(a == null || b == null)
 			return false;

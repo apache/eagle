@@ -39,7 +39,7 @@ public class GreedyPartitionAlgorithm implements PartitionAlgorithm {
         StringBuilder sb = new StringBuilder();
         iter = queue.iterator();
         while (iter.hasNext()) {
-            sb.append(iter.next().value / total + ",");
+            sb.append(iter.next().value / total).append(",");
         }
         sb.deleteCharAt(sb.length()-1);
         LOG.info("Weights: " + sb.toString());
@@ -52,12 +52,11 @@ public class GreedyPartitionAlgorithm implements PartitionAlgorithm {
         for (int i = 0; i < k; i++) {
             queue.add(new Bucket(i, 0.0));
         }
-        int n = weights.size();
-        for (int i = 0; i < n; i++) {
+        for (Weight weight : weights) {
             Bucket bucket = queue.poll();
-            bucket.value = bucket.value + weights.get(i).value;
+            bucket.value = bucket.value + weight.value;
             queue.add(bucket);
-            ret.put(weights.get(i).key, bucket.bucketNum);
+            ret.put(weight.key, bucket.bucketNum);
         }
         printWeightTable(queue);
         return ret;

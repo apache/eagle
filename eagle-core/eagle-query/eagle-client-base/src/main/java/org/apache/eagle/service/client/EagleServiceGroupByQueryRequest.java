@@ -110,11 +110,11 @@ public class EagleServiceGroupByQueryRequest {
 			
 			// metricName
 			if(metricName != null){
-				sb.append("&metricName=" + metricName);
+				sb.append("&metricName=").append(metricName);
 			}
 			
 			if (intervalMin != 0) {
-				sb.append("&timeSeries=true&intervalmin=" + intervalMin);
+				sb.append("&timeSeries=true&intervalmin=").append(intervalMin);
 			}
 			return sb.toString();
 		} catch (UnsupportedEncodingException e) {

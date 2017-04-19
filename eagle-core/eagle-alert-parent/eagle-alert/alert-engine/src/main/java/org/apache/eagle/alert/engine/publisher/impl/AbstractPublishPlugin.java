@@ -86,7 +86,8 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
             }
             serializer = (IEventSerializer) obj;
         } catch (Exception e) {
-            getLogger().error(String.format("initialized failed, use default StringEventSerializer, failure message : {}", e.getMessage()), e);
+            getLogger().error(String.format("initialized failed, use default StringEventSerializer, "
+                                            + "failure message : %s", e.getMessage()), e);
             serializer = new StringEventSerializer(conf);
         }
     }
