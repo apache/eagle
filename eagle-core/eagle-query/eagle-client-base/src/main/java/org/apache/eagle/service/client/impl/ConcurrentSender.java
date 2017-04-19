@@ -128,10 +128,8 @@ public class ConcurrentSender implements Closeable{
                 if(entity!=null){
                     try {
                         this.send(entity);
-                    } catch (IOException e) {
-                        LOG.error(e.getMessage(),e);
-                    } catch (EagleServiceClientException e) {
-                        LOG.error(e.getMessage(),e);
+                    } catch (IOException | EagleServiceClientException e) {
+                        LOG.error(e.getMessage(), e);
                     }
                     long currentTimestamp = System.currentTimeMillis();
 
@@ -141,10 +139,8 @@ public class ConcurrentSender implements Closeable{
 
                         try {
                             this.flush();
-                        } catch (IOException e) {
-                            LOG.error(e.getMessage(),e);
-                        } catch (EagleServiceClientException e) {
-                            LOG.error(e.getMessage(),e);
+                        } catch (IOException | EagleServiceClientException e) {
+                            LOG.error(e.getMessage(), e);
                         }
                     }
                 }else{

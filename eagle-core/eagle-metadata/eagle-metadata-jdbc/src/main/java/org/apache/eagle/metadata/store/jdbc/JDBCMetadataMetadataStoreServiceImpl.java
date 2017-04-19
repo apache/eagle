@@ -74,8 +74,6 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
             statement = connection.prepareStatement(sql);
             mapper.accept(statement,entity);
             return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw e;
         } finally {
             if (statement != null) {
                 try {

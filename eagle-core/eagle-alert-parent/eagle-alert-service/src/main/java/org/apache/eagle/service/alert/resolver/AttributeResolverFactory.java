@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.service.alert.resolver;
 
-import org.apache.eagle.metadata.service.ApplicationEntityService;
 import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,8 +43,6 @@ public final class AttributeResolverFactory {
                 fieldResolvableCache.put(fieldResolverName, instance);
             } catch (ClassNotFoundException e) {
                 throw new AttributeResolveException("Attribute Resolver in type of " + fieldResolverName + " is not found", e);
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new AttributeResolveException(e);
             } catch (Exception ex) {
                 throw new AttributeResolveException(ex);
             }

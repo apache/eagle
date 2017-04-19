@@ -18,13 +18,7 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -37,7 +31,11 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class AlertKafkaPublisher extends AbstractPublishPlugin implements AlertPublishPluginProvider {
 
@@ -140,8 +138,6 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin implements AlertP
                     });
                 }
             }
-        } catch (InterruptedException | ExecutionException e) {
-            failOnException(String.format("Failed to send message to %s, due to:%s", brokerList, e), e);
         } catch (Exception ex) {
             failOnException(String.format("Failed to send message to %s, due to:%s", brokerList, ex), ex);
         }
