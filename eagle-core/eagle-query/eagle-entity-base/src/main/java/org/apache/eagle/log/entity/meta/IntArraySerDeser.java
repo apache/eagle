@@ -57,8 +57,8 @@ public class IntArraySerDeser implements EntitySerDeser<int[]>{
 		int offset = 0;
 		System.arraycopy(first, 0, array, offset, first.length);
 		offset += first.length;
-		for(int i=0; i<size; i++){
-			System.arraycopy(ByteUtil.intToBytes(obj[i]), 0, array, offset, 4);
+		for (int anObj : obj) {
+			System.arraycopy(ByteUtil.intToBytes(anObj), 0, array, offset, 4);
 			offset += 4;
 		}
 		return array;

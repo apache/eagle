@@ -68,7 +68,7 @@ public abstract class AbstractEmailService {
     }
 
     public boolean onAlert(AlertEmailContext mailContext, Map<String, Object> alertData) {
-        /** synchronized email sending. */
+        /* synchronized email sending. */
         if (alertData == null || alertData.isEmpty()) {
             getLogger().warn("alertData for {} is empty");
             return false;

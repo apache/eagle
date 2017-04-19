@@ -25,7 +25,6 @@ import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.impl.EagleServiceBaseClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang.ArrayUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -267,7 +266,7 @@ public class JHFSparkEventReader {
         task.setTags(new HashMap<>(this.app.getTags()));
         task.setTimestamp(app.getTimestamp());
 
-        task.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), Long.toString(JSONUtils.getLong(event, "Stage ID")));
+        task.getTags().put(SparkJobTagName.SPARK_STAGE_ID.toString(), Long.toString(JSONUtils.getLong(event, "Stage ID")));
         task.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), Long.toString(JSONUtils.getLong(event, "Stage Attempt ID")));
 
         JSONObject taskInfo = JSONUtils.getJSONObject(event, "Task Info");
@@ -423,7 +422,7 @@ public class JHFSparkEventReader {
                 this.aggregateStageToApp(stage);
                 needStoreStages.add(stage);
             }
-            String stageId = stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString());
+            String stageId = stage.getTags().get(SparkJobTagName.SPARK_STAGE_ID.toString());
             String stageAttemptId = stage.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString());
             this.jobStageMap.get(jobId).remove(this.generateStageKey(stageId, stageAttemptId));
         }
@@ -541,7 +540,7 @@ public class JHFSparkEventReader {
     }
 
     private void aggregateToStage(SparkTask task) {
-        String stageId = task.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString());
+        String stageId = task.getTags().get(SparkJobTagName.SPARK_STAGE_ID.toString());
         String stageAttemptId = task.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString());
         String key = this.generateStageKey(stageId, stageAttemptId);
         SparkStage stage = stages.get(key);
@@ -629,7 +628,7 @@ public class JHFSparkEventReader {
         int stageAttemptId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString()));
         for (int i = 0; i < stageAttemptId; i++) {
             SparkStage previousStage = stages.get(this.generateStageKey(
-                stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString()), Integer.toString(i)));
+                stage.getTags().get(SparkJobTagName.SPARK_STAGE_ID.toString()), Integer.toString(i)));
             if (previousStage.getStatus().equalsIgnoreCase(SparkEntityConstant.SparkStageStatus.COMPLETE.toString())) {
                 return true;
             }
@@ -647,7 +646,7 @@ public class JHFSparkEventReader {
         stage.setTags(new HashMap<>(this.app.getTags()));
         stage.setTimestamp(app.getTimestamp());
         stage.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), Integer.toString(jobId));
-        stage.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), Integer.toString(stageId));
+        stage.getTags().put(SparkJobTagName.SPARK_STAGE_ID.toString(), Integer.toString(stageId));
         stage.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), Integer.toString(stageAttemptId));
         stage.setName(name);
         stage.setNumActiveTasks(0);

@@ -52,27 +52,24 @@ public class GenericEntityWriter {
 	 * @throws Exception
 	 */
 	public List<String> write(List<? extends TaggedLogAPIEntity> entities) throws Exception{
-		HBaseLogWriter writer = new HBaseLogWriter(entityDef.getTable(), entityDef.getColumnFamily());
 		List<String> rowkeys = new ArrayList<String>(entities.size());
 		List<InternalLog> logs = new ArrayList<InternalLog>(entities.size());
-		
-		try{
+
+		try (HBaseLogWriter writer = new HBaseLogWriter(entityDef.getTable(), entityDef.getColumnFamily())) {
 			writer.open();
-			for(TaggedLogAPIEntity entity : entities){
+			for (TaggedLogAPIEntity entity : entities) {
 				final InternalLog entityLog = HBaseInternalLogHelper.convertToInternalLog(entity, entityDef);
 				logs.add(entityLog);
 			}
-			List<byte[]> bRowkeys  = writer.write(logs);
+			List<byte[]> bRowkeys = writer.write(logs);
 			for (byte[] rowkey : bRowkeys) {
 				rowkeys.add(EagleBase64Wrapper.encodeByteArray2URLSafeString(rowkey));
 			}
 
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			LOG.error("fail writing tagged log", ex);
 			throw ex;
-		}finally{
-			writer.close();
-	 	}
+		}
 		return rowkeys;
 	}
 }

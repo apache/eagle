@@ -536,7 +536,7 @@ public class SparkApplicationParser implements Runnable {
             SparkStageEntity stageEntity = new SparkStageEntity();
             stageEntity.setTags(new HashMap<>(commonTags));
             stageEntity.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), stagesTime.get(stage.getStageId()).getLeft() + "");
-            stageEntity.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), stage.getStageId() + "");
+            stageEntity.getTags().put(SparkJobTagName.SPARK_STAGE_ID.toString(), stage.getStageId() + "");
             stageEntity.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), stage.getAttemptId() + "");
             stageEntity.setStatus(stage.getStatus());
             stageEntity.setNumActiveTasks(stage.getNumActiveTasks());

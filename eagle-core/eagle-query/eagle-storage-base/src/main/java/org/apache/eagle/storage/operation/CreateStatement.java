@@ -37,9 +37,7 @@ public class CreateStatement implements Statement<ModifyResult<String>> {
 
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
-        } catch (InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -57,12 +55,8 @@ public class CreateStatement implements Statement<ModifyResult<String>> {
 
     @Override
     public ModifyResult<String> execute(DataStorage dataStorage) throws IOException {
-        try {
-            checkNotNull(this.entities,"entities");
-            checkNotNull(this.entityDefinition,"entity definition");
-            return dataStorage.create(entities, this.entityDefinition);
-        } catch (IOException e) {
-            throw e;
-        }
+        checkNotNull(this.entities,"entities");
+        checkNotNull(this.entityDefinition,"entity definition");
+        return dataStorage.create(entities, this.entityDefinition);
     }
 }

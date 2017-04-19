@@ -16,18 +16,17 @@
  */
 package org.apache.eagle.log.entity.old;
 
+import org.apache.eagle.common.EagleBase64Wrapper;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.base.taggedlog.TaggedLogObjectMapper;
+import org.apache.eagle.log.entity.InternalLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.eagle.log.base.taggedlog.TaggedLogObjectMapper;
-import org.apache.eagle.log.entity.InternalLog;
-import org.apache.eagle.common.EagleBase64Wrapper;
 
 public class GenericByRowkeyReader {
 	private static final Logger LOG = LoggerFactory.getLogger(GenericByRowkeyReader.class);
@@ -49,10 +48,9 @@ public class GenericByRowkeyReader {
 	}
 	
 	public List<TaggedLogAPIEntity> read(List<String> rowkeys) throws IOException{
-		HBaseLogByRowkeyReader reader = new HBaseLogByRowkeyReader(this.table, this.columnFamily, 
-				outputAll, outputColumns);
 		List<TaggedLogAPIEntity> entities = new ArrayList<TaggedLogAPIEntity>();
-		try{
+        try (HBaseLogByRowkeyReader reader = new HBaseLogByRowkeyReader(this.table, this.columnFamily,
+            outputAll, outputColumns)) {
 			reader.open();
 			for(String rowkeyString : rowkeys){
 				byte[] rowkey = EagleBase64Wrapper.decode(rowkeyString);
@@ -69,10 +67,7 @@ public class GenericByRowkeyReader {
 		}catch(IOException ex){
 			LOG.error("Fail read by rowkey", ex);
 			throw ex;
-		}finally{
-			reader.close();
 		}
-		
 		return entities;
 	}
 }

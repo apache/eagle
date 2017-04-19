@@ -54,8 +54,8 @@ public class DoubleArraySerDeser implements EntitySerDeser<double[]>{
 			int offset = 0;
 			System.arraycopy(first, 0, array, offset, first.length);
 			offset += first.length;
-			for(int i=0; i<size; i++){
-				System.arraycopy(ByteUtil.doubleToBytes(obj[i]), 0, array, offset, SIZE);
+			for (double anObj : obj) {
+				System.arraycopy(ByteUtil.doubleToBytes(anObj), 0, array, offset, SIZE);
 				offset += SIZE;
 			}
 			return array;

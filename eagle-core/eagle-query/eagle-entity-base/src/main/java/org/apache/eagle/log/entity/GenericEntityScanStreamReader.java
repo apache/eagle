@@ -20,7 +20,6 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityConstants;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
-import org.apache.eagle.common.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,8 +92,7 @@ public class GenericEntityScanStreamReader extends StreamReader {
             // Generate the output qualifiers
             outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
         }
-        HBaseLogReader2 reader = new HBaseLogReader2(entityDef, condition.getPartitionValues(), start, end, condition.getFilter(), condition.getStartRowkey(), outputQualifiers, this.prefix);
-        try{
+        try (HBaseLogReader2 reader = new HBaseLogReader2(entityDef, condition.getPartitionValues(), start, end, condition.getFilter(), condition.getStartRowkey(), outputQualifiers, this.prefix)) {
             reader.open();
             InternalLog log;
             int count = 0;
@@ -103,24 +101,22 @@ public class GenericEntityScanStreamReader extends StreamReader {
                 if (lastTimestamp < entity.getTimestamp()) {
                     lastTimestamp = entity.getTimestamp();
                 }
-                if(firstTimestamp > entity.getTimestamp() || firstTimestamp == 0){
+                if (firstTimestamp > entity.getTimestamp() || firstTimestamp == 0) {
                     firstTimestamp = entity.getTimestamp();
                 }
 
                 entity.setSerializeVerbose(condition.isOutputVerbose());
                 entity.setSerializeAlias(condition.getOutputAlias());
 
-                for(EntityCreationListener l : _listeners){
+                for (EntityCreationListener l : _listeners) {
                     l.entityCreated(entity);
                 }
-                if(++count == condition.getPageSize())
+                if (++count == condition.getPageSize())
                     break;
             }
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             LOG.error("Fail reading log", ioe);
             throw ioe;
-        }finally{
-            reader.close();
         }
     }
 

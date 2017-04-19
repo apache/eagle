@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Service(Constants.SPARK_JOB_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(true)
-@Tags({"site","sprkAppId", "sprkAppAttemptId", "sprkAppName", "normSprkAppName", "jobId","user", "queue"})
+@Tags({"site","sparkAppId", "sparkAppAttemptId", "sparkAppName", "normsparkAppName", "jobId","user", "queue"})
 @Partition({"site"})
 public class SparkJob extends TaggedLogAPIEntity {
 

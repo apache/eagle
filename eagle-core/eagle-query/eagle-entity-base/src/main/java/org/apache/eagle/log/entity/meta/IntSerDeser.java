@@ -25,7 +25,7 @@ public class IntSerDeser implements EntitySerDeser<Integer>{
 	public Integer deserialize(byte[] bytes){
 		if(bytes.length < 4)
 			return null;
-		return Integer.valueOf(ByteUtil.bytesToInt(bytes));
+		return ByteUtil.bytesToInt(bytes);
 	}
 	
 	@Override

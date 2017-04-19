@@ -499,6 +499,5 @@ public class ListQueryResource {
 		if(startRowkey != null && startRowkey.equals("null")){
 			LOG.warn("startRowkey being null string is not same to startRowkey == null");
 		}
-		return;
 	}
 }

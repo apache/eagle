@@ -26,7 +26,7 @@ public class LongSerDeser implements EntitySerDeser<Long>{
 		if(bytes.length < 8)
 			return null;
 //		return new Long(ByteUtil.bytesToLong(bytes));
-		return Long.valueOf(ByteUtil.bytesToLong(bytes));
+		return ByteUtil.bytesToLong(bytes);
 	}
 	
 	@Override

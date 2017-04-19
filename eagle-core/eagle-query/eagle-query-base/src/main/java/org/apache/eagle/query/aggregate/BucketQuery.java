@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.query.aggregate;
 
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 public class BucketQuery {
 	public final static String UNASSIGNED_BUCKET = "unassigned"; 
@@ -52,10 +52,7 @@ public class BucketQuery {
 			if(i == bucketCount-1){
 				break;
 			}
-				
-			if(current.get(bucketFieldValue) == null){
-				current.put(bucketFieldValue, new HashMap<String, Object>());
-			}
+			current.putIfAbsent(bucketFieldValue, new HashMap<String, Object>());
 			// for the last level of bucket, it is not Map, instead it is List<TaggedLogAPIEntity> 
 			current = (Map<String, Object>)current.get(bucketFieldValue);
 		}

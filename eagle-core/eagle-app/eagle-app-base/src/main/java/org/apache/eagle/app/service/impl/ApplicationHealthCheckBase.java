@@ -45,26 +45,26 @@ public abstract class ApplicationHealthCheckBase extends HealthCheck {
         return applicationEntity.getStatus();
     }
 
-    protected String printMessages(String ... messages) {
+    protected String printMessages(String... messages) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        for (int i = 0; i < messages.length; i++) {
-            pw.println(messages[i]);
+        for (String message : messages) {
+            pw.println(message);
         }
         return sw.getBuffer().toString();
     }
 
-    protected String formatMillSeconds(long millseconds) {
-        millseconds = millseconds / 1000;
+    protected String formatMillSeconds(long milliseconds) {
+        milliseconds = milliseconds / 1000;
         String result;
-        if (millseconds <= 60) {
-            result = millseconds + " seconds";
-        } else if (millseconds > 60 && millseconds <= 3600) {
-            result = String.format("%.2f minutes", millseconds * 1.0 / 60);
-        } else if (millseconds > 3600 && millseconds <= 3600 * 24) {
-            result = String.format("%.2f hours", millseconds * 1.0 / 3600);
+        if (milliseconds <= 60) {
+            result = milliseconds + " seconds";
+        } else if (milliseconds > 60 && milliseconds <= 3600) {
+            result = String.format("%.2f minutes", milliseconds * 1.0 / 60);
+        } else if (milliseconds > 3600 && milliseconds <= 3600 * 24) {
+            result = String.format("%.2f hours", milliseconds * 1.0 / 3600);
         } else {
-            result = String.format("%.2f days", millseconds * 1.0 / 3600 / 24);
+            result = String.format("%.2f days", milliseconds * 1.0 / 3600 / 24);
         }
 
         return result;

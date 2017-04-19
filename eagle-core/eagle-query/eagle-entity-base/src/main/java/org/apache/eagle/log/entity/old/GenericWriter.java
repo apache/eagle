@@ -16,12 +16,7 @@
  */
 package org.apache.eagle.log.entity.old;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import org.apache.eagle.common.EagleBase64Wrapper;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogObjectMapper;
 import org.apache.eagle.log.entity.HBaseLogWriter;
@@ -29,7 +24,11 @@ import org.apache.eagle.log.entity.InternalLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.eagle.common.EagleBase64Wrapper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class GenericWriter {
 	private static final Logger LOG = LoggerFactory.getLogger(GenericWriter.class);
@@ -45,49 +44,43 @@ public class GenericWriter {
 	}
 	
 	public List<String> write(List<? extends TaggedLogAPIEntity> entities) throws IOException{
-		HBaseLogWriter writer = new HBaseLogWriter(table, columnFamily);
 		List<String> rowkeys = new ArrayList<String>();
-		
-		try{
+
+		try (HBaseLogWriter writer = new HBaseLogWriter(table, columnFamily)) {
 			writer.open();
-			for(TaggedLogAPIEntity entity : entities){
+			for (TaggedLogAPIEntity entity : entities) {
 				InternalLog log = new InternalLog();
 				Map<String, String> inputTags = entity.getTags();
 				Map<String, String> tags = new TreeMap<String, String>();
-				for(Map.Entry<String, String> entry : inputTags.entrySet()){
+				for (Map.Entry<String, String> entry : inputTags.entrySet()) {
 					tags.put(entry.getKey(), entry.getValue());
 				}
 				log.setTags(tags);
 				log.setTimestamp(entity.getTimestamp());
 				log.setPrefix(entity.getPrefix());
 				log.setQualifierValues(mapper.createQualifierValues(entity));
-				byte[] rowkey  = writer.write(log);
+				byte[] rowkey = writer.write(log);
 				rowkeys.add(EagleBase64Wrapper.encodeByteArray2URLSafeString(rowkey));
 			}
-		}catch(IOException ioe){
+		} catch (IOException ioe) {
 			LOG.error("Fail writing tagged log", ioe);
 			throw ioe;
-		}finally{
-			writer.close();
-	 	}
+		}
 		return rowkeys;
 	}
 	
 	public void updateByRowkey(List<? extends TaggedLogAPIEntity> entities) throws IOException{
-		HBaseLogWriter writer = new HBaseLogWriter(table, columnFamily);
-		try{
+		try (HBaseLogWriter writer = new HBaseLogWriter(table, columnFamily)) {
 			writer.open();
-			for(TaggedLogAPIEntity entity : entities){
+			for (TaggedLogAPIEntity entity : entities) {
 				byte[] rowkey = EagleBase64Wrapper.decode(entity.getEncodedRowkey());
 				InternalLog log = new InternalLog();
 				log.setQualifierValues(mapper.createQualifierValues(entity));
 				writer.updateByRowkey(rowkey, log);
 			}
-		}catch(IOException ioe){
+		} catch (IOException ioe) {
 			LOG.error("Fail writing tagged log", ioe);
 			throw ioe;
-		}finally{
-			writer.close();
-	 	}
+		}
 	}
 }

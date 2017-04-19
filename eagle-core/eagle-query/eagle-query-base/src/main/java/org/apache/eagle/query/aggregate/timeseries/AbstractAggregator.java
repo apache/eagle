@@ -88,7 +88,7 @@ public abstract class AbstractAggregator implements Aggregator, EntityCreationLi
 		Boolean placement = _groupbyFieldPlacementCache[i];
 		String groupbyFieldValue = null; 
 		if(placement != null){
-			groupbyFieldValue = placement.booleanValue() ? createGroupFromTags(entity, groupbyField, i) : createGroupFromQualifiers(entity, groupbyField, i); 
+			groupbyFieldValue = placement ? createGroupFromTags(entity, groupbyField, i) : createGroupFromQualifiers(entity, groupbyField, i);
 		}else{
 			groupbyFieldValue = createGroupFromTags(entity, groupbyField, i);
 			if(groupbyFieldValue == null){
@@ -111,7 +111,7 @@ public abstract class AbstractAggregator implements Aggregator, EntityCreationLi
 		int functionIndex = 0;
 		for(AggregateFunctionType type : aggregateFunctionTypes){
 			if(type.name().equals(AggregateFunctionType.count.name())){
-				values.add(new Double(1));
+				values.add(1d);
 			}else{
 				// find value in qualifier by checking java bean
 				String aggregatedField = aggregatedFields.get(functionIndex);
@@ -161,32 +161,32 @@ public abstract class AbstractAggregator implements Aggregator, EntityCreationLi
 		if(obj instanceof Double)
 			return (Double)obj;
 		if(obj instanceof Integer){
-			return new Double(((Integer)obj).doubleValue());
+			return ((Integer) obj).doubleValue();
 		}
 		if(obj instanceof Long){
-			return new Double(((Long)obj).doubleValue());
+			return ((Long) obj).doubleValue();
 		}
 		// TODO hack to support string field for demo purpose, should be removed
 		if(obj == null){
-			return new Double(0.0);
+			return 0.0d;
 		}
 		if(obj instanceof String){
 			try{
 				return new Double((String)obj);
 			}catch(Exception ex){
 				LOG.warn("Datapoint ignored because it can not be converted to correct number for " + obj, ex);
-				return new Double(0.0);
+				return 0.0d;
 			}
 		}
 		if(obj instanceof double[]){
 			double[] value = (double[]) obj;
 			if(value.length > 0){
-				return new Double(value[0]);
+				return value[0];
 			}else{
-				return new Double(0.0);
+				return 0.0d;
 			}
 		}
-		
+
 		throw new IllegalAggregateFieldTypeException(obj.getClass().toString() + " type is not support. The aggregated field must be numeric type, int, long or double");
 	}
 }

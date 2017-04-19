@@ -45,10 +45,7 @@ public class AggreagteRecordMapper implements RecordMapper<Map> {
     public Map processRow(ResultSet resultSet, int rowOffset, CriteriaInterface<?> criteria) throws TorqueException {
         try {
             return JdbcEntitySerDeserHelper.readInternal(resultSet, this.jdbcEntityDefinition);
-        } catch (SQLException e) {
-            LOG.error("Failed to read result set",e);
-            throw new TorqueException(e);
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             LOG.error("Failed to read result set",e);
             throw new TorqueException(e);
         }

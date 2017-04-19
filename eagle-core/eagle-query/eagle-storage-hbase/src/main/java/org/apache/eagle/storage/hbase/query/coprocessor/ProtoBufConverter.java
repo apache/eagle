@@ -30,6 +30,7 @@ import org.apache.hadoop.io.Writable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The protocol adapter for <code>hbase-0.98</code> and <code>protobuffer-2.5</code>
@@ -122,9 +123,7 @@ public final class ProtoBufConverter {
 
     public static List<byte[]> fromPBByteArrayList(List<ByteString> aggregateFuncTypesList) {
         List<byte[]> bytesArrayList = new ArrayList<>(aggregateFuncTypesList.size());
-        for (ByteString byteString : aggregateFuncTypesList) {
-            bytesArrayList.add(byteString.toByteArray());
-        }
+        bytesArrayList.addAll(aggregateFuncTypesList.stream().map(ByteString::toByteArray).collect(Collectors.toList()));
         return bytesArrayList;
     }
 

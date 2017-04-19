@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.query.aggregate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public enum AggregateFunctionType{
 	count("^(count)$"),
@@ -68,18 +68,10 @@ public enum AggregateFunctionType{
 	}
 
 	public static List<byte[]> toBytesList(List<AggregateFunctionType> types){
-		List<byte[]> result = new ArrayList<byte[]>();
-		for(AggregateFunctionType type:types){
-			result.add(serialize(type));
-		}
-		return result;
+		return types.stream().map(AggregateFunctionType::serialize).collect(Collectors.toList());
 	}
 
 	public static List<AggregateFunctionType> fromBytesList(List<byte[]> types){
-		List<AggregateFunctionType> result = new ArrayList<AggregateFunctionType>();
-		for(byte[] bs:types){
-			result.add(deserialize(bs));
-		}
-		return result;
+		return types.stream().map(AggregateFunctionType::deserialize).collect(Collectors.toList());
 	}
 }

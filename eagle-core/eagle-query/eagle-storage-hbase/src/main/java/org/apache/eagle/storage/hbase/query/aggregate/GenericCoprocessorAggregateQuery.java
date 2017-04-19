@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.storage.hbase.query.aggregate;
 
-import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.HBaseInternalLogHelper;
 import org.apache.eagle.log.entity.SearchCondition;
@@ -36,7 +35,6 @@ import org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator;
 import org.apache.eagle.query.aggregate.timeseries.TimeSeriesPostFlatAggregateSort;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResult;
 import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateResultCallbackImpl;
-
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.slf4j.Logger;
@@ -172,10 +170,9 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
         }
         // Generate the output qualifiers
         final byte[][] outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, searchCondition.getOutputFields());
-        GenericAggregateReader reader = new GenericAggregateReader(entityDef,
+        try (GenericAggregateReader reader = new GenericAggregateReader(entityDef,
             searchCondition.getPartitionValues(),
-            start, end, searchCondition.getFilter(), searchCondition.getStartRowkey(), outputQualifiers, this.prefix, this.aggregateCondition);
-        try {
+            start, end, searchCondition.getFilter(), searchCondition.getStartRowkey(), outputQualifiers, this.prefix, this.aggregateCondition)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("open and read group aggregate reader");
             }
@@ -197,7 +194,6 @@ public class GenericCoprocessorAggregateQuery implements GenericQuery {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Release HBase connection");
             }
-            reader.close();
         }
     }
     

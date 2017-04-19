@@ -37,9 +37,7 @@ public class UpdateStatement implements Statement<ModifyResult<String>> {
         this.entities = entities;
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
-        } catch (InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
     }

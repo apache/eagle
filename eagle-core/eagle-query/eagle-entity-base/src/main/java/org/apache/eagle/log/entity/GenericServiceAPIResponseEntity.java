@@ -86,11 +86,9 @@ public class GenericServiceAPIResponseEntity<T>{
      */
     @SuppressWarnings("unused")
     public void setTypeByObj(){
-        for(T t:this.obj){
-            if(this.type == null && t!=null){
-                this.type = (Class<T>) t.getClass();
-            }
-        }
+        this.obj.stream().filter(t -> this.type == null && t != null).forEach(t ->
+            this.type = (Class<T>) t.getClass()
+        );
     }
 
     /**

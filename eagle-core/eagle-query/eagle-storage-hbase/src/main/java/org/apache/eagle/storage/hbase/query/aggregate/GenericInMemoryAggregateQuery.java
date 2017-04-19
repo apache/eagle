@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.storage.hbase.query.aggregate;
 
-import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.*;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;

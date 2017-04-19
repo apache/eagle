@@ -94,9 +94,7 @@ public class WritableList<E extends Writable> extends ArrayList<E> implements Wr
 				E item = itemTypeClass.newInstance();
 				item.readFields(in);
 				this.add(item);
-			} catch (InstantiationException e) {
-				throw new IOException("Got exception to create instance for class: "+itemTypeClass+": "+e.getMessage(),e);
-			} catch (IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException e) {
 				throw new IOException("Got exception to create instance for class: "+itemTypeClass+": "+e.getMessage(),e);
 			}
 		}

@@ -20,7 +20,6 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.storage.DataStorage;
-import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.result.ModifyResult;
 
 import java.io.IOException;
@@ -39,9 +38,7 @@ public class DeleteStatement implements Statement<ModifyResult<String>> {
     public DeleteStatement(String serviceName){
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
-        } catch (InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -49,9 +46,7 @@ public class DeleteStatement implements Statement<ModifyResult<String>> {
     public DeleteStatement(Class<? extends TaggedLogAPIEntity> entityClass){
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(entityClass);
-        } catch (InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -88,9 +83,7 @@ public class DeleteStatement implements Statement<ModifyResult<String>> {
             }else{
                 throw new IllegalStateException("bad delete statement, not given enough parameters");
             }
-        } catch (QueryCompileException e) {
-            throw new IOException(e);
-        }catch (Exception ex){
+        } catch (Exception ex){
             throw new IOException(ex);
         }
         return result;

@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * <h1>Expression Evaluation</h1>
@@ -146,10 +147,9 @@ public class ExpressionParser{
 	public List<String> getDependentFields() {
 		if (dependentFields == null) {
 			dependentFields = new ArrayList<String>();
-			for (String variable : scope.getNames()) {
-				if (!variable.equals("pi") && !variable.equals("E") && !variable.equals("euler"))
-					dependentFields.add(variable);
-			}
+			dependentFields.addAll(scope.getNames().stream().filter(variable ->
+				!variable.equals("pi") && !variable.equals("E") && !variable.equals("euler")
+			).collect(Collectors.toList()));
 		}
 		return dependentFields; 
 	}
