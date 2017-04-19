@@ -240,7 +240,7 @@ public class JobHistorySpout extends BaseRichSpout {
             return;
         }
 
-        LOG.info("update process time stamp {}", minTimeStamp);
+        LOG.info("updating the latest updated process time {}", minTimeStamp);
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
                 put("site", jobHistoryEndpointConfig.site);
@@ -266,7 +266,7 @@ public class JobHistorySpout extends BaseRichSpout {
         int tried = 0;
         while (tried <= MAX_RETRY_TIMES) {
             try {
-                LOG.info("start flushing JobProcessTimeStampEntity entities of total number " + entities.size());
+                LOG.info("start flushing {} JobProcessTimeStampEntity entities", entities.size());
                 client.create(entities);
                 LOG.info("finish flushing entities of total number " + entities.size());
                 break;
