@@ -60,7 +60,7 @@ public class StreamPartitionDigestSerializer implements Serializer<StreamPartiti
         dataInput.readFully(checksum);
         StreamPartition partition = checkSumPartitionMap.get(new DigestBytes(checksum));
         if (partition == null) {
-            throw new IOException("Illegal partition checksum: " + checksum);
+            throw new IOException("Illegal partition checksum: " + Arrays.toString(checksum));
         }
         return partition;
     }

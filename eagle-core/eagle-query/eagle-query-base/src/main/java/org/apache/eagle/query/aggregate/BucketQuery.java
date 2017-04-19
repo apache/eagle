@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 public class BucketQuery {
-	public final static String UNASSIGNED_BUCKET = "unassigned"; 
+	public final static String UNASSIGNED_BUCKET = "unassigned";
 	private List<String> bucketFields;
 	private int limit;
 	private Map<String, Object> root = new HashMap<String, Object>();
-	
+
 	public BucketQuery(List<String> bucketFields, int limit){
 		this.bucketFields = bucketFields;
 		this.limit = limit;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void put(TaggedLogAPIEntity entity){
 		Map<String, Object> current = root;
@@ -53,7 +53,7 @@ public class BucketQuery {
 				break;
 			}
 			current.putIfAbsent(bucketFieldValue, new HashMap<String, Object>());
-			// for the last level of bucket, it is not Map, instead it is List<TaggedLogAPIEntity> 
+			// for the last level of bucket, it is not Map, instead it is List<TaggedLogAPIEntity>
 			current = (Map<String, Object>)current.get(bucketFieldValue);
 		}
 		List<TaggedLogAPIEntity> bucketContent = (List<TaggedLogAPIEntity>)current.get(bucketFieldValue);
@@ -61,20 +61,16 @@ public class BucketQuery {
 			bucketContent = new ArrayList<TaggedLogAPIEntity>();
 			current.put(bucketFieldValue, bucketContent);
 		}
-		
-		if(bucketContent.size() >= limit){
-			return;
-		}else{
+
+		if(bucketContent.size() < limit){
 			bucketContent.add(entity);
 		}
 	}
-	
+
 	public void batchPut(List<TaggedLogAPIEntity> entities){
-		for(TaggedLogAPIEntity entity : entities){
-			put(entity);
-		}
+		entities.forEach(this::put);
 	}
-	
+
 	public Map<String, Object> get(){
 		return root;
 	}

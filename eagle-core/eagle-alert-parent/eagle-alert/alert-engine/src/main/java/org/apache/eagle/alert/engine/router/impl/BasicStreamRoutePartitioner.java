@@ -16,17 +16,17 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.router.StreamRoute;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     private final List<String> outputComponentIds;
@@ -60,15 +60,16 @@ public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     protected List<StreamRoute> routeByShuffle(StreamEvent event) {
         long random = System.currentTimeMillis();
         int hash = Math.abs((int) random);
-        return Arrays.asList(new StreamRoute(outputComponentIds.get(hash % outputComponentIds.size()), -1, StreamPartition.Type.SHUFFLE));
+        return Collections.singletonList(new StreamRoute(
+            outputComponentIds.get(hash % outputComponentIds.size()), -1, StreamPartition.Type.SHUFFLE));
     }
 
     protected List<StreamRoute> routeToAll(StreamEvent event) {
         if (globalRoutingKeys != null) {
             globalRoutingKeys = new ArrayList<>();
-            for (String targetId : outputComponentIds) {
-                globalRoutingKeys.add(new StreamRoute(targetId, -1, StreamPartition.Type.GLOBAL));
-            }
+            globalRoutingKeys.addAll(outputComponentIds.stream().map(targetId ->
+                new StreamRoute(targetId, -1, StreamPartition.Type.GLOBAL)
+            ).collect(Collectors.toList()));
         }
         return globalRoutingKeys;
     }

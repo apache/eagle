@@ -27,6 +27,7 @@ import org.wso2.siddhi.core.query.selector.attribute.aggregator.AttributeAggrega
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -59,9 +60,7 @@ public class AttributeCollectAggregator extends AttributeAggregator {
     public void restoreState(Object[] arg0) {
         value = new LinkedList<Object>();
         if (arg0 != null) {
-            for (Object o : arg0) {
-                value.add(o);
-            }
+            Collections.addAll(value, arg0);
         }
     }
 

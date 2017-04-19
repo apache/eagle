@@ -22,7 +22,7 @@ import backtype.storm.grouping.CustomStreamGrouping;
 import backtype.storm.task.WorkerTopologyContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CustomPartitionGrouping implements CustomStreamGrouping {
@@ -43,6 +43,6 @@ public class CustomPartitionGrouping implements CustomStreamGrouping {
     public List<Integer> chooseTasks(int taskId, List<Object> values) {
         int numTasks = targetTasks.size();
         int targetTaskIndex = strategy.balance((String) values.get(0), numTasks);
-        return Arrays.asList(targetTasks.get(targetTaskIndex));
+        return Collections.singletonList(targetTasks.get(targetTaskIndex));
     }
 }

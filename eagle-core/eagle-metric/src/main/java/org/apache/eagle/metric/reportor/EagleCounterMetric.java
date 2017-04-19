@@ -22,7 +22,7 @@ package org.apache.eagle.metric.reportor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 public class EagleCounterMetric extends EagleMetric {
 
@@ -44,15 +44,12 @@ public class EagleCounterMetric extends EagleMetric {
         for (EagleMetricListener listener : metricListeners) {
             EagleCounterMetric newEagleMetric = new EagleCounterMetric(this);
             newEagleMetric.name = MetricKeyCodeDecoder.addTimestampToMetricKey(trim(latestUserTimeClock), newEagleMetric.name);
-            listener.onMetricFlushed(Arrays.asList((EagleMetric) newEagleMetric));
+            listener.onMetricFlushed(Collections.singletonList(newEagleMetric));
         }
     }
 
     public boolean checkIfNeedFlush(long currentUserTimeClock) {
-        if (currentUserTimeClock - latestUserTimeClock > granularity) {
-            return true;
-        }
-        return false;
+        return currentUserTimeClock - latestUserTimeClock > granularity;
     }
 
     public boolean update(double d, long currentUserTimeClock) {
