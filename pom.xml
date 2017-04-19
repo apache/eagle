@@ -1323,7 +1323,6 @@
                                 <!-- Java Object serial file -->
                                 <exclude>**/test/resources/appinfobyteint</exclude>
                                 <exclude>**/test/resources/appinfobytelong</exclude>
-                                <exclude>*.sdl</exclude>
                             </excludes>
                         </configuration>
                     </execution>
