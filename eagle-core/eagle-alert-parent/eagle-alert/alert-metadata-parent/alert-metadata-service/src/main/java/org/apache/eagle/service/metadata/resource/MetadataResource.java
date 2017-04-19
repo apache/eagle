@@ -105,11 +105,7 @@ public class MetadataResource {
     @Path("/clusters/batch")
     @POST
     public List<OpResult> addClusters(List<StreamingCluster> clusters) {
-        List<OpResult> results = new LinkedList<>();
-        for (StreamingCluster cluster : clusters) {
-            results.add(dao.addCluster(cluster));
-        }
-        return results;
+        return clusters.stream().map(dao::addCluster).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/clusters/{clusterId}")
@@ -121,11 +117,7 @@ public class MetadataResource {
     @Path("/clusters")
     @DELETE
     public List<OpResult> removeClusters(List<String> clusterIds) {
-        List<OpResult> results = new LinkedList<>();
-        for (String cluster : clusterIds) {
-            results.add(dao.removeCluster(cluster));
-        }
-        return results;
+        return clusterIds.stream().map(dao::removeCluster).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/streams")
@@ -149,32 +141,28 @@ public class MetadataResource {
     @Path("/streams/create")
     @POST
     public OpResult createStream(StreamDefinitionWrapper stream) {
-        Preconditions.checkNotNull(stream.getStreamDefinition(),"Stream definition is null");
-        Preconditions.checkNotNull(stream.getStreamSource(),"Stream source is null");
+        Preconditions.checkNotNull(stream.getStreamDefinition(), "Stream definition is null");
+        Preconditions.checkNotNull(stream.getStreamSource(), "Stream source is null");
         stream.validateAndEnsureDefault();
         OpResult createStreamResult = dao.createStream(stream.getStreamDefinition());
         OpResult createDataSourceResult = dao.addDataSource(stream.getStreamSource());
         // TODO: Check kafka topic exist or not.
         if (createStreamResult.code == OpResult.SUCCESS
-                && createDataSourceResult.code == OpResult.SUCCESS) {
+            && createDataSourceResult.code == OpResult.SUCCESS) {
             return OpResult.success("Successfully create stream "
-                    + stream.getStreamDefinition().getStreamId()
-                    + ", and datasource "
-                    + stream.getStreamSource().getName());
+                + stream.getStreamDefinition().getStreamId()
+                + ", and datasource "
+                + stream.getStreamSource().getName());
         } else {
             return OpResult.fail("Error: "
-                    + StringUtils.join(new String[]{createDataSourceResult.message, createDataSourceResult.message},","));
+                + StringUtils.join(new String[] {createDataSourceResult.message, createDataSourceResult.message}, ","));
         }
     }
 
     @Path("/streams/batch")
     @POST
     public List<OpResult> addStreams(List<StreamDefinition> streams) {
-        List<OpResult> results = new LinkedList<>();
-        for (StreamDefinition stream : streams) {
-            results.add(dao.createStream(stream));
-        }
-        return results;
+        return streams.stream().map(dao::createStream).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/streams/{streamId}")
@@ -186,11 +174,7 @@ public class MetadataResource {
     @Path("/streams")
     @DELETE
     public List<OpResult> removeStreams(List<String> streamIds) {
-        List<OpResult> results = new LinkedList<>();
-        for (String streamId : streamIds) {
-            results.add(dao.removeStream(streamId));
-        }
-        return results;
+        return streamIds.stream().map(dao::removeStream).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/datasources")
@@ -208,11 +192,7 @@ public class MetadataResource {
     @Path("/datasources/batch")
     @POST
     public List<OpResult> addDataSources(List<Kafka2TupleMetadata> datasources) {
-        List<OpResult> results = new LinkedList<>();
-        for (Kafka2TupleMetadata ds : datasources) {
-            results.add(dao.addDataSource(ds));
-        }
-        return results;
+        return datasources.stream().map(dao::addDataSource).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/datasources/{datasourceId}")
@@ -224,11 +204,7 @@ public class MetadataResource {
     @Path("/datasources")
     @DELETE
     public List<OpResult> removeDataSources(List<String> datasourceIds) {
-        List<OpResult> results = new LinkedList<>();
-        for (String ds : datasourceIds) {
-            results.add(dao.removeDataSource(ds));
-        }
-        return results;
+        return datasourceIds.stream().map(dao::removeDataSource).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/policies")
@@ -271,11 +247,7 @@ public class MetadataResource {
     @Path("/policies/batch")
     @POST
     public List<OpResult> addPolicies(List<PolicyDefinition> policies) {
-        List<OpResult> results = new LinkedList<>();
-        for (PolicyDefinition policy : policies) {
-            results.add(dao.addPolicy(policy));
-        }
-        return results;
+        return policies.stream().map(dao::addPolicy).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/policies/{policyId}")
@@ -338,11 +310,7 @@ public class MetadataResource {
     @Path("/policies")
     @DELETE
     public List<OpResult> removePolicies(List<String> policies) {
-        List<OpResult> results = new LinkedList<>();
-        for (String policy : policies) {
-            results.add(dao.removePolicy(policy));
-        }
-        return results;
+        return policies.stream().map(dao::removePolicy).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/publishments")
@@ -360,11 +328,7 @@ public class MetadataResource {
     @Path("/publishments/batch")
     @POST
     public List<OpResult> addPublishments(List<Publishment> publishments) {
-        List<OpResult> results = new LinkedList<>();
-        for (Publishment publishment : publishments) {
-            results.add(dao.addPublishment(publishment));
-        }
-        return results;
+        return publishments.stream().map(dao::addPublishment).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/publishments/{name}")
@@ -376,11 +340,7 @@ public class MetadataResource {
     @Path("/publishments")
     @DELETE
     public List<OpResult> removePublishments(List<String> pubIds) {
-        List<OpResult> results = new LinkedList<>();
-        for (String pub : pubIds) {
-            results.add(dao.removePublishment(pub));
-        }
-        return results;
+        return pubIds.stream().map(dao::removePublishment).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/publishmentTypes")
@@ -400,11 +360,7 @@ public class MetadataResource {
     @POST
     @Deprecated
     public List<OpResult> addPublishmentTypes(List<PublishmentType> publishmentTypes) {
-        List<OpResult> results = new LinkedList<>();
-        for (PublishmentType pubType : publishmentTypes) {
-            results.add(dao.addPublishmentType(pubType));
-        }
-        return results;
+        return publishmentTypes.stream().map(dao::addPublishmentType).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/publishmentTypes/{name}")
@@ -418,11 +374,7 @@ public class MetadataResource {
     @DELETE
     @Deprecated
     public List<OpResult> removePublishmentTypes(List<String> pubTypes) {
-        List<OpResult> results = new LinkedList<>();
-        for (String pubType : pubTypes) {
-            results.add(dao.removePublishmentType(pubType));
-        }
-        return results;
+        return pubTypes.stream().map(dao::removePublishmentType).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/schedulestates/{versionId}")
@@ -445,13 +397,13 @@ public class MetadataResource {
 
     @Path("/assignments")
     @GET
-    public List<PolicyAssignment> listAssignmenets() {
+    public List<PolicyAssignment> listAssignments() {
         return dao.listAssignments();
     }
 
     @Path("/assignments")
     @POST
-    public OpResult addAssignmenet(PolicyAssignment pa) {
+    public OpResult addAssignment(PolicyAssignment pa) {
         return dao.addAssignment(pa);
     }
 
@@ -470,11 +422,7 @@ public class MetadataResource {
     @Path("/topologies/batch")
     @POST
     public List<OpResult> addTopologies(List<Topology> topologies) {
-        List<OpResult> results = new LinkedList<>();
-        for (Topology t : topologies) {
-            results.add(dao.addTopology(t));
-        }
-        return results;
+        return topologies.stream().map(dao::addTopology).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/alerts")
@@ -486,11 +434,7 @@ public class MetadataResource {
     @Path("/alerts/batch")
     @POST
     public List<OpResult> addAlertPublishEvents(List<AlertPublishEvent> events) {
-        List<OpResult> results = new LinkedList<>();
-        for (AlertPublishEvent e : events) {
-            results.add(dao.addAlertPublishEvent(e));
-        }
-        return results;
+        return events.stream().map(dao::addAlertPublishEvent).collect(Collectors.toCollection(LinkedList::new));
     }
 
     @Path("/alerts")
@@ -514,12 +458,6 @@ public class MetadataResource {
     @Path("/topologies")
     @DELETE
     public List<OpResult> removeTopologies(List<String> topologies) {
-        List<OpResult> results = new LinkedList<>();
-        for (String t : topologies) {
-            results.add(dao.removeTopology(t));
-        }
-        return results;
+        return topologies.stream().map(dao::removeTopology).collect(Collectors.toCollection(LinkedList::new));
     }
-
-
 }

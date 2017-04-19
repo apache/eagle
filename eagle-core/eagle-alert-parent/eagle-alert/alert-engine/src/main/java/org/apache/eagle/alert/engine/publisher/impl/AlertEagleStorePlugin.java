@@ -24,17 +24,15 @@ import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPluginProvider;
-import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AlertEagleStorePlugin extends AbstractPublishPlugin implements AlertPublishPluginProvider {
 
@@ -62,10 +60,9 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin implements Aler
         if (eventList == null || eventList.isEmpty()) {
             return;
         }
-        List<AlertPublishEvent> alertEvents = new ArrayList<>();
-        for (AlertStreamEvent e : eventList) {
-            alertEvents.add(AlertPublishEvent.createAlertPublishEvent(e));
-        }
+        List<AlertPublishEvent> alertEvents = eventList.stream().map(
+            AlertPublishEvent::createAlertPublishEvent
+        ).collect(Collectors.toList());
         client.addAlertPublishEvents(alertEvents);
     }
 

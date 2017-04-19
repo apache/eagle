@@ -102,15 +102,13 @@ public class KafkaProducerManager {
         // kafka config will overwrite the config defined in publishment properties
         if (publishConfig.containsKey(KEY_KAFKA_PROPERTIES)) {
             Map<String, Object> kafkaProperties = getKafkaProperties(publishConfig.get(KEY_KAFKA_PROPERTIES));
-            kafkaProperties.forEach((k, v) -> configMap.put(k, v));
+            kafkaProperties.forEach(configMap::put);
         }
 
         if (LOG.isInfoEnabled()) {
             LOG.info(" given kafka config {}, create producer config map {}", publishConfig, configMap);
         }
-
-        KafkaProducer<String, Object> producer = new KafkaProducer<>(configMap);
-        return producer;
+        return new KafkaProducer<>(configMap);
     }
 
     public KafkaWriteMode getKafkaWriteMode(Map<String, Object> publishConfig) {

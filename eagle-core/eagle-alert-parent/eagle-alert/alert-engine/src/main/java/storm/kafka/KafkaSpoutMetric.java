@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Since 5/18/16.
@@ -60,10 +61,8 @@ public class KafkaSpoutMetric implements IMetric {
         for (Map.Entry<String, KafkaSpoutMetricContext> entry : metricContextMap.entrySet()) {
             // construct offset metric
             List<PartitionManager> pms = entry.getValue().coordinator.getMyManagedPartitions();
-            Set<Partition> latestPartitions = new HashSet();
-            for (PartitionManager pm : pms) {
-                latestPartitions.add(pm.getPartition());
-            }
+            Set<Partition> latestPartitions = pms.stream().map(PartitionManager::getPartition)
+                .collect(Collectors.toSet());
 
             KafkaUtils.KafkaOffsetMetric offsetMetric = offsetMetricMap.get(entry.getKey());
             offsetMetric.refreshPartitions(latestPartitions);

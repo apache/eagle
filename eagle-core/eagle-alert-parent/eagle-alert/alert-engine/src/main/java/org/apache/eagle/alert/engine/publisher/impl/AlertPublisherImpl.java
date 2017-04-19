@@ -17,14 +17,7 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.PublishPartition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -33,7 +26,9 @@ import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("rawtypes")
 public class AlertPublisherImpl implements AlertPublisher {
@@ -93,7 +88,7 @@ public class AlertPublisherImpl implements AlertPublisher {
 
     @Override
     public void close() {
-        publishPluginMapping.values().forEach(plugin -> plugin.close());
+        publishPluginMapping.values().forEach(AlertPublishPlugin::close);
     }
 
     @Override
@@ -187,9 +182,9 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
         Set<PublishPartition> publishPartitions = new HashSet<>();
         for (String streamId : streamIds) {
-            for (String policyId : publish.getPolicyIds()) {
-                publishPartitions.add(new PublishPartition(streamId, policyId, publish.getName(), publish.getPartitionColumns()));
-            }
+            publishPartitions.addAll(publish.getPolicyIds().stream().map(policyId ->
+                new PublishPartition(streamId, policyId, publish.getName(), publish.getPartitionColumns())
+            ).collect(Collectors.toList()));
         }
         return publishPartitions;
     }
@@ -199,7 +194,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             try {
                 p.close();
             } catch (Exception e) {
-                LOG.error(String.format("Error when close publish plugin {}!", p.getClass().getCanonicalName()), e);
+                LOG.error(String.format("Error when close publish plugin %s!", p.getClass().getCanonicalName()), e);
             }
         }
     }

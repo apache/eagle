@@ -93,7 +93,7 @@ public class KafkaSpoutProvider implements StormSpoutProvider {
         // transaction zkServers to store kafka consumer offset. Default to use storm zookeeper
         if (context.hasPath("txZkServers")) {
             String[] txZkServers = context.getString("txZkServers").split(",");
-            spoutConfig.zkServers = Arrays.asList(txZkServers).stream().map(server -> server.split(":")[0]).collect(Collectors.toList());
+            spoutConfig.zkServers = Arrays.stream(txZkServers).map(server -> server.split(":")[0]).collect(Collectors.toList());
             spoutConfig.zkPort = Integer.parseInt(txZkServers[0].split(":")[1]);
             LOG.info("txZkServers:" + spoutConfig.zkServers + ", zkPort:" + spoutConfig.zkPort);
         }

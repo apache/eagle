@@ -106,9 +106,7 @@ abstract class BaseAuditListenerMap <L extends EventListener> {
 
         L[] listeners = this.map.get(null);
         if (listeners != null) {
-            for (L listener : listeners) {
-                list.add(listener);
-            }
+            Collections.addAll(list, listeners);
         }
         for (Entry<String, L[]> entry : this.map.entrySet()) {
             String name = entry.getKey();
