@@ -31,8 +31,6 @@ get-server-state() {
 }
 
 SERF_RPC_ADDR=${EAGLE_SERVER_HOST}:7373
-serf event --rpc-addr=$SERF_RPC_ADDR start-services
-sleep 30
 serf event --rpc-addr=$SERF_RPC_ADDR eagle
 
 debug waiting for eagle to start on: $EAGLE_HOST

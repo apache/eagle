@@ -16,7 +16,6 @@
 # limitations under the License.
 
 
-#export PATH=/usr/jdk64/jdk1.7.0_67/bin:$PATH
 export AMBARI_HOST=$EAGLE_SERVER_HOST
 
 echo "installing hadoop cluster via ambari..."
