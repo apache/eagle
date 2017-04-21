@@ -145,7 +145,7 @@
                                 <td class="content-block"
                                     style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
                                     valign="top">
-                                    <small>CATEGORY:</small> <strong style="color: $alertColor">#if($alert["alertCategory"]) $alert["alertCategory"] #else N/A #end</strong> <small>EVENT TIME:</small> <strong>$alert["alertTime"]</strong>
+                                    <small>CATEGORY:</small> <strong style="color: $alertColor">#if($alert["alertCategory"]) $alert["alertCategory"] #else N/A #end</strong> <small>CREATE TIME:</small> <strong>$alert["alertTime"]</strong>
                                 </td>
                             </tr>
                                 <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
