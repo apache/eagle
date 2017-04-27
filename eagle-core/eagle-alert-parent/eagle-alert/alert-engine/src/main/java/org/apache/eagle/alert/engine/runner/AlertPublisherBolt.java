@@ -93,6 +93,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             if (deduplicatorMap != null && deduplicatorMap.containsKey(event.getPolicyId())) {
                 List<AlertStreamEvent> eventList = deduplicatorMap.get(event.getPolicyId()).dedup(event);
                 if (eventList == null || eventList.isEmpty()) {
+                    collector.ack(input);
                     return;
                 }
             }
