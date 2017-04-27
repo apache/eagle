@@ -172,6 +172,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
                 wrapper.nextTuple();
             } catch (Exception e) {
                 LOG.error("unexpected exception is caught: {}", e.getMessage(), e);
+                collector.reportError(e);
             }
 
         }
@@ -256,9 +257,14 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
                 LOG.warn(MessageFormat.format("try to create new topic {0}, but found in the active spout list, this may indicate some inconsistency", topic));
                 continue;
             }
-            KafkaSpoutWrapper newWrapper = createKafkaSpout(ConfigFactory.parseMap(dataSourceProperties.get(topic)).withFallback(this.config),
-                    conf, context, collector, topic, newSchemaName.get(topic), newMeta, sds);
-            newKafkaSpoutList.put(topic, newWrapper);
+            try {
+                KafkaSpoutWrapper newWrapper = createKafkaSpout(ConfigFactory.parseMap(dataSourceProperties.get(topic)).withFallback(this.config),
+                        conf, context, collector, topic, newSchemaName.get(topic), newMeta, sds);
+                newKafkaSpoutList.put(topic, newWrapper);
+            } catch (Exception e) {
+                LOG.error("fail to create KafkaSpoutWrapper for topic {} due to {}", topic, e.getMessage(), e);
+                collector.reportError(e);
+            }
         }
         // iterate remove topics and then close KafkaSpout
         for (String topic : removeTopics) {
