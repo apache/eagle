@@ -291,6 +291,8 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         this.cachedSpoutSpec = newMeta;
         this.kafkaSpoutList = newKafkaSpoutList;
         this.sds = sds;
+
+        LOG.info("after CorrelationSpout reloads, {} kafkaSpouts are generated for {} topics", kafkaSpoutList.size(), topics.size());
     }
 
     /**
