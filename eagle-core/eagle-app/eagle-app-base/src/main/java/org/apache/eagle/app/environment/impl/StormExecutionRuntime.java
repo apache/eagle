@@ -121,7 +121,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
 
         if (config.hasPath(APP_STORM_CONF_PATH_DEFAULT)) {
             com.typesafe.config.Config appStormConf = config.getConfig(APP_STORM_CONF_PATH_DEFAULT);
-            for(Map.Entry<String, ConfigValue> entry: appStormConf.entrySet()) {
+            for (Map.Entry<String, ConfigValue> entry: appStormConf.entrySet()) {
                 if (NumberUtils.isNumber(entry.getValue().unwrapped().toString())) {
                     conf.put(entry.getKey(), appStormConf.getNumber(entry.getKey()));
                 } else {
