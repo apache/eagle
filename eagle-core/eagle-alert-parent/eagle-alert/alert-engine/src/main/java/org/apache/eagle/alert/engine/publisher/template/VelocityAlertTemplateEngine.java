@@ -151,9 +151,13 @@ public class VelocityAlertTemplateEngine implements AlertTemplateEngine {
         context.put(AlertContextFields.ALERT_ID, event.getAlertId());
         context.put(AlertContextFields.CREATED_BY, event.getCreatedBy());
         context.put(AlertContextFields.CREATED_TIMESTAMP, event.getCreatedTime());
-        context.put(AlertContextFields.CREATED_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()));
+        context.put(AlertContextFields.CREATED_TIME,  String.format("%s %s",
+                DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getCreatedTime()),
+                DateTimeUtil.CURRENT_TIME_ZONE.getID()));
         context.put(AlertContextFields.ALERT_TIMESTAMP, event.getTimestamp());
-        context.put(AlertContextFields.ALERT_TIME, DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getTimestamp()));
+        context.put(AlertContextFields.ALERT_TIME,  String.format("%s %s",
+                DateTimeUtil.millisecondsToHumanDateWithSeconds(event.getTimestamp()),
+                DateTimeUtil.CURRENT_TIME_ZONE.getID()));
         context.put(AlertContextFields.ALERT_SCHEMA, event.getSchema());
         context.put(AlertContextFields.ALERT_EVENT, event);
 

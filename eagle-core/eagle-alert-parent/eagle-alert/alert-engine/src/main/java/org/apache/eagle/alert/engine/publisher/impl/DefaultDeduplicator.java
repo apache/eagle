@@ -20,6 +20,7 @@ package org.apache.eagle.alert.engine.publisher.impl;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.alert.engine.coordinator.AlertDeduplication;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
@@ -59,6 +60,13 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         this.dedupIntervalSec = intervalMin;
     }
 
+    public DefaultDeduplicator(AlertDeduplication alertDeduplication) {
+        this.customDedupFields = alertDeduplication.getDedupFields();
+        this.dedupIntervalSec = Integer.parseInt(alertDeduplication.getDedupIntervalMin()) * 60;
+        this.withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
+                this.dedupIntervalSec, TimeUnit.SECONDS).build();
+    }
+
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
                                String dedupStateField, String dedupStateCloseValue, DedupCache dedupCache) {
         setDedupIntervalMin(intervalMin);
@@ -81,7 +89,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
      * @param key
      * @return
      */
-    public List<AlertStreamEvent> checkDedup(AlertStreamEvent event, EventUniq key, String stateFiledValue) {
+    private List<AlertStreamEvent> checkDedup(AlertStreamEvent event, EventUniq key, String stateFiledValue) {
         if (StringUtils.isBlank(stateFiledValue)) {
             // without state field, we cannot determine whether it is duplicated
             // without custom filed values, we cannot determine whether it is duplicated

@@ -164,10 +164,3 @@ CREATE TABLE IF NOT EXISTS analysis_email (
   modifiedtime  bigint(20) DEFAULT NULL,
   UNIQUE (siteId, userId)
 );
-
-INSERT INTO publishment_type(id, content) VALUES
-('Kafka', '{"name":"Kafka","type":"org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher","description":null,"fields":[{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]}'),
-('Email', '{"name":"Email","type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher","description":null,"fields":[{"name":"subject"},{"name":"sender"}, {"name":"recipients"}]}'),
-('Slack', '{"name":"Slack","type":"org.apache.eagle.alert.engine.publisher.impl.AlertSlackPublisher","description":null,"fields":[{"name":"token"},{"name":"channels"}, {"name":"severitys"}, {"name":"urltemplate"}]}'),
-('HBaseStorage', '{"name":"HBaseStorage","type":"org.apache.eagle.alert.app.AlertEagleStorePlugin","description":null,"fields":[]}'),
-('JDBCStorage', '{"name":"JDBCStorage","type":"org.apache.eagle.alert.engine.publisher.impl.AlertEagleStorePlugin","description":null,"fields":[]}');

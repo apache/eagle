@@ -43,7 +43,10 @@ public class AlertPublisherImpl implements AlertPublisher {
 
     private final String name;
 
-    private volatile Map<PublishPartition, AlertPublishPlugin> publishPluginMapping = new ConcurrentHashMap<>(1);
+    // <publishId, PublishPlugin>
+    private volatile Map<String, AlertPublishPlugin> publishPluginMapping = new ConcurrentHashMap<>(1);
+    //private volatile Map<PublishPartition, AlertPublishPlugin> publishPluginMapping = new ConcurrentHashMap<>(1);
+
     private Config config;
     private Map conf;
 
@@ -73,11 +76,11 @@ public class AlertPublisherImpl implements AlertPublisher {
     private void notifyAlert(PublishPartition partition, AlertStreamEvent event) {
         // remove the column values for publish plugin match
         partition.getColumnValues().clear();
-        if (!publishPluginMapping.containsKey(partition)) {
+        if (!publishPluginMapping.containsKey(partition.getPublishId())) {
             LOG.warn("PublishPartition {} is not found in publish plugin map", partition);
             return;
         }
-        AlertPublishPlugin plugin = publishPluginMapping.get(partition);
+        AlertPublishPlugin plugin = publishPluginMapping.get(partition.getPublishId());
         if (plugin == null) {
             LOG.warn("PublishPartition {} has problems while initializing publish plugin", partition);
             return;
@@ -120,7 +123,7 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
 
         // copy and swap to avoid concurrency issue
-        Map<PublishPartition, AlertPublishPlugin> newPublishMap = new HashMap<>(publishPluginMapping);
+        Map<String, AlertPublishPlugin> newPublishMap = new HashMap<>(publishPluginMapping);
 
         // added
         for (Publishment publishment : added) {
@@ -128,9 +131,7 @@ public class AlertPublisherImpl implements AlertPublisher {
 
             AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
             if (plugin != null) {
-                for (PublishPartition p : getPublishPartitions(publishment)) {
-                    newPublishMap.put(p, plugin);
-                }
+                newPublishMap.put(publishment.getName(), plugin);
             } else {
                 LOG.error("OnPublishChange alertPublisher {} failed due to invalid format", publishment);
             }
@@ -138,16 +139,9 @@ public class AlertPublisherImpl implements AlertPublisher {
         //removed
         List<AlertPublishPlugin> toBeClosed = new ArrayList<>();
         for (Publishment publishment : removed) {
-            AlertPublishPlugin plugin = null;
-            for (PublishPartition p : getPublishPartitions(publishment)) {
-                if (plugin == null) {
-                    plugin = newPublishMap.remove(p);
-                } else {
-                    newPublishMap.remove(p);
-                }
-            }
-            if (plugin != null) {
-                toBeClosed.add(plugin);
+            AlertPublishPlugin publishPlugin = newPublishMap.remove(publishment.getName());
+            if (publishPlugin != null) {
+                toBeClosed.add(publishPlugin);
             }
         }
         // updated
@@ -155,16 +149,11 @@ public class AlertPublisherImpl implements AlertPublisher {
             // for updated publishment, need to init them too
             AlertPublishPlugin newPlugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
             if (newPlugin != null) {
-                AlertPublishPlugin plugin = null;
-                for (PublishPartition p : getPublishPartitions(publishment)) {
-                    if (plugin == null) {
-                        plugin = newPublishMap.get(p);
-                    }
-                    newPublishMap.put(p, newPlugin);
+                AlertPublishPlugin oldPlugin = newPublishMap.get(publishment.getName());
+                if (oldPlugin != null) {
+                    toBeClosed.add(oldPlugin);
                 }
-                if (plugin != null) {
-                    toBeClosed.add(plugin);
-                }
+                newPublishMap.put(publishment.getName(), newPlugin);
             } else {
                 LOG.error("OnPublishChange alertPublisher {} failed due to invalid format", publishment);
             }
@@ -199,7 +188,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             try {
                 p.close();
             } catch (Exception e) {
-                LOG.error(String.format("Error when close publish plugin {}!", p.getClass().getCanonicalName()), e);
+                LOG.error("Error when close publish plugin {}!", p.getClass().getCanonicalName(), e);
             }
         }
     }

@@ -40,7 +40,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.eagle.alert.service.MetadataServiceClientImpl.*;
 import static org.apache.eagle.common.mail.AlertEmailConstants.*;
 
 public class AlertEmailPublisher extends AbstractPublishPlugin implements AlertPublishPluginProvider {
@@ -215,7 +214,6 @@ public class AlertEmailPublisher extends AbstractPublishPlugin implements AlertP
                 .name("Email")
                 .type(AlertEmailPublisher.class)
                 .description("Email alert publisher")
-                .field("subject")
                 .field("sender")
                 .field("recipients")
                 .build();
