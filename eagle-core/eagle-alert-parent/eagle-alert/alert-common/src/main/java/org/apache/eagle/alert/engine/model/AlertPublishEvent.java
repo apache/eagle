@@ -48,6 +48,7 @@ public class AlertPublishEvent {
     public static final String POLICY_VALUE_KEY = "policyValue";
     public static final String ALERT_CATEGORY = "category";
     public static final String ALERT_SEVERITY = "severity";
+    public static final String ALERT_HOST = "host";
 
     public String getAlertId() {
         return alertId;

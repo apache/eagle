@@ -83,6 +83,16 @@ public class AlertEagleStorePlugin extends AbstractPublishPlugin implements Aler
         tags.put(ALERT_ID_KEY, event.getAlertId());
         tags.put(ALERT_CATEGORY, event.getCategory());
         tags.put(ALERT_SEVERITY, event.getSeverity().toString());
+
+        String host = event.getDataMap().getOrDefault("host", "null").toString();
+        String hostname = event.getDataMap().getOrDefault("hostname", "null").toString();
+
+        if (host != "null") {
+            tags.put(ALERT_HOST, host);
+        } else {
+            tags.put(ALERT_HOST, hostname);
+        }
+
         if (event.getContext() != null && !event.getContext().isEmpty()) {
             tags.put(SITE_ID_KEY, event.getContext().get(SITE_ID_KEY).toString());
             alertEvent.setPolicyValue(event.getContext().get(POLICY_VALUE_KEY).toString());
