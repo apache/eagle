@@ -16,16 +16,16 @@
  */
 package org.apache.eagle.service.client;
 
-import org.apache.eagle.service.hbase.EmbeddedHbase;
+import org.apache.eagle.service.hbase.EmbeddedHBase;
 
 public class ClientTestBase {
 
 	//protected static EmbeddedServer server;
-	protected static EmbeddedHbase hbase;
+	protected static EmbeddedHBase hbase;
 
 	//@BeforeClass
 	public static void startup() throws Exception {
-		//hbase = EmbeddedHbase.getInstance();
+		//hbase = EmbeddedHBase.getInstance();
 		//String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
 		//server = EmbeddedServer.getInstance(webappDirLocation);
 	}

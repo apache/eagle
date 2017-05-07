@@ -65,8 +65,8 @@
 		METRIC.STATUS_DEAD = "dead";
 		METRIC.QUERY_HBASE_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}';
 		METRIC.QUERY_HBASE_METRICS_WITHTIME = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]{*}&pageSize=${limit}';
-		METRIC.QUERY_HBASE_INSTANCE_AGG = "${baseURL}/rest/entities?query=HbaseServiceInstance[${condition}]<${groups}>{${field}}&pageSize=${limit}";
+		METRIC.QUERY_HBASE_INSTANCE = '${baseURL}/rest/entities?query=HBaseServiceInstance[${condition}]{*}&pageSize=${limit}';
+		METRIC.QUERY_HBASE_INSTANCE_AGG = "${baseURL}/rest/entities?query=HBaseServiceInstance[${condition}]<${groups}>{${field}}&pageSize=${limit}";
 		METRIC.QUERY_HBASE_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		/**
 		 * Fetch query content with current site application configuration

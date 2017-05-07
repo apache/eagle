@@ -55,7 +55,7 @@ public class HBaseAuditLogApplication extends StormApplication {
         BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", bolt, numOfParserTasks);
         boltDeclarer.fieldsGrouping("ingest", new Fields(StringScheme.STRING_SCHEME_KEY));
 
-        HbaseResourceSensitivityDataJoinBolt joinBolt = new HbaseResourceSensitivityDataJoinBolt(config);
+        HBaseResourceSensitivityDataJoinBolt joinBolt = new HBaseResourceSensitivityDataJoinBolt(config);
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
 

@@ -1,0 +1,868 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{
+  "name": "EAGLE",
+  "label": "Eagle",
+  "description": "Analyze Big Data Platforms For Security and Performance",
+  "version": "0.5",
+  "icon": "images/icon.png",
+  "inExpressWizard": true,
+  "runAs": {
+    "user": "eagle",
+    "group": "eagle"
+  },
+  "rolesWithExternalLinks": [
+    "EAGLE_SERVER"
+  ],
+  "parameters": [
+    {
+      "name": "service_env",
+      "label": "service_env",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.env",
+      "required": "true",
+      "type": "string",
+      "default": "testing"
+    },
+    {
+      "name": "service_host",
+      "label": "service_host",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.host",
+      "required": "true",
+      "type": "string",
+      "default": "localhost"
+    },
+    {
+      "name": "service_port",
+      "label": "service_port",
+      "description": "See Eagle documentation for description of this parameter",
+      "required": "true",
+      "type": "port",
+      "default": "9090"
+    },
+    {
+      "name": "service_username",
+      "label": "service_username",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.username",
+      "required": "true",
+      "type": "string",
+      "default": "admin"
+    },
+    {
+      "name": "service_password",
+      "label": "service_password",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.password",
+      "required": "true",
+      "type": "string",
+      "default": "secret"
+    },
+    {
+      "name": "service_readTimeOutSeconds",
+      "label": "service_readTimeOutSeconds",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.readTimeOutSeconds",
+      "required": "true",
+      "type": "long",
+      "default": "60"
+    },
+    {
+      "name": "service_context",
+      "label": "service_context",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.context",
+      "required": "true",
+      "type": "string",
+      "default": "/rest"
+    },
+    {
+      "name": "service_timezone",
+      "label": "service_timezone",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "service.timezone",
+      "required": "true",
+      "type": "string",
+      "default": "UTC"
+    },
+    {
+      "name": "zookeeper_zkQuorum",
+      "label": "zookeeper_zkQuorum",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "zookeeper.zkQuorum",
+      "required": "true",
+      "type": "string",
+      "default": "localhost:2181"
+    },
+    {
+      "name": "zookeeper_zkSessionTimeoutMs",
+      "label": "zookeeper_zkSessionTimeoutMs",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "zookeeper.zkSessionTimeoutMs",
+      "required": "true",
+      "type": "long",
+      "default": "15000"
+    },
+    {
+      "name": "zookeeper_zkRetryTimes",
+      "label": "zookeeper_zkRetryTimes",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "zookeeper.zkRetryTimes",
+      "required": "true",
+      "type": "long",
+      "default": "3"
+    },
+    {
+      "name": "zookeeper_zkRetryInterval",
+      "label": "zookeeper_zkRetryInterval",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "zookeeper.zkRetryInterval",
+      "required": "true",
+      "type": "long",
+      "default": "20000"
+    },
+    {
+      "name": "storage_type",
+      "label": "storage_type",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.type",
+      "required": "true",
+      "type": "string",
+      "default": "hbase"
+    },
+    {
+      "name": "storage_hbase_autoCreateTable",
+      "label": "storage_hbase_autoCreateTable",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName" : "storage.hbase.autoCreateTable",
+      "required": "true",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
+      "name": "storage_hbase_zookeeperQuorum",
+      "label": "storage_hbase_zookeeperQuorum",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName" : "storage.hbase.zookeeperQuorum",
+      "required": "true",
+      "type": "string",
+      "default": "localhost"
+    },
+    {
+      "name": "storage_hbase_zookeeperPropertyClientPort",
+      "label": "storage_hbase_zookeeperPropertyClientPort",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName" : "storage.hbase.zookeeperPropertyClientPort",
+      "required": "true",
+      "type": "port",
+      "default": "2181"
+    },
+    {
+      "name": "storage_hbase_zookeeperZnodeParent",
+      "label": "storage_hbase_zookeeperZnodeParent",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName" : "storage.hbase.zookeeperZnodeParent",
+      "required": "true",
+      "type": "string",
+      "default": "/hbase-unsecure"
+    },
+    {
+      "name": "storage_hbase_tableNamePrefixedWithEnvironment",
+      "label": "storage_hbase_tableNamePrefixedWithEnvironment",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName" : "storage.hbase.tableNamePrefixedWithEnvironment",
+      "required": "true",
+      "type": "boolean",
+      "default": "false"
+    },
+    {
+      "name": "storage_hbase_coprocessorEnabled",
+      "label": "storage_hbase_coprocessorEnabled",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName" : "storage.hbase.coprocessorEnabled",
+      "required": "true",
+      "type": "boolean",
+      "default": "false"
+    },
+    {
+      "name": "storage_jdbc_adapter",
+      "label": "storage_jdbc_adapter",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.adapter",
+      "required": "true",
+      "type": "string",
+      "default": "mysql"
+    },
+    {
+      "name": "storage_jdbc_username",
+      "label": "storage_jdbc_username",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.username",
+      "required": "true",
+      "type": "string",
+      "default": "root"
+    },
+    {
+      "name": "storage_jdbc_password",
+      "label": "storage_jdbc_password",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.password",
+      "required": "true",
+      "type": "password",
+      "default": "root"
+    },
+    {
+      "name": "storage_jdbc_database",
+      "label": "storage_jdbc_database",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.database",
+      "required": "true",
+      "type": "string",
+      "default": "eagle"
+    },
+    {
+      "name": "storage_jdbc_connectionUrl",
+      "label": "storage_jdbc_connectionUrl",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.connectionUrl",
+      "required": "true",
+      "type": "string",
+      "default": "jdbc:mysql://localhost:3306/eagle"
+    },
+    {
+      "name": "storage_jdbc_connectionProps",
+      "label": "storage_jdbc_connectionProps",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.connectionProps",
+      "required": "true",
+      "type": "string",
+      "default": "encoding=UTF-8"
+    },
+    {
+      "name": "storage_jdbc_driverClass",
+      "label": "storage_jdbc_driverClass",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.driverClass",
+      "required": "true",
+      "type": "string",
+      "default": "com.mysql.jdbc.Driver"
+    },
+    {
+      "name": "storage_jdbc_connectionMax",
+      "label": "storage_jdbc_connectionMax",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "storage.jdbc.connectionMax",
+      "required": "true",
+      "type": "long",
+      "default": "8"
+    },
+    {
+      "name": "metadata_store",
+      "label": "metadata_store",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.store",
+      "required": "true",
+      "type": "string",
+      "default": "org.apache.eagle.metadata.service.memory.MemoryMetadataStore"
+    },
+    {
+      "name": "metadata_jdbc_connectionProperties",
+      "label": "metadata_jdbc_connectionProperties",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.jdbc.connectionProperties",
+      "required": "true",
+      "type": "string",
+      "default": "encoding=UTF8"
+    },
+    {
+      "name": "metadata_jdbc_username",
+      "label": "metadata_jdbc_username",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.jdbc.username",
+      "required": "true",
+      "type": "string",
+      "default": "root"
+    },
+    {
+      "name": "metadata_jdbc_password",
+      "label": "metadata_jdbc_password",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.jdbc.password",
+      "required": "true",
+      "type": "password",
+      "default": "root"
+    },
+    {
+      "name": "metadata_jdbc_connection",
+      "label": "metadata_jdbc_connection",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.jdbc.connection",
+      "required": "true",
+      "type": "string",
+      "default": "jdbc:mysql://localhost:3306/eagle"
+    },
+    {
+      "name": "metadata_jdbc_database",
+      "label": "metadata_jdbc_database",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.jdbc.database",
+      "required": "true",
+      "type": "string",
+      "default": "eagle"
+    },
+    {
+      "name": "metadata_jdbc_driverClassName",
+      "label": "metadata_jdbc_driverClassName",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "metadata.jdbc.driverClassName",
+      "required": "true",
+      "type": "string",
+      "default": "com.mysql.jdbc.Driver"
+    },
+    {
+      "name": "application_stream_provider",
+      "label": "application_stream_provider",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.stream.provider",
+      "required": "true",
+      "type": "string",
+      "default": "org.apache.eagle.app.messaging.KafkaStreamProvider"
+    },
+    {
+      "name": "application_storm_nimbusHost",
+      "label": "application_storm_nimbusHost",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.storm.nimbusHost",
+      "required": "true",
+      "type": "string",
+      "default": "server.eagle.apache.org"
+    },
+    {
+      "name": "application_storm_nimbusThriftPort",
+      "label": "application_storm_nimbusThriftPort",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.storm.nimbusThriftPort",
+      "required": "true",
+      "type": "long",
+      "default": "6627"
+    },
+    {
+      "name": "application_updateStatus_initialDelay",
+      "label": "application_updateStatus_initialDelay",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.updateStatus.initialDelay",
+      "required": "true",
+      "type": "long",
+      "default": "10"
+    },
+    {
+      "name": "application_updateStatus_period",
+      "label": "application_updateStatus_period",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.updateStatus.period",
+      "required": "true",
+      "type": "long",
+      "default": "10"
+    },
+    {
+      "name": "application_healthCheck_initialDelay",
+      "label": "application_healthCheck_initialDelay",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.initialDelay",
+      "required": "true",
+      "type": "long",
+      "default": "30"
+    },
+    {
+      "name": "application_healthCheck_publisher_publisherImpl",
+      "label": "application_healthCheck_publisher_publisherImpl",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.publisherImpl",
+      "required": "true",
+      "type": "string",
+      "default": "org.apache.eagle.app.service.impl.ApplicationHealthCheckEmailPublisher"
+    },
+    {
+      "name": "application_healthCheck_publisher_dailySendHour",
+      "label": "application_healthCheck_publisher_dailySendHour",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.dailySendHour",
+      "required": "true",
+      "type": "long",
+      "default": "11"
+    },
+    {
+      "name": "application_healthCheck_publisher_mail_smtp_host",
+      "label": "application_healthCheck_publisher_mail_smtp_host",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.mail.smtp.host",
+      "required": "true",
+      "type": "string",
+      "default": "mail.host.com"
+    },
+    {
+      "name": "application_healthCheck_publisher_mail_smtp_port",
+      "label": "application_healthCheck_publisher_mail_smtp_port",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.mail.smtp.port",
+      "required": "true",
+      "type": "long",
+      "default": "25"
+    },
+    {
+      "name": "application_healthCheck_publisher_mail_smtp_recipients",
+      "label": "application_healthCheck_publisher_mail_smtp_recipients",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.mail.smtp.recipients",
+      "required": "true",
+      "type": "string",
+      "default": "someone@email.com"
+    },
+    {
+      "name": "application_healthCheck_publisher_mail_smtp_subject",
+      "label": "application_healthCheck_publisher_mail_smtp_subject",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.mail.smtp.subject",
+      "required": "true",
+      "type": "string",
+      "default": "Eagle Application Health Check"
+    },
+    {
+      "name": "application_healthCheck_publisher_mail_smtp_template",
+      "label": "application_healthCheck_publisher_mail_smtp_template",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.healthCheck.publisher.mail.smtp.template",
+      "required": "true",
+      "type": "string",
+      "default": "HealthCheckTemplate.vm"
+    },
+    {
+      "name": "application_mailService_mailSmtpServer",
+      "label": "application_mailService_mailSmtpServer",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.mailService.mailSmtpServer",
+      "required": "true",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "application_mailService_mailSmtpPort",
+      "label": "application_mailService_mailSmtpPort",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.mailService.mailSmtpPort",
+      "required": "true",
+      "type": "long",
+      "default": "25"
+    },
+    {
+      "name": "application_mailService_mailSmtpAuth",
+      "label": "application_mailService_mailSmtpAuth",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.mailService.mailSmtpAuth",
+      "required": "true",
+      "type": "boolean",
+      "default": "false"
+    },
+    {
+      "name": "application_dailyJobReport_reportHourTime",
+      "label": "application_dailyJobReport_reportHourTime",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.reportHourTime",
+      "required": "true",
+      "type": "long",
+      "default": "1"
+    },
+    {
+      "name": "application_dailyJobReport_reportPeriodInHour",
+      "label": "application_dailyJobReport_reportPeriodInHour",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.reportPeriodInHour",
+      "required": "true",
+      "type": "long",
+      "default": "12"
+    },
+    {
+      "name": "application_dailyJobReport_numTopUsers",
+      "label": "application_dailyJobReport_numTopUsers",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.numTopUsers",
+      "required": "true",
+      "type": "long",
+      "default": "10"
+    },
+    {
+      "name": "application_dailyJobReport_jobOvertimeLimitInHour",
+      "label": "application_dailyJobReport_jobOvertimeLimitInHour",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.jobOvertimeLimitInHour",
+      "required": "true",
+      "type": "long",
+      "default": "6"
+    },
+    {
+      "name": "application_dailyJobReport_subject",
+      "label": "application_dailyJobReport_subject",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.subject",
+      "required": "true",
+      "type": "string",
+      "default": "Job Report For 12 hours"
+    },
+    {
+      "name": "application_dailyJobReport_recipients",
+      "label": "application_dailyJobReport_recipients",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.recipients",
+      "required": "true",
+      "type": "string",
+      "default": "someone@email.com"
+    },
+    {
+      "name": "application_dailyJobReport_template",
+      "label": "application_dailyJobReport_template",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.dailyJobReport.template",
+      "required": "true",
+      "type": "string",
+      "default": "JobReportTemplate.vm"
+    },
+    {
+      "name": "application_analyzerReport_sender",
+      "label": "application_analyzerReport_sender",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.analyzerReport.sender",
+      "required": "true",
+      "type": "string",
+      "default": "nobody@abc.com"
+    },
+    {
+      "name": "application_analyzerReport_recipients",
+      "label": "application_analyzerReport_recipients",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.analyzerReport.recipients",
+      "required": "true",
+      "type": "string",
+      "default": "nobody@abc.com"
+    },
+    {
+      "name": "application_analyzerReport_template",
+      "label": "application_analyzerReport_template",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.analyzerReport.template",
+      "required": "true",
+      "type": "string",
+      "default": "AnalyzerReportTemplate.vm"
+    },
+    {
+      "name": "application_analyzerReport_cc",
+      "label": "application_analyzerReport_cc",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "application.analyzerReport.cc",
+      "required": "true",
+      "type": "string",
+      "default": "nobody@abc.com"
+    },
+    {
+      "name": "coordinator_policiesPerBolt",
+      "label": "coordinator_policiesPerBolt",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.policiesPerBolt",
+      "required": "true",
+      "type": "long",
+      "default": "5"
+    },
+    {
+      "name": "coordinator_boltParallelism",
+      "label": "coordinator_boltParallelism",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.boltParallelism",
+      "required": "true",
+      "type": "long",
+      "default": "5"
+    },
+    {
+      "name": "coordinator_policyDefaultParallelism",
+      "label": "coordinator_policyDefaultParallelism",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.policyDefaultParallelism",
+      "required": "true",
+      "type": "long",
+      "default": "5"
+    },
+    {
+      "name": "coordinator_boltLoadUpbound",
+      "label": "coordinator_boltLoadUpbound",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.boltLoadUpbound",
+      "required": "true",
+      "type": "double",
+      "default": "0.8"
+    },
+    {
+      "name": "coordinator_topologyLoadUpbound",
+      "label": "coordinator_topologyLoadUpbound",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.topologyLoadUpbound",
+      "required": "true",
+      "type": "double",
+      "default": "0.8"
+    },
+    {
+      "name": "coordinator_numOfAlertBoltsPerTopology",
+      "label": "coordinator_numOfAlertBoltsPerTopology",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.numOfAlertBoltsPerTopology",
+      "required": "true",
+      "type": "long",
+      "default": "5"
+    },
+    {
+      "name": "coordinator_zkConfig_zkQuorum",
+      "label": "coordinator_zkConfig_zkQuorum",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.zkConfig.zkQuorum",
+      "required": "true",
+      "type": "string",
+      "default": "server.eagle.apache.org:2181"
+    },
+    {
+      "name": "coordinator_zkConfig_zkRoot",
+      "label": "coordinator_zkConfig_zkRoot",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.zkConfig.zkRoot",
+      "required": "true",
+      "type": "string",
+      "default": "/alert"
+    },
+    {
+      "name": "coordinator_zkConfig_zkSessionTimeoutMs",
+      "label": "coordinator_zkConfig_zkSessionTimeoutMs",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.zkConfig.zkSessionTimeoutMs",
+      "required": "true",
+      "type": "long",
+      "default": "10000"
+    },
+    {
+      "name": "coordinator_zkConfig_connectionTimeoutMs",
+      "label": "coordinator_zkConfig_connectionTimeoutMs",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.zkConfig.connectionTimeoutMs",
+      "required": "true",
+      "type": "long",
+      "default": "10000"
+    },
+    {
+      "name": "coordinator_zkConfig_zkRetryTimes",
+      "label": "coordinator_zkConfig_zkRetryTimes",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.zkConfig.zkRetryTimes",
+      "required": "true",
+      "type": "long",
+      "default": "3"
+    },
+    {
+      "name": "coordinator_zkConfig_zkRetryInterval",
+      "label": "coordinator_zkConfig_zkRetryInterval",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.zkConfig.zkRetryInterval",
+      "required": "true",
+      "type": "long",
+      "default": "3000"
+    },
+    {
+      "name": "coordinator_metadataService_host",
+      "label": "coordinator_metadataService_host",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataService.host",
+      "required": "true",
+      "type": "string",
+      "default": "localhost"
+    },
+    {
+      "name": "coordinator_metadataService_port",
+      "label": "coordinator_metadataService_port",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataService.port",
+      "required": "true",
+      "type": "port",
+      "default": "9090"
+    },
+    {
+      "name": "coordinator_metadataService_context",
+      "label": "coordinator_metadataService_context",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataService.context",
+      "required": "true",
+      "type": "string",
+      "default": "/rest"
+    },
+    {
+      "name": "coordinator_metadataDynamicCheck_initDelayMillis",
+      "label": "coordinator_metadataDynamicCheck_initDelayMillis",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataDynamicCheck.initDelayMillis",
+      "required": "true",
+      "type": "long",
+      "default": "1000"
+    },
+    {
+      "name": "coordinator_metadataDynamicCheck_delayMillis",
+      "label": "coordinator_metadataDynamicCheck_delayMillis",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataDynamicCheck.delayMillis",
+      "required": "true",
+      "type": "long",
+      "default": "30000"
+    },
+    {
+      "name": "coordinator_metadataDynamicCheck_stateClearPeriodMin",
+      "label": "coordinator_metadataDynamicCheck_stateClearPeriodMin",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataDynamicCheck.stateClearPeriodMin",
+      "required": "true",
+      "type": "long",
+      "default": "1440"
+    },
+    {
+      "name": "coordinator_metadataDynamicCheck_stateReservedCapacity",
+      "label": "coordinator_metadataDynamicCheck_stateReservedCapacity",
+      "description": "See Eagle documentation for description of this parameter",
+      "configName": "coordinator.metadataDynamicCheck.stateReservedCapacity",
+      "required": "true",
+      "type": "long",
+      "default": "100"
+    }
+  ],
+  "roles": [
+    {
+      "name": "EAGLE_SERVER",
+      "label": "Eagle Server",
+      "pluralLabel": "Web Servers",
+      "externalLink": {
+        "name": "eagle_web",
+        "label": "Eagle Web",
+        "url": "http://${host}:${service_port}"
+      },
+      "startRunner": {
+        "program": "scripts/control.sh",
+        "args": [
+          "start"
+        ],
+        "environmentVariables": {
+          "WEBSERVER_PORT": "${service_port}"
+        }
+      },
+      "logging": {
+        "dir": "/var/log/eagle",
+        "filename": "eagle-server.log",
+        "isModifiable": true,
+        "configName": "log.dir"
+      },
+      "configWriter": {
+        "generators": [
+          {
+            "filename": "eagle.properties",
+            "configFormat": "properties",
+            "includedParams": [
+              "service_env",
+              "service_host",
+              "service_port",
+              "service_username",
+              "service_password",
+              "service_readTimeOutSeconds",
+              "service_context",
+              "service_timezone",
+              "zookeeper_zkQuorum",
+              "zookeeper_zkSessionTimeoutMs",
+              "zookeeper_zkRetryTimes",
+              "zookeeper_zkRetryInterval",
+              "storage_type",
+              "storage_hbase_autoCreateTable",
+              "storage_hbase_zookeeperQuorum",
+              "storage_hbase_zookeeperPropertyClientPort",
+              "storage_hbase_zookeeperZnodeParent",
+              "storage_hbase_tableNamePrefixedWithEnvironment",
+              "storage_hbase_coprocessorEnabled",
+              "storage_jdbc_adapter",
+              "storage_jdbc_username",
+              "storage_jdbc_password",
+              "storage_jdbc_database",
+              "storage_jdbc_connectionUrl",
+              "storage_jdbc_connectionProps",
+              "storage_jdbc_driverClass",
+              "storage_jdbc_connectionMax",
+              "metadata_store",
+              "metadata_jdbc_connectionProperties",
+              "metadata_jdbc_username",
+              "metadata_jdbc_password",
+              "metadata_jdbc_connection",
+              "metadata_jdbc_database",
+              "metadata_jdbc_driverClassName",
+              "application_stream_provider",
+              "application_storm_nimbusHost",
+              "application_storm_nimbusThriftPort",
+              "application_updateStatus_initialDelay",
+              "application_updateStatus_period",
+              "application_healthCheck_initialDelay",
+              "application_healthCheck_publisher_publisherImpl",
+              "application_healthCheck_publisher_dailySendHour",
+              "application_healthCheck_publisher_mail_smtp_host",
+              "application_healthCheck_publisher_mail_smtp_port",
+              "application_healthCheck_publisher_mail_smtp_recipients",
+              "application_healthCheck_publisher_mail_smtp_subject",
+              "application_healthCheck_publisher_mail_smtp_template",
+              "application_mailService_mailSmtpServer",
+              "application_mailService_mailSmtpPort",
+              "application_mailService_mailSmtpAuth",
+              "application_dailyJobReport_reportHourTime",
+              "application_dailyJobReport_reportPeriodInHour",
+              "application_dailyJobReport_numTopUsers",
+              "application_dailyJobReport_jobOvertimeLimitInHour",
+              "application_dailyJobReport_subject",
+              "application_dailyJobReport_recipients",
+              "application_dailyJobReport_template",
+              "application_analyzerReport_sender",
+              "application_analyzerReport_recipients",
+              "application_analyzerReport_template",
+              "application_analyzerReport_cc",
+              "coordinator_policiesPerBolt",
+              "coordinator_boltParallelism",
+              "coordinator_policyDefaultParallelism",
+              "coordinator_boltLoadUpbound",
+              "coordinator_topologyLoadUpbound",
+              "coordinator_numOfAlertBoltsPerTopology",
+              "coordinator_zkConfig_zkQuorum",
+              "coordinator_zkConfig_zkRoot",
+              "coordinator_zkConfig_zkSessionTimeoutMs",
+              "coordinator_zkConfig_connectionTimeoutMs",
+              "coordinator_zkConfig_zkRetryTimes",
+              "coordinator_zkConfig_zkRetryInterval",
+              "coordinator_metadataService_host",
+              "coordinator_metadataService_port",
+              "coordinator_metadataService_context",
+              "coordinator_metadataDynamicCheck_initDelayMillis",
+              "coordinator_metadataDynamicCheck_delayMillis",
+              "coordinator_metadataDynamicCheck_stateClearPeriodMin",
+              "coordinator_metadataDynamicCheck_stateReservedCapacity"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

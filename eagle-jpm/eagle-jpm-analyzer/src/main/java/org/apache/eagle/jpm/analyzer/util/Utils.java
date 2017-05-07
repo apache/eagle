@@ -26,7 +26,6 @@ import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,55 +45,59 @@ public class Utils {
     public static List<JobMetaEntity> getJobMeta(Config config, String siteId, String jobDefId) {
         List<JobMetaEntity> result = new ArrayList<>();
         String url = "http://"
-                + config.getString(Constants.HOST_PATH)
-                + ":"
-                + config.getInt(Constants.PORT_PATH)
-                + config.getString(Constants.CONTEXT_PATH)
-                + Constants.ANALYZER_PATH
-                + Constants.JOB_META_ROOT_PATH
-                + "/"
-                + siteId
-                + "/"
-                + URLEncoder.encode(jobDefId);
+            + config.getString(Constants.HOST_PATH)
+            + ":"
+            + config.getInt(Constants.PORT_PATH)
+            + config.getString(Constants.CONTEXT_PATH)
+            + Constants.ANALYZER_PATH
+            + Constants.JOB_META_ROOT_PATH
+            + "/"
+            + siteId
+            + "/"
+            + URLEncoder.encode(jobDefId);
 
         InputStream is = null;
         try {
             is = InputStreamUtils.getInputStream(url, null, org.apache.eagle.jpm.util.Constants.CompressionType.NONE);
             LOG.info("get job meta from {}", url);
-            result = ((RESTResponse<List<JobMetaEntity>>)OBJ_MAPPER.readValue(is, new TypeReference<RESTResponse<List<JobMetaEntity>>>(){})).getData();
+            result = ((RESTResponse<List<JobMetaEntity>>) OBJ_MAPPER.readValue(is,
+                new TypeReference<RESTResponse<List<JobMetaEntity>>>() {
+                })).getData();
         } catch (Exception e) {
             LOG.warn("failed to get job meta from {}", url, e);
         } finally {
             org.apache.eagle.jpm.util.Utils.closeInputStream(is);
-            return result;
         }
+        return result;
     }
 
     public static List<UserEmailEntity> getUserMail(Config config, String siteId, String userId) {
         List<UserEmailEntity> result = new ArrayList<>();
         String url = "http://"
-                + config.getString(Constants.HOST_PATH)
-                + ":"
-                + config.getInt(Constants.PORT_PATH)
-                + config.getString(Constants.CONTEXT_PATH)
-                + Constants.ANALYZER_PATH
-                + Constants.USER_META_ROOT_PATH
-                + "/"
-                + siteId
-                + "/"
-                + URLEncoder.encode(userId);
+            + config.getString(Constants.HOST_PATH)
+            + ":"
+            + config.getInt(Constants.PORT_PATH)
+            + config.getString(Constants.CONTEXT_PATH)
+            + Constants.ANALYZER_PATH
+            + Constants.USER_META_ROOT_PATH
+            + "/"
+            + siteId
+            + "/"
+            + URLEncoder.encode(userId);
 
         InputStream is = null;
         try {
             is = InputStreamUtils.getInputStream(url, null, org.apache.eagle.jpm.util.Constants.CompressionType.NONE);
             LOG.info("get user meta from {}", url);
-            result = ((RESTResponse<List<UserEmailEntity>>)OBJ_MAPPER.readValue(is, new TypeReference<RESTResponse<List<UserEmailEntity>>>(){})).getData();
+            result = ((RESTResponse<List<UserEmailEntity>>) OBJ_MAPPER.readValue(is,
+                new TypeReference<RESTResponse<List<UserEmailEntity>>>() {
+                })).getData();
         } catch (Exception e) {
             LOG.warn("failed to get user meta from {}", url, e);
         } finally {
             org.apache.eagle.jpm.util.Utils.closeInputStream(is);
-            return result;
         }
+        return result;
     }
 
     public static <K, V extends Comparable<? super V>> List<Map.Entry<K, V>> sortByValue(Map<K, V> map) {

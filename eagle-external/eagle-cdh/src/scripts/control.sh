@@ -1,5 +1,6 @@
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with`
+# contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
 # The ASF licenses this file to You under the Apache License, Version 2.0
 # (the "License"); you may not use this file except in compliance with
@@ -13,21 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-language: java
+CMD=$1
 
-jdk:
-  - oraclejdk8
+cp -r /opt/cloudera/parcels/EAGLE/* $CONF_DIR
+mv -f $CONF_DIR/eagle.properties $CONF_DIR/conf
 
-before_install: sudo echo "MAVEN_OPTS='-Xmx2048m -Xms1024m -Dorg.slf4j.simpleLogger.defaultLogLevel=error'" > ~/.mavenrc
-
-script: mvn clean test
-
-env:
-  global:
-    - MAVEN_OPTS: "-Xmx2048m -Xms1024m -Dorg.slf4j.simpleLogger.defaultLogLevel=error"
-
-sudo: required
-
-cache:
-  directories:
-    - $HOME/.m2
+case $CMD in
+  (start)
+    echo "Starting the web server on port [$WEBSERVER_PORT]"
+    cmd="bin/eagle-server.sh start"
+    exec ${cmd}
+    ;;
+  (stop)
+    pkill -u eagle -f ServerMain
+    ;;
+  (*)
+    echo "Don't understand [$CMD]"
+    exit 1
+    ;;
+esac

@@ -40,15 +40,15 @@ import java.util.Map;
 
 import static org.apache.eagle.topology.TopologyConstants.*;
 
-public class HbaseTopologyEntityParser implements TopologyEntityParser {
+public class HBaseTopologyEntityParser implements TopologyEntityParser {
 
-    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(HbaseTopologyEntityParser.class);
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(HBaseTopologyEntityParser.class);
     private Configuration hBaseConfiguration;
     private String site;
     private Boolean kerberosEnable = false;
     private TopologyRackResolver rackResolver;
 
-    public HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig, TopologyRackResolver resolver) {
+    public HBaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig, TopologyRackResolver resolver) {
         this.site = site;
         this.rackResolver = resolver;
         this.hBaseConfiguration = HBaseConfiguration.create();

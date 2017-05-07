@@ -153,7 +153,7 @@ public class EagleConfigFactory implements EagleConfig {
     }
 
     @Override
-    public Configuration getHbaseConf() {
+    public Configuration getHBaseConf() {
         return hbaseConf;
     }
 

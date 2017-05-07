@@ -28,11 +28,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HbaseSensitivityTypeResolver extends AbstractSensitivityTypeResolver {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseSensitivityTypeResolver.class);
+public class HBaseSensitivityTypeResolver extends AbstractSensitivityTypeResolver {
+    private final static Logger LOG = LoggerFactory.getLogger(HBaseSensitivityTypeResolver.class);
     private ISecurityMetadataDAO dao;
 
-    public HbaseSensitivityTypeResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+    public HBaseSensitivityTypeResolver(ApplicationEntityService entityService, Config eagleServerConfig){
         // todo I know this is ugly, but push abstraction to later
         dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
     }
@@ -50,7 +50,7 @@ public class HbaseSensitivityTypeResolver extends AbstractSensitivityTypeResolve
             if(!all.containsKey(entity.getSite())){
                 all.put(entity.getSite(), new HashMap<>());
             }
-            all.get(entity.getSite()).put(entity.getHbaseResource(), entity.getSensitivityType());
+            all.get(entity.getSite()).put(entity.getHBaseResource(), entity.getSensitivityType());
         }
         return all;
     }

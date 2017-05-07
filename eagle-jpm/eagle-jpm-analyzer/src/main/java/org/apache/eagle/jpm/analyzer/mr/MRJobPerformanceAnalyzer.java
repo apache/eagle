@@ -61,14 +61,18 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
         Result result = new Result();
 
         for (Evaluator evaluator : evaluators) {
-            Result.EvaluatorResult evaluatorResult = evaluator.evaluate(analyzerJobEntity);
-            if (evaluatorResult != null) {
-                result.addEvaluatorResult(evaluator.getClass(), evaluatorResult);
+            try {
+                Result.EvaluatorResult evaluatorResult = evaluator.evaluate(analyzerJobEntity);
+                if (evaluatorResult != null) {
+                    result.addEvaluatorResult(evaluator.getClass(), evaluatorResult);
+                }
+            } catch (Throwable e) {
+                LOG.error("evaluator {} fails to analyse job {}", evaluator, analyzerJobEntity.getJobId(), e);
             }
         }
 
         if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
-            LOG.info("skip publish job {} alert because it is duplicated", analyzerJobEntity.getJobDefId());
+            LOG.info("skip publish job {} alert because it is duplicated", analyzerJobEntity.getJobId());
             return;
         }
 

@@ -48,7 +48,8 @@ public final class JobCounters implements Serializable {
     }
 
     public Long getCounterValue(CounterName counterName) {
-        if (counters.get(counterName.group.name).containsKey(counterName.name)) {
+        if (counters.containsKey(counterName.group.name)
+                && counters.get(counterName.group.name).containsKey(counterName.name)) {
             return counters.get(counterName.group.name).get(counterName.name);
         } else {
             return 0L;

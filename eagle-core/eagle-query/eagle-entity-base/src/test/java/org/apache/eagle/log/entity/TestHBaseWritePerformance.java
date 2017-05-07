@@ -25,7 +25,7 @@ import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.junit.Test;
 
-public class TestHbaseWritePerformance {
+public class TestHBaseWritePerformance {
 
 	public static void main(String[] args) throws IOException {
 		

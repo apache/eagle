@@ -29,7 +29,7 @@ public interface EagleConfig {
 
     HTableInterface getHTable(String tableName);
 
-    Configuration getHbaseConf();
+    Configuration getHBaseConf();
 
     String getStorageType();
 
