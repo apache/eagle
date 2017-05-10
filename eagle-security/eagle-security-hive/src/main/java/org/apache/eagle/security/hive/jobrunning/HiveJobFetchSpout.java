@@ -285,4 +285,9 @@ public class HiveJobFetchSpout extends BaseRichSpout {
     public void fail(Object msgId) {
         //process fail over later
     }
+
+    @Override
+    public void close() {
+        this.runningJobManager.close();
+    }
 }

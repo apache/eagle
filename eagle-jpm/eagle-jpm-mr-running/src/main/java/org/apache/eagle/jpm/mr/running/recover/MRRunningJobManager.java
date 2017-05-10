@@ -18,12 +18,11 @@
 
 package org.apache.eagle.jpm.mr.running.recover;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -34,7 +33,7 @@ public class MRRunningJobManager implements Serializable {
 
     public MRRunningJobManager(MRRunningJobConfig.ZKStateConfig config) {
         this.runningJobManager = new RunningJobManager(config.zkQuorum,
-                config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot, config.zkLockPath);
+            config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot, config.zkLockPath);
     }
 
     public Map<String, JobExecutionAPIEntity> recoverYarnApp(String appId) throws Exception {
@@ -78,5 +77,9 @@ public class MRRunningJobManager implements Serializable {
 
     public void delete(String yarnAppId, String jobId) {
         this.runningJobManager.delete(yarnAppId, jobId);
+    }
+
+    public void close() {
+        this.runningJobManager.close();
     }
 }

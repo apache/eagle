@@ -53,6 +53,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
     private ExecutorService executorService;
     private Map<String, SparkApplicationParser> runningSparkParsers;
     private ResourceFetcher resourceFetcher;
+    private transient SparkRunningJobManager sparkRunningJobManager;
 
     public SparkRunningJobParseBolt(SparkRunningJobAppConfig.ZKStateConfig zkStateConfig,
                                     SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig,
@@ -81,12 +82,13 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
 
         SparkApplicationParser applicationParser;
         if (!runningSparkParsers.containsKey(appInfo.getId())) {
+            this.sparkRunningJobManager = new SparkRunningJobManager(zkStateConfig);
             applicationParser = new SparkApplicationParser(eagleServiceConfig,
                     endpointConfig,
                     jobExtractorConfig,
                     appInfo,
                     sparkApp,
-                    new SparkRunningJobManager(zkStateConfig),
+                    this.sparkRunningJobManager,
                     resourceFetcher);
             runningSparkParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
@@ -116,5 +118,8 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
     @Override
     public void cleanup() {
         super.cleanup();
+        if (this.sparkRunningJobManager != null) {
+            this.sparkRunningJobManager.close();
+        }
     }
 }
