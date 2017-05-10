@@ -26,7 +26,7 @@ public class ServerDebug {
     private static String serverConf = null;
 
     static {
-        // Set application.conf
+        // Set application.conf 
         if (ServerDebug.class.getResourceAsStream("/application-debug.conf") != null
             || ServerDebug.class.getResourceAsStream("application-debug.conf") != null) {
             LOGGER.info("config.resource = application-debug.conf");
