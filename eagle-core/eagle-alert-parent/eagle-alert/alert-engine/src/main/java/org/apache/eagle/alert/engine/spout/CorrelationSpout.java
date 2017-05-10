@@ -331,6 +331,10 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         if (configure.hasPath("topology.logEventEnabled")) {
             logEventEnabled = configure.getBoolean("topology.logEventEnabled");
         }
+        boolean logEventEnabled = false;
+        if (config.hasPath("topology.logEventEnabled")) {
+            logEventEnabled = config.getBoolean("topology.logEventEnabled");
+        }
         // write partition offset etc. into zkRoot+id, see PartitionManager.committedPath
         String zkStateTransactionRelPath = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_RELATIVE_PATH;
         if (configure.hasPath("spout.stormKafkaEagleConsumer")) {
