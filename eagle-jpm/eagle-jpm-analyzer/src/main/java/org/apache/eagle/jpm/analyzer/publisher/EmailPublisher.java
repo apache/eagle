@@ -70,6 +70,12 @@ public class EmailPublisher implements Publisher, Serializable {
             return;
         }
 
+        if (analyzerJobEntity.getJobMeta() == null) {
+            //do not need send email
+            //TODO, framework should know which publishers that job should uses. Just work around here
+            return;
+        }
+
         LOG.info("EmailPublisher gets job {}", analyzerJobEntity.getJobDefId());
 
         Map<String, String> basic = new HashMap<>();
