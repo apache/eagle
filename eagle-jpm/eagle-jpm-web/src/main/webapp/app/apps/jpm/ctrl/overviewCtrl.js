@@ -58,6 +58,14 @@
 				}]
 			};
 
+			$scope.opsOption = $.extend({}, $scope.commonOption, {
+				yAxis: [{
+					axisLabel: {formatter: function (value) {
+						return common.number.abbr(value);
+					}}
+				}]
+			});
+
 			// ======================================================================
 			// =                          Refresh Overview                          =
 			// ======================================================================
