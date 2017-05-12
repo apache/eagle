@@ -105,7 +105,7 @@
 				<div class="col-sm-6 col-md-8 col-lg-9">
 					<div class="jpm-chart chart-lg overlay-wrapper">
 						<h3 class="text-center">Top HDFS Read OPs</h3>
-						<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="commonOption"></div>
+						<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="opsOption"></div>
 						<div ng-if="!hdfsReadOpsSeries._done" class="overlay">
 							<i class="fa fa-refresh fa-spin"></i>
 						</div>
@@ -127,7 +127,7 @@
 								</a>
 								<span ng-if="type !== 'job'">{{item.name}}</span>
 							</td>
-							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total)}}</td>
 						</tr>
 						</tbody>
 					</table>
