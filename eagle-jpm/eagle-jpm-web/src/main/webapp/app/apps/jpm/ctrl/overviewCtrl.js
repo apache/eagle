@@ -80,8 +80,9 @@
 				var endTime = Time.endTime();
 				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
 
-				function getTopList(metric, scopeVariable) {
+				function getTopList(metric, scopeVariable, aggType) {
 					var deferred = $q.defer();
+					aggType = aggType || 'avg';
 
 					metric = common.template(metric, {
 						type: $scope.type.toLocaleLowerCase()
@@ -96,7 +97,7 @@
 					var aggregation = $scope.aggregationMap[$scope.type];
 
 					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetricsToEntities(
-						JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "avg(value), sum(value) desc", intervalMin, startTime, endTime, 10)
+						JPM.aggMetrics({site: $scope.site}, metric, [aggregation], aggType + "(value), sum(value) desc", intervalMin, startTime, endTime, 10)
 					, [0])._promise.then(function (list) {
 						var series = $.map(list, function (metrics) {
 							return JPM.metricsToSeries(metrics[0].tags[aggregation], metrics, {
@@ -133,8 +134,8 @@
 				getTopList("hadoop.${type}.history.minute.virtual_memory_bytes", "virtualMemorySeries");
 				getTopList("hadoop.${type}.history.minute.hdfs_bytes_read", "hdfsBtyesReadSeries");
 				getTopList("hadoop.${type}.history.minute.hdfs_bytes_written", "hdfsBtyesWrittenSeries");
-				getTopList("hadoop.${type}.history.minute.hdfs_read_ops", "hdfsReadOpsSeries");
-				getTopList("hadoop.${type}.history.minute.hdfs_write_ops", "hdfsWriteOpsSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_read_ops", "hdfsReadOpsSeries", 'max');
+				getTopList("hadoop.${type}.history.minute.hdfs_write_ops", "hdfsWriteOpsSeries", 'max');
 				getTopList("hadoop.${type}.history.minute.file_bytes_read", "fileBytesReadSeries");
 				getTopList("hadoop.${type}.history.minute.file_bytes_written", "fileBytesWrittenSeries");
 			};
