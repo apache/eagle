@@ -32,6 +32,7 @@ import java.util.List;
 @Service(HadoopClusterConstants.RUNNING_QUEUE_SERVICE_NAME)
 @TimeSeries(true)
 @Partition( {"site"})
+@Tags({HadoopClusterConstants.TAG_SITE, HadoopClusterConstants.TAG_QUEUE, HadoopClusterConstants.TAG_PARENT_QUEUE})
 public class RunningQueueAPIEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String state;

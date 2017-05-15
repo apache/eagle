@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
     @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = true),
     @Index(name = "Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
     })
+@Tags({"site", "jobId", "jobName", "jobDefId", "jobType", "user", "queue"})
 public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")
     private String currentState;
