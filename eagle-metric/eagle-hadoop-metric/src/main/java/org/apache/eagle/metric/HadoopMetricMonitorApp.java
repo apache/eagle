@@ -51,15 +51,14 @@ public class HadoopMetricMonitorApp extends StormApplication {
             .siteAs(AppConfigUtils.getSiteId(config))
             .namedByField("metric")
             .eventTimeByField("timestamp")
-            .dimensionFields("host", "group", "site", "device")
+            .dimensionFields("host", "site", "device")
             .granularity(Calendar.SECOND)
             .valueField("value");
         return environment.newApp(config)
             .fromStream("HADOOP_JMX_METRIC_STREAM").transformBy(new CounterToRateFunction(hadoopMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
             .saveAsMetric(hadoopMetricDescriptor)
             .fromStream("SYSTEM_METRIC_STREAM").transformBy(new CounterToRateFunction(systemMetricDescriptor,3, TimeUnit.SECONDS, ClockWithOffset.INSTANCE))
-            .saveAsMetric(systemMetricDescriptor
-            )
+            .saveAsMetric(systemMetricDescriptor)
             .toTopology();
     }
 }

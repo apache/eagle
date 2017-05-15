@@ -36,7 +36,7 @@ public class JdbcConstants {
     // Eagle JDBC Storage Configuration
     public static final String EAGLE_DB_USERNAME = "storage.jdbc.username";
     public static final String EAGLE_DB_PASSWORD = "storage.jdbc.password";
-    public static final String EAGLE_CONN_URL = "storage.jdbc.connectionUrl";
+    public static final String EAGLE_CONN_URL = "storage.jdbc.connection";
     public static final String EAGLE_CONN_PROPS = "storage.jdbc.connectionProps";
     public static final String EAGLE_ADAPTER = "storage.jdbc.adapter";
     public static final String EAGLE_DATABASE = "storage.jdbc.database";
