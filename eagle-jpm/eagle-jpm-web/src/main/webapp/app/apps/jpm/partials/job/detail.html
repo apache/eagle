@@ -136,7 +136,7 @@
 						<tr>
 							<th>Reduce vCores</th>
 							<td class="text-no-break">{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_REDUCES)}} ms</td>
-							<th>Map CPU</th>
+							<th>Reduce CPU</th>
 							<td class="text-no-break">{{common.number.toFixed(job.jobCounters.counters.ReduceTaskAttemptCounter.CPU_MILLISECONDS)}} ms</td>
 							<th>HDFS Write Bytes</th>
 							<td title="{{job.jobCounters.counters['org.apache.hadoop.mapreduce.FileSystemCounter'].HDFS_BYTES_WRITTEN}}">
