@@ -29,6 +29,7 @@ import org.apache.eagle.topology.TopologyConstants;
 @Prefix("systemservicestatus")
 @Service(TopologyConstants.SYSTEM_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
+@Tags( {TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG, TopologyConstants.ROLE_TAG})
 public class SystemServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private String status;
