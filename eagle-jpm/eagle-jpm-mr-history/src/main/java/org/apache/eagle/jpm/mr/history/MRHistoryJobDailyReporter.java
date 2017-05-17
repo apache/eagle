@@ -221,17 +221,18 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
             return data;
         }
         Long totalJobs = jobSummery.values().stream().reduce((a, b) -> a + b).get();
-        String finishedJobQuery = String.format(FINISHED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        String failedJobQuery = String.format(FAILED_JOBS_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
-        String succeededJobQuery = String.format(SUCCEEDED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, jobOvertimeLimit * DateTimeUtil.ONEHOUR, endTime);
         data.put(SUMMARY_INFO_KEY, processResult(jobSummery, totalJobs));
 
         if (jobSummery.containsKey(Constants.JobState.FAILED.toString())) {
+            String failedJobQuery = String.format(FAILED_JOBS_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
             data.put(FAILED_JOB_USERS_KEY, buildJobSummery(failedJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.FAILED.toString())));
         }
         if (jobSummery.containsKey(Constants.JobState.SUCCEEDED.toString())) {
+            String succeededJobQuery = String.format(SUCCEEDED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, jobOvertimeLimit * DateTimeUtil.ONEHOUR, endTime);
             data.put(SUCCEEDED_JOB_USERS_KEY, buildJobSummery(succeededJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.SUCCEEDED.toString())));
         }
+
+        String finishedJobQuery = String.format(FINISHED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
         data.put(FINISHED_JOB_USERS_KEY, buildJobSummery(finishedJobQuery, startTime, endTime, totalJobs));
 
         return data;
