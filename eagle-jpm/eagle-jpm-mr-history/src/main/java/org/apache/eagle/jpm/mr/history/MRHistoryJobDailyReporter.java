@@ -144,14 +144,20 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
                     LOG.warn("application MR_HISTORY_JOB_APP does not run on any sites!");
                     return;
                 }
+
+                int reportHour = currentHour / dailySentPeriod * dailySentPeriod;
+                calendar.set(Calendar.HOUR_OF_DAY, reportHour);
+                long endTime = calendar.getTimeInMillis() / DateTimeUtil.ONEHOUR * DateTimeUtil.ONEHOUR;
+                long startTime = endTime - DateTimeUtil.ONEHOUR * dailySentPeriod;
+
                 for (String site : sites) {
-                    int reportHour = currentHour / dailySentPeriod * dailySentPeriod;
-                    calendar.set(Calendar.HOUR_OF_DAY, reportHour);
-                    long endTime = calendar.getTimeInMillis() / DateTimeUtil.ONEHOUR * DateTimeUtil.ONEHOUR;
-                    long startTime = endTime - DateTimeUtil.ONEHOUR * dailySentPeriod;
-                    String subject = buildAlertSubject(site, startTime, endTime);
-                    Map<String, Object> alertData = buildAlertData(site, startTime, endTime);
-                    sendByEmailWithSubject(alertData, subject);
+                    try {
+                        String subject = buildAlertSubject(site, startTime, endTime);
+                        Map<String, Object> alertData = buildAlertData(site, startTime, endTime);
+                        sendByEmailWithSubject(alertData, subject);
+                    } catch (Exception e) {
+                        LOG.error("Job report failed for {} due to {}", site, e.getMessage(), e);
+                    }
                 }
             } catch (Exception ex) {
                 LOG.error("Fail to get job summery info due to {}", ex.getMessage(), ex);
@@ -219,8 +225,13 @@ public class MRHistoryJobDailyReporter extends AbstractScheduledService {
         String failedJobQuery = String.format(FAILED_JOBS_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, endTime);
         String succeededJobQuery = String.format(SUCCEEDED_JOB_QUERY, Constants.MR_JOB_EXECUTION_SERVICE_NAME, site, jobOvertimeLimit * DateTimeUtil.ONEHOUR, endTime);
         data.put(SUMMARY_INFO_KEY, processResult(jobSummery, totalJobs));
-        data.put(FAILED_JOB_USERS_KEY, buildJobSummery(failedJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.FAILED.toString())));
-        data.put(SUCCEEDED_JOB_USERS_KEY, buildJobSummery(succeededJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.SUCCEEDED.toString())));
+
+        if (jobSummery.containsKey(Constants.JobState.FAILED.toString())) {
+            data.put(FAILED_JOB_USERS_KEY, buildJobSummery(failedJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.FAILED.toString())));
+        }
+        if (jobSummery.containsKey(Constants.JobState.SUCCEEDED.toString())) {
+            data.put(SUCCEEDED_JOB_USERS_KEY, buildJobSummery(succeededJobQuery, startTime, endTime, jobSummery.get(Constants.JobState.SUCCEEDED.toString())));
+        }
         data.put(FINISHED_JOB_USERS_KEY, buildJobSummery(finishedJobQuery, startTime, endTime, totalJobs));
 
         return data;
