@@ -43,7 +43,6 @@ public enum MRJobTagName {
     }
 
     public String toString() {
-
         return this.tagName;
     }
 }

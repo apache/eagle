@@ -20,33 +20,38 @@ package org.apache.eagle.jpm.mr.history.parser;
 import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.meta.model.MapReduceAnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.mr.MRJobPerformanceAnalyzer;
-import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
-import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity;
+import org.apache.eagle.jpm.analyzer.mr.rpc.JobRpcEvaluator;
+import org.apache.eagle.jpm.analyzer.publisher.Result;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisher;
+import org.apache.eagle.jpm.mr.history.publisher.StreamPublisherManager;
+import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
-import org.apache.eagle.jpm.mr.history.parser.JHFEventReaderBase.Keys;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.hadoop.conf.Configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static org.apache.eagle.jpm.util.MRJobTagName.TASK_ATTEMPT_ID;
 import static org.apache.eagle.jpm.util.MRJobTagName.TASK_ID;
 
 /*
- * JobEventCounterListener provides an interface to add job/task counter analyzers
+ * JobSuggestionListener provides an interface to analyze job performance and alerts by email
  */
 public class JobSuggestionListener implements HistoryJobEntityCreationListener {
     private static final Logger LOG = LoggerFactory.getLogger(JobSuggestionListener.class);
 
     private MapReduceAnalyzerEntity info;
     private MRJobPerformanceAnalyzer<MapReduceAnalyzerEntity> analyzer;
+    private StreamPublisher streamPublisher;
 
     public JobSuggestionListener(Config config) {
         this.info = new MapReduceAnalyzerEntity();
         this.analyzer = new MRJobPerformanceAnalyzer<>(config);
+        this.streamPublisher = StreamPublisherManager.getInstance().getStreamPublisher(JobRpcAnalysisAPIEntity.class);
     }
 
     @Override
@@ -75,6 +80,7 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
             info.setTotalMaps(jobExecutionAPIEntity.getNumTotalMaps());
             info.setTotalReduces(jobExecutionAPIEntity.getNumTotalReduces());
             info.setProgress(100);
+            info.setTrackingUrl(((JobExecutionAPIEntity) entity).getTrackingUrl());
         }
     }
 
@@ -90,6 +96,16 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
 
     @Override
     public void flush() throws Exception {
-        analyzer.analyze(info);
+        Result result = analyzer.analyze(info);
+        if (streamPublisher != null) {
+            List<TaggedLogAPIEntity> entities = result.getAlertEntities().get(JobRpcEvaluator.class.getName());
+            if (entities != null && !entities.isEmpty()) {
+                for (TaggedLogAPIEntity entity : entities) {
+                    streamPublisher.flush(entity);
+                }
+            }
+        } else {
+            LOG.warn("JobRpcAnalysisStreamPublisher is null");
+        }
     }
 }

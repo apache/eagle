@@ -35,23 +35,24 @@ public class Result {
         Map<Class<?>, ProcessorResult> processorResults = result.getProcessorResults();
         Map<Class<?>, TaggedLogAPIEntity> processorEntities = result.getProcessorEntities();
 
+        String typeName = type.getName();
+        if (!processorEntities.values().isEmpty()) {
+            alertEntities.put(typeName, new ArrayList<>());
+            alertEntities.get(typeName).addAll(processorEntities.values());
+        }
+
         for (Class<?> processorType : processorResults.keySet()) {
             ProcessorResult processorResult = processorResults.get(processorType);
-
             if (processorResult.resultLevel.equals(ResultLevel.NONE)) {
                 continue;
             }
-
-            String typeName = type.getName();
+            normalizeResult(processorResult);
             if (!alertMessages.containsKey(typeName)) {
                 alertMessages.put(typeName, new ArrayList<>());
-                alertEntities.put(typeName, new ArrayList<>());
             }
-            normalizeResult(processorResult);
             alertMessages.get(typeName).add(processorResult);
-            alertEntities.get(typeName).add(processorEntities.get(processorType));
-
         }
+
     }
 
     public Map<String, List<ProcessorResult>> getAlertMessages() {

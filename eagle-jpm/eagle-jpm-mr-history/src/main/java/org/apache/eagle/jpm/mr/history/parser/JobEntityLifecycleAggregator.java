@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.eagle.jpm.util.MRJobTagName.TASK_TYPE;
+
 public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleListener {
     private static final Logger LOG = LoggerFactory.getLogger(JobEntityLifecycleAggregator.class);
     private JobExecutionAPIEntity jobExecutionAPIEntity;
@@ -107,7 +109,7 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
     private void taskAttemptEntityCreated(TaskAttemptExecutionAPIEntity entity) {
         JobCounters jobCounters = entity.getJobCounters();
-        String taskType = entity.getTags().get(Constants.JOB_TASK_TYPE_TAG);
+        String taskType = entity.getTags().get(TASK_TYPE.toString());
 
         if (taskType != null && jobCounters != null && jobCounters.getCounters() != null) {
             if (Constants.TaskType.MAP.toString().equals(taskType.toUpperCase())) {

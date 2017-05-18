@@ -41,6 +41,7 @@ public class MapReduceAnalyzerEntity extends AnalyzerEntity {
     private Map<String, TaskExecutionAPIEntity> tasksMap;
     private Map<String, TaskAttemptExecutionAPIEntity> completedTaskAttemptsMap;
     private Configuration jobConf;
+    private String trackingUrl;
 
     public MapReduceAnalyzerEntity() {
         this.setEndTime(-1);
@@ -169,6 +170,14 @@ public class MapReduceAnalyzerEntity extends AnalyzerEntity {
 
     public void setJobConf(Configuration jobConf) {
         this.jobConf = jobConf;
+    }
+
+    public String getTrackingUrl() {
+        return trackingUrl;
+    }
+
+    public void setTrackingUrl(String trackingUrl) {
+        this.trackingUrl = trackingUrl;
     }
 
 }

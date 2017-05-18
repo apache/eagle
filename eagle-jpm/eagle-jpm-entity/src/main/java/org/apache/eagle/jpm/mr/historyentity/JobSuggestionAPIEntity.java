@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import static org.apache.eagle.jpm.util.Constants.MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@Table("eaglejpa")
+@Table("eaglejpa_analysis")
 @ColumnFamily("f")
 @Prefix("jsuggestion")
 @Service(MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME)

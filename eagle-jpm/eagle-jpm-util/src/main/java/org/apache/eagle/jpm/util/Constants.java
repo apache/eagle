@@ -128,9 +128,8 @@ public class Constants {
     public static final String MR_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
     public static final String MR_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
     public static final String MR_JOB_OPTIMIZER_SUGGESTION_SERVICE_NAME = "JobOptimizerSuggestionService";
+    public static final String MR_JOB_RPC_ANALYSIS_SERVICE_NAME = "JobRpcAnalysisService";
     public static final String ACCEPTED_APP_SERVICE_NAME = "AcceptedAppService";
-
-    public static final String JOB_TASK_TYPE_TAG = "taskType";
 
     public static class JobConfiguration {
         // job type

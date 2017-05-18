@@ -192,20 +192,38 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>submissionTime</name>
-                    <type>long</type>
-                </column>
-                <column>
                     <name>trackingUrl</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>startTime</name>
-                    <type>long</type>
+                    <name>totalOpsPerSecond</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
                 </column>
                 <column>
-                    <name>endTime</name>
-                    <type>long</type>
+                    <name>mapOpsPerSecond</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>reduceOpsPerSecond</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgOpsPerTask</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgOpsPerMapTask</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgOpsPerReduceTask</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
                 </column>
                 <column>
                     <name>currentState</name>

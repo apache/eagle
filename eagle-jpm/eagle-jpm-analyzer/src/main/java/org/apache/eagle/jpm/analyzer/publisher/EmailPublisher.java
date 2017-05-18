@@ -28,8 +28,10 @@ import org.apache.eagle.common.mail.AlertEmailContext;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
 import org.apache.eagle.jpm.analyzer.meta.model.UserEmailEntity;
 import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
+import org.apache.eagle.jpm.analyzer.mr.suggestion.JobSuggestionEvaluator;
 import org.apache.eagle.jpm.analyzer.util.Constants;
 import org.apache.eagle.jpm.analyzer.util.Utils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,8 @@ public class EmailPublisher implements Publisher, Serializable {
         this.config = config;
         //TODO
         publishResult4Evaluators.add(SLAJobEvaluator.class);
+        publishResult4Evaluators.add(JobSuggestionEvaluator.class);
+
         timeZone = TimeZone.getTimeZone((config.hasPath(EagleConfigConstants.EAGLE_TIME_ZONE)
                 ? config.getString(EagleConfigConstants.EAGLE_TIME_ZONE)
                 : EagleConfigConstants.DEFAULT_EAGLE_TIME_ZONE));
