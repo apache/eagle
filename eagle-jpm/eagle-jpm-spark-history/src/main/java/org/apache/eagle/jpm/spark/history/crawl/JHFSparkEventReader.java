@@ -487,8 +487,9 @@ public class JHFSparkEventReader {
         long result = 0L;
         String fieldValue = config.getConfig().get(fieldName);
         if (fieldValue != null) {
-            result = Utils.parseMemory(fieldValue + "m");
-            if (result == 0L) {
+            try {
+                result = Utils.parseMemory(fieldValue + "m");
+            } catch (Exception e) {
                 result = Utils.parseMemory(fieldValue);
             }
         }
