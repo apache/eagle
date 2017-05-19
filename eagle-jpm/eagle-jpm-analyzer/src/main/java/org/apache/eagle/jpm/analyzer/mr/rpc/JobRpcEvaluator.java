@@ -72,17 +72,6 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
                 }
             }
 
-            double totalOpsPerSecond = (entity.getDurationTime() == 0) ? 0 :
-                    (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getDurationTime() / 1000);
-            double mapOpsPerSecond = (entity.getTotalMaps() == 0) ? 0 :
-                    totalMapHdfsOps / ((mapEndTime - mapStartTime) / 1000);
-            double reduceOpsPerSecond = (entity.getTotalReduces() == 0) ? 0 :
-                    totalReduceHdfsOps / ((reduceEndTime - reduceStartTime) / 1000);
-            double avgOpsPerTask = (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getTotalMaps() + entity.getTotalReduces());
-            double avgOpsPerMap = entity.getTotalMaps() == 0 ? 0 : totalMapHdfsOps / entity.getTotalMaps();
-            double avgOpsPerReduce = entity.getTotalReduces() == 0 ? 0 : totalReduceHdfsOps / entity.getTotalReduces();
-
-
             Map<String, String> tags = new HashMap<>();
             tags.put(SITE.toString(), entity.getSiteId());
             tags.put(USER.toString(), entity.getUserId());
@@ -94,6 +83,20 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
             analysisAPIEntity.setTags(tags);
             analysisAPIEntity.setTimestamp(entity.getStartTime());
             analysisAPIEntity.setTrackingUrl(entity.getTrackingUrl());
+
+            double totalOpsPerSecond = (entity.getDurationTime() == 0) ? 0 :
+                    (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getDurationTime() / 1000);
+            double mapOpsPerSecond = (entity.getTotalMaps() == 0) ? 0 :
+                    totalMapHdfsOps / ((mapEndTime - mapStartTime) / 1000);
+            double reduceOpsPerSecond = (entity.getTotalReduces() == 0) ? 0 :
+                    totalReduceHdfsOps / ((reduceEndTime - reduceStartTime) / 1000);
+            
+            double avgOpsPerTask = (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getTotalMaps() + entity.getTotalReduces());
+            double avgOpsPerMap = (entity.getTotalMaps() == 0) ? 0 :
+                    totalMapHdfsOps / entity.getTotalMaps();
+            double avgOpsPerReduce = (entity.getTotalReduces() == 0) ? 0 :
+                    totalReduceHdfsOps / entity.getTotalReduces();
+
             analysisAPIEntity.setTotalOpsPerSecond(totalOpsPerSecond);
             analysisAPIEntity.setMapOpsPerSecond(mapOpsPerSecond);
             analysisAPIEntity.setReduceOpsPerSecond(reduceOpsPerSecond);

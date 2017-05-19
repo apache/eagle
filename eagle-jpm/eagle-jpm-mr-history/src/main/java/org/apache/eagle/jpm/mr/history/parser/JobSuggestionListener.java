@@ -97,7 +97,7 @@ public class JobSuggestionListener implements HistoryJobEntityCreationListener {
     @Override
     public void flush() throws Exception {
         Result result = analyzer.analyze(info);
-        if (streamPublisher != null) {
+        if (streamPublisher != null && result != null) {
             List<TaggedLogAPIEntity> entities = result.getAlertEntities().get(JobRpcEvaluator.class.getName());
             if (entities != null && !entities.isEmpty()) {
                 for (TaggedLogAPIEntity entity : entities) {

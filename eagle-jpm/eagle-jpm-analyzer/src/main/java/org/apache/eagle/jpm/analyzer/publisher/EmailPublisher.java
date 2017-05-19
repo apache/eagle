@@ -40,6 +40,7 @@ import java.util.*;
 
 public class EmailPublisher implements Publisher, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(EmailPublisher.class);
+    private static final String ALERT_LEVEL_PATH = "application.analyzerReport.alertLevel";
 
     private Config config;
     private List<Class<?>> publishResult4Evaluators = new ArrayList<>();
@@ -64,11 +65,34 @@ public class EmailPublisher implements Publisher, Serializable {
             return;
         }
 
-        Map<String, List<Result.ProcessorResult>> extend = new HashMap<>();
+        Map<String, List<Result.ProcessorResult>> targetResult = new HashMap<>();
         publishResult4Evaluators
                 .stream()
                 .filter(item -> result.getAlertMessages().containsKey(item.getName()))
-                .forEach(item -> extend.put(item.getName(), result.getAlertMessages().get(item.getName())));
+                .forEach(item -> targetResult.put(item.getName(), result.getAlertMessages().get(item.getName())));
+
+        Map<String, List<Result.ProcessorResult>> extend = new HashMap<>();
+
+        Result.ResultLevel serverAlertLevel = getServerAlertLevel();
+        Result.ResultLevel jobAlertLevel = serverAlertLevel;
+        for (String evaluator : targetResult.keySet()) {
+            List<Result.ProcessorResult> alertMessages = new ArrayList<>();
+            for (Result.ProcessorResult message : targetResult.get(evaluator)) {
+                if (isHigherAlertLevel(message.getResultLevel(), serverAlertLevel)) {
+                    alertMessages.add(message);
+
+                    if (isHigherAlertLevel(message.getResultLevel(), jobAlertLevel)) {
+                        jobAlertLevel = message.getResultLevel();
+                    }
+
+                    LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
+                            analyzerJobEntity.getJobId(), message.getMessage(), message.getResultLevel(), evaluator);
+                }
+            }
+            if (!alertMessages.isEmpty()) {
+                extend.put(evaluator, alertMessages);
+            }
+        }
 
         if (extend.size() == 0) {
             return;
@@ -86,19 +110,12 @@ public class EmailPublisher implements Publisher, Serializable {
         basic.put("end", analyzerJobEntity.getEndTime() == 0
                 ? "0"
                 : DateTimeUtil.secondsToHumanDate(analyzerJobEntity.getEndTime() / 1000, timeZone));
-        double progress = analyzerJobEntity.getCurrentState().equalsIgnoreCase(org.apache.eagle.jpm.util.Constants.JobState.RUNNING.toString()) ? analyzerJobEntity.getProgress() : 100;
+        double progress = org.apache.eagle.jpm.util.Constants.JobState.RUNNING.toString().equalsIgnoreCase(analyzerJobEntity.getCurrentState()) ? analyzerJobEntity.getProgress() : 100;
         basic.put("progress", progress + "%");
         basic.put("detail", getJobLink(analyzerJobEntity));
 
         Map<String, Object> alertData = new HashMap<>();
-        for (String evaluator : extend.keySet()) {
-            for (Result.ProcessorResult message : extend.get(evaluator)) {
-                setAlertLevel(alertData, message.getResultLevel());
-                LOG.info("Job [{}] Got Message [{}], Level [{}] By Evaluator [{}]",
-                        analyzerJobEntity.getJobDefId(), message.getMessage(), message.getResultLevel(), evaluator);
-            }
-        }
-
+        alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, jobAlertLevel.toString());
         alertData.put(Constants.ANALYZER_REPORT_DATA_BASIC_KEY, basic);
         alertData.put(Constants.ANALYZER_REPORT_DATA_EXTEND_KEY, extend);
         Config cloneConfig = ConfigFactory.empty().withFallback(config);
@@ -128,18 +145,19 @@ public class EmailPublisher implements Publisher, Serializable {
                 + analyzerJobEntity.getJobId();
     }
 
-    private void setAlertLevel(Map<String, Object> alertData, Result.ResultLevel level) {
-        if (!alertData.containsKey(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY)) {
-            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, Result.ResultLevel.INFO.toString());
+    private Result.ResultLevel getServerAlertLevel() {
+        Result.ResultLevel alertLevel = Result.ResultLevel.WARNING;
+        if (config.hasPath(ALERT_LEVEL_PATH)) {
+            try {
+                alertLevel = Result.ResultLevel.fromString(config.getString(ALERT_LEVEL_PATH));
+            } catch (Exception e) {
+                LOG.warn("invalid alert level config: {}, using WARNING level instead", config.getString(ALERT_LEVEL_PATH));
+            }
         }
+        return alertLevel;
+    }
 
-        if (level.equals(Result.ResultLevel.CRITICAL)) {
-            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, level.toString());
-        }
-
-        if (level.equals(Result.ResultLevel.WARNING)
-                && !alertData.get(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY).equals(Result.ResultLevel.CRITICAL.toString())) {
-            alertData.put(PublishConstants.ALERT_EMAIL_ALERT_SEVERITY, level.toString());
-        }
+    private boolean isHigherAlertLevel(Result.ResultLevel level, Result.ResultLevel serverLevel) {
+        return level.ordinal() >= serverLevel.ordinal();
     }
 }

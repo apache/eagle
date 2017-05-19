@@ -33,7 +33,7 @@ import static org.apache.eagle.jpm.util.Constants.MR_JOB_RPC_ANALYSIS_SERVICE_NA
 @Indexes({
         @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = true),
         @Index(name = "Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
-})
+        })
 public class JobRpcAnalysisAPIEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String trackingUrl;
