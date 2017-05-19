@@ -224,7 +224,7 @@ class SystemMetricCollector(MetricCollector):
         output = os.popen('sudo ipmitool sdr | grep Temp | grep CPU').readlines()
         for item in output:
             items = re.split("^(CPU\d+)\sTemp\.\s+\|\s+(\d+|\d+\.\d+)\s", item.rstrip())
-            event = self.new_metric("System.CPU")
+            event = self.new_metric("system.cpu")
             event["timestamp"] = int(round(time.time() * 1000))
             event["metric"] = DATA_TYPE + "." + 'cpu.temp'
             event["value"] = items[2]

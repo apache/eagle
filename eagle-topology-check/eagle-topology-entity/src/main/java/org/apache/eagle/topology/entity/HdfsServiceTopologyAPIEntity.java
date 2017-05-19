@@ -22,13 +22,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.topology.TopologyConstants;
 
-
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
 @Prefix("hdfsservicestatus")
 @Service(TopologyConstants.HDFS_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
+@Tags( {TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG, TopologyConstants.ROLE_TAG})
 public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private String status;

@@ -40,7 +40,7 @@
 		$scope.metricList = [$scope.metricName];
 		CompatibleEntity.groups({
 			query: 'MetricSchemaService',
-			groups: 'name',
+			groups: 'metricName',
 			fields: 'count',
 			limit: 9999,
 		})._promise.then(function (res) {

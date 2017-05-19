@@ -31,6 +31,7 @@ import java.util.List;
 @Service(HadoopClusterConstants.QUEUE_MAPPING_SERVICE_NAME)
 @TimeSeries(false)
 @Partition( {"site"})
+@Tags({HadoopClusterConstants.TAG_SITE, HadoopClusterConstants.TAG_QUEUE, HadoopClusterConstants.TAG_PARENT_QUEUE})
 public class QueueStructureAPIEntity extends TaggedLogAPIEntity {
     @Column("a")
     private List<String> subQueues;

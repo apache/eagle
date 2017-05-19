@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Prefix("hbaseservicestatus")
 @Service(TopologyConstants.HBASE_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
+@Tags( {TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG, TopologyConstants.ROLE_TAG})
 public class HBaseServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private String status;

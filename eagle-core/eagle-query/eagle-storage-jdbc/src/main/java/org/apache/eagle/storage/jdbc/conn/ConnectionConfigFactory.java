@@ -32,21 +32,29 @@ public class ConnectionConfigFactory {
         String username = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DB_USERNAME);
         String password = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DB_PASSWORD);
         String connUrl = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_URL);
-        String connProps = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_PROPS);
         String adapter = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_ADAPTER);
         String databaseName = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DATABASE);
         String driverClass = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_DRIVER_CLASS);
-        String connMaxSize = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_MAX_SIZE);
+
+
+        String connProps = null;
+        if (EagleConfigFactory.load().getConfig().hasPath(JdbcConstants.EAGLE_CONN_PROPS)) {
+            connProps = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_PROPS);
+        }
+
+        String connMaxSize = null;
+        if (EagleConfigFactory.load().getConfig().hasPath(JdbcConstants.EAGLE_CONN_MAX_SIZE)) {
+            connMaxSize = EagleConfigFactory.load().getConfig().getString(JdbcConstants.EAGLE_CONN_MAX_SIZE);
+        }
 
         ConnectionConfig config = new ConnectionConfig();
         if(username != null) config.setUserName(username);
         if(password != null)config.setPassword(password);
         if(connUrl != null) config.setConnectionUrl(connUrl);
-        if(connProps!=null) config.setConnectionProperties(connProps);
-        if(adapter!=null) config.setAdapter(adapter);
-        if(databaseName!=null) config.setDatabaseName(databaseName);
-        if(driverClass!=null) config.setDriverClassName(driverClass);
-
+        if(connProps != null) config.setConnectionProperties(connProps);
+        if(adapter != null) config.setAdapter(adapter);
+        if(databaseName != null) config.setDatabaseName(databaseName);
+        if(driverClass != null) config.setDriverClassName(driverClass);
 
         if(connMaxSize!=null){
             config.setConnectionMaxActive(Integer.parseInt(connMaxSize));
