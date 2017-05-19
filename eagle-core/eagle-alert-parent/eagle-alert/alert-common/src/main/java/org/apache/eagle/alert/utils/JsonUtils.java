@@ -17,6 +17,7 @@
 package org.apache.eagle.alert.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class JsonUtils {
                 }
             }
         } catch (Exception e) {
-            LOG.warn("exception found {}", e);
+            LOG.warn("illegal json array message: {}, ignored", StringUtils.abbreviate(message, 50));
         }
 
         return result;

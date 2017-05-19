@@ -40,5 +40,6 @@ public class JPAEntityRepository extends EntityRepository {
         entitySet.add(JobCountEntity.class);
         entitySet.add(TaskAttemptErrorCategoryEntity.class);
         entitySet.add(JobSuggestionAPIEntity.class);
+        entitySet.add(JobRpcAnalysisAPIEntity.class);
     }
 }
