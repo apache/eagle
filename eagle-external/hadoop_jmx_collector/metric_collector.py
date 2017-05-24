@@ -106,12 +106,12 @@ class Helper:
             try:
                 if https:
                     logging.info("Reading https://" + str(url) + path)
-                    c = httplib.HTTPSConnection(url, timeout=30)
+                    c = httplib.HTTPSConnection(url, timeout=60)
                     c.request("GET", path)
                     response = c.getresponse()
                 else:
                     logging.info("Reading http://" + str(url) + path)
-                    response = urllib2.urlopen("http://" + str(url) + path, timeout=30)
+                    response = urllib2.urlopen("http://" + str(url) + path, timeout=60)
                 logging.debug("Got response")
                 result = response.read()
                 break
@@ -156,6 +156,13 @@ class JmxReader(object):
         self.jmx_raw = Helper.http_get(self.host, self.port, self.https, "/jmx?anonymous=true")
         if self.jmx_raw is None:
             raise Exception("Response from " + url + " is None")
+        return self
+
+    def read_query(self, qry):
+        self.jmx_raw = Helper.http_get(self.host, self.port, self.https, qry)
+        if self.jmx_raw is None:
+            raise Exception("Response from " + url + " is None")
+        self.set_raw(self.jmx_raw)
         return self
 
     def set_raw(self, text):
@@ -496,7 +503,11 @@ class JmxMetricCollector(MetricCollector):
             self.on_bean_kv(metric_prefix_name, source, key, value)
 
         for listener in self.listeners:
-            listener.on_bean(source, bean.copy())
+            try:
+                listener.on_bean(source, bean.copy())
+            except Exception as e:
+                logging.error("Failed to parse bean: " + bean["name"])
+                logging.exception(e)
 
     def on_bean_kv(self, prefix, source, key, value):
         # Skip Tags
@@ -574,7 +585,9 @@ class MetricNameFilter(MetricFilter):
             return True
         else:
             for name_filter in self.metric_name_filter:
-                if fnmatch.fnmatch(metric["metric"], name_filter):
+                # multiple threads bug exists in fnmatch
+                #if fnmatch.fnmatch(metric["metric"], name_filter):
+                if re.match(name_filter, metric['metric']):
                     return True
         return False
 

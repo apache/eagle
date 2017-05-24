@@ -17,7 +17,7 @@
 #
 
 from metric_collector import JmxMetricCollector,JmxMetricListener,Runner,MetricNameConverter
-import json, logging, fnmatch, sys
+import json, logging, fnmatch, sys, time
 
 class NNSafeModeMetric(JmxMetricListener):
     def on_metric(self, metric):
@@ -28,15 +28,13 @@ class NNSafeModeMetric(JmxMetricListener):
                 metric["value"] = 0
             self.collector.collect(metric)
 
-class NNHAMetric(JmxMetricListener):
-    PREFIX = "hadoop.namenode.fsnamesystem"
+class NNFileSystemMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.dfs"
 
     def on_bean(self, component, bean):
         if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystem":
-            if bean[u"tag.HAState"] == "active":
-                self.collector.on_bean_kv(self.PREFIX, component, "hastate", 0)
-            else:
-                self.collector.on_bean_kv(self.PREFIX, component, "hastate", 1)
+            checkpointtimelag = int(round(time.time() * 1000)) - bean['LastCheckpointTime']
+            self.collector.on_bean_kv(self.PREFIX, component, "checkpointtimelag", checkpointtimelag)
 
 class corruptfilesMetric(JmxMetricListener):
     def on_metric(self, metric):
@@ -47,7 +45,6 @@ class TopUserOpCountsMetric(JmxMetricListener):
     def on_metric(self, metric):
         if metric["metric"] == "hadoop.namenode.fsnamesystemstate.topuseropcounts":
             self.collector.collect(metric, "string", MetricNameConverter())
-
 
 class MemoryUsageMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.jvm"
@@ -71,6 +68,9 @@ class NNCapacityUsageMetric(JmxMetricListener):
         if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystemState":
             capacityusage = round(float(bean['CapacityUsed']) / float(bean['CapacityTotal']) * 100, 2)
             self.collector.on_bean_kv(self.PREFIX, component, "capacityusage", capacityusage)
+
+            numrevisedlivedatanodes = bean['NumLiveDataNodes'] + bean['NumDecomDeadDataNodes']
+            self.collector.on_bean_kv(self.PREFIX, component, "numrevisedlivedatanodes", numrevisedlivedatanodes)
 
 class JournalTransactionInfoMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.journaltransaction"
@@ -107,12 +107,11 @@ if __name__ == '__main__':
     collector = JmxMetricCollector()
     collector.register(
         NNSafeModeMetric(),
-        NNHAMetric(),
+        NNFileSystemMetric(),
         MemoryUsageMetric(),
         NNCapacityUsageMetric(),
         JournalTransactionInfoMetric(),
         DatanodeFSDatasetState(),
-        HBaseRegionServerMetric(),
         corruptfilesMetric(),
         TopUserOpCountsMetric()
     )
