@@ -93,11 +93,6 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
             analysisAPIEntity.setNumTotalReduces(entity.getTotalReduces());
             analysisAPIEntity.setCurrentState(entity.getCurrentState());
 
-            double totalOpsPerSecond = (entity.getDurationTime() == 0) ? 0 :
-                    (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getDurationTime() / 1000);
-
-            double avgOpsPerTask = (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getTotalMaps() + entity.getTotalReduces());
-
             double avgOpsPerMap = 0;
             double avgMapTime = 0;
             double avgOpsPerReduce = 0;
@@ -116,6 +111,11 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
                 reduceOpsPerSecond = totalReduceHdfsOps / ((reduceEndTime - reduceStartTime) / 1000);
             }
 
+            double totalOpsPerSecond = (entity.getDurationTime() == 0) ? 0 :
+                    (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getDurationTime() / 1000);
+
+            double avgOpsPerTask = (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getTotalMaps() + entity.getTotalReduces());
+            
             analysisAPIEntity.setTotalOpsPerSecond(totalOpsPerSecond);
             analysisAPIEntity.setMapOpsPerSecond(mapOpsPerSecond);
             analysisAPIEntity.setReduceOpsPerSecond(reduceOpsPerSecond);
