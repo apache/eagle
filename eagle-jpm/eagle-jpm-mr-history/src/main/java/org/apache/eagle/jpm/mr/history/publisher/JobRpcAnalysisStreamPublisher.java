@@ -47,6 +47,11 @@ public class JobRpcAnalysisStreamPublisher extends StreamPublisher<JobRpcAnalysi
         fields.put("avgOpsPerMap", entity.getAvgOpsPerMap());
         fields.put("avgOpsPerReduce", entity.getAvgOpsPerReduce());
         fields.put("currentState", entity.getCurrentState());
+        fields.put("numTotalMaps", entity.getNumTotalMaps());
+        fields.put("numTotalReduces", entity.getNumTotalReduces());
+        fields.put("duration", entity.getDuration());
+        fields.put("avgMapTime", entity.getAvgMapTime());
+        fields.put("avgReduceTime", entity.getAvgReduceTime());
 
         collector.collect(stormStreamId, new ValuesArray(fields.get(MRJobTagName.JOB_ID.toString()), fields));
     }
