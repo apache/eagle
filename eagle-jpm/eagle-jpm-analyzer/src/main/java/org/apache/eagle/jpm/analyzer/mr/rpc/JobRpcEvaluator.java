@@ -91,6 +91,7 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
             analysisAPIEntity.setDuration(entity.getDurationTime());
             analysisAPIEntity.setNumTotalMaps(entity.getTotalMaps());
             analysisAPIEntity.setNumTotalReduces(entity.getTotalReduces());
+            analysisAPIEntity.setCurrentState(entity.getCurrentState());
 
             double totalOpsPerSecond = (entity.getDurationTime() == 0) ? 0 :
                     (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getDurationTime() / 1000);
