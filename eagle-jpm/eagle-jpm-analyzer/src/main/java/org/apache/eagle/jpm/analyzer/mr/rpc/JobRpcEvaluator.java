@@ -54,8 +54,12 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
             long reduceStartTime = Long.MAX_VALUE;
             long reduceEndTime = 0;
 
+            double totalMapTime = 0;
+            double totalReduceTime = 0;
+
             for (TaskExecutionAPIEntity task : entity.getTasksMap().values()) {
                 if (task.getTags().get(TASK_TYPE.toString()).equalsIgnoreCase(Constants.TaskType.MAP.toString())) {
+                    totalMapTime += task.getDuration();
                     if (mapStartTime > task.getStartTime()) {
                         mapStartTime = task.getStartTime();
                     }
@@ -63,6 +67,7 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
                         mapEndTime = task.getEndTime();
                     }
                 } else {
+                    totalReduceTime += task.getDuration();
                     if (reduceStartTime > task.getStartTime()) {
                         reduceStartTime = task.getStartTime();
                     }
@@ -83,26 +88,42 @@ public class JobRpcEvaluator implements Evaluator<MapReduceAnalyzerEntity>, Seri
             analysisAPIEntity.setTags(tags);
             analysisAPIEntity.setTimestamp(entity.getStartTime());
             analysisAPIEntity.setTrackingUrl(entity.getTrackingUrl());
+            analysisAPIEntity.setDuration(entity.getDurationTime());
+            analysisAPIEntity.setNumTotalMaps(entity.getTotalMaps());
+            analysisAPIEntity.setNumTotalReduces(entity.getTotalReduces());
+            analysisAPIEntity.setCurrentState(entity.getCurrentState());
+
+            double avgOpsPerMap = 0;
+            double avgMapTime = 0;
+            double avgOpsPerReduce = 0;
+            double avgReduceTime = 0;
+            double mapOpsPerSecond = 0;
+            double reduceOpsPerSecond = 0;
+
+            if (entity.getTotalMaps() > 0) {
+                avgMapTime = totalMapTime / entity.getTotalMaps();
+                avgOpsPerMap = totalMapHdfsOps / entity.getTotalMaps();
+                mapOpsPerSecond = totalMapHdfsOps / ((mapEndTime - mapStartTime) / 1000);
+            }
+            if (entity.getTotalReduces() > 0) {
+                avgReduceTime = totalReduceTime / entity.getTotalReduces();
+                avgOpsPerReduce = totalReduceHdfsOps / entity.getTotalReduces();
+                reduceOpsPerSecond = totalReduceHdfsOps / ((reduceEndTime - reduceStartTime) / 1000);
+            }
 
             double totalOpsPerSecond = (entity.getDurationTime() == 0) ? 0 :
                     (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getDurationTime() / 1000);
-            double mapOpsPerSecond = (entity.getTotalMaps() == 0) ? 0 :
-                    totalMapHdfsOps / ((mapEndTime - mapStartTime) / 1000);
-            double reduceOpsPerSecond = (entity.getTotalReduces() == 0) ? 0 :
-                    totalReduceHdfsOps / ((reduceEndTime - reduceStartTime) / 1000);
-            
-            double avgOpsPerTask = (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getTotalMaps() + entity.getTotalReduces());
-            double avgOpsPerMap = (entity.getTotalMaps() == 0) ? 0 :
-                    totalMapHdfsOps / entity.getTotalMaps();
-            double avgOpsPerReduce = (entity.getTotalReduces() == 0) ? 0 :
-                    totalReduceHdfsOps / entity.getTotalReduces();
 
+            double avgOpsPerTask = (totalMapHdfsOps + totalReduceHdfsOps) / (entity.getTotalMaps() + entity.getTotalReduces());
+            
             analysisAPIEntity.setTotalOpsPerSecond(totalOpsPerSecond);
             analysisAPIEntity.setMapOpsPerSecond(mapOpsPerSecond);
             analysisAPIEntity.setReduceOpsPerSecond(reduceOpsPerSecond);
             analysisAPIEntity.setAvgOpsPerTask(avgOpsPerTask);
             analysisAPIEntity.setAvgOpsPerMap(avgOpsPerMap);
             analysisAPIEntity.setAvgOpsPerReduce(avgOpsPerReduce);
+            analysisAPIEntity.setAvgMapTime(avgMapTime);
+            analysisAPIEntity.setAvgReduceTime(avgReduceTime);
 
             Result.EvaluatorResult result = new Result.EvaluatorResult();
             result.addProcessorEntity(JobRpcEvaluator.class, analysisAPIEntity);

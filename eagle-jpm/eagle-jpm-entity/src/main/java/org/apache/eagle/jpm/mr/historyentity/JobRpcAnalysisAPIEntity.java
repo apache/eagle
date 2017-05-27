@@ -51,6 +51,16 @@ public class JobRpcAnalysisAPIEntity extends TaggedLogAPIEntity {
     private double avgOpsPerMap;
     @Column("h")
     private double avgOpsPerReduce;
+    @Column("i")
+    private double avgMapTime;
+    @Column("j")
+    private double avgReduceTime;
+    @Column("k")
+    private int numTotalMaps;
+    @Column("l")
+    private int numTotalReduces;
+    @Column("m")
+    private long duration;
 
     public String getTrackingUrl() {
         return trackingUrl;
@@ -122,6 +132,51 @@ public class JobRpcAnalysisAPIEntity extends TaggedLogAPIEntity {
     public void setAvgOpsPerReduce(double avgOpsPerReduce) {
         this.avgOpsPerReduce = avgOpsPerReduce;
         valueChanged("avgOpsPerReduce");
+    }
+
+    public double getAvgMapTime() {
+        return avgMapTime;
+    }
+
+    public void setAvgMapTime(double avgMapTime) {
+        this.avgMapTime = avgMapTime;
+        valueChanged("avgMapTime");
+    }
+
+    public double getAvgReduceTime() {
+        return avgReduceTime;
+    }
+
+    public void setAvgReduceTime(double avgReduceTime) {
+        this.avgReduceTime = avgReduceTime;
+        valueChanged("avgReduceTime");
+    }
+
+    public int getNumTotalMaps() {
+        return numTotalMaps;
+    }
+
+    public void setNumTotalMaps(int numTotalMaps) {
+        this.numTotalMaps = numTotalMaps;
+        valueChanged("numTotalMaps");
+    }
+
+    public int getNumTotalReduces() {
+        return numTotalReduces;
+    }
+
+    public void setNumTotalReduces(int numTotalReduces) {
+        this.numTotalReduces = numTotalReduces;
+        valueChanged("numTotalReduces");
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+        valueChanged("duration");
     }
 
 }
