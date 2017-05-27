@@ -175,10 +175,12 @@ public class MonitorMetadataGenerator {
                     routeSpec.setStreamId(partiton.getStreamId());
 
                     for (StreamWorkSlotQueue sq : ms.getQueues()) {
-                        PolicyWorkerQueue queue = new PolicyWorkerQueue();
-                        queue.setWorkers(sq.getWorkingSlots());
-                        queue.setPartition(partiton);
-                        routeSpec.addQueue(queue);
+                        if (sq.getTopoGroupStartIndex().containsKey(u.getTopoName())) {
+                            PolicyWorkerQueue queue = new PolicyWorkerQueue();
+                            queue.setWorkers(sq.getWorkingSlots());
+                            queue.setPartition(partiton);
+                            routeSpec.addQueue(queue);
+                        }
                     }
 
                     spec.addRouterSpec(routeSpec);
