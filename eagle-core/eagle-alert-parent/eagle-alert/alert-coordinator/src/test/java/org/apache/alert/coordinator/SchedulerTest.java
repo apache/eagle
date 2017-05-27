@@ -63,6 +63,8 @@ public class SchedulerTest {
     private static final String TEST_POLICY_1 = "test-policy1";
     private static final String TEST_POLICY_2 = "test-policy2";
     private static final String TEST_POLICY_3 = "test-policy3";
+    private static final String TEST_POLICY_4 = "test-policy4";
+    private static final String TEST_POLICY_5 = "test-policy5";
     private static final String STREAM1 = "stream1";
     private static final String DS_NAME = "ds1";
     private static ObjectMapper mapper = new ObjectMapper();
@@ -185,6 +187,45 @@ public class SchedulerTest {
                 String topo1 = alertSpec.getTopologyName();
                 LOG.info("alert spec topology name {}", topo1);
                 Assert.assertEquals(0, alertSpec.getBoltPolicyIdsMap().size());
+            }
+        }
+    }
+
+    @Test
+    public void testMonitorMetadataGenerator() {
+        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService(6, 10);
+
+        GreedyPolicyScheduler ps = new GreedyPolicyScheduler();
+
+        // topology has
+        InMemScheduleConext context = createScheduleContext(mgmtService);
+        createSamplePolicy(context, TEST_POLICY_1, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_2, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_3, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_4, STREAM1, PARALELLISM);
+
+        ps.init(context, mgmtService);
+        ScheduleOption option = new ScheduleOption();
+        option.setPoliciesPerBolt(1);
+        ps.schedule(option);
+        ScheduleState state = ps.getState();
+
+        Assert.assertTrue(state.getGroupSpecs().get("topo2").getRouterSpecs().size() == 0);
+
+        context = createScheduleContext(mgmtService);
+        createSamplePolicy(context, TEST_POLICY_1, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_2, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_3, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_4, STREAM1, PARALELLISM);
+        createSamplePolicy(context, TEST_POLICY_5, STREAM1, PARALELLISM);
+
+        ps.init(context, mgmtService);
+        ps.schedule(option);
+        state = ps.getState();
+
+        for(StreamRouterSpec spec : state.getGroupSpecs().get("topo2").getRouterSpecs()) {
+            if (spec.getStreamId().equals(STREAM1)) {
+                Assert.assertTrue(spec.getTargetQueue().size() == 1);
             }
         }
     }
