@@ -54,6 +54,8 @@ public class EagleMailClient {
             velocityEngine = new VelocityEngine();
             velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,org.apache.velocity.runtime.log.NullLogChute.class.getName());
+            
             velocityEngine.init();
 
             config.put("mail.transport.protocol", "smtp");
