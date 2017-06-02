@@ -24,7 +24,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.velocity.runtime.log.Log4JLogChute;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -53,6 +53,9 @@ public class EagleMailClient {
             velocityEngine = new VelocityEngine();
             velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, Log4JLogChute.class.getName());
+            velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", LOG.getName());
+            velocityEngine.init();
             velocityEngine.init();
 
             config.put("mail.transport.protocol", "smtp");
