@@ -196,6 +196,23 @@
 					<div editor placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></div>
 				</div>
 
+				<div class="form-group">
+					<label>Alert De-duplication Interval(min)</label><br/>
+					<input class="form-control" type="text" ng-model="policy.deduplication.dedupIntervalMin" ng-disabled="policyLock" />
+				</div>
+
+				<div class="form-group">
+					<label>Alert De-duplication Fields</label><br/>
+					<ul>
+						<li ng-repeat="field in getOutputFields() track by $index">
+						<label>
+							<input type="checkbox" ng-checked="isDedupFieldSelected(field)" ng-click="checkDedupField(field)" ng-disabled="policyLock" />
+							{{field}}
+						</label>
+						</li>
+					</ul>
+				</div>
+
 				<label>
 					Publish Alerts
 				</label>
