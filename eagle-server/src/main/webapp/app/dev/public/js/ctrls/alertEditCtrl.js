@@ -322,7 +322,6 @@
 			$scope.publisher = {
 				existPublisher: $scope.publisherList[0],
 				type: "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
-				dedupIntervalMin: "PT1M",
 				serializer : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer",
 				properties: {}
 			};

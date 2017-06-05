@@ -201,9 +201,9 @@
 					<input class="form-control" type="text" ng-model="policy.deduplication.dedupIntervalMin" ng-disabled="policyLock" />
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" ng-if="getOutputFields().length">
 					<label>Alert De-duplication Fields</label><br/>
-					<ul>
+					<ul class="sm-padding">
 						<li ng-repeat="field in getOutputFields() track by $index">
 						<label>
 							<input type="checkbox" ng-checked="isDedupFieldSelected(field)" ng-click="checkDedupField(field)" ng-disabled="policyLock" />
@@ -346,10 +346,6 @@
 							<small ng-if="checkPublisherName()">({{checkPublisherName()}})</small>
 						</label>
 						<input class="form-control" ng-model="publisher.name" />
-					</div>
-					<div class="form-group">
-						<label>Dedup-Interval Minutes</label>
-						<input class="form-control" ng-model="publisher.dedupIntervalMin" />
 					</div>
 					<div class="form-group">
 						<label>Type</label>
