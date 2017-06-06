@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.Properties;
 
 public class EagleMailClient {
+    
     private static final Logger LOG = LoggerFactory.getLogger(EagleMailClient.class);
     private static final String BASE_PATH = "templates/";
-
     private VelocityEngine velocityEngine;
     private Session session;
 
@@ -56,16 +56,15 @@ public class EagleMailClient {
             velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, Log4JLogChute.class.getName());
             velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", LOG.getName());
             velocityEngine.init();
-            velocityEngine.init();
 
             config.put("mail.transport.protocol", "smtp");
             if (Boolean.parseBoolean(config.getProperty(AlertEmailConstants.CONF_MAIL_AUTH))) {
                 session = Session.getInstance(config, new Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(
-                            config.getProperty(AlertEmailConstants.CONF_AUTH_USER),
-                            config.getProperty(AlertEmailConstants.CONF_AUTH_PASSWORD)
-                        );
+                                config.getProperty(AlertEmailConstants.CONF_AUTH_USER),
+                                config.getProperty(AlertEmailConstants.CONF_AUTH_PASSWORD)
+                                );
                     }
                 });
             } else {
