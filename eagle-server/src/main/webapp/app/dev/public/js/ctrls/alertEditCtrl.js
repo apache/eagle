@@ -73,6 +73,10 @@
 				severity: "WARNING",
 				category: "DEFAULT"
 			},
+			deduplication: {
+				dedupIntervalMin: '30',
+				dedupFields: [],
+			},
 			partitionSpec: [],
 			parallelismHint: 5
 		}, $scope.policy);
@@ -174,6 +178,7 @@
 		}
 
 		var checkPromise;
+		$scope.definition = {};
 		$scope.definitionMessage = "";
 		$scope.checkDefinition = function () {
 			$timeout.cancel(checkPromise);
@@ -182,25 +187,33 @@
 					var data = res.data;
 					console.log(data);
 					if(data.success) {
+						$scope.definition = {};
 						$scope.definitionMessage = "";
+
 						if(data.policyExecutionPlan) {
+							$scope.definition = data;
+
 							// Input streams
 							$scope.policy.inputStreams = $.map(data.policyExecutionPlan.inputStreams, function (value, stream) {
 								return stream;
 							});
 
 							// Output streams
-							var outputStreams= $.map(data.policyExecutionPlan.outputStreams, function (value, stream) {
+							var outputStreams = $.map(data.policyExecutionPlan.outputStreams, function (value, stream) {
 								return stream;
 							});
 							$scope.policy.outputStreams = outputStreams.concat();
 							$scope.outputStreams = outputStreams;
 							autoDescription();
 
+							// Dedup fields
+							$scope.policy.deduplication.dedupFields = [];
+
 							// Partition
 							$scope.policy.partitionSpec = data.policyExecutionPlan.streamPartitions;
 						}
 					} else {
+						$scope.definition = {};
 						$scope.definitionMessage = data.message;
 					}
 				});
@@ -224,6 +237,34 @@
 			}
 			autoDescription();
 		};
+
+		$scope.getOutputFields = function () {
+			var defOutputStreams = common.getValueByPath($scope.definition || {}, 'policyExecutionPlan.outputStreams');
+			if (!defOutputStreams) return [];
+
+			var fields = $.map($scope.policy.outputStreams, function (outputStream) {
+				var fields = defOutputStreams[outputStream];
+				return $.map(fields, function (field) {
+					return field.name;
+				});
+			});
+
+			return fields;
+		};
+
+		$scope.isDedupFieldSelected = function (field) {
+			return $.inArray(field, $scope.policy.deduplication.dedupFields) >= 0;
+		};
+
+		$scope.checkDedupField = function (field) {
+			if($scope.isDedupFieldSelected(field)) {
+				$scope.policy.deduplication.dedupFields = common.array.remove(field, $scope.policy.deduplication.dedupFields);
+			} else {
+				$scope.policy.deduplication.dedupFields.push(field);
+			}
+		};
+
+		//$scope.policy.deduplication.dedupFields
 
 		// ==============================================================
 		// =                         Partition                          =
@@ -281,7 +322,6 @@
 			$scope.publisher = {
 				existPublisher: $scope.publisherList[0],
 				type: "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
-				dedupIntervalMin: "PT1M",
 				serializer : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer",
 				properties: {}
 			};
