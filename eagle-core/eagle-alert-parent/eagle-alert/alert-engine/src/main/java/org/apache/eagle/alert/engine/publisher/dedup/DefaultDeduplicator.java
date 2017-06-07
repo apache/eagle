@@ -56,6 +56,8 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         }
         this.withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
                 this.dedupIntervalSec, TimeUnit.SECONDS).build();
+
+        LOG.info("initialize DefaultDeduplicator with dedupIntervalSec={}, customDedupFields={}", dedupIntervalSec, customDedupFields);
     }
 
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
@@ -74,6 +76,8 @@ public class DefaultDeduplicator implements AlertDeduplicator {
 
         withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
             this.dedupIntervalSec, TimeUnit.SECONDS).build();
+
+        LOG.info("initialize DefaultDeduplicator with dedupIntervalSec={}, customDedupFields={}", dedupIntervalSec, customDedupFields);
     }
 
     /*
@@ -103,7 +107,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (event == null) {
             return null;
         }
-        if (dedupIntervalSec == 0) {
+        if (dedupIntervalSec <= 0) {
             return Collections.singletonList(event);
         }
 

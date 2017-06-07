@@ -18,22 +18,23 @@
 
 package org.apache.eagle.alert.engine.router;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.PublishPartition;
-import org.apache.eagle.alert.engine.coordinator.Publishment;
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
+import org.apache.eagle.alert.engine.publisher.dedup.DedupKey;
+import org.apache.eagle.alert.engine.publisher.dedup.DefaultDeduplicator;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublishPluginsFactory;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
+import org.apache.eagle.alert.engine.publisher.template.AlertTemplateProvider;
 import org.apache.eagle.alert.engine.runner.AlertPublisherBolt;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
@@ -299,5 +300,77 @@ public class TestAlertPublisherBolt {
         publisher.nextEvent(new PublishPartition(event3.getStreamId(), event3.getPolicyId(),
             pubs.get(0).getName(), pubs.get(0).getPartitionColumns()), event3);
 
+    }
+
+    @Test
+    public void testOnAlertPolicyChange() throws IllegalAccessException, NoSuchFieldException {
+        AlertDeduplication deduplication = new AlertDeduplication();
+        deduplication.setDedupIntervalMin("1");
+        deduplication.setOutputStreamId("stream");
+
+        PolicyDefinition policy1 = new PolicyDefinition();
+        policy1.setName("policy1");
+        policy1.getAlertDeduplications().add(deduplication);
+
+        Map<String, PolicyDefinition> pds1 = new HashMap<>();
+        pds1.put("policy1", policy1);
+
+        PolicyDefinition policy2 = new PolicyDefinition();
+        policy2.setName("policy2");
+        policy2.getAlertDeduplications().add(deduplication);
+
+        Map<String, PolicyDefinition> pds2 = new HashMap<>();
+        pds2.put("policy2", policy2);
+
+        AlertPublisherBolt bolt = new AlertPublisherBolt("publisher", null, null);
+
+        Field field = AlertPublisherBolt.class.getDeclaredField("alertTemplateEngine");
+        field.setAccessible(true);
+        AlertTemplateEngine engine = AlertTemplateProvider.createAlertTemplateEngine();
+        engine.init(null);
+        field.set(bolt, engine);
+
+        DedupKey dedupKey1 = new DedupKey("policy1", "stream");
+        DedupKey dedupKey2 = new DedupKey("policy2", "stream");
+        bolt.onAlertPolicyChange(pds1, null);
+        Map<DedupKey, DefaultDeduplicator> deduplicatorMap = getAlertDeduplicator(bolt);
+        Assert.assertTrue(deduplicatorMap.containsKey(dedupKey1));
+
+        // remove policy1 and add policy2
+        bolt.onAlertPolicyChange(pds2, null);
+        deduplicatorMap = getAlertDeduplicator(bolt);
+        Assert.assertTrue(deduplicatorMap.containsKey(dedupKey2));
+        Assert.assertFalse(deduplicatorMap.containsKey(dedupKey1));
+
+        // add new policy policy1 in pds2
+        pds2.put("policy1", policy1);
+        bolt.onAlertPolicyChange(pds2, null);
+        deduplicatorMap = getAlertDeduplicator(bolt);
+        Assert.assertTrue(deduplicatorMap.containsKey(dedupKey1));
+        Assert.assertTrue(deduplicatorMap.containsKey(dedupKey2));
+        Assert.assertTrue(deduplicatorMap.get(dedupKey1).getAlertDeduplication()
+                .equals(deduplicatorMap.get(dedupKey2).getAlertDeduplication()));
+
+        // update policy1 alertDeduplication
+        AlertDeduplication deduplication1 = new AlertDeduplication();
+        deduplication1.setOutputStreamId("stream");
+        deduplication1.setDedupIntervalMin("2");
+        policy1.getAlertDeduplications().clear();
+        policy1.getAlertDeduplications().add(deduplication1);
+        pds2.put("policy1", policy1);
+        bolt.onAlertPolicyChange(pds2, null);
+        deduplicatorMap = getAlertDeduplicator(bolt);
+        Assert.assertTrue(deduplicatorMap.containsKey(new DedupKey("policy2", "stream")));
+        Assert.assertTrue(deduplicatorMap.containsKey(new DedupKey("policy1", "stream")));
+        Assert.assertFalse(deduplicatorMap.get(dedupKey1).getAlertDeduplication()
+                .equals(deduplicatorMap.get(dedupKey2).getAlertDeduplication()));
+
+    }
+
+
+    private Map<DedupKey, DefaultDeduplicator> getAlertDeduplicator(AlertPublisherBolt bolt) throws NoSuchFieldException, IllegalAccessException {
+        Field field = AlertPublisherBolt.class.getDeclaredField("deduplicatorMap");
+        field.setAccessible(true);
+        return (Map<DedupKey, DefaultDeduplicator>) field.get(bolt);
     }
 }

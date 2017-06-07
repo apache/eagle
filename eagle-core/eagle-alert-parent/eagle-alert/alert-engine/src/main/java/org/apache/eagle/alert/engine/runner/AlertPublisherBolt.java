@@ -87,7 +87,6 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             }
             DedupKey dedupKey = new DedupKey(event.getPolicyId(), event.getStreamId());
             if (deduplicatorMap != null && deduplicatorMap.containsKey(dedupKey)) {
-
                 List<AlertStreamEvent> eventList = deduplicatorMap.get(dedupKey).dedup(event);
                 if (eventList == null || eventList.isEmpty()) {
                     collector.ack(input);
