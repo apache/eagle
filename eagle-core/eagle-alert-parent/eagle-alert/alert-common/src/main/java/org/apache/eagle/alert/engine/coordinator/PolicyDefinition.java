@@ -43,7 +43,7 @@ public class PolicyDefinition implements Serializable {
     private Definition stateDefinition;
     private PolicyStatus policyStatus = PolicyStatus.ENABLED;
     private AlertDefinition alertDefinition;
-    private AlertDeduplication deduplication;
+    private List<AlertDeduplication> alertDeduplications = new ArrayList<>();
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -136,49 +136,12 @@ public class PolicyDefinition implements Serializable {
         this.policyStatus = policyStatus;
     }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(siteId)
-                .append(name)
-                .append(inputStreams)
-                .append(outputStreams)
-                .append(definition)
-                .append(partitionSpec)
-                .append(policyStatus)
-                .append(parallelismHint)
-                .append(alertDefinition)
-                .append(deduplication)
-                .build();
+    public List<AlertDeduplication> getAlertDeduplications() {
+        return alertDeduplications;
     }
 
-    @Override
-    public boolean equals(Object that) {
-        if (that == this) {
-            return true;
-        }
-
-        if (!(that instanceof PolicyDefinition)) {
-            return false;
-        }
-
-        PolicyDefinition another = (PolicyDefinition) that;
-
-        if (Objects.equals(another.siteId, this.siteId)
-                && Objects.equals(another.name, this.name)
-                && Objects.equals(another.description, this.description)
-                && CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams)
-                && CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams)
-                && (another.definition != null && another.definition.equals(this.definition))
-                && Objects.equals(this.definition, another.definition)
-                && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
-                && another.policyStatus.equals(this.policyStatus)
-                && another.parallelismHint == this.parallelismHint
-                && Objects.equals(another.alertDefinition, alertDefinition)
-                && Objects.equals(another.deduplication, deduplication)) {
-            return true;
-        }
-        return false;
+    public void setAlertDeduplications(List<AlertDeduplication> alertDeduplications) {
+        this.alertDeduplications = alertDeduplications;
     }
 
     public AlertDefinition getAlertDefinition() {
@@ -205,12 +168,49 @@ public class PolicyDefinition implements Serializable {
         this.siteId = siteId;
     }
 
-    public AlertDeduplication getDeduplication() {
-        return deduplication;
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(siteId)
+                .append(name)
+                .append(inputStreams)
+                .append(outputStreams)
+                .append(definition)
+                .append(partitionSpec)
+                .append(policyStatus)
+                .append(parallelismHint)
+                .append(alertDefinition)
+                .append(alertDeduplications)
+                .build();
     }
 
-    public void setDeduplication(AlertDeduplication deduplication) {
-        this.deduplication = deduplication;
+    @Override
+    public boolean equals(Object that) {
+        if (that == this) {
+            return true;
+        }
+
+        if (!(that instanceof PolicyDefinition)) {
+            return false;
+        }
+
+        PolicyDefinition another = (PolicyDefinition) that;
+
+        if (Objects.equals(another.siteId, this.siteId)
+                && Objects.equals(another.name, this.name)
+                && Objects.equals(another.description, this.description)
+                && CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams)
+                && CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams)
+                && (another.definition != null && another.definition.equals(this.definition))
+                && Objects.equals(this.definition, another.definition)
+                && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
+                && another.policyStatus.equals(this.policyStatus)
+                && another.parallelismHint == this.parallelismHint
+                && Objects.equals(another.alertDefinition, alertDefinition)
+                && CollectionUtils.isEqualCollection(another.alertDeduplications, alertDeduplications)) {
+            return true;
+        }
+        return false;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

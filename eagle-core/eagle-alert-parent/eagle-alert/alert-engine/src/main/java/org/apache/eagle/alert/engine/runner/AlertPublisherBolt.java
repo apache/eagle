@@ -28,22 +28,17 @@ import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.model.AlertPublishEvent;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
-import org.apache.eagle.alert.engine.publisher.AlertPublisher;
-import org.apache.eagle.alert.engine.publisher.AlertStreamFilter;
-import org.apache.eagle.alert.engine.publisher.PipeStreamFilter;
+import org.apache.eagle.alert.engine.publisher.*;
+import org.apache.eagle.alert.engine.publisher.dedup.DedupKey;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
-import org.apache.eagle.alert.engine.publisher.impl.DefaultDeduplicator;
+import org.apache.eagle.alert.engine.publisher.dedup.DefaultDeduplicator;
 import org.apache.eagle.alert.engine.publisher.template.AlertTemplateEngine;
 import org.apache.eagle.alert.engine.publisher.template.AlertTemplateProvider;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -53,7 +48,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private volatile Map<String, Publishment> cachedPublishments = new HashMap<>();
     private volatile Map<String, PolicyDefinition> policyDefinitionMap;
     private volatile Map<String, StreamDefinition> streamDefinitionMap;
-    private volatile Map<String, DefaultDeduplicator> deduplicatorMap = new ConcurrentHashMap<>();
+    private volatile Map<DedupKey, DefaultDeduplicator> deduplicatorMap = new ConcurrentHashMap<>();
     private AlertTemplateEngine alertTemplateEngine;
 
     private boolean logEventEnabled;
@@ -90,13 +85,17 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             if (logEventEnabled) {
                 LOG.info("Alert publish bolt {}/{} with partition {} received event: {}", this.getBoltId(), this.context.getThisTaskId(), partition, event);
             }
-            if (deduplicatorMap != null && deduplicatorMap.containsKey(event.getPolicyId())) {
-                List<AlertStreamEvent> eventList = deduplicatorMap.get(event.getPolicyId()).dedup(event);
+            DedupKey dedupKey = new DedupKey(event.getPolicyId(), event.getStreamId());
+            if (deduplicatorMap != null && deduplicatorMap.containsKey(dedupKey)) {
+
+                List<AlertStreamEvent> eventList = deduplicatorMap.get(dedupKey).dedup(event);
                 if (eventList == null || eventList.isEmpty()) {
                     collector.ack(input);
                     return;
                 }
+                event.setDuplicationChecked(true);
             }
+
             AlertStreamEvent filteredEvent = alertFilter.filter(event);
             if (filteredEvent != null) {
                 alertPublisher.nextEvent(partition, filteredEvent);
@@ -161,8 +160,15 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         for (Map.Entry<String, PolicyDefinition> entry : pds.entrySet()) {
             try {
                 this.alertTemplateEngine.register(entry.getValue());
-                if (entry.getValue().getDeduplication() != null) {
-                    this.deduplicatorMap.put(entry.getKey(), new DefaultDeduplicator(entry.getValue().getDeduplication()));
+                List<AlertDeduplication> alertDeduplications = entry.getValue().getAlertDeduplications();
+                if (alertDeduplications != null && alertDeduplications.size() > 0) {
+                    for (AlertDeduplication deduplication : alertDeduplications) {
+                        DedupKey dedupKey = new DedupKey(entry.getKey(), deduplication.getOutputStreamId());
+                        if (!deduplicatorMap.containsKey(dedupKey)
+                                || !deduplicatorMap.get(dedupKey).getAlertDeduplication().equals(deduplication)) {
+                            deduplicatorMap.put(dedupKey, new DefaultDeduplicator(deduplication));
+                        }
+                    }
                 }
             } catch (Throwable throwable) {
                 LOG.error("Failed to register policy {} in template engine", entry.getKey(), throwable);
@@ -172,8 +178,10 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         for (String policyId : policyToRemove) {
             try {
                 this.alertTemplateEngine.unregister(policyId);
-                if (deduplicatorMap != null && deduplicatorMap.containsKey(policyId)) {
-                    deduplicatorMap.remove(policyId);
+                for (DedupKey dedupKey : deduplicatorMap.keySet()) {
+                    if (dedupKey.getPolicyId().equals(policyId)) {
+                        deduplicatorMap.remove(dedupKey);
+                    }
                 }
             } catch (Throwable throwable) {
                 LOG.error("Failed to unregister policy {} from template engine", policyId, throwable);
@@ -231,4 +239,5 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             return this.alertTemplateEngine.filter(event);
         }
     }
+
 }
