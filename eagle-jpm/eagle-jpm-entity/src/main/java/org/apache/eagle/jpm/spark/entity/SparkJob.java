@@ -23,13 +23,13 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Table("eglesprk_jobs")
+@Table("eagle_spark_jobs")
 @ColumnFamily("f")
-@Prefix("sprkjob")
+@Prefix("sparkjob")
 @Service(Constants.SPARK_JOB_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(true)
-@Tags({"site","sprkAppId", "sprkAppAttemptId", "sprkAppName", "normSprkAppName", "jobId","user", "queue"})
+@Tags({"site","sparkAppId", "sparkAppAttemptId", "sparkAppName", "normsparkAppName", "jobId","user", "queue"})
 @Partition({"site"})
 public class SparkJob extends TaggedLogAPIEntity {
 

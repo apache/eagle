@@ -19,10 +19,10 @@ package org.apache.eagle.jpm.util;
 
 public enum SparkJobTagName {
     SITE("site"),
-    SPARK_APP_ID("sprkAppId"),
-    SPARK_APP_ATTEMPT_ID("sprkAppAttemptId"),
-    SPARK_APP_NAME("sprkAppName"),
-    SPARK_APP_NORM_NAME("normSprkAppName"),
+    SPARK_APP_ID("sparkAppId"),
+    SPARK_APP_ATTEMPT_ID("sparkAppAttemptId"),
+    SPARK_APP_NAME("sparkAppName"),
+    SPARK_APP_NORM_NAME("normsparkAppName"),
     SPARK_JOB_ID("jobId"),
     SPARK_SATGE_ID("stageId"),
     SPARK_STAGE_ATTEMPT_ID("stageAttemptId"),
