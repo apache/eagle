@@ -22,7 +22,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.impl.DefaultDeduplicator;
 import org.junit.Assert;
 import org.junit.Test;
 

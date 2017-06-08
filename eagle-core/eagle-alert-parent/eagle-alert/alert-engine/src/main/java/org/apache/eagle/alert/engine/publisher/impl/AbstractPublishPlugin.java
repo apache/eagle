@@ -26,6 +26,7 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
+import org.apache.eagle.alert.engine.publisher.dedup.DefaultDeduplicator;
 import org.apache.eagle.alert.engine.publisher.dedup.ExtendedDeduplicator;
 import org.slf4j.Logger;
 
@@ -93,7 +94,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
             }
             serializer = (IEventSerializer) obj;
         } catch (Exception e) {
-            getLogger().error(String.format("initialized failed, use default StringEventSerializer, failure message : {}", e.getMessage()), e);
+            getLogger().error("initialized failed, use default StringEventSerializer, failure message : {}", e.getMessage(), e);
             serializer = new StringEventSerializer(conf);
         }
     }
@@ -105,7 +106,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
 
     @Override
     public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
-        if (null != deduplicator) {
+        if (null != deduplicator && !event.isDuplicationChecked()) {
             return deduplicator.dedup(event);
         } else {
             return Collections.singletonList(event);

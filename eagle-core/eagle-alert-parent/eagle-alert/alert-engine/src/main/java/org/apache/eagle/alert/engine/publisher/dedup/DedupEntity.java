@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
-
 public class DedupEntity {
 
     private String publishName;
