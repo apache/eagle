@@ -216,12 +216,12 @@
                     <defaultValue>0.0</defaultValue>
                 </column>
                 <column>
-                    <name>avgOpsPerMapTask</name>
+                    <name>avgOpsPerMap</name>
                     <type>double</type>
                     <defaultValue>0.0</defaultValue>
                 </column>
                 <column>
-                    <name>avgOpsPerReduceTask</name>
+                    <name>avgOpsPerReduce</name>
                     <type>double</type>
                     <defaultValue>0.0</defaultValue>
                 </column>
