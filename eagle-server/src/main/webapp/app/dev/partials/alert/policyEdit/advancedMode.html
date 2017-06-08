@@ -196,19 +196,25 @@
 					<div editor placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></div>
 				</div>
 
-				<div class="form-group">
-					<label>Alert De-duplication Interval(min)</label><br/>
-					<input class="form-control" type="text" ng-model="policy.deduplication.dedupIntervalMin" ng-disabled="policyLock" />
-				</div>
+				<!-- Alert dedup region -->
+				<div>
+					<label>Alert De-duplication</label>
+					<ul>
+						<li ng-repeat="outputStreamDedup in policy.alertDeduplications track by $index">
+							<span>{{outputStreamDedup.outputStreamId}}</span><br />
+							<div class="input-group">
+								<span class="bg-gray disabled input-group-addon">Alert De-duplication Interval(min)</span>
+								<input class="form-control" type="text" ng-model="outputStreamDedup.dedupIntervalMin" ng-disabled="policyLock" />
+							</div>
 
-				<div class="form-group" ng-if="getOutputFields().length">
-					<label>Alert De-duplication Fields</label><br/>
-					<ul class="sm-padding">
-						<li ng-repeat="field in getOutputFields() track by $index">
-						<label>
-							<input type="checkbox" ng-checked="isDedupFieldSelected(field)" ng-click="checkDedupField(field)" ng-disabled="policyLock" />
-							{{field}}
-						</label>
+							<ul class="sm-padding">
+								<li ng-repeat="field in getOutputStreamFields(outputStreamDedup.outputStreamId) track by $index">
+									<input type="checkbox" ng-disabled="policyLock"
+											ng-checked="isDedupFieldSelected(outputStreamDedup, field)"
+											ng-click="checkDedupField(outputStreamDedup, field)" />
+									{{field}}
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</div>

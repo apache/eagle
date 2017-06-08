@@ -73,10 +73,7 @@
 				severity: "WARNING",
 				category: "DEFAULT"
 			},
-			deduplication: {
-				dedupIntervalMin: '30',
-				dedupFields: [],
-			},
+			alertDeduplications: [],
 			partitionSpec: [],
 			parallelismHint: 5
 		}, $scope.policy);
@@ -207,7 +204,7 @@
 							autoDescription();
 
 							// Dedup fields
-							$scope.policy.deduplication.dedupFields = [];
+							$scope.refreshOutputSteamFields();
 
 							// Partition
 							$scope.policy.partitionSpec = data.policyExecutionPlan.streamPartitions;
@@ -225,6 +222,7 @@
 		// ==============================================================
 		$scope.outputStreams = ($scope.policy.outputStreams || []).concat();
 
+		// Select output stream
 		$scope.isOutputStreamSelected = function (streamId) {
 			return $.inArray(streamId, $scope.policy.outputStreams) >= 0;
 		};
@@ -236,35 +234,44 @@
 				$scope.policy.outputStreams.push(streamId);
 			}
 			autoDescription();
+
+			$scope.refreshOutputSteamFields();
 		};
 
-		$scope.getOutputFields = function () {
+		// Select output steam field
+		$scope.refreshOutputSteamFields = function () {
 			var defOutputStreams = common.getValueByPath($scope.definition || {}, 'policyExecutionPlan.outputStreams');
 			if (!defOutputStreams) return [];
 
-			var fields = $.map($scope.policy.outputStreams, function (outputStream) {
-				var fields = defOutputStreams[outputStream];
-				return $.map(fields, function (field) {
-					return field.name;
-				});
+			$scope.policy.alertDeduplications = $.map($scope.policy.outputStreams, function (outputStream) {
+				return {
+					outputStreamId: outputStream,
+					dedupIntervalMin: '30',
+					dedupFields: [],
+				};
 			});
+		};
+		$scope.getOutputStreamFields = function (outputStream) {
+			var defOutputStreams = common.getValueByPath($scope.definition || {}, 'policyExecutionPlan.outputStreams');
+			if (!defOutputStreams) return [];
 
-			return fields;
+			var fields = defOutputStreams[outputStream];
+			return $.map(fields, function (field) {
+				return field.name;
+			});
 		};
 
-		$scope.isDedupFieldSelected = function (field) {
-			return $.inArray(field, $scope.policy.deduplication.dedupFields) >= 0;
+		$scope.isDedupFieldSelected = function (outputStreamDedup, field) {
+			return $.inArray(field, outputStreamDedup.dedupFields) >= 0;
 		};
 
-		$scope.checkDedupField = function (field) {
+		$scope.checkDedupField = function (outputStreamDedup, field) {
 			if($scope.isDedupFieldSelected(field)) {
-				$scope.policy.deduplication.dedupFields = common.array.remove(field, $scope.policy.deduplication.dedupFields);
+				outputStreamDedup.dedupFields = common.array.remove(field, outputStreamDedup.dedupFields);
 			} else {
-				$scope.policy.deduplication.dedupFields.push(field);
+				outputStreamDedup.dedupFields.push(field);
 			}
 		};
-
-		//$scope.policy.deduplication.dedupFields
 
 		// ==============================================================
 		// =                         Partition                          =
