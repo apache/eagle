@@ -25,7 +25,6 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.velocity.runtime.log.Log4JLogChute;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ public class EagleMailClient {
             velocityEngine = new VelocityEngine();
             velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,Log4JLogChute.class.getName());
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,org.apache.velocity.runtime.log.Log4JLogChute.class.getName());
             velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", LOG.getName());
             velocityEngine.init();
 
@@ -72,6 +71,7 @@ public class EagleMailClient {
                 session = Session.getInstance(config, new Authenticator() {
                 });
             }
+            
             final String debugMode = config.getProperty(AlertEmailConstants.CONF_MAIL_DEBUG, "false");
             final boolean debug = Boolean.parseBoolean(debugMode);
             LOG.info("Set email debug mode: " + debugMode);
