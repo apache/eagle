@@ -191,7 +191,7 @@
 							$scope.definition = data;
 
 							// Input streams
-							$scope.policy.inputStreams = $.map(data.policyExecutionPlan.inputStreams, function (value, stream) {
+							var inputStreams = $.map(data.policyExecutionPlan.inputStreams, function (value, stream) {
 								return stream;
 							});
 
@@ -199,15 +199,30 @@
 							var outputStreams = $.map(data.policyExecutionPlan.outputStreams, function (value, stream) {
 								return stream;
 							});
+
+							// Partition
+							$scope.policy.partitionSpec = $.grep(data.policyExecutionPlan.streamPartitions, function (partition) {
+								return $.inArray(partition.streamId, outputStreams) == -1;
+							});
+							console.log("partitionSpec", $scope.policy.partitionSpec);
+
+							var tempStreams = $.grep(inputStreams, function (i) {
+								return $.inArray(i, outputStreams) > -1;
+							});
+							console.log("tempStream", tempStreams);
+
+							$.each(tempStreams, function (i, tempStream) {
+								inputStreams = common.array.remove(tempStream, inputStreams);
+								outputStreams = common.array.remove(tempStream, outputStreams);
+							});
+
 							$scope.policy.outputStreams = outputStreams.concat();
+							$scope.policy.inputStreams = inputStreams;
 							$scope.outputStreams = outputStreams;
 							autoDescription();
 
 							// Dedup fields
 							$scope.refreshOutputSteamFields();
-
-							// Partition
-							$scope.policy.partitionSpec = data.policyExecutionPlan.streamPartitions;
 						}
 					} else {
 						$scope.definition = {};
