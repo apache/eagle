@@ -202,14 +202,12 @@
 
 							// Partition
 							$scope.policy.partitionSpec = $.grep(data.policyExecutionPlan.streamPartitions, function (partition) {
-								return $.inArray(partition.streamId, outputStreams) == -1;
+								return $.inArray(partition.streamId, outputStreams) === -1;
 							});
-							console.log("partitionSpec", $scope.policy.partitionSpec);
 
 							var tempStreams = $.grep(inputStreams, function (i) {
 								return $.inArray(i, outputStreams) > -1;
 							});
-							console.log("tempStream", tempStreams);
 
 							$.each(tempStreams, function (i, tempStream) {
 								inputStreams = common.array.remove(tempStream, inputStreams);
