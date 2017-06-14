@@ -108,6 +108,10 @@
 					var seriesList = $.map($scope.series || [], function (series, id) {
 						if(id === 0 && !$scope.category) {
 							//var preDate = -1;
+							var first = series.data[0].x || 0;
+							var last = series.data[series.data.length - 1].x || 0;
+							var crossDay = (last - first) / (1000 * 60 * 60 * 24) >= 1;
+
 							categoryList = $.map(series.data, function (point) {
 								/*ivar time = new Time(point.x);
 								f(preDate !== time.date()) {
@@ -117,7 +121,8 @@
 								if($scope.categoryFunc) {
 									return $scope.categoryFunc(point.x);
 								}
-								return Time.format(point.x, "HH:mm");
+
+								return Time.format(point.x, crossDay ? "MM-DD HH:mm" : "HH:mm").replace(' ', '\n');
 							});
 						}
 
@@ -149,7 +154,7 @@
 						grid: {
 							top: '30',
 							left: '0',
-							right: '0',
+							right: '10',
 							bottom: '0',
 							containLabel: true
 						},
