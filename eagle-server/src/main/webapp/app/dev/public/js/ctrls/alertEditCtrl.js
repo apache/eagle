@@ -177,7 +177,7 @@
 		var checkPromise;
 		$scope.definition = {};
 		$scope.definitionMessage = "";
-		$scope.checkDefinition = function () {
+		$scope.checkDefinition = function (keepDefinition) {
 			$timeout.cancel(checkPromise);
 			checkPromise = $timeout(function () {
 				Entity.post("metadata/policies/parse", $scope.policy.definition.value)._then(function (res) {
@@ -201,9 +201,11 @@
 							});
 
 							// Partition
-							$scope.policy.partitionSpec = $.grep(data.policyExecutionPlan.streamPartitions, function (partition) {
-								return $.inArray(partition.streamId, outputStreams) === -1;
-							});
+							if (keepDefinition !== true) {
+								$scope.policy.partitionSpec = $.grep(data.policyExecutionPlan.streamPartitions, function (partition) {
+									return $.inArray(partition.streamId, outputStreams) === -1;
+								});
+							}
 
 							var tempStreams = $.grep(inputStreams, function (i) {
 								return $.inArray(i, outputStreams) > -1;
@@ -214,13 +216,17 @@
 								outputStreams = common.array.remove(tempStream, outputStreams);
 							});
 
-							$scope.policy.outputStreams = outputStreams.concat();
-							$scope.policy.inputStreams = inputStreams;
+							if (keepDefinition !== true) {
+								$scope.policy.outputStreams = outputStreams.concat();
+								$scope.policy.inputStreams = inputStreams;
+							}
 							$scope.outputStreams = outputStreams;
 							autoDescription();
 
 							// Dedup fields
-							$scope.refreshOutputSteamFields();
+							if (keepDefinition !== true) {
+								$scope.refreshOutputSteamFields();
+							}
 						}
 					} else {
 						$scope.definition = {};
@@ -229,6 +235,8 @@
 				});
 			}, 350);
 		};
+
+		$scope.checkDefinition(true);
 
 		// ==============================================================
 		// =                        Output Stream                       =
