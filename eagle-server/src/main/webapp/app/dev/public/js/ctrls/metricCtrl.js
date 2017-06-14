@@ -35,6 +35,8 @@
 		$scope.groups = $wrapState.param.groups;
 		$scope.fields = $wrapState.param.fields;
 
+		$scope.currentMetricName = '';
+
 		$scope.commonOption = {};
 
 		$scope.metricList = [$scope.metricName];
@@ -50,6 +52,8 @@
 		});
 
 		$scope.loadSeries = function() {
+			$scope.currentMetricName = $scope.metricName;
+
 			$scope.series = CompatibleEntity.timeSeries({
 				condition: { site: $scope.site },
 				groups: $scope.groups,
