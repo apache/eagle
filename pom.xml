@@ -1369,11 +1369,6 @@
             <url>http://maven.wso2.org/nexus/content/groups/wso2-public</url>
         </repository>
         <repository>
-            <id>scale-tools.release</id>
-            <name>Scala-Tools Release Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
-        <repository>
             <id>cloudera.repo</id>
             <name>Cloudera Repository</name>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
@@ -1385,10 +1380,5 @@
         </repository>
     </repositories>
     <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.release</id>
-            <name>Scala-Tools Release Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
     </pluginRepositories>
 </project>
