@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>alert-metadata</artifactId>
+            <artifactId>alert-metadata-service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
