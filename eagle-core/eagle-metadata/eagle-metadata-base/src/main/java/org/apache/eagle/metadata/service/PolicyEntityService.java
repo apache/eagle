@@ -19,7 +19,6 @@ package org.apache.eagle.metadata.service;
 
 import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.model.PolicyEntity;
-import org.apache.eagle.metadata.persistence.PersistenceService;
 
 import java.util.Collection;
 
@@ -33,7 +32,12 @@ public interface PolicyEntityService {
     boolean deletePolicyProtoByUUID(String uuid);
 
     default PolicyEntity createOrUpdatePolicyProto(PolicyEntity policyProto) {
-        Preconditions.checkNotNull(policyProto, "DashboardEntity should not be null");
+        Preconditions.checkNotNull(policyProto, "PolicyProto should not be null");
+        Preconditions.checkNotNull(policyProto.getDefinition(), "PolicyProto definition should not be null");
+        if (policyProto.getName() == null) {
+            policyProto.setName(String.format("[%s]%s", policyProto.getDefinition().getAlertCategory(),
+                    policyProto.getDefinition().getName()));
+        }
         if (policyProto.getUuid() == null) {
             return create(policyProto);
         } else {

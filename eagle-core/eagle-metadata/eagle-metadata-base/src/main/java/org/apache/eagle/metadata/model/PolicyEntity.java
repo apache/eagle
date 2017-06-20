@@ -27,15 +27,24 @@ import java.util.*;
 
 public class PolicyEntity extends PersistenceEntity {
     @Length(min = 1, max = 50, message = "length should between 1 and 50")
-    private PolicyDefinition policyProto;
+    private String name;
+    private PolicyDefinition definition;
     private List<String> alertPublishmentIds = new ArrayList<>();
 
-    public PolicyDefinition getPolicyProto() {
-        return policyProto;
+    public String getName() {
+        return name;
     }
 
-    public void setPolicyProto(PolicyDefinition policyProto) {
-        this.policyProto = policyProto;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public PolicyDefinition getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(PolicyDefinition definition) {
+        this.definition = definition;
     }
 
     public List<String> getAlertPublishmentIds() {
@@ -49,7 +58,8 @@ public class PolicyEntity extends PersistenceEntity {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(policyProto)
+                .append(name)
+                .append(definition)
                 .append(alertPublishmentIds)
                 .build();
     }
@@ -66,13 +76,14 @@ public class PolicyEntity extends PersistenceEntity {
 
         PolicyEntity another = (PolicyEntity) that;
 
-        return Objects.equals(another.policyProto, this.policyProto)
+        return Objects.equals(another.name, this.name)
+                && Objects.equals(another.definition, this.definition)
                 && CollectionUtils.isEqualCollection(another.getAlertPublishmentIds(), alertPublishmentIds);
     }
 
     @Override
     public String toString() {
-        return String.format("{name=\"%s\",definition=%s}", this.getPolicyProto().getName(), this.getPolicyProto() == null ? "null" : this.getPolicyProto().getDefinition().toString());
+        return String.format("{name=\"%s\",definition=%s}", this.name, this.getDefinition() == null ? "null" : this.getDefinition().getDefinition().toString());
     }
 
 }

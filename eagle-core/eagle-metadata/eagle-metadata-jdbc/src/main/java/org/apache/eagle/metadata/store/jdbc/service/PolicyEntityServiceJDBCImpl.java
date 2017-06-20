@@ -41,11 +41,11 @@ import java.util.List;
 public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyEntityServiceJDBCImpl.class);
 
-    private static final String selectSql = "SELECT * FROM policyProto";
-    private static final String queryByUUID = "SELECT * FROM policyProto where uuid = '%s'";
-    private static final String deleteSqlByUUID = "DELETE FROM policyProto where uuid = '%s'";
-    private static final String updateSqlByUUID = "UPDATE policyProto SET policyProto = ? , alertPublisherIds = ? , createdtime = ? , modifiedtime = ?  where uuid = ?";
-    private static final String insertSql = "INSERT INTO policyProto (policyProto, alertPublisherIds, createdtime, modifiedtime, uuid) VALUES (?, ?, ?, ?, ?)";
+    private static final String selectSql = "SELECT * FROM policy_prototype";
+    private static final String queryByUUID = "SELECT * FROM policy_prototype where uuid = '%s'";
+    private static final String deleteSqlByUUID = "DELETE FROM policy_prototype where uuid = '%s'";
+    private static final String updateSqlByUUID = "UPDATE policy_prototype SET name = ?, definition = ? , alertPublisherIds = ? , createdtime = ? , modifiedtime = ?  where uuid = ?";
+    private static final String insertSql = "INSERT INTO policy_prototype (name, definition, alertPublisherIds, createdtime, modifiedtime, uuid) VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -89,11 +89,14 @@ public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
         Preconditions.checkNotNull(policyProto.getUuid(), "uuid should not be null");
         PolicyEntity current = getPolicyProtoByUUID(policyProto.getUuid());
 
+        if (policyProto.getName() != null) {
+            current.setName(policyProto.getName());
+        }
         if (policyProto.getAlertPublishmentIds() != null) {
             current.setAlertPublishmentIds(policyProto.getAlertPublishmentIds());
         }
-        if (policyProto.getPolicyProto() != null) {
-            current.setPolicyProto(policyProto.getPolicyProto());
+        if (policyProto.getDefinition() != null) {
+            current.setDefinition(policyProto.getDefinition());
         }
         current.ensureDefault();
 
@@ -129,12 +132,13 @@ public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
 
     private ThrowableFunction<ResultSet, PolicyEntity, SQLException> policyEntityMapper = resultSet -> {
         PolicyEntity entity = new PolicyEntity();
+        entity.setName(resultSet.getString("name"));
         entity.setUuid(resultSet.getString("uuid"));
-        String policyStr = resultSet.getString("policyProto");
+        String policyStr = resultSet.getString("definition");
         if (policyStr != null) {
             try {
                 PolicyDefinition policyDefinition = OBJECT_MAPPER.readValue(policyStr, PolicyDefinition.class);
-                entity.setPolicyProto(policyDefinition);
+                entity.setDefinition(policyDefinition);
             } catch (Exception e) {
                 throw new SQLException("Error to deserialize JSON as {}", PolicyDefinition.class.getCanonicalName(), e);
             }
@@ -156,23 +160,24 @@ public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
     private ThrowableConsumer2<PreparedStatement, PolicyEntity, SQLException> policyEntityWriter = (statement, policyEntity) -> {
         policyEntity.ensureDefault();
 
-        if (policyEntity.getPolicyProto() != null) {
+        statement.setString(1, policyEntity.getName());
+        if (policyEntity.getDefinition() != null) {
             try {
-                statement.setString(1, OBJECT_MAPPER.writeValueAsString(policyEntity.getPolicyProto()));
+                statement.setString(2, OBJECT_MAPPER.writeValueAsString(policyEntity.getDefinition()));
             } catch (Exception e) {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
         }
         if (policyEntity.getAlertPublishmentIds() != null) {
             try {
-                statement.setString(2, OBJECT_MAPPER.writeValueAsString(policyEntity.getAlertPublishmentIds()));
+                statement.setString(3, OBJECT_MAPPER.writeValueAsString(policyEntity.getAlertPublishmentIds()));
             } catch (Exception e) {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
         }
-        statement.setLong(3, policyEntity.getCreatedTime());
-        statement.setLong(4, policyEntity.getModifiedTime());
-        statement.setString(5, policyEntity.getUuid());
+        statement.setLong(4, policyEntity.getCreatedTime());
+        statement.setLong(5, policyEntity.getModifiedTime());
+        statement.setString(6, policyEntity.getUuid());
     };
 
 

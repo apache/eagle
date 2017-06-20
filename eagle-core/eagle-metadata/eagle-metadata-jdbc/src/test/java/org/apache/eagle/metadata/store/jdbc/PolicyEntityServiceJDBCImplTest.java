@@ -32,7 +32,7 @@ import java.util.List;
 public class PolicyEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
 
     @Inject
-    PolicyEntityService policyEntityService;
+    private PolicyEntityService policyEntityService;
 
     @Test
     public void test() {
@@ -48,11 +48,11 @@ public class PolicyEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         List<String> alertPublisherIds = Arrays.asList("slack");
 
         PolicyEntity policyEntity = new PolicyEntity();
-        policyEntity.setPolicyProto(policyDefinition);
+        policyEntity.setDefinition(policyDefinition);
         policyEntity.setAlertPublishmentIds(alertPublisherIds);
         PolicyEntity res = policyEntityService.createOrUpdatePolicyProto(policyEntity);
         Assert.assertTrue(res != null);
-        Assert.assertTrue(res.getPolicyProto().equals(policyDefinition));
+        Assert.assertTrue(res.getDefinition().equals(policyDefinition));
         Assert.assertTrue(CollectionUtils.isEqualCollection(res.getAlertPublishmentIds(), alertPublisherIds));
 
         Collection<PolicyEntity> policies =  policyEntityService.getAllPolicyProto();
@@ -62,9 +62,9 @@ public class PolicyEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Assert.assertTrue(entity.equals(policies.iterator().next()));
 
         // test update
-        entity.getPolicyProto().setName("policy2");
+        entity.getDefinition().setName("policy2");
         PolicyEntity updatedEntity = policyEntityService.update(entity);
-        Assert.assertTrue(updatedEntity.getPolicyProto().getName().equals("policy2"));
+        Assert.assertTrue(updatedEntity.getDefinition().getName().equals("policy2"));
 
 
         // test delete

@@ -30,7 +30,7 @@ import java.util.List;
 
 public class TestPolicyEntityServiceMemoryImpl {
 
-    PolicyEntityService policyEntityService = new PolicyEntityServiceMemoryImpl();
+    private PolicyEntityService policyEntityService = new PolicyEntityServiceMemoryImpl();
 
     @Test
     public void test() {
@@ -46,10 +46,10 @@ public class TestPolicyEntityServiceMemoryImpl {
         List<String> alertPublisherIds = Arrays.asList("slack");
 
         PolicyEntity policyEntity = new PolicyEntity();
-        policyEntity.setPolicyProto(policyDefinition);
+        policyEntity.setDefinition(policyDefinition);
         policyEntity.setAlertPublishmentIds(alertPublisherIds);
         PolicyEntity res = policyEntityService.createOrUpdatePolicyProto(policyEntity);
-        Assert.assertTrue(res.getPolicyProto().equals(policyDefinition));
+        Assert.assertTrue(res.getDefinition().equals(policyDefinition));
         Assert.assertTrue(CollectionUtils.isEqualCollection(res.getAlertPublishmentIds(), alertPublisherIds));
 
         Collection<PolicyEntity> policies =  policyEntityService.getAllPolicyProto();
@@ -59,9 +59,9 @@ public class TestPolicyEntityServiceMemoryImpl {
         Assert.assertTrue(entity.equals(policies.iterator().next()));
 
         // test update
-        entity.getPolicyProto().setName("policy2");
+        entity.getDefinition().setName("policy2");
         PolicyEntity updatedEntity = policyEntityService.update(entity);
-        Assert.assertTrue(updatedEntity.getPolicyProto().getName().equals("policy2"));
+        Assert.assertTrue(updatedEntity.getDefinition().getName().equals("policy2"));
 
 
         // test delete
