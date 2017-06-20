@@ -443,4 +443,50 @@
 			$("#appMDL").modal();
 		};
 	});
+
+	// ======================================================================================
+	// =                                      Publisher                                     =
+	// ======================================================================================
+	eagleControllers.controller('integrationPublisherListCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity) {
+		PageConfig.title = "Integration";
+		PageConfig.subTitle = "Publishers";
+
+		$scope.publisherList = Entity.queryMetadata("publishments");
+		$scope.gotoPolicy = function (policyName) {
+			var encodePolicyName = encodeURIComponent(policyName);
+			var policyList = Entity.queryMetadata("policies/" + encodePolicyName);
+			policyList._then(function () {
+				var policy = policyList[0];
+				if (!policy) {
+					$.dialog({
+						title: 'OPS',
+						content: 'Policy not found!',
+					});
+					return;
+				}
+
+				$wrapState.go("policyDetail", {siteId: policy.siteId, name: policy.name});
+			});
+		};
+
+		$scope.showPublisher = function (publisher) {
+			var $ul = $('<ul>');
+			$.each(publisher.policyIds, function (i, policyName) {
+				var $a = $("<a>").text(policyName);
+				$a.click(function () {
+					$scope.gotoPolicy(policyName);
+					$dlg.modal('hide');
+				});
+
+				$ul.append(
+					$("<li>").append($a)
+				);
+			});
+
+			var $dlg = $.dialog({
+				title: "Policy List",
+				content: $ul,
+			});
+		};
+	});
 }());

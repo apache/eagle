@@ -16,14 +16,25 @@
   limitations under the License.
   -->
 
-<div class="nav-tabs-custom">
-	<ul class="nav nav-tabs">
-		<li ng-class="{active: getState().indexOf('integration.site') !== -1}"><a href="#/integration/siteList">Sites</a></li>
-		<li ng-class="{active: getState() === 'integration.applicationList'}"><a href="#/integration/applicationList">Applications</a></li>
-		<li ng-class="{active: getState() === 'integration.publisherList'}"><a href="#/integration/publisherList">Publishers</a></li>
-	</ul>
-	<div class="tab-content no-padding">
-		<div ui-view></div>
+<div class="box-body">
+	<div sort-table="publisherList">
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Policies</th>
+					<th>Properties</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-click="showPublisher(item)">
+					<td class="text-no-break"><a>{{item.name}}</a></td>
+					<td>{{item.policyIds.length}}</td>
+					<td><pre>{{item.properties | json: 4}}</pre></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
-
