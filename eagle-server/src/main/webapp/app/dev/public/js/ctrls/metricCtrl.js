@@ -30,6 +30,7 @@
 		$scope.series = [];
 		$scope.loading = false;
 
+		$scope.metricFilter = '';
 		$scope.site = $wrapState.param.site || Site.list[0].siteId;
 		$scope.metricName = $wrapState.param.metric;
 		$scope.groups = $wrapState.param.groups;
@@ -39,17 +40,26 @@
 
 		$scope.commonOption = {};
 
-		$scope.metricList = [$scope.metricName];
+		$scope.originMetricList = $scope.metricList = [$scope.metricName];
 		CompatibleEntity.groups({
 			query: 'MetricSchemaService',
 			groups: 'metricName',
 			fields: 'count',
 			limit: 9999,
 		})._promise.then(function (res) {
-			$scope.metricList = $.map(res.data.obj, function (obj) {
+			$scope.originMetricList = $.map(res.data.obj, function (obj) {
 				return obj.key[0];
 			}).sort();
+			$scope.updateMetricFilter();
 		});
+
+		$scope.updateMetricFilter = function () {
+			var filter = $scope.metricFilter.toUpperCase();
+
+			$scope.metricList = $.grep($scope.originMetricList, function (name) {
+				return name.toUpperCase().indexOf(filter) !== -1;
+			});
+		};
 
 		$scope.loadSeries = function() {
 			$scope.currentMetricName = $scope.metricName;
