@@ -41,10 +41,11 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
     public boolean execute(String sql) throws SQLException {
         Connection connection = null;
         Statement statement = null;
+        boolean success = false;
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
-            return statement.execute(sql);
+            success = statement.execute(sql);
         } catch (SQLException e) {
             throw e;
         } finally {
@@ -63,6 +64,7 @@ public class JDBCMetadataMetadataStoreServiceImpl implements JDBCMetadataQuerySe
                 }
             }
         }
+        return success;
     }
 
     @Override

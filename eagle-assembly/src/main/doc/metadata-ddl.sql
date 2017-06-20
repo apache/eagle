@@ -57,6 +57,17 @@ CREATE TABLE IF NOT EXISTS `dashboards` (
   UNIQUE INDEX `name_UNIQUE` (`name` ASC))
 COMMENT = 'eagle dashboard metadata';
 
+CREATE TABLE IF NOT EXISTS `policy_prototype` (
+  `uuid` VARCHAR(50) NOT NULL,
+  `name` VARCHAR(200) NOT NULL,
+  `definition` longtext NOT NULL,
+  `alertPublisherIds` VARCHAR(500) NULL,
+  `modifiedtime` BIGINT(20) NOT NULL,
+  `createdtime` BIGINT(20) NOT NULL,
+  PRIMARY KEY (`uuid`),
+  UNIQUE INDEX `policy_proto_UNIQUE` (`name` ASC))
+COMMENT = 'eagle policy prototype metadata';
+
 -- eagle security module metadata
 
 CREATE TABLE IF NOT EXISTS hdfs_sensitivity_entity (
