@@ -17,14 +17,16 @@
   -->
 
 <div class="box-body">
-	<div sort-table="publisherList">
+	<span class="fa fa-refresh fa-spin no-animate" ng-show="!publisherList._done"></span>
+
+	<div sort-table="publisherList" ng-show="publisherList._done">
 		<table class="table table-bordered table-hover">
 			<thead>
 				<tr>
 					<th>Name</th>
 					<th>Policies</th>
 					<th>Properties</th>
-					<th></th>
+					<th width="10"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -32,7 +34,11 @@
 					<td class="text-no-break"><a>{{item.name}}</a></td>
 					<td>{{item.policyIds.length}}</td>
 					<td><pre>{{item.properties | json: 4}}</pre></td>
-					<td></td>
+					<td>
+						<button class="btn btn-xs btn-danger" ng-click="deletePublisher($event, item)">
+							<span class="fa fa-trash"></span> Delete
+						</button>
+					</td>
 				</tr>
 			</tbody>
 		</table>

@@ -447,11 +447,14 @@
 	// ======================================================================================
 	// =                                      Publisher                                     =
 	// ======================================================================================
-	eagleControllers.controller('integrationPublisherListCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity) {
+	eagleControllers.controller('integrationPublisherListCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity, UI) {
 		PageConfig.title = "Integration";
 		PageConfig.subTitle = "Publishers";
 
-		$scope.publisherList = Entity.queryMetadata("publishments");
+		function refreshPublishList() {
+			$scope.publisherList = Entity.queryMetadata("publishments");
+		}
+
 		$scope.gotoPolicy = function (policyName) {
 			var encodePolicyName = encodeURIComponent(policyName);
 			var policyList = Entity.queryMetadata("policies/" + encodePolicyName);
@@ -488,5 +491,26 @@
 				content: $ul,
 			});
 		};
+
+		$scope.deletePublisher = function ($event, publisher) {
+			$event.stopPropagation();
+
+			UI.deleteConfirm(publisher.name)(function (entity, closeFunc) {
+				Entity.deleteMetadata("publishments/" + publisher.name)._promise.finally(function (res) {
+					var data = res.data;
+					closeFunc();
+					refreshPublishList();
+
+					if (data.code !== 200) {
+						$.dialog({
+							title: 'OPS',
+							content: data.message,
+						});
+					}
+				});
+			});
+		};
+
+		refreshPublishList();
 	});
 }());
