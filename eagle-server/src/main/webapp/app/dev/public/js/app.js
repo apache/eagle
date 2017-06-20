@@ -157,6 +157,12 @@ var app = {};
 					controller: "integrationApplicationListCtrl",
 					resolve: routeResolve({ application: false })
 				})
+				.state('integration.publisherList', {
+					url: "publisherList",
+					templateUrl: "partials/integration/publisherList.html?_=" + window._TRS(),
+					controller: "integrationPublisherListCtrl",
+					resolve: routeResolve({ application: false })
+				})
 
 				// ================================= Metric =================================
 				.state('metricPreview', {

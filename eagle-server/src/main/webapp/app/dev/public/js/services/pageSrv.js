@@ -109,7 +109,7 @@
 				);
 			}
 
-			return[
+			return [
 				{name: site.siteName || site.siteId + " Home", icon: "home", path: "#/site/" + site.siteId},
 				{name: "Alert", icon: "bell", list: alertPortal},
 			];
