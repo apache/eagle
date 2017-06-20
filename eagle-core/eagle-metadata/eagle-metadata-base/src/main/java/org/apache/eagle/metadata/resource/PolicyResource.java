@@ -90,7 +90,7 @@ public class PolicyResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<List<PolicyDefinition>> loadPolicyDefinition(List<PolicyEntity> policyProtoList, @PathParam("site") String site) {
-        return RESTResponse.async(() -> importPolicyDefinition(policyProtoList, site)).get();
+        return RESTResponse.async(() -> exportPolicyDefinition(policyProtoList, site)).get();
     }
 
     @DELETE
@@ -101,7 +101,7 @@ public class PolicyResource {
         return RESTResponse.async(() -> policyEntityService.deletePolicyProtoByUUID(uuid)).get();
     }
 
-    private List<PolicyDefinition> importPolicyDefinition(List<PolicyEntity> policyProtoList, String site) {
+    private List<PolicyDefinition> exportPolicyDefinition(List<PolicyEntity> policyProtoList, String site) {
         Preconditions.checkNotNull(site, "site should not be null");
         if (policyProtoList == null || policyProtoList.isEmpty()) {
             throw new IllegalArgumentException("policy prototype list is empty or null");
