@@ -58,7 +58,9 @@ public class PolicyEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         Collection<PolicyEntity> policies =  policyEntityService.getAllPolicyProto();
         Assert.assertTrue(policies.size() == 1);
 
-        PolicyEntity entity = policyEntityService.getPolicyProtoByUUID(policies.iterator().next().getUuid());
+        PolicyEntity entity = policyEntityService.getByUUIDorName(policies.iterator().next().getUuid(), null);
+        Assert.assertTrue(entity.equals(policies.iterator().next()));
+        entity = policyEntityService.getByUUIDorName(null, "[null]policy1");
         Assert.assertTrue(entity.equals(policies.iterator().next()));
 
         // test update
