@@ -496,10 +496,8 @@
 			$event.stopPropagation();
 
 			UI.deleteConfirm(publisher.name)(function (entity, closeFunc) {
-				Entity.deleteMetadata("publishments/" + publisher.name)._promise.finally(function (res) {
+				Entity.deleteMetadata("publishments/" + publisher.name)._promise.then(function (res) {
 					var data = res.data;
-					closeFunc();
-					refreshPublishList();
 
 					if (data.code !== 200) {
 						$.dialog({
@@ -507,6 +505,9 @@
 							content: data.message,
 						});
 					}
+				}).finally(function () {
+					closeFunc();
+					refreshPublishList();
 				});
 			});
 		};

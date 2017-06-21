@@ -148,9 +148,7 @@
 
 		Entity.deleteMetadata = function (url) {
 			return {
-				_promise: $authHttp.delete(_host + "/rest/metadata/" + url).then(function (res) {
-					console.log(res);
-				})
+				_promise: $authHttp.delete(_host + "/rest/metadata/" + url)
 			};
 		};
 
