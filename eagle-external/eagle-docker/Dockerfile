@@ -19,12 +19,9 @@ MAINTAINER dev@eagle.apache.org
 
 # Eagle environment
 ENV EAGLE_HOME=/usr/hdp/current/eagle
-ENV JDK_VERSION 8u121
-ENV JDK_BUILD_VERSION b13
-# for local development
-#ADD resource/jdk-8u121-linux-x64.rpm /tmp/
-#RUN rpm -i /tmp/jdk-8u121-linux-x64.rpm
-RUN curl -LO "http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.rpm" -H 'Cookie: oraclelicense=accept-securebackup-cookie' && rpm -i jdk-$JDK_VERSION-linux-x64.rpm;
+RUN yum install -y java-1.8.0-openjdk
+RUN mkdir -p /usr/java
+RUN ln -s /usr/lib/jvm/jre-1.8.0-openjdk.x86_64 /usr/java/default
 ENV JAVA_HOME /usr/java/default
 
 # Install Eagle Package
