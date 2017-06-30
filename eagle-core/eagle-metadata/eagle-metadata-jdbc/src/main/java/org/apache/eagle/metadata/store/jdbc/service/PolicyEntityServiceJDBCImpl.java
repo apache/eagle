@@ -42,9 +42,10 @@ public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyEntityServiceJDBCImpl.class);
 
     private static final String selectSql = "SELECT * FROM policy_prototype";
-    private static final String queryByUUID = "SELECT * FROM policy_prototype where uuid = '%s'";
-    private static final String deleteSqlByUUID = "DELETE FROM policy_prototype where uuid = '%s'";
-    private static final String updateSqlByUUID = "UPDATE policy_prototype SET name = ?, definition = ? , alertPublisherIds = ? , createdtime = ? , modifiedtime = ?  where uuid = ?";
+    private static final String queryByUUID = "SELECT * FROM policy_prototype WHERE uuid = '%s'";
+    private static final String queryByUUIDorName = "SELECT * FROM policy_prototype WHERE uuid = ? or name = ?";
+    private static final String deleteSqlByUUID = "DELETE FROM policy_prototype WHERE uuid = '%s'";
+    private static final String updateSqlByUUID = "UPDATE policy_prototype SET name = ?, definition = ? , alertPublisherIds = ? , createdtime = ? , modifiedtime = ?  WHERE uuid = ?";
     private static final String insertSql = "INSERT INTO policy_prototype (name, definition, alertPublisherIds, createdtime, modifiedtime, uuid) VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -62,11 +63,16 @@ public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
     }
 
     @Override
-    public PolicyEntity getPolicyProtoByUUID(String uuid) {
-        Preconditions.checkNotNull(uuid, "uuid should not be null");
+    public PolicyEntity getByUUIDorName(String uuid, String name) {
+        Preconditions.checkArgument(uuid != null || name != null, "Both uuid and name are null");
         try {
-            return queryService.query(String.format(queryByUUID, uuid), policyEntityMapper).stream()
-                    .findAny().orElseThrow(() -> new EntityNotFoundException("policyProto is not found by uuid"));
+            return queryService.queryWithCond(queryByUUIDorName, o -> {
+                o.setString(1, uuid);
+                o.setString(2, name);
+            }, policyEntityMapper)
+                    .stream()
+                    .findAny()
+                    .orElseThrow(() -> new EntityNotFoundException("policyProto is not found by uuid or name"));
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
@@ -87,7 +93,7 @@ public class PolicyEntityServiceJDBCImpl implements PolicyEntityService {
     public PolicyEntity update(PolicyEntity policyProto) {
         Preconditions.checkNotNull(policyProto, "Entity should not be null");
         Preconditions.checkNotNull(policyProto.getUuid(), "uuid should not be null");
-        PolicyEntity current = getPolicyProtoByUUID(policyProto.getUuid());
+        PolicyEntity current = getByUUIDorName(policyProto.getUuid(), null);
 
         if (policyProto.getName() != null) {
             current.setName(policyProto.getName());

@@ -20,6 +20,7 @@ package org.apache.eagle.metadata.resource;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.apache.eagle.common.rest.RESTResponse;
@@ -60,14 +61,96 @@ public class PolicyResource {
     }
 
     @POST
-    @Path("/import")
+    @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<PolicyEntity> saveAsPolicyProto(PolicyEntity policyEntity) {
-        Preconditions.checkNotNull(policyEntity, "policyProto should not be null");
-        Preconditions.checkNotNull(policyEntity.getDefinition(), "policyDefinition should not be null");
-        Preconditions.checkNotNull(policyEntity.getAlertPublishmentIds(), "alert publisher list should not be null");
+    public RESTResponse<PolicyEntity> saveAsPolicyProto(PolicyEntity policyEntity,
+                                                        @QueryParam("needPolicyCreated") boolean needPolicyCreated) {
+        return RESTResponse.async(() -> {
+            Preconditions.checkNotNull(policyEntity, "entity should not be null");
+            Preconditions.checkNotNull(policyEntity, "policy definition should not be null");
+            Preconditions.checkNotNull(policyEntity.getAlertPublishmentIds(), "alert publisher list should not be null");
 
+            PolicyDefinition policyDefinition = policyEntity.getDefinition();
+            if (needPolicyCreated) {
+                OpResult result = metadataResource.addPolicy(policyDefinition);
+                if (result.code != 200) {
+                    throw new IllegalArgumentException(result.message);
+                }
+                result = metadataResource.addPublishmentsToPolicy(policyDefinition.getName(), policyEntity.getAlertPublishmentIds());
+                if (result.code != 200) {
+                    throw new IllegalArgumentException(result.message);
+                }
+            }
+            return importPolicyProto(policyEntity);
+        }).get();
+    }
+
+    @POST
+    @Path("/create/{policyId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<PolicyEntity> saveAsPolicyProto(@PathParam("policyId") String policyId) {
+        return RESTResponse.async(() -> {
+            Preconditions.checkNotNull(policyId, "policyId should not be null");
+            PolicyDefinition policyDefinition = metadataResource.getPolicyById(policyId);
+
+            if (policyDefinition == null) {
+                throw new IllegalArgumentException("policy does not exist: " + policyId);
+            }
+
+            PolicyEntity policyEntity = new PolicyEntity();
+            policyEntity.setDefinition(policyDefinition);
+
+            List<Publishment> alertPublishments = metadataResource.getPolicyPublishments(policyId);
+            if (alertPublishments != null && !alertPublishments.isEmpty()){
+                List<String> alertPublisherIds = new ArrayList<>();
+                for (Publishment publishment : alertPublishments) {
+                    alertPublisherIds.add(publishment.getName());
+                }
+                policyEntity.setAlertPublishmentIds(alertPublisherIds);
+            }
+            return importPolicyProto(policyEntity);
+        }).get();
+    }
+
+    @POST
+    @Path("/export/{site}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<Boolean> loadPoliciesByProto(List<PolicyEntity> policyProtoList, @PathParam("site") String site) {
+        return RESTResponse.async(() -> exportPolicyProto(policyProtoList, site)).get();
+    }
+
+    @POST
+    @Path("/exportByName/{site}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<Boolean> loadPoliciesByName(List<String> policyProtoList, @PathParam("site") String site) {
+        return RESTResponse.async(() -> {
+            if (policyProtoList == null || policyProtoList.isEmpty()) {
+                throw new IllegalArgumentException("policyProtoList is null or empty");
+            }
+            List<PolicyEntity> policyEntities = new ArrayList<PolicyEntity>();
+            for (String name : policyProtoList) {
+                PolicyEntity entity = policyEntityService.getByUUIDorName(null, name);
+                if (entity != null) {
+                    policyEntities.add(entity);
+                }
+            }
+            return exportPolicyProto(policyEntities, site);
+        }).get();
+    }
+
+    @DELETE
+    @Path("/{uuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<Boolean> deletePolicyProto(@PathParam("uuid") String uuid) {
+        return RESTResponse.async(() -> policyEntityService.deletePolicyProtoByUUID(uuid)).get();
+    }
+
+    private PolicyEntity importPolicyProto(PolicyEntity policyEntity) {
         PolicyDefinition policyDefinition = policyEntity.getDefinition();
         List<String> inputStreamType = new ArrayList<>();
         String newDefinition = policyDefinition.getDefinition().getValue();
@@ -81,32 +164,14 @@ public class PolicyResource {
         policyDefinition.setName(PolicyIdConversions.parsePolicyId(policyDefinition.getSiteId(), policyDefinition.getName()));
         policyDefinition.setSiteId(null);
         policyEntity.setDefinition(policyDefinition);
-
-        return createOrUpdatePolicyProto(policyEntity);
+        return policyEntityService.createOrUpdatePolicyProto(policyEntity);
     }
 
-    @POST
-    @Path("/export/{site}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<List<PolicyDefinition>> loadPolicyDefinition(List<PolicyEntity> policyProtoList, @PathParam("site") String site) {
-        return RESTResponse.async(() -> exportPolicyDefinition(policyProtoList, site)).get();
-    }
-
-    @DELETE
-    @Path("/{uuid}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<Boolean> deletePolicyProto(@PathParam("uuid") String uuid) {
-        return RESTResponse.async(() -> policyEntityService.deletePolicyProtoByUUID(uuid)).get();
-    }
-
-    private List<PolicyDefinition> exportPolicyDefinition(List<PolicyEntity> policyProtoList, String site) {
+    private Boolean exportPolicyProto(List<PolicyEntity> policyProtoList, String site) {
         Preconditions.checkNotNull(site, "site should not be null");
         if (policyProtoList == null || policyProtoList.isEmpty()) {
             throw new IllegalArgumentException("policy prototype list is empty or null");
         }
-        List<PolicyDefinition> policies = new ArrayList<>();
         for (PolicyEntity policyProto : policyProtoList) {
             PolicyDefinition policyDefinition = policyProto.getDefinition();
             List<String> inputStreams = new ArrayList<>();
@@ -134,9 +199,8 @@ public class PolicyResource {
                     throw new IllegalArgumentException("fail to create policy publisherments: " + result.message);
                 }
             }
-            policies.add(policyDefinition);
         }
-        return policies;
+        return true;
     }
 
 }
