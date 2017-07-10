@@ -103,7 +103,7 @@ public class PolicyResource {
             policyEntity.setDefinition(policyDefinition);
 
             List<Publishment> alertPublishments = metadataResource.getPolicyPublishments(policyId);
-            if (alertPublishments != null && !alertPublishments.isEmpty()){
+            if (alertPublishments != null && !alertPublishments.isEmpty()) {
                 List<String> alertPublisherIds = new ArrayList<>();
                 for (Publishment publishment : alertPublishments) {
                     alertPublisherIds.add(publishment.getName());
