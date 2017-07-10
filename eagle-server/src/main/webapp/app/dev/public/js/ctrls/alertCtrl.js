@@ -291,7 +291,17 @@
 			}, function (ret) {
 				if (!ret) return;
 
-				console.log(666);
+				Entity.post('policyProto/create/' + $scope.policy.name, '')._then(function (res) {
+					var validate = res.data;
+					console.log(validate);
+					if(!validate.success) {
+						$.dialog({
+							title: "OPS",
+							content: validate.message
+						});
+						return;
+					}
+				});
 			});
 		};
 
