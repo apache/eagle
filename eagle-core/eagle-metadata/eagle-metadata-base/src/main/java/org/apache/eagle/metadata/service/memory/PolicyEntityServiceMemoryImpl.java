@@ -18,6 +18,7 @@
 package org.apache.eagle.metadata.service.memory;
 
 import com.google.common.base.Preconditions;
+import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.PolicyEntity;
 import org.apache.eagle.metadata.service.PolicyEntityService;
 
@@ -33,8 +34,14 @@ public class PolicyEntityServiceMemoryImpl implements PolicyEntityService {
     }
 
     @Override
-    public PolicyEntity getPolicyProtoByUUID(String uuid) {
-        return policyProtoMap.get(uuid);
+    public PolicyEntity getByUUIDorName(String uuid, String name) {
+        Preconditions.checkArgument(uuid != null || name != null, "Both uuid and name are null");
+        if (uuid != null) {
+            return policyProtoMap.get(uuid);
+        } else {
+            return policyProtoMap.values().stream().filter(o -> o.getName().equals(name)).findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("Policy proto named " + name + " is not found"));
+        }
     }
 
     @Override

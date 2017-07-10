@@ -27,7 +27,7 @@ public interface PolicyEntityService {
 
     Collection<PolicyEntity> getAllPolicyProto();
 
-    PolicyEntity getPolicyProtoByUUID(String uuid);
+    PolicyEntity getByUUIDorName(String uuid, String name);
 
     boolean deletePolicyProtoByUUID(String uuid);
 
