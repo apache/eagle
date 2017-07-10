@@ -186,7 +186,7 @@
 		};
 	});
 
-	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, $interval, PageConfig, Time, Entity, CompatibleEntity, Policy) {
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, $interval, UI, PageConfig, Time, Entity, CompatibleEntity, Policy) {
 		PageConfig.title = "Policy";
 		PageConfig.subTitle = "Detail";
 		PageConfig.navPath = [
@@ -281,6 +281,18 @@
 
 		$scope.stopPolicy = function() {
 			Policy.stop($scope.policy).then(updatePolicy);
+		};
+
+		$scope.makePrototype = function () {
+			$.dialog({
+				title: 'Confirm',
+				content: 'Do you want to make this policy as Prototype?',
+				confirm: true,
+			}, function (ret) {
+				if (!ret) return;
+
+				console.log(666);
+			});
 		};
 
 		var refreshInterval = $interval($scope.alertList._refresh, 1000 * 60);
