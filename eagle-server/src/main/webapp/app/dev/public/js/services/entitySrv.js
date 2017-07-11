@@ -42,6 +42,8 @@
 				list._done = true;
 
 				return res;
+			}, function (res) {
+				return res;
 			});
 			return withThen(list);
 		}
