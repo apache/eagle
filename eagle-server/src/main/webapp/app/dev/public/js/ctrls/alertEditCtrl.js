@@ -90,6 +90,7 @@
 							title: 'OPS',
 							content: data.message,
 						});
+						unlock();
 						return;
 					} else {
 						$.dialog({
