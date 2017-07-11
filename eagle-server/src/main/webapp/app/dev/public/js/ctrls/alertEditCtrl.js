@@ -45,10 +45,10 @@
 				Entity.delete("policyProto/" + prototype.uuid)._promise.then(function (res) {
 					var data = res.data;
 
-					if (data.code !== 200) {
+					if (data.success !== true) {
 						$.dialog({
 							title: 'OPS',
-							content: data.message,
+							content: data.message
 						});
 					}
 				}).finally(function () {
@@ -88,7 +88,7 @@
 					if(!data.success) {
 						$.dialog({
 							title: 'OPS',
-							content: data.message,
+							content: data.message
 						});
 						return;
 					} else {
@@ -532,33 +532,24 @@
 					var policyPromise;
 
 					if ($scope.savePrototype) {
-						policyPromise = Entity.create('policyProto/create?needPolicyCreated=true', {
+						policyPromise = Entity.create('policyProto/create?needPolicyProtoCreated=true', {
 							definition: $scope.policy,
-							alertPublishmentIds: publisherNameList,
+							alertPublishmentIds: publisherNameList
 						});
 					} else {
-						policyPromise = Entity.post("metadata/policies/" + $scope.policy.name + "/publishments/", publisherNameList);
+						policyPromise = Entity.create('policyProto/create?needPolicyProtoCreated=false', {
+							definition: $scope.policy,
+							alertPublishmentIds: publisherNameList
+						});
 					}
 
 					policyPromise._then(function () {
 						console.log("Create policy success...");
-						// Link with publisher
-						Entity.post("metadata/policies/" + $scope.policy.name + "/publishments/", publisherNameList)._then(function () {
-							// Link Success
-							$.dialog({
-								title: "Done",
-								content: "Close dialog to go to the policy detail page."
-							}, function () {
-								$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
-							});
-						}, function (res) {
-							// Link Failed
-							$.dialog({
-								title: "OPS",
-								content: "Link publishers failed:" + res.data.message
-							});
-						}).finally(function () {
-							$scope.policyLock = false;
+						$.dialog({
+							title: "Done",
+							content: "Close dialog to go to the policy detail page."
+						}, function () {
+							$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
 						});
 					}, function (res) {
 						var errormsg = "";

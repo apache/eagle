@@ -65,24 +65,25 @@ public class PolicyResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<PolicyEntity> saveAsPolicyProto(PolicyEntity policyEntity,
-                                                        @QueryParam("needPolicyCreated") boolean needPolicyCreated) {
+                                                        @QueryParam("needPolicyProtoCreated") boolean needPolicyProtoCreated) {
         return RESTResponse.async(() -> {
             Preconditions.checkNotNull(policyEntity, "entity should not be null");
             Preconditions.checkNotNull(policyEntity, "policy definition should not be null");
             Preconditions.checkNotNull(policyEntity.getAlertPublishmentIds(), "alert publisher list should not be null");
 
             PolicyDefinition policyDefinition = policyEntity.getDefinition();
-            if (needPolicyCreated) {
-                OpResult result = metadataResource.addPolicy(policyDefinition);
-                if (result.code != 200) {
-                    throw new IllegalArgumentException(result.message);
-                }
-                result = metadataResource.addPublishmentsToPolicy(policyDefinition.getName(), policyEntity.getAlertPublishmentIds());
-                if (result.code != 200) {
-                    throw new IllegalArgumentException(result.message);
-                }
+            OpResult result = metadataResource.addPolicy(policyDefinition);
+            if (result.code != 200) {
+                throw new IllegalArgumentException(result.message);
             }
-            return importPolicyProto(policyEntity);
+            result = metadataResource.addPublishmentsToPolicy(policyDefinition.getName(), policyEntity.getAlertPublishmentIds());
+            if (result.code != 200) {
+                throw new IllegalArgumentException(result.message);
+            }
+            if (needPolicyProtoCreated) {
+                importPolicyProto(policyEntity);
+            }
+            return policyEntity;
         }).get();
     }
 

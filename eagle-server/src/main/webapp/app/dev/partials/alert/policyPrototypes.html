@@ -20,7 +20,7 @@
 	<div class="box-header with-border">
 		<span class="fa fa-code-fork"></span>
 		<h3 class="box-title">
-			Stream List
+			Prototype List
 		</h3>
 	</div>
 	<div class="box-body">
@@ -31,6 +31,7 @@
 						<th></th>
 						<th>Name</th>
 						<th>Definition</th>
+						<th>Publishers</th>
 						<th width="110">Operation</th>
 					</tr>
 				</thead>
@@ -41,6 +42,13 @@
 						</td>
 						<td>{{item.name}}</td>
 						<td><pre>{{item.definition.definition.value}}</pre></td>
+						<td>
+							<ul class="no-margin">
+								<li ng-repeat="publisher in item.alertPublishmentIds track by $index">
+									{{publisher}}
+								</li>
+							</ul>
+						</td>
 						<td class="text-center">
 							<button class="btn btn-xs btn-primary" ng-click="createPolicy([item])">Create</button>
 							<button class="btn btn-xs btn-danger" ng-click="deletePrototype(item)">Delete</button>
