@@ -29,7 +29,7 @@
 				<thead>
 					<tr>
 						<th>
-							<input type="checkbox" ng-checked="getCheckedList().length === prototypeList.length" ng-click="doCheckAll()" />
+							<input type="checkbox" ng-checked="getCheckedList().length === prototypeList.length && prototypeList.length !== 0" ng-click="doCheckAll()" />
 						</th>
 						<th>Name</th>
 						<th>Definition</th>
@@ -52,7 +52,7 @@
 							</ul>
 						</td>
 						<td class="text-center">
-							<button class="btn btn-xs btn-primary" ng-click="createPolicy([item])">Create</button>
+							<button class="btn btn-xs btn-primary" ng-click="createPolicy([item])">Export</button>
 							<button class="btn btn-xs btn-danger" ng-click="deletePrototype(item)">Delete</button>
 						</td>
 					</tr>
@@ -62,6 +62,6 @@
 
 	</div>
 	<div class="box-footer text-right">
-		<button class="btn btn-primary" ng-click="groupCreate()" ng-disabled="getCheckedList().length === 0">Create By Select Prototypes</button>
+		<button class="btn btn-primary" ng-click="groupCreate()" ng-disabled="getCheckedList().length === 0">Export as Policies</button>
 	</div>
 </div>

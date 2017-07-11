@@ -106,7 +106,7 @@
 			Auth.getPromise().then(function () {
 				if (Auth.isAdmin) {
 					alertPortal.push(
-						{name: "Policy Prototypes", path: "#/site/" + site.siteId + "/policy/prototypes"},
+						{name: "Prototypes", path: "#/site/" + site.siteId + "/policy/prototypes"},
 						{name: "Define Policy", path: "#/site/" + site.siteId + "/policy/create"}
 					);
 				}
