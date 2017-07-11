@@ -34,7 +34,11 @@
 			list._promise = promise.then(function (res) {
 				var data = res.data;
 				list.splice(0);
-				Array.prototype.push.apply(list, data.data);
+				if (typeof data.data === 'object') {
+					Array.prototype.push.apply(list, data.data);
+				} else {
+					list.push(data.data);
+				}
 				list._done = true;
 
 				return res;
