@@ -31,6 +31,85 @@
 		policyEditController.apply(this, newArgs);
 	}
 
+	eagleControllers.controller('policyPrototypesCtrl', function ($scope, $wrapState, Site, PageConfig, Entity, UI) {
+		PageConfig.title = "Policy Prototypes";
+
+		$scope.checkedPrototypes = {};
+
+		function refreshPrototypeList() {
+			$scope.prototypeList = Entity.query('policyProto');
+		}
+
+		$scope.deletePrototype = function (prototype) {
+			UI.deleteConfirm(prototype.name)(function (entity, closeFunc) {
+				Entity.delete("policyProto/" + prototype.uuid)._promise.then(function (res) {
+					var data = res.data;
+
+					if (data.code !== 200) {
+						$.dialog({
+							title: 'OPS',
+							content: data.message,
+						});
+					}
+				}).finally(function () {
+					closeFunc();
+					refreshPrototypeList();
+				});
+			});
+		};
+
+		$scope.groupCreate = function () {
+			var list = $.map($scope.prototypeList, function (proto) {
+				return $scope.checkedPrototypes[proto.name] ? proto : null;
+			});
+			$scope.createPolicy(list);
+		};
+
+		$scope.createPolicy = function (protoList) {
+			if (protoList.length === 0) {
+				$.dialog({
+					title: 'OPS',
+					content: 'Please select at least one prototype.',
+				});
+				return;
+			}
+
+			UI.createConfirm('Policy', {}, [
+				{field: "siteId", name: "Site Id", type: 'select', valueList: $.map(Site.list, function (site) {
+					return site.siteId;
+				})}
+			])(function (entity, closeFunc, unlock) {
+				var nameList = $.map(protoList, function (proto) {
+					return proto.name;
+				});
+				Entity.create("policyProto/exportByName/" + entity.siteId, nameList)._then(function (res) {
+					var data = res.data;
+
+					if(!data.success) {
+						$.dialog({
+							title: 'OPS',
+							content: data.message,
+						});
+						return;
+					} else {
+						$.dialog({
+							title: 'Success',
+							content: 'Create success. Click confirm to go to the policy page.',
+							confirm: true,
+						}, function (ret) {
+							if (!ret) return;
+
+							$wrapState.go('policyList', {siteId: entity.siteId });
+						});
+					}
+					closeFunc();
+				}, unlock);
+			});
+		};
+
+		refreshPrototypeList();
+	});
+
 	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity, Policy) {
 		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
@@ -88,6 +167,7 @@
 		$scope.streamGroups = {};
 		$scope.newPolicy = !$scope.policy.name;
 		$scope.autoPolicyDescription = $scope.newPolicy && !$scope.policy.description;
+		$scope.savePrototype = false;
 
 		PageConfig.navPath = [
 			{title: "Policy List", path: "/policies"},
@@ -445,13 +525,25 @@
 				$q.all(publisherPromiseList).then(function () {
 					console.log("Create publishers success...");
 
-					// Create policy
-					Entity.create("metadata/policies", $scope.policy)._then(function () {
+					var publisherNameList = $.map($scope.policyPublisherList, function (publisher) {
+						return publisher.name;
+					});
+
+					var policyPromise;
+
+					if ($scope.savePrototype) {
+						policyPromise = Entity.create('policyProto/create?needPolicyCreated=true', {
+							definition: $scope.policy,
+							alertPublishmentIds: publisherNameList,
+						});
+					} else {
+						policyPromise = Entity.post("metadata/policies/" + $scope.policy.name + "/publishments/", publisherNameList);
+					}
+
+					policyPromise._then(function () {
 						console.log("Create policy success...");
 						// Link with publisher
-						Entity.post("metadata/policies/" + $scope.policy.name + "/publishments/", $.map($scope.policyPublisherList, function (publisher) {
-							return publisher.name;
-						}))._then(function () {
+						Entity.post("metadata/policies/" + $scope.policy.name + "/publishments/", publisherNameList)._then(function () {
 							// Link Success
 							$.dialog({
 								title: "Done",
