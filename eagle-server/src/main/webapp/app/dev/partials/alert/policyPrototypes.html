@@ -28,7 +28,9 @@
 			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>
-						<th></th>
+						<th>
+							<input type="checkbox" ng-checked="getCheckedList().length === prototypeList.length" ng-click="doCheckAll()" />
+						</th>
 						<th>Name</th>
 						<th>Definition</th>
 						<th>Publishers</th>
@@ -59,7 +61,7 @@
 		</div>
 
 	</div>
-	<div class="box-footer">
-		<button class="btn btn-primary" ng-click="groupCreate()">Create By Select</button>
+	<div class="box-footer text-right">
+		<button class="btn btn-primary" ng-click="groupCreate()" ng-disabled="getCheckedList().length === 0">Create By Select Prototypes</button>
 	</div>
 </div>
