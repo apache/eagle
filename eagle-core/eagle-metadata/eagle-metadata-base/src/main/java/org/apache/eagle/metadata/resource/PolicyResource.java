@@ -68,7 +68,7 @@ public class PolicyResource {
                                                         @QueryParam("needPolicyProtoCreated") boolean needPolicyProtoCreated) {
         return RESTResponse.async(() -> {
             Preconditions.checkNotNull(policyEntity, "entity should not be null");
-            Preconditions.checkNotNull(policyEntity, "policy definition should not be null");
+            Preconditions.checkNotNull(policyEntity.getDefinition(), "policy definition should not be null");
             Preconditions.checkNotNull(policyEntity.getAlertPublishmentIds(), "alert publisher list should not be null");
 
             PolicyDefinition policyDefinition = policyEntity.getDefinition();

@@ -109,7 +109,7 @@
 					} else {
 						$.dialog({
 							title: 'Success',
-							content: 'Create success. Click confirm to go to the policy page.',
+							content: 'Click confirm to go to the policy page.',
 							confirm: true,
 						}, function (ret) {
 							if (!ret) return;

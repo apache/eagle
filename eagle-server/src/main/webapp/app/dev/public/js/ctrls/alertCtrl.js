@@ -300,6 +300,11 @@
 							content: validate.message
 						});
 						return;
+					} else {
+						$.dialog({
+							title: "Success",
+							content: "Please go to the prototype page to check updates"
+						});
 					}
 				});
 			});
