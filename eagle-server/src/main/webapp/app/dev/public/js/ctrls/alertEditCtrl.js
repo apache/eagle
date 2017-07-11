@@ -58,10 +58,24 @@
 			});
 		};
 
-		$scope.groupCreate = function () {
-			var list = $.map($scope.prototypeList, function (proto) {
+		$scope.getCheckedList = function () {
+			return $.map($scope.prototypeList, function (proto) {
 				return $scope.checkedPrototypes[proto.name] ? proto : null;
 			});
+		};
+
+		$scope.doCheckAll = function () {
+			if ($scope.getCheckedList().length === $scope.prototypeList.length) {
+				$scope.checkedPrototypes = {};
+			} else {
+				$.each($scope.prototypeList, function (i, proto) {
+					$scope.checkedPrototypes[proto.name] = true;
+				});
+			}
+		};
+
+		$scope.groupCreate = function () {
+			var list = $scope.getCheckedList();
 			$scope.createPolicy(list);
 		};
 
