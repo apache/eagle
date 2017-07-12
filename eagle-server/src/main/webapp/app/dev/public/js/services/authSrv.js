@@ -21,8 +21,10 @@
 
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Auth', function ($http) {
+	serviceModule.service('Auth', function ($http, $q) {
 		//$http.defaults.withCredentials = true;
+		var _promise;
+
 		var Auth = {
 			isLogin: false,
 			user: {},
@@ -48,7 +50,7 @@
 		};
 
 		Auth.sync = function (hash) {
-			return $http.get(_host + "/rest/auth/principal", {
+			_promise = $http.get(_host + "/rest/auth/principal", {
 				headers: {
 					'Authorization': "Basic " + hash
 				}
@@ -64,10 +66,20 @@
 			}, function () {
 				return false;
 			});
+
+			return _promise;
+		};
+
+		Auth.getPromise = function () {
+			return _promise;
 		};
 
 		if (localStorage && localStorage.getItem('auth')) {
 			Auth.sync(localStorage.getItem('auth'));
+		} else {
+			var deferred = $q.defer();
+			deferred.resolve();
+			_promise = deferred.promise;
 		}
 
 		Object.defineProperties(Auth, {

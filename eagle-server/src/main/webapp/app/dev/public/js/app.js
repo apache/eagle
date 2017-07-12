@@ -43,7 +43,7 @@ var app = {};
 		// ======================================================================================
 		// =                                   Router config                                    =
 		// ======================================================================================
-		var defaultRouterStates = ['site', 'alertList', 'policyList', 'streamList', 'policyCreate', 'policyEdit', 'alertDetail', 'policyDetail'];
+		var defaultRouterStates = ['site', 'alertList', 'policyList', 'streamList', 'policyPrototypes', 'policyCreate', 'policyEdit', 'alertDetail', 'policyDetail'];
 
 		function routeResolve(config) {
 			var resolve = {};
@@ -201,6 +201,12 @@ var app = {};
 					resolve: routeResolve()
 				})
 
+				.state('policyPrototypes', {
+					url: "/site/:siteId/policy/prototypes",
+					templateUrl: "partials/alert/policyPrototypes.html?_=" + window._TRS(),
+					controller: "policyPrototypesCtrl",
+					resolve: routeResolve()
+				})
 				.state('policyCreate', {
 					url: "/site/:siteId/policy/create",
 					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),

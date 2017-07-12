@@ -193,6 +193,12 @@
 						).appendTo($toolContainer);
 						$compile($pageSize)($scope);
 
+						// Non-Sort Column
+						$element.find("table thead th:not([sortpath])").each(function () {
+							var $this = $(this);
+							$compile($this)($scope);
+						});
+
 						// Sort Column
 						$element.find("table [sortpath]").each(function () {
 							var $this = $(this);

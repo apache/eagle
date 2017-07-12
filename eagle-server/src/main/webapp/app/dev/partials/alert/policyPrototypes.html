@@ -1,0 +1,67 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<span class="fa fa-code-fork"></span>
+		<h3 class="box-title">
+			Prototype List
+		</h3>
+	</div>
+	<div class="box-body">
+		<div sort-table="prototypeList">
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<th>
+							<input type="checkbox" ng-checked="getCheckedList().length === prototypeList.length && prototypeList.length !== 0" ng-click="doCheckAll()" />
+						</th>
+						<th>Name</th>
+						<th>Definition</th>
+						<th>Publishers</th>
+						<th width="110">Operation</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<input type="checkbox" ng-checked="checkedPrototypes[item.name]" ng-click="checkedPrototypes[item.name] = !checkedPrototypes[item.name]" />
+						</td>
+						<td>{{item.name}}</td>
+						<td><pre>{{item.definition.definition.value}}</pre></td>
+						<td>
+							<ul class="no-margin">
+								<li ng-repeat="publisher in item.alertPublishmentIds track by $index">
+									{{publisher}}
+								</li>
+							</ul>
+						</td>
+						<td class="text-center">
+							<button class="btn btn-xs btn-primary" ng-click="createPolicy([item])">Export</button>
+							<button class="btn btn-xs btn-danger" ng-click="deletePrototype(item)">Delete</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+	<div class="box-footer text-right">
+		<button class="btn btn-primary" ng-click="groupCreate()" ng-disabled="getCheckedList().length === 0">Export as Policies</button>
+	</div>
+</div>
