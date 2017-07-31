@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.interpreter.PolicyValidationResult;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.apache.eagle.common.rest.RESTResponse;
@@ -72,6 +73,7 @@ public class PolicyResource {
             Preconditions.checkNotNull(policyEntity.getAlertPublishmentIds(), "alert publisher list should not be null");
 
             PolicyDefinition policyDefinition = policyEntity.getDefinition();
+            checkOutputStream(policyDefinition.getInputStreams(), policyDefinition.getOutputStreams());
             OpResult result = metadataResource.addPolicy(policyDefinition);
             if (result.code != 200) {
                 throw new IllegalArgumentException(result.message);
@@ -153,6 +155,7 @@ public class PolicyResource {
 
     private PolicyEntity importPolicyProto(PolicyEntity policyEntity) {
         PolicyDefinition policyDefinition = policyEntity.getDefinition();
+        checkOutputStream(policyDefinition.getInputStreams(), policyDefinition.getOutputStreams());
         List<String> inputStreamType = new ArrayList<>();
         String newDefinition = policyDefinition.getDefinition().getValue();
         for (String inputStream : policyDefinition.getInputStreams()) {
@@ -164,6 +167,7 @@ public class PolicyResource {
         policyDefinition.getDefinition().setValue(newDefinition);
         policyDefinition.setName(PolicyIdConversions.parsePolicyId(policyDefinition.getSiteId(), policyDefinition.getName()));
         policyDefinition.setSiteId(null);
+        policyDefinition.getPartitionSpec().clear();
         policyEntity.setDefinition(policyDefinition);
         return policyEntityService.createOrUpdatePolicyProto(policyEntity);
     }
@@ -186,10 +190,19 @@ public class PolicyResource {
             policyDefinition.getDefinition().setValue(newDefinition);
             policyDefinition.setSiteId(site);
             policyDefinition.setName(PolicyIdConversions.generateUniquePolicyId(site, policyProto.getDefinition().getName()));
+
             PolicyValidationResult validationResult = metadataResource.validatePolicy(policyDefinition);
             if (!validationResult.isSuccess() || validationResult.getException() != null) {
                 throw new IllegalArgumentException(validationResult.getException());
             }
+
+            policyDefinition.getPartitionSpec().clear();
+            for (StreamPartition sd : validationResult.getPolicyExecutionPlan().getStreamPartitions()) {
+                if (inputStreams.contains(sd.getStreamId())) {
+                    policyDefinition.getPartitionSpec().add(sd);
+                }
+            }
+
             OpResult result = metadataResource.addPolicy(policyDefinition);
             if (result.code != 200) {
                 throw new IllegalArgumentException("fail to create policy: " + result.message);
@@ -202,6 +215,17 @@ public class PolicyResource {
             }
         }
         return true;
+    }
+
+    private void checkOutputStream(List<String> inputStreams, List<String> outputStreams) {
+        for (String inputStream : inputStreams) {
+            for (String outputStream : outputStreams) {
+                if (outputStream.contains(inputStream)) {
+                    throw new IllegalArgumentException("OutputStream name should not contains string: " + inputStream
+                            + ". Please rename your OutputStream name");
+                }
+            }
+        }
     }
 
 }

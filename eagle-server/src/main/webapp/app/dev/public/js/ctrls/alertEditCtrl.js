@@ -253,12 +253,12 @@
 		};
 
 		/*$scope.checkInputStream = function (streamId) {
-			if($scope.isInputStreamSelected(streamId)) {
-				$scope.policy.inputStreams = common.array.remove(streamId, $scope.policy.inputStreams);
-			} else {
-				$scope.policy.inputStreams.push(streamId);
-			}
-		};*/
+		 if($scope.isInputStreamSelected(streamId)) {
+		 $scope.policy.inputStreams = common.array.remove(streamId, $scope.policy.inputStreams);
+		 } else {
+		 $scope.policy.inputStreams.push(streamId);
+		 }
+		 };*/
 
 		// ==============================================================
 		// =                         Definition                         =
@@ -558,7 +558,18 @@
 						});
 					}
 
-					policyPromise._then(function () {
+					policyPromise._then(function (res) {
+						var validate = res.data;
+						if (!validate.success) {
+							$.dialog({
+								title: "OPS",
+								content: "Create policy failed: " + (res.data.message || res.data.errors)
+							});
+							$scope.policyLock = false;
+							$scope.saveLock = false;
+							return;
+						}
+
 						console.log("Create policy success...");
 						$.dialog({
 							title: "Done",
@@ -566,18 +577,6 @@
 						}, function () {
 							$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
 						});
-					}, function (res) {
-						var errormsg = "";
-						if(typeof res.data.message !== 'undefined') {
-							errormsg = res.data.message;
-						} else {
-							errormsg = res.data.errors;
-						}
-						$.dialog({
-							title: "OPS",
-							content: "Create policy failed: " + errormsg
-						});
-						$scope.policyLock = false;
 					});
 				}, function (args) {
 					$.dialog({
