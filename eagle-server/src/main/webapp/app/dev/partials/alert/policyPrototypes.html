@@ -27,35 +27,36 @@
 		<div sort-table="prototypeList">
 			<table class="table table-bordered table-hover">
 				<thead>
-					<tr>
-						<th>
-							<input type="checkbox" ng-checked="getCheckedList().length === prototypeList.length && prototypeList.length !== 0" ng-click="doCheckAll()" />
-						</th>
-						<th>Name</th>
-						<th>Definition</th>
-						<th>Publishers</th>
-						<th width="110">Operation</th>
-					</tr>
+				<tr>
+					<th>
+						<input type="checkbox" ng-checked="getCheckedList().length === prototypeList.length && prototypeList.length !== 0" ng-click="doCheckAll()" />
+					</th>
+					<th>Name</th>
+					<th>Definition</th>
+					<!--<th>Publishers</th> -->
+					<th width="110">Operation</th>
+				</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>
-							<input type="checkbox" ng-checked="checkedPrototypes[item.name]" ng-click="checkedPrototypes[item.name] = !checkedPrototypes[item.name]" />
-						</td>
-						<td>{{item.name}}</td>
-						<td><pre>{{item.definition.definition.value}}</pre></td>
-						<td>
-							<ul class="no-margin">
-								<li ng-repeat="publisher in item.alertPublishmentIds track by $index">
-									{{publisher}}
-								</li>
-							</ul>
-						</td>
-						<td class="text-center">
-							<button class="btn btn-xs btn-primary" ng-click="createPolicy([item])">Export</button>
-							<button class="btn btn-xs btn-danger" ng-click="deletePrototype(item)">Delete</button>
-						</td>
-					</tr>
+				<tr>
+					<td>
+						<input type="checkbox" ng-checked="checkedPrototypes[item.name]" ng-click="checkedPrototypes[item.name] = !checkedPrototypes[item.name]" />
+					</td>
+					<td>{{item.name}}</td>
+					<td><pre>{{item.definition.definition.value}}</pre></td>
+					<!--
+					<td>
+						<ul class="no-margin">
+							<li ng-repeat="publisher in item.alertPublishmentIds track by $index">
+								{{publisher}}
+							</li>
+						</ul>
+					</td> -->
+					<td class="text-center">
+						<button class="btn btn-xs btn-primary" ng-click="createPolicy([item])">Export</button>
+						<button class="btn btn-xs btn-danger" ng-click="deletePrototype(item)">Delete</button>
+					</td>
+				</tr>
 				</tbody>
 			</table>
 		</div>

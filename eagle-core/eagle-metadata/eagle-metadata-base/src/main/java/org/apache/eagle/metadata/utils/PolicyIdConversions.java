@@ -22,17 +22,21 @@ import com.google.common.base.Preconditions;
 public class PolicyIdConversions {
 
     public static String generateUniquePolicyId(String siteId, String policyName) {
-        return String.format("%s_%s", policyName, siteId);
+        String subffix = String.format("_%s", siteId.toLowerCase());
+        if (policyName.toLowerCase().endsWith(subffix)) {
+            return policyName;
+        }
+        return String.format("%s_%s", policyName, siteId.toLowerCase());
     }
 
-    public static String parsePolicyId(String siteId, String generatedUniquePolicyId) {
-        String subffix = String.format("_%s", siteId);
-        if (generatedUniquePolicyId.endsWith(subffix)) {
-            int streamTypeIdLength = generatedUniquePolicyId.length() - subffix.length();
-            Preconditions.checkArgument(streamTypeIdLength > 0, "Invalid policyId: " + generatedUniquePolicyId + ", policyId is empty");
-            return generatedUniquePolicyId.substring(0, streamTypeIdLength);
+    public static String parsePolicyId(String siteId, String policyName) {
+        String subffix = String.format("_%s", siteId.toLowerCase());
+        if (policyName.toLowerCase().endsWith(subffix)) {
+            int streamTypeIdLength = policyName.length() - subffix.length();
+            Preconditions.checkArgument(streamTypeIdLength > 0, "Invalid policyId: " + policyName + ", policyId is empty");
+            return policyName.substring(0, streamTypeIdLength);
         } else {
-            return generatedUniquePolicyId;
+            return policyName;
         }
     }
 }
