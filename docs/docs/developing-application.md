@@ -39,7 +39,7 @@ Eagle application framework is designed for end-to-end lifecycle of applications
 
 * Fork and clone eagle source code repository using GIT.
 
-        git clone https://github.com/apache/incubator-eagle.git
+        git clone https://github.com/apache/eagle.git
 
 * Run Eagle Server : execute “org.apache.eagle.server.ServerDebug” under eagle-server in IDE or with maven command line.
 
@@ -135,7 +135,7 @@ eagle-app-example/
 │           └── application.conf
 ```
 
-**Eagle Example Application** - [eagle-app-example](https://github.com/haoch/incubator-eagle/tree/master/eagle-examples/eagle-app-example)
+**Eagle Example Application** - [eagle-app-example](https://github.com/apache/eagle/tree/master/eagle-examples/eagle-app-example)
 
 **Description** - A typical eagle application is mainly consisted of:
 
@@ -148,7 +148,7 @@ eagle-app-example/
         <application>
            <type>EXAMPLE_APPLICATION</type>
            <name>Example Monitoring Application</name>
-           <version>0.5.0-incubating</version>
+           <version>0.5.0</version>
            <configuration>
                <property>
                    <name>message</name>

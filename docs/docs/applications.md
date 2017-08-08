@@ -181,9 +181,9 @@ The example policy monitors the 'kill' operation on jobId under "BASE".
 
 * Setup metric collector for monitored Hadoop/HBase using hadoop_jmx_collector and modify the configuration.
 
-    * Collector scripts: [hadoop_jmx_collector](https://github.com/apache/incubator-eagle/tree/master/eagle-external/hadoop_jmx_collector)
+    * Collector scripts: [hadoop_jmx_collector](https://github.com/apache/eagle/tree/master/eagle-external/hadoop_jmx_collector)
 
-    * Rename config-sample.json to config.json: [config-sample.json](https://github.com/apache/incubator-eagle/blob/master/eagle-external/hadoop_jmx_collector/config-sample.json)
+    * Rename config-sample.json to config.json: [config-sample.json](https://github.com/apache/eagle/blob/master/eagle-external/hadoop_jmx_collector/config-sample.json)
 
             {
                 env: {
@@ -415,7 +415,7 @@ Then, enable the policy in web ui after it's created. Eagle will schedule it aut
 
     * Overall metrics of the cluster: http://{RM_HTTP_ADDRESS}:{PORT}/ws/v1/cluster/metrics
 
-            by version 0.5-incubating, mainly focusing at metrics
+            by version 0.5, mainly focusing at metrics
              - `appsPending`
              - `allocatedMB`
              - `totalMB`
