@@ -140,7 +140,7 @@ public class MRRunningAppMetricBolt extends BaseRichBolt {
                 Map<String, String> tags = generateMetricTags(level, app);
                 for (java.util.Map.Entry<String, String> entry : metrics.entrySet()) {
                     Method method = AppInfo.class.getMethod(entry.getValue());
-                    Integer value = (Integer) method.invoke(app);
+                    Integer value = Integer.valueOf(method.invoke(app).toString());
                     String metricName = String.format(entry.getKey(), level.name);
                     createMetric(appMetricEntities, timestamp, tags, metricName, value);
                 }
