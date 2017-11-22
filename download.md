@@ -6,6 +6,18 @@ permalink: /docs/download.html
 
 > You can verify your download by following these [procedures](https://www.apache.org/info/verification.html) and using these [KEYS](https://dist.apache.org/repos/dist/release/eagle/KEYS).
 
+# 0.5.0
+* Release notes:
+	* [Eagle 0.5.0 Release Notes](https://git-wip-us.apache.org/repos/asf?p=eagle.git;a=blob_plain;f=CHANGELOG.txt;hb=refs/tags/v0.5.0)
+* Source download:
+	* [apache-eagle-0.5.0-src.tar.gz](http://www.apache.org/dyn/closer.cgi?path=/incubator/eagle/apache-eagle-0.5.0-incubating)
+	* [apache-eagle-0.5.0-src.tar.gz.md5](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.md5)
+	* [apache-eagle-0.5.0-src.tar.gz.sha1](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.sha1)
+	* [apache-eagle-0.5.0-src.tar.gz.asc](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.asc)
+* Git revision: 
+	* tag: [v0.5.0](https://git-wip-us.apache.org/repos/asf?p=eagle.git;a=commit;h=refs/tags/v0.5.0)
+	* commit: [c930a7ab4a4fb78a1cbacd8f8419de3b5dbf1bd7](https://git-wip-us.apache.org/repos/asf?p=eagle.git;a=commit;h=c930a7ab4a4fb78a1cbacd8f8419de3b5dbf1bd7)
+
 # 0.4.0-incubating
 * Release notes: 
 	* [Eagle 0.4.0 Release Notes](https://git-wip-us.apache.org/repos/asf?p=eagle.git;a=blob_plain;f=CHANGELOG.txt;hb=refs/tags/v0.4.0-incubating)
