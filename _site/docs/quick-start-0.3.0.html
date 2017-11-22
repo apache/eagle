@@ -178,21 +178,22 @@
   <li>
     <p>Build manually with <a href="https://maven.apache.org/">Apache Maven</a>:</p>
 
-    <pre><code>$ tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
 $ cd incubator-eagle-release-0.3.0-rc3  
 $ curl -O https://patch-diff.githubusercontent.com/raw/apache/eagle/pull/180.patch
 $ git apply 180.patch
 $ mvn clean package -DskipTests
 </code></pre>
+    </div>
 
-    <p>After building successfully, you will get tarball under <code>eagle-assembly/target/</code> named as <code>eagle-0.3.0-incubating-bin.tar.gz</code>
+    <p>After building successfully, you will get tarball under <code class="highlighter-rouge">eagle-assembly/target/</code> named as <code class="highlighter-rouge">eagle-0.3.0-incubating-bin.tar.gz</code>
 <br /></p>
   </li>
 </ul>
 
 <h3 id="install-eagle"><strong>Install Eagle</strong></h3>
 
-<pre><code> $ scp -P 2222  eagle-assembly/target/eagle-0.3.0-incubating-bin.tar.gz root@127.0.0.1:/root/
+<div class="highlighter-rouge"><pre class="highlight"><code> $ scp -P 2222  eagle-assembly/target/eagle-0.3.0-incubating-bin.tar.gz root@127.0.0.1:/root/
  $ ssh root@127.0.0.1 -p 2222 (password is hadoop)
  $ tar -zxvf eagle-0.3.0-incubating-bin.tar.gz
  $ mv eagle-0.3.0-incubating eagle
@@ -200,6 +201,7 @@ $ mvn clean package -DskipTests
  $ cd /usr/hdp/current/eagle
  $ examples/eagle-sandbox-starter.sh
 </code></pre>
+</div>
 
 <p><br /></p>
 
@@ -217,7 +219,7 @@ $ mvn clean package -DskipTests
 <div class="footnotes">
   <ol>
     <li id="fn:HADOOP">
-      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em> <a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em>&nbsp;<a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

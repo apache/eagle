@@ -168,8 +168,9 @@
   <li>
     <p>Create a Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">1</a></sup> topic if you have not. Here is an example command.</p>
 
-    <pre><code>$ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
 </code></pre>
+    </div>
   </li>
   <li>
     <p>Stream HDFS log data to Kafka, and refer to <a href="/docs/import-hdfs-auditLog.html">here</a> on how to do it .</p>
@@ -185,8 +186,9 @@
   <li>
     <p>Install Eagle Ambari plugin</p>
 
-    <pre><code>$ /usr/hdp/current/eagle/bin/eagle-ambari.sh install
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ /usr/hdp/current/eagle/bin/eagle-ambari.sh install
 </code></pre>
+    </div>
   </li>
   <li>
     <p>Restart <a href="http://127.0.0.1:8000/">Ambari</a> click on disable and enable Ambari back.</p>
@@ -200,10 +202,11 @@
   <li>
     <p>Add Policies and meta data required by running the below script.</p>
 
-    <pre><code>$ cd &lt;eagle-home&gt;
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ cd &lt;eagle-home&gt;
 $ examples/sample-sensitivity-resource-create.sh
 $ examples/sample-policy-create.sh
 </code></pre>
+    </div>
   </li>
 </ol>
 
@@ -214,19 +217,19 @@ $ examples/sample-policy-create.sh
 <div class="footnotes">
   <ol>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:STORM">
-      <p><em>Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache Storm.</em>&nbsp;<a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:SPARK">
-      <p><em>Apache Spark.</em> <a href="#fnref:SPARK" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache Spark.</em>&nbsp;<a href="#fnref:SPARK" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HBASE">
-      <p><em>Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:AMBARI">
-      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em>&nbsp;<a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

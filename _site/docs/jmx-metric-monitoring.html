@@ -177,9 +177,10 @@
 <h3 id="setup"><strong>Setup</strong></h3>
 <p>From Hortonworks sandbox just run below setup script to Install Pyton JMX script, Create Kafka topic, update Apache Hbase tables and deploy “hadoopjmx” Storm topology.</p>
 
-<pre><code>$ /usr/hdp/current/eagle/examples/hadoop-metric-sandbox-starter.sh
+<div class="highlighter-rouge"><pre class="highlight"><code>$ /usr/hdp/current/eagle/examples/hadoop-metric-sandbox-starter.sh
 $ /usr/hdp/current/eagle/examples/hadoop-metric-policy-create.sh  
 </code></pre>
+</div>
 
 <p><br /></p>
 
@@ -204,15 +205,17 @@ $ /usr/hdp/current/eagle/examples/hadoop-metric-policy-create.sh
   <li>
     <p>First make sure that Kafka topic “nn_jmx_metric_sandbox” is populated with JMX metric data periodically.(To make sure that python script is running)</p>
 
-    <pre><code>  $ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --zookeeper sandbox.hortonworks.com:2181 --topic nn_jmx_metric_sandbox
+    <div class="highlighter-rouge"><pre class="highlight"><code>  $ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --zookeeper sandbox.hortonworks.com:2181 --topic nn_jmx_metric_sandbox
 </code></pre>
+    </div>
   </li>
   <li>
     <p>Genrate Alert by producing alert triggering message into Kafka topic.</p>
 
-    <pre><code>  $ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic nn_jmx_metric_sandbox
+    <div class="highlighter-rouge"><pre class="highlight"><code>  $ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic nn_jmx_metric_sandbox
   $ {"host": "localhost", "timestamp": 1457033916718, "metric": "hadoop.namenode.fsnamesystemstate.fsstate", "component": "namenode", "site": "sandbox", "value": 1.0}
 </code></pre>
+    </div>
   </li>
 </ul>
 
@@ -223,10 +226,10 @@ $ /usr/hdp/current/eagle/examples/hadoop-metric-policy-create.sh
 <div class="footnotes">
   <ol>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:STORM">
-      <p><em>All mentions of “storm” on this page represent Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “storm” on this page represent Apache Storm.</em>&nbsp;<a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

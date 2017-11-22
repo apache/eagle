@@ -179,21 +179,22 @@
   <li>
     <p>Build manually with <a href="https://maven.apache.org/">Apache Maven</a>:</p>
 
-    <pre><code>$ tar -zxvf apache-eagle-0.4.0-incubating-src.tar.gz
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ tar -zxvf apache-eagle-0.4.0-incubating-src.tar.gz
 $ cd apache-eagle-0.4.0-incubating-src 
 $ curl -O https://patch-diff.githubusercontent.com/raw/apache/eagle/pull/268.patch
 $ git apply 268.patch
 $ mvn clean package -DskipTests
 </code></pre>
+    </div>
 
-    <p>After building successfully, you will get a tarball under <code>eagle-assembly/target/</code> named <code>apache-eagle-0.4.0-incubating-bin.tar.gz</code>
+    <p>After building successfully, you will get a tarball under <code class="highlighter-rouge">eagle-assembly/target/</code> named <code class="highlighter-rouge">apache-eagle-0.4.0-incubating-bin.tar.gz</code>
 <br /></p>
   </li>
 </ul>
 
 <h3 id="install-eagle"><strong>Install Eagle</strong></h3>
 
-<pre><code> $ scp -P 2222 eagle-assembly/target/apache-eagle-0.4.0-incubating-bin.tar.gz root@127.0.0.1:/root/
+<div class="highlighter-rouge"><pre class="highlight"><code> $ scp -P 2222 eagle-assembly/target/apache-eagle-0.4.0-incubating-bin.tar.gz root@127.0.0.1:/root/
  $ ssh root@127.0.0.1 -p 2222 (password is hadoop)
  $ tar -zxvf apache-eagle-0.4.0-incubating-bin.tar.gz
  $ mv apache-eagle-0.4.0-incubating eagle
@@ -201,20 +202,22 @@ $ mvn clean package -DskipTests
  $ cd /usr/hdp/current/eagle
  $ examples/eagle-sandbox-starter.sh
 </code></pre>
+</div>
 
 <p><br /></p>
 
 <h3 id="sample-application-hive-query-activity-monitoring-in-sandbox"><strong>Sample Application: Hive query activity monitoring in sandbox</strong></h3>
-<p>After executing <code>examples/eagle-sandbox-starter.sh</code>, you have a sample application (topology) running on the Apache Storm (check with <a href="http://sandbox.hortonworks.com:8744/index.html">storm ui</a>), and a sample policy of Hive activity monitoring defined.</p>
+<p>After executing <code class="highlighter-rouge">examples/eagle-sandbox-starter.sh</code>, you have a sample application (topology) running on the Apache Storm (check with <a href="http://sandbox.hortonworks.com:8744/index.html">storm ui</a>), and a sample policy of Hive activity monitoring defined.</p>
 
 <p>Next you can trigger an alert by running a Hive query.</p>
 
-<pre><code>$ su hive
+<div class="highlighter-rouge"><pre class="highlight"><code>$ su hive
 $ hive
 $ set hive.execution.engine=mr;
 $ use xademo;
 $ select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
 </code></pre>
+</div>
 <p><br /></p>
 
 <hr />
@@ -224,10 +227,10 @@ $ select a.phone_number from customer_details a, call_detail_records b where a.p
 <div class="footnotes">
   <ol>
     <li id="fn:HADOOP">
-      <p><em>Apache Hadoop.</em> <a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache Hadoop.</em>&nbsp;<a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HIVE">
-      <p><em>All mentions of “hive” on this page represent Apache Hive.</em> <a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hive” on this page represent Apache Hive.</em>&nbsp;<a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

@@ -168,7 +168,7 @@
 <p>Application manager consists of a daemon scheduler and an execution module. The scheduler periodically loads user operations(start/stop) from database, and the execution module executes these operations. For more details, please refer to <a href="https://cwiki.apache.org/confluence/display/EAG/Application+Management">here</a>.</p>
 
 <h3 id="configurations">Configurations</h3>
-<p>The configuration file <code>eagle-scheduler.conf</code> defines scheduler parameters, execution platform settings and parts of default topology configuration.</p>
+<p>The configuration file <code class="highlighter-rouge">eagle-scheduler.conf</code> defines scheduler parameters, execution platform settings and parts of default topology configuration.</p>
 
 <ul>
   <li>
@@ -262,7 +262,7 @@
   <li>
     <p>Editing eagle-scheduler.conf, and start Eagle service</p>
 
-    <pre><code> # enable application manager       
+    <div class="highlighter-rouge"><pre class="highlight"><code> # enable application manager       
  appCommandLoaderEnabled = true
     
  # provide jar path
@@ -272,9 +272,10 @@
  envContextConfig.url = "http://sandbox.hortonworks.com:8744"
  envContextConfig.nimbusHost = "sandbox.hortonworks.com"
 </code></pre>
+    </div>
 
     <p>For more configurations, please back to <a href="/docs/configuration.html">Application Configuration</a>. <br />
- After the configuration is ready, start Eagle service <code>bin/eagle-service.sh start</code>.</p>
+ After the configuration is ready, start Eagle service <code class="highlighter-rouge">bin/eagle-service.sh start</code>.</p>
   </li>
   <li>
     <p>Go to admin page 
@@ -296,11 +297,11 @@
   <li>
     <p>Go to site page, and add topology configurations.</p>
 
-    <p><strong>NOTICE</strong> topology configurations defined here are REQUIRED an extra prefix <code>.app</code></p>
+    <p><strong>NOTICE</strong> topology configurations defined here are REQUIRED an extra prefix <code class="highlighter-rouge">.app</code></p>
 
     <p>Blow are some example configurations for [site=sandbox, applicatoin=hbaseSecurityLog].</p>
 
-    <pre><code> classification.hbase.zookeeper.property.clientPort=2181
+    <div class="highlighter-rouge"><pre class="highlight"><code> classification.hbase.zookeeper.property.clientPort=2181
  classification.hbase.zookeeper.quorum=sandbox.hortonworks.com
     
  app.envContextConfig.env=storm
@@ -329,6 +330,7 @@
  app.eagleProps.eagleService.username=admin
  app.eagleProps.eagleService.password=secret
 </code></pre>
+    </div>
 
     <p><img src="/images/appManager/topology-configuration-1.png" alt="topology-configuration-1" />
 <img src="/images/appManager/topology-configuration-2.png" alt="topology-configuration-2" /></p>
@@ -351,7 +353,7 @@
 <div class="footnotes">
   <ol>
     <li id="fn:STORM">
-      <p><em>All mentions of “storm” on this page represent Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “storm” on this page represent Apache Storm.</em>&nbsp;<a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

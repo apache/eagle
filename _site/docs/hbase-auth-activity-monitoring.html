@@ -160,11 +160,11 @@
 
 <p>Please follow below steps to enable HBase authorization auditing in HDP sandbox and Cloudera</p>
 
-<h4 id="in-hbase-sitexml">1. in hbase-site.xml</h4>
+<h4 id="1-in-hbase-sitexml">1. in hbase-site.xml</h4>
 
 <p>Note: when testing in HDP sandbox, sometimes Apache Ranger will take over access controll for HBase, so maybe you need change that back to native hbase access controller, i.e. change com.xasecure.authorization.hbase.XaSecureAuthorizationCoprocessor to org.apache.hadoop.hbase.security.access.AccessController</p>
 
-<pre><code>&lt;property&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;property&gt;
      &lt;name&gt;hbase.security.authorization&lt;/name&gt;
      &lt;value&gt;true&lt;/value&gt;
 &lt;/property&gt;
@@ -177,10 +177,11 @@
      &lt;value&gt;org.apache.hadoop.hbase.security.token.TokenProvider,org.apache.hadoop.hbase.security.access.AccessController&lt;/value&gt;
 &lt;/property&gt;
 </code></pre>
+</div>
 
-<h4 id="log4jproperties">2. log4j.properties</h4>
+<h4 id="2-log4jproperties">2. log4j.properties</h4>
 
-<pre><code>#
+<div class="highlighter-rouge"><pre class="highlight"><code>#
 # Security audit appender
 #
 hbase.security.log.file=SecurityAuth.audit
@@ -196,6 +197,7 @@ log4j.category.SecurityLogger=${hbase.security.logger}
 log4j.additivity.SecurityLogger=false
 log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE
 </code></pre>
+</div>
 
 <hr />
 
@@ -204,7 +206,7 @@ log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessContro
 <div class="footnotes">
   <ol>
     <li id="fn:HBASE">
-      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

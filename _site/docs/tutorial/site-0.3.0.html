@@ -180,32 +180,35 @@ Here we give configuration examples for HDFS, HBASE, and Hive.</p>
 
         <p>You may configure the default path for Hadoop clients to connect remote hdfs namenode.</p>
 
-        <pre><code>  {"fs.defaultFS":"hdfs://sandbox.hortonworks.com:8020"}
-</code></pre>
+        <div class="highlighter-rouge"><pre class="highlight"><code><span class="w">  </span><span class="p">{</span><span class="nt">"fs.defaultFS"</span><span class="p">:</span><span class="s2">"hdfs://sandbox.hortonworks.com:8020"</span><span class="p">}</span><span class="w">
+</span></code></pre>
+        </div>
       </li>
       <li>
         <p>HA case</p>
 
         <p>Basically, you point your fs.defaultFS at your nameservice and let the client know how its configured (the backing namenodes) and how to fail over between them under the HA mode</p>
 
-        <pre><code>  {"fs.defaultFS":"hdfs://nameservice1",
-   "dfs.nameservices": "nameservice1",
-   "dfs.ha.namenodes.nameservice1":"namenode1,namenode2",
-   "dfs.namenode.rpc-address.nameservice1.namenode1": "hadoopnamenode01:8020",
-   "dfs.namenode.rpc-address.nameservice1.namenode2": "hadoopnamenode02:8020",
-   "dfs.client.failover.proxy.provider.nameservice1": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
-  }
-</code></pre>
+        <div class="highlighter-rouge"><pre class="highlight"><code><span class="w">  </span><span class="p">{</span><span class="nt">"fs.defaultFS"</span><span class="p">:</span><span class="s2">"hdfs://nameservice1"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"dfs.nameservices"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nameservice1"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"dfs.ha.namenodes.nameservice1"</span><span class="p">:</span><span class="s2">"namenode1,namenode2"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"dfs.namenode.rpc-address.nameservice1.namenode1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hadoopnamenode01:8020"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"dfs.namenode.rpc-address.nameservice1.namenode2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hadoopnamenode02:8020"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"dfs.client.failover.proxy.provider.nameservice1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+        </div>
       </li>
       <li>
         <p>Kerberos-secured cluster</p>
 
         <p>For Kerberos-secured cluster, you need to get a keytab file and the principal from your admin, and configure “eagle.keytab.file” and “eagle.kerberos.principal” to authenticate its access.</p>
 
-        <pre><code>  { "eagle.keytab.file":"/EAGLE-HOME/.keytab/eagle.keytab",
-    "eagle.kerberos.principal":"eagle@SOMEWHERE.COM"
-  }
-</code></pre>
+        <div class="highlighter-rouge"><pre class="highlight"><code><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"eagle.keytab.file"</span><span class="p">:</span><span class="s2">"/EAGLE-HOME/.keytab/eagle.keytab"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"eagle.kerberos.principal"</span><span class="p">:</span><span class="s2">"eagle@SOMEWHERE.COM"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+        </div>
 
         <p>If there is an exception about “invalid server principal name”, you may need to check the DNS resolver, or the data transfer , such as “dfs.encrypt.data.transfer”, “dfs.encrypt.data.transfer.algorithm”, “dfs.trustedchannel.resolver.class”, “dfs.datatransfer.client.encrypt”.</p>
       </li>
@@ -216,14 +219,15 @@ Here we give configuration examples for HDFS, HBASE, and Hive.</p>
       <li>
         <p>Basic</p>
 
-        <pre><code>  {
-    "accessType": "metastoredb_jdbc",
-    "password": "hive",
-    "user": "hive",
-    "jdbcDriverClassName": "com.mysql.jdbc.Driver",
-    "jdbcUrl": "jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true"
-  }
-</code></pre>
+        <div class="highlighter-rouge"><pre class="highlight"><code><span class="w">  </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"accessType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"metastoredb_jdbc"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hive"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hive"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"jdbcDriverClassName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.mysql.jdbc.Driver"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"jdbcUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+        </div>
       </li>
     </ul>
   </li>
@@ -236,27 +240,29 @@ Here we give configuration examples for HDFS, HBASE, and Hive.</p>
 
         <p>You need to sett “hbase.zookeeper.quorum”:”localhost” property and “hbase.zookeeper.property.clientPort” property.</p>
 
-        <pre><code>  {
-      "hbase.zookeeper.property.clientPort":"2181",
-      "hbase.zookeeper.quorum":"localhost"
-  }
-</code></pre>
+        <div class="highlighter-rouge"><pre class="highlight"><code><span class="w">  </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"hbase.zookeeper.property.clientPort"</span><span class="p">:</span><span class="s2">"2181"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hbase.zookeeper.quorum"</span><span class="p">:</span><span class="s2">"localhost"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+        </div>
       </li>
       <li>
         <p>Kerberos-secured cluster</p>
 
         <p>According to your environment, you can add or remove some of the following properties. Here is the reference.</p>
 
-        <pre><code>  {
-      "hbase.zookeeper.property.clientPort":"2181",
-      "hbase.zookeeper.quorum":"localhost",
-      "hbase.security.authentication":"kerberos",
-      "hbase.master.kerberos.principal":"hadoop/_HOST@EXAMPLE.COM",
-      "zookeeper.znode.parent":"/hbase",
-      "eagle.keytab.file":"/EAGLE-HOME/.keytab/eagle.keytab",
-      "eagle.kerberos.principal":"eagle@EXAMPLE.COM"
-  }
-</code></pre>
+        <div class="highlighter-rouge"><pre class="highlight"><code><span class="w">  </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"hbase.zookeeper.property.clientPort"</span><span class="p">:</span><span class="s2">"2181"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hbase.zookeeper.quorum"</span><span class="p">:</span><span class="s2">"localhost"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hbase.security.authentication"</span><span class="p">:</span><span class="s2">"kerberos"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hbase.master.kerberos.principal"</span><span class="p">:</span><span class="s2">"hadoop/_HOST@EXAMPLE.COM"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"zookeeper.znode.parent"</span><span class="p">:</span><span class="s2">"/hbase"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"eagle.keytab.file"</span><span class="p">:</span><span class="s2">"/EAGLE-HOME/.keytab/eagle.keytab"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"eagle.kerberos.principal"</span><span class="p">:</span><span class="s2">"eagle@EXAMPLE.COM"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+        </div>
       </li>
     </ul>
   </li>
@@ -274,13 +280,13 @@ Here we give configuration examples for HDFS, HBASE, and Hive.</p>
 <div class="footnotes">
   <ol>
     <li id="fn:HADOOP">
-      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em> <a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em>&nbsp;<a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HIVE">
-      <p><em>Apache Hive.</em> <a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache Hive.</em>&nbsp;<a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HBASE">
-      <p><em>Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

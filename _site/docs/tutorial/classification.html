@@ -182,30 +182,33 @@ Currently this feature is available ONLY for applications monitoring HDFS, Hive<
 
         <p>You may configure the default path for Apache Hadoop clients to connect remote hdfs namenode.</p>
 
-        <pre><code>  classification.fs.defaultFS=hdfs://sandbox.hortonworks.com:8020
+        <div class="highlighter-rouge"><pre class="highlight"><code>  classification.fs.defaultFS=hdfs://sandbox.hortonworks.com:8020
 </code></pre>
+        </div>
       </li>
       <li>
         <p>HA case</p>
 
         <p>Basically, you point your fs.defaultFS at your nameservice and let the client know how its configured (the backing namenodes) and how to fail over between them under the HA mode</p>
 
-        <pre><code>  classification.fs.defaultFS=hdfs://nameservice1
+        <div class="highlighter-rouge"><pre class="highlight"><code>  classification.fs.defaultFS=hdfs://nameservice1
   classification.dfs.nameservices=nameservice1
   classification.dfs.ha.namenodes.nameservice1=namenode1,namenode2
   classification.dfs.namenode.rpc-address.nameservice1.namenode1=hadoopnamenode01:8020
   classification.dfs.namenode.rpc-address.nameservice1.namenode2=hadoopnamenode02:8020
   classification.dfs.client.failover.proxy.provider.nameservice1=org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider
 </code></pre>
+        </div>
       </li>
       <li>
         <p>Kerberos-secured cluster</p>
 
         <p>For Kerberos-secured cluster, you need to get a keytab file and the principal from your admin, and configure “eagle.keytab.file” and “eagle.kerberos.principal” to authenticate its access.</p>
 
-        <pre><code>  classification.eagle.keytab.file=/EAGLE-HOME/.keytab/eagle.keytab
+        <div class="highlighter-rouge"><pre class="highlight"><code>  classification.eagle.keytab.file=/EAGLE-HOME/.keytab/eagle.keytab
   classification.eagle.kerberos.principal=eagle@SOMEWHERE.COM
 </code></pre>
+        </div>
 
         <p>If there is an exception about “invalid server principal name”, you may need to check the DNS resolver, or the data transfer , such as “dfs.encrypt.data.transfer”, “dfs.encrypt.data.transfer.algorithm”, “dfs.trustedchannel.resolver.class”, “dfs.datatransfer.client.encrypt”.</p>
       </li>
@@ -216,12 +219,13 @@ Currently this feature is available ONLY for applications monitoring HDFS, Hive<
       <li>
         <p>Basic</p>
 
-        <pre><code>  classification.accessType=metastoredb_jdbc
+        <div class="highlighter-rouge"><pre class="highlight"><code>  classification.accessType=metastoredb_jdbc
   classification.password=hive
   classification.user=hive
   classification.jdbcDriverClassName=com.mysql.jdbc.Driver
   classification.jdbcUrl=jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true
 </code></pre>
+        </div>
       </li>
     </ul>
   </li>
@@ -234,16 +238,17 @@ Currently this feature is available ONLY for applications monitoring HDFS, Hive<
 
         <p>You need to sett “hbase.zookeeper.quorum”:”localhost” property and “hbase.zookeeper.property.clientPort” property.</p>
 
-        <pre><code>  classification.hbase.zookeeper.property.clientPort=2181
+        <div class="highlighter-rouge"><pre class="highlight"><code>  classification.hbase.zookeeper.property.clientPort=2181
   classification.hbase.zookeeper.quorum=localhost
 </code></pre>
+        </div>
       </li>
       <li>
         <p>Kerberos-secured cluster</p>
 
         <p>According to your environment, you can add or remove some of the following properties. Here is the reference.</p>
 
-        <pre><code>  classification.hbase.zookeeper.property.clientPort=2181
+        <div class="highlighter-rouge"><pre class="highlight"><code>  classification.hbase.zookeeper.property.clientPort=2181
   classification.hbase.zookeeper.quorum=localhost
   classification.hbase.security.authentication=kerberos
   classification.hbase.master.kerberos.principal=hadoop/_HOST@EXAMPLE.COM
@@ -251,6 +256,7 @@ Currently this feature is available ONLY for applications monitoring HDFS, Hive<
   classification.eagle.keytab.file=/EAGLE-HOME/.keytab/eagle.keytab
   classification.eagle.kerberos.principal=eagle@EXAMPLE.COM
 </code></pre>
+        </div>
       </li>
     </ul>
   </li>
@@ -321,10 +327,10 @@ Currently this feature is available ONLY for applications monitoring HDFS, Hive<
 <div class="footnotes">
   <ol>
     <li id="fn:HIVE">
-      <p><em>All mentions of “hive” on this page represent Apache Hive.</em> <a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hive” on this page represent Apache Hive.</em>&nbsp;<a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HBASE">
-      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

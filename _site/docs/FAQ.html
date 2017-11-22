@@ -164,14 +164,16 @@
       <p>Add the following line in host machine’s hosts file</p>
     </blockquote>
 
-    <pre><code>127.0.0.1 sandbox.hortonworks.com
+    <div class="highlighter-rouge"><pre class="highlight"><code>127.0.0.1 sandbox.hortonworks.com
 </code></pre>
+    </div>
   </li>
   <li>
     <p><strong>Q2. Not able to send data into kafka using kafka console producer</strong>:</p>
 
-    <pre><code>/usr/hdp/current/kafka-broker/bin/kafka-console-producer.sh --broker-list localhost:6667 --topic sandbox_hdfs_audit_log
+    <div class="highlighter-rouge"><pre class="highlight"><code>/usr/hdp/current/kafka-broker/bin/kafka-console-producer.sh --broker-list localhost:6667 --topic sandbox_hdfs_audit_log
 </code></pre>
+    </div>
 
     <blockquote>
       <p>Apache Kafka broker are binding to host sandbox.hortonworks.com</p>

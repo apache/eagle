@@ -159,7 +159,7 @@
         <h2 id="how-to-setup-apache-eagle-development-environment-on-mac-osx">How to Setup Apache Eagle Development Environment on Mac OSX</h2>
 
 <p><em>Apache Eagle will be called Eagle in the following.</em><br />
-This tutorial is based <code>Mac OS X</code>. It can be used as a reference guide for other OS like Linux or Windows as well.  To save your time of jumping back and forth between different web pages, all necessary references will be pointed out.</p>
+This tutorial is based <code class="highlighter-rouge">Mac OS X</code>. It can be used as a reference guide for other OS like Linux or Windows as well.  To save your time of jumping back and forth between different web pages, all necessary references will be pointed out.</p>
 
 <h3 id="prerequisite">Prerequisite</h3>
 
@@ -169,8 +169,9 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
 
 <p>Make sure you have HomeBrew installed on your mac. If not, please run:</p>
 
-<pre><code>$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+<div class="highlighter-rouge"><pre class="highlight"><code>$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 </code></pre>
+</div>
 
 <p>you can find more information about HomeBrew at http://brew.sh/ .</p>
 
@@ -180,9 +181,10 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
 
 <p>Some core eagle modules are written with scala. To install Scala and SBT, just run:</p>
 
-<pre><code> $ brew install scala
+<div class="highlighter-rouge"><pre class="highlight"><code> $ brew install scala
  $ brew install sbt
 </code></pre>
+</div>
 
 <ul>
   <li><strong>NPM</strong></li>
@@ -190,8 +192,9 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
 
 <p>Eagle-webservice module uses npm. To install it, run:</p>
 
-<pre><code> $ brew install npm
+<div class="highlighter-rouge"><pre class="highlight"><code> $ brew install npm
 </code></pre>
+</div>
 
 <ul>
   <li><strong>Apache Maven</strong></li>
@@ -199,8 +202,9 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
 
 <p>Eagle is built with maven:</p>
 
-<pre><code> $ brew install maven
+<div class="highlighter-rouge"><pre class="highlight"><code> $ brew install maven
 </code></pre>
+</div>
 
 <ul>
   <li>
@@ -210,8 +214,9 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
       <li>
         <p>Install HomeBrew Cask:</p>
 
-        <pre><code>$ brew install caskroom/cask/brew-cask
+        <div class="highlighter-rouge"><pre class="highlight"><code>$ brew install caskroom/cask/brew-cask
 </code></pre>
+        </div>
       </li>
       <li>
         <p>Next, install JDK via HomeBrew:</p>
@@ -224,15 +229,18 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
 
 <p>you will see all available JDK versions and you can install multiple JDK versions in this way. For eagle please choose java7 to install:</p>
 
-<pre><code> $ brew cask install java7
+<div class="highlighter-rouge"><pre class="highlight"><code> $ brew cask install java7
 </code></pre>
+</div>
 
-<p><strong>Note:</strong>
-- During this writing SBT has issue with JDK 8. This issue has been tested confirmed by using: 
-- Java 1.8.0_66
-- Maven 3.3.9
-- Scala 2.11.7
-- Sbt 0.13.9</p>
+<p><strong>Note:</strong></p>
+<ul>
+  <li>During this writing SBT has issue with JDK 8. This issue has been tested confirmed by using:</li>
+  <li>Java 1.8.0_66</li>
+  <li>Maven 3.3.9</li>
+  <li>Scala 2.11.7</li>
+  <li>Sbt 0.13.9</li>
+</ul>
 
 <p>you can find more information about HomeBrew Cask at <a href="http://caskroom.io">http://caskroom.io</a></p>
 
@@ -242,44 +250,53 @@ This tutorial is based <code>Mac OS X</code>. It can be used as a reference guid
 
 <p>you can use Jenv to manage installed multiple Java versions. To install it:</p>
 
-<pre><code>$ brew install https://raw.githubusercontent.com/entrypass/jenv/homebrew/homebrew/jenv.rb
+<div class="highlighter-rouge"><pre class="highlight"><code>$ brew install https://raw.githubusercontent.com/entrypass/jenv/homebrew/homebrew/jenv.rb
 </code></pre>
+</div>
 
 <p>and make sure activate it automatically:</p>
 
-<pre><code>$ echo 'eval "$(jenv init -)"' &gt;&gt; ~/.bash_profile
+<div class="highlighter-rouge"><pre class="highlight"><code>$ echo 'eval "$(jenv init -)"' &gt;&gt; ~/.bash_profile
 </code></pre>
+</div>
 
-<p><strong>Note:</strong>
-- There is a known issue at this writing: https://github.com/gcuisinier/jenv/wiki/Trouble-Shooting
-- Please make sure JENV_ROOT has been set before jenv init:
-- $ export JENV_ROOT=/usr/local/opt/jenv</p>
+<p><strong>Note:</strong></p>
+<ul>
+  <li>There is a known issue at this writing: https://github.com/gcuisinier/jenv/wiki/Trouble-Shooting</li>
+  <li>Please make sure JENV_ROOT has been set before jenv init:</li>
+  <li>$ export JENV_ROOT=/usr/local/opt/jenv</li>
+</ul>
 
 <p>Now let Jenv manage JDK versions (remember In OSX all JVMs are located at /Library/Java/JavaVirtualMachines):</p>
 
-<pre><code>$ jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_66.jdk/Contents/Home/
+<div class="highlighter-rouge"><pre class="highlight"><code>$ jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_66.jdk/Contents/Home/
 $ jenv add /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/
 </code></pre>
+</div>
 
 <p>and</p>
 
-<pre><code>$ jenv rehash
+<div class="highlighter-rouge"><pre class="highlight"><code>$ jenv rehash
 </code></pre>
+</div>
 
 <p>You can see all managed JDK versions:</p>
 
-<pre><code>$ jenv versions
+<div class="highlighter-rouge"><pre class="highlight"><code>$ jenv versions
 </code></pre>
+</div>
 
 <p>set global java version:</p>
 
-<pre><code>$ jenv global oracle64-1.8.0.66
+<div class="highlighter-rouge"><pre class="highlight"><code>$ jenv global oracle64-1.8.0.66
 </code></pre>
+</div>
 
 <p>switch to your eagle home directory and set the local JDK version for eagle:</p>
 
-<pre><code>$ jenv local oracle64-1.7.0.80
+<div class="highlighter-rouge"><pre class="highlight"><code>$ jenv local oracle64-1.7.0.80
 </code></pre>
+</div>
 
 <p>you can find more information about Jenv at https://github.com/rbenv/rbenv and http://hanxue-it.blogspot.com/2014/05/installing-java-8-managing-multiple.html.</p>
 
@@ -287,8 +304,9 @@ $ jenv add /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/
 
 <p>Go to Eagle home directory and run:</p>
 
-<pre><code>mvn -DskipTests clean package
+<div class="highlighter-rouge"><pre class="highlight"><code>mvn -DskipTests clean package
 </code></pre>
+</div>
 
 <p>That’s all. Now you have runnable eagle on your Mac. Have fun. :-)</p>
 

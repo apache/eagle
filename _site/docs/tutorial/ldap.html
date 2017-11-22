@@ -160,7 +160,7 @@
 
 <p>Step 1: edit configuration under conf/ldap.properties.</p>
 
-<pre><code>ldap.server=ldap://localhost:10389
+<div class="highlighter-rouge"><pre class="highlight"><code>ldap.server=ldap://localhost:10389
 ldap.username=uid=admin,ou=system
 ldap.password=secret
 ldap.user.searchBase=ou=Users,o=mojo
@@ -169,12 +169,13 @@ ldap.user.groupSearchBase=ou=groups,o=mojo
 acl.adminRole=
 acl.defaultRole=ROLE_USER
 </code></pre>
+</div>
 
 <p>acl.adminRole and acl.defaultRole are two customized properties for Eagle. Eagle manages admin users with groups. If you set acl.adminRole as ROLE_{EAGLE-ADMIN-GROUP-NAME}, members in this group have the admin privilege. acl.defaultRole is ROLE_USER.</p>
 
 <p>Step 2: edit conf/eagle-service.conf, and add springActiveProfile=”default”</p>
 
-<pre><code>eagle{
+<div class="highlighter-rouge"><pre class="highlight"><code>eagle{
     service{
         storage-type="hbase"
         hbase-zookeeper-quorum="localhost"
@@ -184,6 +185,7 @@ acl.defaultRole=ROLE_USER
     }
 }
 </code></pre>
+</div>
 
 
       </div><!--end of loadcontent-->  

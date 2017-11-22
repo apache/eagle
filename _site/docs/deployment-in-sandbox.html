@@ -201,21 +201,23 @@
         <p><strong>Option 1</strong>: Download eagle jar from <a href="http://66.211.190.194/eagle-0.1.0.tar.gz">here</a>.</p>
       </li>
       <li>
-        <p><strong>Option 2</strong>: Build form source code <a href="https://github.com/apache/eagle">eagle github</a>. After successful build, ‘eagle-xxx-bin.tar.gz’ will be generated under <code>./eagle-assembly/target</code></p>
+        <p><strong>Option 2</strong>: Build form source code <a href="https://github.com/apache/eagle">eagle github</a>. After successful build, ‘eagle-xxx-bin.tar.gz’ will be generated under <code class="highlighter-rouge">./eagle-assembly/target</code></p>
 
-        <pre><code># installed npm is required before compiling
+        <div class="highlighter-rouge"><pre class="highlight"><code># installed npm is required before compiling
 $ mvn clean install -DskipTests=true
 </code></pre>
+        </div>
       </li>
     </ul>
   </li>
   <li>
     <p><strong>Copy and extract the package to sandbox</strong></p>
 
-    <pre><code>#extract
+    <div class="highlighter-rouge"><pre class="highlight"><code>#extract
 $ tar -zxvf eagle-0.1.0-bin.tar.gz
 $ mv eagle-0.1.0 /usr/hdp/current/eagle
 </code></pre>
+    </div>
   </li>
 </ul>
 
@@ -229,9 +231,10 @@ $ mv eagle-0.1.0 /usr/hdp/current/eagle
   <li>
     <p><strong>Option 1</strong>: Install Eagle using command line</p>
 
-    <pre><code>$ cd /usr/hdp/current/eagle
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ cd /usr/hdp/current/eagle
 $ examples/eagle-sandbox-starter.sh
 </code></pre>
+    </div>
   </li>
   <li>
     <p><strong>Option 2</strong>: Install Eagle using <a href="/docs/ambari-plugin-install.html">Eagle Ambari plugin</a></p>
@@ -246,7 +249,7 @@ $ examples/eagle-sandbox-starter.sh
   <li>
     <p><strong>Step 1</strong>: Configure Advanced hadoop-log4j via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and add below “KAFKA_HDFS_AUDIT” log4j appender to hdfs audit logging.</p>
 
-    <pre><code>log4j.appender.KAFKA_HDFS_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
+    <div class="highlighter-rouge"><pre class="highlight"><code>log4j.appender.KAFKA_HDFS_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
 log4j.appender.KAFKA_HDFS_AUDIT.Topic=sandbox_hdfs_audit_log
 log4j.appender.KAFKA_HDFS_AUDIT.BrokerList=sandbox.hortonworks.com:6667
 log4j.appender.KAFKA_HDFS_AUDIT.KeyClass=org.apache.eagle.log4j.kafka.hadoop.AuditLogKeyer
@@ -256,22 +259,25 @@ log4j.appender.KAFKA_HDFS_AUDIT.ProducerType=async
 #log4j.appender.KAFKA_HDFS_AUDIT.BatchSize=1
 #log4j.appender.KAFKA_HDFS_AUDIT.QueueSize=1
 </code></pre>
+    </div>
 
     <p><img src="/images/docs/hdfs-log4j-conf.png" alt="HDFS LOG4J Configuration" title="hdfslog4jconf" /></p>
   </li>
   <li>
     <p><strong>Step 3</strong>: Edit Advanced hadoop-env via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and add the reference to KAFKA_HDFS_AUDIT to HADOOP_NAMENODE_OPTS.</p>
 
-    <pre><code>-Dhdfs.audit.logger=INFO,DRFAAUDIT,KAFKA_HDFS_AUDIT
+    <div class="highlighter-rouge"><pre class="highlight"><code>-Dhdfs.audit.logger=INFO,DRFAAUDIT,KAFKA_HDFS_AUDIT
 </code></pre>
+    </div>
 
     <p><img src="/images/docs/hdfs-env-conf.png" alt="HDFS Environment Configuration" title="hdfsenvconf" /></p>
   </li>
   <li>
     <p><strong>Step 4</strong>: Edit Advanced hadoop-env via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and append the following command to it.</p>
 
-    <pre><code>export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:/usr/hdp/current/eagle/lib/log4jkafka/lib/*
+    <div class="highlighter-rouge"><pre class="highlight"><code>export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:/usr/hdp/current/eagle/lib/log4jkafka/lib/*
 </code></pre>
+    </div>
 
     <p><img src="/images/docs/hdfs-env-conf2.png" alt="HDFS Environment Configuration" title="hdfsenvconf2" /></p>
   </li>
@@ -279,14 +285,15 @@ log4j.appender.KAFKA_HDFS_AUDIT.ProducerType=async
     <p><strong>Step 5</strong>: save the changes and restart the namenode.</p>
   </li>
   <li>
-    <p><strong>Step 6</strong>: Check whether logs are flowing into topic <code>sandbox_hdfs_audit_log</code></p>
+    <p><strong>Step 6</strong>: Check whether logs are flowing into topic <code class="highlighter-rouge">sandbox_hdfs_audit_log</code></p>
 
-    <pre><code>$ /usr/hdp/current/kafka-broker/bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic sandbox_hdfs_audit_log
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ /usr/hdp/current/kafka-broker/bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic sandbox_hdfs_audit_log
 </code></pre>
+    </div>
   </li>
 </ul>
 
-<p>Now please login to Eagle web http://localhost:9099/eagle-service with account <code>admin/secret</code>, and try the sample demos on
+<p>Now please login to Eagle web http://localhost:9099/eagle-service with account <code class="highlighter-rouge">admin/secret</code>, and try the sample demos on
 <a href="/docs/quick-start.html">Quick Starer</a></p>
 
 <p>(If the NAT network is used in a virtual machine, it’s required to add port 9099 to forwarding ports)
@@ -300,19 +307,19 @@ log4j.appender.KAFKA_HDFS_AUDIT.ProducerType=async
 <div class="footnotes">
   <ol>
     <li id="fn:HADOOP">
-      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em> <a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em>&nbsp;<a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:AMBARI">
-      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em>&nbsp;<a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HBASE">
-      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:STORM">
-      <p><em>All mentions of “storm” on this page represent Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “storm” on this page represent Apache Storm.</em>&nbsp;<a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

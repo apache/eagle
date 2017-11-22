@@ -160,23 +160,25 @@
 
 <h4 id="sample-authorization-logs">Sample authorization logs</h4>
 
-<pre><code>2016-06-08 02:55:07,742 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hdfs (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol
+<div class="highlighter-rouge"><pre class="highlight"><code>2016-06-08 02:55:07,742 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hdfs (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol
 2016-06-08 02:55:35,304 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hdfs (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.server.protocol.NamenodeProtocol
 2016-06-08 02:55:36,862 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hive (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol
 </code></pre>
+</div>
 
 <p>Steps for enabling service-level authorization activity</p>
 
-<h4 id="enable-hdfs-authorization-security-in-core-sitexml">1. Enable HDFS Authorization Security in core-site.xml</h4>
+<h4 id="1-enable-hdfs-authorization-security-in-core-sitexml">1. Enable HDFS Authorization Security in core-site.xml</h4>
 
-<pre><code>  &lt;property&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>  &lt;property&gt;
       &lt;name&gt;hadoop.security.authorization&lt;/name&gt;
       &lt;value&gt;true&lt;/value&gt;
   &lt;/property&gt;
 </code></pre>
+</div>
 
-<h4 id="enable-hdfs-security-log-in-log4jproperties">2. Enable HDFS security log in log4j.properties</h4>
-<pre><code>#
+<h4 id="2-enable-hdfs-security-log-in-log4jproperties">2. Enable HDFS security log in log4j.properties</h4>
+<div class="highlighter-rouge"><pre class="highlight"><code>#
 #Security audit appender
 #
 hadoop.security.logger=INFO,DRFAS
@@ -190,6 +192,7 @@ log4j.appender.DRFAS.layout=org.apache.log4j.PatternLayout
 log4j.appender.DRFAS.layout.ConversionPattern=%d{ISO8601} %p %c: %m%n
 log4j.appender.DRFAS.DatePattern=.yyyy-MM-dd
 </code></pre>
+</div>
 
       </div><!--end of loadcontent-->  
     </div>

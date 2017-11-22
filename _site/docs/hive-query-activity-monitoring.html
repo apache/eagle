@@ -187,12 +187,13 @@
   </li>
 </ul>
 
-<pre><code>$ su hive
+<div class="highlighter-rouge"><pre class="highlight"><code>$ su hive
 $ hive
 $ set hive.execution.engine=mr;
 $ use xademo;
 $ select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
 </code></pre>
+</div>
 
 <p>From UI click on alert tab and you should see alert for your attempt to read restricted column.</p>
 
@@ -203,7 +204,7 @@ $ select a.phone_number from customer_details a, call_detail_records b where a.p
 <div class="footnotes">
   <ol>
     <li id="fn:HIVE">
-      <p><em>All mentions of “hive” on this page represent Apache Hive.</em> <a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hive” on this page represent Apache Hive.</em>&nbsp;<a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

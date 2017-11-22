@@ -173,9 +173,10 @@ is started.</p>
       <li>
         <p>Option 1: command line</p>
 
-        <pre><code>$ cd &lt;eagle-home&gt;/bin
+        <div class="highlighter-rouge"><pre class="highlight"><code>$ cd &lt;eagle-home&gt;/bin
 $ bin/eagle-userprofile-scheduler.sh --site sandbox start
 </code></pre>
+        </div>
       </li>
       <li>
         <p>Option 2: start via Apache Ambari
@@ -203,8 +204,9 @@ $ bin/eagle-userprofile-scheduler.sh --site sandbox start
 
     <p>submit userProfiles topology if it’s not on <a href="http://sandbox.hortonworks.com:8744">topology UI</a></p>
 
-    <pre><code>$ bin/eagle-topology.sh --main org.apache.eagle.security.userprofile.UserProfileDetectionMain --config conf/sandbox-userprofile-topology.conf start
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ bin/eagle-topology.sh --main org.apache.eagle.security.userprofile.UserProfileDetectionMain --config conf/sandbox-userprofile-topology.conf start
 </code></pre>
+    </div>
   </li>
   <li>
     <p><strong>Option 2</strong>: Apache Ambari</p>
@@ -219,23 +221,26 @@ $ bin/eagle-userprofile-scheduler.sh --site sandbox start
   <li>Prepare sample data for ML training and validation sample data
     <ul>
       <li>a. Download following sample data to be used for training</li>
-      <li><a href="/data/user1.hdfs-audit.2015-10-11-00.txt"><code>user1.hdfs-audit.2015-10-11-00.txt</code></a></li>
-      <li><a href="/data/user1.hdfs-audit.2015-10-11-01.txt"><code>user1.hdfs-audit.2015-10-11-01.txt</code></a></li>
-      <li>b. Downlaod <a href="/data/userprofile-validate.txt"><code>userprofile-validate.txt</code></a>file which contains data points that you can try to test the models</li>
+    </ul>
+    <ul>
+      <li><a href="/data/user1.hdfs-audit.2015-10-11-00.txt"><code class="highlighter-rouge">user1.hdfs-audit.2015-10-11-00.txt</code></a></li>
+      <li><a href="/data/user1.hdfs-audit.2015-10-11-01.txt"><code class="highlighter-rouge">user1.hdfs-audit.2015-10-11-01.txt</code></a>
+    * b. Downlaod <a href="/data/userprofile-validate.txt"><code class="highlighter-rouge">userprofile-validate.txt</code></a>file which contains data points that you can try to test the models</li>
     </ul>
   </li>
   <li>Copy the files (downloaded in the previous step) into a location in sandbox 
-For example: <code>/usr/hdp/current/eagle/lib/userprofile/data/</code></li>
-  <li>Modify <code>&lt;Eagle-home&gt;/conf/sandbox-userprofile-scheduler.conf </code>
-update <code>training-audit-path</code> to set to the path for training data sample (the path you used for Step 1.a)
+For example: <code class="highlighter-rouge">/usr/hdp/current/eagle/lib/userprofile/data/</code></li>
+  <li>Modify <code class="highlighter-rouge">&lt;Eagle-home&gt;/conf/sandbox-userprofile-scheduler.conf </code>
+update <code class="highlighter-rouge">training-audit-path</code> to set to the path for training data sample (the path you used for Step 1.a)
 update detection-audit-path to set to the path for validation (the path you used for Step 1.b)</li>
   <li>Run ML training program from eagle UI</li>
   <li>
     <p>Produce Apache Kafka data using the contents from validate file (Step 1.b)
-Run the command (assuming the eagle configuration uses Kafka topic <code>sandbox_hdfs_audit_log</code>)</p>
+Run the command (assuming the eagle configuration uses Kafka topic <code class="highlighter-rouge">sandbox_hdfs_audit_log</code>)</p>
 
-    <pre><code> ./kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic sandbox_hdfs_audit_log
+    <div class="highlighter-rouge"><pre class="highlight"><code> ./kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic sandbox_hdfs_audit_log
 </code></pre>
+    </div>
   </li>
   <li>Paste few lines of data from file validate onto kafka-console-producer 
 Check <a href="http://localhost:9099/eagle-service/#/dam/alertList">http://localhost:9099/eagle-service/#/dam/alertList</a> for generated alerts</li>

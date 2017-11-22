@@ -171,84 +171,97 @@
 <p>Here are the steps to follow:</p>
 
 <h4 id="step1-enable-audit-logs-for-filesystem-operations-and-table-operations-in-mapr">Step1: Enable audit logs for FileSystem Operations and Table Operations in MapR</h4>
-<p>First we need to enable data auditing at all three levels: cluster level, volume level and directory,file or table level. 
-##### Cluster level:</p>
+<p>First we need to enable data auditing at all three levels: cluster level, volume level and directory,file or table level.</p>
+<h5 id="cluster-level">Cluster level:</h5>
 
-<pre><code>       $ maprcli audit data -cluster &lt;cluster name&gt; -enabled true 
+<div class="highlighter-rouge"><pre class="highlight"><code>       $ maprcli audit data -cluster &lt;cluster name&gt; -enabled true 
                            [ -maxsize &lt;GB, defaut value is 32. When size of audit logs exceed this number, an alarm will be sent to the dashboard in the MapR Control Service &gt; ]
                            [ -retention &lt;number of Days&gt; ]
 </code></pre>
+</div>
 <p>Example:</p>
 
-<pre><code>        $ maprcli audit data -cluster mapr.cluster.com -enabled true -maxsize 30 -retention 30
+<div class="highlighter-rouge"><pre class="highlight"><code>        $ maprcli audit data -cluster mapr.cluster.com -enabled true -maxsize 30 -retention 30
 </code></pre>
+</div>
 
 <h5 id="volume-level">Volume level:</h5>
 
-<pre><code>       $ maprcli volume audit -cluster &lt;cluster name&gt; -enabled true 
+<div class="highlighter-rouge"><pre class="highlight"><code>       $ maprcli volume audit -cluster &lt;cluster name&gt; -enabled true 
                             -name &lt;volume name&gt;
                             [ -coalesce &lt;interval in minutes, the interval of time during which READ, WRITE, or GETATTR operations on one file from one client IP address are logged only once, if auditing is enabled&gt; ]
 </code></pre>
+</div>
 
 <p>Example:</p>
 
-<pre><code>        $ maprcli volume audit -cluster mapr.cluster.com -name mapr.tmp -enabled true
+<div class="highlighter-rouge"><pre class="highlight"><code>        $ maprcli volume audit -cluster mapr.cluster.com -name mapr.tmp -enabled true
 </code></pre>
+</div>
 
 <p>To verify that auditing is enabled for a particular volume, use this command:</p>
 
-<pre><code>        $ maprcli volume info -name &lt;volume name&gt; -json | grep -i 'audited\|coalesce'
+<div class="highlighter-rouge"><pre class="highlight"><code>        $ maprcli volume info -name &lt;volume name&gt; -json | grep -i 'audited\|coalesce'
 </code></pre>
+</div>
 <p>and you should see something like this:</p>
 
-<pre><code>                        "audited":1,
+<div class="highlighter-rouge"><pre class="highlight"><code>                        "audited":1,
                         "coalesceInterval":60
 </code></pre>
+</div>
 <p>If “audited” is ‘1’ then auditing is enabled for this volume.</p>
 
 <h5 id="directory-file-or-mapr-db-table-level">Directory, file, or MapR-DB table level:</h5>
 
-<pre><code>        $ hadoop mfs -setaudit on &lt;directory|file|table&gt;
+<div class="highlighter-rouge"><pre class="highlight"><code>        $ hadoop mfs -setaudit on &lt;directory|file|table&gt;
 </code></pre>
+</div>
 
-<p>To check whether Auditing is Enabled for a Directory, File, or MapR-DB Table, use <code>$ hadoop mfs -ls</code>
+<p>To check whether Auditing is Enabled for a Directory, File, or MapR-DB Table, use <code class="highlighter-rouge">$ hadoop mfs -ls</code>
 Example:
-Before enable the audit log on file <code>/tmp/dir</code>, try <code>$ hadoop mfs -ls /tmp/dir</code>, you should see something like this:</p>
+Before enable the audit log on file <code class="highlighter-rouge">/tmp/dir</code>, try <code class="highlighter-rouge">$ hadoop mfs -ls /tmp/dir</code>, you should see something like this:</p>
 
-<pre><code>drwxr-xr-x Z U U   - root root          0 2016-03-02 15:02  268435456 /tmp/dir
+<div class="highlighter-rouge"><pre class="highlight"><code>drwxr-xr-x Z U U   - root root          0 2016-03-02 15:02  268435456 /tmp/dir
                p 2050.32.131328  mapr2.da.dg:5660 mapr1.da.dg:5660
 </code></pre>
+</div>
 
-<p>The second <code>U</code> means auditing on this file is not enabled. 
+<p>The second <code class="highlighter-rouge">U</code> means auditing on this file is not enabled. 
 Enable auditing with this command:</p>
 
-<pre><code>$ hadoop mfs -setaudit on /tmp/dir
+<div class="highlighter-rouge"><pre class="highlight"><code>$ hadoop mfs -setaudit on /tmp/dir
 </code></pre>
+</div>
 
 <p>Then check the auditing bit with :</p>
 
-<pre><code>$ hadoop mfs -ls /tmp/dir
+<div class="highlighter-rouge"><pre class="highlight"><code>$ hadoop mfs -ls /tmp/dir
 </code></pre>
+</div>
 
 <p>you should see something like this:</p>
 
-<pre><code>drwxr-xr-x Z U A   - root root          0 2016-03-02 15:02  268435456 /tmp/dir
+<div class="highlighter-rouge"><pre class="highlight"><code>drwxr-xr-x Z U A   - root root          0 2016-03-02 15:02  268435456 /tmp/dir
                p 2050.32.131328  mapr2.da.dg:5660 mapr1.da.dg:5660
 </code></pre>
+</div>
 
-<p>We can see the previous <code>U</code> has been changed to <code>A</code> which indicates auditing on this file is enabled.</p>
+<p>We can see the previous <code class="highlighter-rouge">U</code> has been changed to <code class="highlighter-rouge">A</code> which indicates auditing on this file is enabled.</p>
 
-<p><code>Important</code>:
+<p><code class="highlighter-rouge">Important</code>:
 When a directory has been enabled auditing,  directories/files located in this dir won’t inherit auditing, but a newly created file/dir (after enabling the auditing on this dir) in this directory will.</p>
 
 <h4 id="step2-stream-log-data-into-kafka-by-using-logstash">Step2: Stream log data into Kafka by using Logstash</h4>
-<p>As MapR do not have name node, instead it use CLDB service, we have to use logstash to stream log data into Kafka.
-- First find out the nodes that have CLDB service
-- Then find out the location of audit log files, eg: <code>/mapr/mapr.cluster.com/var/mapr/local/mapr1.da.dg/audit/</code>, file names should be in this format: <code>FSAudit.log-2016-05-04-001.json</code> 
-- Created a logstash conf file and run it, following this doc<a href="https://github.com/apache/eagle/blob/master/eagle-assembly/src/main/docs/logstash-kafka-conf.md">Logstash-kafka</a></p>
+<p>As MapR do not have name node, instead it use CLDB service, we have to use logstash to stream log data into Kafka.</p>
+<ul>
+  <li>First find out the nodes that have CLDB service</li>
+  <li>Then find out the location of audit log files, eg: <code class="highlighter-rouge">/mapr/mapr.cluster.com/var/mapr/local/mapr1.da.dg/audit/</code>, file names should be in this format: <code class="highlighter-rouge">FSAudit.log-2016-05-04-001.json</code></li>
+  <li>Created a logstash conf file and run it, following this doc<a href="https://github.com/apache/eagle/blob/master/eagle-assembly/src/main/docs/logstash-kafka-conf.md">Logstash-kafka</a></li>
+</ul>
 
 <h4 id="step3-set-up-maprfsauditlog-applicaiton-in-eagle-service">Step3: Set up maprFSAuditLog applicaiton in Eagle Service</h4>
-<p>After Eagle Service gets started, create mapFSAuditLog application using:  <code>$ ./maprFSAuditLog-init.sh</code>. By default it will create maprFSAuditLog in site “sandbox”, you may need to change it to your own site.
+<p>After Eagle Service gets started, create mapFSAuditLog application using:  <code class="highlighter-rouge">$ ./maprFSAuditLog-init.sh</code>. By default it will create maprFSAuditLog in site “sandbox”, you may need to change it to your own site.
 After these steps you are good to go.</p>
 
 <p>Have fun!!! :)</p>
@@ -266,7 +279,7 @@ After these steps you are good to go.</p>
 <div class="footnotes">
   <ol>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

@@ -183,12 +183,12 @@
   </li>
 </ul>
 
-<p><img src="/images/notificationPlugin.png" alt="notificationPlugin" />
-### Customized Notification Plugin</p>
+<p><img src="/images/notificationPlugin.png" alt="notificationPlugin" /></p>
+<h3 id="customized-notification-plugin">Customized Notification Plugin</h3>
 
 <p>To integrate a customized notification plugin, we must implement an interface</p>
 
-<pre><code>public interface NotificationPlugin {
+<div class="highlighter-rouge"><pre class="highlight"><code>public interface NotificationPlugin {
 /**
  * for initialization
  * @throws Exception
@@ -218,24 +218,26 @@ void onAlert(AlertAPIEntity alertEntity) throws  Exception;
 List&lt;NotificationStatus&gt; getStatusList();
 } Examples: AlertKafkaPlugin, AlertEmailPlugin, and AlertEagleStorePlugin.
 </code></pre>
+</div>
 
 <p>The second and crucial step is to register the configurations of the customized plugin. In other words, we need persist the configuration template into database in order to expose the configurations to users in the front end.</p>
 
 <p>Examples:</p>
 
-<pre><code>{
-   "prefix": "alertNotifications",
-   "tags": {
-     "notificationType": "kafka"
-   },
-   "className": "org.apache.eagle.notification.plugin.AlertKafkaPlugin",
-   "description": "send alert to kafka bus",
-   "enabled":true,
-   "fields": "[{\"name\":\"kafka_broker\",\"value\":\"sandbox.hortonworks.com:6667\"},{\"name\":\"topic\"}]"
-}
-</code></pre>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="nt">"prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alertNotifications"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"tags"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="nt">"notificationType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kafka"</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="nt">"className"</span><span class="p">:</span><span class="w"> </span><span class="s2">"org.apache.eagle.notification.plugin.AlertKafkaPlugin"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"send alert to kafka bus"</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"enabled"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="w">
+   </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="s2">"[{\"name\":\"kafka_broker\",\"value\":\"sandbox.hortonworks.com:6667\"},{\"name\":\"topic\"}]"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
 
-<p><strong>Note</strong>: <code>fields</code> is the configuration for notification type <code>kafka</code></p>
+<p><strong>Note</strong>: <code class="highlighter-rouge">fields</code> is the configuration for notification type <code class="highlighter-rouge">kafka</code></p>
 
 <p>How can we do that? <a href="https://github.com/apache/eagle/blob/master/eagle-assembly/src/main/bin/eagle-topology-init.sh">Here</a> are Eagle other notification plugin configurations. Just append yours to it, and run this script when Eagle service is up.</p>
 
@@ -246,7 +248,7 @@ List&lt;NotificationStatus&gt; getStatusList();
 <div class="footnotes">
   <ol>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

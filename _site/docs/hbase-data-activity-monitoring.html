@@ -174,15 +174,16 @@
 
 <ol>
   <li>
-    <p>edit Advanced hbase-log4j via Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">3</a></sup> UI, and append below sentence to <code>Security audit appender</code></p>
+    <p>edit Advanced hbase-log4j via Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">3</a></sup> UI, and append below sentence to <code class="highlighter-rouge">Security audit appender</code></p>
 
-    <pre><code> log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE,RFAS
+    <div class="highlighter-rouge"><pre class="highlight"><code> log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE,RFAS
 </code></pre>
+    </div>
   </li>
   <li>
     <p>edit Advanced hbase-site.xml</p>
 
-    <pre><code> &lt;property&gt;
+    <div class="highlighter-rouge"><pre class="highlight"><code> &lt;property&gt;
    &lt;name&gt;hbase.security.authorization&lt;/name&gt;
    &lt;value&gt;true&lt;/value&gt;
  &lt;/property&gt;
@@ -197,6 +198,7 @@
    &lt;value&gt;org.apache.hadoop.hbase.security.access.AccessController&lt;/value&gt;
  &lt;/property&gt;
 </code></pre>
+    </div>
   </li>
   <li>
     <p>Save and restart HBase</p>
@@ -208,21 +210,22 @@
 <h3 id="how-to-add-a-kafka-log4j-appender">How to add a Kafka log4j appender</h3>
 
 <blockquote>
-  <p>Notice: if you are willing to use sample logs under <code>eagle-security-hbase-security/test/resources/securityAuditLog</code>, please skip this part.</p>
+  <p>Notice: if you are willing to use sample logs under <code class="highlighter-rouge">eagle-security-hbase-security/test/resources/securityAuditLog</code>, please skip this part.</p>
 </blockquote>
 
 <ol>
   <li>
-    <p>create Kafka topic <code>sandbox_hbase_security_log</code></p>
+    <p>create Kafka topic <code class="highlighter-rouge">sandbox_hbase_security_log</code></p>
 
-    <pre><code> $ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hbase_security_log
+    <div class="highlighter-rouge"><pre class="highlight"><code> $ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic sandbox_hbase_security_log
 </code></pre>
+    </div>
   </li>
   <li>
-    <p>add below “KAFKA_HBASE_AUDIT” log4j appender to <code>Security audit appender</code>
+    <p>add below “KAFKA_HBASE_AUDIT” log4j appender to <code class="highlighter-rouge">Security audit appender</code>
 Please refer to http://goeagle.io/docs/import-hdfs-auditLog.html.</p>
 
-    <pre><code> log4j.appender.KAFKA_HBASE_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
+    <div class="highlighter-rouge"><pre class="highlight"><code> log4j.appender.KAFKA_HBASE_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
  log4j.appender.KAFKA_HBASE_AUDIT.Topic=sandbox_hbase_security_log
  log4j.appender.KAFKA_HBASE_AUDIT.BrokerList=sandbox.hortonworks.com:6667
  log4j.appender.KAFKA_HBASE_AUDIT.Layout=org.apache.log4j.PatternLayout
@@ -231,18 +234,21 @@ Please refer to http://goeagle.io/docs/import-hdfs-auditLog.html.</p>
  log4j.appender.KAFKA_HDFS_AUDIT.KeyClass=org.apache.eagle.log4j.kafka.hadoop.GenericLogKeyer
  log4j.appender.KAFKA_HDFS_AUDIT.KeyPattern=user=(\\w+),\\s+
 </code></pre>
+    </div>
   </li>
   <li>
     <p>add the reference to KAFKA_HBASE_AUDIT to log4j appender</p>
 
-    <pre><code> log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE,RFAS,KAFKA_HBASE_AUDIT
+    <div class="highlighter-rouge"><pre class="highlight"><code> log4j.logger.SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController=TRACE,RFAS,KAFKA_HBASE_AUDIT
 </code></pre>
+    </div>
   </li>
   <li>
     <p>add Eagle log4j appender jars into HBASE_CLASSPATH BY editing Advanced hbase-env via Ambari UI</p>
 
-    <pre><code> export HBASE_CLASSPATH=${HBASE_CLASSPATH}:/usr/hdp/current/eagle/lib/log4jkafka/lib/*
+    <div class="highlighter-rouge"><pre class="highlight"><code> export HBASE_CLASSPATH=${HBASE_CLASSPATH}:/usr/hdp/current/eagle/lib/log4jkafka/lib/*
 </code></pre>
+    </div>
   </li>
   <li>
     <p>Save and restart HBase</p>
@@ -253,32 +259,36 @@ Please refer to http://goeagle.io/docs/import-hdfs-auditLog.html.</p>
 
 <ol>
   <li>
-    <p>create tables (<code>skip if you do not use hbase</code>)</p>
+    <p>create tables (<code class="highlighter-rouge">skip if you do not use hbase</code>)</p>
 
-    <pre><code> bin/eagle-service-init.sh 
+    <div class="highlighter-rouge"><pre class="highlight"><code> bin/eagle-service-init.sh 
 </code></pre>
+    </div>
   </li>
   <li>
     <p>start Eagle service</p>
 
-    <pre><code> bin/eagle-service.sh start
+    <div class="highlighter-rouge"><pre class="highlight"><code> bin/eagle-service.sh start
 </code></pre>
+    </div>
   </li>
   <li>
     <p>import metadata</p>
 
-    <pre><code> bin/eagle-topology-init.sh
+    <div class="highlighter-rouge"><pre class="highlight"><code> bin/eagle-topology-init.sh
 </code></pre>
+    </div>
   </li>
   <li>
     <p>submit topology</p>
 
-    <pre><code> bin/eagle-topology.sh --main org.apache.eagle.security.hbase.HbaseAuditLogProcessorMain --config conf/sandbox-hbaseSecurityLog-application.conf start
+    <div class="highlighter-rouge"><pre class="highlight"><code> bin/eagle-topology.sh --main org.apache.eagle.security.hbase.HbaseAuditLogProcessorMain --config conf/sandbox-hbaseSecurityLog-application.conf start
 </code></pre>
+    </div>
   </li>
 </ol>
 
-<p>(sample sensitivity data at <code>examples/sample-sensitivity-resource-create.sh</code>)</p>
+<p>(sample sensitivity data at <code class="highlighter-rouge">examples/sample-sensitivity-resource-create.sh</code>)</p>
 
 <h3 id="q--a">Q &amp; A</h3>
 
@@ -293,13 +303,13 @@ Please refer to http://goeagle.io/docs/import-hdfs-auditLog.html.</p>
 <div class="footnotes">
   <ol>
     <li id="fn:HBASE">
-      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:AMBARI">
-      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em>&nbsp;<a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

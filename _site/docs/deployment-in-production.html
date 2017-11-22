@@ -184,9 +184,9 @@
 
     <ul>
       <li>
-        <p>Edit <code>bin/eagle-env.sh</code></p>
+        <p>Edit <code class="highlighter-rouge">bin/eagle-env.sh</code></p>
 
-        <pre><code>  # TODO: make sure java version is 1.7.x
+        <div class="highlighter-rouge"><pre class="highlight"><code>  # TODO: make sure java version is 1.7.x
   export JAVA_HOME=
 
   # TODO: Apache Storm nimbus host. Default is localhost
@@ -195,11 +195,12 @@
   # TODO: EAGLE_SERVICE_HOST, default is `hostname -f`
   export EAGLE_SERVICE_HOST=localhost
 </code></pre>
+        </div>
       </li>
       <li>
-        <p>Edit <code>conf/eagle-service.conf</code> to configure the database to use (for example: HBase<sup id="fnref:HBASE"><a href="#fn:HBASE" class="footnote">1</a></sup>)</p>
+        <p>Edit <code class="highlighter-rouge">conf/eagle-service.conf</code> to configure the database to use (for example: HBase<sup id="fnref:HBASE"><a href="#fn:HBASE" class="footnote">1</a></sup>)</p>
 
-        <pre><code>  # TODO: hbase.zookeeper.quorum in the format host1,host2,host3,...
+        <div class="highlighter-rouge"><pre class="highlight"><code>  # TODO: hbase.zookeeper.quorum in the format host1,host2,host3,...
   # default is "localhost"
   hbase-zookeeper-quorum="localhost"
 
@@ -211,13 +212,14 @@
   # default is "/hbase"
   zookeeper-znode-parent="/hbase"
 </code></pre>
+        </div>
       </li>
     </ul>
   </li>
   <li>
     <p>Step 2: Install metadata for policies</p>
 
-    <pre><code>  $ cd &lt;eagle-home&gt;
+    <div class="highlighter-rouge"><pre class="highlight"><code>  $ cd &lt;eagle-home&gt;
 
   # start Eagle web service
   $ bin/eagle-service.sh start
@@ -225,6 +227,7 @@
   # import metadata after Eagle service is successfully started
   $ bin/eagle-topology-init.sh
 </code></pre>
+    </div>
   </li>
 </ul>
 
@@ -260,8 +263,9 @@
   <li>
     <p>Stop eagle service</p>
 
-    <pre><code>$ bin/eagle-service.sh stop
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ bin/eagle-service.sh stop
 </code></pre>
+    </div>
   </li>
 </ul>
 
@@ -272,13 +276,13 @@
 <div class="footnotes">
   <ol>
     <li id="fn:HBASE">
-      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HADOOP">
-      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em> <a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hadoop” on this page represent Apache Hadoop.</em>&nbsp;<a href="#fnref:HADOOP" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:HIVE">
-      <p><em>Apache Hive.</em> <a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
+      <p><em>Apache Hive.</em>&nbsp;<a href="#fnref:HIVE" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

@@ -180,16 +180,19 @@
 <h4 id="install-eagle">Install Eagle</h4>
 
 <ul>
-  <li>
-    <p><strong>Step 1</strong>: Clone stable version from <a href="https://github.com/apache/eagle/releases/tag/v0.4.0-incubating">eagle github</a>
-&gt;       Build project mvn clean install -DskipTests=true</p>
+  <li><strong>Step 1</strong>: Clone stable version from <a href="https://github.com/apache/eagle/releases/tag/v0.4.0-incubating">eagle github</a>
+    <blockquote>
+      <div class="highlighter-rouge"><pre class="highlight"><code>  Build project mvn clean install -DskipTests=true
+</code></pre>
+      </div>
+    </blockquote>
   </li>
   <li>
     <p><strong>Step 2</strong>:  Download eagle-bin-0.1.0.tar.gz package from successful build into your HDP sandbox.</p>
 
     <ul>
       <li>
-        <p>Option 1: <code>scp -P 2222  eagle/eagle-assembly/target/eagle-0.1.0-bin.tar.gz root@127.0.0.1:/usr/hdp/current/</code></p>
+        <p>Option 1: <code class="highlighter-rouge">scp -P 2222  eagle/eagle-assembly/target/eagle-0.1.0-bin.tar.gz root@127.0.0.1:/usr/hdp/current/</code></p>
       </li>
       <li>
         <p>Option 2: Create shared directory between host and Sandbox, and restart Sandbox. Then you can find the shared directory under /media in Sandbox.</p>
@@ -199,27 +202,30 @@
   <li>
     <p><strong>Step 3</strong>: Extract eagle tarball package</p>
 
-    <pre><code>$ cd /usr/hdp/current
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ cd /usr/hdp/current
 $ tar -zxvf eagle-0.1.0-bin.tar.gz
 $ mv eagle-0.1.0 eagle
 </code></pre>
+    </div>
   </li>
   <li>
     <p><strong>Step 4</strong>: Add root as a HBase<sup id="fnref:HBASE"><a href="#fn:HBASE" class="footnote">1</a></sup> superuser via <a href="http://127.0.0.1:8080/#/main/services/HBASE/configs">Ambari</a> (Optional, a user can operate HBase by sudo su hbase, as an alternative).</p>
   </li>
-  <li>
-    <p><strong>Step 5</strong>: Install Eagle Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">2</a></sup> service 
-&gt;
-  /usr/hdp/current/eagle/bin/eagle-ambari.sh install.</p>
+  <li><strong>Step 5</strong>: Install Eagle Ambari<sup id="fnref:AMBARI"><a href="#fn:AMBARI" class="footnote">2</a></sup> service
+    <blockquote>
+
+      <p>/usr/hdp/current/eagle/bin/eagle-ambari.sh install.</p>
+    </blockquote>
   </li>
   <li>
     <p><strong>Step 6</strong>: Restart <a href="http://127.0.0.1:8000/">Ambari</a> click on disable and enable Ambari back.</p>
   </li>
-  <li>
-    <p><strong>Step 7</strong>: Start HBase &amp; Storm<sup id="fnref:STORM"><a href="#fn:STORM" class="footnote">3</a></sup> &amp; Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">4</a></sup>
-From Ambari UI, restart any suggested components(“Restart button on top”) &amp; Start Storm (Start “Nimbus” ,”Supervisor” &amp; “Storm UI Server”), Kafka (Start “Kafka Broker”) , HBase (Start “RegionServer”  and “ HBase Master”) 
-&gt;
-<img src="/images/docs/Services.png" alt="Restart Services" title="Services" /></p>
+  <li><strong>Step 7</strong>: Start HBase &amp; Storm<sup id="fnref:STORM"><a href="#fn:STORM" class="footnote">3</a></sup> &amp; Kafka<sup id="fnref:KAFKA"><a href="#fn:KAFKA" class="footnote">4</a></sup>
+From Ambari UI, restart any suggested components(“Restart button on top”) &amp; Start Storm (Start “Nimbus” ,”Supervisor” &amp; “Storm UI Server”), Kafka (Start “Kafka Broker”) , HBase (Start “RegionServer”  and “ HBase Master”)
+    <blockquote>
+
+      <p><img src="/images/docs/Services.png" alt="Restart Services" title="Services" /></p>
+    </blockquote>
   </li>
   <li>
     <p><strong>Step 8</strong>: Add Eagle Service To Ambari. (Click For Video)</p>
@@ -241,9 +247,10 @@ EagleServiceSuccess</p>
   <li>
     <p><strong>Step 9</strong>: Add Policies and meta data required by running below script.</p>
 
-    <pre><code>$ /usr/hdp/current/eagle/examples/sample-sensitivity-resource-create.sh 
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ /usr/hdp/current/eagle/examples/sample-sensitivity-resource-create.sh 
 $ /usr/hdp/current/eagle/examples/sample-policy-create.sh
 </code></pre>
+    </div>
   </li>
 </ul>
 
@@ -254,16 +261,16 @@ $ /usr/hdp/current/eagle/examples/sample-policy-create.sh
 <div class="footnotes">
   <ol>
     <li id="fn:HBASE">
-      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em> <a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “hbase” on this page represent Apache HBase.</em>&nbsp;<a href="#fnref:HBASE" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:AMBARI">
-      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em> <a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “ambari” on this page represent Apache Ambari.</em>&nbsp;<a href="#fnref:AMBARI" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:STORM">
-      <p><em>All mentions of “storm” on this page represent Apache Storm.</em> <a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “storm” on this page represent Apache Storm.</em>&nbsp;<a href="#fnref:STORM" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:KAFKA">
-      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em> <a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
+      <p><em>All mentions of “kafka” on this page represent Apache Kafka.</em>&nbsp;<a href="#fnref:KAFKA" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

@@ -93,7 +93,7 @@
 
 <p>日前，eBay公司隆重宣布正式向开源业界推出分布式实时安全监控方案 － Apache Eagle (http://goeagle.io)，该项目已于2015年10月26日正式加入Apache 成为孵化器项目。Apache Eagle提供一套高效分布式的流式策略引擎，具有高实时、可伸缩、易扩展、交互友好等特点，同时集成机器学习对用户行为建立Profile以实现智能实时地保护Hadoop生态系统中大数据的安全。</p>
 
-<h2 id="section">背景</h2>
+<h2 id="背景">背景</h2>
 <p>随着大数据的发展，越来越多的成功企业或者组织开始采取数据驱动商业的运作模式。在eBay，我们拥有数万名工程师、分析师和数据科学家，他们每天访问分析数PB级的数据，以为我们的用户带来无与伦比的体验。在全球业务中，我们也广泛地利用海量大数据来连接我们数以亿计的用户。</p>
 
 <p>近年来，Hadoop已经逐渐成为大数据分析领域最受欢迎的解决方案，eBay也一直在使用Hadoop技术从数据中挖掘价值，例如，我们通过大数据提高用户的搜索体验，识别和优化精准广告投放，充实我们的产品目录，以及通过点击流分析以理解用户如何使用我们的在线市场平台等。</p>
@@ -130,20 +130,20 @@
   <li><strong>开源</strong>：Eagle一直根据开源的标准开发，并构建于诸多大数据领域的开源产品之上，因此我们决定以Apache许可证开源Eagle，以回馈社区，同时也期待获得社区的反馈、协作与支持。</li>
 </ul>
 
-<h2 id="eagle">Eagle概览</h2>
+<h2 id="eagle概览">Eagle概览</h2>
 
 <p><img src="/images/posts/eagle-group.png" alt="" /></p>
 
-<h4 id="data-collection-and-storage">数据流接入和存储（Data Collection and Storage）</h4>
+<h4 id="数据流接入和存储data-collection-and-storage">数据流接入和存储（Data Collection and Storage）</h4>
 <p>Eagle提供高度可扩展的编程API，可以支持将任何类型的数据源集成到Eagle的策略执行引擎中。例如，在Eagle HDFS 审计事件（Audit）监控模块中，通过Kafka来实时接收来自Namenode Log4j Appender 或者 Logstash Agent 收集的数据；在Eagle Hive 监控模块中，通过YARN API 收集正在运行Job的Hive 查询日志，并保证比较高的可伸缩性和容错性。</p>
 
-<h4 id="data-processing">数据实时处理（Data Processing）</h4>
+<h4 id="数据实时处理data-processing">数据实时处理（Data Processing）</h4>
 
 <p><strong>流处理API（Stream Processing API）Eagle</strong> 提供独立于物理平台而高度抽象的流处理API，目前默认支持Apache Storm，但是也允许扩展到其他任意流处理引擎，比如Flink 或者 Samza等。该层抽象允许开发者在定义监控数据处理逻辑时，无需在物理执行层绑定任何特定流处理平台，而只需通过复用、拼接和组装例如数据转换、过滤、外部数据Join等组件，以实现满足需求的DAG（有向无环图），同时，开发者也可以很容易地以编程地方式将业务逻辑流程和Eagle 策略引擎框架集成起来。Eagle框架内部会将描述业务逻辑的DAG编译成底层流处理架构的原生应用，例如Apache Storm Topology 等，从事实现平台的独立。</p>
 
 <p><strong>以下是一个Eagle如何处理事件和告警的示例：</strong></p>
 
-<pre><code>StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config); // storm env
+<div class="highlighter-rouge"><pre class="highlight"><code>StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config); // storm env
 StreamProducer producer = env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1) // declare kafka source
        .flatMap(new AuditLogTransformer()) // transform event
        .groupBy(Arrays.asList(0))  // group by 1st field
@@ -151,6 +151,7 @@ StreamProducer producer = env.newSource(new KafkaSourcedSpoutProvider().getSpout
        .alertWithConsumer(“userActivity“,”userProfileExecutor“) // ML policy evaluation
 env.execute(); // execute stream processing and alert
 </code></pre>
+</div>
 
 <p><strong>告警框架（Alerting Framework）Eagle</strong>告警框架由流元数据API、策略引擎服务提供API、策略Partitioner API 以及预警去重框架等组成:</p>
 
@@ -160,7 +161,7 @@ env.execute(); // execute stream processing and alert
   <li>
     <p><strong>扩展性</strong> Eagle的策略引擎服务提供API允许你插入新的策略引擎</p>
 
-    <pre><code>  public interface PolicyEvaluatorServiceProvider {
+    <div class="highlighter-rouge"><pre class="highlight"><code>  public interface PolicyEvaluatorServiceProvider {
     public String getPolicyType();         // literal string to identify one type of policy
     public Class&lt;? extends PolicyEvaluator&gt; getPolicyEvaluator(); // get policy evaluator implementation
     public List&lt;Module&gt; getBindingModules();  // policy text with json format to object mapping
@@ -171,15 +172,17 @@ env.execute(); // execute stream processing and alert
     public void onPolicyDelete(); // invoked when policy is deleted
   }
 </code></pre>
+    </div>
   </li>
   <li><strong>策略Partitioner API</strong> 允许策略在不同的物理节点上并行执行。也允许你自定义策略Partitioner类。这些功能使得策略和事件完全以分布式的方式执行。</li>
   <li>
     <p><strong>可伸缩性</strong> Eagle 通过支持策略的分区接口来实现大量的策略可伸缩并发地运行</p>
 
-    <pre><code>  public interface PolicyPartitioner extends Serializable {
+    <div class="highlighter-rouge"><pre class="highlight"><code>  public interface PolicyPartitioner extends Serializable {
     int partition(int numTotalPartitions, String policyType, String policyId); // method to distribute policies
   }
 </code></pre>
+    </div>
 
     <p><img src="/images/posts/policy-partition.png" alt="" /></p>
 
@@ -236,26 +239,29 @@ Eagle 支持根据用户在Hadoop平台上历史使用行为习惯来定义行�
   <li>
     <p>单一事件执行策略（用户访问Hive中的敏感数据列）</p>
 
-    <pre><code>  from hiveAccessLogStream[sensitivityType=='PHONE_NUMBER'] select * insert into outputStream;
+    <div class="highlighter-rouge"><pre class="highlight"><code>  from hiveAccessLogStream[sensitivityType=='PHONE_NUMBER'] select * insert into outputStream;
 </code></pre>
+    </div>
   </li>
   <li>
     <p>基于窗口的策略（用户在10分钟内访问目录 /tmp/private 多余 5次）</p>
 
-    <pre><code>  hdfsAuditLogEventStream[(src == '/tmp/private')]#window.externalTime(timestamp,10 min) select user, count(timestamp) as aggValue group by user having aggValue &gt;= 5 insert into outputStream;
+    <div class="highlighter-rouge"><pre class="highlight"><code>  hdfsAuditLogEventStream[(src == '/tmp/private')]#window.externalTime(timestamp,10 min) select user, count(timestamp) as aggValue group by user having aggValue &gt;= 5 insert into outputStream;
 </code></pre>
+    </div>
   </li>
 </ul>
 
 <p><strong>查询服务（Query Service）</strong> Eagle 提供类SQL的REST API用来实现针对海量数据集的综合计算、查询和分析的能力，支持例如过滤、聚合、直方运算、排序、top、算术表达式以及分页等。Eagle优先支持HBase 作为其默认数据存储，但是同时也支持基JDBC的关系型数据库。特别是当选择以HBase作为存储时，Eagle便原生拥有了HBase存储和查询海量监控数据的能力，Eagle 查询框架会将用户提供的类SQL查询语法最终编译成为HBase 原生的Filter 对象，并支持通过HBase Coprocessor进一步提升响应速度。</p>
 
-<pre><code>query=AlertDefinitionService[@dataSource="hiveQueryLog"]{@policyDef}&amp;pageSize=100000
+<div class="highlighter-rouge"><pre class="highlight"><code>query=AlertDefinitionService[@dataSource="hiveQueryLog"]{@policyDef}&amp;pageSize=100000
 </code></pre>
+</div>
 
-<h2 id="eagleebay">Eagle在eBay的使用场景</h2>
+<h2 id="eagle在ebay的使用场景">Eagle在eBay的使用场景</h2>
 <p>目前，Eagle的数据行为监控系统已经部署到一个拥有2500多个节点的Hadoop集群之上，用以保护数百PB数据的安全，并正计划于今年年底之前扩展到其他上十个Hadoop集群上，从而覆盖eBay 所有主要Hadoop的10000多台节点。在我们的生产环境中，我们已针对HDFS、Hive 等集群中的数据配置了一些基础的安全策略，并将于年底之前不断引入更多的策略，以确保重要数据的绝对安全。目前，Eagle的策略涵盖多种模式，包括从访问模式、频繁访问数据集，预定义查询类型、Hive 表和列、HBase 表以及基于机器学习模型生成的用户Profile相关的所有策略等。同时，我们也有广泛的策略来防止数据的丢失、数据被拷贝到不安全地点、敏感数据被未授权区域访问等。Eagle策略定义上极大的灵活性和扩展性使得我们未来可以轻易地继续扩展更多更复杂的策略以支持更多多元化的用例场景。</p>
 
-<h2 id="section-1">后续计划</h2>
+<h2 id="后续计划">后续计划</h2>
 <p>过去两年中，在eBay 除了被用于数据行为监控以外，Eagle 核心框架还被广泛用于监控节点健康状况、Hadoop应用性能指标、Hadoop 核心服务以及整个Hadoop集群的健康状况等诸多领域。我们还建立一系列的自动化机制，例如节点修复等，帮助我们平台部门极大得节省了我们人工劳力，并有效地提升了整个集群资源地利用率。</p>
 
 <p>以下是我们目前正在开发中地一些特性：</p>
@@ -272,7 +278,7 @@ Eagle 支持根据用户在Hadoop平台上历史使用行为习惯来定义行�
   </li>
 </ul>
 
-<h2 id="section-2">关于作者</h2>
+<h2 id="关于作者">关于作者</h2>
 <p><a href="https://github.com/haoch">陈浩</a>，Apache Eagle Committer 和 PMC 成员，eBay 分析平台基础架构部门高级软件工程师，负责Eagle的产品设计、技术架构、核心实现以及开源社区推广等。</p>
 
 <p>感谢以下来自Apache Eagle社区和eBay公司的联合作者们对本文的贡献：</p>
@@ -286,7 +292,7 @@ Eagle 支持根据用户在Hadoop平台上历史使用行为习惯来定义行�
 
 <p>eBay 分析平台基础架构部（Analytics Data Infrastructure）是eBay的全球数据及分析基础架构部门，负责eBay在数据库、数据仓库、Hadoop、商务智能以及机器学习等各个数据平台开发、管理等,支持eBay全球各部门运用高端的数据分析解决方案作出及时有效的作业决策，为遍布全球的业务用户提供数据分析解决方案。</p>
 
-<h2 id="section-3">参考资料</h2>
+<h2 id="参考资料">参考资料</h2>
 
 <ul>
   <li>Apache Eagle 文档：<a href="http://goeagle.io">http://goeagle.io</a></li>
@@ -294,7 +300,7 @@ Eagle 支持根据用户在Hadoop平台上历史使用行为习惯来定义行�
   <li>Apache Eagle 项目：<a href="http://incubator.apache.org/projects/eagle.html">http://incubator.apache.org/projects/eagle.html</a></li>
 </ul>
 
-<h2 id="section-4">引用链接</h2>
+<h2 id="引用链接">引用链接</h2>
 <ul>
   <li><strong>CSDN</strong>: <a href="http://www.csdn.net/article/2015-10-29/2826076">http://www.csdn.net/article/2015-10-29/2826076</a></li>
   <li><strong>OSCHINA</strong>: <a href="http://www.oschina.net/news/67515/apache-eagle">http://www.oschina.net/news/67515/apache-eagle</a></li>

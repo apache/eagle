@@ -168,8 +168,8 @@ This tutorial is to address these issues before you continue to follow the tutor
 <ul>
   <li>Zookeeper (installed through Cloudera Manager)</li>
   <li>Kafka (installed through Cloudera Manager)</li>
-  <li>Storm (<code>0.9.x</code> or <code>0.10.x</code>, installed manually)</li>
-  <li>Logstash (<code>2.X</code>, installed manually on NameNode)</li>
+  <li>Storm (<code class="highlighter-rouge">0.9.x</code> or <code class="highlighter-rouge">0.10.x</code>, installed manually)</li>
+  <li>Logstash (<code class="highlighter-rouge">2.X</code>, installed manually on NameNode)</li>
 </ul>
 
 <h3 id="kafka">Kafka</h3>
@@ -180,17 +180,18 @@ This tutorial is to address these issues before you continue to follow the tutor
 
 <ul>
   <li>
-    <p>Open Cloudera Manager and open “kafka” configuration, then set <code>“zookeeper Root”</code> to <code>“/”</code>.</p>
+    <p>Open Cloudera Manager and open “kafka” configuration, then set <code class="highlighter-rouge">“zookeeper Root”</code> to <code class="highlighter-rouge">“/”</code>.</p>
   </li>
   <li>
-    <p>If Kafka cannot be started successfully, check kafka’s log. If stack trace shows: <code>“java.lang.OutOfMemoryError: Java heap space”</code>. Increase heap size by setting <code>"KAFKA_HEAP_OPTS"</code>in <code>/bin/kafka-server-start.sh</code>.</p>
+    <p>If Kafka cannot be started successfully, check kafka’s log. If stack trace shows: <code class="highlighter-rouge">“java.lang.OutOfMemoryError: Java heap space”</code>. Increase heap size by setting <code class="highlighter-rouge">"KAFKA_HEAP_OPTS"</code>in <code class="highlighter-rouge">/bin/kafka-server-start.sh</code>.</p>
   </li>
 </ul>
 
 <p>Example:</p>
 
-<pre><code>                  export KAFKA_HEAP_OPTS="-Xmx2G -Xms2G"
+<div class="highlighter-rouge"><pre class="highlight"><code>                  export KAFKA_HEAP_OPTS="-Xmx2G -Xms2G"
 </code></pre>
+</div>
 
 <h4 id="verification">Verification</h4>
 
@@ -198,15 +199,17 @@ This tutorial is to address these issues before you continue to follow the tutor
   <li>Step1: create a kafka topic (here I created a topic called “test”, which will be used in  logstash configuration file to receive hdfsAudit log messages from Cloudera.</li>
 </ul>
 
-<pre><code>bin/kafka-topics.sh --create --zookeeper 127.0.0.1:2181 --replication-factor 1 --partitions 1 --topic test
+<div class="highlighter-rouge"><pre class="highlight"><code>bin/kafka-topics.sh --create --zookeeper 127.0.0.1:2181 --replication-factor 1 --partitions 1 --topic test
 </code></pre>
+</div>
 
 <ul>
   <li>Step2: check if topic has been created successfully.</li>
 </ul>
 
-<pre><code>bin/kafka-topics.sh --list --zookeeper 127.0.0.1:2181
+<div class="highlighter-rouge"><pre class="highlight"><code>bin/kafka-topics.sh --list --zookeeper 127.0.0.1:2181
 </code></pre>
+</div>
 
 <p>this command will show all created topics.</p>
 
@@ -214,9 +217,10 @@ This tutorial is to address these issues before you continue to follow the tutor
   <li>Step3: open two terminals, start “producer” and “consumer” separately.</li>
 </ul>
 
-<pre><code>/usr/bin/kafka-console-producer --broker-list hostname:9092 --topic test
+<div class="highlighter-rouge"><pre class="highlight"><code>/usr/bin/kafka-console-producer --broker-list hostname:9092 --topic test
 /usr/bin/kafka-console-consumer --zookeeper hostname:2181 --topic test
 </code></pre>
+</div>
 
 <ul>
   <li>Step4: type in some message in producer. If consumer can receive the messages sent from producer, then kafka is working fine. Otherwise please check the configuration and logs to identify the root cause of issues.</li>
@@ -228,33 +232,36 @@ This tutorial is to address these issues before you continue to follow the tutor
 
 <p>You can follow <a href="https://www.elastic.co/downloads/logstash">logstash online doc</a> to download and install logstash on your machine:</p>
 
-<p>Or you can install it through <code>yum</code> if you are using centos:</p>
+<p>Or you can install it through <code class="highlighter-rouge">yum</code> if you are using centos:</p>
 
 <ul>
   <li>download and install the public signing key:</li>
 </ul>
 
-<pre><code>rpm --import  https://packages.elastic.co/GPG-KEY-elasticsearch
+<div class="highlighter-rouge"><pre class="highlight"><code>rpm --import  https://packages.elastic.co/GPG-KEY-elasticsearch
 </code></pre>
+</div>
 
 <ul>
-  <li>Add the following lines in <code>/etc/yum.repos.d/</code> directory in a file with a <code>.repo</code> suffix, for example <code>logstash.repo</code>.</li>
+  <li>Add the following lines in <code class="highlighter-rouge">/etc/yum.repos.d/</code> directory in a file with a <code class="highlighter-rouge">.repo</code> suffix, for example <code class="highlighter-rouge">logstash.repo</code>.</li>
 </ul>
 
-<pre><code>[logstash-2.3]
+<div class="highlighter-rouge"><pre class="highlight"><code>[logstash-2.3]
 name=Logstash repository for 2.3.x packages
 baseurl=https://packages.elastic.co/logstash/2.3/centos
 gpgcheck=1
 gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
 enabled=1
 </code></pre>
+</div>
 
 <ul>
-  <li>Then install it using <code>yum</code>:</li>
+  <li>Then install it using <code class="highlighter-rouge">yum</code>:</li>
 </ul>
 
-<pre><code>yum install logstash
+<div class="highlighter-rouge"><pre class="highlight"><code>yum install logstash
 </code></pre>
+</div>
 
 <h4 id="create-conf-file">Create conf file</h4>
 
@@ -262,8 +269,9 @@ enabled=1
 
 <h4 id="start-logstash">Start logstash</h4>
 
-<pre><code>bin/logstash -f conf/first-pipeline.conf
+<div class="highlighter-rouge"><pre class="highlight"><code>bin/logstash -f conf/first-pipeline.conf
 </code></pre>
+</div>
 
 <h4 id="verification-1">Verification</h4>
 
@@ -274,51 +282,55 @@ enabled=1
 
 <h4 id="installation-1">Installation</h4>
 
-<p>Download Apache Storm from <a href="http://storm.apache.org/downloads.html">here</a>, the version you choose should be <code>0.10.x</code> or <code>0.9.x</code> release.
+<p>Download Apache Storm from <a href="http://storm.apache.org/downloads.html">here</a>, the version you choose should be <code class="highlighter-rouge">0.10.x</code> or <code class="highlighter-rouge">0.9.x</code> release.
 Then follow <a href="http://storm.apache.org/releases/0.10.0/Setting-up-a-Storm-cluster.html">Apache Storm online doc</a>) to install Apache Storm on your cluster.</p>
 
-<p>In <code>/etc/profile</code>, add this:</p>
+<p>In <code class="highlighter-rouge">/etc/profile</code>, add this:</p>
 
-<pre><code>export PATH=$PATH:/opt/apache-storm-0.10.1/bin/
+<div class="highlighter-rouge"><pre class="highlight"><code>export PATH=$PATH:/opt/apache-storm-0.10.1/bin/
 </code></pre>
+</div>
 
 <p>save the profile and then type:</p>
 
-<pre><code>source /etc/profile 
+<div class="highlighter-rouge"><pre class="highlight"><code>source /etc/profile 
 </code></pre>
+</div>
 
 <p>to make it work.</p>
 
 <h4 id="configuration-1">Configuration</h4>
 
-<p>In <code>storm/conf/storm.yaml</code>, change the hostname to your own host.</p>
+<p>In <code class="highlighter-rouge">storm/conf/storm.yaml</code>, change the hostname to your own host.</p>
 
 <h4 id="start-apache-storm">Start Apache Storm</h4>
 
 <p>In Termial, type:</p>
 
-<pre><code>$: storm nimbus
+<div class="highlighter-rouge"><pre class="highlight"><code>$: storm nimbus
 $: storm supervisor
 $: storm UI
 </code></pre>
+</div>
 
 <h4 id="verification-2">Verification</h4>
 
-<p>Open storm UI in your browser, default URL is : <code>http://hostname:8080/index.html</code>.</p>
+<p>Open storm UI in your browser, default URL is : <code class="highlighter-rouge">http://hostname:8080/index.html</code>.</p>
 
 <h3 id="apache-eagle">Apache Eagle</h3>
 
 <p>To download and install Apache Eagle, please refer to  <a href="http://eagle.incubator.apache.org/docs/quick-start.html">Get Started with Sandbox.</a> .</p>
 
-<p>One thing need to mention is: in <code>“/bin/eagle-topology.sh”</code>, line 102:</p>
+<p>One thing need to mention is: in <code class="highlighter-rouge">“/bin/eagle-topology.sh”</code>, line 102:</p>
 
-<pre><code>			storm_ui=http://localhost:8080
+<div class="highlighter-rouge"><pre class="highlight"><code>			storm_ui=http://localhost:8080
 </code></pre>
+</div>
 
 <p>If you are not using the default port number, change this to your own Storm UI url.</p>
 
 <p>I know it takes time to finish these configuration, but now it is time to have fun! 
-Just try <code>HDFS Data Activity Monitoring</code> with <code>Demo</code> listed in <a href="http://eagle.incubator.apache.org/docs/hdfs-data-activity-monitoring.html">HDFS Data Activity Monitoring.</a></p>
+Just try <code class="highlighter-rouge">HDFS Data Activity Monitoring</code> with <code class="highlighter-rouge">Demo</code> listed in <a href="http://eagle.incubator.apache.org/docs/hdfs-data-activity-monitoring.html">HDFS Data Activity Monitoring.</a></p>
 
 
       </div><!--end of loadcontent-->  
