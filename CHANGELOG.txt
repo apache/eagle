@@ -1,0 +1,790 @@
+Release Notes - Apache Eagle 0.5.0
+
+** Highlights **
+
+    * Refactored dynamic alert engine with dynamic data source.
+    * Policy/alert manager for policy on-boarding & alert insights on UI.
+    * Refactored application development framework with its lifecycle management.
+    * Lots of new monitoring applications and its dashboards for insight:
+        * Hadoop JMX, System metrics, HDFS JMX, HDFS RPC monitoring app
+        * HBase Monitoring app
+        * Job Performance Monitoring app
+        * Running Hadoop Queue monitoring app
+        * hdfs, hbase and yarn Service health check monitoring app
+        * Host heatmaps UI insight app
+    * LDAP and admin functionality support
+    * Lots of improvements, bug fixes and more...
+ 
+** New Feature ** 
+
+    [EAGLE-26] - Generic solution for Eagle topology merge
+    [EAGLE-126] - enable basic support for eagle RDBMS storage
+    [EAGLE-233] - Integrate [maven-release-plugin] for eagle release
+    [EAGLE-234] - Clean maven build warning in eagle
+    [EAGLE-243] - Set up Eagle IT (Integration Test) Suite
+    [EAGLE-250] - Metadata on mongodb
+    [EAGLE-283] - Convert fid,uid in MapR's audit log to FIle/folder name, user name
+    [EAGLE-325] - Initialize next-gen alert engine code on branch-0.5
+    [EAGLE-350] - Running queue metrics monitoring
+    [EAGLE-351] - Running queue metrics monitoring
+    [EAGLE-382] - Monitoring Application Framework
+    [EAGLE-408] - Eagle-JPM job name normalize
+    [EAGLE-422] - eagle support for mr & spark running job monitoring
+    [EAGLE-433] - DropWizard Service Security Integration with Basic Auth & LDAP
+    [EAGLE-436] - Decouple Application Class-based Configuration
+    [EAGLE-453] - Use META-INF/providers/${appProviderClassName}.xml as default metadata path
+    [EAGLE-464] - StateCheck: multiple stage of definition in single policy
+    [EAGLE-537] - provide tools to collect hbase jmx metrics
+    [EAGLE-541] - Application policy template framework
+    [EAGLE-542] - Support @Bucket annotation in query engine
+    [EAGLE-549] - Add required field for application configuration
+    [EAGLE-557] - Setup Eagle v0.5 Documentation Site Layout
+    [EAGLE-581] - Generate a build number when building the project.
+    [EAGLE-601] - Add updating policy status API: PUT /metadata/policies/{policyId}/status/{status}
+    [EAGLE-603] - Enable/Disable Policy in UI
+    [EAGLE-611] - Add User-Oriented Policy API
+    [EAGLE-613] - Support modify ApplicationEntity through POST /rest/apps/{UUID}/
+    [EAGLE-626] - Add Eagle HBase Metric Store Publisher
+    [EAGLE-630] - Add Publishments to Policy API
+    [EAGLE-643] - Implement oozieAuditLogAppProvider
+    [EAGLE-650] - Hadoop JMX Metric Monitoring Application
+    [EAGLE-651] - HBase JMX Metric Monitoring Application
+    [EAGLE-657] - EagleServiceMetricSink
+    [EAGLE-658] - Add reserved "global" siteId as shared namespace
+    [EAGLE-681] - Add new publisher AlertEagleStorePlugin
+    [EAGLE-688] - UI support Alert display
+    [EAGLE-690] - Integrate topology health check with alert engine
+    [EAGLE-698] - Help eagle to collect system and Hadoop JMX information
+    [EAGLE-789] - Add a new publisher to write alerts into a local file
+    [EAGLE-815] - Support alert template to generate human readable alert
+    [EAGLE-845] - HBase JMX Monitoring Dashboard
+    [EAGLE-846] - HDFS Audit log traffic monitoring
+    [EAGLE-890] - Add Job Scheduling Framework and HadoopHealthCheckApp
+    [EAGLE-908] - Hdfs JMX Monitoring Dashboard
+    [EAGLE-918] - Improve eagle auth framework to support @PermitAll/DenyAll/RolesAllowed/Auth
+    [EAGLE-921] - Integrate role-based Authentication in API and UI
+    [EAGLE-925] - Eagle Docker Image for v0.5
+    [EAGLE-950] - Add REST Stream Proxy for easy integration with Eagle Alert and Dashboard
+    [EAGLE-953] - Host-level Overview Heatmap Diagram for Topology Monitoring
+    [EAGLE-955] - Metric Explorer and Customized Dashboard
+    [EAGLE-958] - ElasticSearch Alert Publisher
+
+** Improvement **
+
+    [EAGLE-43] - Eagle Job Running Spout should support HTTPS
+    [EAGLE-134] - publish javadoc of eagle
+    [EAGLE-218] - convert /list to /entities
+    [EAGLE-220] - Add mvn script to handle maven dependency
+    [EAGLE-252] - Remove dependency of AlertExecutorId in metadata while partitioning policy
+    [EAGLE-256] - Replace HDP version based hadoop dependencies with community version instead.
+    [EAGLE-260] - Support to fetch audit log from http://localhost:50070/logs/hdfs-audit.log for quick preview
+    [EAGLE-265] - AlertExecutor Support to load all policies if AlertExecutorId is not defined
+    [EAGLE-302] - Add sample main app that read config for alert-executor to make onboard easier with topo-mgmt
+    [EAGLE-335] - Show alert definition so that user could see the trigger condition of alert
+    [EAGLE-349] - Add batch processing apis for metadata in the new alert engine
+    [EAGLE-360] - Kafka Java Producer with kerberos
+    [EAGLE-369] - Improve eagle alert email template to provide more useful information and user experience
+    [EAGLE-371] - remove eagle-docs from develop branch
+    [EAGLE-372] - Change AlertNotificationEntity#fields type from String to List
+    [EAGLE-373] - Move Eagle document to Eagle source code control
+    [EAGLE-411] - Improve code coverage of eagle-storage-hbase
+    [EAGLE-416] - Add check style support
+    [EAGLE-420] - HBase audit log monitoring using new app framework
+    [EAGLE-426] - Load app web classes and app topology classes using configured lib dir
+    [EAGLE-428] - Hbase monitoring's metadata browse API in new app framework
+    [EAGLE-430] - explore new packaging method for eagle using new app framework
+    [EAGLE-431] - MetadataDaoFactory should use config from eagle server
+    [EAGLE-432] - Application status monitoring
+    [EAGLE-435] - Coordiantor schedule operation must be exclusive in distributed deployment
+    [EAGLE-437] - create workable fat jar for starting application remotely
+    [EAGLE-439] - Introduce policy enable/disable support
+    [EAGLE-444] - convert eagle-gc app to use new app framework
+    [EAGLE-445] - convert eagle-hdfs-auditlog app to use new app framework
+    [EAGLE-446] - convert eagle-hive app to use new app framework
+    [EAGLE-447] - convert eagle-maprfs app to use new app framework
+    [EAGLE-448] - convert eagle-oozie app to use new app framework
+    [EAGLE-449] - clean inner process alert engine code
+    [EAGLE-450] - Alert check meta version conflict between runtime modules
+    [EAGLE-451] - oozie ingestion+alert engine preview
+    [EAGLE-452] - Add Jersey Resource Unit Test Case
+    [EAGLE-462] - Alert Dudup - same metric generate alert should be deduped
+    [EAGLE-463] - One App type may be run as multiple instances in one site
+    [EAGLE-468] - clean up eagle-application-service to be replaced by new app framework
+    [EAGLE-469] - make dataSource configuration extremely simple
+    [EAGLE-470] - data enrichment refactor in eagle security monitoring
+    [EAGLE-474] - some improvements of app framework: appId naming, jarFile field, InstallOperation etc.
+    [EAGLE-477] - eagle-data-process project clean up to contain only common processing classes
+    [EAGLE-478] - Eagle README in Eagle 0.5 version
+    [EAGLE-479] - Eagle 0.5 API full documents
+    [EAGLE-480] - Make Hadoop jmx monitoring working in Eagle 0.5
+    [EAGLE-481] - Make alert engine topology to be one application so to be managed by Eagle API
+    [EAGLE-486] - upgrade storm and kafka to a version which is consistent with HDP sandbox 2.4 and CDH 5.X
+    [EAGLE-487] - use guice module better in app framework
+    [EAGLE-490] - KafkaStreamSink should not assume fixed field user to do partition
+    [EAGLE-493] - Create alert metadata based on application stream sink configuration
+    [EAGLE-498] - overwrite equals method for PolicyDefinition should not contain field description
+    [EAGLE-503] - Refactor DynamicPolicyLoader to use MapComparator
+    [EAGLE-505] - oozie auditlog parser don`t deal with NullPointerException
+    [EAGLE-506] - AlertEngine : Make policy definition handler extensible
+    [EAGLE-509] - make streaming application's sink type to be java bean
+    [EAGLE-516] - Implement application entity service by jdbc
+    [EAGLE-519] - No data / gap alert enhancement
+    [EAGLE-520] - Decouple Co-processor with Eagle Aggreation Query Service
+    [EAGLE-522] - Implement HOURLY_RULE for Absence Alert.
+    [EAGLE-525] - refactor oozie to new application framework
+    [EAGLE-529] - Clean up embedded tomcat dependency
+    [EAGLE-531] - Dedup alerts according to state change
+    [EAGLE-532] - Fix eagle-jpm code style warnings and enable failOnViolation
+    [EAGLE-533] - Fix storage configuration and remove AppJUnitRunner
+    [EAGLE-534] - Integrate typesafe-config with DropWizard
+    [EAGLE-536] - Suppport application dependency in framework
+    [EAGLE-540] - Use Annotation to describe application metadata in ApplicationProvider.xml
+    [EAGLE-544] - Enhance dedup to support extended deduplicator
+    [EAGLE-548] - Add eagle service host and port config in jpm web app
+    [EAGLE-551] - fix some bugs and improvement of mr history feeder
+    [EAGLE-556] - Install/Update Alert Topology Metadata when start alert engine
+    [EAGLE-558] - Use dynamical loaded jarPath as default value in ApplicationEntity
+    [EAGLE-571] - AlertEngine: Topology should support loopback topic created after policy deployed
+    [EAGLE-572] - AlertEngine: Metadata API doesn't do validation of metadata
+    [EAGLE-576] - Dedup enhancements
+    [EAGLE-578] - Make dedup state value case insensitive
+    [EAGLE-592] - Add a hdfs audit log parser which consumes message in Json format
+    [EAGLE-593] - Eagle Topology assembly multi-version Hadoop support & bug fix
+    [EAGLE-598] - Create "ui" building profile and enable Eagle Web UI Building by default
+    [EAGLE-599] - Some improvements when submit JPM applications
+    [EAGLE-600] - Make sure AlertUnitTopologyApp compatible with both appId and topology.name
+    [EAGLE-604] - Support view/editing application configuration after installed
+    [EAGLE-606] - Add multiple hadoop version assembly application (topology) package
+    [EAGLE-612] - Use LOCAL when app provider is from class file and use Cluster when from jar file
+    [EAGLE-619] - UI Home display site states
+    [EAGLE-623] - [Maven] Move dependencies in profile "dev" to "eagle-topology-assembly"
+    [EAGLE-631] - Policy UI refactory
+    [EAGLE-633] - MR history feeder read some configurations from eagle server
+    [EAGLE-634] - clean up configuration for MR running feeder
+    [EAGLE-635] - Refactor policy parser and validator for richer plan details and better performance
+    [EAGLE-638] - clean up configuration for Eagle JPM aggregation feeder
+    [EAGLE-642] - move application runtime configure to ApplicationEntity context
+    [EAGLE-647] - Support Policy Execution Interpreter and Planner to compile siddhi query to distributed execution plan
+    [EAGLE-653] - remove zk root from configure
+    [EAGLE-656] - Integrate metric system with application framework
+    [EAGLE-659] - MR history feeder and Alert Engine integration
+    [EAGLE-665] - Refactor kafka stream sink and hdfs audit topology using shuffle grouping
+    [EAGLE-666] - Define fast compact data structure for kafka between application and alert engine
+    [EAGLE-669] - Investigate eagle app metric system referring to https://github.com/ooyala/metrics_storm
+    [EAGLE-676] - Package hadoop jmx metric collector into eagle pacakge
+    [EAGLE-677] - Hadoop JMX Collector Support HA switching
+    [EAGLE-678] - Support to configure links for site
+    [EAGLE-680] - Can't generate Html coverage report
+    [EAGLE-683] - AlertEngine : Improve metadata store performance
+    [EAGLE-686] - UI add site select on top nav bar
+    [EAGLE-692] - Modify HBaseAuditLogAppProvider.xml to integrate necessary and correct properties
+    [EAGLE-699] - UI imporvement
+    [EAGLE-701] - AlertEngine: bolt should check ZK for latest spec when start
+    [EAGLE-703] - Application UI add confirm dialog
+    [EAGLE-706] - Policy UI adv mode support sql highlight
+    [EAGLE-707] - Mark "Task Statistic" page title as "Task Statistic (Beta)" instead of "(beta) Task Statistic"
+    [EAGLE-714] - Application improvement
+    [EAGLE-716] - [API] Validate before saving policy
+    [EAGLE-720] - Policy edit ui auto generate description
+    [EAGLE-729] - add hbase kerberose principle and keytab to provider
+    [EAGLE-734] - Integrate maven-buildNumber-plugin and Version.java
+    [EAGLE-741] - Make publishment settings both policy & stream awareness
+    [EAGLE-747] - Add unit test for eagle-storage-base module
+    [EAGLE-758] - Add tuple log for spout & alert bolt
+    [EAGLE-762] - Add AlertEmailPublisherTest test cases
+    [EAGLE-766] - Set default host&port of JPM_WEB_APP as null
+    [EAGLE-769] - InjectMembers in ServerApplication when initialization
+    [EAGLE-779] - add a managed task to regularly schedule registered healthchecks
+    [EAGLE-780] - Update spark running config to integrate with the application framework
+    [EAGLE-784] - application health check support notification
+    [EAGLE-787] - add healthy check for hadoop-queue/topology-health/spark-history apps
+    [EAGLE-791] - Refactor eagle module names to be more meaningful
+    [EAGLE-792] - Resolve google-fonts external connection blocking problem in AdminLTE
+    [EAGLE-794] - Enable publish bolt parallelism
+    [EAGLE-796] - MRJobEntityCreationHandler flush need retry N times
+    [EAGLE-798] - Add a new alert publisher to store alerts into hbase
+    [EAGLE-803] - Just save latest N schedule_state in eagle database.
+    [EAGLE-807] - Refactor JMX Metric Collector Script
+    [EAGLE-808] - Hide SMTP server configuration from end user and read from server config instead of metadata config
+    [EAGLE-809] - Hide Kafka sink configuration used by alert engine
+    [EAGLE-811] - Refactor jdbcMetadataDaoImpl of alert engine metadata
+    [EAGLE-817] - add KillOptions when stop a topology
+    [EAGLE-818] - CEP Based Aggregate Framework
+    [EAGLE-829] - Refactor PublishmentType model to align with PolicyDefinition
+    [EAGLE-830] - Enhance policy UI
+    [EAGLE-831] - UI alert support time range select
+    [EAGLE-832] - Support to define granularity for MetricDefinition to avoid metric duplicate
+    [EAGLE-833] - Add MetricSchemaGenerator and MetricSchemaService
+    [EAGLE-835] - add task failure category
+    [EAGLE-838] - Resolve defunct process in hadoop jmx script by kill -9
+    [EAGLE-839] - add job diagnostics
+    [EAGLE-840] - Task Failing Nodes List and bad node detection
+    [EAGLE-841] - CorrelationSpout reads zk connection from datasource override engine configured
+    [EAGLE-843] - Refactor application shared service registry framework
+    [EAGLE-848] - eagle should log proper error instead of dying
+    [EAGLE-849] - System metric collector python script
+    [EAGLE-850] - fetch node usage from name node/resource manager jmx
+    [EAGLE-873] - Add job name column to let user search their jobs using that field
+    [EAGLE-874] - Improve hadoop jmx collector scripts
+    [EAGLE-875] - Fix hadoop.hbase.ipc.ipc.* metric to hadoop.hbase.regionserver.ipc.*
+    [EAGLE-882] - Stream leaf RunningQueueAPIEntity into Kafka for queue monitoring
+    [EAGLE-895] - Improve alert engine metadata to organize by siteId
+    [EAGLE-904] - Refactor un-meaningful health alert message
+    [EAGLE-912] - make application health check message more readable
+    [EAGLE-920] - mr failed job trouble shooting
+    [EAGLE-927] - add jmx resource info to Hadoop JMX Monitor
+    [EAGLE-932] - Support group in stream definition
+    [EAGLE-933] - Isolate policy execution assignment scheduling by site
+    [EAGLE-942] - Fetch running apps info with Yarn client
+
+** Bug **
+
+    [EAGLE-145] - Send mail failed for javax.mail.internet.AddressException: Illegal semicolon, not in group
+    [EAGLE-146] - SiddhiExtensionLoader Error: viewing zip file for jar:./lib/ojdbc6.jar
+    [EAGLE-249] - Support Postgres as hive metadata
+    [EAGLE-253] - query=AlertService[@hostname=~".*"] returns different results under HBASE and JDBC DB
+    [EAGLE-267] - node_modules is packaged into eagle tar package
+    [EAGLE-320] - Pull Request Reviewer CI job fails to checkout dev branch
+    [EAGLE-329] - Dependency incompatibility bug among jersey, asm and extcos under JAVA 8
+    [EAGLE-332] - Build failed to due to [EAGLE-325]
+    [EAGLE-361] - Fix test building problem caused by kafka version and remove unused files
+    [EAGLE-362] - Remove tomcat package dependencies and use standalone embedded jetty server
+    [EAGLE-363] - Read topologyName from application.conf for MR history job feeder.
+    [EAGLE-364] - Kafka Spout with kerberos
+    [EAGLE-368] - JSlint failed in common/controller.js
+    [EAGLE-375] - Clean web framework to use light-weight DropWizard with Jersey and remove spring dependency
+    [EAGLE-381] - Get resource manager version and improve app attempt id fetcher for spark job feeder
+    [EAGLE-393] - Fix UnitTest Error caused by streamDef.json and TestApplicationImpl
+    [EAGLE-394] - Fix NPE bug while metadata inconsistent; Fix unit test
+    [EAGLE-395] - Doc mismatch package name
+    [EAGLE-400] - Compile errors in develop branch
+    [EAGLE-401] - StreamRouterBolt and PublishBolt also have NPE
+    [EAGLE-405] - hadoopJmxMetricAlertExecutor ArrayIndexOutOfBoundsException
+    [EAGLE-417] - Fix unit test failure on develop branch
+    [EAGLE-418] - Unit test case failed: org.apache.eagle.alert.cep.TestSiddhiEvaluator
+    [EAGLE-421] - JMX Metric APP use new application framework
+    [EAGLE-429] - CoordinatorTest.test_01 sometimes fail
+    [EAGLE-466] - TestSerDeserPer failed with Windows Git bash
+    [EAGLE-473] - Query error if query string contains "[]"
+    [EAGLE-475] - Fix generic email publisher and publish emails for absence alert.
+    [EAGLE-484] - StreamRouterSpec class should override equals method
+    [EAGLE-491] - AlertPublisherImpl dedup throws exception when dedup column is not configured
+    [EAGLE-492] - Fix negative total execution time and make some code optimization for spark history job.
+    [EAGLE-499] - Fix flushing entities for spark history job.
+    [EAGLE-504] - Fix warnings for getting json values in eagle-jpm-spark-history
+    [EAGLE-507] - Jenkins building failed on build #71
+    [EAGLE-508] - Fix NullPointerException when zookeeper is trying to shutdown in ZookeeperEmbedded.
+    [EAGLE-511] - Fix NullPointerException for spark history job
+    [EAGLE-517] - develop branch is actually broken with missing dependencies
+    [EAGLE-521] - Remove envContextConfig.env in SparkRunningJobAppConfig for SparkRunningJobApp.
+    [EAGLE-530] - Fix eagle-alert warnings
+    [EAGLE-535] - Fix eagle-server.sh to support to run under windows bash like Cygwin
+    [EAGLE-543] - Fix eagle default configuration and invalid dependencies
+    [EAGLE-547] - Fix duplicated view path
+    [EAGLE-552] - Resolve eagle dependency security and license issues
+    [EAGLE-553] - Fix /entities/ timeseries query bug
+    [EAGLE-554] - EagleServiceBaseClient cannot configure the basePath
+    [EAGLE-555] - Disruptor dependency conflict
+    [EAGLE-559] - Fix TestServiceAppWithZk test cause failing due to port conflict
+    [EAGLE-560] - Retry embedded zookeeper port by port +1 when conflicts
+    [EAGLE-561] - JsonMappingException in Hadoop queue feeder
+    [EAGLE-566] - add dedup fields into publishment compare consideration
+    [EAGLE-568] - Set max retry times for HDFS problems, otherwise skip instead of blocking whole topology
+    [EAGLE-569] - AlertPublishImpl: Concurrency : Inplace change metadata cause concurrent modification issue
+    [EAGLE-575] - Refactor StaticWebApplication to StaticApplication to support both web/static application
+    [EAGLE-580] - MongodbMetadata: kafka have dot in topic name cause spec store failed
+    [EAGLE-585] - AlertEngine: create metadata validation api
+    [EAGLE-586] - AlertEngine: multiple routing of alerts is broken because of event not copied
+    [EAGLE-587] - AlertEngine : simplify state-based dedup to have only deupvalue for given dedup key
+    [EAGLE-588] - AlertEngine : Not to Use commons3 stringutil.isnoneblank
+    [EAGLE-589] - PR 472 incorrect merge of pr 471
+    [EAGLE-590] - AlertEngine: the kafka_spout might be dropped by metadata update when system ack a tupe
+    [EAGLE-591] - Fix conflict streamId between different sites when installation
+    [EAGLE-596] - Caught NoSuchFieldError when creating policy with existing policyId
+    [EAGLE-597] - Add API to filter publishment by policy: /policies/{policyId}/publishments
+    [EAGLE-602] - Exception that Spec Version [xxx] of AlertBolt is newer than Stream Event Version [null]!
+    [EAGLE-608] - UI update: metadata/policies/policy
+    [EAGLE-609] - NullPointerException in DefaultDeduplicator
+    [EAGLE-610] - ui-build.sh not pop grunt exit code
+    [EAGLE-615] - Jsoup parse hive sql return String without line break "\n"
+    [EAGLE-617] - Scrollbar is missing when install Map Reduce History Job Monitoring
+    [EAGLE-620] - AlertEngine: SpoutWrapper are sending duplicated message.
+    [EAGLE-622] - AlertEngine : unit test failed caused by datasource name and topic name change
+    [EAGLE-624] - Installation Doc is not correctly shown in Installation Dialog
+    [EAGLE-625] - Site home page error for missing partials/site/home.html
+    [EAGLE-627] - Add PolicyValidator and Validation API
+    [EAGLE-628] - Fix jdbc metadata bugs
+    [EAGLE-636] - Absence Alert Engine doesn't alert in some case
+    [EAGLE-645] - No log retention for eagle server log
+    [EAGLE-646] - AlertUnitTopology does not rebuild the scheduler state after restarting
+    [EAGLE-648] - Stream router does not work properly sometimes
+    [EAGLE-654] - Fix alert engine open metric system per tuple
+    [EAGLE-655] - Fix metadata bug
+    [EAGLE-660] - Stream delete mongo implementation is not working
+    [EAGLE-661] - Status is wrongly shown as "INITIALIZED" when updating installed app's configuration
+    [EAGLE-662] - remove jarPath/mode from entity context
+    [EAGLE-663] - Build git head COMMITID into eagle package and display in web page aside eagle version
+    [EAGLE-664] - Add directly updating status API to rigger update status immediately
+    [EAGLE-667] - Should streat storm "KILLED" as "STOPPING" in eagle
+    [EAGLE-668] - Support properties type in text area instead input field of configuration
+    [EAGLE-673] - add numOfPublishExecutors to alert engine topology
+    [EAGLE-674] - fix grouping between AlertBolt and AlertPublisher
+    [EAGLE-675] - AlertEngine: don't host long-live curator framework for schedule
+    [EAGLE-679] - Fix missing CoprocessorService and MR Running feeder task number limitation
+    [EAGLE-682] - fix /policies/{policyId}/publishments bug
+    [EAGLE-684] - AlertEngine : PolicyDefinition.Defintion should not be changed.
+    [EAGLE-687] - When creating sites in UI and metadata storaged as jdbc, the field "Description" can't be null
+    [EAGLE-693] - fix application could not detect stream change
+    [EAGLE-700] - API /policies/{policyId} throws exception if policy does not exist
+    [EAGLE-702] - fix JdbcDatabaseHandler select sql error
+    [EAGLE-705] - streams is null when call /rest/apps/ api
+    [EAGLE-713] - Publish & Router bolts spec change is not thread safe
+    [EAGLE-715] - optimize some configurations for alert
+    [EAGLE-719] - configuration bug in applications
+    [EAGLE-724] - Fix eagle-common checkstyle warnings
+    [EAGLE-731] - HBaseStorage doesn't set affected size after create and delete operation
+    [EAGLE-736] - Fix eagle-data-process checkstyle warnings
+    [EAGLE-737] - Fix eagle-embed checkstyle warnings
+    [EAGLE-738] - Fix eagle-metadata checkstyle warnings
+    [EAGLE-739] - Fix eagle-metric checkstyle warnings
+    [EAGLE-740] - Fix eagle-query checkstyle warnings
+    [EAGLE-742] - check applications when remove site
+    [EAGLE-746] - PolicyValidation is insufficient, and will cause blocking for extended handler
+    [EAGLE-750] - Improve coordinator schedule strategy to reuse alert work slot
+    [EAGLE-755] - Publishment without streamIds update encountered NPE
+    [EAGLE-757] - fix alert JdbcDatabaseHandler connection issue
+    [EAGLE-764] - MR history feeder support Health Checks
+    [EAGLE-768] - AlertEngine: Policy Validation API doesn't evaluate the data source missing
+    [EAGLE-770] - remove InterProcessMutex from JobHistoryZKStateManager
+    [EAGLE-771] - AlertEngine: Make publishment kafka endpoint as optional
+    [EAGLE-772] - simply refactor mr running job feeder
+    [EAGLE-773] - org.apache.eagle.service.generic.MetaDataResource doesn't work correctly
+    [EAGLE-785] - change hbase configuration to optional
+    [EAGLE-793] - Dropwizard related class not found exception in topology
+    [EAGLE-799] - Can not get hbase info by service api when the master becomes not available
+    [EAGLE-806] - Integrate Metric Process and Persistence with Application Framework
+    [EAGLE-814] - fix alertId is null in AlertStreamEvent bug
+    [EAGLE-816] - Fix host name bug in jmx collector scripts
+    [EAGLE-819] - Data from topology health check are inaccurate
+    [EAGLE-821] - coordinator bug in alert engine
+    [EAGLE-826] - Coordinator throws NullPointerException when generateSpoutMonitorMetadata
+    [EAGLE-827] - Coordinator schedule time out
+    [EAGLE-842] - mr running job count in zookeeper does not match the number in hbase
+    [EAGLE-844] - Potential NPE issue
+    [EAGLE-851] - Add validation for policy name
+    [EAGLE-853] - Resolve eagle time problem on alert entities
+    [EAGLE-862] - Fix service.port config to support both STRING and NUMBER
+    [EAGLE-869] - Fix MetricStreamPersist bug: no tuple pass on when batchSize > 1
+    [EAGLE-870] - NoClassDefFoundError while running storm topology for alert and MRrunning
+    [EAGLE-876] - TopologyBaseAPIEntity comparison should consider rack info
+    [EAGLE-883] - Users in RunningQueueAPIEntity is missing due to misconfiguration
+    [EAGLE-887] - Eagle application status is still RUNNING even when storm cluster is down
+    [EAGLE-891] - Add ApplicationPackageProvider Framework to support package multiple applications
+    [EAGLE-892] - MRRunningJobFetchSpout throws NPE when there is no apps found
+    [EAGLE-897] - HBase JMX Widget Url is wrongly using siteName instead of siteId
+    [EAGLE-903] - HBase Master Overview keep loading progress forever if no data available
+    [EAGLE-924] - urls to healthy and unhealthy region-servers in hbase dashboard is not accurate enough
+    [EAGLE-928] - Refine system metric schema design and fix system metric collector
+    [EAGLE-934] - update packaging to use new configs
+    [EAGLE-947] - Publishers with same policy but different schema could produce duplicate alerts
+    [EAGLE-948] - can not package by maven
+    [EAGLE-960] - Fix email template link problem
+    [EAGLE-961] - Text could go beyond job list widget
+    [EAGLE-962] - The status of job list always show Running
+    [EAGLE-963] - Job duration conflicts between job list and job detail page
+    [EAGLE-965] - Eagle JPM Yarn Overview Chart Improvement
+    Task
+    [EAGLE-324] - Initialize code for 0.5.0-incubating-SNAPSHOT
+    [EAGLE-377] - tomcat jar dependencies need to be cleaned up
+    [EAGLE-384] - Alert Engine BugFix and Improvements
+    [EAGLE-410] - stream tumbling window aggregate library
+    [EAGLE-495] - Convert spark history job using application framework
+    [EAGLE-502] - Always retry to parse spark history job when failure happens.
+    [EAGLE-574] - UI refactor for support 0.5 api
+    [EAGLE-577] - UI policy management
+    [EAGLE-670] - AlertEngine: Make Kafka Publisher configurable to async, for throughput tuning
+    [EAGLE-671] - AlertEngine: incorrect metric system use : too many metric object create and registered
+    [EAGLE-672] - AlertEngine: MongoStateStore should be removed
+    [EAGLE-708] - document the Apache Eagle deployment from scratch
+    [EAGLE-709] - Document job performance monitoring application
+    [EAGLE-710] - Document service health check application
+    [EAGLE-711] - Document JMX monitoring application
+    [EAGLE-712] - Document HDFS audit log monitoring application (DAM)
+    [EAGLE-813] - UI alert api update
+    [EAGLE-855] - UI support metric preview
+
+** Sub-task **
+
+    [EAGLE-261] - create jekyll-infra for eagle landing page
+    [EAGLE-262] - create jekyll-infra for eagle version-based page
+    [EAGLE-277] - Spark History jobs Feeder
+    [EAGLE-278] - MR history jobs Feeder
+    [EAGLE-385] - Monitoring Application Framework Core
+    [EAGLE-386] - Refactor Application Framework Interfaces and StreamEventMapper
+    [EAGLE-387] - Implement Application Lifecycle Status Conversion
+    [EAGLE-388] - Alerting on any customized kafka data source (topic)
+    [EAGLE-389] - Integrate application streams as Alerting data source (managed kafka topic) & stream
+    [EAGLE-390] - Integrate application streams as Insight Dashboard data source
+    [EAGLE-391] - Integrate Application start/stop/status interface with TopologyMgmtResourceImpl
+    [EAGLE-397] - Implement KafkaStreamSink with type safe StreamSinkContext
+    [EAGLE-398] - Refine example application for developer to easily know how to create a new app
+    [EAGLE-399] - Implement consistent RESTResponse Wrapper for operation (CREAT/MODIFY/DELETE) request
+    [EAGLE-402] - EAGLE-402 Refactor Application Framework to be better managed or deployed standalone
+    [EAGLE-403] - Enrich Metadata API of Application Management
+    [EAGLE-441] - Combine environment configuration into application configuration for execution
+    [EAGLE-442] - Support to extend metastore DAO modules in SPI
+    [EAGLE-472] - Fix HBase unit test
+    [EAGLE-570] - Refactor: Make sure engine publisher only have general feature.
+    [EAGLE-573] - NPE when apply change of 569
+    [EAGLE-582] - register simple Basic Authentication to server application
+    [EAGLE-583] - implement ldap authentication logic, taking Basic Authentication credentials
+    [EAGLE-639] - Generate sortSpec only on externalWindow
+    [EAGLE-717] - Upgrade maven-surefire-plugin for supporting forkMode ( = always ) correctly
+    [EAGLE-727] - Fix TestGroupAggregateTimeSeriesClient and TestGroupAggregateClient
+    [EAGLE-730] - Add UnitTest for HBaseStorage
+    [EAGLE-732] - Exclude coverage instrumentation of generated class
+    [EAGLE-745] - web ui should check success(true or false) when delete site
+    [EAGLE-754] - Refactor - move ignored test class to corresponding module
+    [EAGLE-775] - add unit test for eagle-service-base
+    [EAGLE-777] - add unit test for alert-metadata
+    [EAGLE-778] - add unit test for alert-metadata-service
+    [EAGLE-863] - Refactor Topology Monitoring Widgets
+    [EAGLE-864] - Make sure "HBase" nav active in sidebar when visiting hbase monitoring web through URL
+    [EAGLE-866] - Refactor HBase JMX Metric with appropriate navigation path
+    [EAGLE-867] - Show real time current server time aside global timepicker
+    [EAGLE-868] - Refactor metric chart render process to improve user experience.
+    [EAGLE-877] - Rename metric "hadoop.hbase.ipc.ipc.*" to "hadoop.hbase.regionserver.ipc.*" to support different hbase version metric
+    [EAGLE-922] - Integrate role-based Authentication in API
+    [EAGLE-923] - Integrate role-based Authentication in UI
+    [EAGLE-956] - Metric Explorer and Customized Dashboard UI Part
+    [EAGLE-957] - Metric Explorer and Customized Dashboard Metadata Part
+    Test
+    [EAGLE-483] - Test email alert publisher
+    [EAGLE-753] - Improve code coverage of eagle-service-base
+    [EAGLE-776] - add unit test for eagle-alert-parent
+
+
+Release Notes - Apache Eagle 0.4.0 (incubating)
+
+** Highlights **
+    * JBDC Metadata Storage Extension
+    * Topology management in remote mode including start/stop/status operations
+    * Auditlogparser for MapR's audit log
+    * Oozie auditlog integration for Oozie security monitoring
+    * Add applicaiton "maprFSAuditLog"
+    * Refactor bin/eagle-sandbox-starter.sh to make it easier to use
+
+** New Feature
+    * [EAGLE-169] - Dynamic security event correlation in Eagle
+    * [EAGLE-203] - Metrics feature support merge chart
+    * [EAGLE-225] - Create eagle bootstrap scripts for examples 
+    * [EAGLE-226] - Refactor Eagle scripts to avoid heavily depending on Hortonworks Sandbox
+    * [EAGLE-232] - Create local Kafka/Zookeeper/Storm runner tools for quickstart examples and add related scripts to start/top zk/kafka
+    * [EAGLE-238] - Support scheduling topology in local mode including start/stop/status operations
+    * [EAGLE-266] - Integrate MkDocs for eagle-docs: http://www.mkdocs.org/
+    * [EAGLE-271] - Topology management in remote mode including start/stop/status operations
+    * [EAGLE-272] - Support topology management in UI including creating topology and monitoring status
+    * [EAGLE-282] - Auditlogparser for MapR's audit log 
+    * [EAGLE-284] - Connect to MapR's CLDB service
+    * [EAGLE-298] - Oozie auditlog integration for Oozie security monitoring
+    * [EAGLE-307] - Add applicaiton "maprFSAuditLog" 
+
+** Improvement
+    * [EAGLE-103] - add comments to readme to tell users: currently, eagle is tested under jdk1.7.x, may have compile error with jdk1.8.x
+    * [EAGLE-182] - Replace Legacy "dataSource" field with "application" in UI request
+    * [EAGLE-185] - UI create cache after building
+    * [EAGLE-190] - JBDC Metadata Storage Extension
+    * [EAGLE-193] - UI metric dashboard support sortable
+    * [EAGLE-194] - UI show exception alert if service error
+    * [EAGLE-195] - policy metric display with interval of 5 min or customized interval
+    * [EAGLE-196] - eagle-topology.sh should have jar file path as parameter
+    * [EAGLE-201] - Change maven group name to org.apache.eagle instead of eagle
+    * [EAGLE-205] - Metric dashboard support multi metrics
+    * [EAGLE-207] - Management page add tips
+    * [EAGLE-208] - UI metric dashboard should support order & rename
+    * [EAGLE-216] - Added RM Policy and GC Policies in Resource
+    * [EAGLE-223] - Notification plugin to enable multiple instance of given alert plugin 
+    * [EAGLE-237] - Add development tools for quickly starting zookeeper, kafka and webservice without depending on sandbox
+    * [EAGLE-248] - Rename directories according industrial common sense
+    * [EAGLE-287] - Make EagleStore as the default notification method
+    * [EAGLE-288] - Need to add "Alert De-Dup Interval" setting in "PolicyObjectBase" 
+    * [EAGLE-295] - Add configuration value to enable application Manager
+    * [EAGLE-303] - Refactor message format in the email template.
+    * [EAGLE-305] - Add a config tip to the document for "Application Manager Tutorial" - setting "appCommandLoaderEnabled=true"
+    * [EAGLE-306] - add metadata for showing "Topology" tab in left-nav by default
+    * [EAGLE-315] - Add tutorial for mapr audit log monitoring
+    * [EAGLE-316] - Feature topology should not be added into an application
+    * [EAGLE-339] - Create HBase tables if not exists 
+    * [EAGLE-340] - refactor bin/eagle-sandbox-starter.sh to make it easier to use 
+
+** Bug
+    * [EAGLE-8] - In eagle-check-env.sh shell , Itbad way to check kafka installation
+    * [EAGLE-18] - Follow up with infra about website creation
+    * [EAGLE-157] - policy metric should be refreshed every minute
+    * [EAGLE-171] - Policy listing table is messed up by too long policy name.
+    * [EAGLE-172] - Scripting string is allowed to create policy rules.
+    * [EAGLE-173] - Mark/Un-mark a sensitivity type does not sync status mark in the table list.
+    * [EAGLE-176] - Metric dashboard UI keep api refresh after page switch
+    * [EAGLE-192] - Uncaught ReferenceError: damControllers is not defined (doc.js:7628)
+    * [EAGLE-200] - GC Log Monitoring  Not Working
+    * [EAGLE-210] - UI application group not display correctly
+    * [EAGLE-211] - Fix sometime unit test failing at TestSiddhiStateSnapshotAndRestore
+    * [EAGLE-212] - Fix AlertDataSourceEntity Bug in Hive web
+    * [EAGLE-213] - Updates fail for MySql  
+    * [EAGLE-214] - Policy edit page need auto switch application
+    * [EAGLE-217] - Fix unstable unit tests about state snapshot management
+    * [EAGLE-224] - Column not found to EAGLE_METRIC when using JDBC
+    * [EAGLE-227] - java.lang.NoClassDefFoundError: org/apache/commons/pool/impl/CursorableLinkedList$ListIter
+    * [EAGLE-228] - org.apache.eagle.notification.plugin.NotificationPluginManagerImpl - fail invoking plugin's onAlert, continue  java.lang.NullPointerException: null
+    * [EAGLE-229] - java.lang.IncompatibleClassChangeError: class net.sf.extcos.internal.JavaResourceAccessor$AnnotatedClassVisitor has interface org.objectweb.asm.ClassVisitor as super class
+    * [EAGLE-230] - Exception in persisting entitiesService side exception: org.codehaus.jackson.map.JsonMappingException: Conflicting setter definitions for property "alertContext"
+    * [EAGLE-235] - org.codehaus.jackson.map.JsonMappingException: Conflicting setter definitions for property "alertContext"
+    * [EAGLE-239] - Alert list and details are not correctly displayed
+    * [EAGLE-240] - java.lang.ArrayIndexOutOfBoundsException thrown by MetricKeyCodeDecoder
+    * [EAGLE-242] -  Import the notification plugin metadata when initializing
+    * [EAGLE-254] - HdfsAuditLog topology keeps alerting for one piece of log
+    * [EAGLE-258] - Automatically add apache-github and apache-git in pr tools
+    * [EAGLE-269] - Comparisons between 'LONG VARCHAR (UCS_BASIC)' and 'LONG VARCHAR (UCS_BASIC)' are not supported
+    * [EAGLE-270] - JDBC: Create table fail for some of the tables
+    * [EAGLE-273] -  Issue with creating MySql tables , only 14 were created out of 24, reason being varchar(30000) for multiple columns lead to exceeding the maximum row size of 65,535 bytes.
+    * [EAGLE-274] - 2016-04-15 15:50:20 b.s.d.worker [ERROR] Error on initialization of server mk-worker java.lang.RuntimeException: java.lang.ClassNotFoundException: org.slf4j.impl.Log4jLoggerAdapter
+    * [EAGLE-275] - Eagle email alert bug: $elem["dataSource"] Alert Detected
+    * [EAGLE-291] - JDBC: Update transactions fail in PostgreSQL
+    * [EAGLE-292] - Updated hbase policy failed: Data too long for column 'policyDef' when using mysql storage
+    * [EAGLE-294] - If a policy metadata field is not set, null attributes can not be able to add into input stream for SiddhiCEP 
+    * [EAGLE-297] - Email with authentication can not be validated and sent out.
+    * [EAGLE-300] - Disable spring debug log by default in webservice
+    * [EAGLE-301] - Tables omitted for using mysql
+    * [EAGLE-304] - Enable Advanced dedup configuration in policy definition 
+    * [EAGLE-308] - Consistency issue: deleting a topology doesn't delete existing topology-execution bound to it.
+    * [EAGLE-310] - already existing active topology status not displayed when a deleted topology+execution re-created with same name
+    * [EAGLE-311] - operations of items listed on topology-management monitoring page require buffering loading approaches
+    * [EAGLE-313] - normally stopped topology-execution shows error message in the description column
+    * [EAGLE-319] - java.sql.SQLSyntaxErrorException caught when querying from table topologyExecutionEntity
+    * [EAGLE-321] - java.lang.NoSuchMethodError: com.google.protobuf.LazyStringList.getUnmodifiableView
+    * [EAGLE-326] - typo found in eagle documentation
+    * [EAGLE-327] - java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Integer
+    * [EAGLE-330] - Hive ql.Parser can't parser a hive query sql with keywords
+    * [EAGLE-338] - fix topology-assembly build issue because of module name change
+    * [EAGLE-346] - ClassNotFoundException thrown out when topology is executing
+
+** Task
+    * [EAGLE-73] - Put docker steps to site tutorial
+    * [EAGLE-221] - Support cusomized notification type in policy editor
+    * [EAGLE-222] - Documentation for eagle alert plugin mechnism
+    * [EAGLE-280] - Update logstash-kafka-conf.md
+    * [EAGLE-309] - Add code formatter template
+
+** Sub-task
+    * [EAGLE-219] - Use PUT method for updating request when possible in front-end.
+
+
+
+Release Notes - Apache Eagle 0.3.1 (incubating)
+
+** Highlights **
+    * Hadoop JMX metric monitoring.
+    * NameNode log monitoring for GC alerts.
+    * Eagle UI Modularization (With new customizable UI options).
+    * Generic Notification Plugin Framework for integrating alerts with various third parties.
+    * Docker Image for Eagle.
+    * Provide analytic DSL support.
+
+** New Feature
+    * [EAGLE-15] - HBase auditlog integration for HBase security monitoring
+    * [EAGLE-17] - HDFS security log integration for HDFS security monitoring
+    * [EAGLE-46] - track the work before moving code to apache site
+    * [EAGLE-47] - Ability to audit who made changes to Eagle policies
+    * [EAGLE-53] - Docker Image for Eagle
+    * [EAGLE-79] - Provide analytic DSL support
+    * [EAGLE-81] - Notification Plugin Framework
+    * [EAGLE-100] - provide tools to collect hadoop jmx metrics
+    * [EAGLE-122] - Create a generic notification plugin for integrating alerts
+
+** Bug
+    * [EAGLE-4] - configure parallelism with bolt/spout friendly name
+    * [EAGLE-6] - group-by user between bolts and spouts for hdfs/hive audit log monitoring
+    * [EAGLE-10] - Bad way to check kafka installation in eagle-check-env.sh
+    * [EAGLE-28] - Znode root should be configurable.
+    * [EAGLE-30] - Topology run in storm local mode should not terminate after Integer.MAX_VALUE milliseconds
+    * [EAGLE-41] - Eagle policy engine supports customizable ExceptionHandler instead of using FetalExceptionHandler
+    * [EAGLE-48] - Alert message time is wrong in some cases
+    * [EAGLE-56] - Building failed for artifact jdk.tools:jdk.tools:jar:1.7 not found
+    * [EAGLE-69] - http 404 bug in accessing http://localhost:9099/eagle-service
+    * [EAGLE-70] - Fix Goovy into Groovy in pom
+    * [EAGLE-74] - in sandbox setup, change package name from eagle. to org.apache.eagle
+    * [EAGLE-76] - Disable creating newStream for common user role
+    * [EAGLE-85] - Fix unit test failure.
+    * [EAGLE-94] - fix the bug of eagle docker in Mac
+    * [EAGLE-95] - DAM HDFS topology fails to start, if there is invalid policy.
+    * [EAGLE-104] - Fix the unit test TestHDFSSecuritylogParser
+    * [EAGLE-118] - Siddhi contains is neither a function extension nor an aggregated attribute extension
+    * [EAGLE-119] - fix unit testing bugs
+    * [EAGLE-125] - Add LICENSE in eagle external
+    * [EAGLE-128] - Fix unit test failure
+    * [EAGLE-141] - fix some unit testing exception which is thrown within annoymous class
+    * [EAGLE-142] - Replace AlertDefinitionDAOImpl with PolicyDefinitionDAOImpl
+    * [EAGLE-148] - Master build failure due to siddhi ql test
+    * [EAGLE-163] - HDFS topology not working.
+
+** Improvement
+    * [EAGLE-7] - expose storm config as individual eagle topology config
+    * [EAGLE-13] - Eagle machine learning no longer needs hourly aggregation
+    * [EAGLE-14] - Re-assemble high level hdfs commands for better policy
+    * [EAGLE-24] - Load skew issue when partition by user
+    * [EAGLE-29] - Update Alert page for display more infomation
+    * [EAGLE-38] - reminder for Alerts in the UI
+    * [EAGLE-40] - Policy detail page support alert list display
+    * [EAGLE-42] - Customized partition support for Kafka spout
+    * [EAGLE-44] - previous page should be reloaded after login session is timed out and re-login
+    * [EAGLE-50] - Eagle internal metric framework
+    * [EAGLE-52] - Eagle framework should support custom group by function in addition to group by fields
+    * [EAGLE-55] - JobCompletedConfigServiceURLBuilderImpl in hive running spout miss anonymous paramter
+    * [EAGLE-58] - Enhance Hive query parse model
+    * [EAGLE-62] - Add jshint for front end UI building
+    * [EAGLE-66] - Eagle TypeSafe Stream Processing DSL
+    * [EAGLE-80] - remove httpd directory
+    * [EAGLE-86] - Rewrite HDFSAuditLogParser to a non-regular expression version
+    * [EAGLE-88] - Eagle web-service should have status url
+    * [EAGLE-99] - policy distribution statistics to be printed in log
+    * [EAGLE-106] - UI use same chart component
+    * [EAGLE-107] - Build Status Icon has been enabled for our github repo, please apply it to readme.md
+    * [EAGLE-108] - a tool tests performace between mongodb3.0 and couchDB1.6.1
+    * [EAGLE-109] - add hdfs related ports mapping from docker container to host
+    * [EAGLE-112] - Should support sum aggregation in front end for slide window function
+    * [EAGLE-114] - Enable RAT check and fix missing license headers
+    * [EAGLE-138] - Extend JMX Collector to support "hadoop.namenode.JournalTransaction"
+    * [EAGLE-143] - Create Eagle release 0.3.1
+    * [EAGLE-149] - Enable hadoop jmx metric cases
+    * [EAGLE-152] - hadoop-metric monitoring automation script
+    * [EAGLE-158] - Disable org.apache.eagle.datastream.EagleTuple
+    * [EAGLE-166] - Enhance metric collector script to extract hadoop ha status as metric
+
+** Task
+    * [EAGLE-83] - Integrate Jenkins with GitHub for checking pull requests
+    * [EAGLE-84] - Create scripts for merging PRs automatically
+    * [EAGLE-102] - ask jenkins-admin's help to setup "Embeddable Build Status Plugin" and make the status visible in Readme.md of incubator-eagle.git
+    * [EAGLE-117] - update Build Status Link and make it point to CI job building upon master
+    * [EAGLE-131] - make eagle main CI build pass
+    * [EAGLE-136] - Setup hadoop metric application
+    * [EAGLE-154] - hadoop-metric monitoring sandbox starter script
+    * [EAGLE-164] - Tutorial for setting up the development environment on mac
+    * [EAGLE-165] - Add more jmx metric cases
+
+** Sub-task
+    * [EAGLE-51] - Clean and manage external licensed static resource dependencies in eagle web with npm and grunt
+    * [EAGLE-60] - HBase sensitivity UI
+    * [EAGLE-63] - Improve docker image for quick preview
+    * [EAGLE-64] - Push eagle docker image to docker hub
+    * [EAGLE-65] - Eagle docker consistent port mapping
+    * [EAGLE-71] - Fix eagle docker run command
+    * [EAGLE-75] - Leverage dropwizard metrics for generating Eagle Topology and DataSource Metrics
+    * [EAGLE-78] - eagle-lib.sh script not work for mac osx and windows
+    * [EAGLE-130] - Eagle Pipeline DSL: Parser, Compiler, Runner
+    * [EAGLE-140] - Eagle Pipeline Package and Script
+
+
+
+Release Notes - Apache Eagle 0.3.0 (incubating)
+
+** Highlights **
+    * Hadoop JMX metric monitoring.
+    * NameNode log monitoring for GC alerts.
+    * Eagle UI Modularization (With new customizable UI options).
+    * Generic Notification Plugin Framework for integrating alerts with various third parties.
+    * Docker Image for Eagle.
+    * Provide analytic DSL support.
+
+** New Feature
+    * [EAGLE-15] - HBase auditlog integration for HBase security monitoring
+    * [EAGLE-17] - HDFS security log integration for HDFS security monitoring
+    * [EAGLE-46] - track the work before moving code to apache site
+    * [EAGLE-47] - Ability to audit who made changes to Eagle policies
+    * [EAGLE-53] - Docker Image for Eagle
+    * [EAGLE-79] - Provide analytic DSL support
+    * [EAGLE-81] - Notification Plugin Framework
+    * [EAGLE-100] - provide tools to collect hadoop jmx metrics
+    * [EAGLE-122] - Create a generic notification plugin for integrating alerts
+
+** Bug
+    * [EAGLE-4] - configure parallelism with bolt/spout friendly name
+    * [EAGLE-6] - group-by user between bolts and spouts for hdfs/hive audit log monitoring
+    * [EAGLE-10] - Bad way to check kafka installation in eagle-check-env.sh
+    * [EAGLE-28] - Znode root should be configurable.
+    * [EAGLE-30] - Topology run in storm local mode should not terminate after Integer.MAX_VALUE milliseconds
+    * [EAGLE-41] - Eagle policy engine supports customizable ExceptionHandler instead of using FetalExceptionHandler
+    * [EAGLE-48] - Alert message time is wrong in some cases
+    * [EAGLE-56] - Building failed for artifact jdk.tools:jdk.tools:jar:1.7 not found
+    * [EAGLE-69] - http 404 bug in accessing http://localhost:9099/eagle-service
+    * [EAGLE-70] - Fix Goovy into Groovy in pom
+    * [EAGLE-74] - in sandbox setup, change package name from eagle. to org.apache.eagle
+    * [EAGLE-76] - Disable creating newStream for common user role
+    * [EAGLE-85] - Fix unit test failure.
+    * [EAGLE-94] - fix the bug of eagle docker in Mac
+    * [EAGLE-95] - DAM HDFS topology fails to start, if there is invalid policy.
+    * [EAGLE-104] - Fix the unit test TestHDFSSecuritylogParser
+    * [EAGLE-118] - Siddhi contains is neither a function extension nor an aggregated attribute extension
+    * [EAGLE-119] - fix unit testing bugs
+    * [EAGLE-125] - Add LICENSE in eagle external
+    * [EAGLE-128] - Fix unit test failure
+    * [EAGLE-141] - fix some unit testing exception which is thrown within annoymous class
+    * [EAGLE-142] - Replace AlertDefinitionDAOImpl with PolicyDefinitionDAOImpl
+    * [EAGLE-148] - Master build failure due to siddhi ql test
+    * [EAGLE-163] - HDFS topology not working.
+
+** Improvement
+    * [EAGLE-7] - expose storm config as individual eagle topology config
+    * [EAGLE-13] - Eagle machine learning no longer needs hourly aggregation
+    * [EAGLE-14] - Re-assemble high level hdfs commands for better policy
+    * [EAGLE-24] - Load skew issue when partition by user
+    * [EAGLE-29] - Update Alert page for display more infomation
+    * [EAGLE-38] - reminder for Alerts in the UI
+    * [EAGLE-40] - Policy detail page support alert list display
+    * [EAGLE-42] - Customized partition support for Kafka spout
+    * [EAGLE-44] - previous page should be reloaded after login session is timed out and re-login
+    * [EAGLE-50] - Eagle internal metric framework
+    * [EAGLE-52] - Eagle framework should support custom group by function in addition to group by fields
+    * [EAGLE-55] - JobCompletedConfigServiceURLBuilderImpl in hive running spout miss anonymous paramter
+    * [EAGLE-58] - Enhance Hive query parse model
+    * [EAGLE-62] - Add jshint for front end UI building
+    * [EAGLE-66] - Eagle TypeSafe Stream Processing DSL
+    * [EAGLE-80] - remove httpd directory
+    * [EAGLE-86] - Rewrite HDFSAuditLogParser to a non-regular expression version
+    * [EAGLE-88] - Eagle web-service should have status url
+    * [EAGLE-99] - policy distribution statistics to be printed in log
+    * [EAGLE-106] - UI use same chart component
+    * [EAGLE-107] - Build Status Icon has been enabled for our github repo, please apply it to readme.md
+    * [EAGLE-108] - a tool tests performace between mongodb3.0 and couchDB1.6.1
+    * [EAGLE-109] - add hdfs related ports mapping from docker container to host
+    * [EAGLE-112] - Should support sum aggregation in front end for slide window function
+    * [EAGLE-114] - Enable RAT check and fix missing license headers
+    * [EAGLE-138] - Extend JMX Collector to support "hadoop.namenode.JournalTransaction"
+    * [EAGLE-143] - Create Eagle release 0.3.0
+    * [EAGLE-149] - Enable hadoop jmx metric cases
+    * [EAGLE-152] - hadoop-metric monitoring automation script
+    * [EAGLE-158] - Disable org.apache.eagle.datastream.EagleTuple
+    * [EAGLE-166] - Enhance metric collector script to extract hadoop ha status as metric
+
+** Task
+    * [EAGLE-83] - Integrate Jenkins with GitHub for checking pull requests
+    * [EAGLE-84] - Create scripts for merging PRs automatically
+    * [EAGLE-102] - ask jenkins-admin's help to setup "Embeddable Build Status Plugin" and make the status visible in Readme.md of incubator-eagle.git
+    * [EAGLE-117] - update Build Status Link and make it point to CI job building upon master
+    * [EAGLE-131] - make eagle main CI build pass
+    * [EAGLE-136] - Setup hadoop metric application
+    * [EAGLE-154] - hadoop-metric monitoring sandbox starter script
+    * [EAGLE-164] - Tutorial for setting up the development environment on mac
+    * [EAGLE-165] - Add more jmx metric cases
+
+** Sub-task
+    * [EAGLE-51] - Clean and manage external licensed static resource dependencies in eagle web with npm and grunt
+    * [EAGLE-60] - HBase sensitivity UI
+    * [EAGLE-63] - Improve docker image for quick preview
+    * [EAGLE-64] - Push eagle docker image to docker hub
+    * [EAGLE-65] - Eagle docker consistent port mapping
+    * [EAGLE-71] - Fix eagle docker run command
+    * [EAGLE-75] - Leverage dropwizard metrics for generating Eagle Topology and DataSource Metrics
+    * [EAGLE-78] - eagle-lib.sh script not work for mac osx and windows
+    * [EAGLE-130] - Eagle Pipeline DSL: Parser, Compiler, Runner
+    * [EAGLE-140] - Eagle Pipeline Package and Script
+
