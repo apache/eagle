@@ -26,6 +26,14 @@
 		$scope.password = '';
 
 		$scope.login = function () {
+		if (!$scope.username || !$scope.password)
+        					{
+        					$.dialog({
+                            	title: 'OPS',
+                            	content: 'Username or password cannot be Empty.'
+                            });
+
+        					}else {
 			Auth.login($scope.username, $scope.password).then(function (result) {
 				if (result) {
 					$wrapState.go('home');
@@ -35,7 +43,7 @@
 						content: 'Username or password not correct.'
 					});
 				}
-			});
+			}); }
 		};
 
 		$scope.onKeyPress = function (event) {
