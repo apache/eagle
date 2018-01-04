@@ -12,7 +12,7 @@ permalink: /docs/download.html
 * Source download:
 	* [apache-eagle-0.5.0-src.tar.gz](http://www.apache.org/dyn/closer.cgi?path=eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz)
 	* [apache-eagle-0.5.0-src.tar.gz.md5](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.md5)
-	* [apache-eagle-0.5.0-src.tar.gz.sha1](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.sha1)
+	* [apache-eagle-0.5.0-src.tar.gz.sha512](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.sha512)
 	* [apache-eagle-0.5.0-src.tar.gz.asc](https://dist.apache.org/repos/dist/release/eagle/apache-eagle-0.5.0/apache-eagle-0.5.0-src.tar.gz.asc)
 * Git revision: 
 	* tag: [v0.5.0](https://git-wip-us.apache.org/repos/asf?p=eagle.git;a=commit;h=refs/tags/v0.5.0)
