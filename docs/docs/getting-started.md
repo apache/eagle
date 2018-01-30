@@ -144,19 +144,11 @@ Here is an example ApplicationDesc of `JPM_WEB_APP`
         executable: false,
         dependencies: [{
             type: "MR_RUNNING_JOB_APP",
-<<<<<<< HEAD
-            version: "0.5.0",
-            required: true
-        }, {
-            type: "MR_HISTORY_JOB_APP",
-            version: "0.5.0",
-=======
             version: "0.5.1",
             required: true
         }, {
             type: "MR_HISTORY_JOB_APP",
             version: "0.5.1",
->>>>>>> bumping eagle version to 0.5.1 for master
             required: true
         }]
         }
