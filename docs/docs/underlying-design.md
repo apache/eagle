@@ -75,10 +75,17 @@ Here is a ApplicationDesc example of `JPM_WEB_APP`
         {
             type: "JPM_WEB_APP",
             name: "Job Performance Monitoring Web ",
+<<<<<<< HEAD
             version: "0.5.0",
             description: null,
             appClass: "org.apache.eagle.app.StaticApplication",
             jarPath: "/opt/eagle/eagle-0.5.0/lib/eagle-topology-0.5.0-hadoop-2.4.1-11-assembly.jar",
+=======
+            version: "0.5.1",
+            description: null,
+            appClass: "org.apache.eagle.app.StaticApplication",
+            jarPath: "/opt/eagle/0.5.1-SNAPSHOT-build-20161103T0332/eagle-0.5.1-SNAPSHOT/lib/eagle-topology-0.5.1-SNAPSHOT-hadoop-2.4.1-11-assembly.jar",
+>>>>>>> bumping eagle version to 0.5.1 for master
             viewPath: "/apps/jpm",
             providerClass: "org.apache.eagle.app.jpm.JPMWebApplicationProvider",
             configuration: {
@@ -101,11 +108,19 @@ Here is a ApplicationDesc example of `JPM_WEB_APP`
             executable: false,
             dependencies: [{
                 type: "MR_RUNNING_JOB_APP",
+<<<<<<< HEAD
                 version: "0.5.0",
                 required: true
             }, {
                 type: "MR_HISTORY_JOB_APP",
                 version: "0.5.0",
+=======
+                version: "0.5.1",
+                required: true
+            }, {
+                type: "MR_HISTORY_JOB_APP",
+                version: "0.5.1",
+>>>>>>> bumping eagle version to 0.5.1 for master
                 required: true
             }]
         }

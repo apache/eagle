@@ -148,7 +148,7 @@ eagle-app-example/
         <application>
            <type>EXAMPLE_APPLICATION</type>
            <name>Example Monitoring Application</name>
-           <version>0.5.0</version>
+        <version>0.5.1-SNAPSHOT</version>
            <configuration>
                <property>
                    <name>message</name>
