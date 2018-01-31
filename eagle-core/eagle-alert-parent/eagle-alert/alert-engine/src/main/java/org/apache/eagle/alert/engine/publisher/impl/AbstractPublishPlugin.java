@@ -66,7 +66,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
                     publishment.getDedupStateField(),
                     dedupCache,
                     publishment.getName());
-                getLogger().info("{} initiliazed extended deduplicator {} with properties {} successfully",
+                getLogger().info("{} initialized extended deduplicator {} with properties {} successfully",
                     publishment.getName(), spec.getClassName(), Joiner.on(",").withKeyValueSeparator(">").join(
                         spec.getProperties() == null ? new HashMap<String, String>() : spec.getProperties()));
             } catch (Throwable t) {
@@ -94,7 +94,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
             }
             serializer = (IEventSerializer) obj;
         } catch (Exception e) {
-            getLogger().error("initialized failed, use default StringEventSerializer, failure message : {}", e.getMessage(), e);
+            getLogger().error("initialization failed, use default StringEventSerializer, failure message : {}", e.getMessage(), e);
             serializer = new StringEventSerializer(conf);
         }
     }
