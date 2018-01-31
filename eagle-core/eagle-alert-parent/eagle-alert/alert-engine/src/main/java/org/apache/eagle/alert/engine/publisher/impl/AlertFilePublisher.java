@@ -54,13 +54,26 @@ public class AlertFilePublisher extends AbstractPublishPlugin implements AlertPu
         int numOfFiles = DEFAULT_FILE_NUMBER;
         if (publishment.getProperties() != null) {
             if (publishment.getProperties().containsKey(PublishConstants.FILE_NAME)) {
-                fileName = (String) publishment.getProperties().get(PublishConstants.FILE_NAME);
+                String property = (String) publishment.getProperties().get(PublishConstants.FILE_NAME);
+                if (property != null && !"".equals(property)) {
+                    fileName = property;
+                }
             }
             if (publishment.getProperties().containsKey(PublishConstants.ROTATE_EVERY_KB)) {
-                rotateSize = Integer.valueOf(publishment.getProperties().get(PublishConstants.ROTATE_EVERY_KB).toString());
+                Object property = publishment.getProperties().get(PublishConstants.ROTATE_EVERY_KB);
+                if (property instanceof Integer) {
+                    rotateSize = (Integer)property;
+                } else if (property instanceof String && !"".equals((String)property)) {
+                    rotateSize = Integer.valueOf((String)property);
+                }
             }
             if (publishment.getProperties().containsKey(PublishConstants.NUMBER_OF_FILES)) {
-                numOfFiles = Integer.valueOf(publishment.getProperties().get(PublishConstants.NUMBER_OF_FILES).toString());
+                Object property = publishment.getProperties().get(PublishConstants.NUMBER_OF_FILES);
+                if (property instanceof Integer) {
+                    numOfFiles = (Integer)property;
+                } else if (property instanceof String && !"".equals((String)property)) {
+                    numOfFiles = Integer.valueOf((String)property);
+                }
             }
         }
         handler = new FileHandler(fileName, rotateSize * 1024, numOfFiles, true);
@@ -75,6 +88,9 @@ public class AlertFilePublisher extends AbstractPublishPlugin implements AlertPu
                 .name("File")
                 .type(AlertFilePublisher.class)
                 .description("Local log file publisher")
+                .field(PublishConstants.FILE_NAME)
+                .field(PublishConstants.ROTATE_EVERY_KB)
+                .field(PublishConstants.NUMBER_OF_FILES)
                 .build();
     }
 
