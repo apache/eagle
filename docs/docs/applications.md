@@ -160,7 +160,7 @@ The example policy monitors the 'kill' operation on jobId under "BASE".
     |   Fields   ||
     | :---: | :---: |
     | **Type**    | *HADOOP_JMX_METRIC_MONITOR* |
-    | **Version** | *0.5.0-version* |
+    | **Version** | *0.5.1-version* |
     | **Description** | *Collect JMX Metric and monitor in real-time* |
     | **Streams** | *HADOOP_JMX_METRIC_STREAM* |
     | **Configuration** | *JMX Metric Kafka Topic (default: hadoop_jmx_metric_{SITE_ID})*<br/><br/>*Kafka Broker List (default: localhost:6667)* |
@@ -368,7 +368,7 @@ Then, enable the policy in web ui after it's created. Eagle will schedule it aut
     |   Fields   ||
     | :---: | :---: |
     | **Type**    | *TOPOLOGY_HEALTH_CHECK* |
-    | **Version** | *0.5.0-version* |
+    | **Version** | *0.5.1-version* |
     | **Description** | *Collect MR,HBASE,HDFS node status and cluster ratio* |
     | **Streams** | *TOPOLOGY_HEALTH_CHECK_STREAM* |
     | **Configuration** | *Topology Health Check Topic (default: topology_health_check)*<br/><br/>*Kafka Broker List (default: sandobox.hortonworks.com:6667)* |

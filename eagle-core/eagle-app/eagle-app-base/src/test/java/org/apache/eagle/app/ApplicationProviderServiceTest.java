@@ -46,7 +46,7 @@ public class ApplicationProviderServiceTest extends ApplicationTestBase {
         assertNull(providerManager.getApplicationDescByType("TEST_APPLICATION").getViewPath());
         assertEquals(Version.version,providerManager.getApplicationDescByType("TEST_APPLICATION").getVersion());
         assertEquals("/apps/test_web_app",providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getViewPath());
-        assertEquals("0.5.0-beta",providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getVersion());
+        assertEquals("0.5.1",providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getVersion());
         assertNotNull(providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getDependencies());
         assertEquals(1,providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getDependencies().size());
         assertEquals("TEST_APPLICATION",providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getDependencies().get(0).getType());
