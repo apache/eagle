@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.service.client.impl;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.log.entity.test.TestEntity;
 import org.apache.eagle.service.client.ListQueryAPIResponseConvertHelper;

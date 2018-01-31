@@ -17,7 +17,7 @@
 package org.apache.eagle.common.config;
 
 import com.typesafe.config.Config;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 
