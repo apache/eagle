@@ -63,7 +63,7 @@ public class TestListQueryResource extends TestHBaseBase {
 //			rowkeys = prepareTestEntity(200);
 		} catch (Exception e) {
 			e.printStackTrace();
-			junit.framework.Assert.fail(e.getMessage());
+			org.junit.Assert.fail(e.getMessage());
 		}
 		endTime = System.currentTimeMillis();
 
@@ -73,7 +73,7 @@ public class TestListQueryResource extends TestHBaseBase {
 		try {
 			compiler = new ListQueryCompiler(TEST_TIME_SERIES_API_SERVICE +"[@cluster=\"test4UT\" and @datacenter = \"dc1\"]{@field1,@field2}");
 		} catch (Exception e) {
-			junit.framework.Assert.fail(e.getMessage());
+			org.junit.Assert.fail(e.getMessage());
 		}
 		scan.setFilter(compiler.filter());
 //		scan.setStartRow(EagleBase64Wrapper.decode(rowkeys.get(0)));

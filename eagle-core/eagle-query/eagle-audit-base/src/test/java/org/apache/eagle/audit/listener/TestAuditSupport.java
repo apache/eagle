@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.audit.listener;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.eagle.audit.common.AuditListenerMap;
 import org.apache.eagle.audit.entity.GenericAuditEntity;
 import org.junit.Test;

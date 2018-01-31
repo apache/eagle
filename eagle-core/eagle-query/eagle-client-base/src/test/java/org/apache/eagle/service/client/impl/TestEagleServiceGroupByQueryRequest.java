@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.service.client.impl;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceGroupByQueryRequest;
 import org.junit.Test;
