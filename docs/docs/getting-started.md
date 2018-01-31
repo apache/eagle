@@ -121,7 +121,7 @@ Here is an example ApplicationDesc of `JPM_WEB_APP`
         version: "0.5.1",
         description: null,
         appClass: "org.apache.eagle.app.StaticApplication",
-        jarPath: "/opt/eagle/0.5.1-SNAPSHOT-build-20161103T0332/eagle-0.5.1-SNAPSHOT/lib/eagle-topology-0.5.1-SNAPSHOT-hadoop-2.4.1-11-assembly.jar",
+        jarPath: "/opt/eagle/eagle-0.5.1/lib/eagle-topology-0.5.1-SNAPSHOT-hadoop-2.4.1-11-assembly.jar",
         viewPath: "/apps/jpm",
         providerClass: "org.apache.eagle.app.jpm.JPMWebApplicationProvider",
         configuration: {
