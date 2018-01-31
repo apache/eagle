@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.function.Function;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -517,6 +518,7 @@ public class MRJobParser implements Runnable {
             connection.setReadTimeout(READ_TIMEOUT);
             is = connection.getInputStream();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dt = db.parse(is);
             Element element = dt.getDocumentElement();
