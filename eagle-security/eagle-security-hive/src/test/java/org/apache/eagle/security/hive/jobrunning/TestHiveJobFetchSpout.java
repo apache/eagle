@@ -19,7 +19,7 @@ package org.apache.eagle.security.hive.jobrunning;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
