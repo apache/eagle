@@ -44,6 +44,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
@@ -201,6 +202,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
                 is = connection.getInputStream();
                 Map<String, String> hiveQueryLog = new HashMap<>();
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document dt = db.parse(is);
                 Element element = dt.getDocumentElement();
