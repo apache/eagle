@@ -43,8 +43,8 @@ The fastest way to get started with Eagle is to run with [docker](https://github
 
       docker run -p 9099:9099 -p 8080:8080 -p 8744:8744 -p 2181:2181 -p 2888:2888 -p 6667:6667 -p 60020:60020 \
         -p 60030:60030 -p 60010:60010 -d --dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh \
-        -e KEYCHAIN= --env EAGLE_SERVER_HOST=server.eagle.incubator.apache.org --name sandbox \
-        -h server.eagle.incubator.apache.org --privileged=true apacheeagle/sandbox:latest \
+        -e KEYCHAIN= --env EAGLE_SERVER_HOST=server.eagle.apache.org --name sandbox \
+        -h server.eagle.apache.org --privileged=true apacheeagle/sandbox:latest \
         --tag ambari-server=true
       docker run -it --rm -e EXPECTED_HOST_COUNT=1 -e BLUEPRINT=hdp-singlenode-eagle --link sandbox:ambariserver\
         --entrypoint /bin/sh apacheeagle/sandbox:latest -c /tmp/install-cluster.sh
@@ -52,8 +52,8 @@ The fastest way to get started with Eagle is to run with [docker](https://github
       
 * Build eagle docker image from source code with [eagle-docker](eagle-external/eagle-docker):
 
-        git clone https://github.com/apache/incubator-eagle.git
-        cd incubator-eagle && ./eagle-docker boot
+        git clone https://github.com/apache/eagle.git
+        cd eagle && ./eagle-docker boot
 
 ## Usage ##
 Basic usage of the entry script of eagle-docker: [bin/eagle-docker.sh](bin/eagle-docker.sh)
@@ -115,8 +115,8 @@ Basic usage of the entry script of eagle-docker: [bin/eagle-docker.sh](bin/eagle
   * Storm UI: `http://{{container_ip}}:8744`
 
 ## Get Help
-The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.incubator.apache.org](mailto:dev@eagle.incubator.apache.org),
-and remember to subscribe our mail list via [dev-subscribe@eagle.incubator.apache.org](mailto:dev-subscribe@eagle.incubator.apache.org)
+The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.apache.org](mailto:dev@eagle.apache.org),
+and remember to subscribe our mail list via [dev-subscribe@eagle.apache.org](mailto:dev-subscribe@eagle.apache.org)
 
 ## FAQ
 [https://cwiki.apache.org/confluence/display/EAG/FAQ#FAQ-EagleDocker](https://cwiki.apache.org/confluence/display/EAG/FAQ#FAQ-EagleDocker)
