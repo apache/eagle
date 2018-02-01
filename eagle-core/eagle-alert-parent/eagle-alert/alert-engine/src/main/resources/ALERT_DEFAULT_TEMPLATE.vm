@@ -290,7 +290,7 @@
                 <tr>
                     <!-- Copyright -->
                     <td align="center">
-                        <p><i>Powered by <a href="http://eagle.incubator.apache.org">Apache Eagle</a> (version: $alert["version"])</i></p>
+                        <p><i>Powered by <a href="http://eagle.apache.org">Apache Eagle</a> (version: $alert["version"])</i></p>
                     </td>
                 </tr>
             </table>

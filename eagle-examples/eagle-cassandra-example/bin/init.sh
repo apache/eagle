@@ -227,7 +227,7 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
 		"description": "Alert[cf_ customer_details_and_ ks_ dg_keyspace_policy]",
 		"policyDef": "{\"expression\":\"from cassandraQueryLogStream[(cf == \\\"customer_details\\\") and (ks == \\\"dg_keyspace\\\")] select * insert into outputStream;\",\"type\":\"siddhiCEPEngine\"}",
 		"dedupeDef": "{\"alertDedupIntervalMin\": 10,\"emailDedupIntervalMin\": 10}",
-		"notificationDef": "[{\"sender\":\"no-reply@eagle.incubator.apache.org\",\"recipients\":\"no-reply@eagle.incubator.apache.org\",\"subject\":\"Alert[cf_ customer_details_and_ ks_ dg_keyspace_policy]\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]",
+		"notificationDef": "[{\"sender\":\"no-reply@eagle.apache.org\",\"recipients\":\"no-reply@eagle.apache.org\",\"subject\":\"Alert[cf_ customer_details_and_ ks_ dg_keyspace_policy]\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]",
 		"remediationDef": "",
 		"enabled": true,
 		"owner": "admin",
