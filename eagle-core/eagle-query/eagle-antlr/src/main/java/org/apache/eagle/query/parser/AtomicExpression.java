@@ -17,51 +17,57 @@
 package org.apache.eagle.query.parser;
 
 public class AtomicExpression {
-	private String key;
-	private ComparisonOperator op;
-	private String value;
-	private TokenType keyType;
-	private TokenType valueType;
+    private String key;
+    private ComparisonOperator op;
+    private String value;
+    private TokenType keyType;
+    private TokenType valueType;
 
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public ComparisonOperator getOp() {
-		return op;
-	}
-	public void setOp(ComparisonOperator op) {
-		this.op = op;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}
-	public String toString(){
-		if(this.valueType == TokenType.STRING){
-			return key + op + "\"" + value + "\"";
-		}else{
-			return key + op + value;
-		}
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public TokenType getKeyType() {
-		return keyType;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public void setKeyType(TokenType keyType) {
-		this.keyType = keyType;
-	}
-	
-	public TokenType getValueType() {
-		return valueType;
-	}
+    public ComparisonOperator getOp() {
+        return op;
+    }
 
-	public void setValueType(TokenType type) {
-		this.valueType = type;
-	}
+    public void setOp(ComparisonOperator op) {
+        this.op = op;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String toString() {
+        if (this.valueType == TokenType.STRING) {
+            return key + op + "\"" + value + "\"";
+        } else {
+            return key + op + value;
+        }
+    }
+
+    public TokenType getKeyType() {
+        return keyType;
+    }
+
+    public void setKeyType(TokenType keyType) {
+        this.keyType = keyType;
+    }
+
+    public TokenType getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(TokenType type) {
+        this.valueType = type;
+    }
 }

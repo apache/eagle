@@ -35,23 +35,22 @@ public class Result {
         Map<Class<?>, ProcessorResult> processorResults = result.getProcessorResults();
         Map<Class<?>, TaggedLogAPIEntity> processorEntities = result.getProcessorEntities();
 
+        String typeName = type.getName();
+        if (!processorEntities.values().isEmpty()) {
+            alertEntities.put(typeName, new ArrayList<>());
+            alertEntities.get(typeName).addAll(processorEntities.values());
+        }
+
         for (Class<?> processorType : processorResults.keySet()) {
             ProcessorResult processorResult = processorResults.get(processorType);
 
-            if (processorResult.resultLevel.equals(ResultLevel.NONE)) {
-                continue;
-            }
-
-            String typeName = type.getName();
+            normalizeResult(processorResult);
             if (!alertMessages.containsKey(typeName)) {
                 alertMessages.put(typeName, new ArrayList<>());
-                alertEntities.put(typeName, new ArrayList<>());
             }
-            normalizeResult(processorResult);
             alertMessages.get(typeName).add(processorResult);
-            alertEntities.get(typeName).add(processorEntities.get(processorType));
-
         }
+
     }
 
     public Map<String, List<ProcessorResult>> getAlertMessages() {
@@ -80,15 +79,17 @@ public class Result {
         WARNING,
         CRITICAL;
 
-        private static final Map<String, ResultLevel> stringToLevels = new HashMap<>();
-        static {
-            for (ResultLevel level : values()) {
-                stringToLevels.put(level.toString(), level);
-            }
+        public static ResultLevel fromString(String levelString) {
+            return ResultLevel.valueOf(levelString);
         }
 
-        public static ResultLevel fromString(String levelString) {
-            return stringToLevels.get(levelString);
+        public static boolean contains(String levelString) {
+            for (ResultLevel level : ResultLevel.values()) {
+                if (level.name().equals(levelString)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

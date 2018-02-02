@@ -119,7 +119,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
                     }
                 }
                 jobHistoryFiles.clear();
-                LOG.info("after filtering, number of job history files " + processQueue.size());
+                LOG.info("after filtering, number of job history files " + allJobHistoryFiles.size());
             }
 
             Collections.sort(allJobHistoryFiles,

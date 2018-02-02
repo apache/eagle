@@ -22,6 +22,7 @@ import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;
 import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.DashboardEntityService;
+import org.apache.eagle.metadata.service.PolicyEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
 
 public class MemoryMetadataStore extends MetadataStore {
@@ -31,5 +32,6 @@ public class MemoryMetadataStore extends MetadataStore {
         bind(ApplicationEntityService.class).to(ApplicationEntityServiceMemoryImpl.class).in(Singleton.class);
         bind(IMetadataDao.class).to(InMemMetadataDaoImpl.class).in(Singleton.class);
         bind(DashboardEntityService.class).to(DashboardEntityServiceMemoryImpl.class).in(Singleton.class);
+        bind(PolicyEntityService.class).to(PolicyEntityServiceMemoryImpl.class).in(Singleton.class);
     }
 }

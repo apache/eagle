@@ -34,9 +34,15 @@
 			list._promise = promise.then(function (res) {
 				var data = res.data;
 				list.splice(0);
-				Array.prototype.push.apply(list, data.data);
+				if (typeof data.data === 'object') {
+					Array.prototype.push.apply(list, data.data);
+				} else {
+					list.push(data.data);
+				}
 				list._done = true;
 
+				return res;
+			}, function (res) {
 				return res;
 			});
 			return withThen(list);
@@ -148,9 +154,7 @@
 
 		Entity.deleteMetadata = function (url) {
 			return {
-				_promise: $authHttp.delete(_host + "/rest/metadata/" + url).then(function (res) {
-					console.log(res);
-				})
+				_promise: $authHttp.delete(_host + "/rest/metadata/" + url)
 			};
 		};
 

@@ -30,17 +30,20 @@
 		$scope.series = [];
 		$scope.loading = false;
 
+		$scope.metricFilter = '';
 		$scope.site = $wrapState.param.site || Site.list[0].siteId;
 		$scope.metricName = $wrapState.param.metric;
 		$scope.groups = $wrapState.param.groups;
 		$scope.fields = $wrapState.param.fields;
+
+		$scope.currentMetricName = '';
 
 		$scope.commonOption = {};
 
 		$scope.metricList = [$scope.metricName];
 		CompatibleEntity.groups({
 			query: 'MetricSchemaService',
-			groups: 'name',
+			groups: 'metricName',
 			fields: 'count',
 			limit: 9999,
 		})._promise.then(function (res) {
@@ -50,6 +53,8 @@
 		});
 
 		$scope.loadSeries = function() {
+			$scope.currentMetricName = $scope.metricName;
+
 			$scope.series = CompatibleEntity.timeSeries({
 				condition: { site: $scope.site },
 				groups: $scope.groups,

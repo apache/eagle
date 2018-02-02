@@ -18,7 +18,7 @@ package org.apache.eagle.app.service;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;

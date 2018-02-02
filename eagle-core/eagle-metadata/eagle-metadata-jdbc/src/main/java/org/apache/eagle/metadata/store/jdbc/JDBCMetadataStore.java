@@ -21,14 +21,17 @@ import com.google.inject.Singleton;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
+import org.apache.eagle.metadata.model.PolicyEntity;
 import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.DashboardEntityService;
+import org.apache.eagle.metadata.service.PolicyEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
 import org.apache.eagle.metadata.store.jdbc.provider.JDBCDataSourceProvider;
 import org.apache.eagle.metadata.store.jdbc.provider.JDBCMetadataStoreConfigProvider;
 import org.apache.eagle.metadata.store.jdbc.service.ApplicationEntityServiceJDBCImpl;
 import org.apache.eagle.metadata.store.jdbc.service.DashboardEntityServiceJDBCImpl;
+import org.apache.eagle.metadata.store.jdbc.service.PolicyEntityServiceJDBCImpl;
 import org.apache.eagle.metadata.store.jdbc.service.SiteEntityServiceJDBCImpl;
 
 import javax.sql.DataSource;
@@ -43,5 +46,6 @@ public class JDBCMetadataStore extends MetadataStore {
         bind(ApplicationEntityService.class).to(ApplicationEntityServiceJDBCImpl.class).in(Singleton.class);
         bind(SiteEntityService.class).to(SiteEntityServiceJDBCImpl.class).in(Singleton.class);
         bind(DashboardEntityService.class).to(DashboardEntityServiceJDBCImpl.class).in(Singleton.class);
+        bind(PolicyEntityService.class).to(PolicyEntityServiceJDBCImpl.class).in(Singleton.class);
     }
 }

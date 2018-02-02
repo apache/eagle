@@ -24,8 +24,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class AlertDeduplication {
+    private String outputStreamId;
     private String dedupIntervalMin;
     private List<String> dedupFields;
+
+    public String getOutputStreamId() {
+        return outputStreamId;
+    }
+
+    public void setOutputStreamId(String outputStreamId) {
+        this.outputStreamId = outputStreamId;
+    }
 
     public String getDedupIntervalMin() {
         return dedupIntervalMin;
@@ -46,6 +55,7 @@ public class AlertDeduplication {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(outputStreamId)
                 .append(dedupFields)
                 .append(dedupIntervalMin)
                 .build();
@@ -61,7 +71,8 @@ public class AlertDeduplication {
         }
         AlertDeduplication another = (AlertDeduplication) that;
         if (ListUtils.isEqualList(another.dedupFields, this.dedupFields)
-                && Objects.equals(another.dedupIntervalMin, this.dedupIntervalMin)) {
+                && Objects.equals(another.dedupIntervalMin, this.dedupIntervalMin)
+                && Objects.equals(another.outputStreamId, this.outputStreamId)) {
             return true;
         }
         return false;

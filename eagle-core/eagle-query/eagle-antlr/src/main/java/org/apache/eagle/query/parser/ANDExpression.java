@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ANDExpression {
-	// TODO use Set data structure to dedupe for optimization?
-	private List<AtomicExpression> atomicExpressionList = new ArrayList<AtomicExpression>();
+    // TODO use Set data structure to dedupe for optimization?
+    private List<AtomicExpression> atomicExpressionList = new ArrayList<AtomicExpression>();
 
-	public List<AtomicExpression> getAtomicExprList() {
-		return atomicExpressionList;
-	}
+    public List<AtomicExpression> getAtomicExprList() {
+        return atomicExpressionList;
+    }
 
-	public void setAtomicExprList(List<AtomicExpression> list) {
-		this.atomicExpressionList = list;
-	}
+    public void setAtomicExprList(List<AtomicExpression> list) {
+        this.atomicExpressionList = list;
+    }
 }

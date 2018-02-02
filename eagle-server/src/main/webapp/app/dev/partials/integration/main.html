@@ -20,6 +20,7 @@
 	<ul class="nav nav-tabs">
 		<li ng-class="{active: getState().indexOf('integration.site') !== -1}"><a href="#/integration/siteList">Sites</a></li>
 		<li ng-class="{active: getState() === 'integration.applicationList'}"><a href="#/integration/applicationList">Applications</a></li>
+		<li ng-class="{active: getState() === 'integration.publisherList'}"><a href="#/integration/publisherList">Publishers</a></li>
 	</ul>
 	<div class="tab-content no-padding">
 		<div ui-view></div>

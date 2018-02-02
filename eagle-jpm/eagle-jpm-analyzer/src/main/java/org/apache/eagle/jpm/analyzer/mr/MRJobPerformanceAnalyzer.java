@@ -21,6 +21,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.jpm.analyzer.*;
 import org.apache.eagle.jpm.analyzer.Evaluator;
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.mr.rpc.JobRpcEvaluator;
 import org.apache.eagle.jpm.analyzer.mr.sla.SLAJobEvaluator;
 import org.apache.eagle.jpm.analyzer.mr.suggestion.JobSuggestionEvaluator;
 import org.apache.eagle.jpm.analyzer.publisher.EagleStorePublisher;
@@ -42,13 +43,12 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
     private List<Evaluator> evaluators = new ArrayList<>();
     private List<Publisher> publishers = new ArrayList<>();
 
-    private Config config;
     private AlertDeduplicator alertDeduplicator;
 
     public MRJobPerformanceAnalyzer(Config config) {
-        this.config = config;
         evaluators.add(new SLAJobEvaluator(config));
         evaluators.add(new JobSuggestionEvaluator(config));
+        evaluators.add(new JobRpcEvaluator());
 
         publishers.add(new EagleStorePublisher(config));
         publishers.add(new EmailPublisher(config));
@@ -57,7 +57,7 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
     }
 
     @Override
-    public void analyze(T analyzerJobEntity) throws Exception {
+    public Result analyze(T analyzerJobEntity) throws Exception {
         Result result = new Result();
 
         for (Evaluator evaluator : evaluators) {
@@ -73,11 +73,12 @@ public class MRJobPerformanceAnalyzer<T extends AnalyzerEntity> implements JobAn
 
         if (alertDeduplicator.dedup(analyzerJobEntity, result)) {
             LOG.info("skip publish job {} alert because it is duplicated", analyzerJobEntity.getJobId());
-            return;
+            return null;
         }
 
         for (Publisher publisher : publishers) {
             publisher.publish(analyzerJobEntity, result);
         }
+        return result;
     }
 }

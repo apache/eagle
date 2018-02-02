@@ -19,7 +19,7 @@ limitations under the License.
 
 # What is Eagle
 
-** Apache Eagle ** (incubating) is a highly extensible, scalable monitoring and alerting platform, designed with its flexible application framework and proven big data technologies, such as Kafka, Spark and Storm. It ships a rich set of applications for big data platform monitoring, e.g. HDFS/HBase/YARN service health check, JMX metrics, daemon logs, audit logs and yarn applications. External Eagle developers can define applications to monitoring their NoSQLs or Web Servers, and publish to Eagle application repository at your own discretion. It also provides the state-of-art alert engine to report security breaches, service failures, and application anomalies, highly customizable by the alert policy definition. 
+** Apache Eagle ** is a highly extensible, scalable monitoring and alerting platform, designed with its flexible application framework and proven big data technologies, such as Kafka, Spark and Storm. It ships a rich set of applications for big data platform monitoring, e.g. HDFS/HBase/YARN service health check, JMX metrics, daemon logs, audit logs and yarn applications. External Eagle developers can define applications to monitoring their NoSQLs or Web Servers, and publish to Eagle application repository at your own discretion. It also provides the state-of-art alert engine to report security breaches, service failures, and application anomalies, highly customizable by the alert policy definition. 
 
 ![overview](include/images/overview.png)
 
@@ -91,7 +91,7 @@ limitations under the License.
 
 * Data activity represents how user explores data provided by big data platforms. Analyzing data activity and alerting for insecure access are fundamental requirements for securing enterprise data. As data volume is increasing exponentially with Hadoop, Hive, Spark technology, understanding data activities for every user becomes extremely hard, let alone to alert for a single malicious event in real time among petabytes streaming data per day.
 
-* Securing enterprise data starts from understanding data activities for every user. Apache Eagle (incubating, called Eagle in the following) has integrated with many popular big data platforms e.g. Hadoop, Hive, Spark, Cassandra etc. With Eagle user can browse data hierarchy, mark sensitive data and then create comprehensive policy to alert for insecure data access.
+* Securing enterprise data starts from understanding data activities for every user. Apache Eagle (called Eagle in the following) has integrated with many popular big data platforms e.g. Hadoop, Hive, Spark, Cassandra etc. With Eagle user can browse data hierarchy, mark sensitive data and then create comprehensive policy to alert for insecure data access.
 
 ## Job Performance Analysis
 
@@ -109,4 +109,4 @@ limitations under the License.
 
 # Disclaimer
 
-* Apache Eagle now is being incubated, and therefore, across the whole documentation site, all appearances of case-insensitive word `eagle` and `apache eagle` represent `Apache Eagle (incubating)`. This could be seen as a part of disclaimer.
+* Apache Eagle has become a Top Level Project (TLP) of Apache Software Foundation (ASF) since Jan 10th, 2017, and therefore, across the whole documentation site, all appearances of case-insensitive word `eagle` and `apache eagle` represent `Apache Eagle`. This could be seen as a part of disclaimer.

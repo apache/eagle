@@ -196,8 +196,31 @@
 					<div editor placeholder="Please input alert body (support template)" ng-model="policy.alertDefinition.body" ng-disabled="policyLock"></div>
 				</div>
 
+				<!-- Alert dedup region -->
+				<div>
+					<label>Alert De-duplication</label>
+					<ul>
+						<li ng-repeat="outputStreamDedup in policy.alertDeduplications track by $index">
+							<span>{{outputStreamDedup.outputStreamId}}</span><br />
+							<div class="input-group">
+								<span class="bg-gray disabled input-group-addon">Alert De-duplication Interval(min)</span>
+								<input class="form-control" type="text" ng-model="outputStreamDedup.dedupIntervalMin" ng-disabled="policyLock" />
+							</div>
+
+							<ul class="sm-padding">
+								<li ng-repeat="field in getOutputStreamFields(outputStreamDedup.outputStreamId) track by $index">
+									<input type="checkbox" ng-disabled="policyLock"
+											ng-checked="isDedupFieldSelected(outputStreamDedup, field)"
+											ng-click="checkDedupField(outputStreamDedup, field)" />
+									{{field}}
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+
 				<label>
-					Publish Alerts
+					Alert Publishers *
 				</label>
 
 				<ul class="sm-padding">
@@ -229,6 +252,13 @@
 							<label>Schedule Parallelism *</label>
 							<input type="text" class="form-control" ng-model="policy.parallelismHint" ng-disabled="policyLock" />
 						</div>
+						<!--
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" ng-checked="savePrototype" ng-click="savePrototype = !savePrototype">
+								Make this Policy as Prototype
+							</label>
+						</div> -->
 					</div>
 				</div>
 			</div>
@@ -329,10 +359,6 @@
 							<small ng-if="checkPublisherName()">({{checkPublisherName()}})</small>
 						</label>
 						<input class="form-control" ng-model="publisher.name" />
-					</div>
-					<div class="form-group">
-						<label>Dedup-Interval Minutes</label>
-						<input class="form-control" ng-model="publisher.dedupIntervalMin" />
 					</div>
 					<div class="form-group">
 						<label>Type</label>

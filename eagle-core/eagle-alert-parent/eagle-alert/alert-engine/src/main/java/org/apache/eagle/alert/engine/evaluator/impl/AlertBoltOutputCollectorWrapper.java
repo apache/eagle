@@ -49,28 +49,32 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
 
     @Override
     public void emit(AlertStreamEvent event) {
+        if (event == null) {
+            return;
+        }
+        event.ensureAlertId();
         Set<PublishPartition> clonedPublishPartitions = new HashSet<>(publishPartitions);
         for (PublishPartition publishPartition : clonedPublishPartitions) {
             // skip the publish partition which is not belong to this policy and also check streamId
             PublishPartition cloned = publishPartition.clone();
             Optional.ofNullable(event)
-                .filter(x -> x != null
-                    && x.getSchema() != null
-                    && cloned.getPolicyId().equalsIgnoreCase(x.getPolicyId())
-                    && (cloned.getStreamId().equalsIgnoreCase(x.getSchema().getStreamId())
-                    || cloned.getStreamId().equalsIgnoreCase(Publishment.STREAM_NAME_DEFAULT)))
-                .ifPresent(x -> {
-                    cloned.getColumns().stream()
-                        .filter(y -> event.getSchema().getColumnIndex(y) >= 0
-                            && event.getSchema().getColumnIndex(y) < event.getSchema().getColumns().size())
-                        .map(y -> event.getData()[event.getSchema().getColumnIndex(y)])
-                        .filter(y -> y != null)
-                        .forEach(y -> cloned.getColumnValues().add(y));
-                    synchronized (outputLock) {
-                        streamContext.counter().incr("alert_count");
-                        delegate.emit(Arrays.asList(cloned, event));
-                    }
-                });
+                    .filter(x -> x != null
+                            && x.getSchema() != null
+                            && cloned.getPolicyId().equalsIgnoreCase(x.getPolicyId())
+                            && (cloned.getStreamId().equalsIgnoreCase(x.getSchema().getStreamId())
+                            || cloned.getStreamId().equalsIgnoreCase(Publishment.STREAM_NAME_DEFAULT)))
+                    .ifPresent(x -> {
+                        cloned.getColumns().stream()
+                                .filter(y -> event.getSchema().getColumnIndex(y) >= 0
+                                        && event.getSchema().getColumnIndex(y) < event.getSchema().getColumns().size())
+                                .map(y -> event.getData()[event.getSchema().getColumnIndex(y)])
+                                .filter(y -> y != null)
+                                .forEach(y -> cloned.getColumnValues().add(y));
+                        synchronized (outputLock) {
+                            streamContext.counter().incr("alert_count");
+                            delegate.emit(Arrays.asList(cloned, event));
+                        }
+                    });
         }
     }
 

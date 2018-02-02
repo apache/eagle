@@ -39,6 +39,7 @@ public class AlertStreamEvent extends StreamEvent {
     private long createdTime;
     private String category;
     private AlertSeverity severity = AlertSeverity.WARNING;
+    private boolean duplicationChecked = false;
 
     // ----------------------
     // Lazy Alert Fields
@@ -186,5 +187,13 @@ public class AlertStreamEvent extends StreamEvent {
 
     public void setSiteId(String siteId) {
         this.siteId = siteId;
+    }
+
+    public boolean isDuplicationChecked() {
+        return duplicationChecked;
+    }
+
+    public void setDuplicationChecked(boolean duplicationChecked) {
+        this.duplicationChecked = duplicationChecked;
     }
 }

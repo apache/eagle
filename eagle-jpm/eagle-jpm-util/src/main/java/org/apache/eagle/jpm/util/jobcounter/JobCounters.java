@@ -56,6 +56,14 @@ public final class JobCounters implements Serializable {
         }
     }
 
+    public Long getCounterValue(String groupName, String counterName) {
+        if (counters.containsKey(groupName) && counters.get(groupName).containsKey(counterName)) {
+            return counters.get(groupName).get(counterName);
+        } else {
+            return 0L;
+        }
+    }
+
     public static enum GroupName {
         FileSystemCounters("org.apache.hadoop.mapreduce.FileSystemCounter", "FileSystemCounters"),
         MapReduceTaskCounter("org.apache.hadoop.mapreduce.TaskCounter", "MapReduceTaskCounter"),
@@ -80,10 +88,15 @@ public final class JobCounters implements Serializable {
 
     public static enum CounterName {
 
-        FILE_BYTES_READ(GroupName.FileSystemCounters, "FILE_BYTES_READ", "FILE_BYTES_READ"),
-        FILE_BYTES_WRITTEN(GroupName.FileSystemCounters, "FILE_BYTES_WRITTEN", "FILE_BYTES_WRITTEN"),
-        HDFS_BYTES_READ(GroupName.FileSystemCounters, "HDFS_BYTES_READ", "HDFS_BYTES_READ"),
-        HDFS_BYTES_WRITTEN(GroupName.FileSystemCounters, "HDFS_BYTES_WRITTEN", "HDFS_BYTES_WRITTEN"),
+        FILE_BYTES_READ(GroupName.FileSystemCounters, "FILE_BYTES_READ", "File read bytes"),
+        FILE_BYTES_WRITTEN(GroupName.FileSystemCounters, "FILE_BYTES_WRITTEN", "File written bytes"),
+        HDFS_BYTES_READ(GroupName.FileSystemCounters, "HDFS_BYTES_READ", "HDFS read bytes"),
+        HDFS_BYTES_WRITTEN(GroupName.FileSystemCounters, "HDFS_BYTES_WRITTEN", "HDFS written bytes"),
+        HDFS_READ_OPS(GroupName.FileSystemCounters, "HDFS_READ_OPS", "HDFS read ops"),
+        HDFS_WRITE_OPS(GroupName.FileSystemCounters, "HDFS_WRITE_OPS", "HDFS write ops"),
+
+        MILLIS_MAPS(GroupName.MapReduceJobCounter, "MILLIS_MAPS", "total maps mills"),
+        MILLIS_REDUCES(GroupName.MapReduceJobCounter, "MILLIS_REDUCES", "total reduce mills"),
 
         MAP_INPUT_RECORDS(GroupName.MapReduceTaskCounter, "MAP_INPUT_RECORDS", "Map input records"),
         MAP_OUTPUT_RECORDS(GroupName.MapReduceTaskCounter, "MAP_OUTPUT_RECORDS", "Map output records"),

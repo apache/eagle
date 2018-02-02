@@ -443,4 +443,75 @@
 			$("#appMDL").modal();
 		};
 	});
+
+	// ======================================================================================
+	// =                                      Publisher                                     =
+	// ======================================================================================
+	eagleControllers.controller('integrationPublisherListCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity, UI) {
+		PageConfig.title = "Integration";
+		PageConfig.subTitle = "Publishers";
+
+		function refreshPublishList() {
+			$scope.publisherList = Entity.queryMetadata("publishments");
+		}
+
+		$scope.gotoPolicy = function (policyName) {
+			var encodePolicyName = encodeURIComponent(policyName);
+			var policyList = Entity.queryMetadata("policies/" + encodePolicyName);
+			policyList._then(function () {
+				var policy = policyList[0];
+				if (!policy) {
+					$.dialog({
+						title: 'OPS',
+						content: 'Policy not found!',
+					});
+					return;
+				}
+
+				$wrapState.go("policyDetail", {siteId: policy.siteId, name: policy.name});
+			});
+		};
+
+		$scope.showPublisher = function (publisher) {
+			var $ul = $('<ul>');
+			$.each(publisher.policyIds, function (i, policyName) {
+				var $a = $("<a>").text(policyName);
+				$a.click(function () {
+					$scope.gotoPolicy(policyName);
+					$dlg.modal('hide');
+				});
+
+				$ul.append(
+					$("<li>").append($a)
+				);
+			});
+
+			var $dlg = $.dialog({
+				title: "Policy List",
+				content: $ul,
+			});
+		};
+
+		$scope.deletePublisher = function ($event, publisher) {
+			$event.stopPropagation();
+
+			UI.deleteConfirm(publisher.name)(function (entity, closeFunc) {
+				Entity.deleteMetadata("publishments/" + publisher.name)._promise.then(function (res) {
+					var data = res.data;
+
+					if (data.code !== 200) {
+						$.dialog({
+							title: 'OPS',
+							content: data.message,
+						});
+					}
+				}).finally(function () {
+					closeFunc();
+					refreshPublishList();
+				});
+			});
+		};
+
+		refreshPublishList();
+	});
 }());

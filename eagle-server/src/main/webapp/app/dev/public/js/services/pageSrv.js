@@ -103,13 +103,16 @@
 				{name: "Streams", path: "#/site/" + site.siteId + "/streams"},
 			];
 
-			if (Auth.isAdmin) {
-				alertPortal.push(
-					{name: "Define Policy", path: "#/site/" + site.siteId + "/policy/create"}
-				);
-			}
+			Auth.getPromise().then(function () {
+				if (Auth.isAdmin) {
+					alertPortal.push(
+						{name: "Prototypes", path: "#/site/" + site.siteId + "/policy/prototypes"},
+						{name: "Define Policy", path: "#/site/" + site.siteId + "/policy/create"}
+					);
+				}
+			});
 
-			return[
+			return [
 				{name: site.siteName || site.siteId + " Home", icon: "home", path: "#/site/" + site.siteId},
 				{name: "Alert", icon: "bell", list: alertPortal},
 			];

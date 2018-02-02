@@ -192,19 +192,57 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>submissionTime</name>
-                    <type>long</type>
-                </column>
-                <column>
                     <name>trackingUrl</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>startTime</name>
-                    <type>long</type>
+                    <name>totalOpsPerSecond</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
                 </column>
                 <column>
-                    <name>endTime</name>
+                    <name>mapOpsPerSecond</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>reduceOpsPerSecond</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgOpsPerTask</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgOpsPerMap</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgOpsPerReduce</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+                <column>
+                    <name>avgMapTime</name>
+                    <type>double</type>
+                </column>
+                <column>
+                    <name>avgReduceTime</name>
+                    <type>double</type>
+                </column>
+                <column>
+                    <name>numTotalMaps</name>
+                    <type>int</type>
+                </column>
+                <column>
+                    <name>numTotalReduces</name>
+                    <type>int</type>
+                </column>
+                <column>
+                    <name>duration</name>
                     <type>long</type>
                 </column>
                 <column>

@@ -18,6 +18,7 @@
 package org.apache.eagle.jpm.analyzer;
 
 import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
+import org.apache.eagle.jpm.analyzer.publisher.Result;
 
 /**
  * Each JobAnalyzer contains one or more Evaluators to analyze each job.
@@ -26,5 +27,5 @@ import org.apache.eagle.jpm.analyzer.meta.model.AnalyzerEntity;
  *
  */
 public interface JobAnalyzer<T extends AnalyzerEntity> {
-    void analyze(T analyzerEntity) throws Exception;
+    Result analyze(T analyzerEntity) throws Exception;
 }

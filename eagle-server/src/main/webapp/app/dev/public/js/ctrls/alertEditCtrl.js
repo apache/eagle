@@ -31,6 +31,100 @@
 		policyEditController.apply(this, newArgs);
 	}
 
+	eagleControllers.controller('policyPrototypesCtrl', function ($scope, $wrapState, Site, PageConfig, Entity, UI) {
+		PageConfig.title = "Policy Prototypes";
+
+		$scope.checkedPrototypes = {};
+
+		function refreshPrototypeList() {
+			$scope.prototypeList = Entity.query('policyProto');
+		}
+
+		$scope.deletePrototype = function (prototype) {
+			UI.deleteConfirm(prototype.name)(function (entity, closeFunc) {
+				Entity.delete("policyProto/" + prototype.uuid)._promise.then(function (res) {
+					var data = res.data;
+
+					if (data.success !== true) {
+						$.dialog({
+							title: 'OPS',
+							content: data.message
+						});
+					}
+				}).finally(function () {
+					closeFunc();
+					refreshPrototypeList();
+				});
+			});
+		};
+
+		$scope.getCheckedList = function () {
+			return $.map($scope.prototypeList, function (proto) {
+				return $scope.checkedPrototypes[proto.name] ? proto : null;
+			});
+		};
+
+		$scope.doCheckAll = function () {
+			if ($scope.getCheckedList().length === $scope.prototypeList.length) {
+				$scope.checkedPrototypes = {};
+			} else {
+				$.each($scope.prototypeList, function (i, proto) {
+					$scope.checkedPrototypes[proto.name] = true;
+				});
+			}
+		};
+
+		$scope.groupCreate = function () {
+			var list = $scope.getCheckedList();
+			$scope.createPolicy(list);
+		};
+
+		$scope.createPolicy = function (protoList) {
+			if (protoList.length === 0) {
+				$.dialog({
+					title: 'OPS',
+					content: 'Please select at least one prototype.',
+				});
+				return;
+			}
+
+			UI.createConfirm('Policy', {}, [
+				{field: "siteId", name: "Site Id", type: 'select', valueList: $.map(Site.list, function (site) {
+					return site.siteId;
+				})}
+			])(function (entity, closeFunc, unlock) {
+				var nameList = $.map(protoList, function (proto) {
+					return proto.name;
+				});
+				Entity.create("policyProto/exportByName/" + entity.siteId, nameList)._then(function (res) {
+					var data = res.data;
+
+					if(!data.success) {
+						$.dialog({
+							title: 'OPS',
+							content: data.message
+						});
+						unlock();
+						return;
+					} else {
+						$.dialog({
+							title: 'Success',
+							content: 'Click confirm to go to the policy page.',
+							confirm: true,
+						}, function (ret) {
+							if (!ret) return;
+
+							$wrapState.go('policyList', {siteId: entity.siteId });
+						});
+					}
+					closeFunc();
+				}, unlock);
+			});
+		};
+
+		refreshPrototypeList();
+	});
+
 	eagleControllers.controller('policyCreateCtrl', function ($scope, $q, $wrapState, $timeout, PageConfig, Entity, Policy) {
 		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
@@ -73,6 +167,7 @@
 				severity: "WARNING",
 				category: "DEFAULT"
 			},
+			alertDeduplications: [],
 			partitionSpec: [],
 			parallelismHint: 5
 		}, $scope.policy);
@@ -87,6 +182,7 @@
 		$scope.streamGroups = {};
 		$scope.newPolicy = !$scope.policy.name;
 		$scope.autoPolicyDescription = $scope.newPolicy && !$scope.policy.description;
+		$scope.savePrototype = false;
 
 		PageConfig.navPath = [
 			{title: "Policy List", path: "/policies"},
@@ -157,12 +253,12 @@
 		};
 
 		/*$scope.checkInputStream = function (streamId) {
-			if($scope.isInputStreamSelected(streamId)) {
-				$scope.policy.inputStreams = common.array.remove(streamId, $scope.policy.inputStreams);
-			} else {
-				$scope.policy.inputStreams.push(streamId);
-			}
-		};*/
+		 if($scope.isInputStreamSelected(streamId)) {
+		 $scope.policy.inputStreams = common.array.remove(streamId, $scope.policy.inputStreams);
+		 } else {
+		 $scope.policy.inputStreams.push(streamId);
+		 }
+		 };*/
 
 		// ==============================================================
 		// =                         Definition                         =
@@ -174,44 +270,75 @@
 		}
 
 		var checkPromise;
+		$scope.definition = {};
 		$scope.definitionMessage = "";
-		$scope.checkDefinition = function () {
+		$scope.checkDefinition = function (keepDefinition) {
 			$timeout.cancel(checkPromise);
 			checkPromise = $timeout(function () {
 				Entity.post("metadata/policies/parse", $scope.policy.definition.value)._then(function (res) {
 					var data = res.data;
 					console.log(data);
 					if(data.success) {
+						$scope.definition = {};
 						$scope.definitionMessage = "";
+
 						if(data.policyExecutionPlan) {
+							$scope.definition = data;
+
 							// Input streams
-							$scope.policy.inputStreams = $.map(data.policyExecutionPlan.inputStreams, function (value, stream) {
+							var inputStreams = $.map(data.policyExecutionPlan.inputStreams, function (value, stream) {
 								return stream;
 							});
 
 							// Output streams
-							var outputStreams= $.map(data.policyExecutionPlan.outputStreams, function (value, stream) {
+							var outputStreams = $.map(data.policyExecutionPlan.outputStreams, function (value, stream) {
 								return stream;
 							});
-							$scope.policy.outputStreams = outputStreams.concat();
+
+							// Partition
+							if (keepDefinition !== true) {
+								$scope.policy.partitionSpec = $.grep(data.policyExecutionPlan.streamPartitions, function (partition) {
+									return $.inArray(partition.streamId, outputStreams) === -1;
+								});
+							}
+
+							var tempStreams = $.grep(inputStreams, function (i) {
+								return $.inArray(i, outputStreams) > -1;
+							});
+
+							$.each(tempStreams, function (i, tempStream) {
+								inputStreams = common.array.remove(tempStream, inputStreams);
+								outputStreams = common.array.remove(tempStream, outputStreams);
+							});
+
+							if (keepDefinition !== true) {
+								$scope.policy.outputStreams = outputStreams.concat();
+								$scope.policy.inputStreams = inputStreams;
+							}
 							$scope.outputStreams = outputStreams;
 							autoDescription();
 
-							// Partition
-							$scope.policy.partitionSpec = data.policyExecutionPlan.streamPartitions;
+							// Dedup fields
+							if (keepDefinition !== true) {
+								$scope.refreshOutputSteamFields();
+							}
 						}
 					} else {
+						$scope.definition = {};
 						$scope.definitionMessage = data.message;
 					}
 				});
 			}, 350);
 		};
 
+		$scope.checkDefinition(true);
+
 		// ==============================================================
 		// =                        Output Stream                       =
 		// ==============================================================
 		$scope.outputStreams = ($scope.policy.outputStreams || []).concat();
 
+		// Select output stream
 		$scope.isOutputStreamSelected = function (streamId) {
 			return $.inArray(streamId, $scope.policy.outputStreams) >= 0;
 		};
@@ -223,6 +350,43 @@
 				$scope.policy.outputStreams.push(streamId);
 			}
 			autoDescription();
+
+			$scope.refreshOutputSteamFields();
+		};
+
+		// Select output steam field
+		$scope.refreshOutputSteamFields = function () {
+			var defOutputStreams = common.getValueByPath($scope.definition || {}, 'policyExecutionPlan.outputStreams');
+			if (!defOutputStreams) return [];
+
+			$scope.policy.alertDeduplications = $.map($scope.policy.outputStreams, function (outputStream) {
+				return {
+					outputStreamId: outputStream,
+					dedupIntervalMin: '30',
+					dedupFields: [],
+				};
+			});
+		};
+		$scope.getOutputStreamFields = function (outputStream) {
+			var defOutputStreams = common.getValueByPath($scope.definition || {}, 'policyExecutionPlan.outputStreams');
+			if (!defOutputStreams) return [];
+
+			var fields = defOutputStreams[outputStream];
+			return $.map(fields, function (field) {
+				return field.name;
+			});
+		};
+
+		$scope.isDedupFieldSelected = function (outputStreamDedup, field) {
+			return $.inArray(field, outputStreamDedup.dedupFields) >= 0;
+		};
+
+		$scope.checkDedupField = function (outputStreamDedup, field) {
+			if($scope.isDedupFieldSelected(field)) {
+				outputStreamDedup.dedupFields = common.array.remove(field, outputStreamDedup.dedupFields);
+			} else {
+				outputStreamDedup.dedupFields.push(field);
+			}
 		};
 
 		// ==============================================================
@@ -281,7 +445,6 @@
 			$scope.publisher = {
 				existPublisher: $scope.publisherList[0],
 				type: "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
-				dedupIntervalMin: "PT1M",
 				serializer : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer",
 				properties: {}
 			};
@@ -377,41 +540,43 @@
 				$q.all(publisherPromiseList).then(function () {
 					console.log("Create publishers success...");
 
-					// Create policy
-					Entity.create("metadata/policies", $scope.policy)._then(function () {
-						console.log("Create policy success...");
-						// Link with publisher
-						Entity.post("metadata/policies/" + $scope.policy.name + "/publishments/", $.map($scope.policyPublisherList, function (publisher) {
-							return publisher.name;
-						}))._then(function () {
-							// Link Success
-							$.dialog({
-								title: "Done",
-								content: "Close dialog to go to the policy detail page."
-							}, function () {
-								$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
-							});
-						}, function (res) {
-							// Link Failed
+					var publisherNameList = $.map($scope.policyPublisherList, function (publisher) {
+						return publisher.name;
+					});
+
+					var policyPromise;
+
+					if ($scope.savePrototype) {
+						policyPromise = Entity.create('policyProto/create?needPolicyProtoCreated=true', {
+							definition: $scope.policy,
+							alertPublishmentIds: publisherNameList
+						});
+					} else {
+						policyPromise = Entity.create('policyProto/create?needPolicyProtoCreated=false', {
+							definition: $scope.policy,
+							alertPublishmentIds: publisherNameList
+						});
+					}
+
+					policyPromise._then(function (res) {
+						var validate = res.data;
+						if (!validate.success) {
 							$.dialog({
 								title: "OPS",
-								content: "Link publishers failed:" + res.data.message
+								content: "Create policy failed: " + (res.data.message || res.data.errors)
 							});
-						}).finally(function () {
 							$scope.policyLock = false;
-						});
-					}, function (res) {
-						var errormsg = "";
-						if(typeof res.data.message !== 'undefined') {
-							errormsg = res.data.message;
-						} else {
-							errormsg = res.data.errors;
+							$scope.saveLock = false;
+							return;
 						}
+
+						console.log("Create policy success...");
 						$.dialog({
-							title: "OPS",
-							content: "Create policy failed: " + errormsg
+							title: "Done",
+							content: "Close dialog to go to the policy detail page."
+						}, function () {
+							$wrapState.go("policyDetail", {name: $scope.policy.name, siteId: $scope.policy.siteId});
 						});
-						$scope.policyLock = false;
 					});
 				}, function (args) {
 					$.dialog({

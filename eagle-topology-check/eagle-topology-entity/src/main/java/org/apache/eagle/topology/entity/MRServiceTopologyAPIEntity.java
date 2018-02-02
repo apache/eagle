@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Prefix("mrservicestatus")
 @Service(TopologyConstants.MR_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
+@Tags( {TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG, TopologyConstants.ROLE_TAG})
 public class MRServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
     private String status;

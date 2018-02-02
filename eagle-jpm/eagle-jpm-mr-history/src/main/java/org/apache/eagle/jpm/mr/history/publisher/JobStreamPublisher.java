@@ -19,7 +19,6 @@
 package org.apache.eagle.jpm.mr.history.publisher;
 
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
-import org.apache.eagle.jpm.mr.history.crawler.EagleOutputCollector;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.slf4j.Logger;

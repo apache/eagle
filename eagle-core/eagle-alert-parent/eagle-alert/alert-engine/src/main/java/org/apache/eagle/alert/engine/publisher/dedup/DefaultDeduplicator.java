@@ -1,38 +1,34 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
  */
-package org.apache.eagle.alert.engine.publisher.impl;
+package org.apache.eagle.alert.engine.publisher.dedup;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.AlertDeduplication;
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
-import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class DefaultDeduplicator implements AlertDeduplicator {
@@ -43,28 +39,25 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     private List<String> customDedupFields = new ArrayList<>();
     private String dedupStateField;
     private String dedupStateCloseValue;
+    private AlertDeduplication alertDeduplication = null;
 
     private DedupCache dedupCache;
 
     private Cache<EventUniq, String> withoutStatesCache;
 
-    public DefaultDeduplicator() {
-        this.dedupIntervalSec = 0;
-    }
-
-    public DefaultDeduplicator(String intervalMin) {
-        setDedupIntervalMin(intervalMin);
-    }
-
-    public DefaultDeduplicator(long intervalMin) {
-        this.dedupIntervalSec = intervalMin;
-    }
-
     public DefaultDeduplicator(AlertDeduplication alertDeduplication) {
+        this.alertDeduplication = alertDeduplication;
         this.customDedupFields = alertDeduplication.getDedupFields();
-        this.dedupIntervalSec = Integer.parseInt(alertDeduplication.getDedupIntervalMin()) * 60;
+        try {
+            this.dedupIntervalSec = Integer.parseInt(alertDeduplication.getDedupIntervalMin()) * 60;
+        } catch (Exception e) {
+            LOG.error("de-duplication intervalSec {} parse error, use 30 min instead", alertDeduplication.getDedupIntervalMin(), e.getMessage());
+            this.dedupIntervalSec = 1800;
+        }
         this.withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
                 this.dedupIntervalSec, TimeUnit.SECONDS).build();
+
+        LOG.info("initialize DefaultDeduplicator with dedupIntervalSec={}, customDedupFields={}", dedupIntervalSec, customDedupFields);
     }
 
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
@@ -83,6 +76,8 @@ public class DefaultDeduplicator implements AlertDeduplicator {
 
         withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
             this.dedupIntervalSec, TimeUnit.SECONDS).build();
+
+        LOG.info("initialize DefaultDeduplicator with dedupIntervalSec={}, customDedupFields={}", dedupIntervalSec, customDedupFields);
     }
 
     /*
@@ -112,6 +107,10 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (event == null) {
             return null;
         }
+        if (dedupIntervalSec <= 0) {
+            return Collections.singletonList(event);
+        }
+
         // check custom field, and get the field values
         StreamDefinition streamDefinition = event.getSchema();
         HashMap<String, String> customFieldValues = new HashMap<>();
@@ -133,7 +132,9 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             // make all of the field as unique key if no custom dedup field provided
             if (colValue != null) {
                 if (customDedupFields == null || customDedupFields.size() <= 0) {
-                    customFieldValues.put(colName, colValue.toString());
+                    if (streamDefinition.getColumns().get(i).getType().equals(StreamColumn.Type.STRING)) {
+                        customFieldValues.put(colName, colValue.toString());
+                    }
                 } else {
                     for (String field : customDedupFields) {
                         if (colName.equals(field)) {
@@ -168,6 +169,10 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             LOG.warn("Fail to pares deDupIntervalMin, will disable deduplication instead", e);
             this.dedupIntervalSec = 0;
         }
+    }
+
+    public AlertDeduplication getAlertDeduplication() {
+        return alertDeduplication;
     }
 
 }

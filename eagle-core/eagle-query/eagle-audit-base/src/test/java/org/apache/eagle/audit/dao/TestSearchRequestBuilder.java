@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.audit.dao;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
 import org.apache.eagle.service.client.IEagleServiceClient;

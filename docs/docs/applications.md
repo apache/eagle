@@ -160,7 +160,7 @@ The example policy monitors the 'kill' operation on jobId under "BASE".
     |   Fields   ||
     | :---: | :---: |
     | **Type**    | *HADOOP_JMX_METRIC_MONITOR* |
-    | **Version** | *0.5.0-version* |
+    | **Version** | *0.5.1-version* |
     | **Description** | *Collect JMX Metric and monitor in real-time* |
     | **Streams** | *HADOOP_JMX_METRIC_STREAM* |
     | **Configuration** | *JMX Metric Kafka Topic (default: hadoop_jmx_metric_{SITE_ID})*<br/><br/>*Kafka Broker List (default: localhost:6667)* |
@@ -181,9 +181,9 @@ The example policy monitors the 'kill' operation on jobId under "BASE".
 
 * Setup metric collector for monitored Hadoop/HBase using hadoop_jmx_collector and modify the configuration.
 
-    * Collector scripts: [hadoop_jmx_collector](https://github.com/apache/incubator-eagle/tree/master/eagle-external/hadoop_jmx_collector)
+    * Collector scripts: [hadoop_jmx_collector](https://github.com/apache/eagle/tree/master/eagle-external/hadoop_jmx_collector)
 
-    * Rename config-sample.json to config.json: [config-sample.json](https://github.com/apache/incubator-eagle/blob/master/eagle-external/hadoop_jmx_collector/config-sample.json)
+    * Rename config-sample.json to config.json: [config-sample.json](https://github.com/apache/eagle/blob/master/eagle-external/hadoop_jmx_collector/config-sample.json)
 
             {
                 env: {
@@ -368,7 +368,7 @@ Then, enable the policy in web ui after it's created. Eagle will schedule it aut
     |   Fields   ||
     | :---: | :---: |
     | **Type**    | *TOPOLOGY_HEALTH_CHECK* |
-    | **Version** | *0.5.0-version* |
+    | **Version** | *0.5.1-version* |
     | **Description** | *Collect MR,HBASE,HDFS node status and cluster ratio* |
     | **Streams** | *TOPOLOGY_HEALTH_CHECK_STREAM* |
     | **Configuration** | *Topology Health Check Topic (default: topology_health_check)*<br/><br/>*Kafka Broker List (default: sandobox.hortonworks.com:6667)* |
@@ -415,7 +415,7 @@ Then, enable the policy in web ui after it's created. Eagle will schedule it aut
 
     * Overall metrics of the cluster: http://{RM_HTTP_ADDRESS}:{PORT}/ws/v1/cluster/metrics
 
-            by version 0.5-incubating, mainly focusing at metrics
+            by version 0.5, mainly focusing at metrics
              - `appsPending`
              - `allocatedMB`
              - `totalMB`

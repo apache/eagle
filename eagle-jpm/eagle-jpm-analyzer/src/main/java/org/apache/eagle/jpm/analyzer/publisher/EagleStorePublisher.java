@@ -44,11 +44,11 @@ public class EagleStorePublisher implements Publisher, Serializable {
 
     @Override
     public void publish(AnalyzerEntity analyzerJobEntity, Result result) {
-        if (result.getAlertMessages().size() == 0) {
+        if (result.getAlertEntities().size() == 0) {
             return;
         }
 
-        LOG.info("EagleStorePublisher gets job {}", analyzerJobEntity.getJobDefId());
+        LOG.info("EagleStorePublisher gets job {}", analyzerJobEntity.getJobId());
 
         try {
             this.client = new EagleServiceClientImpl(config);

@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.service.client.impl;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
