@@ -20,4 +20,6 @@
     <!-- Suppresses files in the src/main folder. To be used for rules which only apply to test
          code. -->
     <suppress files="[\\/]src[\\/]main[\\/].*" id="TestScope"/>
+
+    <suppress checks="Javadoc" files="."/>
 </suppressions>

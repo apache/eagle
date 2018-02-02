@@ -19,59 +19,70 @@ package org.apache.eagle.query.aggregate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AggregateParams{
-	List<String> groupbyFields;
-	boolean counting;
-	List<String> sumFunctionFields = new ArrayList<String>();
-	List<SortFieldOrder> sortFieldOrders = new ArrayList<SortFieldOrder>();
-	
-	public List<SortFieldOrder> getSortFieldOrders() {
-		return sortFieldOrders;
-	}
-	public void setSortFieldOrders(List<SortFieldOrder> sortFieldOrders) {
-		this.sortFieldOrders = sortFieldOrders;
-	}
-	public List<String> getGroupbyFields() {
-		return groupbyFields;
-	}
-	public void setGroupbyFields(List<String> groupbyFields) {
-		this.groupbyFields = groupbyFields;
-	}
-	public boolean isCounting() {
-		return counting;
-	}
-	public void setCounting(boolean counting) {
-		this.counting = counting;
-	}
-	public List<String> getSumFunctionFields() {
-		return sumFunctionFields;
-	}
-	public void setSumFunctionFields(List<String> sumFunctionFields) {
-		this.sumFunctionFields = sumFunctionFields;
-	}
+public class AggregateParams {
+    List<String> groupbyFields;
+    boolean counting;
+    List<String> sumFunctionFields = new ArrayList<String>();
+    List<SortFieldOrder> sortFieldOrders = new ArrayList<SortFieldOrder>();
 
-	public static class SortFieldOrder{
-		public static final String SORT_BY_AGGREGATE_KEY = "key";
-		public static final String SORT_BY_COUNT = "count";
-		private String field;
-		private boolean ascendant;
-		
-		public SortFieldOrder(String field, boolean ascendant) {
-			super();
-			this.field = field;
-			this.ascendant = ascendant;
-		}
-		public String getField() {
-			return field;
-		}
-		public void setField(String field) {
-			this.field = field;
-		}
-		public boolean isAscendant() {
-			return ascendant;
-		}
-		public void setAscendant(boolean ascendant) {
-			this.ascendant = ascendant;
-		} 
-	}
+    public List<SortFieldOrder> getSortFieldOrders() {
+        return sortFieldOrders;
+    }
+
+    public void setSortFieldOrders(List<SortFieldOrder> sortFieldOrders) {
+        this.sortFieldOrders = sortFieldOrders;
+    }
+
+    public List<String> getGroupbyFields() {
+        return groupbyFields;
+    }
+
+    public void setGroupbyFields(List<String> groupbyFields) {
+        this.groupbyFields = groupbyFields;
+    }
+
+    public boolean isCounting() {
+        return counting;
+    }
+
+    public void setCounting(boolean counting) {
+        this.counting = counting;
+    }
+
+    public List<String> getSumFunctionFields() {
+        return sumFunctionFields;
+    }
+
+    public void setSumFunctionFields(List<String> sumFunctionFields) {
+        this.sumFunctionFields = sumFunctionFields;
+    }
+
+    public static class SortFieldOrder {
+        public static final String SORT_BY_AGGREGATE_KEY = "key";
+        public static final String SORT_BY_COUNT = "count";
+        private String field;
+        private boolean ascendant;
+
+        public SortFieldOrder(String field, boolean ascendant) {
+            super();
+            this.field = field;
+            this.ascendant = ascendant;
+        }
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
+
+        public boolean isAscendant() {
+            return ascendant;
+        }
+
+        public void setAscendant(boolean ascendant) {
+            this.ascendant = ascendant;
+        }
+    }
 }

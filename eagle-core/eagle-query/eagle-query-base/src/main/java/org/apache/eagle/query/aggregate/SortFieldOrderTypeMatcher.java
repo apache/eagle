@@ -18,21 +18,21 @@ package org.apache.eagle.query.aggregate;
 
 
 public class SortFieldOrderTypeMatcher {
-	private boolean matched;
-	private AggregateParams.SortFieldOrder sortFieldOrder;
+    private boolean matched;
+    private AggregateParams.SortFieldOrder sortFieldOrder;
 
-	public SortFieldOrderTypeMatcher(boolean matched, String field, String order){
-		this.matched = matched;
-		if(matched){
-			this.sortFieldOrder = new AggregateParams.SortFieldOrder(field, order.equals("asc"));
-		}
-	}
-	
-	public boolean find(){
-		return this.matched;
-	}
-	
-	public AggregateParams.SortFieldOrder sortFieldOrder(){
-		return this.sortFieldOrder;
-	}
+    public SortFieldOrderTypeMatcher(boolean matched, String field, String order) {
+        this.matched = matched;
+        if (matched) {
+            this.sortFieldOrder = new AggregateParams.SortFieldOrder(field, order.equals("asc"));
+        }
+    }
+
+    public boolean find() {
+        return this.matched;
+    }
+
+    public AggregateParams.SortFieldOrder sortFieldOrder() {
+        return this.sortFieldOrder;
+    }
 }

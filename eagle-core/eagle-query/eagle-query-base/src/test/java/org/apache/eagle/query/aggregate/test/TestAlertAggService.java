@@ -23,34 +23,34 @@ import java.util.List;
 import org.junit.Test;
 
 public class TestAlertAggService {
-	@Test
-	public void testCompileAndSplitCondition(){
-		List<String> alertTagNameValues = new ArrayList<String>();
-		String tagNameValue1 = "cluster=cluster1";
-		String tagNameValue2 = "category=checkHadoopFS";
-		String tagNameValue3 = "category=highloadDisk";
-		String tagNameValue4 = "cluster=dc124";
-		String tagNameValue5 = "category=lowloadDisk";
-		alertTagNameValues.add(tagNameValue1);
-		alertTagNameValues.add(tagNameValue2);
-		alertTagNameValues.add(tagNameValue3);
-		alertTagNameValues.add(tagNameValue4);
-		alertTagNameValues.add(tagNameValue5);
-//		AlertAggResource r = new AlertAggResource();
-//		List<List<String>> result = r.compileAndSplitConditions(alertTagNameValues);
-//		Assert.assertEquals(result.size(), 3);
-//		Assert.assertEquals(result.get(0).size(), 3);
-//		Assert.assertTrue(result.get(0).contains(tagNameValue2));
-//		Assert.assertTrue(result.get(0).contains(tagNameValue1));
-//		Assert.assertTrue(result.get(0).contains(tagNameValue4));
-//		Assert.assertEquals(result.get(1).size(), 3);
-//		Assert.assertTrue(result.get(1).contains(tagNameValue3));
-//		Assert.assertTrue(result.get(1).contains(tagNameValue1));
-//		Assert.assertTrue(result.get(1).contains(tagNameValue4));
-//		Assert.assertEquals(result.get(2).size(), 3);
-//		Assert.assertTrue(result.get(2).contains(tagNameValue5));
-//		Assert.assertTrue(result.get(2).contains(tagNameValue1));
-//		Assert.assertTrue(result.get(2).contains(tagNameValue4));
-	}
+    @Test
+    public void testCompileAndSplitCondition() {
+        List<String> alertTagNameValues = new ArrayList<String>();
+        String tagNameValue1 = "cluster = cluster1";
+        String tagNameValue2 = "category = checkHadoopFS";
+        String tagNameValue3 = "category = highloadDisk";
+        String tagNameValue4 = "cluster = dc124";
+        String tagNameValue5 = "category = lowloadDisk";
+        alertTagNameValues.add(tagNameValue1);
+        alertTagNameValues.add(tagNameValue2);
+        alertTagNameValues.add(tagNameValue3);
+        alertTagNameValues.add(tagNameValue4);
+        alertTagNameValues.add(tagNameValue5);
+        //		AlertAggResource r = new AlertAggResource();
+        //		List<List<String>> result = r.compileAndSplitConditions(alertTagNameValues);
+        //		Assert.assertEquals(result.size(), 3);
+        //		Assert.assertEquals(result.get(0).size(), 3);
+        //		Assert.assertTrue(result.get(0).contains(tagNameValue2));
+        //		Assert.assertTrue(result.get(0).contains(tagNameValue1));
+        //		Assert.assertTrue(result.get(0).contains(tagNameValue4));
+        //		Assert.assertEquals(result.get(1).size(), 3);
+        //		Assert.assertTrue(result.get(1).contains(tagNameValue3));
+        //		Assert.assertTrue(result.get(1).contains(tagNameValue1));
+        //		Assert.assertTrue(result.get(1).contains(tagNameValue4));
+        //		Assert.assertEquals(result.get(2).size(), 3);
+        //		Assert.assertTrue(result.get(2).contains(tagNameValue5));
+        //		Assert.assertTrue(result.get(2).contains(tagNameValue1));
+        //		Assert.assertTrue(result.get(2).contains(tagNameValue4));
+    }
 }
 
