@@ -18,7 +18,7 @@
 export EAGLE_SERVER_JMX_PORT=9999
 
 # EAGLE Environment Variables
-export EAGLE_HOME=$(dirname $0)/..
+export EAGLE_HOME=$(readlink -f $(dirname $0)/..)
 export EAGLE_CLASSPATH=$EAGLE_HOME/conf
 
 # System Environment Variables
