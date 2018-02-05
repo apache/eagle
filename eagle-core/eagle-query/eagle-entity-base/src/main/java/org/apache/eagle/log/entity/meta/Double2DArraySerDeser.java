@@ -25,22 +25,23 @@ import java.io.IOException;
  * @since 7/22/15
  */
 public class Double2DArraySerDeser implements EntitySerDeser<double[][]> {
-    private final int SIZE = 8;
+    private static final int SIZE = 8;
+
     @Override
-    public double[][] deserialize(byte[] bytes){
-//        if((bytes.length-4) % SIZE != 0)
-//            return null;
+    public double[][] deserialize(byte[] bytes) {
+        // if((bytes.length-4) % SIZE != 0)
+        // return null;
         int offset = 0;
         // get size of int array
         int rowSize = ByteUtil.bytesToInt(bytes, offset);
         offset += 4;
 
         double[][] data = new double[rowSize][];
-        for(int i=0; i<rowSize; i++) {
+        for (int i = 0; i < rowSize; i++) {
             int colSize = ByteUtil.bytesToInt(bytes, offset);
             offset += 4;
             double[] values = null;
-            if (colSize >= 0){
+            if (colSize >= 0) {
                 values = new double[colSize];
                 for (int j = 0; j < colSize; j++) {
                     values[j] = ByteUtil.bytesToDouble(bytes, offset);
@@ -54,27 +55,28 @@ public class Double2DArraySerDeser implements EntitySerDeser<double[][]> {
     }
 
     /**
-     *
      * @param obj
      * @return
      */
     @Override
-    public byte[] serialize(double[][] obj){
-        if(obj == null) return null;
+    public byte[] serialize(double[][] obj) {
+        if (obj == null) {
+            return null;
+        }
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         int size = obj.length;
         byte[] sizeBytes = ByteUtil.intToBytes(size);
-        data.write(sizeBytes,0,sizeBytes.length);
+        data.write(sizeBytes, 0, sizeBytes.length);
 
-        try{
-            for(double[] o:obj){
-                if(o!=null){
+        try {
+            for (double[] o : obj) {
+                if (o != null) {
                     data.write(ByteUtil.intToBytes(o.length));
-                    for(double d:o){
-                        data.write(ByteUtil.doubleToBytes(d),0,SIZE);
+                    for (double d : o) {
+                        data.write(ByteUtil.doubleToBytes(d), 0, SIZE);
                     }
-                }else{
-                    data.write(ByteUtil.intToBytes(-1),0,4);
+                } else {
+                    data.write(ByteUtil.intToBytes(-1), 0, 4);
                 }
             }
         } catch (IOException e) {

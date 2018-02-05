@@ -22,11 +22,11 @@ package org.apache.eagle.log.entity.meta;
 import org.apache.eagle.common.SerializableUtils;
 
 public class DefaultJavaObjctSerDeser implements EntitySerDeser<Object> {
-    public final static  EntitySerDeser<Object> INSTANCE = new DefaultJavaObjctSerDeser();
+    public static final EntitySerDeser<Object> INSTANCE = new DefaultJavaObjctSerDeser();
 
     @Override
     public Object deserialize(byte[] bytes) {
-        return SerializableUtils.deserializeFromByteArray(bytes,"Deserialize from java object bytes");
+        return SerializableUtils.deserializeFromByteArray(bytes, "Deserialize from java object bytes");
     }
 
     @Override

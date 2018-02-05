@@ -38,7 +38,8 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
 
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException, IOException {
-        EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition entityDefinition = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
 
         EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
@@ -52,7 +53,8 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
 
     @After
     public void cleanUp() throws IllegalAccessException, InstantiationException, IOException {
-        EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition entityDefinition = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         hbase.deleteTable(entityDefinition.getTable());
     }
 
@@ -70,15 +72,15 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
         int wroteCount = 0;
         List<String> rowkeys = new ArrayList<String>();
         List<TestLogAPIEntity> list = new ArrayList<TestLogAPIEntity>();
-        for (int i = 0 ; i <= count;i++) {
+        for (int i = 0; i <= count; i++) {
             TestLogAPIEntity e = new TestLogAPIEntity();
             e.setTimestamp(new Date().getTime());
             e.setField1(i);
             e.setField2(i);
             e.setField3(i);
-            e.setField4((long) i);
-            e.setField5((double) i);
-            e.setField6((double) i);
+            e.setField4((long)i);
+            e.setField5(i);
+            e.setField6((double)i);
             e.setField7(String.valueOf(i));
             e.setTags(new HashMap<String, String>());
             e.getTags().put("jobID", "index_test_job_id");
@@ -87,14 +89,17 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
             e.getTags().put("class", e.toString());
             list.add(e);
 
-            if ( list.size() >= 1000) {
+            if (list.size() >= 1000) {
                 try {
                     StopWatch watch = new StopWatch();
                     watch.start();
                     rowkeys.addAll(writer.write(list));
                     watch.stop();
                     wroteCount += list.size();
-                    if (LOG.isDebugEnabled()) LOG.debug("Wrote "+wroteCount+" / "+count+" entities"+" in "+watch.getTime()+" ms");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Wrote " + wroteCount + " / " + count + " entities" + " in "
+                                  + watch.getTime() + " ms");
+                    }
                     list.clear();
                 } catch (Exception e1) {
                     Assert.fail(e1.getMessage());
@@ -105,11 +110,15 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
         try {
             rowkeys.addAll(writer.write(list));
             wroteCount += list.size();
-            if (LOG.isDebugEnabled()) LOG.debug("wrote "+wroteCount+" / "+count+" entities");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("wrote " + wroteCount + " / " + count + " entities");
+            }
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
-        if (LOG.isDebugEnabled()) LOG.debug("done "+count+" entities");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("done " + count + " entities");
+        }
         return rowkeys;
     }
 

@@ -18,26 +18,29 @@ package org.apache.eagle.log.entity.meta;
 
 import org.apache.eagle.common.ByteUtil;
 
-public class LongSerDeser implements EntitySerDeser<Long>{
-	public LongSerDeser(){}
+public class LongSerDeser implements EntitySerDeser<Long> {
+    public LongSerDeser() {
+    }
 
-	@Override
-	public Long deserialize(byte[] bytes){
-		if(bytes.length < 8)
-			return null;
-//		return new Long(ByteUtil.bytesToLong(bytes));
-		return Long.valueOf(ByteUtil.bytesToLong(bytes));
-	}
-	
-	@Override
-	public byte[] serialize(Long obj){
-		if(obj == null)
-			return null;
-		return ByteUtil.longToBytes(obj);
-	}
+    @Override
+    public Long deserialize(byte[] bytes) {
+        if (bytes.length < 8) {
+            return null;
+        }
+        // return new Long(ByteUtil.bytesToLong(bytes));
+        return Long.valueOf(ByteUtil.bytesToLong(bytes));
+    }
 
-	@Override
-	public Class<Long> type() {
-		return Long.class;
-	}
+    @Override
+    public byte[] serialize(Long obj) {
+        if (obj == null) {
+            return null;
+        }
+        return ByteUtil.longToBytes(obj);
+    }
+
+    @Override
+    public Class<Long> type() {
+        return Long.class;
+    }
 }

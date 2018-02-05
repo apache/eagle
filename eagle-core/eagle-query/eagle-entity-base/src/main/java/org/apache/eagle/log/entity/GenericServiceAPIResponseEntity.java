@@ -35,24 +35,27 @@ import java.util.Map;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"success","exception","meta","type","obj"})
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@XmlType(propOrder = {
+                      "success", "exception", "meta", "type", "obj"
+    })
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonDeserialize(using = GenericServiceAPIResponseEntityDeserializer.class)
-@JsonIgnoreProperties(ignoreUnknown=true)
-public class GenericServiceAPIResponseEntity<T>{
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GenericServiceAPIResponseEntity<T> {
     /**
      * Please use primitive type of value in meta as possible
      */
-    private Map<String,Object> meta;
-	private boolean success;
-	private String exception;
+    private Map<String, Object> meta;
+    private boolean success;
+    private String exception;
     private List<T> obj;
     private Class<T> type;
 
-    public GenericServiceAPIResponseEntity(){
+    public GenericServiceAPIResponseEntity() {
         // default constructor
     }
-    public GenericServiceAPIResponseEntity(Class<T> type){
+
+    public GenericServiceAPIResponseEntity(Class<T> type) {
         this.setType(type);
     }
 
@@ -72,7 +75,7 @@ public class GenericServiceAPIResponseEntity<T>{
         this.obj = obj;
     }
 
-    public void setObj(List<T> obj,Class<T> type) {
+    public void setObj(List<T> obj, Class<T> type) {
         this.setObj(obj);
         this.setType(type);
     }
@@ -85,10 +88,10 @@ public class GenericServiceAPIResponseEntity<T>{
      * Set the first object's class as type
      */
     @SuppressWarnings("unused")
-    public void setTypeByObj(){
-        for(T t:this.obj){
-            if(this.type == null && t!=null){
-                this.type = (Class<T>) t.getClass();
+    public void setTypeByObj() {
+        for (T t : this.obj) {
+            if (this.type == null && t != null) {
+                this.type = (Class<T>)t.getClass();
             }
         }
     }
@@ -102,17 +105,19 @@ public class GenericServiceAPIResponseEntity<T>{
         this.type = type;
     }
 
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
+    public boolean isSuccess() {
+        return success;
+    }
 
-    public void setException(Exception exceptionObj){
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(Exception exceptionObj) {
         this.exception = EagleExceptionWrapper.wrap(exceptionObj);
     }
 }

@@ -23,9 +23,9 @@ import org.junit.Test;
 
 public class TestEntityRepositoryScanner {
 
-	@Test
-	public void testScan() throws InstantiationException, IllegalAccessException {
-		Assert.assertEquals(MetricMetadataEntity.class,
-				EntityDefinitionManager.getEntityByServiceName("MetricMetadataService").getEntityClass());
-	}
+    @Test
+    public void testScan() throws InstantiationException, IllegalAccessException {
+        Assert.assertEquals(MetricMetadataEntity.class, EntityDefinitionManager
+            .getEntityByServiceName("MetricMetadataService").getEntityClass());
+    }
 }

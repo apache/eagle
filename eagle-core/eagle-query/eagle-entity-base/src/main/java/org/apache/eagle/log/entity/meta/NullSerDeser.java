@@ -16,22 +16,22 @@
  */
 package org.apache.eagle.log.entity.meta;
 
-public class NullSerDeser implements EntitySerDeser<NullObject>{
+public class NullSerDeser implements EntitySerDeser<NullObject> {
 
-	private static final byte[] EMPTY_NULL_ARRAY = new byte[0];
-	
-	@Override
-	public NullObject deserialize(byte[] bytes) {
-		return null;
-	}
+    private static final byte[] EMPTY_NULL_ARRAY = new byte[0];
 
-	@Override
-	public byte[] serialize(NullObject t) {
-		return EMPTY_NULL_ARRAY;
-	}
+    @Override
+    public NullObject deserialize(byte[] bytes) {
+        return null;
+    }
 
-	@Override
-	public Class<NullObject> type() {
-		return NullObject.class;
-	}
+    @Override
+    public byte[] serialize(NullObject t) {
+        return EMPTY_NULL_ARRAY;
+    }
+
+    @Override
+    public Class<NullObject> type() {
+        return NullObject.class;
+    }
 }

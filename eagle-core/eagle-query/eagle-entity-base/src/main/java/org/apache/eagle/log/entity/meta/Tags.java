@@ -27,5 +27,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Tags {
-	String[] value() default {""};
+    String[] value() default {
+                              ""
+    };
 }
