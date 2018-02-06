@@ -191,8 +191,6 @@
 
         <spark.core.version>1.4.0</spark.core.version>
 
-        <!--  Client -->
-        <!--<kafka-client.version>0.9.0.0</kafka-client.version>-->
         <!-- Reflection -->
         <reflections.version>0.9.8</reflections.version>
 
@@ -244,18 +242,11 @@
         <jasypt.version>1.9.2</jasypt.version>
 
         <!-- Streaming -->
-        <!--<kafka.version>0.10.0.0</kafka.version>-->
         <kafka.version>0.8.2.2</kafka.version>
-        <kafka-clients.version>0.8.2.0</kafka-clients.version>
         <kafka.artifact.id>kafka_2.11</kafka.artifact.id>
         <jgrapht.version>0.9.0</jgrapht.version>
         <storm-kafka.version>0.10.0</storm-kafka.version>
-        <storm.version>0.9.3</storm.version>
-
-        <mapr-kafka.version>0.9.0.0-mapr-1607</mapr-kafka.version>
-        <mapr-kafka-clients.version>0.8.3-mapr-1509</mapr-kafka-clients.version>
-        <mapr-storm-kafka.version>0.9.3</mapr-storm-kafka.version>
-        <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
+        <storm.version>0.9.7</storm.version>
 
         <curator.version>2.5.0</curator.version>
         <curator.test.version>2.5.0</curator.test.version>
@@ -577,7 +568,7 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>${kafka-clients.version}</version>
+                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.storm</groupId>
@@ -1056,7 +1047,7 @@
                     <dependency>
                         <groupId>org.apache.storm</groupId>
                         <artifactId>storm-kafka</artifactId>
-                        <version>${mapr-storm-kafka.version}</version>
+                        <version>${storm.version}</version>
                         <exclusions>
                             <exclusion>
                                 <groupId>ch.qos.logback</groupId>
