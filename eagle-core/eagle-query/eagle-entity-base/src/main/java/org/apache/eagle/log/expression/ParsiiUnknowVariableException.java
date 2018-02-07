@@ -22,36 +22,36 @@ package org.apache.eagle.log.expression;
 /**
  * @since Nov 7, 2014
  */
-public class ParsiiUnknowVariableException extends Exception{
-	
-	private static final long serialVersionUID = 1L;
+public class ParsiiUnknowVariableException extends Exception {
 
-	/**
-	 * Default constructor
-	 */
-	public ParsiiUnknowVariableException() {
-		super();
-	}
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ParsiiUnknowVariableException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * Default constructor
+     */
+    public ParsiiUnknowVariableException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 */
-	public ParsiiUnknowVariableException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public ParsiiUnknowVariableException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public ParsiiUnknowVariableException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param message
+     */
+    public ParsiiUnknowVariableException(String message) {
+        super(message);
+    }
+
+    /**
+     * @param cause
+     */
+    public ParsiiUnknowVariableException(Throwable cause) {
+        super(cause);
+    }
 }

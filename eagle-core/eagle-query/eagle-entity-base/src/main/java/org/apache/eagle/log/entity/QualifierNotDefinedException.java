@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.log.entity;
 
-public class QualifierNotDefinedException extends Exception{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class QualifierNotDefinedException extends Exception {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	public QualifierNotDefinedException(String message){
-		super(message);
-	}
+    public QualifierNotDefinedException(String message) {
+        super(message);
+    }
 }

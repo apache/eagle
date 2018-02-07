@@ -42,10 +42,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * rowkey: prefix + timestamp + tagNameValues
- * as of now, all tags will be persisted as a column in hbase table
- * tag name is column qualifier name
- * tag value is column value.
+ * rowkey: prefix + timestamp + tagNameValues as of now, all tags will be persisted as a column in hbase table
+ * tag name is column qualifier name tag value is column value.
  */
 @JsonFilter(TaggedLogAPIEntity.PropertyBeanFilterName)
 public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable {
@@ -63,17 +61,14 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
     }
 
     /**
-     * Extra dynamic attributes.
-     * TODO: can we move exp, serializeAlias, serializeVerbose to a wrapper class?
+     * Extra dynamic attributes. TODO: can we move exp, serializeAlias, serializeVerbose to a wrapper class?
      */
     private Map<String, Object> exp;
 
     private String encodedRowkey;
     // track what qualifiers are changed
     private Set<String> modifiedProperties = new HashSet<String>();
-    protected PropertyChangeSupport pcs
-            = new PropertyChangeSupport(this);
-
+    protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public Map<String, String> getSerializeAlias() {
         return serializeAlias;
@@ -135,6 +130,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         pcs.firePropertyChange(fieldModified, null, null);
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         modifiedProperties.add(evt.getPropertyName());
     }
@@ -143,6 +139,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         return this.modifiedProperties;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("prefix:");
@@ -189,22 +186,26 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         };
 
         @Override
-        public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
+        public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider,
+                                     PropertyWriter writer)
+            throws Exception {
             if (pojo instanceof TaggedLogAPIEntity) {
-                TaggedLogAPIEntity entity = (TaggedLogAPIEntity) pojo;
+                TaggedLogAPIEntity entity = (TaggedLogAPIEntity)pojo;
                 Set<String> modified = entity.modifiedQualifiers();
                 Set<String> basePropertyNames = getPropertyNames();
                 String writerName = writer.getName();
                 if (modified.contains(writerName) || basePropertyNames.contains(writerName)) {
                     if ((!entity.isSerializeVerbose() && verboseFields.contains(writerName))
-                            || (timestamp.equals(writerName) && !EntityDefinitionManager.isTimeSeries(entity.getClass()))) {
+                        || (timestamp.equals(writerName)
+                            && !EntityDefinitionManager.isTimeSeries(entity.getClass()))) {
                         // log skip
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("skip field");
                         }
                     } else {
                         // if serializeAlias is not null and exp is not null
-                        if (exp.equals(writerName) && entity.getSerializeAlias() != null && entity.getExp() != null) {
+                        if (exp.equals(writerName) && entity.getSerializeAlias() != null
+                            && entity.getExp() != null) {
                             Map<String, Object> _exp = new HashMap<String, Object>();
                             for (Map.Entry<String, Object> entry : entity.getExp().entrySet()) {
                                 String alias = entity.getSerializeAlias().get(entry.getKey());

@@ -27,74 +27,71 @@ import org.junit.Test;
 
 public class TestHBaseWritePerformance {
 
-	public static void main(String[] args) throws IOException {
-		
-		HTableInterface tbl = EagleConfigFactory.load().getHTable("unittest");
+    public static void main(String[] args) throws IOException {
 
-		int putSize = 1000;
-		List<Put> list = new ArrayList<Put>(putSize);
-		for (int i = 0; i < putSize; ++i) {
-			byte[] v = Integer.toString(i).getBytes();
-			Put p = new Put(v);
-			p.add("f".getBytes(), "a".getBytes(), 100, v);
-			list.add(p);
-		}
+        HTableInterface tbl = EagleConfigFactory.load().getHTable("unittest");
 
-		// Case 1
-		System.out.println("Case 1: autoflush = true, individual put");
-		tbl.setAutoFlush(true);
-		long startTime = System.currentTimeMillis();
-		for (int i = 0; i < 1; ++i) {
-			for (Put p : list) {
-				tbl.put(p);
-			}
-			tbl.flushCommits();
-		}
-		long endTime = System.currentTimeMillis();
-		System.out.println("Case 1: " + (endTime - startTime) + " ms");
-		
-		
-		// Case 2
-		System.out.println("Case 2: autoflush = true, multi-put");
-		tbl.setAutoFlush(true);
-		startTime = System.currentTimeMillis();
-		for (int i = 0; i < 1; ++i) {
-			tbl.put(list);
-			tbl.flushCommits();
-		}
-		endTime = System.currentTimeMillis();
-		System.out.println("Case 2: " + (endTime - startTime) + " ms");
+        int putSize = 1000;
+        List<Put> list = new ArrayList<Put>(putSize);
+        for (int i = 0; i < putSize; ++i) {
+            byte[] v = Integer.toString(i).getBytes();
+            Put p = new Put(v);
+            p.add("f".getBytes(), "a".getBytes(), 100, v);
+            list.add(p);
+        }
 
-		
-		// Case 3
-		System.out.println("Case 3: autoflush = false, multi-put");
-		tbl.setAutoFlush(false);
-		startTime = System.currentTimeMillis();
-		for (int i = 0; i < 1; ++i) {
-			tbl.put(list);
-			tbl.flushCommits();
-		}
-		endTime = System.currentTimeMillis();
-		System.out.println("Case 3: " + (endTime - startTime) + " ms");
+        // Case 1
+        System.out.println("Case 1: autoflush = true, individual put");
+        tbl.setAutoFlush(true);
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 1; ++i) {
+            for (Put p : list) {
+                tbl.put(p);
+            }
+            tbl.flushCommits();
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("Case 1: " + (endTime - startTime) + " ms");
 
-		
-		// Case 4
-		System.out.println("Case 4: autoflush = false, individual put");
-		tbl.setAutoFlush(true);
-		startTime = System.currentTimeMillis();
-		for (int i = 0; i < 1; ++i) {
-			for (Put p : list) {
-				tbl.put(p);
-			}
-			tbl.flushCommits();
-		}
-		endTime = System.currentTimeMillis();
-		System.out.println("Case 4: " + (endTime - startTime) + " ms");
+        // Case 2
+        System.out.println("Case 2: autoflush = true, multi-put");
+        tbl.setAutoFlush(true);
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < 1; ++i) {
+            tbl.put(list);
+            tbl.flushCommits();
+        }
+        endTime = System.currentTimeMillis();
+        System.out.println("Case 2: " + (endTime - startTime) + " ms");
 
-	}
-	
-	@Test
-	public void test() {
-		
-	}
+        // Case 3
+        System.out.println("Case 3: autoflush = false, multi-put");
+        tbl.setAutoFlush(false);
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < 1; ++i) {
+            tbl.put(list);
+            tbl.flushCommits();
+        }
+        endTime = System.currentTimeMillis();
+        System.out.println("Case 3: " + (endTime - startTime) + " ms");
+
+        // Case 4
+        System.out.println("Case 4: autoflush = false, individual put");
+        tbl.setAutoFlush(true);
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < 1; ++i) {
+            for (Put p : list) {
+                tbl.put(p);
+            }
+            tbl.flushCommits();
+        }
+        endTime = System.currentTimeMillis();
+        System.out.println("Case 4: " + (endTime - startTime) + " ms");
+
+    }
+
+    @Test
+    public void test() {
+
+    }
 }

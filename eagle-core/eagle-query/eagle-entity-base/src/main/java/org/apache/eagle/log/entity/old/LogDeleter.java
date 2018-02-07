@@ -21,14 +21,15 @@ import java.io.IOException;
 
 import org.apache.eagle.log.entity.InternalLog;
 
-public interface LogDeleter extends Closeable{
-	public void flush() throws IOException;
+public interface LogDeleter extends Closeable {
+    public void flush() throws IOException;
 
-	public void open() throws IOException;
+    public void open() throws IOException;
 
-	public void close() throws IOException;
+    @Override
+    public void close() throws IOException;
 
-	public void delete(InternalLog log) throws IOException;
-	
-	public void deleteRowByRowkey(String encodedRowkey) throws IOException;
+    public void delete(InternalLog log) throws IOException;
+
+    public void deleteRowByRowkey(String encodedRowkey) throws IOException;
 }

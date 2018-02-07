@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.log.base.taggedlog;
 
-public class NoSuchRowException extends RuntimeException{
-	static final long serialVersionUID = -4538233994503905943L;
+public class NoSuchRowException extends RuntimeException {
+    static final long serialVersionUID = -4538233994503905943L;
 
-	public NoSuchRowException(){
-		super();
-	}
-	
-	public NoSuchRowException(String s){
-		super(s);
-	}
+    public NoSuchRowException() {
+        super();
+    }
+
+    public NoSuchRowException(String s) {
+        super(s);
+    }
 }

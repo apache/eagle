@@ -31,26 +31,28 @@ public final class EntityRepositoryScanner {
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityRepositoryScanner.class);
 
-    //    public static void scan() throws InstantiationException, IllegalAccessException {
-    //        // TODO currently extcos 0.3b doesn't support to search packages like "com.*.eagle.*", "org.*.eagle.*". However 0.4b depends on asm-all version 4.0, which is
-    //        // conflicted with jersey server 1.8. We should fix it later
-    //        LOG.info("Scanning all entity repositories with pattern \"org.apache.eagle.*\"");
-    //        final ComponentScanner scanner = new ComponentScanner();
-    //        final Set<Class<?>> classes = scanner.getClasses(new EntityRepoScanQuery() );
-    //        for (Class<?> entityClass : classes) {
-    //            LOG.info("Processing entity repository: " + entityClass.getName());
-    //            if (EntityRepository.class.isAssignableFrom(entityClass)) {
-    //                EntityRepository repo = (EntityRepository)entityClass.newInstance();
-    //                addRepo(repo);
-    //            }
-    //        }
-    //    }
+    // public static void scan() throws InstantiationException, IllegalAccessException {
+    // // TODO currently extcos 0.3b doesn't support to search packages like "com.*.eagle.*", "org.*.eagle.*".
+    // However 0.4b depends on asm-all version 4.0, which is
+    // // conflicted with jersey server 1.8. We should fix it later
+    // LOG.info("Scanning all entity repositories with pattern \"org.apache.eagle.*\"");
+    // final ComponentScanner scanner = new ComponentScanner();
+    // final Set<Class<?>> classes = scanner.getClasses(new EntityRepoScanQuery() );
+    // for (Class<?> entityClass : classes) {
+    // LOG.info("Processing entity repository: " + entityClass.getName());
+    // if (EntityRepository.class.isAssignableFrom(entityClass)) {
+    // EntityRepository repo = (EntityRepository)entityClass.newInstance();
+    // addRepo(repo);
+    // }
+    // }
+    // }
 
     public static void scan() throws IllegalAccessException, InstantiationException {
         LOG.info("Scanning all entity repositories");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        for (Class<? extends EntityRepository> entityRepoClass : ReflectionsHelper.getInstance().getSubTypesOf(EntityRepository.class)) {
+        for (Class<? extends EntityRepository> entityRepoClass : ReflectionsHelper.getInstance()
+            .getSubTypesOf(EntityRepository.class)) {
             if (EntityRepository.class.isAssignableFrom(entityRepoClass)) {
                 EntityRepository repo = entityRepoClass.newInstance();
                 addRepo(repo);
@@ -71,12 +73,12 @@ public final class EntityRepositoryScanner {
         }
     }
 
-    //    public static class EntityRepoScanQuery extends ComponentQuery {
+    // public static class EntityRepoScanQuery extends ComponentQuery {
     //
-    //        @Override
-    //        protected void query() {
-    //            select().from("org.apache.eagle").returning(
-    //            allExtending(EntityRepository.class));
-    //        }
-    //   }
+    // @Override
+    // protected void query() {
+    // select().from("org.apache.eagle").returning(
+    // allExtending(EntityRepository.class));
+    // }
+    // }
 }

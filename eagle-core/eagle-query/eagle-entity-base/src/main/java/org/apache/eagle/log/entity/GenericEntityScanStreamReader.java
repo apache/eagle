@@ -36,7 +36,8 @@ public class GenericEntityScanStreamReader extends StreamReader {
     private long lastTimestamp = 0;
     private long firstTimestamp = 0;
 
-    public GenericEntityScanStreamReader(String serviceName, SearchCondition condition, String prefix) throws InstantiationException, IllegalAccessException{
+    public GenericEntityScanStreamReader(String serviceName, SearchCondition condition, String prefix)
+        throws InstantiationException, IllegalAccessException {
         this.prefix = prefix;
         checkNotNull(serviceName, "serviceName");
         this.entityDef = EntityDefinitionManager.getEntityByServiceName(serviceName);
@@ -44,7 +45,8 @@ public class GenericEntityScanStreamReader extends StreamReader {
         this.condition = condition;
     }
 
-    public GenericEntityScanStreamReader(EntityDefinition entityDef, SearchCondition condition, String prefix) throws InstantiationException, IllegalAccessException{
+    public GenericEntityScanStreamReader(EntityDefinition entityDef, SearchCondition condition, String prefix)
+        throws InstantiationException, IllegalAccessException {
         this.prefix = prefix;
         checkNotNull(entityDef, "entityDef");
         this.entityDef = entityDef;
@@ -52,12 +54,13 @@ public class GenericEntityScanStreamReader extends StreamReader {
         this.condition = condition;
     }
 
+    @Override
     public long getLastTimestamp() {
         return lastTimestamp;
     }
 
-    private void checkNotNull(Object o, String message){
-        if(o == null){
+    private void checkNotNull(Object o, String message) {
+        if (o == null) {
             throw new IllegalArgumentException(message + " should not be null");
         }
     }
@@ -71,30 +74,33 @@ public class GenericEntityScanStreamReader extends StreamReader {
     }
 
     @Override
-    public void readAsStream() throws Exception{
+    public void readAsStream() throws Exception {
         Date start = null;
         Date end = null;
         // shortcut to avoid read when pageSize=0
-        if(condition.getPageSize() <= 0){
+        if (condition.getPageSize() <= 0) {
             return; // return nothing
         }
         // Process the time range if needed
-        if(entityDef.isTimeSeries()){
+        if (entityDef.isTimeSeries()) {
             start = new Date(condition.getStartTime());
             end = new Date(condition.getEndTime());
-        }else{
-            //start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
-            //end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
+        } else {
+            // start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
+            // end = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_END_HUMANTIME);
             start = new Date(EntityConstants.FIXED_READ_START_TIMESTAMP);
             end = new Date(EntityConstants.FIXED_READ_END_TIMESTAMP);
         }
         byte[][] outputQualifiers = null;
-        if(!condition.isOutputAll()) {
+        if (!condition.isOutputAll()) {
             // Generate the output qualifiers
-            outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef, condition.getOutputFields());
+            outputQualifiers = HBaseInternalLogHelper.getOutputQualifiers(entityDef,
+                                                                          condition.getOutputFields());
         }
-        HBaseLogReader2 reader = new HBaseLogReader2(entityDef, condition.getPartitionValues(), start, end, condition.getFilter(), condition.getStartRowkey(), outputQualifiers, this.prefix);
-        try{
+        HBaseLogReader2 reader = new HBaseLogReader2(entityDef, condition.getPartitionValues(), start, end,
+                                                     condition.getFilter(), condition.getStartRowkey(),
+                                                     outputQualifiers, this.prefix);
+        try {
             reader.open();
             InternalLog log;
             int count = 0;
@@ -103,23 +109,24 @@ public class GenericEntityScanStreamReader extends StreamReader {
                 if (lastTimestamp < entity.getTimestamp()) {
                     lastTimestamp = entity.getTimestamp();
                 }
-                if(firstTimestamp > entity.getTimestamp() || firstTimestamp == 0){
+                if (firstTimestamp > entity.getTimestamp() || firstTimestamp == 0) {
                     firstTimestamp = entity.getTimestamp();
                 }
 
                 entity.setSerializeVerbose(condition.isOutputVerbose());
                 entity.setSerializeAlias(condition.getOutputAlias());
 
-                for(EntityCreationListener l : _listeners){
+                for (EntityCreationListener l : listeners) {
                     l.entityCreated(entity);
                 }
-                if(++count == condition.getPageSize())
+                if (++count == condition.getPageSize()) {
                     break;
+                }
             }
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             LOG.error("Fail reading log", ioe);
             throw ioe;
-        }finally{
+        } finally {
             reader.close();
         }
     }

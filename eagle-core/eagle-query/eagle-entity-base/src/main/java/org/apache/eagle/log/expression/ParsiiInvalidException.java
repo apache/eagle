@@ -22,36 +22,36 @@ package org.apache.eagle.log.expression;
 /**
  * @since Nov 7, 2014
  */
-public class ParsiiInvalidException extends Exception{
-	
-	private static final long serialVersionUID = 1L;
+public class ParsiiInvalidException extends Exception {
 
-	/**
-	 * Default constructor
-	 */
-	public ParsiiInvalidException() {
-		super();
-	}
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ParsiiInvalidException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * Default constructor
+     */
+    public ParsiiInvalidException() {
+        super();
+    }
 
-	/**
-	 * @param message
-	 */
-	public ParsiiInvalidException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public ParsiiInvalidException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public ParsiiInvalidException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param message
+     */
+    public ParsiiInvalidException(String message) {
+        super(message);
+    }
+
+    /**
+     * @param cause
+     */
+    public ParsiiInvalidException(Throwable cause) {
+        super(cause);
+    }
 }
