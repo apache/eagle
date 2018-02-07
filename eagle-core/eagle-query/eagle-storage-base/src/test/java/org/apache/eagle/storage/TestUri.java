@@ -26,7 +26,7 @@ import java.net.URI;
  */
 public class TestUri {
     @Test
-    public void testUri(){
+    public void testUri() {
         String url = "eagle:hbase://zk1:2181,zk2:2181/hbase?connectionTimeout=12";
         String cleanURI = url.substring(6);
 
