@@ -19,24 +19,24 @@
 package org.apache.eagle.query.aggregate.test;
 
 import org.apache.eagle.query.ListQueryCompiler;
-import org.apache.eagle.query.parser.EagleQueryParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestListQueryCompiler {
-    private final static Logger LOG = LoggerFactory.getLogger(TestListQueryCompiler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestListQueryCompiler.class);
+
     @Test
     public void test() throws Exception {
         try {
-            String queryWithCondition = "TestTimeSeriesAPIEntity[@site=\"test\"]{*}";
-            ListQueryCompiler compiler = new ListQueryCompiler(queryWithCondition);
-            String queryWithSquareBrackets = "TestTimeSeriesAPIEntity[@condition=\"[A9BB756BFB8] Data[site=2]/(4/5)\"]{*}";
+            String queryWithCondition = "TestTimeSeriesAPIEntity[@site =\"test\"]{*}";
+            new ListQueryCompiler(queryWithCondition);
+            String queryWithSquareBrackets = "TestTimeSeriesAPIEntity[@condition =\"[A9BB756BFB8] Data[site= 2]/(4/5)\"]{*}";
             new ListQueryCompiler(queryWithSquareBrackets);
             String queryWithoutCondition = "TestTimeSeriesAPIEntity[]{*}";
             new ListQueryCompiler(queryWithoutCondition);
-            String query = "TestTimeSeriesAPIEntity[@condition=\"[A9BB756BFB8]{4/5}\"]{*}";
+            String query = "TestTimeSeriesAPIEntity[@condition =\"[A9BB756BFB8]{4/5}\"]{*}";
             new ListQueryCompiler(query);
         } catch (IllegalArgumentException e) {
             LOG.error(e.getMessage());

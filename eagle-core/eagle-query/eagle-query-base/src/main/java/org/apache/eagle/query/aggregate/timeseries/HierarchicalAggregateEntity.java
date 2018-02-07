@@ -25,43 +25,52 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class HierarchicalAggregateEntity {
-	private String key;
-	private List<GroupbyBucket.Function> tmpValues = new ArrayList<GroupbyBucket.Function>();
-	private List<Double> values = new ArrayList<Double>();
-	private SortedMap<String, HierarchicalAggregateEntity> children = new TreeMap<String, HierarchicalAggregateEntity>();
-	private SortedSet<Map.Entry<String, HierarchicalAggregateEntity>> sortedList = null;
+    private String key;
+    private List<GroupbyBucket.Function> tmpValues = new ArrayList<GroupbyBucket.Function>();
+    private List<Double> values = new ArrayList<Double>();
+    private SortedMap<String, HierarchicalAggregateEntity> children = new TreeMap<String, HierarchicalAggregateEntity>();
+    private SortedSet<Map.Entry<String, HierarchicalAggregateEntity>> sortedList = null;
 
-	public SortedSet<Map.Entry<String, HierarchicalAggregateEntity>> getSortedList() {
-		return sortedList;
-	}
-	public void setSortedList(
-			SortedSet<Map.Entry<String, HierarchicalAggregateEntity>> sortedList) {
-		this.sortedList = sortedList;
-	}
-	public List<GroupbyBucket.Function> getTmpValues() {
-		return tmpValues;
-	}
-	public void setTmpValues(List<GroupbyBucket.Function> tmpValues) {
-		this.tmpValues = tmpValues;
-	}
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public List<Double> getValues() {
-		return values;
-	}
-	public void setValues(List<Double> values) {
-		this.values = values;
-	}
-	public SortedMap<String, HierarchicalAggregateEntity> getChildren() {
-		return children;
-	}
-	public void setChildren(SortedMap<String, HierarchicalAggregateEntity> children) {
-		this.children = children;
-	}
+    public SortedSet<Map.Entry<String, HierarchicalAggregateEntity>> getSortedList() {
+        return sortedList;
+    }
+
+    public void setSortedList(
+                              SortedSet<Map.Entry<String, HierarchicalAggregateEntity>> sortedList) {
+        this.sortedList = sortedList;
+    }
+
+    public List<GroupbyBucket.Function> getTmpValues() {
+        return tmpValues;
+    }
+
+    public void setTmpValues(List<GroupbyBucket.Function> tmpValues) {
+        this.tmpValues = tmpValues;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public List<Double> getValues() {
+        return values;
+    }
+
+    public void setValues(List<Double> values) {
+        this.values = values;
+    }
+
+    public SortedMap<String, HierarchicalAggregateEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(SortedMap<String, HierarchicalAggregateEntity> children) {
+        this.children = children;
+    }
 }
