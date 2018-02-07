@@ -26,36 +26,36 @@ import org.apache.eagle.query.aggregate.AggregateFunctionType;
 /**
  * Not thread safe
  */
-public class FlatAggregator extends AbstractAggregator{
-	protected GroupbyBucket bucket;
+public class FlatAggregator extends AbstractAggregator {
+    protected GroupbyBucket bucket;
 
     /**
      * @param groupbyFields
      * @param aggregateFuntionTypes
      * @param aggregatedFields
      */
-	public FlatAggregator(List<String> groupbyFields, List<AggregateFunctionType> aggregateFuntionTypes, List<String> aggregatedFields){
-		super(groupbyFields, aggregateFuntionTypes, aggregatedFields);
-		bucket = new GroupbyBucket(this.aggregateFunctionTypes);
-	}
-	
-	public void accumulate(TaggedLogAPIEntity entity) throws Exception{
-		List<String> groupbyFieldValues = createGroup(entity);
-		List<Double> preAggregatedValues = createPreAggregatedValues(entity);
-		bucket.addDatapoint(groupbyFieldValues, preAggregatedValues);
-	}
-	
-	public Map<List<String>, List<Double>> result(){
-		return bucket.result(); 
-	}
-	
-	protected List<String> createGroup(TaggedLogAPIEntity entity){
-		List<String> groupbyFieldValues = new ArrayList<String>();
-		int i = 0;
-		for(String groupbyField : groupbyFields){
-			String groupbyFieldValue = determineGroupbyFieldValue(entity, groupbyField, i++);
-			groupbyFieldValues.add(groupbyFieldValue);
-		}
-		return groupbyFieldValues;
-	}
+    public FlatAggregator(List<String> groupbyFields, List<AggregateFunctionType> aggregateFuntionTypes, List<String> aggregatedFields) {
+        super(groupbyFields, aggregateFuntionTypes, aggregatedFields);
+        bucket = new GroupbyBucket(this.aggregateFunctionTypes);
+    }
+
+    public void accumulate(TaggedLogAPIEntity entity) throws Exception {
+        List<String> groupbyFieldValues = createGroup(entity);
+        List<Double> preAggregatedValues = createPreAggregatedValues(entity);
+        bucket.addDatapoint(groupbyFieldValues, preAggregatedValues);
+    }
+
+    public Map<List<String>, List<Double>> result() {
+        return bucket.result();
+    }
+
+    protected List<String> createGroup(TaggedLogAPIEntity entity) {
+        List<String> groupbyFieldValues = new ArrayList<String>();
+        int i = 0;
+        for (String groupbyField : groupbyFields) {
+            String groupbyFieldValue = determineGroupbyFieldValue(entity, groupbyField, i++);
+            groupbyFieldValues.add(groupbyFieldValue);
+        }
+        return groupbyFieldValues;
+    }
 }

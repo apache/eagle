@@ -25,5 +25,5 @@ public interface Aggregator {
      * @param entity accumulated entity instance
      * @throws Exception
      */
-	public void accumulate(TaggedLogAPIEntity entity) throws Exception;
+    void accumulate(TaggedLogAPIEntity entity) throws Exception;
 }
