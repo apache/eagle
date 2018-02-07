@@ -25,7 +25,7 @@ then
 	print_help
 fi
 
-DIR=$(dirname $0)
+DIR=$(readlink -f $(dirname $0))
 
 
 source ${DIR}/eagle-env.sh
