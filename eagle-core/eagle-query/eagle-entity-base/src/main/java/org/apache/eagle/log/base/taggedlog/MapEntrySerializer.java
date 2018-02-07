@@ -29,10 +29,11 @@ public class MapEntrySerializer extends JsonSerializer<Map.Entry> {
     private static final String VALUE_FIELD = "value";
 
     @Override
-    public void serialize(Map.Entry entry, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+    public void serialize(Map.Entry entry, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+        throws IOException, JsonProcessingException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeObjectField(KEY_FIELD,entry.getKey());
-        jsonGenerator.writeObjectField(VALUE_FIELD,entry.getValue());
+        jsonGenerator.writeObjectField(KEY_FIELD, entry.getKey());
+        jsonGenerator.writeObjectField(VALUE_FIELD, entry.getValue());
         jsonGenerator.writeEndObject();
     }
 }

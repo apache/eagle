@@ -28,30 +28,37 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"success", "exception", "encodedRowkeys"})
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown=true)
-public class GenericCreateAPIResponseEntity{
-	private boolean success;
-	private String exception;
-	private List<String> encodedRowkeys;
-	
-	public List<String> getEncodedRowkeys() {
-		return encodedRowkeys;
-	}
-	public void setEncodedRowkeys(List<String> encodedRowkeys) {
-		this.encodedRowkeys = encodedRowkeys;
-	}
-	public boolean isSuccess() {
-		return success;
-	}
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-	public String getException() {
-		return exception;
-	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
+@XmlType(propOrder = {
+                      "success", "exception", "encodedRowkeys"
+    })
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GenericCreateAPIResponseEntity {
+    private boolean success;
+    private String exception;
+    private List<String> encodedRowkeys;
+
+    public List<String> getEncodedRowkeys() {
+        return encodedRowkeys;
+    }
+
+    public void setEncodedRowkeys(List<String> encodedRowkeys) {
+        this.encodedRowkeys = encodedRowkeys;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
+    }
 }

@@ -23,9 +23,10 @@ import java.lang.annotation.Target;
 
 /**
  * This class is for service client for generic entity creation API (entities and metrics)
- *
  */
-@Target({ElementType.TYPE})
+@Target({
+         ElementType.TYPE
+})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServicePath {
 

@@ -30,55 +30,59 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * @since 3/18/15
+ * @since 3/18/15.
  */
-public class GenericServiceAPIResponseEntityDeserializer extends JsonDeserializer<GenericServiceAPIResponseEntity> {
-    private final static String META_FIELD="meta";
-    private final static String SUCCESS_FIELD="success";
-    private final static String EXCEPTION_FIELD="exception";
-    private final static String OBJ_FIELD="obj";
-    private final static String TYPE_FIELD="type";
+public class GenericServiceAPIResponseEntityDeserializer
+    extends JsonDeserializer<GenericServiceAPIResponseEntity> {
+    private static final String META_FIELD = "meta";
+    private static final String SUCCESS_FIELD = "success";
+    private static final String EXCEPTION_FIELD = "exception";
+    private static final String OBJ_FIELD = "obj";
+    private static final String TYPE_FIELD = "type";
 
     @Override
-    public GenericServiceAPIResponseEntity deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public GenericServiceAPIResponseEntity deserialize(JsonParser jp, DeserializationContext ctxt)
+        throws IOException, JsonProcessingException {
         GenericServiceAPIResponseEntity entity = new GenericServiceAPIResponseEntity();
         ObjectCodec objectCodec = jp.getCodec();
 
         JsonNode rootNode = jp.getCodec().readTree(jp);
-        if(rootNode.isObject()){
-            Iterator<Map.Entry<String,JsonNode>> fields = rootNode.fields();
+        if (rootNode.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
             JsonNode objNode = null;
-            while(fields.hasNext()){
-                Map.Entry<String,JsonNode> field = fields.next();
-                if (META_FIELD.equals(field.getKey()) && field.getValue() != null)
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                if (META_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     entity.setMeta(objectCodec.readValue(field.getValue().traverse(), Map.class));
-                else if(SUCCESS_FIELD.equals(field.getKey()) && field.getValue() != null){
+                } else if (SUCCESS_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     entity.setSuccess(field.getValue().booleanValue());
-                }else if(EXCEPTION_FIELD.equals(field.getKey()) && field.getValue() != null){
+                } else if (EXCEPTION_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     entity.setException(new Exception(field.getValue().textValue()));
-                }else if(TYPE_FIELD.endsWith(field.getKey())  && field.getValue() != null){
-                    Preconditions.checkNotNull(field.getValue().textValue(),"Response type class is null");
+                } else if (TYPE_FIELD.endsWith(field.getKey()) && field.getValue() != null) {
+                    Preconditions.checkNotNull(field.getValue().textValue(), "Response type class is null");
                     try {
                         entity.setType(Class.forName(field.getValue().textValue()));
                     } catch (ClassNotFoundException e) {
                         throw new IOException(e);
                     }
-                }else if(OBJ_FIELD.equals(field.getKey()) && field.getValue() != null){
+                } else if (OBJ_FIELD.equals(field.getKey()) && field.getValue() != null) {
                     objNode = field.getValue();
                 }
             }
 
-            if(objNode!=null) {
-                JavaType collectionType=null;
+            if (objNode != null) {
+                JavaType collectionType = null;
                 if (entity.getType() != null) {
-                    collectionType = TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, entity.getType());
-                }else{
-                    collectionType = TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, Map.class);
+                    collectionType = TypeFactory.defaultInstance().constructCollectionType(LinkedList.class,
+                                                                                           entity.getType());
+                } else {
+                    collectionType = TypeFactory.defaultInstance().constructCollectionType(LinkedList.class,
+                                                                                           Map.class);
                 }
                 List obj = objectCodec.readValue(objNode.traverse(), collectionType);
                 entity.setObj(obj);
             }
-        }else{
+        } else {
             throw new IOException("root node is not object");
         }
         return entity;

@@ -24,7 +24,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.Column;
@@ -38,13 +37,13 @@ public class TestTaggedLogAPIEntity {
     private static ObjectMapper objectMapper;
 
     @BeforeClass
-    public static void setUp(){
+    public static void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.setFilters(TaggedLogAPIEntity.getFilterProvider());
         objectMapper.registerModule(new EntityJsonModule());
     }
 
-    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     private class MockSubTaggedLogAPIEntity extends TaggedLogAPIEntity {
         public double getField1() {
             return field1;
@@ -72,7 +71,7 @@ public class TestTaggedLogAPIEntity {
     }
 
     @SuppressWarnings("unchecked")
-	@Test
+    @Test
     public void testJsonSerializeFilter() throws IOException {
         MockSubTaggedLogAPIEntity mock = new MockSubTaggedLogAPIEntity();
         Assert.assertTrue(mock instanceof TaggedLogAPIEntity);
@@ -91,12 +90,16 @@ public class TestTaggedLogAPIEntity {
         mock.setPrefix("mock");
         mock.setField2("ok");
         mock.setField1(12.345);
-        mock.setTags(new HashMap<String, String>(){{
-            put("tagName", "tagValue");
-        }});
-        mock.setExp(new HashMap<String, Object>() {{
-            put("extra_field", 3.14);
-        }});
+        mock.setTags(new HashMap<String, String>() {
+            {
+                put("tagName", "tagValue");
+            }
+        });
+        mock.setExp(new HashMap<String, Object>() {
+            {
+                put("extra_field", 3.14);
+            }
+        });
         json = objectMapper.writeValueAsString(mock);
         System.out.println(json);
         Assert.assertTrue(json.contains("field2"));
@@ -105,9 +108,9 @@ public class TestTaggedLogAPIEntity {
 
     @Test
     public void testJsonSerializeMap() throws JsonProcessingException {
-        Map<List<String>,List<Object>> entries = new HashMap<List<String>,List<Object>>(){
+        Map<List<String>, List<Object>> entries = new HashMap<List<String>, List<Object>>() {
             {
-                put(Arrays.asList("a","b"),Arrays.asList(1,2,3));
+                put(Arrays.asList("a", "b"), Arrays.asList(1, 2, 3));
             }
         };
         String json = objectMapper.writeValueAsString(entries.entrySet());

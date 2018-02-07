@@ -25,7 +25,6 @@ import org.apache.eagle.log.entity.meta.IndexDefinition;
 import org.apache.eagle.log.entity.old.GenericDeleter;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,13 +39,16 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
 
     @BeforeClass
     public static void createTable() throws IllegalAccessException, InstantiationException, IOException {
-        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition ed = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         hbase.createTable(ed.getTable(), ed.getColumnFamily());
     }
 
     @Test
-    public void testGetValue() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+    public void testGetValue() throws InstantiationException, IllegalAccessException,
+        IllegalArgumentException, InvocationTargetException {
+        EntityDefinition ed = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         if (ed == null) {
             EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
             ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
@@ -79,7 +81,8 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
     @Test
     public void testIndexDefinition() throws InstantiationException, IllegalAccessException {
 
-        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition ed = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         if (ed == null) {
             EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
             ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
@@ -97,10 +100,12 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
 
     @Test
     public void testWriteEmptyIndexFieldAndDeleteWithoutPartition() throws Exception {
-        EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition entityDefinition = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         // hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
 
-        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition ed = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         if (ed == null) {
             EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
             ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
@@ -141,14 +146,15 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
             qualifiers[5] = "f".getBytes();
             qualifiers[6] = "g".getBytes();
 
-            UniqueIndexLogReader reader = new UniqueIndexLogReader(indexDefs[0], indexRowkeys, qualifiers, null);
+            UniqueIndexLogReader reader = new UniqueIndexLogReader(indexDefs[0], indexRowkeys, qualifiers,
+                                                                   null);
             reader.open();
             InternalLog log = reader.read();
             Assert.assertNotNull(log);
 
             TaggedLogAPIEntity newEntity = HBaseInternalLogHelper.buildEntity(log, ed);
             Assert.assertEquals(TestLogAPIEntity.class, newEntity.getClass());
-            TestLogAPIEntity e1 = (TestLogAPIEntity) newEntity;
+            TestLogAPIEntity e1 = (TestLogAPIEntity)newEntity;
             Assert.assertEquals(e.getField1(), e1.getField1());
             Assert.assertEquals(e.getField2(), e1.getField2());
             Assert.assertEquals(e.getField3(), e1.getField3());
@@ -161,7 +167,7 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
             Assert.assertNotNull(log);
             newEntity = HBaseInternalLogHelper.buildEntity(log, ed);
             Assert.assertEquals(TestLogAPIEntity.class, newEntity.getClass());
-            e1 = (TestLogAPIEntity) newEntity;
+            e1 = (TestLogAPIEntity)newEntity;
             Assert.assertEquals(e.getField1(), e1.getField1());
             Assert.assertEquals(e.getField2(), e1.getField2());
             Assert.assertEquals(e.getField3(), e1.getField3());
@@ -188,16 +194,18 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
         // hbase.deleteTable(entityDefinition.getTable());
     }
 
-
     /*
-     *  testWriteEmptyIndexFieldAndDeleteWithPartition(eagle.log.entity.TestTestLogAPIEntity): expected:<86400000> but was:<0>
+     * testWriteEmptyIndexFieldAndDeleteWithPartition(eagle.log.entity.TestTestLogAPIEntity):
+     * expected:<86400000> but was:<0>
      */
-    //@Test
+    // @Test
     public void testWriteEmptyIndexFieldAndDeleteWithPartition() throws Exception {
-        EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition entityDefinition = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         // hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
 
-        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition ed = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         if (ed == null) {
             EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
             ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
@@ -244,14 +252,15 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
             qualifiers[7] = "cluster".getBytes();
             qualifiers[8] = "datacenter".getBytes();
 
-            UniqueIndexLogReader reader = new UniqueIndexLogReader(indexDefs[0], indexRowkeys, qualifiers, null);
+            UniqueIndexLogReader reader = new UniqueIndexLogReader(indexDefs[0], indexRowkeys, qualifiers,
+                                                                   null);
             reader.open();
             InternalLog log = reader.read();
             Assert.assertNotNull(log);
 
             TaggedLogAPIEntity newEntity = HBaseInternalLogHelper.buildEntity(log, ed);
             Assert.assertEquals(TestLogAPIEntity.class, newEntity.getClass());
-            TestLogAPIEntity e1 = (TestLogAPIEntity) newEntity;
+            TestLogAPIEntity e1 = (TestLogAPIEntity)newEntity;
             Assert.assertEquals(e.getField1(), e1.getField1());
             Assert.assertEquals(e.getField2(), e1.getField2());
             Assert.assertEquals(e.getField3(), e1.getField3());
@@ -267,7 +276,7 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
             Assert.assertNotNull(log);
             newEntity = HBaseInternalLogHelper.buildEntity(log, ed);
             Assert.assertEquals(TestLogAPIEntity.class, newEntity.getClass());
-            e1 = (TestLogAPIEntity) newEntity;
+            e1 = (TestLogAPIEntity)newEntity;
             Assert.assertEquals(e.getField1(), e1.getField1());
             Assert.assertEquals(e.getField2(), e1.getField2());
             Assert.assertEquals(e.getField3(), e1.getField3());
@@ -298,15 +307,18 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
     }
 
     /**
-     * testWriteEmptyIndexFieldAndDeleteWithPartitionAndTimeSeries(eagle.log.entity.TestTestLogAPIEntity): expected:<1434809555569> but was:<0>
+     * testWriteEmptyIndexFieldAndDeleteWithPartitionAndTimeSeries(eagle.log.entity.TestTestLogAPIEntity):
+     * expected:<1434809555569> but was:<0>
      */
 
-    //@Test
+    // @Test
     public void testWriteEmptyIndexFieldAndDeleteWithPartitionAndTimeSeries() throws Exception {
-        EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition entityDefinition = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         // hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
 
-        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        EntityDefinition ed = EntityDefinitionManager
+            .getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
         if (ed == null) {
             EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
             ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
@@ -357,14 +369,15 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
             qualifiers[7] = "cluster".getBytes();
             qualifiers[8] = "datacenter".getBytes();
 
-            UniqueIndexLogReader reader = new UniqueIndexLogReader(indexDefs[0], indexRowkeys, qualifiers, null);
+            UniqueIndexLogReader reader = new UniqueIndexLogReader(indexDefs[0], indexRowkeys, qualifiers,
+                                                                   null);
             reader.open();
             InternalLog log = reader.read();
             Assert.assertNotNull(log);
 
             TaggedLogAPIEntity newEntity = HBaseInternalLogHelper.buildEntity(log, ed);
             Assert.assertEquals(TestLogAPIEntity.class, newEntity.getClass());
-            TestLogAPIEntity e1 = (TestLogAPIEntity) newEntity;
+            TestLogAPIEntity e1 = (TestLogAPIEntity)newEntity;
             Assert.assertEquals(e.getField1(), e1.getField1());
             Assert.assertEquals(e.getField2(), e1.getField2());
             Assert.assertEquals(e.getField3(), e1.getField3());
@@ -380,7 +393,7 @@ public class TestTestLogAPIEntity extends TestHBaseBase {
             Assert.assertNotNull(log);
             newEntity = HBaseInternalLogHelper.buildEntity(log, ed);
             Assert.assertEquals(TestLogAPIEntity.class, newEntity.getClass());
-            e1 = (TestLogAPIEntity) newEntity;
+            e1 = (TestLogAPIEntity)newEntity;
             Assert.assertEquals(e.getField1(), e1.getField1());
             Assert.assertEquals(e.getField2(), e1.getField2());
             Assert.assertEquals(e.getField3(), e1.getField3());
