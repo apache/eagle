@@ -203,6 +203,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
                 Map<String, String> hiveQueryLog = new HashMap<>();
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document dt = db.parse(is);
                 Element element = dt.getDocumentElement();
