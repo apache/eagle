@@ -53,8 +53,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     private final String HIVE_INSERT_STATEMENT = "INSERT INTO hive_sensitivity_entity (site, hive_resource, sensitivity_type) VALUES (?, ?, ?)";
 
     private final String OOZIE_QUERY_ALL_STATEMENT = "SELECT jobid, name, sensitivity_type FROM oozie_sensitivity_entity";
-    private final String OOZIE_INSERT_STATEMENT = "INSERT INTO oozie_sensitivity_entity (site, filedir, sensitivity_type) VALUES (?, ?, ?)";
-
+    private final String OOZIE_INSERT_STATEMENT = "INSERT INTO oozie_sensitivity_entity (jobid, name, sensitivity_type) VALUES (?, ?, ?)";
     // get connection url from config
     @Inject
     public JDBCSecurityMetadataDAO(Config config){
