@@ -36,7 +36,7 @@ public class TestCompiledQuery {
 
     static EntityDefinition entityDefinition = null;
 
-    final String queryStr = "TestTimeSeriesAPIEntity[@cluster=\"c4ut\"]{*}";
+    final String queryStr = "TestTimeSeriesAPIEntity[@cluster =\"c4ut\"]{*}";
     final int pageSize = 1000;
     final long baseTimestamp = createTimeStamp(2017, 0, 11, 0, 0, 0);
     final String startTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp);

@@ -70,18 +70,18 @@ public interface DataStorage<I> {
     <E extends TaggedLogAPIEntity> ModifyResult<I> delete(List<E> entities, EntityDefinition entityDefinition) throws IOException;
 
     /**
-     * Execute delete operation by entity ids
-     *
-     * @throws IOException
-     */
-    ModifyResult<I> deleteByID(List<I> ids, EntityDefinition entityDefinition) throws IOException;
-
-    /**
      * Execute delete operation
      *
      * @throws IOException
      */
     ModifyResult<I> delete(CompiledQuery query, EntityDefinition entityDefinition) throws IOException;
+
+    /**
+     * Execute delete operation by entity ids
+     *
+     * @throws IOException
+     */
+    ModifyResult<I> deleteByID(List<I> ids, EntityDefinition entityDefinition) throws IOException;
 
     /**
      * Execute query to return a list of results, may not always tagged entities

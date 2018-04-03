@@ -23,7 +23,7 @@ import org.junit.Test;
  * @since 3/20/15
  */
 public class TestDataStorageServiceProvider implements DataStorageServiceProvider {
-    private final static String TEST = "test";
+    private static final String TEST = "test";
 
     @Override
     public String getType() {

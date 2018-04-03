@@ -20,6 +20,10 @@ package org.apache.eagle.storage.result;
  * @since 3/18/15
  */
 public class Result {
+    private boolean success;
+
+    private int size;
+
     public boolean isSuccess() {
         return success;
     }
@@ -27,9 +31,6 @@ public class Result {
     public void setSuccess(boolean success) {
         this.success = success;
     }
-    private boolean success;
-
-    private int size;
 
     public void setSize(int size) {
         this.size = size;
