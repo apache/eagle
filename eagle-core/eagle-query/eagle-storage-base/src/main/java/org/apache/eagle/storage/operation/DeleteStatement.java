@@ -36,7 +36,7 @@ public class DeleteStatement implements Statement<ModifyResult<String>> {
 
     private EntityDefinition entityDefinition;
 
-    public DeleteStatement(String serviceName){
+    public DeleteStatement(String serviceName) {
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityByServiceName(serviceName);
         } catch (InstantiationException e) {
@@ -46,7 +46,7 @@ public class DeleteStatement implements Statement<ModifyResult<String>> {
         }
     }
 
-    public DeleteStatement(Class<? extends TaggedLogAPIEntity> entityClass){
+    public DeleteStatement(Class<? extends TaggedLogAPIEntity> entityClass) {
         try {
             this.entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(entityClass);
         } catch (InstantiationException e) {
@@ -56,41 +56,41 @@ public class DeleteStatement implements Statement<ModifyResult<String>> {
         }
     }
 
-    public DeleteStatement(RawQuery query){
+    public DeleteStatement(RawQuery query) {
         this.query = query;
     }
 
-    public void setIds(List ids){
+    public void setIds(List ids) {
         this.ids = ids;
     }
 
-    public void setEntities(List<? extends TaggedLogAPIEntity> entities){
+    public void setEntities(List<? extends TaggedLogAPIEntity> entities) {
         this.entities = entities;
     }
 
-//    public void setQuery(RawQuery query){
-//        this.query = query;
-//    }
+    //    public void setQuery(RawQuery query) {
+    //        this.query = query;
+    //    }
 
     @SuppressWarnings("unchecked")
     @Override
-    public ModifyResult<String> execute(DataStorage storage) throws IOException{
+    public ModifyResult<String> execute(DataStorage storage) throws IOException {
         ModifyResult result;
         try {
-            if(this.ids !=null){
+            if (this.ids != null) {
                 result = storage.deleteByID(this.ids,this.entityDefinition);
-            }else if(this.entities != null){
-                result =storage.delete(this.entities, this.entityDefinition);
-            }else if(this.query != null){
+            } else if (this.entities != null) {
+                result = storage.delete(this.entities, this.entityDefinition);
+            } else if (this.query != null) {
                 CompiledQuery compiledQuery = storage.compile(this.query);
                 this.entityDefinition = EntityDefinitionManager.getEntityByServiceName(compiledQuery.getServiceName());
                 result = storage.delete(compiledQuery,this.entityDefinition);
-            }else{
+            } else {
                 throw new IllegalStateException("bad delete statement, not given enough parameters");
             }
         } catch (QueryCompileException e) {
             throw new IOException(e);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new IOException(ex);
         }
         return result;

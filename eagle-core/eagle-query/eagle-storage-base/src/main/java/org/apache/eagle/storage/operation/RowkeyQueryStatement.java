@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @since 6/29/15
  */
-public class RowkeyQueryStatement implements Statement<QueryResult<?>>{
+public class RowkeyQueryStatement implements Statement<QueryResult<?>> {
     private final List<String> rowkeys;
     private final EntityDefinition entityDefinition;
 

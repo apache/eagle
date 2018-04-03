@@ -26,7 +26,7 @@ import java.util.*;
  * @since 3/20/15
  */
 public class DataStorageServiceLoader {
-    private final Logger LOG = LoggerFactory.getLogger(DataStorageServiceLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataStorageServiceLoader.class);
     private final ServiceLoader<DataStorageServiceProvider> serviceLoader;
     private final Map<String, DataStorageServiceProvider> storageServiceProviders;
 

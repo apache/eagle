@@ -31,10 +31,12 @@ import java.util.Properties;
  * @since 3/20/15
  */
 public class DataStorageManager {
-    public final static String EAGLE_STORAGE_TYPE = "eagle.service.storage-type";
-    public final static String DEFAULT_DATA_STORAGE_TYPE = "hbase";
+    public static final String EAGLE_STORAGE_TYPE = "eagle.service.storage-type";
+    public static final String DEFAULT_DATA_STORAGE_TYPE = "hbase";
 
-    private final static Logger LOG = LoggerFactory.getLogger(DataStorageManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataStorageManager.class);
+
+    private static DataStorage singletonStorageInstance;
 
     /**
      * Get data storage without cache
@@ -56,39 +58,6 @@ public class DataStorageManager {
             throw new IllegalStateException(e);
         }
         return dataStorage;
-    }
-
-    private static DataStorage singletonStorageInstance;
-
-    /**
-     * get storage class by type configured as eagle.storage.type from eagle configuration: config.properties
-     *
-     * @return DataStorage instance
-     * @throws IllegalDataStorageTypeException
-     */
-    public synchronized static DataStorage getDataStorageByEagleConfig(boolean cache) throws IllegalDataStorageTypeException {
-        String storageType = EagleConfigFactory.load().getStorageType();
-
-        if (!cache) {
-            return newDataStorage(storageType);
-        }
-
-        if (singletonStorageInstance == null) {
-            if (storageType == null) {
-                LOG.error(EAGLE_STORAGE_TYPE + " is null, trying default data storage: " + DEFAULT_DATA_STORAGE_TYPE);
-                storageType = DEFAULT_DATA_STORAGE_TYPE;
-            }
-            singletonStorageInstance = newDataStorage(storageType);
-        }
-        return singletonStorageInstance;
-    }
-
-    /**
-     * @return DataStorage instance by singleton pattern
-     * @throws IllegalDataStorageTypeException
-     */
-    public synchronized static DataStorage getDataStorageByEagleConfig() throws IllegalDataStorageTypeException {
-        return getDataStorageByEagleConfig(true);
     }
 
     /**
@@ -121,4 +90,36 @@ public class DataStorageManager {
         }
         return newDataStorage(storageType);
     }
+
+    /**
+     * get storage class by type configured as eagle.storage.type from eagle configuration: config.properties
+     *
+     * @return DataStorage instance
+     * @throws IllegalDataStorageTypeException
+     */
+    public static synchronized DataStorage getDataStorageByEagleConfig(boolean cache) throws IllegalDataStorageTypeException {
+        String storageType = EagleConfigFactory.load().getStorageType();
+
+        if (!cache) {
+            return newDataStorage(storageType);
+        }
+
+        if (singletonStorageInstance == null) {
+            if (storageType == null) {
+                LOG.error(EAGLE_STORAGE_TYPE + " is null, trying default data storage: " + DEFAULT_DATA_STORAGE_TYPE);
+                storageType = DEFAULT_DATA_STORAGE_TYPE;
+            }
+            singletonStorageInstance = newDataStorage(storageType);
+        }
+        return singletonStorageInstance;
+    }
+
+    /**
+     * @return DataStorage instance by singleton pattern
+     * @throws IllegalDataStorageTypeException
+     */
+    public static synchronized DataStorage getDataStorageByEagleConfig() throws IllegalDataStorageTypeException {
+        return getDataStorageByEagleConfig(true);
+    }
+
 }
