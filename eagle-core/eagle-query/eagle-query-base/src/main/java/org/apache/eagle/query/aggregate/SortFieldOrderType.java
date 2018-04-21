@@ -51,7 +51,7 @@ public enum SortFieldOrderType {
     public static AggregateParams.SortFieldOrder matchAll(String sortFieldOrder) {
         for (SortFieldOrderType type : SortFieldOrderType.values()) {
             SortFieldOrderTypeMatcher m = type.matcher(sortFieldOrder);
-            if (m.find()) {
+            if (m.isMatched()) {
                 return m.sortFieldOrder();
             }
         }

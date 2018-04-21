@@ -28,7 +28,7 @@ public class SortFieldOrderTypeMatcher {
         }
     }
 
-    public boolean find() {
+    public boolean isMatched() {
         return this.matched;
     }
 
