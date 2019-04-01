@@ -62,7 +62,10 @@ public class MapRNameResolver {
         JSONArray list = (JSONArray) response.get("data");
         if(list.length()!=0) {
             JSONObject jsonObject = (JSONObject) list.get(0);
-            volumeId = jsonObject.getString("volumeid");
+            String string = jsonObject.optString("volumeid");
+            if (!string.isEmpty()) {
+                volumeId = string;
+            }
         }
         return volumeId;
     }
