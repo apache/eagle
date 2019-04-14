@@ -56,7 +56,7 @@ public final class JMXQueryHelper {
         final Map<String, JMXBean> resultMap = new HashMap<String, JMXBean>();
         final JSONTokener tokener = new JSONTokener(is);
         final JSONObject jsonBeansObject = new JSONObject(tokener);
-        final JSONArray jsonArray = jsonBeansObject.getJSONArray("beans");
+        final JSONArray jsonArray = jsonBeansObject.optJSONArray("beans");
         int size = jsonArray.length();
         for (int i = 0; i < size; ++i) {
             final JSONObject obj = (JSONObject) jsonArray.get(i);
