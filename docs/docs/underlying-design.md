@@ -22,7 +22,7 @@ limitations under the License.
 
 ### Distributed Real-time Streaming
 
-Eagle Alert Engine is buit on open source realtime streaming infrastrcuture like [Apache Storm](http://storm.apache.org/) as default execution engine and [Apache  Kafka](http://kafka.apache.org/) as default messagig Bus.
+Eagle Alert Engine is buit on open source realtime streaming infrastrcuture like [Apache Storm](http://storm.apache.org/) as default execution engine and [Apache  Kafka](http://kafka.apache.org/) as default messaging Bus.
 
 ![Eagle Alert Engine](include/images/alert_engine.png)
 
