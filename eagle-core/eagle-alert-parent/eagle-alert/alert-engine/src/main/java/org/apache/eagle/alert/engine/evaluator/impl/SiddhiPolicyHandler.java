@@ -26,16 +26,16 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.stream.input.InputHandler;
 
 import java.util.List;
 import java.util.Map;
 
 public class SiddhiPolicyHandler implements PolicyStreamHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SiddhiPolicyHandler.class);
-    private ExecutionPlanRuntime executionRuntime;
+    private SiddhiAppRuntime executionRuntime;
     private SiddhiManager siddhiManager;
     private Map<String, StreamDefinition> sds;
     private PolicyDefinition policy;
@@ -59,7 +59,7 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         this.siddhiManager = new SiddhiManager();
         String plan = generateExecutionPlan(policy, sds);
         try {
-            this.executionRuntime = siddhiManager.createExecutionPlanRuntime(plan);
+            this.executionRuntime = siddhiManager.createSiddhiAppRuntime(plan);
             LOG.info("Created siddhi runtime {}", executionRuntime.getName());
         } catch (Exception parserException) {
             LOG.error("Failed to create siddhi runtime for policy: {}, siddhi plan: \n\n{}\n", context.getPolicyDefinition().getName(), plan, parserException);

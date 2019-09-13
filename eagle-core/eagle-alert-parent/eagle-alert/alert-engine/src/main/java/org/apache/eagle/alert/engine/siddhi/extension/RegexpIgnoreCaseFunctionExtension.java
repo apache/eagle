@@ -17,62 +17,110 @@
 
 package org.apache.eagle.alert.engine.siddhi.extension;
 
-import org.wso2.siddhi.core.config.ExecutionPlanContext;
-import org.wso2.siddhi.core.exception.ExecutionPlanRuntimeException;
-import org.wso2.siddhi.core.executor.ConstantExpressionExecutor;
-import org.wso2.siddhi.core.executor.ExpressionExecutor;
-import org.wso2.siddhi.extension.string.RegexpFunctionExtension;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
+import io.siddhi.annotation.Example;
+import io.siddhi.annotation.Extension;
+import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ParameterOverload;
+import io.siddhi.annotation.ReturnAttribute;
+import io.siddhi.annotation.util.DataType;
+import io.siddhi.core.config.SiddhiQueryContext;
+import io.siddhi.core.exception.SiddhiAppRuntimeException;
+import io.siddhi.core.executor.ConstantExpressionExecutor;
+import io.siddhi.core.executor.ExpressionExecutor;
+import io.siddhi.core.executor.function.FunctionExecutor;
+import io.siddhi.core.util.config.ConfigReader;
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
+import io.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.exception.SiddhiAppValidationException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * regexpIgnoreCase(string, regex)
+ *
  * Tells whether or not this 'string' matches the given regular expression 'regex'.
  * Accept Type(s): (STRING,STRING)
  * Return Type(s): BOOLEAN
  */
-public class RegexpIgnoreCaseFunctionExtension extends RegexpFunctionExtension {
+@Extension(
+        name = "regexpIgnoreCase",
+        namespace = "str",
+        description = "Returns whether 'source' string matches the given regular expression 'regex'.",
+        parameters = {
+                @Parameter(name = "source",
+                        description = "Source string.",
+                        type = {DataType.STRING},
+                        dynamic = true),
+                @Parameter(name = "regex",
+                        description = "Regex string.",
+                        type = {DataType.STRING},
+                        dynamic = true)
+        },
+        parameterOverloads = {
+                @ParameterOverload(parameterNames = {"source", "regex"})
+        },
+        returnAttributes = @ReturnAttribute(
+                description = "Returns whether 'source' matches the given regular expression 'regex'.",
+                type = {DataType.BOOL}),
+        examples = {
+                @Example(
+                        syntax = "str:regexpIgnoreCase(string, regex)",
+                        description = "Returns whether 'source' matches the given regular expression 'regex'.")
+        }
+)
+public class RegexpIgnoreCaseFunctionExtension extends FunctionExecutor {
 
     //state-variables
-    boolean isRegexConstant = false;
-    String regexConstant;
-    Pattern patternConstant;
+    private boolean isRegexConstant = false;
+    private Pattern patternConstant;
 
+    /**
+     * The initialization method for EqualsIgnoreCaseExtension,
+     * this method will be called before the other methods.
+     *
+     * @param attributeExpressionExecutors the executors of each function parameter
+     * @param configReader                 the config reader for the Siddhi app
+     * @param siddhiQueryContext           the context of the Siddhi query
+     */
     @Override
-    protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
+    protected StateFactory init(ExpressionExecutor[] attributeExpressionExecutors, ConfigReader configReader,
+                                SiddhiQueryContext siddhiQueryContext) {
         if (attributeExpressionExecutors.length != 2) {
-            throw new ExecutionPlanValidationException("Invalid no of arguments passed to str:regexpIgnoreCase() function, required 2, "
-                + "but found " + attributeExpressionExecutors.length);
+            throw new SiddhiAppValidationException("Invalid no of arguments passed to str:regexpIgnoreCase() function, "
+                    + "required 2, but found " + attributeExpressionExecutors.length);
         }
         if (attributeExpressionExecutors[0].getReturnType() != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the first argument of str:regexpIgnoreCase() function, "
-                + "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[0].getReturnType().toString());
+            throw new SiddhiAppValidationException("Invalid parameter type found for the first argument of "
+                    + "str:regexpIgnoreCase() function, required " + Attribute.Type.STRING + ", but found "
+                    + attributeExpressionExecutors[0].getReturnType().toString());
         }
         if (attributeExpressionExecutors[1].getReturnType() != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the second argument of str:regexpIgnoreCase() function, "
-                + "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[1].getReturnType().toString());
+            throw new SiddhiAppValidationException("Invalid parameter type found for the second argument of "
+                    + "str:regexpIgnoreCase() function, required " + Attribute.Type.STRING + ", but found "
+                    + attributeExpressionExecutors[1].getReturnType().toString());
         }
         if (attributeExpressionExecutors[1] instanceof ConstantExpressionExecutor) {
-            isRegexConstant = true;
-            regexConstant = (String) ((ConstantExpressionExecutor) attributeExpressionExecutors[1]).getValue();
+            String regexConstant = (String) ((ConstantExpressionExecutor) attributeExpressionExecutors[1]).getValue();
             patternConstant = Pattern.compile(regexConstant, Pattern.CASE_INSENSITIVE);
+            isRegexConstant = true;
         }
+        return null;
     }
 
     @Override
-    protected Object execute(Object[] data) {
+    protected Object execute(Object[] data, State state) {
         String regex;
         Pattern pattern;
         Matcher matcher;
 
         if (data[0] == null) {
-            throw new ExecutionPlanRuntimeException("Invalid input given to str:regexpIgnoreCase() function. First argument cannot be null");
+            throw new SiddhiAppRuntimeException("Invalid input given to str:regexpIgnoreCase() function. "
+                    + "First argument cannot be null");
         }
         if (data[1] == null) {
-            throw new ExecutionPlanRuntimeException("Invalid input given to str:regexpIgnoreCase() function. Second argument cannot be null");
+            throw new SiddhiAppRuntimeException("Invalid input given to str:regexpIgnoreCase() function. "
+                    + "Second argument cannot be null");
         }
         String source = (String) data[0];
 
@@ -87,4 +135,15 @@ public class RegexpIgnoreCaseFunctionExtension extends RegexpFunctionExtension {
             return matcher.matches();
         }
     }
+
+    @Override
+    protected Object execute(Object data, State state) {
+        return null;
+    }
+
+    @Override
+    public Attribute.Type getReturnType() {
+        return Attribute.Type.BOOL;
+    }
+
 }

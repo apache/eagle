@@ -10,7 +10,7 @@
   ],
   "definition": {
     "type": "siddhiCEPEngine",
-    "value": "select count(*) from in-stream-1"
+    "value": "select count() from in-stream-1"
   },
   "partitionSpec": [
     {

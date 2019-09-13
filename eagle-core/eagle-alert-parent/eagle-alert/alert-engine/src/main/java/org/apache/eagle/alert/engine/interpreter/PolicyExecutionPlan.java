@@ -19,7 +19,7 @@ package org.apache.eagle.alert.engine.interpreter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.wso2.siddhi.query.api.ExecutionPlan;
+import io.siddhi.query.api.SiddhiApp;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class PolicyExecutionPlan {
     /**
      * Execution plan.
      */
-    private ExecutionPlan internalExecutionPlan;
+    private SiddhiApp internalSiddhiApp;
 
     private String executionPlanDesc;
 
@@ -58,12 +58,12 @@ public class PolicyExecutionPlan {
         this.executionPlanSource = executionPlanSource;
     }
 
-    public ExecutionPlan getInternalExecutionPlan() {
-        return internalExecutionPlan;
+    public SiddhiApp getInternalSiddhiApp() {
+        return internalSiddhiApp;
     }
 
-    public void setInternalExecutionPlan(ExecutionPlan internalExecutionPlan) {
-        this.internalExecutionPlan = internalExecutionPlan;
+    public void setInternalSiddhiApp(SiddhiApp internalSiddhiApp) {
+        this.internalSiddhiApp = internalSiddhiApp;
     }
 
     public String getExecutionPlanDesc() {

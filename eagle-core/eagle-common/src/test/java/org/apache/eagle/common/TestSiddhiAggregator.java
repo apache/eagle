@@ -18,11 +18,11 @@ package org.apache.eagle.common;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.query.output.callback.QueryCallback;
+import io.siddhi.core.stream.input.InputHandler;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,7 +36,7 @@ public class TestSiddhiAggregator {
             " @info(name='query') " +
             " from s[metric == \"missingblocks\"]#window.externalTimeBatch(timestamp, 1 min, 0) select host, count(value) as avg group by host insert into tmp; ";
         SiddhiManager sm = new SiddhiManager();
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(ql);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(ql);
 
         InputHandler input = runtime.getInputHandler("s");
 

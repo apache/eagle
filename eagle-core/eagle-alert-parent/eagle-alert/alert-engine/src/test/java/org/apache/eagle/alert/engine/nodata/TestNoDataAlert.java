@@ -17,11 +17,11 @@
 package org.apache.eagle.alert.engine.nodata;
 
 import org.junit.Test;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
 
 /**
  * Since 6/27/16.
@@ -33,7 +33,7 @@ public class TestNoDataAlert {
 //        String[] appearHosts = new String[]{"host_6","host_7","host_8"};
 //        String[] noDataHosts = new String[]{"host_1","host_2","host_3","host_4","host_5"};
 
-        ExecutionPlanRuntime runtime = new SiddhiManager().createExecutionPlanRuntime(
+        SiddhiAppRuntime runtime = new SiddhiManager().createSiddhiAppRuntime(
             "define stream appearStream (key string, src string);" +
                 "define stream expectStream (key string, src string);" +
                 "define table expectTable (key string, src string);" +
@@ -46,7 +46,7 @@ public class TestNoDataAlert {
 //                        "from joinStream[k2 is null] select k1 insert current events into missingStream;"
         );
 
-//        ExecutionPlanRuntime runtime = new SiddhiManager().createExecutionPlanRuntime(
+//        SiddhiAppRuntime runtime = new SiddhiManager().createSiddhiAppRuntime(
 //                "define stream appearStream (key string, src string);"+
 //                        "define stream expectStream (key string, src string);"+
 //                        "define table expectTable (key string, src string);"+
@@ -87,7 +87,7 @@ public class TestNoDataAlert {
      */
     @Test
     public void testMissingBlock() throws Exception {
-        ExecutionPlanRuntime runtime = new SiddhiManager().createExecutionPlanRuntime(
+        SiddhiAppRuntime runtime = new SiddhiManager().createSiddhiAppRuntime(
             "define stream hadoopJmxMetricEventStream (component string, metric string, host string, site string, value double, timestamp long);" +
                 "from every a = hadoopJmxMetricEventStream[ component==\"namenode\" and metric == \"hadoop.namenode.dfs.missingblocks\"] -> " +
                 "b = hadoopJmxMetricEventStream[b.component==a.component and b.metric==a.metric and b.host==a.host and " +

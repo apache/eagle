@@ -21,11 +21,11 @@ package org.apache.eagle.alert.engine.siddhi.extension;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class AttributeCollectAggregatorTest {
         ql += " select eagle:collect(timestamp) as timestamps, eagle:collect(host) as hosts, type group by type insert into output;";
 
         SiddhiManager sm = new SiddhiManager();
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(ql);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(ql);
 
         InputHandler input = runtime.getInputHandler("s1");
         runtime.addCallback("output", new StreamCallback() {
@@ -143,6 +143,6 @@ public class AttributeCollectAggregatorTest {
         ql += "from perfmon_input_stream_cpu#window.length(3) select host, min(value) as min group by host having min>91.0 insert into perfmon_output_stream_cpu;";
 
         SiddhiManager sm = new SiddhiManager();
-        sm.createExecutionPlanRuntime(ql);
+        sm.createSiddhiAppRuntime(ql);
     }
 }

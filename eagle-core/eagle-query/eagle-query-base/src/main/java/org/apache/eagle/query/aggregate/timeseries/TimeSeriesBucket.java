@@ -51,7 +51,7 @@ public class TimeSeriesBucket {
 
     /**
      * add datapoint which has a list of values for different aggregate functions
-     * for example, sum(numHosts), count(*), avg(timespan) etc
+     * for example, sum(numHosts), count(), avg(timespan) etc
      * @param timestamp
      * @param values
      */

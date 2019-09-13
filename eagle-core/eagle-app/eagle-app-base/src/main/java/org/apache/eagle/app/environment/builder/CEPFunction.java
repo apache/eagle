@@ -20,11 +20,11 @@ import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class CEPFunction implements TransformFunction {
 
     private static final Logger LOG = LoggerFactory.getLogger(CEPFunction.class);
 
-    private ExecutionPlanRuntime runtime;
+    private SiddhiAppRuntime runtime;
     private SiddhiManager siddhiManager;
     private final CEPDefinition cepDefinition;
     private Collector collector;
@@ -57,7 +57,7 @@ public class CEPFunction implements TransformFunction {
     public void open(Collector collector) {
         this.collector = collector;
         this.siddhiManager = new SiddhiManager();
-        this.runtime = siddhiManager.createExecutionPlanRuntime(cepDefinition.getSiddhiQuery());
+        this.runtime = siddhiManager.createSiddhiAppRuntime(cepDefinition.getSiddhiQuery());
         if (runtime.getStreamDefinitionMap().containsKey(cepDefinition.outputStreamId)) {
             runtime.addCallback(cepDefinition.outputStreamId, new StreamCallback() {
                 @Override
