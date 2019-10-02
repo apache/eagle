@@ -38,6 +38,10 @@ try:
 except ImportError:
     JIRA_IMPORTED = False
 
+if sys.version_info < (3, 0):
+    sys.stdout.write("Sorry, requires Python 3.x, not Python 2.x\n")
+    sys.exit(1)
+
 # Location of your EAGLE git development area
 EAGLE_HOME = os.environ.get("EAGLE_HOME", os.getcwd())
 # Remote name which points to the Gihub site
@@ -71,17 +75,18 @@ def get_json(url):
         if GITHUB_OAUTH_KEY:
             headers={'Authorization': 'token %s' % GITHUB_OAUTH_KEY}
         response = requests.get(url=url, headers=headers)
+        response.raise_for_status()
         return response.json()
     except requests.HTTPError as e:
-        if "X-RateLimit-Remaining" in e.headers and e.headers["X-RateLimit-Remaining"] == '0':
+        if hasattr(e, "headers") and "X-RateLimit-Remaining" in e.headers and e.headers["X-RateLimit-Remaining"] == '0':
             print("Exceeded the GitHub API rate limit; see the instructions in " + \
                   "eagle-dev/merge_eagle_pr.py to configure an OAuth token for making authenticated " + \
                   "GitHub requests.")
         else:
-            print("Unable to fetch URL, exiting: %s" % url)
+            print("Unable to fetch URL, exiting: %s" % url, e)
         sys.exit(-1)
     except Exception as e:
-        print("Unable to fetch URL, exiting: %s" % url)
+        print("Unable to fetch URL, exiting: %s" % url, e)
         sys.exit(-1)
 
 def fail(msg):
@@ -93,9 +98,9 @@ def fail(msg):
 def run_cmd(cmd):
     print(cmd)
     if isinstance(cmd, list):
-        return subprocess.check_output(cmd)
+        return str(subprocess.check_output(cmd))
     else:
-        return subprocess.check_output(cmd.split(" "))
+        return str(subprocess.check_output(cmd.split(" ")))
 
 
 def continue_maybe(prompt):
@@ -362,11 +367,17 @@ def check_init():
         run_cmd("git remote add %s %s" % (PUSH_REMOTE_NAME, PUSH_REPO))
 
 
+def str(value):
+    if isinstance(value, bytes):
+        return value.decode('utf-8')
+    else:
+        return value
+
 def main():
     global original_head
 
     os.chdir(EAGLE_HOME)
-    original_head = get_current_ref()
+    original_head = str(get_current_ref())
 
     check_init()
 
