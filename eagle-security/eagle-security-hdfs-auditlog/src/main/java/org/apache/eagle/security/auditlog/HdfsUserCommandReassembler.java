@@ -24,11 +24,11 @@ import org.apache.eagle.security.entity.HdfsUserCommandPatternEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.query.output.callback.QueryCallback;
+import io.siddhi.core.stream.input.InputHandler;
 
 import java.util.*;
 
@@ -156,14 +156,14 @@ public class HdfsUserCommandReassembler {
         }
 
         LOG.info("patterns: " + sb.toString());
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(sb.toString());
+        SiddhiAppRuntime SiddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(sb.toString());
 
         for(HdfsUserCommandPatternEntity rule : list){
-            executionPlanRuntime.addCallback(rule.getTags().get("userCommand"), new GenericQueryCallback(rule.getFieldSelector(), rule.getFieldModifier()));
+            SiddhiAppRuntime.addCallback(rule.getTags().get("userCommand"), new GenericQueryCallback(rule.getFieldSelector(), rule.getFieldModifier()));
         }
 
-        inputHandler = executionPlanRuntime.getInputHandler(streamName);
-        executionPlanRuntime.start();
+        inputHandler = SiddhiAppRuntime.getInputHandler(streamName);
+        SiddhiAppRuntime.start();
     }
 
     public void flatMap(List<Object> input, OutputCollector collector) {

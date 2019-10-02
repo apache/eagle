@@ -17,6 +17,36 @@
 package org.apache.eagle.alert.engine.interpreter;
 
 import com.google.common.base.Preconditions;
+import io.siddhi.core.exception.DefinitionNotExistException;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.exception.DuplicateDefinitionException;
+import io.siddhi.query.api.exception.SiddhiAppValidationException;
+import io.siddhi.query.api.execution.ExecutionElement;
+import io.siddhi.query.api.execution.query.Query;
+import io.siddhi.query.api.execution.query.input.handler.StreamHandler;
+import io.siddhi.query.api.execution.query.input.handler.Window;
+import io.siddhi.query.api.execution.query.input.state.CountStateElement;
+import io.siddhi.query.api.execution.query.input.state.EveryStateElement;
+import io.siddhi.query.api.execution.query.input.state.LogicalStateElement;
+import io.siddhi.query.api.execution.query.input.state.NextStateElement;
+import io.siddhi.query.api.execution.query.input.state.StateElement;
+import io.siddhi.query.api.execution.query.input.state.StreamStateElement;
+import io.siddhi.query.api.execution.query.input.stream.BasicSingleInputStream;
+import io.siddhi.query.api.execution.query.input.stream.InputStream;
+import io.siddhi.query.api.execution.query.input.stream.JoinInputStream;
+import io.siddhi.query.api.execution.query.input.stream.SingleInputStream;
+import io.siddhi.query.api.execution.query.input.stream.StateInputStream;
+import io.siddhi.query.api.execution.query.output.stream.OutputStream;
+import io.siddhi.query.api.execution.query.selection.OutputAttribute;
+import io.siddhi.query.api.execution.query.selection.Selector;
+import io.siddhi.query.api.expression.Expression;
+import io.siddhi.query.api.expression.Variable;
+import io.siddhi.query.api.expression.condition.Compare;
+import io.siddhi.query.api.expression.constant.IntConstant;
+import io.siddhi.query.api.expression.constant.LongConstant;
+import io.siddhi.query.api.expression.constant.TimeConstant;
+import io.siddhi.query.compiler.SiddhiCompiler;
+import io.siddhi.query.compiler.exception.SiddhiParserException;
 import org.apache.commons.collections.ListUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
@@ -24,28 +54,13 @@ import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.exception.DefinitionNotExistException;
-import org.wso2.siddhi.query.api.ExecutionPlan;
-import org.wso2.siddhi.query.api.exception.DuplicateDefinitionException;
-import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
-import org.wso2.siddhi.query.api.execution.ExecutionElement;
-import org.wso2.siddhi.query.api.execution.query.Query;
-import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
-import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
-import org.wso2.siddhi.query.api.execution.query.input.state.*;
-import org.wso2.siddhi.query.api.execution.query.input.stream.*;
-import org.wso2.siddhi.query.api.execution.query.output.stream.OutputStream;
-import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
-import org.wso2.siddhi.query.api.execution.query.selection.Selector;
-import org.wso2.siddhi.query.api.expression.Expression;
-import org.wso2.siddhi.query.api.expression.Variable;
-import org.wso2.siddhi.query.api.expression.condition.Compare;
-import org.wso2.siddhi.query.api.expression.constant.IntConstant;
-import org.wso2.siddhi.query.api.expression.constant.LongConstant;
-import org.wso2.siddhi.query.api.expression.constant.TimeConstant;
-import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
@@ -65,7 +80,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
     private final PolicyExecutionPlan policyExecutionPlan;
 
     public PolicyExecutionPlannerImpl(String executionPlan) throws Exception {
-        this.executionPlan = executionPlan;
+        this.executionPlan = validateAndGet(executionPlan);
         this.effectiveInputStreams = new HashMap<>();
         this.effectiveInputStreamsAlias = new HashMap<>();
         this.effectiveOutputStreams = new HashMap<>();
@@ -78,20 +93,37 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
         return policyExecutionPlan;
     }
 
+    private String validateAndGet(String executionPlan) {
+        try {
+            SiddhiCompiler.parse(executionPlan);
+            return executionPlan;
+        } catch (SiddhiParserException e) {
+            // There should be at least 1 stream definition for compiler to parse the execution plan.
+            // Therefore, try prepending a IgnoreStream definition to the execution plan.
+            String ignoreStreamDef = "define stream IgnoreStream (ignored bool); ";
+            try {
+                String epWithStreamDef = ignoreStreamDef + executionPlan;
+                SiddhiCompiler.parse(epWithStreamDef);
+                return epWithStreamDef;
+            } catch (Exception ex) {
+                return executionPlan;
+            }
+        }
+    }
+
     private PolicyExecutionPlan doParse()  throws Exception {
         PolicyExecutionPlan policyExecutionPlan = new PolicyExecutionPlan();
         try {
-            ExecutionPlan executionPlan = SiddhiCompiler.parse(this.executionPlan);
-
-            policyExecutionPlan.setExecutionPlanDesc(executionPlan.toString());
+            SiddhiApp siddhiApp = SiddhiCompiler.parse(this.executionPlan);
+            policyExecutionPlan.setExecutionPlanDesc(siddhiApp.toString());
 
             // Set current execution plan as valid
             policyExecutionPlan.setExecutionPlanSource(this.executionPlan);
-            policyExecutionPlan.setInternalExecutionPlan(executionPlan);
+            policyExecutionPlan.setInternalSiddhiApp(siddhiApp);
 
 
             // Go through execution element
-            for (ExecutionElement executionElement : executionPlan.getExecutionElementList()) {
+            for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
                 // -------------
                 // Explain Query
                 // -------------
@@ -106,7 +138,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                     // Inputs stream definitions
                     for (String streamId : inputStream.getUniqueStreamIds()) {
                         if (!effectiveInputStreams.containsKey(streamId)) {
-                            org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = executionPlan.getStreamDefinitionMap().get(streamId);
+                            io.siddhi.query.api.definition.StreamDefinition streamDefinition = siddhiApp.getStreamDefinitionMap().get(streamId);
                             if (streamDefinition != null) {
                                 effectiveInputStreams.put(streamId, SiddhiDefinitionAdapter.convertFromSiddiDefinition(streamDefinition).getColumns());
                             } else {
@@ -132,7 +164,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                                 retrieveAliasForQuery(rightInputStream, queryLevelAliasToStreamMapping);
 
                             } else {
-                                throw new ExecutionPlanValidationException("Not support " + ((JoinInputStream) inputStream).getType() + " yet, currently support: INNER JOIN");
+                                throw new SiddhiAppValidationException("Not support " + ((JoinInputStream) inputStream).getType() + " yet, currently support: INNER JOIN");
                             }
 
                             Expression joinCondition = ((JoinInputStream) inputStream).getOnCompare();
@@ -159,10 +191,10 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                                         rightPartition.setStreamId(retrieveStreamId(rightExpression, effectiveInputStreams,queryLevelAliasToStreamMapping));
                                         retrievePartition(leftPartition);
                                     } else {
-                                        throw new ExecutionPlanValidationException("Only support \"EQUAL\" condition in INNER JOIN" + joinCondition);
+                                        throw new SiddhiAppValidationException("Only support \"EQUAL\" condition in INNER JOIN" + joinCondition);
                                     }
                                 } else {
-                                    throw new ExecutionPlanValidationException("Only support \"Compare\" on INNER JOIN condition in INNER JOIN: " + joinCondition);
+                                    throw new SiddhiAppValidationException("Only support \"Compare\" on INNER JOIN condition in INNER JOIN: " + joinCondition);
                                 }
                             }
                         } else if (inputStream instanceof StateInputStream) {
@@ -268,7 +300,8 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
     private String retrieveStreamId(Variable variable, Map<String, List<StreamColumn>> streamMap, Map<String, SingleInputStream> aliasMap) {
         Preconditions.checkNotNull(variable.getStreamId(), "streamId");
         if (streamMap.containsKey(variable.getStreamId()) && aliasMap.containsKey(variable.getStreamId())) {
-            throw new DuplicateDefinitionException("Duplicated streamId and alias: " + variable.getStreamId());
+            throw new DuplicateDefinitionException("Duplicated streamId and alias: " + variable.getStreamId(),
+                    variable.getQueryContextStartIndex(), variable.getQueryContextEndIndex());
         } else if (streamMap.containsKey(variable.getStreamId())) {
             return variable.getStreamId();
         } else if (aliasMap.containsKey(variable.getStreamId())) {
@@ -313,7 +346,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
                 effectivePartitions.put(partition.getStreamId(), partition);
             } else {
                 // Throw exception as it unable to conflict effectivePartitions on same stream will not be able to run in distributed mode
-                throw new ExecutionPlanValidationException("You have incompatible partitions on stream " + partition.getStreamId()
+                throw new SiddhiAppValidationException("You have incompatible partitions on stream " + partition.getStreamId()
                     + ": [1] " + effectivePartitions.get(partition.getStreamId()).toString() + " [2] " + partition.toString() + "");
             }
         }
@@ -322,7 +355,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
     private void retrieveAliasForQuery(SingleInputStream inputStream, Map<String, SingleInputStream> aliasStreamMapping) {
         if (inputStream.getStreamReferenceId() != null) {
             if (aliasStreamMapping.containsKey(inputStream.getStreamReferenceId())) {
-                throw new ExecutionPlanValidationException("Duplicated stream alias " + inputStream.getStreamId() + " -> " + inputStream);
+                throw new SiddhiAppValidationException("Duplicated stream alias " + inputStream.getStreamId() + " -> " + inputStream);
             } else {
                 aliasStreamMapping.put(inputStream.getStreamReferenceId(), inputStream);
             }
@@ -335,7 +368,7 @@ class PolicyExecutionPlannerImpl implements PolicyExecutionPlanner {
         StreamSortSpec sortSpec = null;
         if (windows != null && windows.size() > 0) {
             for (Window window : windows) {
-                if (window.getFunction().equals(WINDOW_EXTERNAL_TIME)) {
+                if (window.getName().equals(WINDOW_EXTERNAL_TIME)) {
                     sortSpec = new StreamSortSpec();
                     sortSpec.setWindowPeriodMillis(getExternalTimeWindowSize(window));
                     sortSpec.setWindowMargin(sortSpec.getWindowPeriodMillis() / 5);

@@ -17,11 +17,11 @@
 package org.apache.eagle.alert.engine.nodata;
 
 import org.junit.Test;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
 
 /**
  * Since 6/27/16.
@@ -29,7 +29,7 @@ import org.wso2.siddhi.core.util.EventPrinter;
 public class TestEventTable {
     @Test
     public void test() throws Exception {
-        ExecutionPlanRuntime runtime = new SiddhiManager().createExecutionPlanRuntime(
+        SiddhiAppRuntime runtime = new SiddhiManager().createSiddhiAppRuntime(
             "define stream expectStream (key string, src string);" +
                 "define stream appearStream (key string, src string);" +
                 "define table expectTable (key string, src string);" +

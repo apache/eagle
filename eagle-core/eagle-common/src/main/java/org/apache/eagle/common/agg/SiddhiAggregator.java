@@ -18,11 +18,11 @@ package org.apache.eagle.common.agg;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.query.output.callback.QueryCallback;
+import io.siddhi.core.stream.input.InputHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class SiddhiAggregator {
 
         String query = buildSiddhiAggQuery();
         SiddhiManager sm = new SiddhiManager();
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(query);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(query);
 
         input = runtime.getInputHandler("s");
 

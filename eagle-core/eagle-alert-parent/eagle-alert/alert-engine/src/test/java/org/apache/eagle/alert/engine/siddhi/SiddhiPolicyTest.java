@@ -19,12 +19,12 @@ package org.apache.eagle.alert.engine.siddhi;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,7 +64,7 @@ public class SiddhiPolicyTest {
 
     @Test
     public void testPolicy_grpby() {
-        String ql = " from syslog_stream#window.time(1min) select name, namespace, timestamp, dims_hostname, count(*) as abortCount group by dims_hostname insert into syslog_severity_check_output; ";
+        String ql = " from syslog_stream#window.time(1min) select name, namespace, timestamp, dims_hostname, count() as abortCount group by dims_hostname insert into syslog_severity_check_output; ";
         StreamCallback sc = new StreamCallback() {
             @Override
             public void receive(Event[] arg0) {
@@ -75,7 +75,7 @@ public class SiddhiPolicyTest {
         };
 
         String executionPlan = streams + ql;
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(executionPlan);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(executionPlan);
         runtime.addCallback("syslog_severity_check_output", sc);
         runtime.start();
     }
@@ -88,7 +88,7 @@ public class SiddhiPolicyTest {
             + "namespace, "
             + "timestamp, "
             + "dims_hostname, "
-            + "count(*) as abortCount "
+            + "count() as abortCount "
             + "group by dims_hostname "
             + "having abortCount > 3 insert into syslog_severity_check_output; ";
 
@@ -114,7 +114,7 @@ public class SiddhiPolicyTest {
         };
 
         String executionPlan = streams + sql;
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(executionPlan);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(executionPlan);
         runtime.addCallback("syslog_severity_check_output", sc);
         runtime.start();
         InputHandler handler = runtime.getInputHandler("syslog_stream");
@@ -166,7 +166,7 @@ public class SiddhiPolicyTest {
     @Ignore
     @Test
     public void testPolicy_regex() throws Exception {
-        String sql = " from syslog_stream[regex:find(\"Abort\", op)]#window.time(1min) select timestamp, dims_hostname, count(*) as abortCount group by dims_hostname insert into syslog_severity_check_output; ";
+        String sql = " from syslog_stream[regex:find(\"Abort\", op)]#window.time(1min) select timestamp, dims_hostname, count() as abortCount group by dims_hostname insert into syslog_severity_check_output; ";
 
         AtomicBoolean checked = new AtomicBoolean();
         StreamCallback sc = new StreamCallback() {
@@ -179,7 +179,7 @@ public class SiddhiPolicyTest {
         };
 
         String executionPlan = streams + sql;
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(executionPlan);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(executionPlan);
         runtime.addCallback("syslog_severity_check_output", sc);
         runtime.start();
 
@@ -214,7 +214,7 @@ public class SiddhiPolicyTest {
         };
 
         String executionPlan = streams + sql;
-        ExecutionPlanRuntime runtime = sm.createExecutionPlanRuntime(executionPlan);
+        SiddhiAppRuntime runtime = sm.createSiddhiAppRuntime(executionPlan);
         runtime.addCallback("syslog_severity_check_output", sc);
         runtime.start();
         InputHandler handler = runtime.getInputHandler("syslog_stream");
@@ -255,7 +255,7 @@ public class SiddhiPolicyTest {
         String ql = " define stream log(timestamp long, switchLabel string, port string, message string); " +
             " from log select timestamp, str:concat(switchLabel, '===', port) as alertKey, message insert into output; ";
         SiddhiManager manager = new SiddhiManager();
-        ExecutionPlanRuntime runtime = manager.createExecutionPlanRuntime(ql);
+        SiddhiAppRuntime runtime = manager.createSiddhiAppRuntime(ql);
         runtime.addCallback("output", new StreamCallback() {
             @Override
             public void receive(Event[] events) {

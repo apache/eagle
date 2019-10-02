@@ -20,12 +20,12 @@ package org.apache.eagle.security.auditlog;
 
 import org.apache.eagle.common.DateTimeUtil;
 import org.junit.Test;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.util.EventPrinter;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.query.output.callback.QueryCallback;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.util.EventPrinter;
 
 public class TestSiddhiPattern {
     @Test
@@ -40,17 +40,17 @@ public class TestSiddhiPattern {
                 "select a.user as user, b.cmd as cmd, a.src as src " +
                 "insert into outputStreams";
 
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(cseEventStream + query);
+        SiddhiAppRuntime SiddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(cseEventStream + query);
 
-        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+        SiddhiAppRuntime.addCallback("query1", new QueryCallback() {
             @Override
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
             }
         });
 
-        InputHandler inputHandler = executionPlanRuntime.getInputHandler("eventStream");
-        executionPlanRuntime.start();
+        InputHandler inputHandler = SiddhiAppRuntime.getInputHandler("eventStream");
+        SiddhiAppRuntime.start();
         long curTime = DateTimeUtil.humanDateToMilliseconds("2015-09-17 00:00:00,000");
         System.out.println("curTime : " + curTime);
         inputHandler.send(new Object[]{curTime, "user", "/tmp/private", "getfileinfo"});
@@ -62,7 +62,7 @@ public class TestSiddhiPattern {
         Thread.sleep(100);
         inputHandler.send(new Object[]{curTime, "user", "/tmp/private1", "getfileinfo"});
         Thread.sleep(100);
-        executionPlanRuntime.shutdown();
+        SiddhiAppRuntime.shutdown();
 
     }
 
@@ -83,23 +83,23 @@ public class TestSiddhiPattern {
                 "select a.user as user, b.cmd as cmd, a.src as src " +
                 "insert into outputStream";
 
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(cseEventStream + query1+query2);
+        SiddhiAppRuntime SiddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(cseEventStream + query1+query2);
 
-        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+        SiddhiAppRuntime.addCallback("query1", new QueryCallback() {
             @Override
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
             }
         });
-        executionPlanRuntime.addCallback("query2", new QueryCallback() {
+        SiddhiAppRuntime.addCallback("query2", new QueryCallback() {
             @Override
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
             }
         });
 
-        InputHandler inputHandler = executionPlanRuntime.getInputHandler("eventStream");
-        executionPlanRuntime.start();
+        InputHandler inputHandler = SiddhiAppRuntime.getInputHandler("eventStream");
+        SiddhiAppRuntime.start();
         long curTime = DateTimeUtil.humanDateToMilliseconds("2015-09-17 00:00:00,000");
         System.out.println("curTime : " + curTime);
         inputHandler.send(new Object[]{curTime, "user", "/tmp/private", "getfileinfo"});
@@ -111,7 +111,7 @@ public class TestSiddhiPattern {
         Thread.sleep(100);
         inputHandler.send(new Object[]{curTime, "user", "/tmp/private1", "getfileinfo"});
         Thread.sleep(100);
-        executionPlanRuntime.shutdown();
+        SiddhiAppRuntime.shutdown();
 
     }
 }

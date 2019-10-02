@@ -17,32 +17,66 @@
 
 package org.apache.eagle.alert.siddhiext;
 
-import org.wso2.siddhi.core.config.ExecutionPlanContext;
-import org.wso2.siddhi.core.executor.ExpressionExecutor;
-import org.wso2.siddhi.core.executor.function.FunctionExecutor;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
+import io.siddhi.annotation.Example;
+import io.siddhi.annotation.Extension;
+import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ParameterOverload;
+import io.siddhi.annotation.ReturnAttribute;
+import io.siddhi.annotation.util.DataType;
+import io.siddhi.core.config.SiddhiQueryContext;
+import io.siddhi.core.executor.ExpressionExecutor;
+import io.siddhi.core.executor.function.FunctionExecutor;
+import io.siddhi.core.util.config.ConfigReader;
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
+import io.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.exception.SiddhiAppValidationException;
 
+@Extension(
+        name = "empty",
+        namespace = "str",
+        description = "Returns whether source string is null or empty.",
+        parameters = {
+                @Parameter(name = "source",
+                        description = "Source string.",
+                        type = {DataType.STRING},
+                        dynamic = true)
+        },
+        parameterOverloads = {
+                @ParameterOverload(parameterNames = {"source"})
+        },
+        returnAttributes = @ReturnAttribute(
+                description = "Returns whether source string is null or empty.",
+                type = {DataType.BOOL}),
+        examples = {
+                @Example(
+                        syntax = "str:empty(strAttribute) as isEmpty",
+                        description = "Returns whether strAttribute is null or empty.")
+        }
+)
 public class StringEmptyFunctionExtension extends FunctionExecutor {
     /**
-     * The initialization method for StringEmptyFunctionExtension, this method will be called before the other methods.
+     * The initialization method for StringEmptyFunctionExtension,
+     * this method will be called before the other methods.
      *
-     * @param attributeExpressionExecutors the executors of each function parameter
-     * @param executionPlanContext         the context of the execution plan
+     * @param attributeExpressionExecutors  the executors of each function parameter
+     * @param configReader                  the config reader for the Siddhi app
+     * @param siddhiQueryContext            the context of the Siddhi query
      */
     @Override
-    protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
+    protected StateFactory init(ExpressionExecutor[] attributeExpressionExecutors, ConfigReader configReader,
+                                SiddhiQueryContext siddhiQueryContext) {
         if (attributeExpressionExecutors.length != 1) {
-            throw new ExecutionPlanValidationException("Invalid no of arguments passed to string:empty() function, "
+            throw new SiddhiAppValidationException("Invalid no of arguments passed to str:empty() function, "
                     + "required 1, but found " + attributeExpressionExecutors.length);
         }
 
         Attribute.Type attributeType = attributeExpressionExecutors[0].getReturnType();
         if (attributeType != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the argument of math:string() function, "
-                    + "required " + Attribute.Type.STRING
-                    + ", but found " + attributeType.toString());
+            throw new SiddhiAppValidationException("Invalid parameter type found for the argument of str:empty() "
+                    + "function, required " + Attribute.Type.STRING + ", but found " + attributeType.toString());
         }
+        return null;
     }
 
     /**
@@ -53,21 +87,13 @@ public class StringEmptyFunctionExtension extends FunctionExecutor {
      * @return the function result
      */
     @Override
-    protected Object execute(Object[] data) {
+    protected Object execute(Object[] data, State state) {
         return null;
     }
 
     @Override
-    protected Object execute(Object data) {
+    protected Object execute(Object data, State state) {
         return !(data == null || ((String) data).isEmpty());
-    }
-
-    @Override
-    public void start() {
-    }
-
-    @Override
-    public void stop() {
     }
 
     @Override
@@ -75,12 +101,4 @@ public class StringEmptyFunctionExtension extends FunctionExecutor {
         return Attribute.Type.BOOL;
     }
 
-    @Override
-    public Object[] currentState() {
-        return null;
-    }
-
-    @Override
-    public void restoreState(Object[] state) {
-    }
 }

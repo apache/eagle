@@ -26,8 +26,8 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.junit.Assert;
 import org.junit.Test;
-import org.wso2.siddhi.core.exception.DefinitionNotExistException;
-import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
+import io.siddhi.core.exception.DefinitionNotExistException;
+import io.siddhi.query.api.exception.SiddhiAppValidationException;
 
 import java.util.*;
 
@@ -75,7 +75,7 @@ public class PolicyInterpreterTest {
         Assert.assertEquals(60*60*1000, executionPlan.getStreamPartitions().get(0).getSortSpec().getWindowPeriodMillis());
     }
 
-    @Test(expected = ExecutionPlanValidationException.class)
+    @Test(expected = SiddhiAppValidationException.class)
     public void testParseSingleStreamPolicyQueryWithConflictPartition() throws Exception {
         PolicyExecutionPlan executionPlan = PolicyInterpreter.parseExecutionPlan(
             "from HDFS_AUDIT_LOG_ENRICHED_STREAM_SANDBOX#window.externalTime(timestamp, 5 min) "

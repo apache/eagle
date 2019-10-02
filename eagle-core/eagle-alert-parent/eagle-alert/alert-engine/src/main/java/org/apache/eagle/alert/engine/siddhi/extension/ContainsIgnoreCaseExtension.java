@@ -17,40 +17,87 @@
 
 package org.apache.eagle.alert.engine.siddhi.extension;
 
-import org.wso2.siddhi.core.config.ExecutionPlanContext;
-import org.wso2.siddhi.core.exception.ExecutionPlanRuntimeException;
-import org.wso2.siddhi.core.executor.ExpressionExecutor;
-import org.wso2.siddhi.core.executor.function.FunctionExecutor;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
+import io.siddhi.annotation.Example;
+import io.siddhi.annotation.Extension;
+import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ParameterOverload;
+import io.siddhi.annotation.ReturnAttribute;
+import io.siddhi.annotation.util.DataType;
+import io.siddhi.core.config.SiddhiQueryContext;
+import io.siddhi.core.exception.SiddhiAppRuntimeException;
+import io.siddhi.core.executor.ExpressionExecutor;
+import io.siddhi.core.executor.function.FunctionExecutor;
+import io.siddhi.core.util.config.ConfigReader;
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
+import io.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.exception.SiddhiAppValidationException;
 
+@Extension(
+        name = "containsIgnoreCase",
+        namespace = "str",
+        description = "Returns whether a string contains another given string.",
+        parameters = {
+                @Parameter(name = "first.string",
+                        description = "Source string.",
+                        type = {DataType.STRING},
+                        dynamic = true),
+                @Parameter(name = "second.string",
+                        description = "Regex string.",
+                        type = {DataType.STRING},
+                        dynamic = true)
+        },
+        parameterOverloads = {
+                @ParameterOverload(parameterNames = {"first.string", "second.string"})
+        },
+        returnAttributes = @ReturnAttribute(
+                description = "Returns whether 'first.string' contains 'second.string'.",
+                type = {DataType.BOOL}),
+        examples = {
+                @Example(
+                        syntax = "str:containsIgnoreCase(stringA, stringB) as isContains",
+                        description = "Returns whether 'stringA' contains 'stringB'.")
+        }
+)
 public class ContainsIgnoreCaseExtension extends FunctionExecutor {
 
-    Attribute.Type returnType = Attribute.Type.BOOL;
-
+    /**
+     * The initialization method for ContainsIgnoreCaseExtension,
+     * this method will be called before the other methods.
+     *
+     * @param attributeExpressionExecutors the executors of each function parameter
+     * @param configReader                 the config reader for the Siddhi app
+     * @param siddhiQueryContext           the context of the Siddhi query
+     */
     @Override
-    protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
+    protected StateFactory init(ExpressionExecutor[] attributeExpressionExecutors, ConfigReader configReader,
+                                SiddhiQueryContext siddhiQueryContext) {
         if (attributeExpressionExecutors.length != 2) {
-            throw new ExecutionPlanValidationException("Invalid no of arguments passed to str:containsIgnoreCase() function, required 2, "
-                + "but found " + attributeExpressionExecutors.length);
+            throw new SiddhiAppValidationException("Invalid no of arguments passed to str:containsIgnoreCase() "
+                    + "function, required 2, but found " + attributeExpressionExecutors.length);
         }
         if (attributeExpressionExecutors[0].getReturnType() != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the first argument of str:containsIgnoreCase() function, "
-                + "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[0].getReturnType().toString());
+            throw new SiddhiAppValidationException("Invalid parameter type found for the first argument of "
+                    + "str:containsIgnoreCase() function, required " + Attribute.Type.STRING + ", but found "
+                    + attributeExpressionExecutors[0].getReturnType().toString());
         }
         if (attributeExpressionExecutors[1].getReturnType() != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the second argument of str:containsIgnoreCase() function, "
-                + "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[1].getReturnType().toString());
+            throw new SiddhiAppValidationException("Invalid parameter type found for the second argument of "
+                    + "str:containsIgnoreCase() function, required " + Attribute.Type.STRING + ", but found "
+                    + attributeExpressionExecutors[1].getReturnType().toString());
         }
+        return null;
     }
 
     @Override
-    protected Object execute(Object[] data) {
+    protected Object execute(Object[] data, State state) {
         if (data[0] == null) {
-            throw new ExecutionPlanRuntimeException("Invalid input given to str:containsIgnoreCase() function. First argument cannot be null");
+            throw new SiddhiAppRuntimeException("Invalid input given to str:containsIgnoreCase() function. "
+                    + "First argument cannot be null");
         }
         if (data[1] == null) {
-            throw new ExecutionPlanRuntimeException("Invalid input given to str:containsIgnoreCase() function. Second argument cannot be null");
+            throw new SiddhiAppRuntimeException("Invalid input given to str:containsIgnoreCase() function. "
+                    + "Second argument cannot be null");
         }
         String str1 = (String) data[0];
         String str2 = (String) data[1];
@@ -58,31 +105,15 @@ public class ContainsIgnoreCaseExtension extends FunctionExecutor {
     }
 
     @Override
-    protected Object execute(Object data) {
-        return null; //Since the containsIgnoreCase function takes in 2 parameters, this method does not get called. Hence, not implemented.
-    }
-
-    @Override
-    public void start() {
-        //Nothing to start
-    }
-
-    @Override
-    public void stop() {
-        //Nothing to stop
+    protected Object execute(Object data, State state) {
+        // Since the containsIgnoreCase function takes in 2 parameters,
+        // this method does not get called. Hence, not implemented.
+        return null;
     }
 
     @Override
     public Attribute.Type getReturnType() {
-        return returnType;
+        return Attribute.Type.BOOL;
     }
 
-    @Override
-    public Object[] currentState() {
-        return new Object[] {};
-    }
-
-    @Override
-    public void restoreState(Object[] state) {
-    }
 }

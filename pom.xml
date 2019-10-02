@@ -281,7 +281,9 @@
         <javax.mail.version>1.4</javax.mail.version>
         <!--<extcos4.version>0.4b</extcos4.version>-->
         <!--<extcos3.version>0.3b</extcos3.version>-->
-        <siddhi.version>3.1.1</siddhi.version>
+        <siddhi.version>5.1.4</siddhi.version>
+        <siddhi-execution-regex.version>5.0.5</siddhi-execution-regex.version>
+        <siddhi-execution-string.version>5.0.5</siddhi-execution-string.version>
 
         <!-- Testing -->
         <junit.version>4.12</junit.version>
@@ -703,14 +705,14 @@
                 <version>${velocity.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
+                <groupId>io.siddhi</groupId>
                 <artifactId>siddhi-core</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-string</artifactId>
-                <version>${siddhi.version}</version>
+                <groupId>io.siddhi.extension.execution.string</groupId>
+                <artifactId>siddhi-execution-string</artifactId>
+                <version>${siddhi-execution-string.version}</version>
             </dependency>
 
             <!-- Testing Dependencies -->
@@ -1276,7 +1278,6 @@
                                 <exclude>**/velocity.log*</exclude>
                                 <!-- all json files should be excluded -->
                                 <exclude>**/*.json</exclude>
-                                <exclude>**/resources/eagle.siddhiext</exclude>
                                 <exclude>**/test/resources/securityAuditLog</exclude>
                                 <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>
                                 <exclude>**/test/resources/onelinehiveauditlog.txt</exclude>

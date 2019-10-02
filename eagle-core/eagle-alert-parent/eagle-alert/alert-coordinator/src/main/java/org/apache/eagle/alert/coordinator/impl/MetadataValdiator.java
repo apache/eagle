@@ -30,7 +30,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.SiddhiManager;
+import io.siddhi.core.SiddhiManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -120,7 +120,7 @@ public class MetadataValdiator {
             // now evaluate
             try {
                 SiddhiManager sm = new SiddhiManager();
-                sm.createExecutionPlanRuntime(builder.toString());
+                sm.createSiddhiAppRuntime(builder.toString());
             } catch (Exception e) {
                 LOG.error(String.format("siddhi creation failed! %s ", builder.toString()), e);
                 state.appendPolicyValidation(pd.getName(), e.getMessage());

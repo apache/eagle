@@ -20,12 +20,12 @@ package org.apache.eagle.siddhiext;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
 
 import java.util.concurrent.Semaphore;
 
@@ -36,9 +36,9 @@ public class StringSubtractFunctionExtensionTest {
     public void testStringSubtract() throws Exception {
         Semaphore semp = new Semaphore(1);
         String ql = " define stream log(timestamp long, switchLabel string, port string, message string); " +
-                " from log select string:subtract(switchLabel, message) as alertKey insert into output; ";
+                " from log select str:subtract(switchLabel, message) as alertKey insert into output; ";
         SiddhiManager manager = new SiddhiManager();
-        ExecutionPlanRuntime runtime = manager.createExecutionPlanRuntime(ql);
+        SiddhiAppRuntime runtime = manager.createSiddhiAppRuntime(ql);
         runtime.addCallback("output", new StreamCallback() {
             @Override
             public void receive(Event[] events) {

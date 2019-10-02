@@ -21,12 +21,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
 
 import java.util.concurrent.Semaphore;
 
@@ -37,9 +37,9 @@ public class StringListSizeFunctionExtensionTest {
     public void testStringListSize() throws Exception {
         Semaphore semp = new Semaphore(1);
         String ql = " define stream log(timestamp long, switchLabel string, port string, message string); " +
-                " from log select string:listSize(switchLabel) as alertKey insert into output; ";
+                " from log select str:listSize(switchLabel) as alertKey insert into output; ";
         SiddhiManager manager = new SiddhiManager();
-        ExecutionPlanRuntime runtime = manager.createExecutionPlanRuntime(ql);
+        SiddhiAppRuntime runtime = manager.createSiddhiAppRuntime(ql);
         runtime.addCallback("output", new StreamCallback() {
             @Override
             public void receive(Event[] events) {
@@ -73,10 +73,10 @@ public class StringListSizeFunctionExtensionTest {
                 " from a = log[resource == \"hadoop.namenode.namenodeinfo.corruptfiles\"],\n" +
                 "b = log[component == a.component and resource == a.resource and host == a.host and a.value != b.value]\n" +
                 "select b.site as site, b.host as host, b.component as component, b.resource as resource, " +
-                "b.timestamp as timestamp, string:listSize(b.value) as newMissingBlocksNumber, string:listSize(a.value) as oldMissingBlocksNumber, string:subtract(b.value, a.value) as missingBlocks\n" +
+                "b.timestamp as timestamp, str:listSize(b.value) as newMissingBlocksNumber, str:listSize(a.value) as oldMissingBlocksNumber, str:subtract(b.value, a.value) as missingBlocks\n" +
                 "insert into output;";
         SiddhiManager manager = new SiddhiManager();
-        ExecutionPlanRuntime runtime = manager.createExecutionPlanRuntime(ql);
+        SiddhiAppRuntime runtime = manager.createSiddhiAppRuntime(ql);
         runtime.addCallback("output", new StreamCallback() {
             @Override
             public void receive(Event[] events) {

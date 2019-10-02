@@ -17,7 +17,7 @@
 package org.apache.eagle.security.auditlog;
 
 /**
- * @see org.wso2.siddhi.query.api.definition.Attribute.Type
+ * @see io.siddhi.query.api.definition.Attribute.Type
  */
 public enum AttributeType {
 	STRING,

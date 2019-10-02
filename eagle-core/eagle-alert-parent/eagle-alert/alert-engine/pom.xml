@@ -57,24 +57,24 @@
             <artifactId>archaius-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-query-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
+            <groupId>io.siddhi</groupId>
             <artifactId>siddhi-query-compiler</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-regex</artifactId>
+            <groupId>io.siddhi.extension.execution.regex</groupId>
+            <artifactId>siddhi-execution-regex</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-string</artifactId>
+            <groupId>io.siddhi.extension.execution.string</groupId>
+            <artifactId>siddhi-execution-string</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -17,43 +17,78 @@
 
 package org.apache.eagle.alert.siddhiext;
 
+import io.siddhi.annotation.Example;
+import io.siddhi.annotation.Extension;
+import io.siddhi.annotation.Parameter;
+import io.siddhi.annotation.ParameterOverload;
+import io.siddhi.annotation.ReturnAttribute;
+import io.siddhi.annotation.util.DataType;
+import io.siddhi.core.config.SiddhiQueryContext;
+import io.siddhi.core.executor.ExpressionExecutor;
+import io.siddhi.core.executor.function.FunctionExecutor;
+import io.siddhi.core.util.config.ConfigReader;
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
+import io.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.exception.SiddhiAppValidationException;
 import org.apache.commons.collections.ListUtils;
 import org.apache.eagle.alert.utils.JsonUtils;
-import org.codehaus.jettison.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.config.ExecutionPlanContext;
-import org.wso2.siddhi.core.executor.ExpressionExecutor;
-import org.wso2.siddhi.core.executor.function.FunctionExecutor;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+@Extension(
+        name = "subtract",
+        namespace = "str",
+        description = "Returns subtraction of two list of strings.",
+        parameters = {
+                @Parameter(name = "ths",
+                        description = "Source list.",
+                        type = {DataType.STRING},
+                        dynamic = true),
+                @Parameter(name = "rhs",
+                        description = "List to subtract.",
+                        type = {DataType.STRING},
+                        dynamic = true)
+        },
+        parameterOverloads = {
+                @ParameterOverload(parameterNames = {"ths", "rhs"})
+        },
+        returnAttributes = @ReturnAttribute(
+                description = "Returns subtraction of two list of strings.",
+                type = {DataType.STRING}),
+        examples = {
+                @Example(
+                        syntax = "str:subtract(ths, rhs) as subStr",
+                        description = "Returns subtraction of two list of strings (ths - rhs).")
+        }
+)
 public class StringSubtractFunctionExtension extends FunctionExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(StringSubtractFunctionExtension.class);
 
     /**
-     * The initialization method for StringSubtractFunctionExtension, this method will be called before the other methods.
+     * The initialization method for StringSubtractFunctionExtension,
+     * this method will be called before the other methods.
      *
-     * @param attributeExpressionExecutors the executors of each function parameter
-     * @param executionPlanContext         the context of the execution plan
+     * @param attributeExpressionExecutors  the executors of each function parameter
+     * @param configReader                  the config reader for the Siddhi app
+     * @param siddhiQueryContext            the context of the Siddhi query
      */
     @Override
-    protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
+    protected StateFactory init(ExpressionExecutor[] attributeExpressionExecutors, ConfigReader configReader,
+                                SiddhiQueryContext siddhiQueryContext) {
         if (attributeExpressionExecutors.length != 2) {
-            throw new ExecutionPlanValidationException("Invalid no of arguments passed to string:subtract() function, "
+            throw new SiddhiAppValidationException("Invalid no of arguments passed to str:subtract() function, "
                     + "required 2, but found " + attributeExpressionExecutors.length);
         }
 
         Attribute.Type attributeType = attributeExpressionExecutors[0].getReturnType();
         if (attributeType != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the argument of string:subtract() function, "
-                    + "required " + Attribute.Type.STRING
-                    + ", but found " + attributeType.toString());
+            throw new SiddhiAppValidationException("Invalid parameter type found for the argument of str:subtract() "
+                    + "function, required " + Attribute.Type.STRING + ", but found " + attributeType.toString());
         }
+        return null;
     }
 
     /**
@@ -65,29 +100,21 @@ public class StringSubtractFunctionExtension extends FunctionExecutor {
      * @return the function result
      */
     @Override
-    protected Object execute(Object[] data) {
+    protected Object execute(Object[] data, State state) {
         try {
             List<String> ths = JsonUtils.jsonStringToList((String) data[0]);
             List<String> rhs = JsonUtils.jsonStringToList((String) data[1]);
 
             return org.apache.commons.lang.StringUtils.join(ListUtils.subtract(ths, rhs), "\n");
         } catch (Exception e) {
-            LOG.warn("exception found {}", e);
+            LOG.warn("exception found {0}", e);
             return null;
         }
     }
 
     @Override
-    protected Object execute(Object data) {
+    protected Object execute(Object data, State state) {
         return null;
-    }
-
-    @Override
-    public void start() {
-    }
-
-    @Override
-    public void stop() {
     }
 
     @Override
@@ -95,12 +122,4 @@ public class StringSubtractFunctionExtension extends FunctionExecutor {
         return Attribute.Type.STRING;
     }
 
-    @Override
-    public Object[] currentState() {
-        return null;
-    }
-
-    @Override
-    public void restoreState(Object[] state) {
-    }
 }

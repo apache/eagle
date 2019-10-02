@@ -23,8 +23,8 @@ import org.apache.eagle.alert.engine.evaluator.PolicyHandlerContext;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.output.StreamCallback;
 
 /**
  * Created on 8/2/16.

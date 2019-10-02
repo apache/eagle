@@ -166,7 +166,7 @@
                 <version>${metrics.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
+                <groupId>io.siddhi</groupId>
                 <artifactId>siddhi-core</artifactId>
                 <version>${siddhi.version}</version>
                 <exclusions>
@@ -177,24 +177,24 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
+                <groupId>io.siddhi</groupId>
                 <artifactId>siddhi-query-api</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
+                <groupId>io.siddhi</groupId>
                 <artifactId>siddhi-query-compiler</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-regex</artifactId>
-                <version>${siddhi.version}</version>
+                <groupId>io.siddhi.extension.execution.regex</groupId>
+                <artifactId>siddhi-execution-regex</artifactId>
+                <version>${siddhi-execution-regex.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-string</artifactId>
-                <version>${siddhi.version}</version>
+                <groupId>io.siddhi.extension.execution.string</groupId>
+                <artifactId>siddhi-execution-string</artifactId>
+                <version>${siddhi-execution-string.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
