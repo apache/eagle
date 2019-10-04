@@ -151,6 +151,7 @@
         <scala-lang.version>2.11.8</scala-lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <owasp.check.skip>false</owasp.check.skip>
 
         <!-- Maven Plugins Versions -->
         <maven.version>3.3.3</maven.version>
@@ -173,6 +174,7 @@
         <checkstyle.version>7.1</checkstyle.version>
         <cobertura-maven.version>2.7</cobertura-maven.version>
         <coveralls-maven.version>4.3.0</coveralls-maven.version>
+        <dependency-check-maven.version>5.2.2</dependency-check-maven.version>
 
         <buildnumber-maven.version>1.4</buildnumber-maven.version>
         <templating-maven.version>1.0.0</templating-maven.version>
@@ -1320,6 +1322,30 @@
                 <configuration>
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
+            </plugin>
+
+            <!-- OWASP dependency check -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${dependency-check-maven.version}</version>
+                <configuration>
+                    <!-- use -Dowasp.check.skip=true to skip dependency check -->
+                    <skip>${owasp.check.skip}</skip>
+                    <format>HTML</format>
+                    <bundleAuditAnalyzerEnabled>false</bundleAuditAnalyzerEnabled>
+                    <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                    <suppressionFile>eagle-dev/owasp-dependency-check-suppression.xml</suppressionFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- generates aggregated reports in target/ -->
+                            <goal>check</goal>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
