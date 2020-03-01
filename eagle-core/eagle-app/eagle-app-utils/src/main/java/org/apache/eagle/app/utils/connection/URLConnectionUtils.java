@@ -82,6 +82,7 @@ public final class URLConnectionUtils {
         return url.openConnection();
     }
 
+    /** It is not secure!*/
     public static class TrustAllX509TrustManager implements X509TrustManager {
         @Override
         public void checkClientTrusted(
