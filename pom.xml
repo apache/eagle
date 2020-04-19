@@ -143,6 +143,7 @@
         <module>eagle-jpm</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-check</module>
+        <module>eagle-flink</module>
     </modules>
     <properties>
         <!-- General Properties -->
