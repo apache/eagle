@@ -28,7 +28,6 @@ public class AlertStreamCallback extends StreamCallback {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertStreamCallback.class);
     private final String outputStream;
-    private final Collector<AlertStreamEvent> collector;
     private final PolicyHandlerContext context;
     private final StreamDefinition definition;
 
@@ -36,11 +35,9 @@ public class AlertStreamCallback extends StreamCallback {
 
     public AlertStreamCallback(String outputStream,
                                StreamDefinition streamDefinition,
-                               Collector<AlertStreamEvent> collector,
                                PolicyHandlerContext context,
                                int currentIndex) {
         this.outputStream = outputStream;
-        this.collector = collector;
         this.context = context;
         this.definition = streamDefinition;
         this.currentIndex = currentIndex;
@@ -54,10 +51,9 @@ public class AlertStreamCallback extends StreamCallback {
         String policyName = context.getPolicyDefinition().getName();
         String siteId = context.getPolicyDefinition().getSiteId();
         CompositePolicyHandler handler = ((PolicyGroupEvaluatorImpl) context.getPolicyEvaluator()).getPolicyHandler(policyName);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Generated {} alerts from policy '{}' in {}, index of definiton {} ", events.length, policyName, context.getPolicyEvaluatorId(), currentIndex);
-        }
+        LOG.info("Generated {} alerts from policy '{}' in {}, index of definiton {} ", events.length, policyName, context.getPolicyEvaluatorId(), currentIndex);
         for (Event e : events) {
+            org.apache.eagle.flink.Collector eagleCollector = (org.apache.eagle.flink.Collector)e.getData()[0];
             AlertStreamEvent event = new AlertStreamEvent();
             event.setSiteId(siteId);
             event.setTimestamp(e.getTimestamp());
@@ -73,19 +69,20 @@ public class AlertStreamCallback extends StreamCallback {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Generate new alert event: {}", event);
             }
-            try {
-                if (handler == null) {
-                    // extreme case: the handler is removed from the evaluator. Just emit.
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(" handler not found when callback received event, directly emit. policy removed? ");
-                    }
-                    collector.emit(event);
-                } else {
-                    handler.send(event, currentIndex + 1);
-                }
-            } catch (Exception ex) {
-                LOG.error(String.format("send event %s to index %d failed with exception. ", event, currentIndex), ex);
-            }
+            eagleCollector.emit(event);
+//            try {
+//                if (handler == null) {
+//                    // extreme case: the handler is removed from the evaluator. Just emit.
+//                    if (LOG.isDebugEnabled()) {
+//                        LOG.debug(" handler not found when callback received event, directly emit. policy removed? ");
+//                    }
+//                    eagleCollector.emit(event);
+//                } else {
+//                    handler.send(event, currentIndex + 1);
+//                }
+//            } catch (Exception ex) {
+//                LOG.error(String.format("send event %s to index %d failed with exception. ", event, currentIndex), ex);
+//            }
         }
         context.getPolicyCounter().incrBy(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "alert_count"), events.length);
     }

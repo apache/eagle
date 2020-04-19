@@ -113,7 +113,7 @@ public class PartitionedEvent implements Serializable {
     }
 
     public boolean isSortRequired() {
-        return isPartitionRequired() && this.getPartition().getSortSpec() != null;
+        return isPartitionRequired();
     }
 
     public boolean isPartitionRequired() {

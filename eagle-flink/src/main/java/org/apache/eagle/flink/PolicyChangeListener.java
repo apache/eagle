@@ -19,6 +19,12 @@ package org.apache.eagle.flink;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.List;
+import java.util.Map;
+
 public interface PolicyChangeListener {
-    void onPolicyChange(List<PolicyDefinition> allPolicies, Collection<String> addedPolicies, Collection<String> removedPolicies, Collection<String> modifiedPolicies);
+    void onPolicyChange(String version,
+                        List<PolicyDefinition> added,
+                        List<PolicyDefinition> removed,
+                        List<PolicyDefinition> modified, Map<String, StreamDefinition> sds);
 }

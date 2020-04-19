@@ -61,7 +61,7 @@ public class StreamEvent implements Serializable {
     }
 
     public long getKey(){
-        return 1;
+        return timestamp;
     }
 
     public void setData(Object[] data) {

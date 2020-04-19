@@ -17,9 +17,9 @@
 package org.apache.eagle.flink;
 
 public interface PolicyStreamHandler {
-    void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception;
+    void prepare(PolicyHandlerContext context) throws Exception;
 
-    void send(StreamEvent event) throws Exception;
+    void send(StreamEvent event, Collector collector) throws Exception;
 
     void close() throws Exception;
 }

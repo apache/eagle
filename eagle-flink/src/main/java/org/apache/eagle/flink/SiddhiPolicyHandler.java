@@ -45,11 +45,12 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
     }
 
     @Override
-    public void prepare(final Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception {
+    public void prepare(PolicyHandlerContext context) throws Exception {
         LOG.info("Initializing handler for policy {}", context.getPolicyDefinition());
         this.policy = context.getPolicyDefinition();
         this.siddhiManager = new SiddhiManager();
         String plan = generateExecutionPlan(policy, sds);
+        LOG.info("Siddhi execution plan: {}", plan);
         try {
             this.executionRuntime = siddhiManager.createExecutionPlanRuntime(plan);
             LOG.info("Created siddhi runtime {}", executionRuntime.getName());
@@ -65,7 +66,7 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
                 StreamDefinition streamDefinition = SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream));
                 this.executionRuntime.addCallback(outputStream,
                     new AlertStreamCallback(outputStream, streamDefinition,
-                        collector, context, currentIndex));
+                         context, currentIndex));
             } else {
                 throw new IllegalStateException("Undefined output stream " + outputStream);
             }
@@ -79,12 +80,17 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         return policy.getOutputStreams().isEmpty() ? policy.getDefinition().getOutputStreams() : policy.getOutputStreams();
     }
 
-    public void send(StreamEvent event) throws Exception {
+    public void send(StreamEvent event, Collector collector) throws Exception {
         context.getPolicyCounter().incr(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "receive_count"));
         String streamId = event.getStreamId();
         InputHandler inputHandler = executionRuntime.getInputHandler(streamId);
         if (inputHandler != null) {
             context.getPolicyCounter().incr(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "eval_count"));
+            // wrap event with collector
+//            Object[] wrapper = new Object[event.getData().length + 1];
+//            wrapper[0] = collector;
+//            System.arraycopy(event.getData(), 0, wrapper, 1, event.getData().length);
+            event.getData()[0] = collector;
             inputHandler.send(event.getTimestamp(), event.getData());
 
             if (LOG.isDebugEnabled()) {

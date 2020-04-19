@@ -21,6 +21,7 @@ package org.apache.eagle.flink;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -74,32 +75,39 @@ final class StreamEventIterator implements Iterator<StreamEvent>, Serializable {
 		return StreamEvent;
 	}
 
+	private static StreamEvent createSampleEvent(long timestamp, String name, double value) {
+		return StreamEvent.builder()
+				.schema(MockSampleMetadataFactory.createSampleStreamDefinition("sampleStream_1"))
+				.streamId("sampleStream_1")
+				.timestamep(start + timestamp)
+				.attributes(new HashMap<String, Object>() {{
+					put("name", name);
+					put("value", value);
+				}}).build();
+	}
+
+	private static long start = System.currentTimeMillis();
 	private static List<StreamEvent> data = Arrays.asList(
-		new StreamEvent("testStream_1", 0L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 10L, new Object[]{100}),
-		new StreamEvent("testStream_1", 10L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 20L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 20L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 20L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 30L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 40L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 50L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 70L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 90L, new Object[]{100}),
-		new StreamEvent("testStream_1", 100L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 200L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 210L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 220L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 230L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 250L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 260L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 270L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 300L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 400L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 600L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 1000L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 12000L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 12001L, new Object[]{188.23}),
-		new StreamEvent("testStream_1", 12002L, new Object[]{188.23})
+			createSampleEvent(0, "cpu", 60.0),
+			createSampleEvent(1, "nic", 10.0),
+			createSampleEvent(1, "nic", 20.0),
+			createSampleEvent(10, "cpu", 60.0),
+			createSampleEvent(10, "cpu", 60.0),
+			createSampleEvent(10, "cpu", 60.0),
+			createSampleEvent(20, "cpu", 60.0),
+			createSampleEvent(30, "cpu", 60.0),
+			createSampleEvent(50, "cpu", 60.0),
+			createSampleEvent(100, "cpu", 60.0),
+			createSampleEvent(120, "cpu", 60.0),
+			createSampleEvent(120, "cpu", 60.0),
+			createSampleEvent(130, "cpu", 60.0),
+			createSampleEvent(160, "cpu", 60.0),
+			createSampleEvent(2000, "door", 100.0),
+			createSampleEvent(2000, "cpu", 60.0),
+			createSampleEvent(2200, "cpu", 60.0),
+			createSampleEvent(2500, "cpu", 60.0),
+			createSampleEvent(2500, "cpu", 60.0),
+			createSampleEvent(2500, "cpu", 60.0),
+			createSampleEvent(3000, "cpu", 60.0)
 	);
 }

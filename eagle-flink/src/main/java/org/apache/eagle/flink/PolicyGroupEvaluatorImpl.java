@@ -80,7 +80,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
                 try {
                     handled = true;
                     this.context.counter().incr("eval_count");
-                    policyStreamHandler.getValue().send(partitionedEvent.getEvent());
+                    policyStreamHandler.getValue().send(partitionedEvent.getEvent(), null);
                 } catch (Exception e) {
                     this.context.counter().incr("fail_count");
                     LOG.error("{} failed to handle {}", policyStreamHandler.getValue(), partitionedEvent.getEvent(), e);
@@ -101,33 +101,29 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
             || policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()));
     }
 
+
     @Override
-    public void onPolicyChange(List<PolicyDefinition> allPolicies, Collection<String> addedPolicies, Collection<String> removedPolicies, Collection<String> modifiedPolicies) {
+    public void onPolicyChange(String version, List<PolicyDefinition> added, List<PolicyDefinition> removed, List<PolicyDefinition> modified, Map<String, StreamDefinition> sds) {
+        Map<String, PolicyDefinition> copyPolicies = new HashMap<>(policyDefinitionMap);
+        Map<String, CompositePolicyHandler> copyHandlers = new HashMap<>(policyStreamHandlerMap);
+        for (PolicyDefinition pd : added) {
+            inplaceAdd(copyPolicies, copyHandlers, pd, sds);
+        }
+        for (PolicyDefinition pd : removed) {
+            inplaceRemove(copyPolicies, copyHandlers, pd);
+        }
+        for (PolicyDefinition pd : modified) {
+            inplaceRemove(copyPolicies, copyHandlers, pd);
+            inplaceAdd(copyPolicies, copyHandlers, pd, sds);
+        }
 
+        // logging
+        LOG.info("{} with {} Policy metadata updated with added={}, removed={}, modified={}", policyEvaluatorId, version, added, removed, modified);
+
+        // switch reference
+        this.policyDefinitionMap = copyPolicies;
+        this.policyStreamHandlerMap = copyHandlers;
     }
-
-//    @Override
-//    public void onPolicyChange(String version, List<PolicyDefinition> added, List<PolicyDefinition> removed, List<PolicyDefinition> modified, Map<String, StreamDefinition> sds) {
-//        Map<String, PolicyDefinition> copyPolicies = new HashMap<>(policyDefinitionMap);
-//        Map<String, CompositePolicyHandler> copyHandlers = new HashMap<>(policyStreamHandlerMap);
-//        for (PolicyDefinition pd : added) {
-//            inplaceAdd(copyPolicies, copyHandlers, pd, sds);
-//        }
-//        for (PolicyDefinition pd : removed) {
-//            inplaceRemove(copyPolicies, copyHandlers, pd);
-//        }
-//        for (PolicyDefinition pd : modified) {
-//            inplaceRemove(copyPolicies, copyHandlers, pd);
-//            inplaceAdd(copyPolicies, copyHandlers, pd, sds);
-//        }
-//
-//        // logging
-//        LOG.info("{} with {} Policy metadata updated with added={}, removed={}, modified={}", policyEvaluatorId, version, added, removed, modified);
-//
-//        // switch reference
-//        this.policyDefinitionMap = copyPolicies;
-//        this.policyStreamHandlerMap = copyHandlers;
-//    }
 
     private void inplaceAdd(Map<String, PolicyDefinition> policies, Map<String, CompositePolicyHandler> handlers, PolicyDefinition policy, Map<String, StreamDefinition> sds) {
         if (handlers.containsKey(policy.getName())) {
@@ -142,7 +138,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
                 handlerContext.setPolicyEvaluator(this);
                 handlerContext.setPolicyEvaluatorId(policyEvaluatorId);
                 handlerContext.setConfig(this.context.config());
-                handler.prepare(collector, handlerContext);
+                handler.prepare(handlerContext);
                 handlers.put(policy.getName(), handler);
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);

@@ -31,7 +31,6 @@ public class AlertStreamEvent extends StreamEvent {
     private String createdBy;
     private long createdTime;
     private String category;
-    private AlertSeverity severity = AlertSeverity.WARNING;
     private boolean duplicationChecked = false;
 
     // ----------------------
@@ -136,6 +135,10 @@ public class AlertStreamEvent extends StreamEvent {
         return alertId;
     }
 
+    public void setAlertId(String alertId){
+        this.alertId = alertId;
+    }
+
     public void ensureAlertId() {
         if (this.alertId == null) {
             this.alertId = UUID.randomUUID().toString();
@@ -164,14 +167,6 @@ public class AlertStreamEvent extends StreamEvent {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public AlertSeverity getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(AlertSeverity severity) {
-        this.severity = severity;
     }
 
     public String getSiteId() {

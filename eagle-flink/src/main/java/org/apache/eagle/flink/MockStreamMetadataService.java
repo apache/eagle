@@ -1,13 +1,13 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,24 +16,24 @@
  */
 package org.apache.eagle.flink;
 
-import com.typesafe.config.Config;
+import org.apache.eagle.flink.StreamDefinition;
+import org.apache.eagle.flink.StreamNotDefinedException;
 
-public class StreamContextImpl implements StreamContext {
-    private final Config config;
-    private final StreamCounter counter;
+import java.util.HashMap;
+import java.util.Map;
 
-    public StreamContextImpl(Config config, MyStreamCounter counter) {
-        this.counter = counter;
-        this.config = config;
+public class MockStreamMetadataService {
+    private final Map<String, StreamDefinition> streamSchemaMap = new HashMap<>();
+
+    public StreamDefinition getStreamDefinition(String streamId) throws StreamNotDefinedException {
+        if (streamSchemaMap.containsKey(streamId)) {
+            return streamSchemaMap.get(streamId);
+        } else {
+            throw new StreamNotDefinedException(streamId);
+        }
     }
 
-    @Override
-    public StreamCounter counter() {
-        return this.counter;
-    }
-
-    @Override
-    public Config config() {
-        return this.config;
+    public void registerStream(String streamId, StreamDefinition schema) {
+        streamSchemaMap.put(streamId, schema);
     }
 }

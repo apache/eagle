@@ -11,7 +11,7 @@ public class EagleFlinkStreamApp {
                 .addSource(new StreamEventSource())
                 .name("eagle-events");
 
-        DataStream<AlertPublishEvent> alerts = events
+        DataStream<AlertStreamEvent> alerts = events
                 .keyBy(StreamEvent::getKey)
                 .process(new SiddhiCEPOp())
                 .name("eagle-alert-engine");

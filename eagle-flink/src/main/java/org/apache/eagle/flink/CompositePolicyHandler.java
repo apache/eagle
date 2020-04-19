@@ -42,22 +42,22 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
     }
 
     @Override
-    public void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception {
+    public void prepare(PolicyHandlerContext context) throws Exception {
         this.collector = collector;
         // TODO: create two handlers
         policyHandler = PolicyStreamHandlers.createHandler(context.getPolicyDefinition().getDefinition(), sds);
-        policyHandler.prepare(collector, context);
+//        policyHandler.prepare(collector, context);
         handlers.add(policyHandler);
 
         if (context.getPolicyDefinition().getStateDefinition() != null) {
             stateHandler = PolicyStreamHandlers.createStateHandler(context.getPolicyDefinition().getStateDefinition().type, sds);
-            stateHandler.prepare(collector, context);
+//            stateHandler.prepare(collector, context);
             handlers.add(stateHandler);
         }
     }
 
     @Override
-    public void send(StreamEvent event) throws Exception {
+    public void send(StreamEvent event, Collector collector) throws Exception {
         // policyHandler.send(event);
         send(event, 0);
     }
@@ -65,7 +65,7 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
     // send event to index of stream handler
     public void send(StreamEvent event, int idx) throws Exception {
         if (handlers.size() > idx) {
-            handlers.get(idx).send(event);
+            handlers.get(idx).send(event,  null);
         } else if (event instanceof AlertStreamEvent) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Emit new alert event: {}", event);

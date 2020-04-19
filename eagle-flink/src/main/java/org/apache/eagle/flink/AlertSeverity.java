@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.flink;
 
-public enum AlertSeverity {
+import java.io.Serializable;
+
+public enum AlertSeverity{
     UNKNOWN, OK, WARNING, CRITICAL, FATAL
 }
