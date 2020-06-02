@@ -155,14 +155,21 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         }
         String jnInfoString = (String) bean.getPropertyMap().get(JN_TRANSACTION_INFO);
         JSONObject jsonObject = new JSONObject(jnInfoString);
-        long lastTxId = Long.parseLong(jsonObject.getString(LAST_TX_ID));
+        String lstIdStr = jsonObject.optString(LAST_TX_ID);
+        if (lstIdStr.isEmpty()) {
+            return;
+        }
+        long lastTxId = Long.parseLong(lstIdStr);
 
         String journalnodeString = (String) bean.getPropertyMap().get(JN_STATUS);
         JSONArray jsonArray = new JSONArray(journalnodeString);
         JSONObject jsonMap = (JSONObject) jsonArray.get(0);
 
         Map<String, HdfsServiceTopologyAPIEntity> journalNodesMap = new HashMap<>();
-        String manager = jsonMap.getString("manager");
+        String manager = jsonMap.optString("manager");
+        if (manager.isEmpty()) {
+            return;
+        }
         Pattern qjm = Pattern.compile(QJM_PATTERN);
         Matcher jpmMatcher = qjm.matcher(manager);
         while (jpmMatcher.find()) {
@@ -177,7 +184,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             return;
         }
 
-        String stream = jsonMap.getString("stream");
+        String stream = jsonMap.optString("stream");
         Pattern status = Pattern.compile(STATUS_PATTERN);
         Matcher statusMatcher = status.matcher(stream);
         long numLiveJournalNodes = 0;

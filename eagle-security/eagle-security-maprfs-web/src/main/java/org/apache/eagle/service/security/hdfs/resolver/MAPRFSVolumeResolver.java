@@ -114,7 +114,7 @@ public class MAPRFSVolumeResolver implements AttributeResolvable<GenericAttribut
         JSONArray list = (JSONArray) response.get("data");
         for(int i = 0; i< list.length();i++ ){
             JSONObject element = (JSONObject) list.get(i);
-            result.add(element.getString("volumename"));
+            result.add(element.optString("volumename"));
         }
         return result;
     }
