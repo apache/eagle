@@ -18,6 +18,7 @@ package org.apache.eagle.flink;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.flink.util.Collector;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,6 +51,17 @@ public class StreamEvent implements Serializable {
         this.setTimestamp(timestamp);
         this.setData(data);
         this.setMetaVersion(metaVersion);
+    }
+
+    /**
+     * Attach flink collector to the first element of Object[] data
+     */
+    public void attachFlinkCollector(Collector<AlertStreamEvent> out){
+        data[0] = out;
+    }
+
+    public Collector<AlertStreamEvent> getFlinkCollector(){
+        return (Collector<AlertStreamEvent>)(data[0]);
     }
 
     public String getStreamId() {

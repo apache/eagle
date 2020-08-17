@@ -1,5 +1,6 @@
-package org.apache.eagle.flink;
+package org.apache.eagle.flink.test;
 
+import org.apache.eagle.flink.StreamEvent;
 import org.apache.flink.annotation.Public;
 import org.apache.flink.streaming.api.functions.source.FromIteratorFunction;
 

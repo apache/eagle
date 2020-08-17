@@ -1,5 +1,6 @@
-package org.apache.eagle.flink;
+package org.apache.eagle.flink.test;
 
+import org.apache.eagle.flink.*;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
@@ -9,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SiddhiCEPOp extends KeyedProcessFunction<Long, StreamEvent, AlertStreamEvent> {
-    private static final Logger LOG = LoggerFactory.getLogger(SiddhiCEPOp.class);
+public class SampleSiddhiCEPOp extends KeyedProcessFunction<Long, StreamEvent, AlertStreamEvent> {
+    private static final Logger LOG = LoggerFactory.getLogger(SampleSiddhiCEPOp.class);
     private transient SiddhiPolicyHandler handler;
 
     @Override
@@ -24,6 +25,9 @@ public class SiddhiCEPOp extends KeyedProcessFunction<Long, StreamEvent, AlertSt
         handler.prepare(context);
     }
 
+    /**
+     * Collector is not defined in prepare stage, that is why handler.send is used for collect output here
+     */
     @Override
     public void processElement(StreamEvent value, Context ctx, Collector<AlertStreamEvent> out) throws Exception {
         handler.send(value, new org.apache.eagle.flink.Collector<AlertStreamEvent>(){

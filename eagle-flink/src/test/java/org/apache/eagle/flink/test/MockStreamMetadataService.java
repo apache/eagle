@@ -14,37 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.flink;
+package org.apache.eagle.flink.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.eagle.flink.StreamDefinition;
+import org.apache.eagle.flink.StreamNotDefinedException;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MockStreamCollector implements Collector<AlertStreamEvent> {
-    @SuppressWarnings("unused")
-    private final static Logger LOG = LoggerFactory.getLogger(MockStreamCollector.class);
-    private List<AlertStreamEvent> cache;
+public class MockStreamMetadataService {
+    private final Map<String, StreamDefinition> streamSchemaMap = new HashMap<>();
 
-    public MockStreamCollector() {
-        cache = new LinkedList<>();
+    public StreamDefinition getStreamDefinition(String streamId) throws StreamNotDefinedException {
+        if (streamSchemaMap.containsKey(streamId)) {
+            return streamSchemaMap.get(streamId);
+        } else {
+            throw new StreamNotDefinedException(streamId);
+        }
     }
 
-    public void emit(AlertStreamEvent event) {
-        cache.add(event);
-         LOG.info("AlertStreamEvent received: {}",event);
-    }
-
-    public void clear() {
-        cache.clear();
-    }
-
-    public List<AlertStreamEvent> get() {
-        return cache;
-    }
-
-    public int size() {
-        return cache.size();
+    public void registerStream(String streamId, StreamDefinition schema) {
+        streamSchemaMap.put(streamId, schema);
     }
 }

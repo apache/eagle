@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.flink;
+package org.apache.eagle.flink.test;
 
+
+import org.apache.eagle.flink.*;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;

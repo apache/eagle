@@ -16,32 +16,18 @@
  */
 package org.apache.eagle.flink;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 
-/**
- * Created on 8/2/16.
- */
+@RequiredArgsConstructor
+@Slf4j
 public class AlertStreamCallback extends StreamCallback {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AlertStreamCallback.class);
     private final String outputStream;
-    private final PolicyHandlerContext context;
     private final StreamDefinition definition;
-
-    private int currentIndex;
-
-    public AlertStreamCallback(String outputStream,
-                               StreamDefinition streamDefinition,
-                               PolicyHandlerContext context,
-                               int currentIndex) {
-        this.outputStream = outputStream;
-        this.context = context;
-        this.definition = streamDefinition;
-        this.currentIndex = currentIndex;
-    }
+    private final PolicyHandlerContext context;
+    private final int currentIndex;
 
     /**
      * Possibly more than one event will be triggered for alerting.
@@ -50,10 +36,10 @@ public class AlertStreamCallback extends StreamCallback {
     public void receive(Event[] events) {
         String policyName = context.getPolicyDefinition().getName();
         String siteId = context.getPolicyDefinition().getSiteId();
-        CompositePolicyHandler handler = ((PolicyGroupEvaluatorImpl) context.getPolicyEvaluator()).getPolicyHandler(policyName);
-        LOG.info("Generated {} alerts from policy '{}' in {}, index of definiton {} ", events.length, policyName, context.getPolicyEvaluatorId(), currentIndex);
+        log.info("Generated {} alerts from policy '{}' in {}, index of definiton {} ",
+                events.length, policyName, context.getPolicyEvaluatorId(), currentIndex);
         for (Event e : events) {
-            org.apache.eagle.flink.Collector eagleCollector = (org.apache.eagle.flink.Collector)e.getData()[0];
+            org.apache.eagle.flink.Collector<AlertStreamEvent> eagleCollector = (org.apache.eagle.flink.Collector<AlertStreamEvent>)e.getData()[0];
             AlertStreamEvent event = new AlertStreamEvent();
             event.setSiteId(siteId);
             event.setTimestamp(e.getTimestamp());
@@ -66,23 +52,8 @@ public class AlertStreamCallback extends StreamCallback {
             event.setCreatedTime(System.currentTimeMillis());
             event.setSchema(definition);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Generate new alert event: {}", event);
-            }
+            log.debug("Generate new alert event: {}", event);
             eagleCollector.emit(event);
-//            try {
-//                if (handler == null) {
-//                    // extreme case: the handler is removed from the evaluator. Just emit.
-//                    if (LOG.isDebugEnabled()) {
-//                        LOG.debug(" handler not found when callback received event, directly emit. policy removed? ");
-//                    }
-//                    eagleCollector.emit(event);
-//                } else {
-//                    handler.send(event, currentIndex + 1);
-//                }
-//            } catch (Exception ex) {
-//                LOG.error(String.format("send event %s to index %d failed with exception. ", event, currentIndex), ex);
-//            }
         }
         context.getPolicyCounter().incrBy(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "alert_count"), events.length);
     }

@@ -1,5 +1,7 @@
 package org.apache.eagle.flink;
 
+import org.apache.eagle.flink.StreamCounter;
+
 public class MyStreamCounter implements StreamCounter {
     @Override
     public void incr(String scopeName) {

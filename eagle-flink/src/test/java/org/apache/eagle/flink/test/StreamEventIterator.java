@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.flink;
+package org.apache.eagle.flink.test;
+
+import org.apache.eagle.flink.StreamEvent;
 
 import java.io.Serializable;
 import java.sql.Timestamp;

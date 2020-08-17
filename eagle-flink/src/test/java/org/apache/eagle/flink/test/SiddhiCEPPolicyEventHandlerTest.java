@@ -39,7 +39,17 @@ public class SiddhiCEPPolicyEventHandlerTest {
         return sds;
     }
 
-    @SuppressWarnings("serial")
+    /**
+     * use Siddhi API to go through
+     * 1) stream definition
+     * 2) policy definition
+     * 3) output collector
+     */
+    @Test
+    public void testSimpleSiddhiPolicyEvaluation(){
+
+    }
+
     @Test
     public void testBySendSimpleEvent() throws Exception {
         SiddhiPolicyHandler handler;
@@ -64,6 +74,8 @@ public class SiddhiCEPPolicyEventHandlerTest {
             }}).build();
         handler.send(event, collector);
         handler.close();
+
+        Assert.assertTrue(collector.size() == 1);
     }
 
     @SuppressWarnings("serial")
