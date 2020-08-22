@@ -15,8 +15,12 @@ public class StreamEventSource extends FromIteratorFunction<StreamEvent> {
 
     private static final long serialVersionUID = 1L;
 
+    public StreamEventSource(boolean unbounded) {
+        super(new RateLimitedIterator<>(unbounded ? StreamEventIterator.unbounded() : StreamEventIterator.bounded()));
+    }
+
     public StreamEventSource() {
-        super(new RateLimitedIterator<>(StreamEventIterator.unbounded()));
+        this(true);
     }
 
     private static class RateLimitedIterator<T> implements Iterator<T>, Serializable {

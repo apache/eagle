@@ -4,9 +4,17 @@ import org.apache.eagle.flink.*;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-public class EagleFlinkStreamApp {
+import java.util.HashMap;
+import java.util.Map;
+
+public class EagleFlinkStreamExampleApp {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        // prepare stream definition and policy
+        StreamDefinition inStreamDef = MockSampleMetadataFactory.createInStreamDef("sampleStream_1");
+        String policy = MockSampleMetadataFactory.createPolicy();
+        StreamDefinition outStreamDef = MockSampleMetadataFactory.createInStreamDef("outputStream");
 
         DataStream<StreamEvent> source = env
                 .addSource(new StreamEventSource())
@@ -14,12 +22,13 @@ public class EagleFlinkStreamApp {
 
         DataStream<AlertStreamEvent> alerts = source
                 .keyBy(StreamEvent::getKey)
-                .process(new SampleSiddhiCEPOp())
+                .process(new SiddhiPolicyFlinkProcessor(inStreamDef, policy, outStreamDef))
                 .name("eagle-alert-engine");
 
         alerts.addSink(new AlertSink())
                 .name("eagle-alert-publisher");
 
         env.execute("Eagle Alert Engine");
+
     }
 }

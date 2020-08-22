@@ -79,7 +79,7 @@ final class StreamEventIterator implements Iterator<StreamEvent>, Serializable {
 
 	private static StreamEvent createSampleEvent(long timestamp, String name, double value) {
 		return StreamEvent.builder()
-				.schema(MockSampleMetadataFactory.createSampleStreamDefinition("sampleStream_1"))
+				.schema(MockSampleMetadataFactory.createInStreamDef("sampleStream_1"))
 				.streamId("sampleStream_1")
 				.timestamep(start + timestamp)
 				.attributes(new HashMap<String, Object>() {{

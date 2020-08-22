@@ -25,43 +25,38 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class SiddhiPolicyFlinkProcessor extends KeyedProcessFunction<Long, StreamEvent, AlertStreamEvent> {
-    private final Map<String, StreamDefinition> streamDefs;
-    private final PolicyDefinition policyDefinition;
+    private final StreamDefinition inStreamDef;
+    private final String policy;
+    private final StreamDefinition outStreamDef;
 
     private volatile SiddhiManager siddhiManager;
     private ExecutionPlanRuntime executionRuntime;
+
     /**
      * setup phase
      */
     @Override
     public void open(Configuration parameters) throws Exception{
         this.siddhiManager = new SiddhiManager();
-        String plan = SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition, streamDefs);
+        String plan = SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(inStreamDef, policy, outStreamDef);
         log.info("Siddhi execution plan: {}", plan);
         try {
             this.executionRuntime = siddhiManager.createExecutionPlanRuntime(plan);
             log.info("Created siddhi runtime {}", executionRuntime.getName());
         } catch (Exception parserException) {
-            log.error("Failed to create siddhi runtime for policy: {}, siddhi plan: \n\n{}\n",
-                    this.policyDefinition.getName(), plan, parserException);
+            log.error("Failed to create siddhi runtime for input stream: {}, output stream: {}, siddhi plan: \n\n{}\n",
+                    inStreamDef.getStreamId(), outStreamDef.getStreamId(), plan, parserException);
             throw parserException;
         }
 
         // fixme what to set up for PolicyHandlerContext
         PolicyHandlerContext context = new PolicyHandlerContext();
+        context.setPolicyDefinition(null);
+        context.setPolicyCounter(new MyStreamCounter());
 
         // add output stream callback
-        List<String> outputStreams = this.policyDefinition.getOutputStreams();
-        for (final String outputStream : outputStreams) {
-            if (executionRuntime.getStreamDefinitionMap().containsKey(outputStream)) {
-                StreamDefinition streamDefinition = SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream));
-                this.executionRuntime.addCallback(outputStream,
-                        new AlertStreamCallback(outputStream, streamDefinition,
-                                context, 0));
-            } else {
-                throw new IllegalStateException("Undefined output stream " + outputStream);
-            }
-        }
+        this.executionRuntime.addCallback(outStreamDef.getStreamId(),
+                new AlertStreamCallback(outStreamDef.getStreamId(), outStreamDef, context, 0));
         this.executionRuntime.start();
     }
 
@@ -77,8 +72,11 @@ public class SiddhiPolicyFlinkProcessor extends KeyedProcessFunction<Long, Strea
         String streamId = value.getStreamId();
         InputHandler inputHandler = executionRuntime.getInputHandler(streamId);
         if (inputHandler != null) {
-            value.attachFlinkCollector(out);
-            inputHandler.send(value.getTimestamp(), value.getData());
+            // add collector to existing event data
+            Object[] modified = new Object[value.getData().length+1];
+            modified[0] = out;
+            System.arraycopy(value.getData(), 0, modified, 1, value.getData().length);
+            inputHandler.send(value.getTimestamp(), modified);
             log.debug("sent event to siddhi stream {} ", streamId);
         } else {
             log.warn("No input handler found for stream {}", streamId);

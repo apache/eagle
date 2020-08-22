@@ -31,32 +31,52 @@ public class MockSampleMetadataFactory {
             return mockStreamMetadataServiceInstance;
         }
         mockStreamMetadataServiceInstance = new MockStreamMetadataService();
-        mockStreamMetadataServiceInstance.registerStream("sampleStream", createSampleStreamDefinition("sampleStream"));
-        mockStreamMetadataServiceInstance.registerStream("sampleStream_1", createSampleStreamDefinition("sampleStream_1"));
-        mockStreamMetadataServiceInstance.registerStream("sampleStream_2", createSampleStreamDefinition("sampleStream_2"));
-        mockStreamMetadataServiceInstance.registerStream("sampleStream_3", createSampleStreamDefinition("sampleStream_3"));
-        mockStreamMetadataServiceInstance.registerStream("sampleStream_4", createSampleStreamDefinition("sampleStream_4"));
+        mockStreamMetadataServiceInstance.registerStream("sampleStream", createInStreamDef("sampleStream"));
+        mockStreamMetadataServiceInstance.registerStream("sampleStream_1", createInStreamDef("sampleStream_1"));
+        mockStreamMetadataServiceInstance.registerStream("sampleStream_2", createInStreamDef("sampleStream_2"));
+        mockStreamMetadataServiceInstance.registerStream("sampleStream_3", createInStreamDef("sampleStream_3"));
+        mockStreamMetadataServiceInstance.registerStream("sampleStream_4", createInStreamDef("sampleStream_4"));
         return mockStreamMetadataServiceInstance;
     }
 
-    public static StreamDefinition createSampleStreamDefinition(String streamId) {
-        StreamDefinition sampleStreamDefinition = new StreamDefinition();
-        sampleStreamDefinition.setStreamId(streamId);
-        sampleStreamDefinition.setTimeseries(true);
-        sampleStreamDefinition.setValidate(true);
-        sampleStreamDefinition.setDescription("Schema for " + streamId);
+    public static StreamDefinition createInStreamDef(String streamId) {
+        StreamDefinition.StreamDefinitionBuilder builder = StreamDefinition.builder();
+        builder.streamId(streamId);
+        builder.timeseries(true);
+        builder.validate(true);
+        builder.description("Schema for " + streamId);
         List<StreamColumn> streamColumns = new ArrayList<>();
 
-        streamColumns.add(new StreamColumn.Builder().name("__collector__").type(StreamColumn.Type.OBJECT).build());
-        streamColumns.add(new StreamColumn.Builder().name("name").type(StreamColumn.Type.STRING).build());
-        streamColumns.add(new StreamColumn.Builder().name("host").type(StreamColumn.Type.STRING).build());
-        streamColumns.add(new StreamColumn.Builder().name("flag").type(StreamColumn.Type.BOOL).build());
-        streamColumns.add(new StreamColumn.Builder().name("timestamp").type(StreamColumn.Type.LONG).build());
-        streamColumns.add(new StreamColumn.Builder().name("value").type(StreamColumn.Type.DOUBLE).build());
-        sampleStreamDefinition.setColumns(streamColumns);
-        return sampleStreamDefinition;
+        streamColumns.add(StreamColumn.builder().name("name").type(StreamColumn.ColumnType.STRING).build());
+        streamColumns.add(StreamColumn.builder().name("host").type(StreamColumn.ColumnType.STRING).build());
+        streamColumns.add(StreamColumn.builder().name("flag").type(StreamColumn.ColumnType.BOOL).build());
+        streamColumns.add(StreamColumn.builder().name("timestamp").type(StreamColumn.ColumnType.LONG).build());
+        streamColumns.add(StreamColumn.builder().name("value").type(StreamColumn.ColumnType.DOUBLE).build());
+        builder.columns(streamColumns);
+        return builder.build();
     }
 
+    public static StreamDefinition createOutStreamDef(String streamId) {
+        StreamDefinition.StreamDefinitionBuilder builder = StreamDefinition.builder();
+        builder.streamId(streamId);
+        builder.timeseries(true);
+        builder.validate(true);
+        builder.description("Schema for " + streamId);
+        List<StreamColumn> streamColumns = new ArrayList<>();
+
+        streamColumns.add(StreamColumn.builder().name("name").type(StreamColumn.ColumnType.STRING).build());
+        streamColumns.add(StreamColumn.builder().name("host").type(StreamColumn.ColumnType.STRING).build());
+        streamColumns.add(StreamColumn.builder().name("flag").type(StreamColumn.ColumnType.BOOL).build());
+        streamColumns.add(StreamColumn.builder().name("timestamp").type(StreamColumn.ColumnType.LONG).build());
+        streamColumns.add(StreamColumn.builder().name("value").type(StreamColumn.ColumnType.DOUBLE).build());
+        builder.columns(streamColumns);
+        return builder.build();
+    }
+
+
+    public static String createPolicy(){
+        return "name == \"cpu\" and value > 50.0";
+    }
 
     /**
      * Policy: from sampleStream_1[name == "cpu" and value > 50.0] select name, host, flag, value insert into outputStream;

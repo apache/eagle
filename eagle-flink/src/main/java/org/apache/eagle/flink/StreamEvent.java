@@ -53,13 +53,6 @@ public class StreamEvent implements Serializable {
         this.setMetaVersion(metaVersion);
     }
 
-    /**
-     * Attach flink collector to the first element of Object[] data
-     */
-    public void attachFlinkCollector(Collector<AlertStreamEvent> out){
-        data[0] = out;
-    }
-
     public Collector<AlertStreamEvent> getFlinkCollector(){
         return (Collector<AlertStreamEvent>)(data[0]);
     }

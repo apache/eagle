@@ -70,6 +70,9 @@ public class AlertStreamEvent extends StreamEvent {
 
     @Override
     public String toString() {
+        if(this.getData() == null){
+            return "";
+        }
         List<String> dataStrings = new ArrayList<>(this.getData().length);
         for (Object obj : this.getData()) {
             if (obj != null) {
