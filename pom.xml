@@ -24,7 +24,7 @@
     </parent>
     <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-parent</artifactId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Eagle::Parent</name>
     <url>https://eagle.apache.org</url>
@@ -143,6 +143,7 @@
         <module>eagle-jpm</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-check</module>
+        <module>eagle-flink</module>
     </modules>
     <properties>
         <!-- General Properties -->

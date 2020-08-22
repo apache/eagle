@@ -65,6 +65,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
 
     private SpoutSpec cachedSpoutSpec;
 
+
     private transient KafkaSpoutMetric kafkaSpoutMetric;
 
     @SuppressWarnings("rawtypes")

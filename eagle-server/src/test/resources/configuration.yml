@@ -21,6 +21,24 @@ server:
     - type: http
       port: 9091
 
+
+logging:
+  level: INFO
+  loggers:
+      org.apache.eagle: INFO
+  appenders:
+    - type: file
+      currentLogFilename: log/eagle-server.log
+      threshold: ALL
+      archive: true
+      archivedLogFilenamePattern: log/eagle-server-%d.log
+      archivedFileCount: 5
+      logFormat: "%-5p [%d{ISO8601,UTC}] [%t] %c: %m%n%rEx"
+    - type: console
+      threshold: INFO
+      logFormat: "%-5p [%d{ISO8601,UTC}] [%t] %c: %m%n%rEx"
+
+
 # ---------------------------------------------
 # Eagle Authentication Configuration
 # ---------------------------------------------

@@ -35,7 +35,7 @@ public class ExampleStormApplication extends StormApplication{
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("metric_spout", new RandomEventSpout(), config.getInt("spoutNum"));
+        builder.setSpout("metric_spout", new RandomEventSpout(), config.hasPath("spoutNum") ? config.getInt("spoutNum") : 1);
         builder.setBolt("sink_1",environment.getStreamSink("SAMPLE_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         builder.setBolt("sink_2",environment.getStreamSink("SAMPLE_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
